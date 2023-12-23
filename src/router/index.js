@@ -26,6 +26,12 @@ const routes = [
       import(/* webpackChunkName: "signup" */ "../views/DeviceList.vue"),
   },
   {
+    path: "/mapmarker",
+    name: "mapmarker",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../views/MapMarker.vue"),
+  },
+  {
     path: "/maplist",
     name: "maplist",
     component: () =>
