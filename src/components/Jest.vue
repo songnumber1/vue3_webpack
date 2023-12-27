@@ -11,14 +11,17 @@ export default {
     msg: String,
   },
   mounted() {
-    this.divHeightChange();
+    //this.divHeightChange();
   },
   methods: {
-    divHeightChange() {
+    voidRefsFunc() {
       this.$refs.tgmp.innerText = "1234";
     },
-    divHeightChange1(data) {
+    returnIntRefsFunc(data) {
       this.$refs.tgmp.innerText = "1234";
+      return data;
+    },
+    returnIntFunc(data) {
       return data;
     },
   },
