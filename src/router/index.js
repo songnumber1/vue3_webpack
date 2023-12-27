@@ -43,6 +43,12 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "signup" */ "../views/TimeLine.vue"),
   },
+  {
+    path: "/jest",
+    name: "jest",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../components/Jest.vue"),
+  },
 ];
 
 const router = createRouter({

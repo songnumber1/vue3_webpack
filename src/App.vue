@@ -91,6 +91,12 @@
           title="SOS List"
           to="/sos"
         ></v-list-item>
+
+        <v-list-item
+          prepend-icon="mdi-alarm-light-outline"
+          title="Jest"
+          to="/jest"
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
