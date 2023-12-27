@@ -44,7 +44,8 @@ describe("Jest.vue", () => {
 
     // 위에 spy 주석 처리하면 아래 내용은 모두 fail이다.
     // toHaveBeen~은 mock 또는 spy로 할 때 정상적으로 동작한다.
-    Jest.methods.returnIntFunc();
+    const result = Jest.methods.returnIntFunc(123);
+    expect(result).toBe(123);
     expect(Jest.methods.returnIntFunc).toHaveBeenCalledTimes(1);
   });
 });
