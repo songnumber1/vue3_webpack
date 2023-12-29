@@ -47,7 +47,21 @@ const routes = [
     path: "/jest",
     name: "jest",
     component: () =>
-      import(/* webpackChunkName: "signup" */ "../components/Jest.vue"),
+      import(/* webpackChunkName: "signup" */ "../views/Jest/JestView.vue"),
+  },
+  {
+    path: "/jest-list",
+    name: "jest-list",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../views/Jest/JestListView.vue"),
+  },
+  {
+    path: "/jest-messagetoggle",
+    name: "jest-messagetoggle",
+    component: () =>
+      import(
+        /* webpackChunkName: "signup" */ "../views/Jest/JestMessageToggleView.vue"
+      ),
   },
 ];
 

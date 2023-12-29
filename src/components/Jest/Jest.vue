@@ -11,7 +11,7 @@ export default {
     msg: String,
   },
   mounted() {
-    //this.divHeightChange();
+    this.voidRefsFunc();
   },
   methods: {
     voidRefsFunc() {

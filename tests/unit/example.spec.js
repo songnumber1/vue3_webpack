@@ -1,5 +1,5 @@
 import {shallowMount} from "@vue/test-utils";
-import Jest from "@/components/Jest.vue";
+import Jest from "@/components/Jest/Jest.vue";
 
 describe("Jest.vue", () => {
   it("리턴값이 void이며 refs를 참조한다.", () => {

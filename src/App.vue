@@ -97,6 +97,18 @@
           title="Jest"
           to="/jest"
         ></v-list-item>
+
+        <v-list-item
+          prepend-icon="mdi-alarm-light-outline"
+          title="Jest-List"
+          to="/jest-list"
+        ></v-list-item>
+
+        <v-list-item
+          prepend-icon="mdi-alarm-light-outline"
+          title="Jest-MessageToggle"
+          to="/jest-messagetoggle"
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
