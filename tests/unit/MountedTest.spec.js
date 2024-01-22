@@ -33,8 +33,10 @@ describe("MountedTest.vue", () => {
 
     const secondValue = wrapper.vm.$refs.secondRef.text;
 
-    console.log(wrapper.find(".second").text());
-    console.log(secondValue);
+    // 4321이 나온다.
+    console.log("1", wrapper.find(".second").text());
+    // 43211이 나온다.
+    console.log("2", secondValue);
     console.log("hello");
 
     expect(logSpy).toHaveBeenCalledWith("hello");
