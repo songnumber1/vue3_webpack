@@ -18,18 +18,26 @@ describe("MountedTest.vue", () => {
   });
 
   it("MountedTest 컴포턴트 Custom Mounted", async () => {
-    const wrapper = mount(MountedTest, {
+    const wrapper = shallowMount(MountedTest, {
       // mocks: {
       //   mounted() {},
       // },
     });
 
+    wrapper.vm.$refs.secondRef.text = "43211";
+
+    console.log(wrapper.vm.$refs.secondRef.text);
     await nextTick(); // <- Await the render loop
+
     const logSpy = jest.spyOn(console, "log");
 
+    const secondValue = wrapper.vm.$refs.secondRef.text;
+
     console.log(wrapper.find(".second").text());
+    console.log(secondValue);
     console.log("hello");
 
     expect(logSpy).toHaveBeenCalledWith("hello");
+    expect(secondValue).toEqual("43211");
   });
 });
