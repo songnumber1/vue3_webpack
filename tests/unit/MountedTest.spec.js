@@ -2,6 +2,8 @@ import {shallowMount, mount} from "@vue/test-utils";
 import {nextTick} from "vue";
 import MountedTest from "@/components/Jest/MountedTest.vue";
 
+const logSpy = jest.spyOn(console, "log");
+
 describe("MountedTest.vue", () => {
   it("MountedTest 컴포턴트 Mounted", () => {
     const wrapper = shallowMount(MountedTest);
@@ -28,8 +30,6 @@ describe("MountedTest.vue", () => {
 
     console.log(wrapper.vm.$refs.secondRef.text);
     await nextTick(); // <- Await the render loop
-
-    const logSpy = jest.spyOn(console, "log");
 
     const secondValue = wrapper.vm.$refs.secondRef.text;
 
