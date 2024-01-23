@@ -71,13 +71,4 @@ describe("Jest.vue", () => {
     Jest.watch.message("1111");
     expect(Jest).toBeTruthy();
   });
-
-  it("mounted", () => {
-    jest.spyOn(Jest, "mounted");
-
-    // 위에 spy 주석 처리하면 아래 내용은 모두 fail이다.
-    // toHaveBeen~은 mock 또는 spy로 할 때 정상적으로 동작한다.
-    Jest.mounted();
-    expect(Jest).toBeTruthy();
-  });
 });

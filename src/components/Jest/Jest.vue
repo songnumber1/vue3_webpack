@@ -29,7 +29,6 @@ export default {
     },
 
     reversedMessage1: function () {
-      // `this` 는 vm 인스턴스를 가리킵니다.
       return "1234";
     },
   },
