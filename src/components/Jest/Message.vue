@@ -9,5 +9,11 @@ export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: "message",
   props: ["msg"],
+  methods: {
+    /* istanbul ignore next */
+    ignoreFunctionTest() {},
+
+    noticeFunctionTest() {},
+  },
 };
 </script>
