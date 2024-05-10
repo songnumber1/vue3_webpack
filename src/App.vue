@@ -109,6 +109,12 @@
           title="Jest-MessageToggle"
           to="/jest-messagetoggle"
         ></v-list-item>
+
+        <v-list-item
+          prepend-icon="mdi-alarm-light-outline"
+          title="element"
+          to="/element"
+        ></v-list-item>
       </v-list>
     </v-navigation-drawer>
 

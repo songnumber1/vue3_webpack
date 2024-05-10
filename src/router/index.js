@@ -63,6 +63,12 @@ const routes = [
         /* webpackChunkName: "signup" */ "../views/Jest/JestMessageToggleView.vue"
       ),
   },
+  {
+    path: "/element",
+    name: "element",
+    component: () =>
+      import(/* webpackChunkName: "signup" */ "../views/Element"),
+  },
 ];
 
 const router = createRouter({
