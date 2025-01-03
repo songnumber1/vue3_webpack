@@ -21,22 +21,33 @@
             </div>
 
             <!-- Chat Body -->
-            <div class="flex-grow-1 d-flex flex-column">
-                <div class="chat-body p-3">
-                    <div v-for="(message, index) in chatMessages" :key="index">
-                        <chat-message :message="message"></chat-message>
+            <div class="content-area flex-grow-1 d-flex overflow-auto">
+                <!-- Left Panel -->
+                <div class="left-panel flex-grow-1">
+                    <div class="chat-body p-3">
+                        <div v-for="(message, index) in chatMessages" :key="index">
+                            <chat-message :message="message"></chat-message>
+                        </div>
                     </div>
+                    <div class="p-3 bg-light">
+                        <div class="input-group">
+                        <input
+                            type="text"
+                            class="form-control"
+                            placeholder="Type a message..."
+                            v-model="newMessage"
+                            @keyup.enter="sendMessage"
+                        />
+                        <button class="btn btn-primary" @click="sendMessage">Send</button>
+                        </div>
+                    </div>                    
                 </div>
-                <div class="p-3 bg-light" style="position: relative; bottom: 0;">
-                    <div class="input-group">
-                    <input
-                        type="text"
-                        class="form-control"
-                        placeholder="Type a message..."
-                        v-model="newMessage"
-                        @keyup.enter="sendMessage"
-                    />
-                    <button class="btn btn-primary" @click="sendMessage">Send</button>
+
+                <!-- Right Panel -->
+                <div class="right-panel flex-shrink-0" style="width: 350px;">
+                    <div class="p-3">
+                    <h6>Right Panel</h6>
+                    <p>Content for the right panel.</p>
                     </div>
                 </div>
             </div>
@@ -76,9 +87,14 @@ export default {
 </script>
 
 <style>
+    .content-area {
+      height: calc(100vh - 130px);
+    }
+
     .chat-body {
-      height: 100%;
+      height: calc(100% - 70px);
       overflow-y: auto;
+      background-color: red;
     }
     .left-menu {
       width: 250px;
