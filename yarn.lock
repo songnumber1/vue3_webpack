@@ -6474,6 +6474,23 @@ multicast-dns@^7.2.5:
     dns-packet "^5.2.2"
     thunky "^1.0.2"
 
+"myapp@file:":
+  version "0.1.0"
+  resolved "file:"
+  dependencies:
+    "@mdi/font" "5.9.55"
+    axios "^1.7.2"
+    core-js "^3.8.3"
+    element-plus "^2.7.2"
+    myapp "file:"
+    register-service-worker "^1.7.2"
+    roboto-fontface "*"
+    vue "^3.2.13"
+    vue-router "^4.0.3"
+    vuetify "^3.0.0-beta.0"
+    vuex "^4.0.0"
+    webfontloader "^1.0.0"
+
 mz@^2.4.0:
   version "2.7.0"
   resolved "https://registry.npmmirror.com/mz/-/mz-2.7.0.tgz"

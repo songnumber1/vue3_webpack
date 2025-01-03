@@ -13,6 +13,7 @@
     "axios": "^1.7.2",
     "core-js": "^3.8.3",
     "element-plus": "^2.7.2",
+    "myapp": "file:",
     "register-service-worker": "^1.7.2",
     "roboto-fontface": "*",
     "vue": "^3.2.13",

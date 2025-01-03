@@ -1,5 +1,6 @@
 import {createApp} from "vue";
-import App from "./App.vue";
+// import AppVuetify from "./AppVuetify.vue";
+import AppBootStrap from "./AppBootStrap.vue";
 import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
@@ -9,7 +10,8 @@ import "element-plus/dist/index.css";
 
 loadFonts();
 
-createApp(App)
+// createApp(AppVuetify)
+createApp(AppBootStrap)
   .use(router)
   .use(store)
   .use(vuetify)
