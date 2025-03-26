@@ -1466,6 +1466,11 @@
   resolved "https://registry.npmjs.org/@sxzz/popperjs-es/-/popperjs-es-2.11.7.tgz"
   integrity sha512-Ccy0NlLkzr0Ex2FKvh2X+OyERHXJ88XJ1MXtsI9y9fGexlaXaVTPzBCRBwIxFkORuOb+uBqeu+RqnpgYTEZRUQ==
 
+"@redgoose/json-editor@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/@redgoose/json-editor/-/json-editor-1.2.2.tgz"
+  integrity sha512-bcOqH0nWGHzeIUUsYeYnEfHFOtjqeyT2GwrvoFtQGGSILuSyEMAlZ9jGj1EUd9cgbm5mgowO5NSdN1sWuRzRCg==
+
 "@rollup/plugin-babel@^5.2.0":
   version "5.3.1"
   resolved "https://registry.npmmirror.com/@rollup/plugin-babel/-/plugin-babel-5.3.1.tgz"
@@ -6479,6 +6484,7 @@ multicast-dns@^7.2.5:
   resolved "file:"
   dependencies:
     "@mdi/font" "5.9.55"
+    "@redgoose/json-editor" "^1.2.2"
     axios "^1.7.2"
     core-js "^3.8.3"
     element-plus "^2.7.2"

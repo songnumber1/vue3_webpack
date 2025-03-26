@@ -77,6 +77,22 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import("../views/AxiosView.vue"),
   },
+  {
+    path: "/jsonEditor",
+    name: "jsonEditor",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/JsonEditorView.vue"),
+  },
+  {
+    path: "/bootstrap",
+    name: "bootstrap",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/AppBootStrap.vue"),
+  },
 ];
 
 const router = createRouter({
