@@ -4,10 +4,13 @@
     <div
       class="editor-wrapper editor-scroll-box"
       ref="editorContainer"
-      style="height: 220px"
+      style="height: 420px"
     ></div>
     <button @click="printData">현재 데이터 콘솔 출력</button> <br />
-    <button @click="exportData">export</button>
+    <button @click="exportData">export</button> <br />
+    <button @click="expandData">expand</button> <br />
+    <button @click="collapseData">collapse</button> <br />
+    <button @click="clearData">clear</button>
   </div>
 </template>
 
@@ -21,6 +24,8 @@ export default {
   data() {
     return {
       editor: null,
+      wrap: null,
+      handleContextEvent: null,
       jsonData: [
         [
           {
@@ -74,53 +79,49 @@ export default {
     };
   },
   mounted() {
-    this.editor = new JsonEditor(this.$refs.editorContainer, {
-      node: this.jsonData,
-      edit: "all",
-      theme: "light",
-      live: true,
-      preview: true,
-    });
+    this.initEditor();
+  },
+  beforeUnmount() {
+    this.destroyEditor();
+  },
+  methods: {
+    initEditor() {
+      this.editor = new JsonEditor(this.$refs.editorContainer, {
+        node: this.jsonData,
+        edit: "all",
+        theme: "light",
+        live: true,
+        preview: true,
+      });
 
-    const wrap = this.editor.el.wrap.get(0);
+      this.wrap = this.editor.el.wrap.get(0);
 
-    wrap.addEventListener("update", ({detail}) => {
-      this.onEditorUpdate(detail);
-    });
+      if (this.handleContextEvent) {
+        this.wrap.removeEventListener("context", this.handleContextEvent);
+      }
 
-    wrap.addEventListener(
-      "context",
-      ({detail: {body, node, type, isRoot, $}}) => {
-        console.log(body, node, type);
+      // 새로운 context 이벤트 핸들러 정의 및 등록
+      this.handleContextEvent = ({detail: {body, node, type, isRoot, $}}) => {
         if (isRoot) {
-          // ✅ 메뉴를 살짝 아래로 이동 (예: 10px)
           const $ol = $(body).find("ol");
           const currentTop = parseInt($ol.css("top") || "0", 10);
           $ol.css("top", `${currentTop + 11}px`);
-        } else {
-          const menu = body;
-
-          // ✅ 외부 클릭 감지 핸들러
-          const handleOutsideClick = (e) => {
-            //menu.style.display = "none";
-            console.log(e);
-            menu.remove();
-            document.removeEventListener("mousedown", handleOutsideClick);
-          };
-
-          setTimeout(() => {
-            document.addEventListener("mousedown", handleOutsideClick);
-          }, 10);
         }
+      };
+
+      this.wrap.addEventListener("context", this.handleContextEvent);
+    },
+
+    destroyEditor() {
+      if (this.editor) {
+        this.editor.destroy();
       }
-    );
-  },
-  beforeUnmount() {
-    if (this.editor) {
-      this.editor.destroy();
-    }
-  },
-  methods: {
+
+      if (this.handleContextEvent && this.wrap) {
+        this.wrap.removeEventListener("context", this.handleContextEvent);
+        this.handleContextEvent = null;
+      }
+    },
     printData() {
       try {
         // const updated = JSON.parse(JSON.stringify(this.editor.node));
@@ -130,6 +131,24 @@ export default {
       }
     },
     exportData() {},
+    expandData() {
+      this.editor.el.wrap
+        .get(0)
+        .querySelectorAll("li.node")
+        .forEach((el) => el.classList.add("open"));
+    },
+    collapseData() {
+      this.editor.el.wrap
+        .get(0)
+        .querySelectorAll("li.node.open")
+        .forEach((el) => el.classList.remove("open"));
+    },
+    clearData() {
+      this.destroyEditor();
+
+      this.jsonData = [];
+      this.initEditor();
+    },
     onEditorUpdate(data) {
       console.log("updated data", data, JSON.stringify(data));
       this.jsonData = data;
