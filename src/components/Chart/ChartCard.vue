@@ -1,194 +1,179 @@
 <template>
   <div class="chart-card">
     <h3>{{ chartTitle }}</h3>
-    <component
-      :is="chartComponent"
-      ref="chartRef"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <div class="chart-content">
+      <canvas :ref="canvasRefName" height="300"></canvas>
+      <div class="custom-legend">
+        <div
+          v-for="(item, i) in legendItems"
+          :key="i"
+          class="legend-item"
+          @click="toggleDataset(i)"
+          :class="{inactive: isDatasetHidden(i)}"
+        >
+          <span class="color-box" :style="{backgroundColor: item.color}"></span>
+          {{ item.label }}
+        </div>
+      </div>
+    </div>
+    <button @click="createChart" :disabled="isDrawing">
+      {{ isDrawing ? "그리는 중..." : "다시 그리기" }}
+    </button>
   </div>
 </template>
 
 <script>
-import {
-  Chart as ChartJS,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  LineElement,
-  ArcElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale,
-} from "chart.js";
-
-import {Bar, Line, Pie, Doughnut, PolarArea, Radar} from "vue-chartjs";
-
-ChartJS.register(
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  LineElement,
-  ArcElement,
-  PointElement,
-  CategoryScale,
-  LinearScale,
-  RadialLinearScale
-);
+import {Chart, registerables} from "chart.js";
+Chart.register(...registerables);
 
 export default {
-  props: ["chartType"],
-  components: {Bar, Line, Pie, Doughnut, PolarArea, Radar},
+  props: {
+    chartType: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
-      chartData: {
-        labels: [],
-        datasets: [],
-      },
-      chartOptions: {},
+      chart: null,
+      isDrawing: false,
+      legendItems: [],
     };
   },
   computed: {
-    chartComponent() {
-      return {
-        bar: "Bar",
-        "stacked-bar": "Bar",
-        "grouped-bar": "Bar",
-        line: "Line",
-        pie: "Pie",
-        doughnut: "Doughnut",
-        polarArea: "PolarArea",
-        radar: "Radar",
-      }[this.chartType];
+    canvasRefName() {
+      return `${this.chartType}Canvas`;
     },
     chartTitle() {
-      return {
+      const titles = {
         bar: "Bar Chart",
-        "stacked-bar": "Stacked Bar Chart",
-        "grouped-bar": "Grouped Bar Chart",
         line: "Line Chart",
         pie: "Pie Chart",
         doughnut: "Doughnut Chart",
         polarArea: "Polar Area Chart",
-        radar: "Radar Chart",
-      }[this.chartType];
+        "stacked-bar": "Stacked Bar Chart",
+      };
+      return titles[this.chartType] || "Chart";
     },
   },
   mounted() {
-    const colors = [
-      "#60a5fa",
-      "#f87171",
-      "#10b981",
-      "#facc15",
-      "#a78bfa",
-      "#fb923c",
-    ];
-    const labels = ["A", "B", "C"];
-
-    if (this.chartType === "stacked-bar") {
-      this.chartData.labels = ["전략실", "기획실", "개발실"];
-      this.chartData.datasets = [
-        {label: "부서 A", data: [10, 20, 30], backgroundColor: colors[0]},
-        {label: "부서 B", data: [20, 10, 15], backgroundColor: colors[1]},
-        {label: "부서 C", data: [5, 8, 12], backgroundColor: colors[2]},
-      ];
-      this.chartOptions = {
-        responsive: true,
-        plugins: {title: {display: true, text: this.chartTitle}},
-        scales: {x: {stacked: true}, y: {stacked: true, beginAtZero: true}},
-      };
-    } else if (this.chartType === "grouped-bar") {
-      this.chartData.labels = ["1분기", "2분기", "3분기"];
-      this.chartData.datasets = [
-        {label: "팀 A", data: [65, 59, 80], backgroundColor: colors[0]},
-        {label: "팀 B", data: [28, 48, 40], backgroundColor: colors[1]},
-      ];
-      this.chartOptions = {
-        responsive: true,
-        plugins: {title: {display: true, text: this.chartTitle}},
-        scales: {x: {stacked: false}, y: {stacked: false, beginAtZero: true}},
-      };
-    } else if (this.chartType === "radar") {
-      this.chartData.labels = ["속도", "힘", "기술", "지구력", "지능"];
-      this.chartData.datasets = [
-        {
-          label: "선수 A",
-          data: [65, 59, 90, 81, 56],
-          backgroundColor: "rgba(96,165,250,0.2)",
-          borderColor: "#60a5fa",
-          pointBackgroundColor: "#60a5fa",
-        },
-      ];
-      this.chartOptions = {
-        responsive: true,
-        scales: {r: {beginAtZero: true}},
-        plugins: {title: {display: true, text: this.chartTitle}},
-      };
-    } else if (["pie", "doughnut", "polarArea"].includes(this.chartType)) {
-      this.chartData.labels = labels;
-      this.chartData.datasets = [{data: [10, 20, 30], backgroundColor: colors}];
-      this.chartOptions = {
-        responsive: true,
-        plugins: {
-          legend: {position: "top"},
-          title: {display: true, text: this.chartTitle},
-        },
-      };
-    } else {
-      console.log("1323131");
-      this.chartData.labels = labels;
-      this.chartData.datasets = [
-        {
-          label: "Data",
-          data: [30, 50, 70],
-          backgroundColor: this.chartType === "bar" ? colors : undefined,
-          borderColor: this.chartType === "line" ? "#60a5fa" : undefined,
-          fill: false,
-        },
-      ];
-      this.chartOptions = {
-        responsive: true,
-        plugins: {
-          legend: {display: this.chartType === "line"},
-          title: {display: true, text: this.chartTitle},
-        },
-        scales: {y: {beginAtZero: true}},
-      };
-    }
+    this.createChart();
   },
   methods: {
-    updateChartData(newLabels, newData) {
-      if (!this.chartData.datasets || this.chartData.datasets.length === 0) {
-        this.chartData.datasets = [
-          {data: [], backgroundColor: ["#60a5fa", "#f87171", "#10b981"]},
-        ];
-      }
-      this.chartData.labels = newLabels;
-      this.chartData.datasets[0].data = newData;
-      this.$refs.chartRef.chart.update();
+    isDatasetHidden(index) {
+      const meta = this.chart?.getDatasetMeta(index);
+      return meta?.hidden;
     },
-    updateStackedData(newLabels, newMatrix) {
-      if (
-        !this.chartData.datasets ||
-        newMatrix.length !== this.chartData.datasets.length
-      ) {
-        const colors = ["#60a5fa", "#f87171", "#10b981"];
-        this.chartData.datasets = newMatrix.map((row, i) => ({
-          label: `Dataset ${i + 1}`,
-          data: row,
-          backgroundColor: colors[i % colors.length],
-        }));
-      } else {
-        newMatrix.forEach((row, i) => {
-          this.chartData.datasets[i].data = row;
-        });
+    toggleDataset(index) {
+      console.log(index);
+      if (!this.chart) return;
+      const meta = this.chart.getDatasetMeta(index);
+      if (!meta) return;
+
+      // ✅ 상태 변경
+      meta.hidden = !meta.hidden;
+
+      requestAnimationFrame(() => {
+        this.chart.update();
+      });
+    },
+    async createChart() {
+      if (this.isDrawing) return;
+      this.isDrawing = true;
+      await this.$nextTick();
+
+      const canvas = this.$refs[this.canvasRefName];
+      if (!canvas) {
+        this.isDrawing = false;
+        return;
       }
-      this.chartData.labels = newLabels;
-      this.$refs.chartRef.chart.update();
+
+      if (this.chart) {
+        try {
+          this.chart.stop();
+          this.chart.clear();
+          this.chart.destroy();
+        } catch (e) {
+          console.warn("Chart destroy error:", e);
+        }
+        this.chart = null;
+        await this.$nextTick();
+      }
+
+      const ctx = canvas.getContext("2d");
+      const labels = ["A", "B", "C"];
+      const colors = ["#60a5fa", "#f87171", "#10b981"];
+      let data = {},
+        options = {};
+
+      if (this.chartType === "stacked-bar") {
+        data = {
+          labels,
+          datasets: [
+            {label: "부서 A", data: [10, 20, 30], backgroundColor: "#60a5fa"},
+            {label: "부서 B", data: [15, 10, 5], backgroundColor: "#f87171"},
+          ],
+        };
+        this.legendItems = [
+          {label: "부서 A", color: "#60a5fa"},
+          {label: "부서 B", color: "#f87171"},
+        ];
+        options = {
+          responsive: true,
+          plugins: {
+            legend: {display: false},
+            title: {display: true, text: this.chartTitle},
+          },
+          scales: {
+            x: {stacked: true},
+            y: {stacked: true, beginAtZero: true},
+          },
+        };
+      } else {
+        data = {
+          labels,
+          datasets: [
+            {
+              label: "데이터",
+              data: [30, 50, 70],
+              backgroundColor: colors,
+              borderColor: colors,
+              borderWidth: 1,
+              fill: this.chartType === "line",
+            },
+          ],
+        };
+        this.legendItems = [
+          {label: "A", color: "#60a5fa"},
+          {label: "B", color: "#f87171"},
+          {label: "C", color: "#10b981"},
+        ];
+        options = {
+          responsive: true,
+          plugins: {
+            legend: {display: false},
+            title: {display: true, text: this.chartTitle},
+          },
+          scales:
+            this.chartType === "bar" || this.chartType === "line"
+              ? {
+                  y: {beginAtZero: true},
+                }
+              : undefined,
+        };
+      }
+
+      options.animation = {
+        onComplete: () => {
+          this.isDrawing = false;
+        },
+      };
+
+      this.chart = new Chart(ctx, {
+        type: this.chartType === "stacked-bar" ? "bar" : this.chartType,
+        data,
+        options,
+      });
     },
   },
 };
@@ -199,8 +184,53 @@ export default {
   width: 100%;
   max-width: 600px;
   padding: 1rem;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.chart-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.custom-legend {
+  display: flex;
+  flex-direction: column;
+  padding-top: 0.5rem;
+  min-width: 120px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.2s;
+}
+.legend-item.inactive {
+  opacity: 0.5;
+}
+.color-box {
+  width: 12px;
+  height: 12px;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+}
+button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
+  background: #60a5fa;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  min-width: 120px;
+}
+button:disabled {
+  background: #a5b4fc;
+  cursor: not-allowed;
 }
 </style>
