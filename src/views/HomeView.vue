@@ -11,7 +11,8 @@
     <router-link to="/jest-messagetoggle">jest-messagetoggle</router-link> |
     <router-link to="/element">element</router-link> |
     <router-link to="/axios">axios</router-link> |
-    <router-link to="/jsonEditor">jsonEditor</router-link>
+    <router-link to="/jsonEditor">jsonEditor</router-link> |
+    <router-link to="/chart">Chart</router-link>
   </div>
 </template>
 
