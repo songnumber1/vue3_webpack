@@ -12,7 +12,10 @@
     <router-link to="/element">element</router-link> |
     <router-link to="/axios">axios</router-link> |
     <router-link to="/jsonEditor">jsonEditor</router-link> |
-    <router-link to="/chart">Chart</router-link>
+    <router-link to="/chart">Chart</router-link> |
+    <router-link to="/stackedChart">Stacked Chart</router-link> |
+    <router-link to="/barChart">Bar Chart</router-link> |
+    <router-link to="/dashboard">Dashboard</router-link> |
   </div>
 </template>
 

@@ -101,6 +101,30 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import("../views/ChartView.vue"),
   },
+  {
+    path: "/stackedChart",
+    name: "stackedChart",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/StackedChart.vue"),
+  },
+  {
+    path: "/barChart",
+    name: "barChart",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/BarChart.vue"),
+  },
+  {
+    path: "/dashboard",
+    name: "dashboard",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/Dashboard.vue"),
+  },
 ];
 
 const router = createRouter({
