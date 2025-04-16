@@ -12,7 +12,8 @@
     <router-link to="/element">element</router-link> |
     <router-link to="/axios">axios</router-link> |
     <router-link to="/jsonEditor">jsonEditor</router-link> |
-    <router-link to="/chart">Chart</router-link>
+    <router-link to="/chart">Chart</router-link> |
+    <router-link to="/filemanger">File manager</router-link>
   </div>
 </template>
 

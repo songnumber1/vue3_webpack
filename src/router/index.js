@@ -101,6 +101,11 @@ const routes = [
     // which is lazy-loaded when the route is visited.
     component: () => import("../views/ChartView.vue"),
   },
+  {
+    path: "/filemanger",
+    name: "filemanger",
+    component: () => import("../views/FileManager.vue"),
+  },
 ];
 
 const router = createRouter({
