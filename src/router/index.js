@@ -130,6 +130,11 @@ const routes = [
     name: "filemanger",
     component: () => import("../views/FileManager.vue"),
   },
+  {
+    path: "/timeoutchecker",
+    name: "timeoutchecker",
+    component: () => import("../views/TimeoutChecker.vue"),
+  },
 ];
 
 const router = createRouter({

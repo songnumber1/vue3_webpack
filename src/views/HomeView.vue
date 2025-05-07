@@ -16,7 +16,8 @@
     <router-link to="/stackedChart">Stacked Chart</router-link> |
     <router-link to="/barChart">Bar Chart</router-link> |
     <router-link to="/dashboard">Dashboard</router-link> |
-    <router-link to="/filemanger">File manager</router-link>
+    <router-link to="/filemanger">File manager</router-link> |
+    <router-link to="/timeoutchecker">Timeout Checker</router-link>
   </div>
 </template>
 
