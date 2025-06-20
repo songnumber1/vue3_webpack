@@ -1,65 +1,38 @@
-<!-- <script>
-import Vue3MarkdownIt from "vue3-markdown-it";
-// eslint-disable-next-line no-unused-vars
-import markdownItTemml from "markdown-it-math/temml";
-// eslint-disable-next-line no-unused-vars
-import markdownItKatex from "markdown-it-katex";
-// eslint-disable-next-line no-unused-vars
-import markdownItMathJax from "markdown-it-mathjax3";
-// eslint-disable-next-line no-unused-vars
-import mathFallbackPlugin from "@/plugins/math-fallback-plugin";
-
-export default {
-  components: {Vue3MarkdownIt},
-  props: {
-    source: String,
-  },
-  computed: {
-    markdownPlugins() {
-      return [
-        // {plugin: markdownItTemml},
-        // {plugin: markdownItKatex},
-        // { plugin: markdownItMathJax },
-        {plugin: mathFallbackPlugin},
-      ];
-    },
-  },
-};
-</script>
-
 <template>
-  <Vue3MarkdownIt
-    :source="source"
+  <vue3-markdown-it
+    :source="processedSource"
     :plugins="markdownPlugins"
     :html="true"
     :breaks="true"
     :linkify="true"
+    ref="markdown"
   />
-</template> -->
-
-<template>
-  <div ref="content">
-    <vue3-markdown-it
-      :source="processedSource"
-      :plugins="markdownPlugins"
-      :html="true"
-      :breaks="true"
-      :linkify="true"
-      ref="markdown"
-    />
-  </div>
 </template>
 
 <script>
 import Vue3MarkdownIt from "vue3-markdown-it";
-// eslint-disable-next-line no-unused-vars
 import mathFallbackPlugin, {
   getSuccessfulMathEngine,
 } from "@/plugins/math-fallback-plugin";
 import mermaid from "mermaid";
-import mermaidItMermaid from "markdown-it-mermaid";
 
-mermaid.initialize({startOnLoad: false});
+// Mermaid 플러그인 대신 직접 처리 (markdown-it-mermaid 불필요)
+function mermaidCodeBlockWrapper(md) {
+  const defaultFence =
+    md.renderer.rules.fence ||
+    function (tokens, idx, options, env, self) {
+      return self.renderToken(tokens, idx, options);
+    };
+
+  md.renderer.rules.fence = function (tokens, idx, options, env, self) {
+    const token = tokens[idx];
+    if (token.info.trim() === "mermaid") {
+      const code = token.content.trim();
+      return `<div class="mermaid">${code}</div>`;
+    }
+    return defaultFence(tokens, idx, options, env, self);
+  };
+}
 
 export default {
   name: "MathMarkdown",
@@ -74,7 +47,7 @@ export default {
     return {
       markdownPlugins: [
         {plugin: mathFallbackPlugin},
-        {plugin: mermaidItMermaid},
+        {plugin: mermaidCodeBlockWrapper},
       ],
     };
   },
@@ -82,68 +55,27 @@ export default {
     processedSource() {
       return this.normalizeMathMarkdown(this.source);
     },
-    // markdownPlugins() {
-    //   return [{plugin: mathFallbackPlugin}];
-    // },
   },
   watch: {
     processedSource: {
       immediate: true,
       handler() {
         this.$nextTick(() => {
-          // getSuccessfulMathEngine();
-
-          setTimeout(() => {
-            const engine = getSuccessfulMathEngine();
-            this.loadMathCss(engine);
-            this.$nextTick(this.convertMermaid);
-          }, 50);
+          const engine = getSuccessfulMathEngine();
+          this.loadMathCss(engine);
+          this.convertMermaid();
         });
       },
     },
   },
   methods: {
-    convertMermaid() {
-      try {
-        mermaid.init(
-          undefined,
-          this.$refs.content.querySelectorAll(".mermaid")
-        );
-      } catch (err) {
-        console.warn("Mermaid rendering failed:", err);
-      }
-      // const el = this.$refs.markdown?.$el;
-
-      // console.log(el);
-      // if (!el) return;
-
-      // // mermaid 코드 블록을 찾아서 SVG로 대체
-      // el.querySelectorAll("mermaid").forEach((block) => {
-      //   const code = block.textContent.trim();
-      //   const container = document.createElement("div");
-      //   container.className = "mermaid";
-      //   const id = "mermaid-" + Date.now();
-      //   try {
-      //     const svg = mermaid.render(id, code, () => {});
-      //     container.innerHTML = svg;
-      //     console.log(svg);
-      //     block.replaceWith(container);
-      //   } catch (e) {
-      //     container.innerHTML = `<pre style="color:red;">Mermaid Syntax Error</pre>`;
-      //     block.replaceWith(container);
-      //   }
-      // });
-    },
     normalizeMathMarkdown(markdown) {
       if (!markdown) return "";
-      return (
-        markdown
-          .replace(/\${3}([\s\S]*?)\${3}/g, (_, expr) => `$$${expr}$$`)
-          .replace(/\r\n/g, "\n")
-          .replace(/\n{3,}/g, "\n\n")
-          // 3. \\\\ → \\ (이스케이프 줄이기)
-          .replace(/\\\\/g, "\\")
-      ); // from 4 backslashes → 2
+      return markdown
+        .replace(/\${3}([\s\S]*?)\${3}/g, (_, expr) => `$$${expr}$$`)
+        .replace(/\r\n/g, "\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .replace(/\\\\/g, "\\"); // 4 → 2
     },
     loadMathCss(engine) {
       const links = {
@@ -162,6 +94,30 @@ export default {
       link.setAttribute("data-math-css", engine);
       document.head.appendChild(link);
     },
+    convertMermaid() {
+      const els = this.$el.querySelectorAll(".mermaid");
+      if (els.length === 0) return;
+
+      mermaid.initialize({startOnLoad: false});
+
+      // eslint-disable-next-line no-unused-vars
+      els.forEach((el, index) => {
+        if (el.dataset.processed === "true") return;
+        try {
+          mermaid.init(undefined, el);
+          el.dataset.processed = "true";
+        } catch (e) {
+          el.innerHTML = `<pre style="color:red;">Mermaid Error: ${e.message}</pre>`;
+        }
+      });
+    },
   },
 };
 </script>
+
+<style scoped>
+/* 선택적 스타일 */
+.katex {
+  font-size: 1.1em;
+}
+</style>
