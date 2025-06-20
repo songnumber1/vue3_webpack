@@ -10,9 +10,17 @@
   },
   "dependencies": {
     "core-js": "^3.8.3",
+    "katex": "^0.16.22",
+    "markdown-it": "^14.1.0",
+    "markdown-it-katex": "^2.0.3",
+    "markdown-it-math": "^5.2.1",
+    "markdown-it-mathjax3": "^4.3.2",
+    "mathjax3": "^3.0.0-beta.4",
     "register-service-worker": "^1.7.2",
+    "temml": "^0.11.8",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
+    "vue3-markdown-it": "^1.0.10",
     "vuex": "^4.0.0"
   },
   "devDependencies": {

@@ -1,30 +1,69 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <MathMarkdown :source="markdown" />
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import MathMarkdown from "./components/MathMarkdown.vue";
 
-nav {
-  padding: 30px;
-}
+export default {
+  components: {MathMarkdown},
+  data() {
+    return {
+      /* eslint-disable */
+      markdown: `
+## 수학 공식 렌더링 테스트
 
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
+### ✅ TEMML에서도 되는 수식
 
-nav a.router-link-exact-active {
-  color: #42b983;
+- 인라인 수식: $x^2 + y^2$
+- 블럭 수식:
+
+$$$
+x^2 + y^2 = z^2
+$$$
+
+---
+
+### ❌ TEMML은 실패할 가능성이 있는 수식 (fallback 테스트용)
+
+- 복잡한 정규분포 함수:
+
+$$
+\\frac{1}{\\sqrt{2\\pi\\sigma^2}} e^{-\\frac{(x - \\mu)^2}{2\\sigma^2}}
+$$
+
+- 복잡한 행렬:
+
+$$
+\\begin{bmatrix}
+1 & 2 & 3 \\\\
+4 & 5 & 6
+\\end{bmatrix}
+$$
+
+- 넓은 덧셈기호:
+
+$$
+\\sum_{i=1}^{\\infty} \\frac{1}{i^2} = \\frac{\\pi^2}{6}
+$$
+
+## KaTeX도 실패하는 예제
+
+$$
+\\eqalign{
+  a &= b + c \\cr
+  x &= y + z \\cr
 }
-</style>
+$$
+
+$$
+\\begin{align}
+f(x) &= x^2 + 1 \\
+f'(x) &= 2x
+\\end{align}
+$$
+      `.trim(),
+    };
+  },
+};
+</script>
