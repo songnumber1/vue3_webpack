@@ -38,20 +38,28 @@ export default {
 </template> -->
 
 <template>
-  <vue3-markdown-it
-    :source="processedSource"
-    :plugins="markdownPlugins"
-    :html="true"
-    :breaks="true"
-    :linkify="true"
-  />
+  <div ref="content">
+    <vue3-markdown-it
+      :source="processedSource"
+      :plugins="markdownPlugins"
+      :html="true"
+      :breaks="true"
+      :linkify="true"
+      ref="markdown"
+    />
+  </div>
 </template>
 
 <script>
 import Vue3MarkdownIt from "vue3-markdown-it";
+// eslint-disable-next-line no-unused-vars
 import mathFallbackPlugin, {
   getSuccessfulMathEngine,
 } from "@/plugins/math-fallback-plugin";
+import mermaid from "mermaid";
+import mermaidItMermaid from "markdown-it-mermaid";
+
+mermaid.initialize({startOnLoad: false});
 
 export default {
   name: "MathMarkdown",
@@ -64,7 +72,10 @@ export default {
   },
   data() {
     return {
-      markdownPlugins: [{plugin: mathFallbackPlugin}],
+      markdownPlugins: [
+        {plugin: mathFallbackPlugin},
+        {plugin: mermaidItMermaid},
+      ],
     };
   },
   computed: {
@@ -85,12 +96,44 @@ export default {
           setTimeout(() => {
             const engine = getSuccessfulMathEngine();
             this.loadMathCss(engine);
+            this.$nextTick(this.convertMermaid);
           }, 50);
         });
       },
     },
   },
   methods: {
+    convertMermaid() {
+      try {
+        mermaid.init(
+          undefined,
+          this.$refs.content.querySelectorAll(".mermaid")
+        );
+      } catch (err) {
+        console.warn("Mermaid rendering failed:", err);
+      }
+      // const el = this.$refs.markdown?.$el;
+
+      // console.log(el);
+      // if (!el) return;
+
+      // // mermaid 코드 블록을 찾아서 SVG로 대체
+      // el.querySelectorAll("mermaid").forEach((block) => {
+      //   const code = block.textContent.trim();
+      //   const container = document.createElement("div");
+      //   container.className = "mermaid";
+      //   const id = "mermaid-" + Date.now();
+      //   try {
+      //     const svg = mermaid.render(id, code, () => {});
+      //     container.innerHTML = svg;
+      //     console.log(svg);
+      //     block.replaceWith(container);
+      //   } catch (e) {
+      //     container.innerHTML = `<pre style="color:red;">Mermaid Syntax Error</pre>`;
+      //     block.replaceWith(container);
+      //   }
+      // });
+    },
     normalizeMathMarkdown(markdown) {
       if (!markdown) return "";
       return (

@@ -62,6 +62,23 @@ f(x) &= x^2 + 1 \\
 f'(x) &= 2x
 \\end{align}
 $$
+
+## Mermaid 예시
+
+\`\`\`mermaid
+sequenceDiagram
+  participant A
+  participant B
+  A->>B: Hello B, how are you?
+  B-->>A: I am fine, thanks!
+\`\`\`
+
+\`\`\`mermaid
+flowchart TD
+  Start --> Login
+  Login -->|Success| Dashboard
+  Login -->|Fail| Error
+\`\`\`
       `.trim(),
     };
   },
