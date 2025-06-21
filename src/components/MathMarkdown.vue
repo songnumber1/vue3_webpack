@@ -14,6 +14,11 @@ import Vue3MarkdownIt from "vue3-markdown-it";
 import mathFallbackPlugin, {
   getSuccessfulMathEngine,
 } from "@/plugins/math-fallback-plugin";
+
+import markdownItKatex from "markdown-it-katex";
+import markdownItTemml from "markdown-it-math/temml";
+import markdownItMathjax from "markdown-it-mathjax3";
+
 import mermaid from "mermaid";
 
 // Mermaid 플러그인 대신 직접 처리 (markdown-it-mermaid 불필요)
@@ -38,22 +43,44 @@ export default {
   name: "MathMarkdown",
   components: {Vue3MarkdownIt},
   props: {
+    useTemml: Boolean,
+    useKatex: Boolean,
+    useMathjax: Boolean,
+    useFallback: Boolean,
     source: {
       type: String,
       required: true,
     },
   },
-  data() {
-    return {
-      markdownPlugins: [
-        {plugin: mathFallbackPlugin},
-        {plugin: mermaidCodeBlockWrapper},
-      ],
-    };
-  },
+  // data() {
+  //   return {
+  //     markdownPlugins: [
+  //       {plugin: mathFallbackPlugin},
+  //       {plugin: mermaidCodeBlockWrapper},
+  //     ],
+  //   };
+  // },
   computed: {
     processedSource() {
       return this.normalizeMathMarkdown(this.source);
+    },
+    markdownPlugins() {
+      const plugins = [];
+
+      // 조건부 수학 플러그인
+      if (this.useFallback) {
+        plugins.push({plugin: mathFallbackPlugin});
+      } else {
+        // 맨 마지막 플러그인이 적용되므로 순서가 중요하다
+        if (this.useMathjax) plugins.push({plugin: markdownItMathjax});
+        if (this.useKatex) plugins.push({plugin: markdownItKatex});
+        if (this.useTemml) plugins.push({plugin: markdownItTemml});
+      }
+
+      // ✅ Mermaid 플러그인은 항상 마지막에 포함
+      plugins.push({plugin: mermaidCodeBlockWrapper});
+
+      return plugins;
     },
   },
   watch: {
@@ -64,6 +91,18 @@ export default {
           const engine = getSuccessfulMathEngine();
           this.loadMathCss(engine);
           this.convertMermaid();
+        });
+      },
+    },
+    markdownPlugins: {
+      immediate: true,
+      handler() {
+        this.$nextTick(() => {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              this.convertMermaid();
+            }, 20);
+          });
         });
       },
     },
@@ -115,9 +154,16 @@ export default {
 };
 </script>
 
-<style scoped>
-/* 선택적 스타일 */
-.katex {
-  font-size: 1.1em;
+<style>
+/* Mermaid 스타일 전역 적용 */
+/* .mermaid {
+  display: block;
+  overflow: auto;
+  margin: 1em 0;
 }
+
+.mermaid svg {
+  width: 100% !important;
+  height: auto !important;
+} */
 </style>

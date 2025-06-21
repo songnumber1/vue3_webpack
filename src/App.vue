@@ -1,5 +1,17 @@
 <template>
-  <MathMarkdown :source="markdown" />
+  <label><input type="checkbox" v-model="useTemml" /> Temml</label>
+  <label><input type="checkbox" v-model="useKatex" /> KaTeX</label>
+  <label><input type="checkbox" v-model="useMathjax" /> MathJax</label>
+  <label><input type="checkbox" v-model="useFallback" /> Fallback</label>
+
+  <hr />
+  <MathMarkdown
+    :source="markdown"
+    :useTemml="useTemml"
+    :useKatex="useKatex"
+    :useMathjax="useMathjax"
+    :useFallback="useFallback"
+  />
 </template>
 
 <script>
@@ -21,10 +33,6 @@ export default {
 $$$
 x^2 + y^2 = z^2
 $$$
-
----
-
-### ❌ TEMML은 실패할 가능성이 있는 수식 (fallback 테스트용)
 
 - 복잡한 정규분포 함수:
 
@@ -215,7 +223,32 @@ pie title Pets adopted by volunteers
     "Rats" : 15
 \`\`\`
       `.trim(),
+      useTemml: true,
+      useKatex: true,
+      useMathjax: true,
+      useFallback: false,
     };
+  },
+  watch: {
+    // fallback이 true일 경우 나머지 3개 false로 강제
+    useFallback(val) {
+      if (val) {
+        this.useTemml = false;
+        this.useKatex = false;
+        this.useMathjax = false;
+      }
+    },
+    // 개별 수학 엔진이 모두 true일 경우 fallback을 꺼야 함
+    useTemml: "syncFallbackState",
+    useKatex: "syncFallbackState",
+    useMathjax: "syncFallbackState",
+  },
+  methods: {
+    syncFallbackState() {
+      if (this.useTemml && this.useKatex && this.useMathjax) {
+        this.useFallback = false;
+      }
+    },
   },
 };
 </script>
