@@ -25,7 +25,7 @@ export default {
       markdown: `
 ## 수학 공식 렌더링 테스트
 
-### ✅ TEMML에서도 되는 수식
+### ✅ TEMML
 
 - 인라인 수식: $x^2 + y^2$
 - 블럭 수식:
@@ -55,7 +55,7 @@ $$
 \\sum_{i=1}^{\\infty} \\frac{1}{i^2} = \\frac{\\pi^2}{6}
 $$
 
-## KaTeX도 실패하는 예제
+## KaTeX
 
 $$
 \\eqalign{

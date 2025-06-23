@@ -5,30 +5,24 @@
     :html="true"
     :breaks="true"
     :linkify="true"
-    ref="markdown"
   />
 </template>
 
 <script>
 import Vue3MarkdownIt from "vue3-markdown-it";
-import mathFallbackPlugin, {
-  getSuccessfulMathEngine,
-} from "@/plugins/math-fallback-plugin";
-
-import markdownItKatex from "markdown-it-katex";
 import markdownItTemml from "markdown-it-math/temml";
-import markdownItMathjax from "markdown-it-mathjax3";
-
+import temml from "temml";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+import {renderMathInElement} from "mathup";
 import mermaid from "mermaid";
 
-// Mermaid 플러그인 대신 직접 처리 (markdown-it-mermaid 불필요)
+// Mermaid 코드 블럭 wrapper
 function mermaidCodeBlockWrapper(md) {
   const defaultFence =
     md.renderer.rules.fence ||
-    function (tokens, idx, options, env, self) {
-      return self.renderToken(tokens, idx, options);
-    };
-
+    ((tokens, idx, options, env, self) =>
+      self.renderToken(tokens, idx, options));
   md.renderer.rules.fence = function (tokens, idx, options, env, self) {
     const token = tokens[idx];
     if (token.info.trim() === "mermaid") {
@@ -43,44 +37,28 @@ export default {
   name: "MathMarkdown",
   components: {Vue3MarkdownIt},
   props: {
-    useTemml: Boolean,
-    useKatex: Boolean,
-    useMathjax: Boolean,
-    useFallback: Boolean,
-    source: {
-      type: String,
-      required: true,
-    },
+    source: {type: String, required: true},
   },
-  // data() {
-  //   return {
-  //     markdownPlugins: [
-  //       {plugin: mathFallbackPlugin},
-  //       {plugin: mermaidCodeBlockWrapper},
-  //     ],
-  //   };
-  // },
   computed: {
     processedSource() {
       return this.normalizeMathMarkdown(this.source);
     },
     markdownPlugins() {
-      const plugins = [];
-
-      // 조건부 수학 플러그인
-      if (this.useFallback) {
-        plugins.push({plugin: mathFallbackPlugin});
-      } else {
-        // 맨 마지막 플러그인이 적용되므로 순서가 중요하다
-        if (this.useMathjax) plugins.push({plugin: markdownItMathjax});
-        if (this.useKatex) plugins.push({plugin: markdownItKatex});
-        if (this.useTemml) plugins.push({plugin: markdownItTemml});
-      }
-
-      // ✅ Mermaid 플러그인은 항상 마지막에 포함
-      plugins.push({plugin: mermaidCodeBlockWrapper});
-
-      return plugins;
+      return [
+        {
+          plugin: markdownItTemml,
+          options: {
+            inlineDelimiters: [["$", "$"]],
+            blockDelimiters: [
+              ["$$", "$$"],
+              ["\\[", "\\]"],
+            ],
+            inlineRenderer: (str) => this.renderMathWithFallback(str, false),
+            blockRenderer: (str) => this.renderMathWithFallback(str, true),
+          },
+        },
+        {plugin: mermaidCodeBlockWrapper},
+      ];
     },
   },
   watch: {
@@ -88,59 +66,62 @@ export default {
       immediate: true,
       handler() {
         this.$nextTick(() => {
-          const engine = getSuccessfulMathEngine();
-          this.loadMathCss(engine);
-          this.convertMermaid();
-        });
-      },
-    },
-    markdownPlugins: {
-      immediate: true,
-      handler() {
-        this.$nextTick(() => {
           requestAnimationFrame(() => {
             setTimeout(() => {
               this.convertMermaid();
-            }, 20);
+            }, 10);
           });
         });
       },
     },
   },
   methods: {
-    normalizeMathMarkdown(markdown) {
-      if (!markdown) return "";
-      return markdown
+    normalizeMathMarkdown(md) {
+      if (!md) return "";
+      return md
         .replace(/\${3}([\s\S]*?)\${3}/g, (_, expr) => `$$${expr}$$`)
         .replace(/\r\n/g, "\n")
         .replace(/\n{3,}/g, "\n\n")
-        .replace(/\\\\/g, "\\"); // 4 → 2
+        .replace(/[\uE000-\uF8FF]/g, "");
     },
-    loadMathCss(engine) {
-      const links = {
-        KaTeX: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
-        TEMML: "https://cdn.jsdelivr.net/npm/temml@0.9.1/temml.min.css",
-        MathJax: null,
-      };
-      const href = links[engine];
-      if (!href) return;
-
-      if (document.querySelector(`link[data-math-css="${engine}"]`)) return;
-
-      const link = document.createElement("link");
-      link.rel = "stylesheet";
-      link.href = href;
-      link.setAttribute("data-math-css", engine);
-      document.head.appendChild(link);
+    renderMathWithFallback(str, displayMode) {
+      const wrap = (html, engine) =>
+        `<div class="math-render" data-engine="${engine}" style="${
+          displayMode ? "" : "display:inline"
+        }">${html}</div>`;
+      try {
+        const html = temml.renderToString(str, {display: displayMode});
+        if (!html || html.includes("temml-error"))
+          throw new Error("Temml failed");
+        return wrap(html, "Temml");
+      } catch {
+        try {
+          const html = katex.renderToString(str, {
+            displayMode,
+            throwOnError: false,
+          });
+          if (!html || html.includes("katex-error"))
+            throw new Error("KaTeX failed");
+          return wrap(html, "KaTeX");
+        } catch {
+          try {
+            const wrapper = document.createElement(
+              displayMode ? "div" : "span"
+            );
+            wrapper.setAttribute("data-math", str);
+            renderMathInElement(wrapper);
+            return wrap(wrapper.outerHTML, "MathUp");
+          } catch {
+            return `<div class="math-render math-error" data-engine="None">[Math parse error]</div>`;
+          }
+        }
+      }
     },
     convertMermaid() {
       const els = this.$el.querySelectorAll(".mermaid");
-      if (els.length === 0) return;
-
+      if (!els.length) return;
       mermaid.initialize({startOnLoad: false});
-
-      // eslint-disable-next-line no-unused-vars
-      els.forEach((el, index) => {
+      els.forEach((el) => {
         if (el.dataset.processed === "true") return;
         try {
           mermaid.init(undefined, el);
@@ -155,15 +136,37 @@ export default {
 </script>
 
 <style>
-/* Mermaid 스타일 전역 적용 */
-/* .mermaid {
-  display: block;
-  overflow: auto;
-  margin: 1em 0;
+.math-render,
+.math-render * {
+  font-size: 1.05rem !important;
+  text-align: left !important;
+  color: #111 !important;
+  margin: 0.6em 0 !important;
+  padding: 0.2em 0 !important;
+  line-height: 1.6 !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+  box-sizing: border-box;
 }
 
-.mermaid svg {
-  width: 100% !important;
-  height: auto !important;
-} */
+[data-math],
+[data-math] * {
+  font-size: 1.05rem !important;
+  text-align: left !important;
+  color: #111 !important;
+  margin: 0.6em 0 !important;
+  padding: 0.2em 0 !important;
+  line-height: 1.6 !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+  box-sizing: border-box;
+}
+
+.math-render.math-error {
+  color: red !important;
+  background: #fff0f0 !important;
+  border-radius: 4px;
+  padding: 0.5em !important;
+  font-size: 1em !important;
+}
 </style>
