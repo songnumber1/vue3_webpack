@@ -141,10 +141,10 @@ export default {
   font-size: 1.05rem !important;
   text-align: left !important;
   color: #111 !important;
-  margin: 0.6em 0 !important;
+  /* margin: 0.6em 0 !important;
   padding: 0.2em 0 !important;
   line-height: 1.6 !important;
-  vertical-align: middle !important;
+  vertical-align: middle !important; */
   background: transparent !important;
   box-sizing: border-box;
 }
