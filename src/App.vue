@@ -23,7 +23,7 @@ export default {
     return {
       /* eslint-disable */
       markdown: `
-## 수학 공식 렌더링 테스트
+      ## 수학 공식 렌더링 테스트
 
 ### ✅ TEMML
 
@@ -221,6 +221,42 @@ pie title Pets adopted by volunteers
     "Dogs" : 386
     "Cats" : 85
     "Rats" : 15
+\`\`\`
+
+### style
+
+\`\`\`mermaid
+flowchart LR
+    id1(Start)-->id2(Stop)
+    style id1 fill:#f9f,stroke:#333,stroke-width:4px
+    style id2 fill:#bbf,stroke:#f66,stroke-width:2px,color:#fff,stroke-dasharray: 5 5
+\`\`\`
+
+### config
+\`\`\`mermaid
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+flowchart LR
+  A[Start] --> B{Decision}
+  B -->|Yes| C[Continue]
+  B -->|No| D[Stop]
+\`\`\`
+
+### sequenceDiagram 예시
+
+\`\`\`mermaid
+---
+config:
+  theme: forest
+---
+sequenceDiagram
+  participant A
+  participant B
+  A->>B: Hello B, how are you?
+  B-->>A: I am fine, thanks!
 \`\`\`
       `.trim(),
       useTemml: true,
