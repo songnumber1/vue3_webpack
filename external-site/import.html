@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vue 채팅</title>
+    <title>Iframe 스타일 변경</title>
     <style>
       :root {
         --send-button-color: #1976d2;
@@ -48,51 +48,51 @@
         font-size: 1.8rem;
         font-weight: bold;
       }
+      nav select {
+        margin-left: 24px;
+        padding: 8px 14px;
+        font-size: 1rem;
+        font-weight: 500;
+        font-family: inherit;
 
-      nav {
-        display: flex;
-        align-items: center;
+        /* ✅ 배경과 텍스트 컬러 명시 */
+        background-color: rgba(255, 255, 255, 0.9);
+        color: #000;
+
+        border: none;
+        border-radius: 6px;
+
+        /* ✅ 기본 select 스타일 제거 시 */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+
+        /* ✅ 커스텀 화살표를 위한 배경 이미지 추가도 가능 (선택사항) */
+        background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        padding-right: 36px;
       }
 
       nav a {
         margin-left: 24px;
         color: #fff;
-        text-decoration: none;
         font-weight: 500;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font-family: inherit;
+        font-size: 1rem;
+      }
+
+      nav a {
+        text-decoration: none;
       }
 
       nav a:hover {
         text-decoration: underline;
-      }
-
-      .theme-toggle {
-        background: rgba(255, 255, 255, 0.2);
-        color: #fff;
-        padding: 8px 14px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        margin-left: 20px;
-        font-weight: 500;
-      }
-
-      main {
-        position: relative;
-        z-index: 1;
-        padding: 100px 48px;
-        max-width: 960px;
-        margin: auto;
-        text-align: center;
-      }
-
-      main h1 {
-        font-size: 3rem;
-        margin-bottom: 20px;
-      }
-
-      main p {
-        font-size: 1.2rem;
-        line-height: 1.8;
       }
 
       .draggable-wrapper {
@@ -101,8 +101,6 @@
         right: 20px;
         width: 400px;
         border-radius: 10px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        background-color: white;
         overflow: hidden;
         z-index: 2;
       }
@@ -134,16 +132,13 @@
         <a href="#">기능</a>
         <a href="#">요금제</a>
         <a href="#">문의</a>
-        <a id="themeToggle" class="theme-toggle">테마</a>
+        <select id="themeSelect">
+          <option value="0">다크 테마</option>
+          <option value="1">라이트 테마</option>
+          <option value="2">샌드 테마</option>
+        </select>
       </nav>
     </header>
-
-    <main>
-      <h1>Vue 채팅 앱을 직접 체험해보세요</h1>
-      <p>
-        실시간 채팅 인터페이스를 확인하고, 다크/라이트 테마를 직접 바꿔보세요!
-      </p>
-    </main>
 
     <div class="draggable-wrapper" id="draggable">
       <div class="drag-header" id="dragHandle">Vue 채팅</div>
@@ -156,15 +151,58 @@
     </div>
 
     <script>
+      const iframe = document.getElementById("chatIframe");
+      const themeSelect = document.getElementById("themeSelect");
+
+      const themeSet = [
+        {
+          "--background-color": "#1e1e1e",
+          "--input-bg": "#2c2c2c",
+          "--send-button-color": "#8e44ad",
+          "--bubble-bg-sent": "#555",
+          "--bubble-bg-received": "#333",
+          "--text-color": "#eee",
+        },
+        {
+          "--background-color": "#f5f5f5",
+          "--input-bg": "white",
+          "--send-button-color": "#1976d2",
+          "--bubble-bg-sent": "#1976d2",
+          "--bubble-bg-received": "#e0e0e0",
+          "--text-color": "#000",
+        },
+        {
+          "--background-color": "#fffbe6",
+          "--input-bg": "#fff9db",
+          "--send-button-color": "#e67e22",
+          "--bubble-bg-sent": "#f39c12",
+          "--bubble-bg-received": "#ffeaa7",
+          "--text-color": "#333",
+        },
+      ];
+
+      themeSelect.addEventListener("change", (e) => {
+        const selectedTheme = parseInt(e.target.value, 10);
+        iframe.contentWindow.postMessage(
+          {type: "theme-change", payload: themeSet[selectedTheme]},
+          "*"
+        );
+      });
+
+      window.addEventListener("load", () => {
+        iframe.contentWindow.postMessage(
+          {type: "theme-change", payload: themeSet[0]},
+          "*"
+        );
+      });
+
+      // 드래그 기능 (기존과 동일)
       const dragEl = document.getElementById("draggable");
       const dragHandle = document.getElementById("dragHandle");
-      const iframe = document.getElementById("chatIframe");
-      const themeToggle = document.getElementById("themeToggle");
 
       let offsetX = 0;
       let offsetY = 0;
       let isDragging = false;
-      let theme = "light";
 
       dragHandle.addEventListener("mousedown", (e) => {
         isDragging = true;
@@ -198,22 +236,6 @@
         isDragging = false;
         document.body.style.userSelect = "";
         iframe.style.pointerEvents = "auto";
-      });
-
-      function sendTheme(themeValue) {
-        iframe.contentWindow.postMessage(
-          {type: "theme-change", theme: themeValue},
-          "*"
-        );
-      }
-
-      themeToggle.addEventListener("click", () => {
-        theme = theme === "light" ? "dark" : "light";
-        sendTheme(theme);
-      });
-
-      window.addEventListener("load", () => {
-        sendTheme(theme);
       });
     </script>
   </body>

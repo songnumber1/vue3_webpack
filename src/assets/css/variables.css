@@ -1,0 +1,8 @@
+:root {
+  --background-color: #f5f5f5;
+  --input-bg: white;
+  --send-button-color: #1976d2;
+  --bubble-bg-sent: #1976d2;
+  --bubble-bg-received: #e0e0e0;
+  --text-color: #000;
+}
