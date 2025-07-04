@@ -6,6 +6,7 @@ import vuetify from "./plugins/vuetify";
 import {loadFonts} from "./plugins/webfontloader";
 import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
+import "@/assets/css/variables.css";
 
 loadFonts();
 

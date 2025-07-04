@@ -97,9 +97,7 @@ export default {
 };
 </script>
 
-<style scoped>
-@import "@/assets/css/variables.css";
-
+<style>
 .chat-wrapper {
   display: flex;
   flex-direction: column;
