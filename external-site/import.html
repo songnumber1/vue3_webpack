@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vue Chat Homepage</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        height: 100vh;
+        font-family: "Segoe UI", sans-serif;
+        background-image: url("./backgroud.png");
+        background-size: cover;
+        background-position: center;
+        color: #fff;
+        overflow: hidden;
+      }
+
+      .overlay {
+        background: rgba(0, 0, 0, 0.5);
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 0;
+      }
+
+      header {
+        position: relative;
+        z-index: 1;
+        padding: 24px 48px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header .logo {
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      nav a {
+        margin-left: 24px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      nav a:hover {
+        text-decoration: underline;
+      }
+
+      main {
+        position: relative;
+        z-index: 1;
+        padding: 100px 48px;
+        max-width: 960px;
+        margin: auto;
+        text-align: center;
+      }
+
+      main h1 {
+        font-size: 3rem;
+        margin-bottom: 20px;
+      }
+
+      main p {
+        font-size: 1.2rem;
+        line-height: 1.8;
+      }
+
+      .draggable-wrapper {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 400px;
+        border-radius: 10px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        background-color: white;
+        overflow: hidden;
+        z-index: 2;
+      }
+
+      .drag-header {
+        background-color: #1976d2;
+        color: white;
+        padding: 12px 16px;
+        font-weight: bold;
+        cursor: move;
+        user-select: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .drag-header button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.8rem;
+      }
+
+      .drag-header button:hover {
+        background: rgba(255, 255, 255, 0.4);
+      }
+
+      iframe {
+        width: 100%;
+        height: 600px;
+        border: none;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="overlay"></div>
+
+    <header>
+      <div class="logo">MyBrand</div>
+      <nav>
+        <a href="#">홈</a>
+        <a href="#">기능</a>
+        <a href="#">요금제</a>
+        <a href="#">문의</a>
+      </nav>
+    </header>
+
+    <main>
+      <h1>Vue 채팅 앱을 직접 체험해보세요</h1>
+      <p>
+        실시간으로 작동하는 채팅 인터페이스를 iframe으로 불러와 확인해볼 수
+        있습니다.<br />
+        우측 하단의 채팅 박스를 클릭하여 메시지를 보내보세요!
+      </p>
+    </main>
+
+    <div class="draggable-wrapper" id="draggable">
+      <div class="drag-header" id="dragHandle">
+        <span id="chatTitle">Vuetify 채팅</span>
+        <button id="toggleBtn">일반 채팅</button>
+      </div>
+      <iframe
+        id="chatIframe"
+        src="http://localhost:8080/vuetify-chat"
+        title="Vue Chat App"
+        scrolling="no"
+      ></iframe>
+    </div>
+
+    <script>
+      const dragEl = document.getElementById("draggable");
+      const dragHandle = document.getElementById("dragHandle");
+      const iframe = document.getElementById("chatIframe");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const chatTitle = document.getElementById("chatTitle");
+
+      let offsetX = 0;
+      let offsetY = 0;
+      let isDragging = false;
+
+      let currentUrl = "vuetify-chat";
+
+      // 드래그 시작
+      dragHandle.addEventListener("mousedown", (e) => {
+        if (e.target.tagName.toLowerCase() === "button") return;
+
+        isDragging = true;
+        offsetX = e.clientX - dragEl.offsetLeft;
+        offsetY = e.clientY - dragEl.offsetTop;
+        document.body.style.userSelect = "none";
+        iframe.style.pointerEvents = "none"; // 드래그 중 iframe 차단
+      });
+
+      // 드래그 중
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+
+        const winW = window.innerWidth;
+        const winH = window.innerHeight;
+        const elW = dragEl.offsetWidth;
+        const elH = dragEl.offsetHeight;
+
+        let left = e.clientX - offsetX;
+        let top = e.clientY - offsetY;
+
+        left = Math.max(0, Math.min(left, winW - elW));
+        top = Math.max(0, Math.min(top, winH - elH));
+
+        dragEl.style.left = `${left}px`;
+        dragEl.style.top = `${top}px`;
+        dragEl.style.right = "auto";
+        dragEl.style.bottom = "auto";
+      });
+
+      // 드래그 종료
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+        document.body.style.userSelect = "";
+        iframe.style.pointerEvents = "auto"; // 다시 클릭 가능
+      });
+
+      // 스위치 버튼 클릭
+      toggleBtn.addEventListener("click", () => {
+        if (currentUrl === "vuetify-chat") {
+          currentUrl = "response-chat";
+          iframe.src = "http://localhost:8080/response-chat";
+          chatTitle.textContent = "일반 채팅";
+          toggleBtn.textContent = "Vuetify 채팅";
+        } else {
+          currentUrl = "vuetify-chat";
+          iframe.src = "http://localhost:8080/vuetify-chat";
+          chatTitle.textContent = "Vuetify 채팅";
+          toggleBtn.textContent = "일반 채팅";
+        }
+      });
+    </script>
+  </body>
+</html>

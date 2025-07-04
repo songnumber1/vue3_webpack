@@ -86,12 +86,28 @@ const routes = [
     component: () => import("../views/JsonEditorView.vue"),
   },
   {
-    path: "/bootstrap",
-    name: "bootstrap",
+    path: "/bootstrap-chat",
+    name: "bootstrap-chat",
     // route level code-splitting
     // this generates a separate chunk (About.[hash].js) for this route
     // which is lazy-loaded when the route is visited.
-    component: () => import("../views/AppBootStrap.vue"),
+    component: () => import("../views/BootStrapChat.vue"),
+  },
+  {
+    path: "/vuetify-chat",
+    name: "vuetify-chat",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/VuetifyChat.vue"),
+  },
+  {
+    path: "/response-chat",
+    name: "response-chat",
+    // route level code-splitting
+    // this generates a separate chunk (About.[hash].js) for this route
+    // which is lazy-loaded when the route is visited.
+    component: () => import("../views/ResponseChat.vue"),
   },
   {
     path: "/chart",
