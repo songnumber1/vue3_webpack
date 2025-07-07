@@ -6502,6 +6502,7 @@ multicast-dns@^7.2.5:
     chart.js "^4.4.8"
     core-js "^3.8.3"
     element-plus "^2.7.2"
+    idb-keyval "^6.2.2"
     myapp "file:"
     register-service-worker "^1.7.2"
     roboto-fontface "*"

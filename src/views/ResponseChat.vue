@@ -19,6 +19,7 @@
     <div class="chat-input">
       <input
         v-model="input"
+        class="chat-input"
         type="text"
         placeholder="메시지를 입력하세요..."
         @keyup.enter="sendMessage"
@@ -77,6 +78,9 @@ export default {
   flex-direction: column;
   height: 100vh;
   background-color: var(--background-color);
+  color: var(--text-color);
+}
+.chat-input {
   color: var(--text-color);
 }
 
