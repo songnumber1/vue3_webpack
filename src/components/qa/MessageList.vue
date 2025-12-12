@@ -22,11 +22,6 @@ export default {
 };
 </script>
 
-<style scoped>
-.message-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: var(--space-4);
-}
+<style lang="scss">
+@use "@/assets/styles/components/messagelist.scss";
 </style>

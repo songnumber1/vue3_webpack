@@ -61,22 +61,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.base-field__required {
-  color: #ef4444;
-  margin-left: 2px;
-  font-size: var(--font-size-xs);
-}
-
-.base-field__error {
-  font-size: var(--font-size-xs);
-  color: #ef4444;
-  margin: 0;
-}
+<style lang="scss">
+@use "@/assets/styles/components/basefield.scss";
 </style>

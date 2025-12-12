@@ -1,0 +1,11 @@
+.base-option-group__label {
+  padding: var(--space-2) var(--space-3);
+  font-size: calc(var(--control-font-size) * 0.85);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.base-option-group__options {
+  padding-bottom: var(--space-2);
+}

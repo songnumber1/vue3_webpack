@@ -44,25 +44,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.chat-input {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  box-shadow: var(--shadow-subtle);
-}
-
-.chat-input__textarea {
-  flex: 1;
-}
-
-.chat-input__send {
-  flex-shrink: 0;
-  width: 40px;
-  justify-content: center;
-}
+<style lang="scss">
+@use "@/assets/styles/components/chatinput.scss";
 </style>

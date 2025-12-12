@@ -10,11 +10,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-  margin-bottom: var(--space-1);
-  display: inline-block;
-}
+<style lang="scss">
+@use "@/assets/styles/components/baselabel.scss";
 </style>

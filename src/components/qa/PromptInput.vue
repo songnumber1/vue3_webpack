@@ -27,31 +27,6 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-.prompt-area {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border-top: 1px solid var(--color-border);
-  background: var(--color-bg);
-}
-
-.prompt-textarea {
-  min-height: 3rem;
-  padding: var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  font-size: var(--control-font-size);
-  resize: none;
-}
-
-.send-btn {
-  padding: 0 var(--space-4);
-  background: var(--color-primary);
-  color: #fff;
-  border-radius: var(--radius-md);
-  border: none;
-}
+<style lang="scss">
+@use "@/assets/styles/components/promptinput.scss";
 </style>

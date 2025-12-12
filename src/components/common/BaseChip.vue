@@ -47,34 +47,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  padding: 0 var(--space-2);
-  height: calc(var(--btn-height) * 0.6);
-  border-radius: 999px;
-  border: 1px solid var(--color-border);
-  font-size: calc(var(--control-font-size) * 0.85);
-  color: var(--color-text-muted);
-  background: var(--color-bg-soft);
-}
-
-.base-chip--clickable {
-  cursor: pointer;
-}
-
-.base-chip--selected {
-  background: var(--color-primary-soft);
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-}
-
-.base-chip__close {
-  border: none;
-  background: transparent;
-  font-size: 0.75rem;
-  cursor: pointer;
-}
+<style lang="scss">
+@use "@/assets/styles/components/basechip.scss";
 </style>

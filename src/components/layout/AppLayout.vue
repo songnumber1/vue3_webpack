@@ -70,43 +70,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-@import "@/assets/styles/mixins";
-
-.layout-root {
-  min-height: 100vh;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  display: flex;
-  flex-direction: column;
-}
-
-.layout-main {
-  display: flex;
-  min-height: calc(
-    100vh - var(--layout-header-height) - var(--layout-footer-height)
-  );
-}
-
-.layout-content {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  padding: var(--space-4);
-}
-
-.layout-content__inner {
-  width: 100%;
-  max-width: var(--layout-max-width);
-}
-
-@include mobile {
-  .layout-main {
-    position: relative;
-  }
-
-  .layout-content {
-    padding: var(--space-3);
-  }
-}
+<style lang="scss">
+@use "@/assets/styles/components/applayout.scss";
 </style>

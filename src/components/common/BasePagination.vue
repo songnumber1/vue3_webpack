@@ -148,42 +148,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-pagination {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-  font-size: var(--font-size-xs);
-}
-
-.base-pagination__button {
-  min-width: 28px;
-  height: 28px;
-  padding: 0 var(--space-1);
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.base-pagination__button--active {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: #ffffff;
-}
-
-.base-pagination__button--ellipsis {
-  cursor: default;
-}
-
-.base-pagination__button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.base-pagination__meta {
-  margin-left: var(--space-2);
-  color: var(--color-text-muted);
-}
+<style lang="scss">
+@use "@/assets/styles/components/basepagination.scss";
 </style>

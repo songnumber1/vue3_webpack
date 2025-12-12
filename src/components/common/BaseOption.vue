@@ -89,27 +89,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-option {
-  padding: var(--space-2) var(--space-3);
-  font-size: var(--control-font-size);
-  color: var(--color-text);
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  transition: background-color 0.12s ease, color 0.12s ease;
-}
-
-.base-option:hover {
-  background: var(--color-primary-soft);
-}
-
-.base-option--selected {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
-}
-
-.base-option--disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+<style lang="scss">
+@use "@/assets/styles/components/baseoption.scss";
 </style>

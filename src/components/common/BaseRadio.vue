@@ -34,38 +34,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-radio {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-}
-
-.base-radio__input {
-  display: none;
-}
-
-.base-radio__outer {
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  border: 2px solid var(--color-border);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.base-radio__inner {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: var(--color-primary);
-}
-
-.base-radio__label {
-  user-select: none;
-}
+<style lang="scss">
+@use "@/assets/styles/components/baseradio.scss";
 </style>

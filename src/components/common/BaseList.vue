@@ -30,25 +30,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.base-list__item {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-}
-
-.base-list__item + .base-list__item {
-  margin-top: var(--space-1);
-}
-
-.base-list__item:hover {
-  background-color: var(--color-primary-soft);
-}
+<style lang="scss">
+@use "@/assets/styles/components/baselist.scss";
 </style>

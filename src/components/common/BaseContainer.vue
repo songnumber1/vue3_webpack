@@ -10,11 +10,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.base-container {
-  width: 100%;
-  max-width: var(--layout-max-width);
-  margin: 0 auto;
-  padding: 0 var(--space-4);
-}
+<style lang="scss">
+@use "@/assets/styles/components/basecontainer.scss";
 </style>
