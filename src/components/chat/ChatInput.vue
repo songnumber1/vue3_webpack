@@ -30,7 +30,7 @@ export default {
   emits: ["submit"],
   data() {
     return {
-      localValue: ""
+      localValue: "",
     };
   },
   methods: {
@@ -39,11 +39,11 @@ export default {
       if (!v) return;
       this.$emit("submit", v);
       this.localValue = "";
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/chatinput.scss";
+@use "@/assets/styles/chat/chatinput.scss";
 </style>

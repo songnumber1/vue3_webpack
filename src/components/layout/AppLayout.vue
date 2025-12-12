@@ -41,7 +41,7 @@ export default {
   data() {
     return {
       sidebarOpen: true,
-      activePage: "chat"
+      activePage: "chat",
     };
   },
   watch: {
@@ -53,8 +53,8 @@ export default {
         } else {
           this.sidebarOpen = false;
         }
-      }
-    }
+      },
+    },
   },
   methods: {
     toggleSidebar() {
@@ -65,11 +65,11 @@ export default {
       if (!this.isDesktop) {
         this.sidebarOpen = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/applayout.scss";
+@use "@/assets/styles/layout/applayout.scss";
 </style>

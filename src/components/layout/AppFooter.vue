@@ -11,12 +11,12 @@ export default {
   name: "AppFooter",
   data() {
     return {
-      year: new Date().getFullYear()
+      year: new Date().getFullYear(),
     };
-  }
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/appfooter.scss";
+@use "@/assets/styles/layout/appfooter.scss";
 </style>

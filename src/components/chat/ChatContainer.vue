@@ -3,7 +3,8 @@
     <div class="chat-container__header">
       <h1 class="chat-container__title">ChatGPT-like Responsive Chat</h1>
       <p class="chat-container__subtitle">
-        Ask anything about Vue, Spring, SSE, WebClient, Redis, Studio 구조 등. 레이아웃은 화면 크기에 따라 자동 반응합니다.
+        Ask anything about Vue, Spring, SSE, WebClient, Redis, Studio 구조 등.
+        레이아웃은 화면 크기에 따라 자동 반응합니다.
       </p>
     </div>
 
@@ -31,10 +32,10 @@ export default {
         {
           role: "assistant",
           content:
-            "안녕하세요! DS Assistant UI Boilerplate 입니다. 아무 질문이나 해보세요. 반응형, 테마 토글, 사이드바까지 모두 포함되어 있습니다."
-        }
+            "안녕하세요! DS Assistant UI Boilerplate 입니다. 아무 질문이나 해보세요. 반응형, 테마 토글, 사이드바까지 모두 포함되어 있습니다.",
+        },
       ],
-      typing: false
+      typing: false,
     };
   },
   methods: {
@@ -59,7 +60,7 @@ export default {
       });
     },
     mockAssistantReply(text) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           resolve(
             [
@@ -72,16 +73,16 @@ export default {
               "4. 사이드바 + 헤더 + 푸터",
               "5. ChatGPT 스타일의 채팅 UI",
               "",
-              "실제 프로젝트에 이 구조만 붙여서 바로 쓸 수 있게 설계했습니다."
+              "실제 프로젝트에 이 구조만 붙여서 바로 쓸 수 있게 설계했습니다.",
             ].join("\n")
           );
         }, 800);
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/chatcontainer.scss";
+@use "@/assets/styles/chat/chatcontainer.scss";
 </style>

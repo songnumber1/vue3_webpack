@@ -6,7 +6,7 @@
       class="chat-message"
       :class="{
         'chat-message--user': msg.role === 'user',
-        'chat-message--assistant': msg.role === 'assistant'
+        'chat-message--assistant': msg.role === 'assistant',
       }"
     >
       <div class="chat-message__avatar">
@@ -15,7 +15,7 @@
       </div>
       <div class="chat-message__bubble">
         <div class="chat-message__role">
-          {{ msg.role === 'user' ? 'You' : 'DS Assistant' }}
+          {{ msg.role === "user" ? "You" : "DS Assistant" }}
         </div>
         <div class="chat-message__content">
           {{ msg.content }}
@@ -24,13 +24,9 @@
     </div>
 
     <div v-if="typing" class="chat-message chat-message--assistant">
-      <div class="chat-message__avatar">
-        🤖
-      </div>
+      <div class="chat-message__avatar">🤖</div>
       <div class="chat-message__bubble">
-        <div class="chat-message__role">
-          DS Assistant
-        </div>
+        <div class="chat-message__role">DS Assistant</div>
         <div class="chat-message__content chat-message__content--typing">
           <span class="dot"></span>
           <span class="dot"></span>
@@ -47,16 +43,16 @@ export default {
   props: {
     messages: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     typing: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/chatmessagelist.scss";
+@use "@/assets/styles/chat/chatmessagelist.scss";
 </style>

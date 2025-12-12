@@ -3,7 +3,7 @@
     class="app-sidebar"
     :class="{
       'app-sidebar--open': isOpen,
-      'app-sidebar--overlay': isMobileOrTablet
+      'app-sidebar--overlay': isMobileOrTablet,
     }"
   >
     <div class="app-sidebar__inner">
@@ -28,7 +28,9 @@
           </li>
           <li
             class="app-sidebar__item"
-            :class="{ 'app-sidebar__item--active': activePage === 'playground' }"
+            :class="{
+              'app-sidebar__item--active': activePage === 'playground',
+            }"
             @click="$emit('navigate', 'playground')"
           >
             <span class="app-sidebar__icon">🧪</span>
@@ -48,8 +50,8 @@
       <div class="app-sidebar__section app-sidebar__section--hint">
         <div class="app-sidebar__hint-title">Tip</div>
         <p class="app-sidebar__hint-text">
-          UI Playground에서 공통 컴포넌트를 먼저 디자인한 뒤,
-          실제 화면(챗, 대시보드, 설정)에 붙여나가면 개발 속도가 매우 빨라집니다.
+          UI Playground에서 공통 컴포넌트를 먼저 디자인한 뒤, 실제 화면(챗,
+          대시보드, 설정)에 붙여나가면 개발 속도가 매우 빨라집니다.
         </p>
       </div>
     </div>
@@ -69,21 +71,21 @@ export default {
   props: {
     isOpen: {
       type: Boolean,
-      default: true
+      default: true,
     },
     isMobileOrTablet: {
       type: Boolean,
-      default: false
+      default: false,
     },
     activePage: {
       type: String,
-      default: "chat"
-    }
+      default: "chat",
+    },
   },
-  emits: ["close", "navigate"]
+  emits: ["close", "navigate"],
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/appsidebar.scss";
+@use "@/assets/styles/layout/appsidebar.scss";
 </style>

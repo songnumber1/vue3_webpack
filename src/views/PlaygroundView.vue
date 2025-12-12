@@ -443,5 +443,5 @@ function hello(name) {
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/playgroundview.scss";
+@use "@/assets/styles/views/playgroundview.scss";
 </style>

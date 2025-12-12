@@ -36,10 +36,10 @@ export default {
   setup() {
     const { theme, isDark, toggleTheme } = useTheme();
     return { theme, isDark, toggleTheme };
-  }
+  },
 };
 </script>
 
 <style lang="scss">
-@use "@/assets/styles/components/appheader.scss";
+@use "@/assets/styles/layout/appheader.scss";
 </style>
