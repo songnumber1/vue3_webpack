@@ -2,15 +2,16 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import responsiveManager from "@/plugins/responsiveManager";
 
 export function useResponsive() {
-  const width = ref(window.innerWidth);
-  const height = ref(window.innerHeight);
-  const device = ref("desktop");
+  const initialState = responsiveManager.getState();
+  const width = ref(initialState.widthRem ?? 0);
+  const height = ref(initialState.heightPx ?? 0);
+  const device = ref(initialState.device ?? "desktop");
   let unsubscribe = null;
 
   onMounted(() => {
-    unsubscribe = responsiveManager.subscribe(state => {
-      width.value = state.width;
-      height.value = state.height;
+    unsubscribe = responsiveManager.subscribe((state) => {
+      width.value = state.widthRem;
+      height.value = state.heightPx;
       device.value = state.device;
     });
   });
@@ -29,6 +30,6 @@ export function useResponsive() {
     device,
     isMobile,
     isTablet,
-    isDesktop
+    isDesktop,
   };
 }

@@ -1,11 +1,14 @@
 // src/plugins/responsiveManager.js
 import { BREAKPOINTS_REM } from "@/constants/breakpoints";
 
+const hasDOM = typeof window !== "undefined" && typeof document !== "undefined";
+
 /**
  * 실제 root font-size(px)를 가져온다
  * - 접근성 설정, 브라우저 zoom, 사용자 설정 반영
  */
 function getRootFontSizePx() {
+  if (!hasDOM) return 16;
   return parseFloat(getComputedStyle(document.documentElement).fontSize);
 }
 
@@ -14,6 +17,9 @@ function getRootFontSizePx() {
  */
 function getViewportWidthRem() {
   const rootFontSize = getRootFontSizePx();
+
+  if (!hasDOM) return 0;
+
   return window.innerWidth / rootFontSize;
 }
 
@@ -33,6 +39,8 @@ function getDevice(widthRem) {
 }
 
 function applyRootAttributes(bp) {
+  if (!hasDOM) return;
+
   const root = document.documentElement;
   root.setAttribute("data-bp", bp);
 
@@ -48,6 +56,27 @@ function applyRootAttributes(bp) {
 }
 
 function createResponsiveManager() {
+  if (!hasDOM) {
+    const fallbackState = {
+      widthRem: 0,
+      heightPx: 0,
+      rootFontSizePx: 16,
+      device: "desktop",
+      bp: "lg",
+    };
+
+    return {
+      subscribe(callback) {
+        callback(fallbackState);
+        return () => {};
+      },
+      getState() {
+        return fallbackState;
+      },
+      dispose() {},
+    };
+  }
+
   let rootFontSizePx = getRootFontSizePx();
   let widthRem = getViewportWidthRem();
   let heightPx = window.innerHeight;
@@ -128,9 +157,16 @@ function createResponsiveManager() {
     };
   }
 
+  function dispose() {
+    window.removeEventListener("resize", handleResize);
+    fontSizeObserver.disconnect();
+    subscribers.clear();
+  }
+
   return {
     subscribe,
     getState,
+    dispose,
   };
 }
 
