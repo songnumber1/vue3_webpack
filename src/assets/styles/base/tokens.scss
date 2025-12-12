@@ -46,24 +46,39 @@
   --layout-footer-height: 2.5rem;
   --layout-sidebar-width: 16rem;
 
-  /* Control sizes: default = md */
-  --control-font-size: 0.875rem;
-  --btn-height: 2.5rem; /* 40px */
+  /* ------------------------------------------------------------------
+     Control sizes (🔥 핵심 변경)
+     ------------------------------------------------------------------ */
+
+  /* 디자인 기준값 (scale 미적용) */
+  --control-font-base: 0.875rem;
+
+  /* 실제 사용값 (scale-factor 반영) */
+  --control-font-size: calc(var(--control-font-base) * var(--scale-factor));
+
+  --btn-height: 2.5rem; /* rem 기반이라 scale-factor 자동 반영 */
   --btn-padding-x: 1rem;
   --input-height: 2.5rem;
   --textarea-min-height: 5rem;
-  --avatar-size: 2rem; /* 32px */
+  --avatar-size: 2rem;
 
+  /* Global scale */
   --scale-factor: 1;
 }
 
+/* 🔥 rem 기준 자체를 scale */
 html {
   font-size: calc(16px * var(--scale-factor));
 }
 
-/* Breakpoint-based size tweaks (sm / md / lg) */
+/* ------------------------------------------------------------------
+   Breakpoint-based tweaks
+   → ❗ control-font-size ❌
+   → ✅ control-font-base 만 조정
+   ------------------------------------------------------------------ */
+
 [data-bp="sm"] {
-  --control-font-size: 0.8rem;
+  --control-font-base: 0.8rem;
   --btn-height: 2.25rem;
   --btn-padding-x: 0.75rem;
   --input-height: 2.25rem;
@@ -72,7 +87,7 @@ html {
 }
 
 [data-bp="md"] {
-  --control-font-size: 0.875rem;
+  --control-font-base: 0.875rem;
   --btn-height: 2.5rem;
   --btn-padding-x: 1rem;
   --input-height: 2.5rem;
@@ -81,7 +96,7 @@ html {
 }
 
 [data-bp="lg"] {
-  --control-font-size: 0.95rem;
+  --control-font-base: 0.95rem;
   --btn-height: 2.75rem;
   --btn-padding-x: 1.1rem;
   --input-height: 2.75rem;
@@ -89,7 +104,10 @@ html {
   --avatar-size: 2.25rem;
 }
 
-/* Dark theme base */
+/* ------------------------------------------------------------------
+   Dark theme
+   ------------------------------------------------------------------ */
+
 [data-theme="dark"] {
   --color-bg: #020617;
   --color-bg-soft: #020617;
@@ -110,11 +128,11 @@ html {
 
 /* Dark + BP fine tuning */
 [data-theme="dark"][data-bp="sm"] {
-  --control-font-size: 0.82rem;
+  --control-font-base: 0.82rem;
   --btn-height: 2.3rem;
 }
 
 [data-theme="dark"][data-bp="lg"] {
-  --control-font-size: 1rem;
+  --control-font-base: 1rem;
   --btn-height: 2.85rem;
 }
