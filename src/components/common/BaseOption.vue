@@ -4,7 +4,7 @@
     class="base-option"
     :class="{
       'base-option--selected': isSelected,
-      'base-option--disabled': disabled
+      'base-option--disabled': disabled,
     }"
     @click="handleClick"
   >
@@ -20,25 +20,25 @@ export default {
   props: {
     value: {
       type: [String, Number, Object],
-      required: true
+      required: true,
     },
     label: {
       type: String,
-      default: ""
+      default: "",
     },
     disabled: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   inject: {
     baseSelect: {
-      default: null
-    }
+      default: null,
+    },
   },
   data() {
     return {
-      selfLabel: ""
+      selfLabel: "",
     };
   },
   computed: {
@@ -55,19 +55,22 @@ export default {
       const q = (this.baseSelect.getSearchQuery() || "").toLowerCase();
       if (!q) return true;
       return this.effectiveLabel.toLowerCase().includes(q);
-    }
+    },
   },
   mounted() {
     // slot 텍스트를 label로 사용할 수 있도록 시도
     if (!this.label && this.$slots.default) {
       const vnodes = this.$slots.default();
-      const text = vnodes.map((v) => v.children || "").join("").trim();
+      const text = vnodes
+        .map((v) => v.children || "")
+        .join("")
+        .trim();
       this.selfLabel = text;
     }
     if (this.baseSelect && this.baseSelect.registerOption) {
       this.baseSelect.registerOption({
         value: this.value,
-        label: this.effectiveLabel
+        label: this.effectiveLabel,
       });
     }
   },
@@ -81,8 +84,8 @@ export default {
       if (this.disabled) return;
       if (!this.baseSelect || !this.baseSelect.onOptionClick) return;
       this.baseSelect.onOptionClick(this.value, this.effectiveLabel);
-    }
-  }
+    },
+  },
 };
 </script>
 
