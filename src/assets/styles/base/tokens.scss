@@ -48,13 +48,17 @@
 
   /* Control sizes: default = md */
   --control-font-size: 0.875rem;
-  --btn-height: 2.5rem;          /* 40px */
+  --btn-height: 2.5rem; /* 40px */
   --btn-padding-x: 1rem;
   --input-height: 2.5rem;
   --textarea-min-height: 5rem;
-  --avatar-size: 2rem;           /* 32px */
+  --avatar-size: 2rem; /* 32px */
 
   --scale-factor: 1;
+}
+
+html {
+  font-size: calc(16px * var(--scale-factor));
 }
 
 /* Breakpoint-based size tweaks (sm / md / lg) */
