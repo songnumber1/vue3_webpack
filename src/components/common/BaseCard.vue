@@ -1,0 +1,74 @@
+<template>
+  <article class="base-card" :class="{ 'base-card--hoverable': hoverable }">
+    <header v-if="$slots.header" class="base-card__header">
+      <slot name="header" />
+    </header>
+
+    <section class="base-card__body">
+      <slot />
+    </section>
+
+    <footer v-if="$slots.footer" class="base-card__footer">
+      <slot name="footer" />
+    </footer>
+  </article>
+</template>
+
+<script>
+export default {
+  name: "BaseCard",
+  props: {
+    hoverable: {
+      type: Boolean,
+      default: true
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/styles/mixins";
+
+.base-card {
+  @include surface-card;
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  transition: box-shadow 0.18s ease, transform 0.12s ease;
+
+  &--hoverable:hover {
+    box-shadow: var(--shadow-soft);
+    transform: translateY(-2px);
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-2);
+    font-size: var(--font-size-md);
+    font-weight: 600;
+  }
+
+  &__body {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+  }
+
+  &__footer {
+    margin-top: var(--space-3);
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+  }
+
+  @include mobile {
+    padding: var(--space-3);
+
+    &__header {
+      font-size: var(--font-size-sm);
+    }
+  }
+}
+</style>

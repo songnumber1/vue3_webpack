@@ -1,0 +1,155 @@
+<template>
+  <div class="chat-message-list">
+    <div
+      v-for="(msg, index) in messages"
+      :key="index"
+      class="chat-message"
+      :class="{
+        'chat-message--user': msg.role === 'user',
+        'chat-message--assistant': msg.role === 'assistant'
+      }"
+    >
+      <div class="chat-message__avatar">
+        <span v-if="msg.role === 'user'">👤</span>
+        <span v-else>🤖</span>
+      </div>
+      <div class="chat-message__bubble">
+        <div class="chat-message__role">
+          {{ msg.role === 'user' ? 'You' : 'DS Assistant' }}
+        </div>
+        <div class="chat-message__content">
+          {{ msg.content }}
+        </div>
+      </div>
+    </div>
+
+    <div v-if="typing" class="chat-message chat-message--assistant">
+      <div class="chat-message__avatar">
+        🤖
+      </div>
+      <div class="chat-message__bubble">
+        <div class="chat-message__role">
+          DS Assistant
+        </div>
+        <div class="chat-message__content chat-message__content--typing">
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "ChatMessageList",
+  props: {
+    messages: {
+      type: Array,
+      default: () => []
+    },
+    typing: {
+      type: Boolean,
+      default: false
+    }
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/styles/mixins";
+
+.chat-message-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.chat-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+
+  &--user {
+    flex-direction: row-reverse;
+
+    .chat-message__bubble {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .chat-message__role {
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  &--assistant {
+    .chat-message__bubble {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+    }
+  }
+}
+
+.chat-message__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--color-primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.chat-message__bubble {
+  max-width: 720px;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-subtle);
+  font-size: var(--font-size-sm);
+}
+
+.chat-message__role {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.chat-message__content {
+  white-space: pre-wrap;
+}
+
+.chat-message__content--typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-text-muted);
+  animation: blink 1.2s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink {
+  0%, 80%, 100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+</style>
