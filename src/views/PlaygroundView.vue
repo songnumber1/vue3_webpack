@@ -70,6 +70,35 @@
                 <BaseSwitch v-model="notifications"> 알림 허용 </BaseSwitch>
               </div>
             </div>
+            <div>
+              <h3>Select Options</h3>
+              <BaseSelect v-model="selectedValue" block>
+                <BaseOptionGroup label="Group A">
+                  <BaseOption
+                    v-for="opt in groupA"
+                    :key="opt.value"
+                    :value="opt.value"
+                    :label="opt.label"
+                    :selected="opt.value === selectedValue"
+                    @select="onSelect"
+                  />
+                </BaseOptionGroup>
+                <BaseOptionGroup label="Group B">
+                  <BaseOption
+                    v-for="opt in groupB"
+                    :key="opt.value"
+                    :value="opt.value"
+                    :label="opt.label"
+                    :selected="opt.value === selectedValue"
+                    @select="onSelect"
+                  />
+                </BaseOptionGroup>
+              </BaseSelect>
+
+              <div class="playground__hint">
+                선택된 값: <strong>{{ selectedValue }}</strong>
+              </div>
+            </div>
           </div>
         </section>
       </template>
@@ -209,6 +238,12 @@
         </section>
       </template>
 
+      <template #markdown>
+        <section class="playground__section">
+          <BaseMarkdown :content="sampleMarkdown" />
+        </section>
+      </template>
+
       <template #layout>
         <section class="playground__section">
           <h2>Layout</h2>
@@ -259,6 +294,10 @@ import BaseContextMenu from "@/components/common/BaseContextMenu.vue";
 import BaseContainer from "@/components/common/BaseContainer.vue";
 import BaseGrid from "@/components/common/BaseGrid.vue";
 import BaseSection from "@/components/common/BaseSection.vue";
+import BaseMarkdown from "@/components/common/BaseMarkdown.vue";
+import BaseSelect from "@/components/common/BaseSelect.vue";
+import BaseOption from "@/components/common/BaseOption.vue";
+import BaseOptionGroup from "@/components/common/BaseOptionGroup.vue";
 
 export default {
   name: "PlaygroundView",
@@ -286,6 +325,10 @@ export default {
     BaseContainer,
     BaseGrid,
     BaseSection,
+    BaseMarkdown,
+    BaseSelect,
+    BaseOption,
+    BaseOptionGroup,
   },
   data() {
     return {
@@ -295,6 +338,7 @@ export default {
         { key: "navigation", label: "Navigation", slot: "navigation" },
         { key: "data", label: "Data Display", slot: "data" },
         { key: "overlay", label: "Overlay / Feedback", slot: "overlay" },
+        { key: "markdown", label: "markdown", slot: "markdown" },
         { key: "layout", label: "Layout", slot: "layout" },
       ],
       email: "",
@@ -303,6 +347,16 @@ export default {
       language: "",
       themeChoice: "system",
       agree: false,
+      selectedValue: "opt-1",
+      groupA: [
+        { value: "opt-1", label: "Option 1" },
+        { value: "opt-2", label: "Option 2" },
+      ],
+      groupB: [
+        { value: "opt-3", label: "Option 3" },
+        { value: "opt-4", label: "Option 4" },
+      ],
+
       notifications: true,
 
       // Navigation data
@@ -358,6 +412,23 @@ export default {
         { label: "즐겨찾기에 추가", action: "fav" },
       ],
       lastContextSelect: null,
+
+      sampleMarkdown: `# BaseMarkdown Demo
+
+Vue 3 + **markdown-it** + \`highlight.js\` 기반 Markdown 렌더러입니다.
+
+\`\`\`js
+function hello(name) {
+  console.log("Hello " + name);
+}
+\`\`\`
+
+- 반응형 폰트 크기
+- 다크/라이트 테마 연동
+- 코드 블록 / 테이블 / 리스트 대응
+
+> 인용 블록, 코드, 링크 등 ChatGPT 스타일 UI에 최적화되어 있습니다.
+`,
     };
   },
   methods: {

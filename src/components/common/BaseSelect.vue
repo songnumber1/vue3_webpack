@@ -4,7 +4,7 @@
     :class="{
       'base-select--open': isOpen,
       'base-select--disabled': disabled,
-      'base-select--block': block
+      'base-select--block': block,
     }"
   >
     <!-- 컨트롤 영역 -->
@@ -25,17 +25,12 @@
         ✕
       </button>
 
-      <span class="base-select__arrow">
-        ▾
-      </span>
+      <span class="base-select__arrow"> ▽ </span>
     </div>
 
     <!-- 드롭다운 -->
     <transition name="fade">
-      <div
-        v-if="isOpen"
-        class="base-select__dropdown"
-      >
+      <div v-if="isOpen" class="base-select__dropdown">
         <!-- 검색 바 -->
         <div v-if="searchable" class="base-select__search">
           <input
@@ -66,46 +61,46 @@ export default {
         unregisterOption: this.unregisterOption,
         isSelected: this.isSelected,
         onOptionClick: this.onOptionClick,
-        getSearchQuery: () => this.searchQuery
-      }
+        getSearchQuery: () => this.searchQuery,
+      },
     };
   },
   props: {
     modelValue: {
       type: [String, Number, Object],
-      default: null
+      default: null,
     },
     placeholder: {
       type: String,
-      default: "선택하세요"
+      default: "선택하세요",
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     clearable: {
       type: Boolean,
-      default: true
+      default: true,
     },
     searchable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     searchPlaceholder: {
       type: String,
-      default: "검색..."
+      default: "검색...",
     },
     block: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ["update:modelValue", "change"],
   data() {
     return {
       isOpen: false,
       searchQuery: "",
-      options: [] // { value, label }
+      options: [], // { value, label }
     };
   },
   computed: {
@@ -121,7 +116,7 @@ export default {
         this.isSameValue(opt.value, this.modelValue)
       );
       return match ? match.label : "";
-    }
+    },
   },
   mounted() {
     window.addEventListener("click", this.handleClickOutside);
@@ -173,8 +168,8 @@ export default {
       this.options = this.options.filter(
         (opt) => !this.isSameValue(opt.value, value)
       );
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -202,7 +197,7 @@ export default {
   width: 100%;
   min-height: var(--input-height);
   padding: 0 var(--space-4);
-  padding-right: calc(var(--space-6) + 1.25rem); /* 화살표 & clear 영역 확보 */
+  padding-right: calc(var(--space-4)); /* 화살표 & clear 영역 확보 */
 
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
