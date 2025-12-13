@@ -48,3 +48,20 @@
   border-color: #94a3b8 !important;
   color: #94a3b8 !important;
 }
+
+
+/* ================= LIGHT CHAT BUBBLE VISIBILITY ================= */
+[data-theme="light"] .msg .bubble {
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .msg.user .bubble {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .msg.ai .bubble {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+}
