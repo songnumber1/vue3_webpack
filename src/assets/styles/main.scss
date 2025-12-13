@@ -1,47 +1,50 @@
-@use './theme.scss';
+/* =================================================
+   Light Theme – Send Button Visibility FINAL FIX
+   ================================================= */
 
-/* =====================================================
-   Global
-   ===================================================== */
-body {
-  margin: 0;
-  background: var(--bg-color);
-  color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+/* Header theme button (keep as-is, safety) */
+[data-theme="light"] .theme-btn.active {
+  background-color: #ffffff !important;
+  color: #111827 !important;
+  border: 1px solid #d1d5db !important;
 }
 
-/* =====================================================
-   Buttons
-   ===================================================== */
-.theme-btn {
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-color);
-  background: transparent;
-  color: var(--text-muted-color);
-  cursor: pointer;
-  transition: all 0.15s ease;
+/* ---------------- SEND BUTTON ---------------- */
+/* cover button + icon/text inside */
+[data-theme="light"] .send-btn,
+[data-theme="light"] button.send,
+[data-theme="light"] .chat-send,
+[data-theme="light"] .chat-input button {
+  background-color: transparent !important;
+  border: 1.5px solid #2563eb !important;
+  color: #2563eb !important;
 }
 
-.theme-btn:hover {
-  background: var(--surface-color);
-  color: var(--text-color);
+/* icon / svg / span inside button */
+[data-theme="light"] .send-btn svg,
+[data-theme="light"] .send-btn span,
+[data-theme="light"] .send-btn i {
+  color: #2563eb !important;
+  fill: #2563eb !important;
 }
 
-.theme-btn.active {
-  background: var(--theme-btn-active-bg);
-  color: var(--theme-btn-active-text);
-  border-color: var(--theme-btn-active-border);
+/* hover */
+[data-theme="light"] .send-btn:hover,
+[data-theme="light"] button.send:hover,
+[data-theme="light"] .chat-input button:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
 }
 
-/* =====================================================
-   Utility
-   ===================================================== */
-.border {
-  border: 1px solid var(--border-color);
+[data-theme="light"] .send-btn:hover svg,
+[data-theme="light"] .send-btn:hover span,
+[data-theme="light"] .send-btn:hover i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
 }
 
-.text-muted {
-  color: var(--text-muted-color);
+/* disabled */
+[data-theme="light"] .send-btn:disabled {
+  border-color: #94a3b8 !important;
+  color: #94a3b8 !important;
 }
