@@ -71,33 +71,47 @@
               </div>
             </div>
             <div>
-              <h3>Select Options</h3>
-              <BaseSelect v-model="selectedValue" block>
-                <BaseOptionGroup label="Group A">
-                  <BaseOption
-                    v-for="opt in groupA"
-                    :key="opt.value"
-                    :value="opt.value"
-                    :label="opt.label"
-                    :selected="opt.value === selectedValue"
-                    @select="onSelect"
-                  />
-                </BaseOptionGroup>
-                <BaseOptionGroup label="Group B">
-                  <BaseOption
-                    v-for="opt in groupB"
-                    :key="opt.value"
-                    :value="opt.value"
-                    :label="opt.label"
-                    :selected="opt.value === selectedValue"
-                    @select="onSelect"
-                  />
-                </BaseOptionGroup>
+              <h3>Select Custom Options</h3>
+              <BaseSelect
+                v-model="selectedCustomValue"
+                block
+                placeholder="선택하세요"
+              >
+                <optgroup label="Group A">
+                  <option value="a1">Option 1</option>
+                  <option value="a2">Option 2</option>
+                </optgroup>
+
+                <optgroup label="Group B">
+                  <option value="b1">Option 3</option>
+                  <option value="b2">Option 4</option>
+                </optgroup>
               </BaseSelect>
 
               <div class="playground__hint">
-                선택된 값: <strong>{{ selectedValue }}</strong>
+                선택된 값: <strong>{{ selectedCustomValue }}</strong>
               </div>
+            </div>
+
+            <div>
+              <h3>Select Options</h3>
+              <BaseSelect
+                v-model="selectedValue"
+                block
+                placeholder="선택하세요"
+              >
+                <option
+                  v-for="opt in options"
+                  :key="opt.value"
+                  :value="opt.value"
+                >
+                  {{ opt.label }}
+                </option>
+              </BaseSelect>
+
+              <p style="margin-top: 1rem">
+                Selected: <strong>{{ selectedValue }}</strong>
+              </p>
             </div>
           </div>
         </section>
@@ -296,8 +310,6 @@ import BaseGrid from "@/components/common/BaseGrid.vue";
 import BaseSection from "@/components/common/BaseSection.vue";
 import BaseMarkdown from "@/components/common/BaseMarkdown.vue";
 import BaseSelect from "@/components/common/BaseSelect.vue";
-import BaseOption from "@/components/common/BaseOption.vue";
-import BaseOptionGroup from "@/components/common/BaseOptionGroup.vue";
 
 export default {
   name: "PlaygroundView",
@@ -327,8 +339,6 @@ export default {
     BaseSection,
     BaseMarkdown,
     BaseSelect,
-    BaseOption,
-    BaseOptionGroup,
   },
   data() {
     return {
@@ -347,7 +357,7 @@ export default {
       language: "",
       themeChoice: "system",
       agree: false,
-      selectedValue: "opt-1",
+      selectedCustomValue: "opt-1",
       groupA: [
         { value: "opt-1", label: "Option 1" },
         { value: "opt-2", label: "Option 2" },
@@ -355,6 +365,12 @@ export default {
       groupB: [
         { value: "opt-3", label: "Option 3" },
         { value: "opt-4", label: "Option 4" },
+      ],
+      selectedValue: "",
+      options: [
+        { value: "opt1", label: "Option 1" },
+        { value: "opt2", label: "Option 2" },
+        { value: "opt3", label: "Option 3" },
       ],
 
       notifications: true,

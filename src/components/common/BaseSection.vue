@@ -54,7 +54,6 @@
 export default {
   name: "BaseSelect",
   provide() {
-    // BaseOption / BaseOptionGroup 에서 inject 해서 사용
     return {
       baseSelect: {
         registerOption: this.registerOption,

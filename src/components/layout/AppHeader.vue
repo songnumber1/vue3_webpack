@@ -1,56 +1,63 @@
 <template>
   <header class="app-header">
+    <!-- LEFT -->
     <div class="app-header__left">
-      <button
+      <BaseButton
         class="app-header__icon-button app-header__menu-button"
-        @click="$emit('toggle-sidebar')"
+        variant="ghost"
         aria-label="Toggle sidebar"
+        @click="$emit('toggle-sidebar')"
       >
         ☰
-      </button>
+      </BaseButton>
+
       <div class="app-header__title">
         <span class="app-header__logo">⚡</span>
         <span class="app-header__text">DS Assistant UI</span>
       </div>
     </div>
 
+    <!-- RIGHT -->
     <div class="app-header__right">
-      <label class="app-header__theme-picker">
-        <span class="app-header__theme-label">Theme</span>
-        <select
-          class="app-header__theme-select"
-          v-model="selectedTheme"
-          aria-label="Select theme"
-        >
-          <option
-            v-for="option in availableThemes"
-            :key="option"
-            :value="option"
-          >
-            {{ formatThemeLabel(option) }}
-          </option>
-        </select>
-      </label>
+      <BaseSelect
+        class="app-header__theme-select"
+        v-model="selectedTheme"
+        aria-label="Select theme"
+      >
+        <option v-for="option in availableThemes" :key="option" :value="option">
+          {{ formatThemeLabel(option) }}
+        </option>
+      </BaseSelect>
 
-      <button
+      <BaseButton
         class="app-header__icon-button"
+        variant="ghost"
         @click="toggleTheme"
         :aria-label="`Cycle theme (current: ${theme})`"
       >
         <span v-if="isDark">🌙</span>
         <span v-else-if="theme === 'dim'">🌓</span>
         <span v-else>☀️</span>
-      </button>
+      </BaseButton>
     </div>
   </header>
 </template>
 
 <script>
-import { useTheme } from "@/composables/useTheme";
 import { computed } from "vue";
+import { useTheme } from "@/composables/useTheme";
+
+import BaseButton from "@/components/common/BaseButton.vue";
+import BaseSelect from "@/components/common/BaseSelect.vue";
+import BaseLabel from "@/components/common/BaseLabel.vue";
 
 export default {
   name: "AppHeader",
+  components: {
+    BaseButton,
+    BaseSelect,
+    BaseLabel,
+  },
   emits: ["toggle-sidebar"],
   setup() {
     const { theme, isDark, availableThemes, setTheme, toggleTheme } =
