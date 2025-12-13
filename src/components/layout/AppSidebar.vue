@@ -1,29 +1,39 @@
 <template>
   <aside class="sidebar" :class="{ open: open, collapsed: collapsed }">
-    <strong class="label">DS Assistant</strong>
+    <strong v-if="!collapsed" class="label">DS Assistant</strong>
 
-    <router-link to="/chat"
-      ><span class="icon">💬</span><span class="text">Chat</span></router-link
-    >
-    <router-link to="/playground"
-      ><span class="icon">🧪</span
-      ><span class="text">Playground</span></router-link
-    >
+    <!-- 아이콘 레일: collapsed 시에도 UI가 깨지지 않도록 네비게이션은 항상 유지 -->
+    <nav class="nav">
+      <router-link to="/chat" aria-label="Chat">
+        <span class="icon">💬</span><span class="text">Chat</span>
+      </router-link>
+      <router-link to="/playground" aria-label="Playground">
+        <span class="icon">🧪</span><span class="text">Playground</span>
+      </router-link>
+    </nav>
 
-    <hr />
+    <!-- collapsed 상태에서는 채팅 리스트를 숨기고, 아이콘만 보여줌 -->
+    <template v-if="!collapsed">
+      <hr />
 
-    <button type="button" @click="startNewChat">
-      <span class="icon">➕</span><span class="text">새 대화</span>
-    </button>
-
-    <div v-for="c in safeChats" :key="c.id" class="chat-item">
-      <button type="button" class="chat-title" @click="selectChat(c.id)">
-        {{ c.title }}
+      <button type="button" class="chat-new" @click="startNewChat">
+        <span class="icon">➕</span><span class="text">새 대화</span>
       </button>
-      <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
-        X
-      </button>
-    </div>
+
+      <div class="chat-list">
+        <div
+          v-for="c in safeChats"
+          :key="c.id"
+          class="chat-item"
+          :class="{ active: store.activeChatId === c.id }"
+        >
+          <button type="button" class="chat-title" @click="selectChat(c.id)">
+            {{ c.title }}
+          </button>
+          <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">🗑</button>
+        </div>
+      </div>
+    </template>
   </aside>
 </template>
 

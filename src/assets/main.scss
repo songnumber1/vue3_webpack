@@ -104,6 +104,38 @@ body {
   display: none;
 }
 
+/* collapsed(데스크탑)에서는 아이콘만 중앙 정렬로 보여 UX 깨짐 방지 */
+.sidebar.collapsed .nav a {
+  justify-content: center;
+}
+
+/* =========================================================
+   MOBILE OFFCANVAS
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    width: 260px;
+    transform: translateX(-110%);
+    transition: transform 0.25s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* 모바일에서는 collapse UI를 사용하지 않음 */
+  .sidebar.collapsed {
+    width: 260px;
+  }
+}
+
 .sidebar button {
   cursor: pointer;
   background: none;

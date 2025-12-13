@@ -1,11 +1,12 @@
 <template>
   <div class="layout">
+    <!-- DESKTOP: sidebar는 레이아웃(flow) 안에 배치 -->
     <AppSidebar
+      v-if="!isMobile"
       :store="store"
-      :open="sidebarOpen"
+      :open="true"
       :collapsed="sidebarCollapsed"
-      :is-mobile="isMobile"
-      @close="sidebarOpen = false"
+      :is-mobile="false"
       @store:update="onStoreUpdate"
     />
 
@@ -24,6 +25,18 @@
       <AppFooter />
     </div>
 
+    <!-- MOBILE: sidebar는 overlay(fixed)로 따로 렌더링해서 '빈 공간'이 생기지 않게 함 -->
+    <AppSidebar
+      v-if="isMobile"
+      class="mobile-sidebar"
+      :store="store"
+      :open="sidebarOpen"
+      :collapsed="false"
+      :is-mobile="true"
+      @close="sidebarOpen = false"
+      @store:update="onStoreUpdate"
+    />
+
     <div
       v-if="isMobile && sidebarOpen"
       class="backdrop"
@@ -31,6 +44,7 @@
     />
   </div>
 </template>
+
 
 <script>
 import AppHeader from "./AppHeader.vue";
@@ -137,7 +151,11 @@ export default {
 .backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  /*
+    Mobile에서 사이드바 바깥 영역 클릭으로 닫히게 하되,
+    전체 화면이 회색으로 덮이는(backdrop dim) UX는 제거.
+  */
+  background: rgba(0, 0, 0, 0);
   z-index: 40;
 }
 </style>
