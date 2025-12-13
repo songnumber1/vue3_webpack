@@ -1,6 +1,6 @@
 <template>
   <header class="header">
-    <button class="hamburger" @click="$emit('toggle-sidebar')">☰</button>
+    <button type="button" class="hamburger" @click="$emit('toggle-sidebar')">☰</button>
     <strong>DS Assistant</strong>
 
     <div class="themes">
