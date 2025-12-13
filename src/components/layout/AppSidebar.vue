@@ -30,7 +30,9 @@
           <button type="button" class="chat-title" @click="selectChat(c.id)">
             {{ c.title }}
           </button>
-          <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">🗑</button>
+          <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
+            🗑
+          </button>
         </div>
       </div>
     </template>
@@ -67,7 +69,10 @@ export default {
   methods: {
     startNewChat() {
       // prop store를 직접 mutate 하되, undefined 방어
-      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      const s =
+        this.store && typeof this.store === "object"
+          ? this.store
+          : (this.store = {});
       s.chats = Array.isArray(s.chats) ? s.chats : [];
       s.activeChatId = null;
       s.draft = true;
@@ -77,7 +82,10 @@ export default {
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
     selectChat(id) {
-      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      const s =
+        this.store && typeof this.store === "object"
+          ? this.store
+          : (this.store = {});
       s.chats = Array.isArray(s.chats) ? s.chats : [];
       s.activeChatId = id;
       s.draft = false;
@@ -86,7 +94,10 @@ export default {
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
     deleteChat(id) {
-      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      const s =
+        this.store && typeof this.store === "object"
+          ? this.store
+          : (this.store = {});
       const chats = Array.isArray(s.chats) ? s.chats : [];
       s.chats = chats.filter((c) => c.id !== id);
 
@@ -110,6 +121,7 @@ export default {
   gap: 8px;
 }
 .chat-title {
+  font-size: 0.8rem;
   flex: 1;
   background: none;
   border: none;
