@@ -1,25 +1,30 @@
 <template>
-  <div class="layout-root">
-    <AppHeader @toggle-sidebar="toggleSidebar" />
+  <div class="layout">
+    <AppSidebar
+      :open="sidebarOpen"
+      :is-mobile="isMobile"
+      @close="sidebarOpen = false"
+    />
 
-    <div class="layout-main">
-      <AppSidebar
-        :isOpen="sidebarOpen"
-        :isMobileOrTablet="!isDesktop"
-        :activePage="activePage"
-        @close="sidebarOpen = false"
-        @navigate="handleNavigate"
+    <div class="main">
+      <AppHeader
+        :is-mobile="isMobile"
+        @toggle-sidebar="sidebarOpen = !sidebarOpen"
       />
 
-      <main class="layout-content">
-        <div class="layout-content__inner">
-          <ChatView v-if="activePage === 'chat'" />
-          <PlaygroundView v-else-if="activePage === 'playground'" />
-        </div>
+      <main class="content">
+        <ChatView />
       </main>
+
+      <AppFooter />
     </div>
 
-    <AppFooter />
+    <!-- backdrop for mobile sidebar -->
+    <div
+      v-if="isMobile && sidebarOpen"
+      class="backdrop"
+      @click="sidebarOpen = false"
+    ></div>
   </div>
 </template>
 
@@ -28,48 +33,52 @@ import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
 import ChatView from "@/views/ChatView.vue";
-import PlaygroundView from "@/views/PlaygroundView.vue";
 import { useResponsive } from "@/composables/useResponsive";
 
 export default {
   name: "AppLayout",
-  components: { AppHeader, AppSidebar, AppFooter, ChatView, PlaygroundView },
-  setup() {
-    const { isDesktop } = useResponsive();
-    return { isDesktop };
-  },
+
   data() {
     return {
-      sidebarOpen: true,
-      activePage: "chat",
+      sidebarOpen: false,
     };
   },
-  watch: {
-    isDesktop: {
-      immediate: true,
-      handler(val) {
-        if (val) {
-          this.sidebarOpen = true;
-        } else {
-          this.sidebarOpen = false;
-        }
-      },
+
+  computed: {
+    isMobile() {
+      return this.$responsive.getState().bp === "sm";
     },
   },
-  methods: {
-    toggleSidebar() {
-      this.sidebarOpen = !this.sidebarOpen;
-    },
-    handleNavigate(page) {
-      this.activePage = page;
-      if (!this.isDesktop) {
-        this.sidebarOpen = false;
-      }
+
+  watch: {
+    isMobile(v) {
+      if (!v) this.sidebarOpen = false;
     },
   },
 };
 </script>
 
-<style lang="scss">
-@use "@/assets/styles/layout/applayout.scss";
+<style scoped lang="scss">
+.layout {
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg);
+}
+.main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.content {
+  flex: 1;
+  min-height: 0;
+  padding: var(--gap-2);
+}
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 40;
+}
 </style>

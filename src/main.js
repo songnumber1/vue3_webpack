@@ -1,6 +1,8 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import "@/assets/styles/base/main.scss";
 
-const app = createApp(App);
-app.mount("#app");
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import 'katex/dist/katex.min.css';
+import './assets/main.scss';
+
+createApp(App).use(router).mount('#app');

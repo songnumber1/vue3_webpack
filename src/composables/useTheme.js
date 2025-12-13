@@ -1,28 +1,11 @@
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
-import themeManager from "@/plugins/themeManager";
+import { inject } from "vue";
 
 export function useTheme() {
-  const theme = ref(themeManager.getTheme());
-  const availableThemes = computed(() => themeManager.getAvailableThemes());
-  let unsubscribe = null;
-
-  onMounted(() => {
-    unsubscribe = themeManager.subscribe((next) => {
-      theme.value = next;
-    });
-  });
-
-  onBeforeUnmount(() => {
-    if (unsubscribe) unsubscribe();
-  });
-
-  const isDark = computed(() => theme.value === "dark");
-
-  return {
-    theme,
-    isDark,
-    availableThemes,
-    setTheme: themeManager.setTheme,
-    toggleTheme: themeManager.toggleTheme,
-  };
+  const api = inject("theme");
+  if (!api) {
+    throw new Error(
+      "themeManager plugin is not installed. Call app.use(themeManager)."
+    );
+  }
+  return api;
 }

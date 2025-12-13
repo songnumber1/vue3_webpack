@@ -1,88 +1,105 @@
 <template>
-  <header class="app-header">
-    <!-- LEFT -->
-    <div class="app-header__left">
-      <BaseButton
-        class="app-header__icon-button app-header__menu-button"
-        variant="ghost"
-        aria-label="Toggle sidebar"
+  <header class="header card">
+    <div class="left">
+      <button
+        v-if="isMobile"
+        class="btn btn-ghost btn-rsp"
         @click="$emit('toggle-sidebar')"
+        aria-label="menu"
       >
         ☰
-      </BaseButton>
+      </button>
 
-      <div class="app-header__title">
-        <span class="app-header__logo">⚡</span>
-        <span class="app-header__text">DS Assistant UI</span>
+      <div class="title">
+        <div class="name">Chat UI</div>
+        <div class="sub muted">ChatGPT-style layout · Vue 3 Option API</div>
       </div>
     </div>
 
-    <!-- RIGHT -->
-    <div class="app-header__right">
-      <BaseSelect
-        class="app-header__theme-select"
-        v-model="selectedTheme"
-        aria-label="Select theme"
-      >
-        <option v-for="option in availableThemes" :key="option" :value="option">
-          {{ formatThemeLabel(option) }}
-        </option>
-      </BaseSelect>
-
-      <BaseButton
-        class="app-header__icon-button"
-        variant="ghost"
-        @click="toggleTheme"
-        :aria-label="`Cycle theme (current: ${theme})`"
-      >
-        <span v-if="isDark">🌙</span>
-        <span v-else-if="theme === 'dim'">🌓</span>
-        <span v-else>☀️</span>
-      </BaseButton>
+    <div class="right">
+      <span class="label label-rsp">Theme</span>
+      <div class="seg">
+        <button
+          v-for="t in themes"
+          :key="t"
+          class="btn btn-sm"
+          :class="{ 'btn-primary': t === theme }"
+          @click="setTheme(t)"
+        >
+          {{ t }}
+        </button>
+      </div>
     </div>
   </header>
 </template>
 
 <script>
-import { computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
-
-import BaseButton from "@/components/common/BaseButton.vue";
-import BaseSelect from "@/components/common/BaseSelect.vue";
-import BaseLabel from "@/components/common/BaseLabel.vue";
 
 export default {
   name: "AppHeader",
-  components: {
-    BaseButton,
-    BaseSelect,
-    BaseLabel,
+  props: {
+    isMobile: { type: Boolean, default: false },
   },
-  emits: ["toggle-sidebar"],
-  setup() {
-    const { theme, isDark, availableThemes, setTheme, toggleTheme } =
-      useTheme();
 
-    const selectedTheme = computed({
-      get: () => theme.value,
-      set: (value) => setTheme(value),
-    });
+  computed: {
+    theme() {
+      return this.$theme.getState().theme;
+    },
+    themes() {
+      return this.$theme.themes;
+    },
+  },
 
-    const formatThemeLabel = (name) =>
-      name.charAt(0).toUpperCase() + name.slice(1);
-
-    return {
-      theme,
-      isDark,
-      availableThemes,
-      selectedTheme,
-      toggleTheme,
-      formatThemeLabel,
-    };
+  methods: {
+    setTheme(t) {
+      this.$theme.setTheme(t);
+    },
   },
 };
 </script>
 
-<style lang="scss">
-@use "@/assets/styles/layout/appheader.scss";
+<style scoped lang="scss">
+.header {
+  margin: var(--gap-2);
+  padding: var(--gap-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-2);
+}
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  min-width: 0;
+}
+.title {
+  min-width: 0;
+}
+.name {
+  font-size: calc(16px * var(--ui-scale));
+  font-weight: 700;
+}
+.sub {
+  font-size: var(--font-sm);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 52vw;
+}
+.right {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-1);
+}
+.seg {
+  display: inline-flex;
+  gap: calc(6px * var(--ui-scale));
+  padding: calc(4px * var(--ui-scale));
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--panel), var(--panel-2) 30%);
+}
 </style>

@@ -3,55 +3,53 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 
 module.exports = {
-  entry: "./src/main.js",
+  entry: path.resolve(__dirname, "src/main.js"),
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.[contenthash].js",
     clean: true,
-  },
-  devtool: "source-map",
-  devServer: {
-    static: "./dist",
-    hot: true,
-    port: 5173,
+    publicPath: "/",
   },
   resolve: {
+    extensions: [".js", ".vue", ".json"],
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
-    extensions: [".js", ".vue"],
+  },
+  devServer: {
+    static: { directory: path.join(__dirname, "public") },
+    historyApiFallback: true,
+    hot: true,
+    port: 5174,
+    client: { overlay: true },
   },
   module: {
     rules: [
       { test: /\.vue$/, loader: "vue-loader" },
       {
-        test: /\.scss$/,
+        test: /\.m?js$/,
+        exclude: /node_modules/,
+        use: { loader: "babel-loader" },
+      },
+      {
+        test: /\.(sa|sc|c)ss$/,
         use: [
-          "vue-style-loader",
-          {
-            loader: "css-loader",
-            options: { esModule: false },
-          },
-          {
-            loader: "sass-loader",
-            options: {
-              sourceMap: true,
-              sassOptions: { quietDeps: true },
-            },
-          },
+          "style-loader",
+          { loader: "css-loader", options: { sourceMap: true } },
+          { loader: "sass-loader", options: { sourceMap: true } },
         ],
       },
       {
-        test: /\.js$/,
-        loader: "babel-loader",
-        exclude: /node_modules/,
+        test: /\.(png|jpg|jpeg|gif|svg|webp)$/i,
+        type: "asset/resource",
+        generator: { filename: "assets/[name].[hash][ext]" },
       },
     ],
   },
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
+      template: path.resolve(__dirname, "public/index.html"),
     }),
   ],
 };
