@@ -1,14 +1,10 @@
+<!-- src/App.vue -->
 <template>
-  <AppLayout>
-    <router-view />
-  </AppLayout>
+  <router-view />
 </template>
 
 <script>
-import AppLayout from "@/components/layout/AppLayout.vue";
-
 export default {
   name: "App",
-  components: { AppLayout },
 };
 </script>

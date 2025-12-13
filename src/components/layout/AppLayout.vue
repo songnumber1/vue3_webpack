@@ -1,16 +1,22 @@
 <template>
   <div class="layout">
     <AppSidebar
+      :store="store"
       :open="sidebarOpen"
       :is-mobile="isMobile"
       @close="sidebarOpen = false"
     />
 
     <div class="main">
-      <AppHeader :is-mobile="isMobile" @toggle-sidebar="toggleSidebar" />
+      <AppHeader
+        :theme="theme"
+        :is-mobile="isMobile"
+        @toggle-sidebar="sidebarOpen = !sidebarOpen"
+        @theme-change="setTheme"
+      />
 
       <main class="content">
-        <slot />
+        <router-view :store="store" @store:update="onStoreUpdate" />
       </main>
 
       <AppFooter />
@@ -32,39 +38,45 @@ import { loadStore, saveStore } from "@/services/chatStore";
 
 export default {
   name: "AppLayout",
+
   components: { AppHeader, AppSidebar, AppFooter },
 
   data() {
     return {
-      sidebarOpen: false,
       store: loadStore(),
+      sidebarOpen: false,
+      theme: "light",
     };
   },
 
   computed: {
     isMobile() {
-      return this.$responsive.getState().bp === "sm";
+      return window.innerWidth <= 768;
     },
   },
 
-  provide() {
-    return {
-      chatStore: this.store,
-      updateChatStore: this.updateStore,
-    };
+  mounted() {
+    const t = localStorage.getItem("theme") || "light";
+    this.setTheme(t);
+    window.addEventListener("resize", this.onResize);
   },
 
-  watch: {
-    isMobile(v) {
-      if (!v) this.sidebarOpen = false;
-    },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.onResize);
   },
 
   methods: {
-    toggleSidebar() {
-      this.sidebarOpen = !this.sidebarOpen;
+    onResize() {
+      if (!this.isMobile) this.sidebarOpen = false;
     },
-    updateStore(newStore) {
+
+    setTheme(t) {
+      this.theme = t;
+      document.documentElement.setAttribute("data-theme", t);
+      localStorage.setItem("theme", t);
+    },
+
+    onStoreUpdate(newStore) {
       this.store = newStore;
       saveStore(this.store);
     },
@@ -72,10 +84,10 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
+<style scoped>
 .layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
 }
 .main {
   flex: 1;
@@ -86,6 +98,7 @@ export default {
 .content {
   flex: 1;
   min-height: 0;
+  overflow: hidden;
 }
 .backdrop {
   position: fixed;

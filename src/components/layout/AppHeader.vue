@@ -1,14 +1,15 @@
 <template>
   <header class="header">
-    <button @click="$emit('toggle-sidebar')">☰</button>
+    <button class="hamburger" @click="$emit('toggle-sidebar')">☰</button>
     <strong>DS Assistant</strong>
-    <div>
+
+    <div class="themes">
       <button
         v-for="t in ['light', 'dim', 'dark']"
         :key="t"
         class="theme-btn"
         :class="{ active: theme === t }"
-        @click="setTheme(t)"
+        @click="$emit('theme-change', t)"
       >
         {{ t }}
       </button>
@@ -18,20 +19,9 @@
 
 <script>
 export default {
-  props: { isMobile: Boolean },
-  data() {
-    return { theme: "light" };
-  },
-  mounted() {
-    const t = localStorage.getItem("theme") || "light";
-    this.setTheme(t);
-  },
-  methods: {
-    setTheme(t) {
-      this.theme = t;
-      document.documentElement.setAttribute("data-theme", t);
-      localStorage.setItem("theme", t);
-    },
+  props: {
+    theme: String,
+    isMobile: Boolean,
   },
 };
 </script>
