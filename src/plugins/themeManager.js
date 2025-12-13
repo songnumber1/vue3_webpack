@@ -1,6 +1,6 @@
 const hasDOM = typeof window !== "undefined" && typeof document !== "undefined";
 const THEME_KEY = "app-theme";
-const THEME_LIST = ["light", "dark"];
+const THEME_LIST = ["light", "dim", "dark"];
 
 function createThemeManager() {
   let currentTheme = loadInitialTheme();
@@ -29,9 +29,8 @@ function createThemeManager() {
     document.documentElement.setAttribute("data-theme", theme);
   }
 
-  function getTheme() {
-    return currentTheme;
-  }
+  const getTheme = () => currentTheme;
+  const getAvailableThemes = () => [...THEME_LIST];
 
   function setTheme(theme) {
     if (!THEME_LIST.includes(theme)) return;
@@ -49,7 +48,9 @@ function createThemeManager() {
   }
 
   function toggleTheme() {
-    setTheme(currentTheme === "light" ? "dark" : "light");
+    const idx = THEME_LIST.indexOf(currentTheme);
+    const next = THEME_LIST[(idx + 1) % THEME_LIST.length];
+    setTheme(next);
   }
 
   function subscribe(callback) {
@@ -60,6 +61,7 @@ function createThemeManager() {
 
   return {
     getTheme,
+    getAvailableThemes,
     setTheme,
     toggleTheme,
     subscribe,

@@ -3,10 +3,11 @@ import themeManager from "@/plugins/themeManager";
 
 export function useTheme() {
   const theme = ref(themeManager.getTheme());
+  const availableThemes = computed(() => themeManager.getAvailableThemes());
   let unsubscribe = null;
 
   onMounted(() => {
-    unsubscribe = themeManager.subscribe(next => {
+    unsubscribe = themeManager.subscribe((next) => {
       theme.value = next;
     });
   });
@@ -20,7 +21,8 @@ export function useTheme() {
   return {
     theme,
     isDark,
+    availableThemes,
     setTheme: themeManager.setTheme,
-    toggleTheme: themeManager.toggleTheme
+    toggleTheme: themeManager.toggleTheme,
   };
 }

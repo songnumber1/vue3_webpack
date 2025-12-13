@@ -34,7 +34,41 @@
 .app-header__right {
   display: flex;
   align-items: center;
+  gap: var(--space-3);
+}
+
+.app-header__theme-picker {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-2);
+  padding: 0 var(--space-2);
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  height: 2.25rem;
+}
+
+.app-header__theme-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-header__theme-select {
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
 }
 
 .app-header__icon-button {
