@@ -2,11 +2,18 @@
   <div class="chat-box">
     <!-- 메시지 영역 -->
     <div class="messages" ref="messages">
-      <div v-if="isDraft" class="muted">새 대화를 시작하세요.</div>
+      <!-- ✅ ChatGPT처럼: 새 대화(draft)일 때는 '빈 상태' 전용 UI/UX를 보여주되,
+           하단 입력창은 그대로 유지 -->
+      <NewChatLanding
+        v-if="isDraft"
+        @pick="applySuggestion"
+      />
 
-      <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.role">
-        <div class="bubble" v-html="render(m.text)" />
-      </div>
+      <template v-else>
+        <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.role">
+          <div class="bubble" v-html="render(m.text)" />
+        </div>
+      </template>
     </div>
 
     <!-- 입력 영역 -->
@@ -25,14 +32,18 @@
 <script>
 import { md } from "@/utils/markdown";
 import { createChatFromFirstMessage } from "@/services/chatStore";
+import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 
 export default {
   name: "ChatView",
 
+  components: { NewChatLanding },
+
   props: {
     store: {
       type: Object,
-      required: true,
+      // route 전환/초기 렌더 타이밍에서 store가 잠깐 undefined가 될 수 있어 방어
+      default: () => ({ chats: [], activeChatId: null, draft: true }),
     },
   },
 
@@ -82,6 +93,15 @@ export default {
   },
 
   methods: {
+    applySuggestion(text) {
+      this.input = text || "";
+      // textarea에 포커스(가능하면)
+      this.$nextTick(() => {
+        const ta = this.$el?.querySelector?.("textarea");
+        if (ta && ta.focus) ta.focus();
+      });
+    },
+
     render(text) {
       return md.render(text || "");
     },
@@ -108,6 +128,9 @@ export default {
     send() {
       const text = (this.input || "").trim();
       if (!text) return;
+
+      // store가 비정상일 때도 크래시하지 않도록 normalize
+      if (!this.store || typeof this.store !== "object") return;
 
       // 채팅 최초 생성
       if (!this.activeChat) {

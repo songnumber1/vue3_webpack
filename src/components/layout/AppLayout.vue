@@ -151,6 +151,18 @@ export default {
     전체 화면이 회색으로 덮이는(backdrop dim) UX는 제거.
   */
   background: rgba(0, 0, 0, 0);
-  z-index: 40;
+  z-index: 45;
+  /* 사이드바 영역(260px)은 backdrop이 덮지 않게 하여 클릭 방해 버그 방지 */
+  left: 0;
 }
+
+@media (max-width: 768px) {
+  .backdrop {
+    left: 260px;
+  }
+  .mobile-sidebar {
+    z-index: 50;
+  }
+}
+
 </style>

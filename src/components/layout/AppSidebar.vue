@@ -25,7 +25,7 @@
           v-for="c in safeChats"
           :key="c.id"
           class="chat-item"
-          :class="{ active: store.activeChatId === c.id }"
+          :class="{ active: safeStore.activeChatId === c.id }"
         >
           <button type="button" class="chat-title" @click="selectChat(c.id)">
             {{ c.title }}
@@ -40,46 +40,64 @@
 <script>
 export default {
   props: {
-    store: { type: Object, required: true },
+    // ✅ route 전환/초기 렌더 타이밍에서 store가 잠깐 undefined가 될 수 있어 방어적으로 default 제공
+    store: {
+      type: Object,
+      default: () => ({ chats: [], activeChatId: null, draft: true }),
+    },
     open: Boolean,
     collapsed: Boolean,
     isMobile: Boolean,
   },
 
   computed: {
+    safeStore() {
+      const s = this.store && typeof this.store === "object" ? this.store : {};
+      return {
+        chats: Array.isArray(s.chats) ? s.chats : [],
+        activeChatId: s.activeChatId ?? null,
+        draft: s.draft ?? !s.activeChatId,
+      };
+    },
     safeChats() {
-      return Array.isArray(this.store?.chats) ? this.store.chats : [];
+      return this.safeStore.chats;
     },
   },
 
   methods: {
     startNewChat() {
-      this.store.activeChatId = null;
-      this.store.draft = true;
-      this.$emit("store:update", this.store);
+      // prop store를 직접 mutate 하되, undefined 방어
+      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      s.chats = Array.isArray(s.chats) ? s.chats : [];
+      s.activeChatId = null;
+      s.draft = true;
+      this.$emit("store:update", s);
       if (this.isMobile) this.$emit("close");
       // 새 대화 시작 시 채팅 화면으로
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
     selectChat(id) {
-      this.store.activeChatId = id;
-      this.store.draft = false;
-      this.$emit("store:update", this.store);
+      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      s.chats = Array.isArray(s.chats) ? s.chats : [];
+      s.activeChatId = id;
+      s.draft = false;
+      this.$emit("store:update", s);
       if (this.isMobile) this.$emit("close");
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
     deleteChat(id) {
-      const chats = Array.isArray(this.store?.chats) ? this.store.chats : [];
-      this.store.chats = chats.filter((c) => c.id !== id);
+      const s = this.store && typeof this.store === "object" ? this.store : (this.store = {});
+      const chats = Array.isArray(s.chats) ? s.chats : [];
+      s.chats = chats.filter((c) => c.id !== id);
 
       // 삭제한 채팅이 active면 다음 채팅으로 이동
-      if (this.store.activeChatId === id) {
-        const next = this.store.chats[0];
-        this.store.activeChatId = next ? next.id : null;
-        this.store.draft = !this.store.activeChatId;
+      if (s.activeChatId === id) {
+        const next = s.chats[0];
+        s.activeChatId = next ? next.id : null;
+        s.draft = !s.activeChatId;
       }
 
-      this.$emit("store:update", this.store);
+      this.$emit("store:update", s);
     },
   },
 };
