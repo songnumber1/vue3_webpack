@@ -1,8 +1,16 @@
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
 
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import 'katex/dist/katex.min.css';
-import './assets/main.scss';
+import responsiveManager from "./plugins/responsiveManager";
+import themeManager from "./plugins/themeManager";
 
-createApp(App).use(router).mount('#app');
+import "./assets/main.scss";
+
+const app = createApp(App);
+
+app.use(router);
+app.use(responsiveManager);
+app.use(themeManager);
+
+app.mount("#app");

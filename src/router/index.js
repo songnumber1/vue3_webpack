@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
-import ChatView from "../views/ChatView.vue";
-import PlaygroundView from "../views/PlaygroundView.vue";
+import ChatView from "@/views/ChatView.vue";
+import PlaygroundView from "@/views/PlaygroundView.vue";
 
 export default createRouter({
   history: createWebHistory(),

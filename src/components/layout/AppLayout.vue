@@ -7,24 +7,20 @@
     />
 
     <div class="main">
-      <AppHeader
-        :is-mobile="isMobile"
-        @toggle-sidebar="sidebarOpen = !sidebarOpen"
-      />
+      <AppHeader :is-mobile="isMobile" @toggle-sidebar="toggleSidebar" />
 
       <main class="content">
-        <ChatView />
+        <slot />
       </main>
 
       <AppFooter />
     </div>
 
-    <!-- backdrop for mobile sidebar -->
     <div
       v-if="isMobile && sidebarOpen"
       class="backdrop"
       @click="sidebarOpen = false"
-    ></div>
+    />
   </div>
 </template>
 
@@ -32,15 +28,16 @@
 import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
-import ChatView from "@/views/ChatView.vue";
-import { useResponsive } from "@/composables/useResponsive";
+import { loadStore, saveStore } from "@/services/chatStore";
 
 export default {
   name: "AppLayout",
+  components: { AppHeader, AppSidebar, AppFooter },
 
   data() {
     return {
       sidebarOpen: false,
+      store: loadStore(),
     };
   },
 
@@ -50,9 +47,26 @@ export default {
     },
   },
 
+  provide() {
+    return {
+      chatStore: this.store,
+      updateChatStore: this.updateStore,
+    };
+  },
+
   watch: {
     isMobile(v) {
       if (!v) this.sidebarOpen = false;
+    },
+  },
+
+  methods: {
+    toggleSidebar() {
+      this.sidebarOpen = !this.sidebarOpen;
+    },
+    updateStore(newStore) {
+      this.store = newStore;
+      saveStore(this.store);
     },
   },
 };
@@ -60,9 +74,8 @@ export default {
 
 <style scoped lang="scss">
 .layout {
-  min-height: 100vh;
   display: flex;
-  background: var(--bg);
+  min-height: 100vh;
 }
 .main {
   flex: 1;
@@ -73,7 +86,6 @@ export default {
 .content {
   flex: 1;
   min-height: 0;
-  padding: var(--gap-2);
 }
 .backdrop {
   position: fixed;
