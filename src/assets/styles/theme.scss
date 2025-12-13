@@ -1,0 +1,51 @@
+/* =====================================================
+   Theme Variables
+   ===================================================== */
+
+/* 공통 변수 */
+:root {
+  --accent: #4f46e5;
+
+  --font-size-sm: 0.85rem;
+  --font-size-md: 0.9rem;
+  --font-size-lg: 1rem;
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+}
+
+/* =====================================================
+   Light Theme
+   ===================================================== */
+:root[data-theme='light'] {
+  --bg-color: #ffffff;
+  --surface-color: #f9fafb;
+
+  --text-color: #111111;
+  --text-muted-color: #666666;
+
+  --border-color: #dddddd;
+
+  /* theme button active (light) */
+  --theme-btn-active-bg: #e9eefb;
+  --theme-btn-active-text: #1f3a8a;
+  --theme-btn-active-border: #c7d2fe;
+}
+
+/* =====================================================
+   Dark Theme
+   ===================================================== */
+:root[data-theme='dark'] {
+  --bg-color: #0f172a;
+  --surface-color: #020617;
+
+  --text-color: #e5e7eb;
+  --text-muted-color: #9ca3af;
+
+  --border-color: #1e293b;
+
+  /* theme button active (dark) */
+  --theme-btn-active-bg: var(--accent);
+  --theme-btn-active-text: #ffffff;
+  --theme-btn-active-border: transparent;
+}
