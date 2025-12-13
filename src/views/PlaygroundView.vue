@@ -251,7 +251,6 @@ export default {
   data() {
     return {
       activeTab: "data",
-      width: typeof window !== "undefined" ? window.innerWidth : 1200,
       demoSwitch: true,
       tabs: [
         { key: "data", label: "Data" },
@@ -284,11 +283,14 @@ export default {
     };
   },
   computed: {
+    width() {
+      return (
+        this.$responsive?.width ??
+        (typeof window !== "undefined" ? window.innerWidth : 1200)
+      );
+    },
     bpLabel() {
-      const w = this.width;
-      if (w < 768) return "sm";
-      if (w < 992) return "md";
-      return "lg";
+      return this.$responsive?.bp || "lg";
     },
     cols() {
       // 카드 그리드 컬럼 수
@@ -298,13 +300,7 @@ export default {
     },
   },
   mounted() {
-    this._onResize = () => {
-      this.width = window.innerWidth;
-    };
-    window.addEventListener("resize", this._onResize, { passive: true });
-  },
-  beforeUnmount() {
-    window.removeEventListener("resize", this._onResize);
+    // no-op (responsiveManager handles resize)
   },
 };
 </script>

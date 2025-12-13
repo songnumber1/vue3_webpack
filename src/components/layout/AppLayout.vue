@@ -60,7 +60,6 @@ export default {
   data() {
     return {
       store: { chats: [], activeChatId: null, draft: true },
-      viewportWidth: window.innerWidth,
       sidebarOpen: false, // mobile offcanvas
       sidebarCollapsed: false, // desktop collapsed
       theme: "light",
@@ -69,7 +68,8 @@ export default {
 
   computed: {
     isMobile() {
-      return this.viewportWidth <= 768;
+      // single source of truth for responsive
+      return this.$responsive?.isMobile?.() ?? (window.innerWidth < 768);
     },
   },
 
@@ -80,28 +80,20 @@ export default {
       ? { chats: Array.isArray(loaded.chats) ? loaded.chats : [], activeChatId: loaded.activeChatId ?? null, draft: loaded.draft ?? true }
       : { chats: [], activeChatId: null, draft: true };
 
-    const t = localStorage.getItem("theme") || "light";
-    this.setTheme(t);
-    window.addEventListener("resize", this.onResize);
+    // init theme from themeManager (already applies to DOM)
+    this.theme = this.$theme?.getTheme?.() || localStorage.getItem("theme") || "light";
 
-    // 초기 레이아웃 상태
-    this.onResize();
+    // responsive plugin is reactive; resize listener는 responsiveManager가 관리
   },
 
-  beforeUnmount() {
-    window.removeEventListener("resize", this.onResize);
+  watch: {
+    // breakpoint 변경 시 mobile overlay 상태 정리
+    "$responsive.state.bp"() {
+      if (!this.isMobile) this.sidebarOpen = false;
+    },
   },
 
   methods: {
-    onResize() {
-      this.viewportWidth = window.innerWidth;
-
-      // desktop: sidebar는 기본적으로 보이게
-      if (!this.isMobile) {
-        this.sidebarOpen = false;
-      }
-    },
-
     onToggleSidebar() {
       // mobile: offcanvas open/close
       if (this.isMobile) {
@@ -114,8 +106,11 @@ export default {
 
     setTheme(t) {
       this.theme = t;
-      document.documentElement.setAttribute("data-theme", t);
-      localStorage.setItem("theme", t);
+      if (this.$theme?.setTheme) this.$theme.setTheme(t);
+      else {
+        document.documentElement.setAttribute("data-theme", t);
+        localStorage.setItem("theme", t);
+      }
     },
 
     onStoreUpdate(newStore) {
