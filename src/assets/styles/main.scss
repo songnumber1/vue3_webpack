@@ -49,7 +49,6 @@
   color: #94a3b8 !important;
 }
 
-
 /* ================= LIGHT CHAT BUBBLE VISIBILITY ================= */
 [data-theme="light"] .msg .bubble {
   border: 1px solid var(--border);
@@ -64,4 +63,32 @@
 [data-theme="light"] .msg.ai .bubble {
   background-color: #f8fafc;
   border-color: #e2e8f0;
+}
+
+[data-theme="light"] .input-row > button {
+  background-color: transparent !important;
+  border: 1.5px solid #2563eb !important;
+  color: #2563eb !important;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+/* hover */
+[data-theme="light"] .input-row > button:hover {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* disabled */
+[data-theme="light"] .input-row > button:disabled {
+  background-color: transparent !important;
+  border-color: #94a3b8 !important;
+  color: #94a3b8 !important;
+  cursor: not-allowed;
+}
+
+/* focus (keyboard) */
+[data-theme="light"] .input-row > button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35);
 }
