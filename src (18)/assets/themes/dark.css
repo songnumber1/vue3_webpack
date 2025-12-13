@@ -1,0 +1,23 @@
+:root[data-theme="dark"]{
+  --bg-app: #0b0f19;
+  --bg-surface: #0b0f19;
+  --bg-elevated: #0f1629;
+  --bg-muted: #111b33;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --border: #1f2a44;
+
+  --primary: #7c3aed;
+  --primary-contrast: #ffffff;
+
+  --danger: #f43f5e;
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.40);
+  --shadow-md: 0 12px 34px rgba(0,0,0,0.55);
+
+  --code-bg: #0a0f1a;
+  --code-text: #e5e7eb;
+}

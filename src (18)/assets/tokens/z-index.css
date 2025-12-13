@@ -1,0 +1,8 @@
+:root{
+  --z-base: 1;
+  --z-header: 20;
+  --z-sidebar: 30;
+  --z-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}

@@ -1,33 +1,26 @@
 /* =========================================================
-   Theme variable aliases
-   - Actual theme palettes live in /assets/themes/*.css and are switched by themeManager (data-theme attr)
-   - These aliases keep existing styles working while avoiding duplicate token definitions
-   ========================================================= */
-
-:root{
-  --bg: var(--bg-app);
-  --panel: var(--bg-surface);
-  --panel-2: var(--bg-elevated);
-  --text: var(--text-primary);
-  --muted: var(--text-muted);
-  --line: var(--border);
-  /* fallback accent if theme file doesn't define it */
-  --accent: var(--accent, #2563eb);
-
-  /* chat semantic tokens */
-  --chat-text-primary: var(--text-primary);
-  --chat-text-secondary: var(--text-secondary);
-  --chat-bubble-user-bg: var(--accent);
-  --chat-bubble-ai-bg: var(--bg-elevated);
-  --chat-code-bg: var(--code-bg, rgba(0,0,0,0.08));
-  --chat-code-text: var(--code-text, var(--text-primary));
-}
-
-/* =========================================================
    THEME TOKENS
    ========================================================= */
 
+:root {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --panel-2: #f1f5f9;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --accent: #2563eb;
 
+  /* chat semantic tokens (light default) */
+  --chat-text-primary: #0f172a;
+  --chat-text-secondary: #475569;
+
+  --chat-bubble-ai-bg: #f1f5f9;
+  --chat-bubble-user-bg: #dbeafe;
+
+  --chat-code-bg: #0f172a;
+  --chat-code-text: #e5e7eb;
+}
 
 html[data-theme="dim"] {
   --bg: #0f172a;
@@ -466,7 +459,22 @@ body {
 }
 
 /* === THEME TOKENS & CHAT FIX (v13) === */
+:root {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --panel-2: #f1f5f9;
+  --text: #0f172a;
+  --muted: #64748b;
+  --line: #e5e7eb;
+  --accent: #2563eb;
 
+  --chat-text-primary: #0f172a;
+  --chat-text-secondary: #475569;
+  --chat-bubble-ai-bg: #f1f5f9;
+  --chat-bubble-user-bg: #dbeafe;
+  --chat-code-bg: #0f172a;
+  --chat-code-text: #e5e7eb;
+}
 html[data-theme="dim"] {
   --bg: #0f172a;
   --panel: #111c33;
