@@ -1,22 +1,20 @@
 <template>
   <div class="chat-box">
     <!-- 메시지 영역 -->
-    <div class="messages" ref="messages">
-      <!-- ✅ ChatGPT처럼: 새 대화(draft)일 때는 '빈 상태' 전용 UI/UX를 보여주되,
-           하단 입력창은 그대로 유지 -->
-      <NewChatLanding
-        v-if="isDraft"
-        @pick="applySuggestion"
-      />
+    <div class="messages">
+      <!-- 새 대화(draft) -->
+      <NewChatLanding v-if="isDraft" @pick="applySuggestion" />
 
-      <template v-else>
-        <div v-for="(m, i) in messages" :key="i" class="msg" :class="m.role">
-          <div class="bubble" v-html="render(m.text)" />
-        </div>
-      </template>
+      <!-- 채팅 메시지 리스트 -->
+      <ChatMessageList
+        v-else
+        ref="messageList"
+        :messages="messages"
+        :render="render"
+      />
     </div>
 
-    <!-- 입력 영역 -->
+    <!-- 입력 영역 (기존 그대로) -->
     <div class="input-row">
       <textarea
         v-model="input"
@@ -33,16 +31,19 @@
 import { md } from "@/utils/markdown";
 import { createChatFromFirstMessage } from "@/services/chatStore";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
+import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 
 export default {
   name: "ChatView",
 
-  components: { NewChatLanding },
+  components: {
+    NewChatLanding,
+    ChatMessageList,
+  },
 
   props: {
     store: {
       type: Object,
-      // route 전환/초기 렌더 타이밍에서 store가 잠깐 undefined가 될 수 있어 방어
       default: () => ({ chats: [], activeChatId: null, draft: true }),
     },
   },
@@ -71,8 +72,9 @@ export default {
 
     activeChat() {
       return (
-        this.safeStore.chats.find((c) => c.id === this.safeStore.activeChatId) ||
-        null
+        this.safeStore.chats.find(
+          (c) => c.id === this.safeStore.activeChatId
+        ) || null
       );
     },
 
@@ -82,7 +84,6 @@ export default {
   },
 
   watch: {
-    // 채팅 이력 클릭 등으로 activeChatId가 바뀌면 스크롤 보정
     "store.activeChatId"() {
       this.$nextTick(this.scrollToBottom);
     },
@@ -95,7 +96,6 @@ export default {
   methods: {
     applySuggestion(text) {
       this.input = text || "";
-      // textarea에 포커스(가능하면)
       this.$nextTick(() => {
         const ta = this.$el?.querySelector?.("textarea");
         if (ta && ta.focus) ta.focus();
@@ -107,13 +107,8 @@ export default {
     },
 
     onKeydown(e) {
-      // IME(한글/일본어 등) 조합 중 Enter는 전송 금지
       if (e?.isComposing) return;
-
-      // Shift+Enter는 줄바꿈 허용
       if (e.key === "Enter" && e.shiftKey) return;
-
-      // Enter는 전송
       if (e.key === "Enter") {
         e.preventDefault();
         this.send();
@@ -121,35 +116,34 @@ export default {
     },
 
     emitUpdate() {
-      // 부모(AppLayout)에서 saveStore 수행
       this.$emit("store:update", this.store);
     },
 
     send() {
       const text = (this.input || "").trim();
       if (!text) return;
-
-      // store가 비정상일 때도 크래시하지 않도록 normalize
       if (!this.store || typeof this.store !== "object") return;
 
-      // 채팅 최초 생성
+      // 최초 채팅 생성
       if (!this.activeChat) {
         const chat = createChatFromFirstMessage(text);
-        // 최신이 위로 오도록 unshift
-        this.store.chats = Array.isArray(this.store.chats) ? this.store.chats : [];
+        this.store.chats = Array.isArray(this.store.chats)
+          ? this.store.chats
+          : [];
         this.store.chats.unshift(chat);
         this.store.activeChatId = chat.id;
         this.store.draft = false;
       }
 
-      // activeChat는 computed이므로 store에서 다시 찾아 push
-      const idx = this.store.chats.findIndex((c) => c.id === this.store.activeChatId);
+      const idx = this.store.chats.findIndex(
+        (c) => c.id === this.store.activeChatId
+      );
+
       if (idx >= 0) {
         const chat = this.store.chats[idx];
         chat.messages = Array.isArray(chat.messages) ? chat.messages : [];
         chat.messages.push({ role: "user", text });
 
-        // 제목이 비어있으면 첫 질문으로 설정
         if (!chat.title || chat.title === "New Chat") {
           chat.title = text.slice(0, 24);
         }
@@ -161,7 +155,9 @@ export default {
     },
 
     scrollToBottom() {
-      const el = this.$refs.messages;
+      const el =
+        this.$refs.messageList?.$el || this.$el?.querySelector?.(".messages");
+
       if (el) el.scrollTop = el.scrollHeight;
     },
   },
