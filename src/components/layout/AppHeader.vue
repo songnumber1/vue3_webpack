@@ -1,11 +1,13 @@
 <template>
   <header class="header">
-    <button type="button" class="hamburger" @click="$emit('toggle-sidebar')">☰</button>
+    <button type="button" class="hamburger" @click="$emit('toggle-sidebar')">
+      ☰
+    </button>
     <strong>DS Assistant</strong>
 
     <div class="themes">
       <button
-        v-for="t in ['light', 'dim', 'dark']"
+        v-for="t in $theme.THEMES"
         :key="t"
         class="theme-btn"
         :class="{ active: theme === t }"

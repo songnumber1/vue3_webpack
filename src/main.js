@@ -12,6 +12,7 @@ import "./assets/tokens/z-index.css";
 import "./assets/themes/light.css";
 import "./assets/themes/dim.css";
 import "./assets/themes/dark.css";
+import "./assets/themes/summary.css";
 import "./assets/styles/main.scss";
 import "./assets/main.scss";
 

@@ -4,7 +4,7 @@ import { reactive, readonly } from "vue";
 // - Provides a single reactive theme state
 // - Exposes the same API via provide/inject and this.$theme (Option API)
 
-const THEMES = Object.freeze(["light", "dim", "dark"]);
+const THEMES = Object.freeze(["light", "dim", "dark", "summer"]);
 
 function normalizeTheme(t) {
   return THEMES.includes(t) ? t : "light";
