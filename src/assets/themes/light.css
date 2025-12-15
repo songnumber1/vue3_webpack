@@ -1,23 +1,29 @@
 :root[data-theme="light"] {
-  --bg-app: #ffffff;
+  --bg-app: #f7f8fa;
   --bg-surface: #ffffff;
-  --bg-elevated: #f6f7f9;
-  --bg-muted: #eef1f5;
+  --bg-elevated: #f1f3f6;
 
-  --text-primary: #101828;
-  --text-secondary: #475467;
-  --text-muted: #667085;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --text-inverse: #ffffff;
 
-  --border: #e4e7ec;
+  --color-border: #e5e7eb;
 
-  --primary: #2563eb;
-  --primary-contrast: #ffffff;
+  --accent: #2563eb;
 
-  --danger: #ef4444;
+  --layout-header-height: 56px;
+  --layout-sidebar-width: 260px;
+  --layout-footer-height: 40px;
 
-  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
-  --shadow-md: 0 8px 20px rgba(16, 24, 40, 0.1);
+  /* chat */
+  --chat-user-bg: #e0edff;
+  --chat-user-text: #1e3a8a;
+  --chat-ai-bg: #ffffff;
+  --chat-ai-text: #111827;
 
-  --code-bg: #0b1220;
-  --code-text: #e5e7eb;
+  /* input */
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+  --input-focus-border: var(--accent);
 }
