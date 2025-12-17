@@ -29,7 +29,7 @@
 
 <script>
 import { md } from "@/utils/markdown";
-import { createChatFromFirstMessage } from "@/services/chatStore";
+import { createChatFromFirstMessage } from "@/stores/chatStore";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 

@@ -19,4 +19,31 @@
   --primary: #1ea7ff;
   --primary-contrast: #ffffff;
   --accent: var(--primary);
+
+  /* typography */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* spacing scale (a bit roomier) */
+  --space-0: 0px;
+  --space-1: 5px;
+  --space-2: 10px;
+  --space-3: 14px;
+  --space-4: 18px;
+  --space-5: 22px;
+  --space-6: 28px;
+  --space-7: 36px;
+  --space-8: 44px;
+
+  /* layout sizing */
+  --header-height: 60px;
+  --sidebar-width: 300px;
+  --sidebar-collapsed-width: 80px;
+  --content-max-width: 960px;
+
+  /* component spacing */
+  --layout-gap: var(--space-6);
+  --layout-padding: var(--space-5);
+  --chat-padding: var(--space-5);
+
 }

@@ -50,7 +50,7 @@
 import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
-import { loadStore, saveStore } from "@/services/chatStore";
+import { loadStore, saveStore } from "@/stores/chatStore";
 
 export default {
   name: "AppLayout",
