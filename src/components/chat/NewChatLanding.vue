@@ -4,6 +4,15 @@
       <div class="logo" aria-hidden="true">✨</div>
       <h1 class="title">무엇을 도와드릴까요?</h1>
       <p class="subtitle">새 대화를 시작해보세요. 아래 예시를 눌러 바로 입력할 수도 있어요.</p>
+
+      <!-- ✅ 모델 그룹/모델 선택 (대화 이력 선택/새 대화 모두 동일한 UX) -->
+      <ModelSelect
+        :groups="modelGroups"
+        :group-id="modelGroupId"
+        :model-id="modelId"
+        @update:group="$emit('model:group', $event)"
+        @update:model="$emit('model', $event)"
+      />
     </div>
 
     <div class="grid">
@@ -27,10 +36,26 @@
 </template>
 
 <script>
+import { MODEL_GROUPS } from "@/constants/models";
+import ModelSelect from "@/components/common/ModelSelect.vue";
+
 export default {
   name: "NewChatLanding",
-  emits: ["pick"],
+  components: { ModelSelect },
+  emits: ["pick", "model:group", "model"],
   props: {
+    modelGroups: {
+      type: Array,
+      default: () => MODEL_GROUPS,
+    },
+    modelGroupId: {
+      type: String,
+      default: "",
+    },
+    modelId: {
+      type: String,
+      default: "",
+    },
     // 프로젝트 성격(개발/운영/모니터링)에 맞는 기본 프롬프트 세트
     suggestions: {
       type: Array,

@@ -50,7 +50,7 @@
 import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
-import { loadStore, saveStore } from "@/stores/chatStore";
+import { loadStore, saveStore, normalizeStore } from "@/stores/chatStore";
 
 export default {
   name: "AppLayout",
@@ -76,9 +76,7 @@ export default {
   mounted() {
     // 항상 안전한 기본 store 보장
     const loaded = loadStore();
-    this.store = loaded && typeof loaded === "object"
-      ? { chats: Array.isArray(loaded.chats) ? loaded.chats : [], activeChatId: loaded.activeChatId ?? null, draft: loaded.draft ?? true }
-      : { chats: [], activeChatId: null, draft: true };
+    this.store = normalizeStore(loaded);
 
     // init theme from themeManager (already applies to DOM)
     this.theme = this.$theme?.getTheme?.() || localStorage.getItem("theme") || "light";
@@ -115,12 +113,7 @@ export default {
 
     onStoreUpdate(newStore) {
       // child에서 prop store를 직접 mutate할 수도 있으니 방어적으로 normalize
-      const s = newStore && typeof newStore === "object" ? newStore : {};
-      this.store = {
-        chats: Array.isArray(s.chats) ? s.chats : [],
-        activeChatId: s.activeChatId ?? null,
-        draft: s.draft ?? !s.activeChatId,
-      };
+      this.store = normalizeStore(newStore);
       saveStore(this.store);
     },
   },
