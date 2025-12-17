@@ -5,48 +5,41 @@
       <h1 class="title">무엇을 도와드릴까요?</h1>
       <p class="subtitle">새 대화를 시작해보세요. 아래 예시를 눌러 바로 입력할 수도 있어요.</p>
 
-      <!-- ✅ 모델 그룹/모델 선택 (대화 이력 선택/새 대화 모두 동일한 UX) -->
+      <!-- ✅ 모델 그룹은 이미 선택되어 있으므로, 모델 옵션만 표시 -->
       <ModelSelect
-        :groups="modelGroups"
-        :group-id="modelGroupId"
+        :models="currentModels"
         :model-id="modelId"
-        @update:group="$emit('model:group', $event)"
         @update:model="$emit('model', $event)"
       />
     </div>
 
-    <div class="grid">
+    <div class="grid" role="list" aria-label="Suggestions">
       <button
         v-for="(s, i) in suggestions"
         :key="i"
         type="button"
         class="card"
-        @click="$emit('pick', s.text)"
+        role="listitem"
+        @click="$emit('pick', s)"
       >
-        <div class="cardTitle">{{ s.title }}</div>
-        <div class="cardText">{{ s.text }}</div>
+        <div class="card-title">{{ s.title }}</div>
+        <div class="card-desc">{{ s.desc }}</div>
       </button>
-    </div>
-
-    <div class="hint">
-      <span class="dot" />
-      <span>Enter로 전송, Shift+Enter로 줄바꿈</span>
     </div>
   </div>
 </template>
 
 <script>
-import { MODEL_GROUPS } from "@/constants/models";
 import ModelSelect from "@/components/common/ModelSelect.vue";
 
 export default {
   name: "NewChatLanding",
   components: { ModelSelect },
-  emits: ["pick", "model:group", "model"],
+
   props: {
     modelGroups: {
       type: Array,
-      default: () => MODEL_GROUPS,
+      default: () => [],
     },
     modelGroupId: {
       type: String,
@@ -56,28 +49,26 @@ export default {
       type: String,
       default: "",
     },
-    // 프로젝트 성격(개발/운영/모니터링)에 맞는 기본 프롬프트 세트
-    suggestions: {
-      type: Array,
-      default: () => [
-        {
-          title: "UI/UX 개선",
-          text: "ChatGPT처럼 새 대화 화면(빈 상태) UI/UX를 만들어줘. 반응형 + 테마도 유지해줘.",
-        },
-        {
-          title: "버그 디버깅",
-          text: "Uncaught (in promise) TypeError를 원인부터 재현/수정까지 단계별로 정리해줘.",
-        },
-        {
-          title: "리팩토링",
-          text: "store를 전역으로 정리해서 컴포넌트 간 상태 공유를 안정적으로 리팩토링해줘.",
-        },
-        {
-          title: "문서/가이드",
-          text: "프로젝트 폴더 구조와 주요 컴포넌트 역할을 README 형태로 정리해줘.",
-        },
-      ],
+  },
+
+  emits: ["pick", "model"],
+
+  computed: {
+    currentModels() {
+      const g = (this.modelGroups || []).find((x) => x.id === this.modelGroupId);
+      return (g && Array.isArray(g.models) ? g.models : []) || [];
     },
+  },
+
+  data() {
+    return {
+      suggestions: [
+        { title: "요약해줘", desc: "긴 내용을 핵심만 요약해볼게요.", text: "다음 내용을 요약해줘: " },
+        { title: "메일 초안", desc: "상황에 맞는 메일을 작성해볼게요.", text: "다음 상황으로 메일 초안을 작성해줘: " },
+        { title: "기획 아이디어", desc: "아이디어를 여러 개 제안해볼게요.", text: "다음 주제의 기획 아이디어를 제안해줘: " },
+        { title: "버그 원인", desc: "에러 원인을 함께 추적해볼게요.", text: "다음 오류 로그 원인을 분석해줘: " },
+      ],
+    };
   },
 };
 </script>
@@ -90,92 +81,74 @@ export default {
   flex-direction: column;
   justify-content: center;
   gap: 18px;
-  padding: 24px 16px;
-  max-width: 980px;
-  margin: 0 auto;
+  padding: 18px;
 }
 
 .hero{
+  display: grid;
+  gap: 10px;
+  justify-items: center;
   text-align: center;
 }
 
 .logo{
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: grid;
   place-items: center;
-  margin: 0 auto 10px;
-  border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
-  box-shadow: var(--shadow-sm);
-  font-size: 22px;
 }
 
 .title{
+  font-size: 26px;
   margin: 0;
-  font-size: 24px;
-  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 .subtitle{
-  margin: 8px 0 0;
-  color: var(--text-muted);
   font-size: 13px;
+  margin: 0;
+  color: var(--text-muted);
+  max-width: 560px;
 }
 
 .grid{
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .card{
   text-align: left;
   border: 1px solid var(--border);
   background: var(--bg-surface);
-  border-radius: var(--radius-lg);
+  border-radius: 16px;
   padding: 14px;
   cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: transform .06s ease, background .06s ease;
 }
 
 .card:hover{
-  transform: translateY(-1px);
-  background: var(--bg-elevated);
+  background: var(--bg-soft);
 }
 
-.cardTitle{
-  font-weight: 800;
+.card-title{
   font-size: 14px;
+  color: var(--text-primary);
+  font-weight: 600;
   margin-bottom: 6px;
 }
 
-.cardText{
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.hint{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--text-muted);
+.card-desc{
   font-size: 12px;
+  color: var(--text-muted);
 }
 
-.dot{
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 70%, transparent);
-}
-
-@media (max-width: 700px){
+@media (max-width: 720px){
   .grid{ grid-template-columns: 1fr; }
-  .landing{ padding: 18px 12px; }
 }
 </style>

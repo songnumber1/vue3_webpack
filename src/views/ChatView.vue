@@ -8,7 +8,6 @@
         :model-groups="modelGroups"
         :model-group-id="currentModelGroupId"
         :model-id="currentModelId"
-        @model:group="setModelGroup"
         @model="setModel"
         @pick="applySuggestion"
       />

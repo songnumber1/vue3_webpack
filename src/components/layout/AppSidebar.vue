@@ -2,42 +2,43 @@
   <aside class="sidebar" :class="{ open: open, collapsed: collapsed }">
     <strong v-if="!collapsed" class="label">DS Assistant</strong>
 
-    <!-- 아이콘 레일: collapsed 시에도 UI가 깨지지 않도록 네비게이션은 항상 유지 -->
-    <nav class="nav">
-      <router-link to="/chat" aria-label="Chat">
-        <span class="icon">💬</span><span class="text">Chat</span>
+    <!-- 상단 네비게이션 (Chat / Playground / Models) -->
+    <nav class="nav" aria-label="Primary navigation">
+      <router-link to="/chat" aria-label="Chat" class="nav-item">
+        <span class="icon" aria-hidden="true">💬</span><span class="text">Chat</span>
       </router-link>
-      <router-link to="/playground" aria-label="Playground">
-        <span class="icon">🧪</span><span class="text">Playground</span>
+
+      <router-link to="/playground" aria-label="Playground" class="nav-item">
+        <span class="icon" aria-hidden="true">🧪</span><span class="text">Playground</span>
       </router-link>
+
+      <div class="nav-divider" aria-hidden="true" />
+
+      <!-- Models: Chat/Playground와 동일한 위치(네비게이션 영역)에서 row 단위로 표시 -->
+      <div class="nav-section" :class="{ collapsed: collapsed }" role="group" aria-label="Models">
+        <div v-if="!collapsed" class="nav-section-label">Models</div>
+
+        <button
+          v-for="g in modelGroups"
+          :key="g.id"
+          type="button"
+          class="nav-item nav-btn"
+          :class="{ active: safeStore.activeModelGroupId === g.id }"
+          @click="setModelGroup(g.id)"
+        >
+          <span class="icon model-icon" aria-hidden="true">{{ iconForGroup(g.id) }}</span>
+          <span class="text">{{ g.label }}</span>
+        </button>
+      </div>
     </nav>
 
     <!-- collapsed 상태에서는 채팅 리스트를 숨기고, 아이콘만 보여줌 -->
     <template v-if="!collapsed">
-      <hr />
-
-      <!-- ✅ 모델 상위 그룹 (Chat / Playground 공통) -->
-      <div class="model-groups" aria-label="Model groups">
-        <div class="section-title">Models</div>
-        <div class="group-list">
-          <button
-            v-for="g in modelGroups"
-            :key="g.id"
-            type="button"
-            class="group-btn"
-            :class="{ active: safeStore.activeModelGroupId === g.id }"
-            @click="setModelGroup(g.id)"
-          >
-            {{ g.label }}
-          </button>
-        </div>
-      </div>
-
       <button type="button" class="chat-new" @click="startNewChat">
-        <span class="icon">➕</span><span class="text">새 대화</span>
+        <span class="icon" aria-hidden="true">➕</span><span class="text">새 대화</span>
       </button>
 
-      <div class="chat-list">
+      <div class="chat-list" aria-label="Chat list">
         <div
           v-for="c in safeChats"
           :key="c.id"
@@ -47,9 +48,13 @@
           <button type="button" class="chat-title" @click="selectChat(c.id)">
             {{ c.title }}
           </button>
-          <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
+          <button type="button" class="chat-del" aria-label="Delete chat" @click.stop="deleteChat(c.id)">
             🗑
           </button>
+        </div>
+
+        <div v-if="!safeChats.length" class="chat-empty">
+          아직 대화가 없어요.
         </div>
       </div>
     </template>
@@ -60,8 +65,9 @@
 import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
 
 export default {
+  name: "AppSidebar",
+
   props: {
-    // ✅ route 전환/초기 렌더 타이밍에서 store가 잠깐 undefined가 될 수 있어 방어적으로 default 제공
     store: {
       type: Object,
       default: () => ({ chats: [], activeChatId: null, draft: true }),
@@ -87,57 +93,31 @@ export default {
     safeChats() {
       return this.safeStore.chats;
     },
-
     modelGroups() {
       return MODEL_GROUPS;
     },
   },
 
   methods: {
-    setModelGroup(groupId) {
-      const s =
-        this.store && typeof this.store === "object"
-          ? this.store
-          : (this.store = {});
-      s.activeModelGroupId = groupId;
-      s.activeModelId = getDefaultModelId(groupId);
-
-      // chat이 선택되어 있으면 chat별 모델도 맞춰줌 (대화 이력 선택 시 landing 옵션이 일치)
-      if (s.activeChatId) {
-        const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
-        if (chat) {
-          chat.modelGroupId = groupId;
-          chat.modelId = s.activeModelId;
-        }
-      }
-
-      this.$emit("store:update", s);
+    iconForGroup(id) {
+      if (id === "ds") return "DS";
+      if (id === "spec") return "SP";
+      if (id === "ops") return "OP";
+      return "M";
     },
+
     startNewChat() {
-      // prop store를 직접 mutate 하되, undefined 방어
-      const s =
-        this.store && typeof this.store === "object"
-          ? this.store
-          : (this.store = {});
-      s.chats = Array.isArray(s.chats) ? s.chats : [];
+      const s = { ...this.safeStore };
       s.activeChatId = null;
       s.draft = true;
-      // 새 대화는 현재 모델 선택 유지
-      s.activeModelGroupId =
-        s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds";
-      s.activeModelId =
-        s.activeModelId || getDefaultModelId(s.activeModelGroupId);
+      // 새 대화는 현재 선택된 모델 유지
       this.$emit("store:update", s);
       if (this.isMobile) this.$emit("close");
-      // 새 대화 시작 시 채팅 화면으로
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
+
     selectChat(id) {
-      const s =
-        this.store && typeof this.store === "object"
-          ? this.store
-          : (this.store = {});
-      s.chats = Array.isArray(s.chats) ? s.chats : [];
+      const s = { ...this.safeStore };
       s.activeChatId = id;
       s.draft = false;
 
@@ -151,79 +131,205 @@ export default {
       if (this.isMobile) this.$emit("close");
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
-    deleteChat(id) {
-      const s =
-        this.store && typeof this.store === "object"
-          ? this.store
-          : (this.store = {});
-      const chats = Array.isArray(s.chats) ? s.chats : [];
-      s.chats = chats.filter((c) => c.id !== id);
 
-      // 삭제한 채팅이 active면 다음 채팅으로 이동
+    deleteChat(id) {
+      const s = { ...this.safeStore };
+      s.chats = (s.chats || []).filter((c) => c.id !== id);
       if (s.activeChatId === id) {
-        const next = s.chats[0];
-        s.activeChatId = next ? next.id : null;
-        s.draft = !s.activeChatId;
+        s.activeChatId = null;
+        s.draft = true;
+      }
+      this.$emit("store:update", s);
+    },
+
+    setModelGroup(groupId) {
+      const s = { ...this.safeStore };
+      s.activeModelGroupId = groupId;
+      s.activeModelId = getDefaultModelId(groupId);
+
+      // draft/선택된 채팅에도 모델 반영 (현재 UX 유지)
+      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
+      if (chat) {
+        chat.modelGroupId = groupId;
+        chat.modelId = s.activeModelId;
       }
 
       this.$emit("store:update", s);
+
+      // 모델 그룹 변경은 "Chat" 맥락이므로 Chat으로 이동
+      if (this.isMobile) this.$emit("close");
+      if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
   },
 };
 </script>
 
 <style scoped>
-.section-title{
-  font-size: 12px;
-  color: var(--text-muted);
-  margin: 8px 0 6px;
-}
-
-.group-list{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-.group-btn{
-  border: 1px solid var(--border);
+.sidebar{
+  width: 280px;
+  min-width: 280px;
+  border-right: 1px solid var(--border);
   background: var(--bg-surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  transition: width .2s ease, min-width .2s ease;
+  overflow: hidden;
+}
+
+.sidebar.collapsed{
+  width: 76px;
+  min-width: 76px;
+  padding: 14px 10px;
+}
+
+.label{
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: .2px;
+}
+
+.nav{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 12px;
+  text-decoration: none;
+  border: 1px solid transparent;
   color: var(--text-primary);
-  border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 12px;
+  background: transparent;
   cursor: pointer;
 }
 
-.group-btn.active{
-  background: var(--accent);
-  color: #fff;
-  border-color: transparent;
+.nav-item:hover{
+  background: var(--bg-soft);
+  border-color: var(--border);
 }
 
-.chat-item {
+.nav-btn{
+  text-align: left;
+}
+
+.nav-item.active{
+  background: var(--bg-soft);
+  border-color: var(--border);
+}
+
+.nav-divider{
+  height: 1px;
+  background: var(--border);
+  margin: 6px 6px;
+  opacity: .7;
+}
+
+.nav-section{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-section-label{
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 8px 10px 2px;
+}
+
+.icon{
+  width: 22px;
+  min-width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.model-icon{
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2px 0;
+}
+
+.text{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .text{
+  display: none;
+}
+
+.chat-new{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.chat-new:hover{
+  filter: brightness(1.02);
+}
+
+.chat-list{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.chat-item{
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 8px 8px;
+  border-radius: 12px;
+  border: 1px solid transparent;
 }
-.chat-title {
-  font-size: 0.8rem;
+
+.chat-item.active{
+  background: var(--bg-soft);
+  border-color: var(--border);
+}
+
+.chat-title{
   flex: 1;
-  background: none;
-  border: none;
-  color: inherit;
   text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
   cursor: pointer;
-  padding: 6px 8px;
-  border-radius: 10px;
+  font-size: 13px;
 }
-.chat-title:hover {
-  background: rgba(127, 127, 127, 0.15);
-}
-.chat-del {
-  background: none;
+
+.chat-del{
+  background: transparent;
   border: none;
   cursor: pointer;
+  opacity: .8;
+}
+
+.chat-empty{
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 8px 10px;
 }
 </style>
