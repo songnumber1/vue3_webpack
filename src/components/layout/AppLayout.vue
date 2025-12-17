@@ -1,11 +1,16 @@
 <template>
   <div class="layout">
     <!-- ✅ Header는 전체 너비 -->
-    <AppHeader :theme="theme" :is-mobile="isMobile" @theme-change="setTheme" />
+    <AppHeader
+      :theme="theme"
+      :is-mobile="isMobile"
+      @theme-change="setTheme"
+      @open-sidebar="sidebarOpen = true"
+    />
 
     <!-- ✅ Header 아래에 Sidebar + Main -->
     <div class="body">
-      <!-- DESKTOP: sidebar는 레이아웃(flow) 안에 배치 -->
+      <!-- DESKTOP -->
       <AppSidebar
         v-if="!isMobile"
         :store="store"
@@ -16,7 +21,7 @@
         @store:update="onStoreUpdate"
       />
 
-      <!-- MOBILE: sidebar overlay -->
+      <!-- MOBILE overlay -->
       <AppSidebar
         v-if="isMobile"
         class="mobile-sidebar"
@@ -29,17 +34,6 @@
       />
 
       <div class="main">
-        <!-- MOBILE: Sidebar를 열기 위한 플로팅 버튼 (Header에 두지 않음) -->
-        <button
-          v-if="isMobile && !sidebarOpen"
-          type="button"
-          class="mobile-open-btn"
-          aria-label="Open sidebar"
-          @click="sidebarOpen = true"
-        >
-          ☰
-        </button>
-
         <main class="content">
           <router-view :store="store" @store:update="onStoreUpdate" />
         </main>
@@ -64,7 +58,6 @@ import { loadStore, saveStore, normalizeStore } from "@/stores/chatStore";
 
 export default {
   name: "AppLayout",
-
   components: { AppHeader, AppSidebar, AppFooter },
 
   data() {
@@ -83,7 +76,6 @@ export default {
   },
 
   mounted() {
-    // responsive manager
     const update = () => {
       this.isMobile = this.$responsive.isSm();
       if (!this.isMobile) this.sidebarOpen = false;
@@ -109,7 +101,6 @@ export default {
     },
 
     onToggleSidebarCollapse() {
-      // desktop collapse toggle
       this.sidebarCollapsed = !this.sidebarCollapsed;
     },
   },
@@ -142,18 +133,6 @@ export default {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-}
-
-.mobile-open-btn {
-  position: fixed;
-  left: 12px;
-  top: 66px;
-  z-index: 60;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  border-radius: 10px;
-  padding: 8px 10px;
-  cursor: pointer;
 }
 
 .mobile-sidebar {

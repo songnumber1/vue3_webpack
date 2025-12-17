@@ -44,7 +44,7 @@
 
 <script>
 import { md } from "@/utils/markdown";
-import { createChatFromFirstMessage } from "@/stores/chatStore";
+import { createChatFromFirstMessage, touchChatOnMessage } from "@/stores/chatStore";
 import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
@@ -136,10 +136,14 @@ export default {
       return md.render(String(text ?? ""));
     },
 
-    applySuggestion(text) {
-      this.input = String(text ?? "");
-      this.$nextTick(() => this.send());
+    applySuggestion(payload) {
+      // ✅ 예제 클릭 시: input에만 채우고, 전송은 사용자가 Enter/Send로만
+      const text = typeof payload === 'string'
+        ? payload
+        : (payload && typeof payload === 'object' ? (payload.text || payload.title || '') : '');
+      this.input = String(text ?? '');
     },
+
 
     setModel({ groupId, modelId }) {
       const s = { ...this.safeStore };
@@ -183,7 +187,9 @@ export default {
       const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
       if (chat) {
         if (!Array.isArray(chat.messages)) chat.messages = [];
-        chat.messages.push({ role: "user", text });
+        const msg = { role: "user", text, ts: Date.now() };
+        chat.messages.push(msg);
+        touchChatOnMessage(chat, msg);
       }
 
       this.input = "";

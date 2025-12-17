@@ -1,5 +1,16 @@
 <template>
   <header class="header">
+    <!-- ✅ SM일 때만 Header 좌측에 햄버거 -->
+    <button
+      v-if="isMobile"
+      type="button"
+      class="hamburger"
+      aria-label="Open sidebar"
+      @click="$emit('open-sidebar')"
+    >
+      ☰
+    </button>
+
     <strong class="title">DS Assistant</strong>
 
     <div class="themes">
@@ -23,6 +34,7 @@ export default {
     theme: String,
     isMobile: Boolean,
   },
+  emits: ["theme-change", "open-sidebar"],
 };
 </script>
 
@@ -32,10 +44,23 @@ export default {
   height: 56px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   padding: 0 14px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
+}
+
+.hamburger {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  cursor: pointer;
+}
+
+.hamburger:hover {
+  background: var(--bg-soft);
 }
 
 .title {

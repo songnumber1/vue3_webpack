@@ -20,7 +20,7 @@
         type="button"
         class="card"
         role="listitem"
-        @click="$emit('pick', s)"
+        @click="$emit('pick', s.text)"
       >
         <div class="card-title">{{ s.title }}</div>
         <div class="card-desc">{{ s.desc }}</div>

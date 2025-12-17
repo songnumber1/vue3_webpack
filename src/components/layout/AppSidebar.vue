@@ -1,14 +1,25 @@
 <template>
   <aside class="sidebar" :class="{ open: open, collapsed: collapsed }">
     <div class="top-row">
-      <!-- ✅ hamburger moved here -->
+      <!-- ✅ Desktop에서는 Sidebar에 햄버거(접기/펼치기), Mobile에서는 Header에 있으므로 Sidebar에선 닫기(X) -->
       <button
+        v-if="!isMobile"
         type="button"
         class="hamburger"
-        :aria-label="isMobile ? 'Close sidebar' : 'Toggle sidebar'"
-        @click="onHamburger"
+        aria-label="Toggle sidebar"
+        @click="$emit('toggle-collapse')"
       >
         ☰
+      </button>
+
+      <button
+        v-else
+        type="button"
+        class="hamburger"
+        aria-label="Close sidebar"
+        @click="$emit('close')"
+      >
+        ✕
       </button>
 
       <strong v-if="!collapsed" class="label">DS Assistant</strong>
@@ -53,31 +64,39 @@
       </div>
     </nav>
 
-    <!-- ✅ collapsed 상태에서는 채팅 리스트를 숨기고, 아이콘만 보여줌 -->
     <template v-if="!collapsed">
+      <!-- ✅ 채팅 리스트: 오늘/어제/MM-dd 그룹 -->
       <div class="chat-list" aria-label="Chat list">
-        <div
-          v-for="c in safeChats"
-          :key="c.id"
-          class="chat-item"
-          :class="{ active: safeStore.activeChatId === c.id }"
-        >
-          <button type="button" class="chat-title" @click="selectChat(c.id)">
-            {{ c.title }}
-          </button>
-          <button
-            type="button"
-            class="chat-del"
-            aria-label="Delete chat"
-            @click.stop="deleteChat(c.id)"
-          >
-            🗑
-          </button>
-        </div>
+        <template v-if="groupedChats.length">
+          <div v-for="(g, gi) in groupedChats" :key="gi" class="chat-group">
+            <div class="chat-group-title">{{ g.label }}</div>
 
-        <div v-if="!safeChats.length" class="chat-empty">
-          아직 대화가 없어요.
-        </div>
+            <div
+              v-for="c in g.items"
+              :key="c.id"
+              class="chat-item"
+              :class="{ active: safeStore.activeChatId === c.id }"
+            >
+              <button
+                type="button"
+                class="chat-title"
+                @click="selectChat(c.id)"
+              >
+                {{ c.title }}
+              </button>
+              <button
+                type="button"
+                class="chat-del"
+                aria-label="Delete chat"
+                @click.stop="deleteChat(c.id)"
+              >
+                🗑
+              </button>
+            </div>
+          </div>
+        </template>
+
+        <div v-else class="chat-empty">아직 대화가 없어요.</div>
       </div>
     </template>
   </aside>
@@ -85,6 +104,19 @@
 
 <script>
 import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
+
+function startOfDay(d) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x.getTime();
+}
+
+function formatMMDD(ts) {
+  const d = new Date(ts);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${mm}-${dd}`;
+}
 
 export default {
   name: "AppSidebar",
@@ -115,23 +147,75 @@ export default {
           ),
       };
     },
-    safeChats() {
-      return this.safeStore.chats;
-    },
+
     modelGroups() {
       return MODEL_GROUPS;
+    },
+
+    groupedChats() {
+      const chats = (this.safeStore.chats || [])
+        .map((c) => ({
+          ...c,
+          lastAt:
+            typeof c.lastAt === "number"
+              ? c.lastAt
+              : typeof c.createdAt === "number"
+              ? c.createdAt
+              : 0,
+        }))
+        .sort((a, b) => b.lastAt - a.lastAt);
+
+      if (!chats.length) return [];
+
+      const toYMD = (ts) => {
+        const d = new Date(ts);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}-${String(d.getDate()).padStart(2, "0")}`;
+      };
+
+      const toMMDD = (ts) => {
+        const d = new Date(ts);
+        return `${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+          d.getDate()
+        ).padStart(2, "0")}`;
+      };
+
+      const now = new Date();
+      const todayYMD = toYMD(now.getTime());
+
+      const y = new Date(now);
+      y.setDate(y.getDate() - 1);
+      const yesterdayYMD = toYMD(y.getTime());
+
+      const groups = [];
+      const map = new Map();
+
+      for (const c of chats) {
+        const ymd = toYMD(c.lastAt);
+        let label;
+
+        if (ymd === todayYMD) {
+          label = "오늘";
+        } else if (ymd === yesterdayYMD) {
+          label = "어제";
+        } else {
+          label = toMMDD(c.lastAt);
+        }
+
+        if (!map.has(label)) {
+          map.set(label, { label, items: [] });
+          groups.push(map.get(label));
+        }
+        map.get(label).items.push(c);
+      }
+
+      return groups;
     },
   },
 
   methods: {
-    onHamburger() {
-      if (this.isMobile) {
-        this.$emit("close");
-      } else {
-        this.$emit("toggle-collapse");
-      }
-    },
-
     iconForGroup(id) {
       if (id === "ds") return "DS";
       if (id === "spec") return "SP";
@@ -165,18 +249,14 @@ export default {
       this.$emit("store:update", s);
     },
 
-    /**
-     * ✅ Models 클릭 시: 새 대화 화면으로 전환(draft) 후 모델 그룹 적용
-     * - "새 대화 버튼"은 제거되었고, 이 동작이 그 역할을 대체
-     */
     setModelGroup(groupId) {
       const s = { ...this.safeStore };
 
-      // 1) 새 대화 상태로 초기화 (채팅 목록은 유지)
+      // 새 대화 상태
       s.activeChatId = null;
       s.draft = true;
 
-      // 2) 모델 그룹/기본 모델 설정
+      // 모델 그룹/기본 모델
       s.activeModelGroupId = groupId;
       s.activeModelId = getDefaultModelId(groupId);
 
@@ -317,10 +397,16 @@ export default {
 .chat-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+}
+
+.chat-group-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 6px 10px 2px;
 }
 
 .chat-item {
