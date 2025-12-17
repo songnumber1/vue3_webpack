@@ -1,16 +1,26 @@
 :root[data-theme="light"] {
+  /* surfaces */
   --bg-app: #f7f8fa;
   --bg-surface: #ffffff;
   --bg-elevated: #f1f3f6;
+  --bg-muted: #eef2f7;
 
+  /* text */
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --text-muted: #9ca3af;
   --text-inverse: #ffffff;
 
-  --color-border: #e5e7eb;
+  /* borders / lines */
+  --border: #e5e7eb;
+  /* keep legacy name used by some rules */
+  --color-border: var(--border);
 
-  --accent: #2563eb;
+  /* brand / accent */
+  --primary: #2563eb;
+  --primary-contrast: #ffffff;
+  /* legacy name */
+  --accent: var(--primary);
 
   --layout-header-height: 56px;
   --layout-sidebar-width: 260px;
@@ -25,5 +35,5 @@
   /* input */
   --input-bg: #ffffff;
   --input-border: #d1d5db;
-  --input-focus-border: var(--accent);
+  --input-focus-border: var(--primary);
 }

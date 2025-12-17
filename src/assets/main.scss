@@ -5,14 +5,21 @@
    ========================================================= */
 
 :root{
+  /* Map palette tokens (from /assets/themes/*.css) -> semantic tokens used by components */
   --bg: var(--bg-app);
   --panel: var(--bg-surface);
   --panel-2: var(--bg-elevated);
+
   --text: var(--text-primary);
   --muted: var(--text-muted);
-  --line: var(--border);
-  /* fallback accent if theme file doesn't define it */
-  --accent: var(--accent, #2563eb);
+
+  /* borders / lines */
+  --line: var(--border, #e5e7eb);
+  --color-border: var(--border, #e5e7eb);
+
+  /* accent */
+  --accent: var(--primary, #2563eb);
+  --accent-contrast: var(--primary-contrast, #ffffff);
 
   /* chat semantic tokens */
   --chat-text-primary: var(--text-primary);
@@ -22,50 +29,10 @@
   --chat-code-bg: var(--code-bg, rgba(0,0,0,0.08));
   --chat-code-text: var(--code-text, var(--text-primary));
 }
-
 /* =========================================================
    THEME TOKENS
    ========================================================= */
 
-
-
-html[data-theme="dim"] {
-  --bg: #0f172a;
-  --panel: #111c33;
-  --panel-2: #1e293b;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --line: #334155;
-  --accent: #22c55e;
-
-  --chat-text-primary: #e5e7eb;
-  --chat-text-secondary: #cbd5f5;
-
-  --chat-bubble-ai-bg: #1e293b;
-  --chat-bubble-user-bg: #2563eb;
-
-  --chat-code-bg: #020617;
-  --chat-code-text: #e5e7eb;
-}
-
-html[data-theme="dark"] {
-  --bg: #020617;
-  --panel: #0b1222;
-  --panel-2: #020617;
-  --text: #e5e7eb;
-  --muted: #64748b;
-  --line: #1e293b;
-  --accent: #a78bfa;
-
-  --chat-text-primary: #f1f5f9;
-  --chat-text-secondary: #c7d2fe;
-
-  --chat-bubble-ai-bg: #020617;
-  --chat-bubble-user-bg: #1d4ed8;
-
-  --chat-code-bg: #000000;
-  --chat-code-text: #f9fafb;
-}
 
 /* =========================================================
    BASE
@@ -171,7 +138,7 @@ body {
 
 .theme-btn.active {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--accent-contrast);
   border-color: transparent;
 }
 
@@ -402,7 +369,7 @@ body {
   border-radius: 999px;
   border: none;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--accent-contrast);
   cursor: pointer;
 }
 
@@ -466,37 +433,6 @@ body {
 }
 
 /* === THEME TOKENS & CHAT FIX (v13) === */
-
-html[data-theme="dim"] {
-  --bg: #0f172a;
-  --panel: #111c33;
-  --panel-2: #1e293b;
-  --text: #e5e7eb;
-  --muted: #94a3b8;
-  --line: #334155;
-  --accent: #22c55e;
-  --chat-text-primary: #e5e7eb;
-  --chat-text-secondary: #cbd5f5;
-  --chat-bubble-ai-bg: #1e293b;
-  --chat-bubble-user-bg: #2563eb;
-  --chat-code-bg: #020617;
-  --chat-code-text: #e5e7eb;
-}
-html[data-theme="dark"] {
-  --bg: #020617;
-  --panel: #0b1222;
-  --panel-2: #020617;
-  --text: #e5e7eb;
-  --muted: #64748b;
-  --line: #1e293b;
-  --accent: #a78bfa;
-  --chat-text-primary: #f1f5f9;
-  --chat-text-secondary: #c7d2fe;
-  --chat-bubble-ai-bg: #020617;
-  --chat-bubble-user-bg: #1d4ed8;
-  --chat-code-bg: #000000;
-  --chat-code-text: #f9fafb;
-}
 
 /* base */
 * {
