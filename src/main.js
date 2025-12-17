@@ -13,7 +13,6 @@ import "./assets/themes/light.css";
 import "./assets/themes/dim.css";
 import "./assets/themes/dark.css";
 import "./assets/themes/summer.css";
-import "./assets/styles/main.scss";
 import "./assets/main.scss";
 
 const app = createApp(App);
