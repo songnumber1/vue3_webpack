@@ -1,5 +1,13 @@
 <template>
   <div class="chat-box">
+    <!-- ✅ 이전 대화방 접속 시에만 채팅방 헤더 표시 -->
+    <div v-if="showRoomHeader" class="room-header">
+      <strong class="room-title">{{ activeChatTitle }}</strong>
+      <span class="room-sub">
+        {{ currentModelGroupLabel }} · {{ currentModelId }}
+      </span>
+    </div>
+
     <!-- 메시지 영역 -->
     <div class="messages">
       <!-- 새 대화(draft) -->
@@ -44,7 +52,6 @@ import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 export default {
   name: "ChatView",
 
-  // 옵션 API에서 computed에서 재사용하기 위해 static처럼 보관
   modelGroupsConst: MODEL_GROUPS,
 
   components: {
@@ -70,149 +77,172 @@ export default {
   computed: {
     safeStore() {
       const s = this.store && typeof this.store === "object" ? this.store : {};
+      const fallbackGroup = MODEL_GROUPS?.[0]?.id || "ds";
+      const groupId = s.activeModelGroupId || fallbackGroup;
+
       return {
         chats: Array.isArray(s.chats) ? s.chats : [],
         activeChatId: s.activeChatId ?? null,
         draft: s.draft ?? !s.activeChatId,
-        activeModelGroupId: s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds",
-        activeModelId:
-          s.activeModelId ||
-          getDefaultModelId(s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds"),
+        activeModelGroupId: groupId,
+        activeModelId: s.activeModelId || getDefaultModelId(groupId),
       };
     },
 
-    isDraft() {
-      return !this.safeStore.activeChatId;
-    },
-
     showLanding() {
-      // ✅ 요청: 대화 이력을 선택해도(메시지가 없을 때) "무엇을 도와드릴까요?" + 모델 옵션이 노출되게
-      if (this.isDraft) return true;
-      return (this.messages || []).length === 0;
+      return !!this.safeStore.draft;
     },
 
-    activeChat() {
-      return (
-        this.safeStore.chats.find(
-          (c) => c.id === this.safeStore.activeChatId
-        ) || null
+    showRoomHeader() {
+      // ✅ "이전 대화방 접속"일 때만: activeChatId 존재 + draft=false
+      return !!this.safeStore.activeChatId && !this.safeStore.draft;
+    },
+
+    activeChatTitle() {
+      const chat = (this.safeStore.chats || []).find(
+        (c) => c.id === this.safeStore.activeChatId
       );
+      return chat ? chat.title : "Chat";
     },
 
     messages() {
-      return this.activeChat?.messages || [];
-    },
-
-    modelGroups() {
-      return this.$options.modelGroupsConst || [];
+      if (this.showLanding) return [];
+      const chat = (this.safeStore.chats || []).find(
+        (c) => c.id === this.safeStore.activeChatId
+      );
+      return chat ? (Array.isArray(chat.messages) ? chat.messages : []) : [];
     },
 
     currentModelGroupId() {
-      // activeChat이 있으면 chat별 설정 우선
-      return (
-        this.activeChat?.modelGroupId || this.safeStore.activeModelGroupId || ""
-      );
+      return this.safeStore.activeModelGroupId;
     },
 
     currentModelId() {
-      return this.activeChat?.modelId || this.safeStore.activeModelId || "";
+      return this.safeStore.activeModelId;
     },
-  },
 
-  watch: {
-    "store.activeChatId"() {
-      this.$nextTick(this.scrollToBottom);
+    currentModelGroupLabel() {
+      const g = (MODEL_GROUPS || []).find((x) => x.id === this.currentModelGroupId);
+      return g ? g.label : this.currentModelGroupId;
     },
-  },
 
-  mounted() {
-    this.$nextTick(this.scrollToBottom);
+    modelGroups() {
+      return MODEL_GROUPS;
+    },
   },
 
   methods: {
-    setModelGroup(groupId) {
-      if (!this.store || typeof this.store !== "object") return;
-      this.store.activeModelGroupId = groupId;
-      // activeChat이 있으면 chat에도 반영
-      if (this.activeChat) this.activeChat.modelGroupId = groupId;
-      this.emitUpdate();
-    },
-
-    setModel(modelId) {
-      if (!this.store || typeof this.store !== "object") return;
-      this.store.activeModelId = modelId;
-      if (this.activeChat) this.activeChat.modelId = modelId;
-      this.emitUpdate();
-    },
-    applySuggestion(text) {
-      this.input = text || "";
-      this.$nextTick(() => {
-        const ta = this.$el?.querySelector?.("textarea");
-        if (ta && ta.focus) ta.focus();
-      });
-    },
-
     render(text) {
-      return md.render(text || "");
+      return md.render(String(text ?? ""));
+    },
+
+    applySuggestion(text) {
+      this.input = String(text ?? "");
+      this.$nextTick(() => this.send());
+    },
+
+    setModel({ groupId, modelId }) {
+      const s = { ...this.safeStore };
+      s.activeModelGroupId = groupId;
+      s.activeModelId = modelId;
+
+      // 현재 채팅방이 있으면 그 채팅에도 모델 반영
+      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
+      if (chat) {
+        chat.modelGroupId = groupId;
+        chat.modelId = modelId;
+      }
+
+      this.$emit("store:update", s);
     },
 
     onKeydown(e) {
-      if (e?.isComposing) return;
-      if (e.key === "Enter" && e.shiftKey) return;
-      if (e.key === "Enter") {
+      if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         this.send();
       }
     },
 
-    emitUpdate() {
-      this.$emit("store:update", this.store);
-    },
-
     send() {
-      const text = (this.input || "").trim();
+      const text = String(this.input ?? "").trim();
       if (!text) return;
-      if (!this.store || typeof this.store !== "object") return;
 
-      // 최초 채팅 생성
-      if (!this.activeChat) {
+      const s = { ...this.safeStore };
+
+      // draft 상태(새 대화)에서 첫 메시지 입력이면 채팅방 생성
+      if (s.draft) {
         const chat = createChatFromFirstMessage(text);
-        // ✅ 새 채팅은 현재 선택된 모델 설정을 고정
-        chat.modelGroupId = this.safeStore.activeModelGroupId;
-        chat.modelId = this.safeStore.activeModelId;
-        this.store.chats = Array.isArray(this.store.chats)
-          ? this.store.chats
-          : [];
-        this.store.chats.unshift(chat);
-        this.store.activeChatId = chat.id;
-        this.store.draft = false;
+        chat.modelGroupId = s.activeModelGroupId;
+        chat.modelId = s.activeModelId;
+        chat.messages = [];
+        s.chats = [chat, ...(s.chats || [])];
+        s.activeChatId = chat.id;
+        s.draft = false;
       }
 
-      const idx = this.store.chats.findIndex(
-        (c) => c.id === this.store.activeChatId
-      );
-
-      if (idx >= 0) {
-        const chat = this.store.chats[idx];
-        chat.messages = Array.isArray(chat.messages) ? chat.messages : [];
+      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
+      if (chat) {
+        if (!Array.isArray(chat.messages)) chat.messages = [];
         chat.messages.push({ role: "user", text });
-
-        if (!chat.title || chat.title === "New Chat") {
-          chat.title = text.slice(0, 24);
-        }
       }
 
       this.input = "";
-      this.emitUpdate();
-      this.$nextTick(this.scrollToBottom);
-    },
+      this.$emit("store:update", s);
 
-    scrollToBottom() {
-      const el =
-        this.$refs.messageList?.$el || this.$el?.querySelector?.(".messages");
-
-      if (el) el.scrollTop = el.scrollHeight;
+      this.$nextTick(() => {
+        const list = this.$refs.messageList;
+        if (list && typeof list.scrollToBottom === "function") list.scrollToBottom();
+      });
     },
   },
 };
 </script>
+
+<style scoped>
+.chat-box {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.room-header {
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+.room-title {
+  font-size: 13px;
+  color: var(--text-primary);
+}
+
+.room-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.messages {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+
+textarea {
+  flex: 1;
+  resize: none;
+}
+</style>

@@ -1,21 +1,40 @@
 <template>
   <aside class="sidebar" :class="{ open: open, collapsed: collapsed }">
-    <strong v-if="!collapsed" class="label">DS Assistant</strong>
+    <div class="top-row">
+      <!-- ✅ hamburger moved here -->
+      <button
+        type="button"
+        class="hamburger"
+        :aria-label="isMobile ? 'Close sidebar' : 'Toggle sidebar'"
+        @click="onHamburger"
+      >
+        ☰
+      </button>
+
+      <strong v-if="!collapsed" class="label">DS Assistant</strong>
+    </div>
 
     <!-- 상단 네비게이션 (Chat / Playground / Models) -->
     <nav class="nav" aria-label="Primary navigation">
       <router-link to="/chat" aria-label="Chat" class="nav-item">
-        <span class="icon" aria-hidden="true">💬</span><span class="text">Chat</span>
+        <span class="icon" aria-hidden="true">💬</span>
+        <span class="text">Chat</span>
       </router-link>
 
       <router-link to="/playground" aria-label="Playground" class="nav-item">
-        <span class="icon" aria-hidden="true">🧪</span><span class="text">Playground</span>
+        <span class="icon" aria-hidden="true">🧪</span>
+        <span class="text">Playground</span>
       </router-link>
 
       <div class="nav-divider" aria-hidden="true" />
 
-      <!-- Models: Chat/Playground와 동일한 위치(네비게이션 영역)에서 row 단위로 표시 -->
-      <div class="nav-section" :class="{ collapsed: collapsed }" role="group" aria-label="Models">
+      <!-- Models -->
+      <div
+        class="nav-section"
+        :class="{ collapsed: collapsed }"
+        role="group"
+        aria-label="Models"
+      >
         <div v-if="!collapsed" class="nav-section-label">Models</div>
 
         <button
@@ -26,18 +45,16 @@
           :class="{ active: safeStore.activeModelGroupId === g.id }"
           @click="setModelGroup(g.id)"
         >
-          <span class="icon model-icon" aria-hidden="true">{{ iconForGroup(g.id) }}</span>
+          <span class="icon model-icon" aria-hidden="true">
+            {{ iconForGroup(g.id) }}
+          </span>
           <span class="text">{{ g.label }}</span>
         </button>
       </div>
     </nav>
 
-    <!-- collapsed 상태에서는 채팅 리스트를 숨기고, 아이콘만 보여줌 -->
+    <!-- ✅ collapsed 상태에서는 채팅 리스트를 숨기고, 아이콘만 보여줌 -->
     <template v-if="!collapsed">
-      <button type="button" class="chat-new" @click="startNewChat">
-        <span class="icon" aria-hidden="true">➕</span><span class="text">새 대화</span>
-      </button>
-
       <div class="chat-list" aria-label="Chat list">
         <div
           v-for="c in safeChats"
@@ -48,7 +65,12 @@
           <button type="button" class="chat-title" @click="selectChat(c.id)">
             {{ c.title }}
           </button>
-          <button type="button" class="chat-del" aria-label="Delete chat" @click.stop="deleteChat(c.id)">
+          <button
+            type="button"
+            class="chat-del"
+            aria-label="Delete chat"
+            @click.stop="deleteChat(c.id)"
+          >
             🗑
           </button>
         </div>
@@ -84,10 +106,13 @@ export default {
         chats: Array.isArray(s.chats) ? s.chats : [],
         activeChatId: s.activeChatId ?? null,
         draft: s.draft ?? !s.activeChatId,
-        activeModelGroupId: s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds",
+        activeModelGroupId:
+          s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds",
         activeModelId:
           s.activeModelId ||
-          getDefaultModelId(s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds"),
+          getDefaultModelId(
+            s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds"
+          ),
       };
     },
     safeChats() {
@@ -99,6 +124,14 @@ export default {
   },
 
   methods: {
+    onHamburger() {
+      if (this.isMobile) {
+        this.$emit("close");
+      } else {
+        this.$emit("toggle-collapse");
+      }
+    },
+
     iconForGroup(id) {
       if (id === "ds") return "DS";
       if (id === "spec") return "SP";
@@ -106,27 +139,17 @@ export default {
       return "M";
     },
 
-    startNewChat() {
-      const s = { ...this.safeStore };
-      s.activeChatId = null;
-      s.draft = true;
-      // 새 대화는 현재 선택된 모델 유지
-      this.$emit("store:update", s);
-      if (this.isMobile) this.$emit("close");
-      if (this.$route.path !== "/chat") this.$router.push("/chat");
-    },
-
     selectChat(id) {
       const s = { ...this.safeStore };
       s.activeChatId = id;
       s.draft = false;
 
-      // 선택한 chat에 모델이 있으면 전역 선택도 그 값으로 맞춤 (UX 일관)
       const chat = (s.chats || []).find((c) => c.id === id);
       if (chat) {
         if (chat.modelGroupId) s.activeModelGroupId = chat.modelGroupId;
         if (chat.modelId) s.activeModelId = chat.modelId;
       }
+
       this.$emit("store:update", s);
       if (this.isMobile) this.$emit("close");
       if (this.$route.path !== "/chat") this.$router.push("/chat");
@@ -142,21 +165,23 @@ export default {
       this.$emit("store:update", s);
     },
 
+    /**
+     * ✅ Models 클릭 시: 새 대화 화면으로 전환(draft) 후 모델 그룹 적용
+     * - "새 대화 버튼"은 제거되었고, 이 동작이 그 역할을 대체
+     */
     setModelGroup(groupId) {
       const s = { ...this.safeStore };
+
+      // 1) 새 대화 상태로 초기화 (채팅 목록은 유지)
+      s.activeChatId = null;
+      s.draft = true;
+
+      // 2) 모델 그룹/기본 모델 설정
       s.activeModelGroupId = groupId;
       s.activeModelId = getDefaultModelId(groupId);
 
-      // draft/선택된 채팅에도 모델 반영 (현재 UX 유지)
-      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
-      if (chat) {
-        chat.modelGroupId = groupId;
-        chat.modelId = s.activeModelId;
-      }
-
       this.$emit("store:update", s);
 
-      // 모델 그룹 변경은 "Chat" 맥락이므로 Chat으로 이동
       if (this.isMobile) this.$emit("close");
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
@@ -165,7 +190,7 @@ export default {
 </script>
 
 <style scoped>
-.sidebar{
+.sidebar {
   width: 280px;
   min-width: 280px;
   border-right: 1px solid var(--border);
@@ -174,29 +199,48 @@ export default {
   flex-direction: column;
   gap: 12px;
   padding: 14px;
-  transition: width .2s ease, min-width .2s ease;
+  transition: width 0.2s ease, min-width 0.2s ease;
   overflow: hidden;
 }
 
-.sidebar.collapsed{
+.sidebar.collapsed {
   width: 76px;
   min-width: 76px;
   padding: 14px 10px;
 }
 
-.label{
-  font-size: 14px;
-  color: var(--text-muted);
-  letter-spacing: .2px;
+.top-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.nav{
+.hamburger {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  cursor: pointer;
+}
+
+.hamburger:hover {
+  background: var(--bg-soft);
+}
+
+.label {
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+.nav {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.nav-item{
+.nav-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -210,40 +254,40 @@ export default {
   cursor: pointer;
 }
 
-.nav-item:hover{
+.nav-item:hover {
   background: var(--bg-soft);
   border-color: var(--border);
 }
 
-.nav-btn{
+.nav-btn {
   text-align: left;
 }
 
-.nav-item.active{
+.nav-item.active {
   background: var(--bg-soft);
   border-color: var(--border);
 }
 
-.nav-divider{
+.nav-divider {
   height: 1px;
   background: var(--border);
   margin: 6px 6px;
-  opacity: .7;
+  opacity: 0.7;
 }
 
-.nav-section{
+.nav-section {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.nav-section-label{
+.nav-section-label {
   font-size: 12px;
   color: var(--text-muted);
   padding: 8px 10px 2px;
 }
 
-.icon{
+.icon {
   width: 22px;
   min-width: 22px;
   height: 22px;
@@ -252,7 +296,7 @@ export default {
   justify-content: center;
 }
 
-.model-icon{
+.model-icon {
   font-size: 11px;
   font-weight: 700;
   border: 1px solid var(--border);
@@ -260,34 +304,17 @@ export default {
   padding: 2px 0;
 }
 
-.text{
+.text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sidebar.collapsed .text{
+.sidebar.collapsed .text {
   display: none;
 }
 
-.chat-new{
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-soft);
-  color: var(--text-primary);
-  cursor: pointer;
-}
-
-.chat-new:hover{
-  filter: brightness(1.02);
-}
-
-.chat-list{
+.chat-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -296,7 +323,7 @@ export default {
   padding-right: 2px;
 }
 
-.chat-item{
+.chat-item {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -305,12 +332,12 @@ export default {
   border: 1px solid transparent;
 }
 
-.chat-item.active{
+.chat-item.active {
   background: var(--bg-soft);
   border-color: var(--border);
 }
 
-.chat-title{
+.chat-title {
   flex: 1;
   text-align: left;
   background: transparent;
@@ -320,14 +347,14 @@ export default {
   font-size: 13px;
 }
 
-.chat-del{
+.chat-del {
   background: transparent;
   border: none;
   cursor: pointer;
-  opacity: .8;
+  opacity: 0.8;
 }
 
-.chat-empty{
+.chat-empty {
   color: var(--text-muted);
   font-size: 12px;
   padding: 8px 10px;

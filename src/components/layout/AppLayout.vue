@@ -1,50 +1,60 @@
 <template>
   <div class="layout">
-    <!-- DESKTOP: sidebar는 레이아웃(flow) 안에 배치 -->
-    <AppSidebar
-      v-if="!isMobile"
-      :store="store"
-      :open="true"
-      :collapsed="sidebarCollapsed"
-      :is-mobile="false"
-      @store:update="onStoreUpdate"
-    />
+    <!-- ✅ Header는 전체 너비 -->
+    <AppHeader :theme="theme" :is-mobile="isMobile" @theme-change="setTheme" />
 
-    <div class="main">
-      <AppHeader
-        :theme="theme"
-        :is-mobile="isMobile"
-        @toggle-sidebar="onToggleSidebar"
-        @theme-change="setTheme"
+    <!-- ✅ Header 아래에 Sidebar + Main -->
+    <div class="body">
+      <!-- DESKTOP: sidebar는 레이아웃(flow) 안에 배치 -->
+      <AppSidebar
+        v-if="!isMobile"
+        :store="store"
+        :open="true"
+        :collapsed="sidebarCollapsed"
+        :is-mobile="false"
+        @toggle-collapse="onToggleSidebarCollapse"
+        @store:update="onStoreUpdate"
       />
 
-      <main class="content">
-        <router-view :store="store" @store:update="onStoreUpdate" />
-      </main>
+      <!-- MOBILE: sidebar overlay -->
+      <AppSidebar
+        v-if="isMobile"
+        class="mobile-sidebar"
+        :store="store"
+        :open="sidebarOpen"
+        :collapsed="false"
+        :is-mobile="true"
+        @close="sidebarOpen = false"
+        @store:update="onStoreUpdate"
+      />
 
-      <AppFooter />
+      <div class="main">
+        <!-- MOBILE: Sidebar를 열기 위한 플로팅 버튼 (Header에 두지 않음) -->
+        <button
+          v-if="isMobile && !sidebarOpen"
+          type="button"
+          class="mobile-open-btn"
+          aria-label="Open sidebar"
+          @click="sidebarOpen = true"
+        >
+          ☰
+        </button>
+
+        <main class="content">
+          <router-view :store="store" @store:update="onStoreUpdate" />
+        </main>
+
+        <AppFooter />
+      </div>
+
+      <div
+        v-if="isMobile && sidebarOpen"
+        class="backdrop"
+        @click="sidebarOpen = false"
+      />
     </div>
-
-    <!-- MOBILE: sidebar는 overlay(fixed)로 따로 렌더링해서 '빈 공간'이 생기지 않게 함 -->
-    <AppSidebar
-      v-if="isMobile"
-      class="mobile-sidebar"
-      :store="store"
-      :open="sidebarOpen"
-      :collapsed="false"
-      :is-mobile="true"
-      @close="sidebarOpen = false"
-      @store:update="onStoreUpdate"
-    />
-
-    <div
-      v-if="isMobile && sidebarOpen"
-      class="backdrop"
-      @click="sidebarOpen = false"
-    />
   </div>
 </template>
-
 
 <script>
 import AppHeader from "./AppHeader.vue";
@@ -60,61 +70,47 @@ export default {
   data() {
     return {
       store: { chats: [], activeChatId: null, draft: true },
-      sidebarOpen: false, // mobile offcanvas
-      sidebarCollapsed: false, // desktop collapsed
       theme: "light",
+      isMobile: false,
+      sidebarOpen: false,
+      sidebarCollapsed: false,
     };
   },
 
-  computed: {
-    isMobile() {
-      // single source of truth for responsive
-      return this.$responsive?.isMobile?.() ?? (window.innerWidth < 768);
-    },
+  created() {
+    this.store = normalizeStore(loadStore());
+    this.theme = this.$theme.getTheme();
   },
 
   mounted() {
-    // 항상 안전한 기본 store 보장
-    const loaded = loadStore();
-    this.store = normalizeStore(loaded);
-
-    // init theme from themeManager (already applies to DOM)
-    this.theme = this.$theme?.getTheme?.() || localStorage.getItem("theme") || "light";
-
-    // responsive plugin is reactive; resize listener는 responsiveManager가 관리
+    // responsive manager
+    const update = () => {
+      this.isMobile = this.$responsive.isSm();
+      if (!this.isMobile) this.sidebarOpen = false;
+    };
+    update();
+    window.addEventListener("resize", update);
+    this._onResize = update;
   },
 
-  watch: {
-    // breakpoint 변경 시 mobile overlay 상태 정리
-    "$responsive.state.bp"() {
-      if (!this.isMobile) this.sidebarOpen = false;
-    },
+  beforeUnmount() {
+    window.removeEventListener("resize", this._onResize);
   },
 
   methods: {
-    onToggleSidebar() {
-      // mobile: offcanvas open/close
-      if (this.isMobile) {
-        this.sidebarOpen = !this.sidebarOpen;
-        return;
-      }
-      // desktop: collapse/expand
-      this.sidebarCollapsed = !this.sidebarCollapsed;
+    onStoreUpdate(next) {
+      this.store = normalizeStore(next);
+      saveStore(this.store);
     },
 
     setTheme(t) {
       this.theme = t;
-      if (this.$theme?.setTheme) this.$theme.setTheme(t);
-      else {
-        document.documentElement.setAttribute("data-theme", t);
-        localStorage.setItem("theme", t);
-      }
+      this.$theme.setTheme(t);
     },
 
-    onStoreUpdate(newStore) {
-      // child에서 prop store를 직접 mutate할 수도 있으니 방어적으로 normalize
-      this.store = normalizeStore(newStore);
-      saveStore(this.store);
+    onToggleSidebarCollapse() {
+      // desktop collapse toggle
+      this.sidebarCollapsed = !this.sidebarCollapsed;
     },
   },
 };
@@ -122,40 +118,56 @@ export default {
 
 <style scoped>
 .layout {
-  display: flex;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
 }
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+}
+
 .main {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
 }
+
 .content {
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
+
+.mobile-open-btn {
+  position: fixed;
+  left: 12px;
+  top: 66px;
+  z-index: 60;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.mobile-sidebar {
+  position: fixed;
+  left: 0;
+  top: 56px; /* header height */
+  height: calc(100vh - 56px);
+  z-index: 80;
+}
+
 .backdrop {
   position: fixed;
-  inset: 0;
-  /*
-    Mobile에서 사이드바 바깥 영역 클릭으로 닫히게 하되,
-    전체 화면이 회색으로 덮이는(backdrop dim) UX는 제거.
-  */
-  background: rgba(0, 0, 0, 0);
-  z-index: 45;
-  /* 사이드바 영역(260px)은 backdrop이 덮지 않게 하여 클릭 방해 버그 방지 */
-  left: 0;
+  inset: 56px 0 0 0; /* below header */
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 70;
 }
-
-@media (max-width: 768px) {
-  .backdrop {
-    left: 260px;
-  }
-  .mobile-sidebar {
-    z-index: 50;
-  }
-}
-
 </style>
