@@ -239,14 +239,25 @@
       </template>
 
       <template v-else-if="activeTab === 'modal'">
-        <div class="empty">
-          Modal 탭 (유지) — 모달 관련 샘플 또는 설명 추가 가능
-        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Modal Playground</div>
+            <div class="card-sub">
+              modalManager 기반 sm / md / lg 모달 테스트
+            </div>
+          </div>
 
-        <div class="btn-row">
-          <button class="btn btn-primary btn-lg" @click="openModal">
-            Modal
-          </button>
+          <div class="btn-row">
+            <button class="btn btn-primary btn-md" @click="open('sm')">
+              Open SM
+            </button>
+            <button class="btn btn-primary btn-md" @click="open('md')">
+              Open MD
+            </button>
+            <button class="btn btn-primary btn-md" @click="open('lg')">
+              Open LG
+            </button>
+          </div>
         </div>
       </template>
 
@@ -258,7 +269,8 @@
 </template>
 
 <script>
-import { modalManager } from "@/plugins/modalManager";
+import { openModal } from "@/plugins/modalManager";
+import SampleFormModal from "@/components/sample/SampleFormModal.vue";
 
 export default {
   name: "PlaygroundView",
@@ -270,7 +282,7 @@ export default {
         { key: "data", label: "Data" },
         { key: "navigators", label: "Navigators" },
         { key: "theme", label: "Theme" },
-        { key: "modal", label: "modal" },
+        { key: "modal", label: "Modal" },
       ],
       rows: [
         {
@@ -304,26 +316,26 @@ export default {
         (typeof window !== "undefined" ? window.innerWidth : 1200)
       );
     },
-    bpLabel() {
-      return this.$responsive?.bp || "lg";
-    },
     cols() {
-      // 카드 그리드 컬럼 수
+      // 🔴 이 부분이 빠져 있어서 경고 발생
       if (this.bpLabel === "sm") return 1;
       if (this.bpLabel === "md") return 2;
       return 3;
     },
-  },
-  mounted() {
-    // no-op (responsiveManager handles resize)
+    bpLabel() {
+      return this.$responsive?.bp || "lg";
+    },
   },
 
   methods: {
-    async openModal() {
-      const result = await modalManager.openModal("sample");
+    async open(size) {
+      const result = await openModal(SampleFormModal, {}, size);
 
       if (result) {
-        console.log("결과:", result);
+        console.log("저장됨:", result);
+        // 👉 여기서 메인 화면 상태 업데이트 가능
+      } else {
+        console.log("취소됨");
       }
     },
   },

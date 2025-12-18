@@ -1,38 +1,47 @@
-// plugins/modalManager.js
-import { reactive } from "vue";
+import { reactive, readonly, markRaw } from "vue";
 
-export const modalManager = reactive({
-  open: false,
-  type: null,
+let resolver = null;
+
+const state = reactive({
+  visible: false,
+  component: null,
   props: {},
-  resolve: null,
-
-  modalMap: {
-    sample: {
-      title: "샘플 입력",
-      confirmText: "저장",
-      component: "SampleFormModal",
-    },
-  },
-
-  openModal(type, props = {}) {
-    return new Promise((resolve) => {
-      this.type = type;
-      this.props = props;
-      this.resolve = resolve;
-      this.open = true;
-    });
-  },  
-
-  close() {
-    this.open = false;
-    this.type = null;
-    this.props = {};
-    this.resolve = null;
-  },
-
-  confirm(data = true) {
-    this.resolve && this.resolve(data);
-    this.close();
-  },
+  size: "md",
 });
+
+export function openModal(component, props = {}, size = "md") {
+  state.visible = true;
+  state.component = markRaw(component);
+  state.size = size;
+
+  return new Promise((resolve) => {
+    resolver = resolve;
+    state.props = {
+      ...props,
+      // 모달에서 호출할 콜백 주입
+      onConfirm: (data) => {
+        resolve(data);
+        closeModal();
+      },
+      onCancel: () => {
+        resolve(null);
+        closeModal();
+      },
+    };
+  });
+}
+
+export function closeModal() {
+  state.visible = false;
+  state.component = null;
+  state.props = {};
+  resolver = null;
+}
+
+export function useModalManager() {
+  return {
+    state: readonly(state),
+    openModal,
+    closeModal,
+  };
+}
