@@ -1,32 +1,32 @@
 <template>
-  <div class="sample-modal">
-    <header class="header">
-      <strong>샘플 폼</strong>
-      <button class="close" @click="handleCancel">✕</button>
-    </header>
-
-    <section class="body">
+  <BaseModal title="샘플 폼" :onCancel="handleCancel">
+    <!-- Body -->
+    <div class="form">
       <label>
         이름
-        <input v-model="name" placeholder="이름 입력" />
+        <input v-model="name" />
       </label>
 
       <label>
         설명
-        <textarea v-model="desc" rows="3" placeholder="설명 입력" />
+        <textarea v-model="desc" rows="3" />
       </label>
-    </section>
+    </div>
 
-    <footer class="footer">
+    <!-- Footer -->
+    <template #footer>
       <button class="btn ghost" @click="handleCancel">취소</button>
       <button class="btn primary" @click="handleConfirm">저장</button>
-    </footer>
-  </div>
+    </template>
+  </BaseModal>
 </template>
 
 <script>
+import BaseModal from "@/components/common/BaseModal.vue";
+
 export default {
   name: "SampleFormModal",
+  components: { BaseModal },
 
   props: {
     onConfirm: Function,
@@ -55,71 +55,20 @@ export default {
 </script>
 
 <style scoped>
-.sample-modal {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-}
-
-.close {
-  margin-left: auto;
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
+.form {
+  display: grid;
   gap: 12px;
 }
-
 label {
   display: flex;
   flex-direction: column;
   font-size: 13px;
-  color: var(--text-muted);
 }
-
 input,
 textarea {
   margin-top: 4px;
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--border);
-}
-
-.footer {
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.btn {
-  padding: 8px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-.btn.ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-}
-
-.btn.primary {
-  background: var(--accent);
-  color: #fff;
-  border: none;
 }
 </style>
