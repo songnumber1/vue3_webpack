@@ -247,18 +247,62 @@
             </div>
           </div>
 
-          <div class="btn-row">
-            <button class="btn btn-primary btn-md" @click="open('sm')">
+          <div class="btn-row btn-container">
+            <button class="btn btn-primary btn-sm" @click="open('sm')">
               Open SM
             </button>
             <button class="btn btn-primary btn-md" @click="open('md')">
               Open MD
             </button>
-            <button class="btn btn-primary btn-md" @click="open('lg')">
+            <button class="btn btn-primary btn-lg" @click="open('lg')">
               Open LG
             </button>
           </div>
         </div>
+      </template>
+
+      <template v-else-if="activeTab === 'storage'">
+        <section class="card">
+          <div class="card-head">
+            <div class="card-title">Storage Playground</div>
+            <div class="card-sub">local / session / cookie / indexed</div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field">
+              <label>Type</label>
+              <select v-model="storageType" class="select">
+                <option value="local">localStorage</option>
+                <option value="session">sessionStorage</option>
+                <option value="cookie">cookie</option>
+                <option value="indexed">indexedDB</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Key</label>
+              <input v-model="storageKey" class="input" />
+            </div>
+
+            <div class="field">
+              <label>Value</label>
+              <textarea v-model="storageValue" rows="3" class="textarea" />
+            </div>
+          </div>
+
+          <div class="btn-row btn-container">
+            <button class="btn btn-primary" @click="saveStorage">Save</button>
+            <button class="btn btn-ghost" @click="loadStorage">Load</button>
+            <button class="btn btn-danger" @click="deleteStorage">
+              Delete
+            </button>
+          </div>
+
+          <div class="preview">
+            <div class="preview-title">Result</div>
+            <pre>{{ storageResult }}</pre>
+          </div>
+        </section>
       </template>
 
       <template v-else>
@@ -270,6 +314,11 @@
 
 <script>
 import { openModal } from "@/plugins/modalManager";
+import {
+  setStorage,
+  getStorage,
+  removeStorage,
+} from "@/plugins/storageManager";
 import SampleFormModal from "@/components/sample/SampleFormModal.vue";
 
 export default {
@@ -283,6 +332,7 @@ export default {
         { key: "navigators", label: "Navigators" },
         { key: "theme", label: "Theme" },
         { key: "modal", label: "Modal" },
+        { key: "storage", label: "Storage" },
       ],
       rows: [
         {
@@ -307,6 +357,10 @@ export default {
           badgeClass: "badge-danger",
         },
       ],
+      storageType: "local",
+      storageKey: "pg_demo",
+      storageValue: "",
+      storageResult: null,
     };
   },
   computed: {
@@ -336,6 +390,36 @@ export default {
         // 👉 여기서 메인 화면 상태 업데이트 가능
       } else {
         console.log("취소됨");
+      }
+    },
+
+    async saveStorage() {
+      const res = await setStorage(
+        this.storageType,
+        this.storageKey,
+        this.parseValue(this.storageValue)
+      );
+
+      this.storageResult = res;
+    },
+
+    async loadStorage() {
+      const res = await getStorage(this.storageType, this.storageKey);
+
+      this.storageResult = res;
+    },
+
+    async deleteStorage() {
+      const res = await removeStorage(this.storageType, this.storageKey);
+
+      this.storageResult = res;
+    },
+
+    parseValue(value) {
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
       }
     },
   },
@@ -461,6 +545,10 @@ export default {
   .preview-wrap {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+.btn-container {
+  padding: 10px;
 }
 
 .preview {

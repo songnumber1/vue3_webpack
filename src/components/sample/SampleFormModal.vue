@@ -15,8 +15,8 @@
 
     <!-- Footer -->
     <template #footer>
-      <button class="btn ghost" @click="handleCancel">취소</button>
-      <button class="btn primary" @click="handleConfirm">저장</button>
+      <button class="btn" @click="handleCancel">취소</button>
+      <button class="btn btn-primary" @click="handleConfirm">저장</button>
     </template>
   </BaseModal>
 </template>
