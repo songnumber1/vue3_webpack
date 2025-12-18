@@ -238,6 +238,18 @@
         </div>
       </template>
 
+      <template v-else-if="activeTab === 'modal'">
+        <div class="empty">
+          Modal 탭 (유지) — 모달 관련 샘플 또는 설명 추가 가능
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary btn-lg" @click="openModal">
+            Modal
+          </button>
+        </div>
+      </template>
+
       <template v-else>
         <div class="empty">준비중</div>
       </template>
@@ -246,6 +258,8 @@
 </template>
 
 <script>
+import { modalManager } from "@/plugins/modalManager";
+
 export default {
   name: "PlaygroundView",
   data() {
@@ -256,6 +270,7 @@ export default {
         { key: "data", label: "Data" },
         { key: "navigators", label: "Navigators" },
         { key: "theme", label: "Theme" },
+        { key: "modal", label: "modal" },
       ],
       rows: [
         {
@@ -301,6 +316,16 @@ export default {
   },
   mounted() {
     // no-op (responsiveManager handles resize)
+  },
+
+  methods: {
+    async openModal() {
+      const result = await modalManager.openModal("sample");
+
+      if (result) {
+        console.log("결과:", result);
+      }
+    },
   },
 };
 </script>
