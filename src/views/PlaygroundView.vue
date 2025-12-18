@@ -404,6 +404,7 @@ export default {
     },
 
     async loadStorage() {
+      console.log(this.storageType);
       const res = await getStorage(this.storageType, this.storageKey);
 
       this.storageResult = res;
