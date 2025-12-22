@@ -44,7 +44,10 @@
 
 <script>
 import { md } from "@/utils/markdown";
-import { createChatFromFirstMessage, touchChatOnMessage } from "@/stores/chatStore";
+import {
+  createChatFromFirstMessage,
+  touchChatOnMessage,
+} from "@/storage/chatStore";
 import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
@@ -122,7 +125,9 @@ export default {
     },
 
     currentModelGroupLabel() {
-      const g = (MODEL_GROUPS || []).find((x) => x.id === this.currentModelGroupId);
+      const g = (MODEL_GROUPS || []).find(
+        (x) => x.id === this.currentModelGroupId
+      );
       return g ? g.label : this.currentModelGroupId;
     },
 
@@ -138,12 +143,14 @@ export default {
 
     applySuggestion(payload) {
       // ✅ 예제 클릭 시: input에만 채우고, 전송은 사용자가 Enter/Send로만
-      const text = typeof payload === 'string'
-        ? payload
-        : (payload && typeof payload === 'object' ? (payload.text || payload.title || '') : '');
-      this.input = String(text ?? '');
+      const text =
+        typeof payload === "string"
+          ? payload
+          : payload && typeof payload === "object"
+          ? payload.text || payload.title || ""
+          : "";
+      this.input = String(text ?? "");
     },
-
 
     setModel({ groupId, modelId }) {
       const s = { ...this.safeStore };
@@ -197,7 +204,8 @@ export default {
 
       this.$nextTick(() => {
         const list = this.$refs.messageList;
-        if (list && typeof list.scrollToBottom === "function") list.scrollToBottom();
+        if (list && typeof list.scrollToBottom === "function")
+          list.scrollToBottom();
       });
     },
   },
