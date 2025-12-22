@@ -31,13 +31,17 @@
 
     <!-- 입력 영역 (기존 그대로) -->
     <div class="input-row">
-      <textarea
-        v-model="input"
-        rows="2"
-        placeholder="메시지를 입력하세요"
-        @keydown="onKeydown"
-      />
-      <button type="button" @click="send">Send</button>
+      <InputHeader class="input-header" />
+
+      <div class="input-main">
+        <textarea
+          v-model="input"
+          rows="2"
+          placeholder="메시지를 입력하세요"
+          @keydown="onKeydown"
+        />
+        <button type="button" @click="send">Send</button>
+      </div>
     </div>
   </div>
 </template>
@@ -51,6 +55,7 @@ import {
 import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
+import InputHeader from "@/components/chat/InputHeader.vue";
 
 export default {
   name: "ChatView",
@@ -60,6 +65,7 @@ export default {
   components: {
     NewChatLanding,
     ChatMessageList,
+    InputHeader,
   },
 
   props: {
@@ -80,7 +86,8 @@ export default {
   computed: {
     safeStore() {
       const s = this.store && typeof this.store === "object" ? this.store : {};
-      const fallbackGroup = MODEL_GROUPS?.[0]?.id || "ds";
+      const fallbackGroup =
+        this.$store?.state?.model?.groupId || MODEL_GROUPS?.[0]?.id || "ds";
       const groupId = s.activeModelGroupId || fallbackGroup;
 
       return {
@@ -88,7 +95,8 @@ export default {
         activeChatId: s.activeChatId ?? null,
         draft: s.draft ?? !s.activeChatId,
         activeModelGroupId: groupId,
-        activeModelId: s.activeModelId || getDefaultModelId(groupId),
+        activeModelId:
+          s.activeModelId || this.$store?.state?.model?.modelId || getDefaultModelId(groupId),
       };
     },
 
@@ -117,11 +125,11 @@ export default {
     },
 
     currentModelGroupId() {
-      return this.safeStore.activeModelGroupId;
+      return this.$store.state.model.groupId;
     },
 
     currentModelId() {
-      return this.safeStore.activeModelId;
+      return this.$store.state.model.modelId;
     },
 
     currentModelGroupLabel() {
@@ -152,7 +160,12 @@ export default {
       this.input = String(text ?? "");
     },
 
-    setModel({ groupId, modelId }) {
+    // Landing(ModelSelect)에서 modelId(string)만 넘어옵니다.
+    setModel(modelId) {
+      // Vuex 모델 상태 업데이트
+      this.$store.dispatch("model/setModel", modelId);
+
+      const groupId = this.$store.state.model.groupId;
       const s = { ...this.safeStore };
       s.activeModelGroupId = groupId;
       s.activeModelId = modelId;
@@ -249,14 +262,32 @@ export default {
 
 .input-row {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   padding: 12px 14px;
   border-top: 1px solid var(--border);
   background: var(--bg-surface);
 }
 
+.input-main{
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
 textarea {
   flex: 1;
   resize: none;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+  border-radius: 14px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+textarea:focus{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 </style>

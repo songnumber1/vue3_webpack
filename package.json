@@ -5,13 +5,14 @@
     "dev": "webpack serve --mode development"
   },
   "dependencies": {
+    "highlight.js": "^11.9.0",
+    "katex": "^0.16.10",
+    "markdown-it": "^14.1.0",
+    "markdown-it-katex": "^2.0.3",
+    "mermaid": "^10.9.1",
     "vue": "^3.4.38",
     "vue-router": "^4.4.5",
-    "markdown-it": "^14.1.0",
-    "highlight.js": "^11.9.0",
-    "mermaid": "^10.9.1",
-    "katex": "^0.16.10",
-    "markdown-it-katex": "^2.0.3"
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

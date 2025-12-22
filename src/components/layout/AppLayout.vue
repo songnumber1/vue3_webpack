@@ -54,7 +54,6 @@
 import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
-import { loadStore, saveStore, normalizeStore } from "@/storage/chatStore";
 
 export default {
   name: "AppLayout",
@@ -62,7 +61,6 @@ export default {
 
   data() {
     return {
-      store: { chats: [], activeChatId: null, draft: true },
       theme: "light",
       isMobile: false,
       sidebarOpen: false,
@@ -71,8 +69,16 @@ export default {
   },
 
   created() {
-    this.store = normalizeStore(loadStore());
     this.theme = this.$theme.getTheme();
+
+    // 초기 템플릿 선택 보정
+    this.$store.dispatch("prompt/onModelChanged");
+  },
+
+  computed: {
+    store() {
+      return this.$store.getters["chat/safeStore"]; // {chats, activeChatId, draft, ...}
+    },
   },
 
   mounted() {
@@ -91,8 +97,7 @@ export default {
 
   methods: {
     onStoreUpdate(next) {
-      this.store = normalizeStore(next);
-      saveStore(this.store);
+      this.$store.dispatch("chat/update", next);
     },
 
     setTheme(t) {

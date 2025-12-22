@@ -234,6 +234,10 @@ export default {
         if (chat.modelId) s.activeModelId = chat.modelId;
       }
 
+      // Vuex 모델 상태도 동기화
+      if (chat?.modelGroupId) this.$store.dispatch("model/setGroup", chat.modelGroupId);
+      if (chat?.modelId) this.$store.dispatch("model/setModel", chat.modelId);
+
       this.$emit("store:update", s);
       if (this.isMobile) this.$emit("close");
       if (this.$route.path !== "/chat") this.$router.push("/chat");
@@ -259,6 +263,9 @@ export default {
       // 모델 그룹/기본 모델
       s.activeModelGroupId = groupId;
       s.activeModelId = getDefaultModelId(groupId);
+
+      // Vuex 모델 상태도 동기화
+      this.$store.dispatch("model/setGroup", groupId);
 
       this.$emit("store:update", s);
 
