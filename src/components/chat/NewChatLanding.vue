@@ -8,8 +8,8 @@
       <!-- ✅ 모델 그룹은 이미 선택되어 있으므로, 모델 옵션만 표시 -->
       <ModelSelect
         :models="currentModels"
-        :model-id="modelId"
-        @update:model="$emit('model', $event)"
+        :model-id="currentModelId"
+        @update:model="setModel"
       />
     </div>
 
@@ -20,7 +20,7 @@
         type="button"
         class="card"
         role="listitem"
-        @click="$emit('pick', s.text)"
+        @click="pickSuggestion(s.text)"
       >
         <div class="card-title">{{ s.title }}</div>
         <div class="card-desc">{{ s.desc }}</div>
@@ -31,32 +31,21 @@
 
 <script>
 import ModelSelect from "@/components/common/ModelSelect.vue";
+import { MODEL_GROUPS } from "@/constants/models";
 
 export default {
   name: "NewChatLanding",
   components: { ModelSelect },
 
-  props: {
-    modelGroups: {
-      type: Array,
-      default: () => [],
-    },
-    modelGroupId: {
-      type: String,
-      default: "",
-    },
-    modelId: {
-      type: String,
-      default: "",
-    },
-  },
-
-  emits: ["pick", "model"],
-
   computed: {
     currentModels() {
-      const g = (this.modelGroups || []).find((x) => x.id === this.modelGroupId);
+      const g = (MODEL_GROUPS || []).find(
+        (x) => x.id === this.$store.state.model.groupId
+      );
       return (g && Array.isArray(g.models) ? g.models : []) || [];
+    },
+    currentModelId() {
+      return this.$store.state.model.modelId;
     },
   },
 
@@ -69,6 +58,16 @@ export default {
         { title: "버그 원인", desc: "에러 원인을 함께 추적해볼게요.", text: "다음 오류 로그 원인을 분석해줘: " },
       ],
     };
+  },
+
+  methods: {
+    setModel(modelId) {
+      this.$store.dispatch("model/setModel", modelId);
+      this.$store.dispatch("prompt/onModelChanged");
+    },
+    pickSuggestion(text) {
+      this.$store.dispatch("input/setText", String(text ?? ""));
+    },
   },
 };
 </script>

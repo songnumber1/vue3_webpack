@@ -1,41 +1,26 @@
 <template>
   <div class="layout">
     <!-- ✅ Header는 전체 너비 -->
-    <AppHeader
-      :theme="theme"
-      :is-mobile="isMobile"
-      @theme-change="setTheme"
-      @open-sidebar="sidebarOpen = true"
-    />
+    <AppHeader />
 
     <!-- ✅ Header 아래에 Sidebar + Main -->
     <div class="body">
       <!-- DESKTOP -->
       <AppSidebar
         v-if="!isMobile"
-        :store="store"
-        :open="true"
-        :collapsed="sidebarCollapsed"
-        :is-mobile="false"
-        @toggle-collapse="onToggleSidebarCollapse"
-        @store:update="onStoreUpdate"
+        :class="{ collapsed: sidebarCollapsed }"
       />
 
       <!-- MOBILE overlay -->
       <AppSidebar
         v-if="isMobile"
         class="mobile-sidebar"
-        :store="store"
-        :open="sidebarOpen"
-        :collapsed="false"
-        :is-mobile="true"
-        @close="sidebarOpen = false"
-        @store:update="onStoreUpdate"
+        :class="{ open: sidebarOpen }"
       />
 
       <div class="main">
         <main class="content">
-          <router-view :store="store" @store:update="onStoreUpdate" />
+          <router-view />
         </main>
 
         <AppFooter />
@@ -44,7 +29,7 @@
       <div
         v-if="isMobile && sidebarOpen"
         class="backdrop"
-        @click="sidebarOpen = false"
+        @click="closeSidebar"
       />
     </div>
   </div>
@@ -61,30 +46,33 @@ export default {
 
   data() {
     return {
-      theme: "light",
-      isMobile: false,
-      sidebarOpen: false,
-      sidebarCollapsed: false,
+      // UI 상태는 Vuex(ui 모듈)로 이동
     };
   },
 
   created() {
-    this.theme = this.$theme.getTheme();
+    const t = this.$theme.getTheme();
+    this.$store.dispatch("ui/initTheme", t);
 
     // 초기 템플릿 선택 보정
     this.$store.dispatch("prompt/onModelChanged");
   },
 
   computed: {
-    store() {
-      return this.$store.getters["chat/safeStore"]; // {chats, activeChatId, draft, ...}
+    isMobile() {
+      return this.$store.state.ui.isMobile;
+    },
+    sidebarOpen() {
+      return this.$store.state.ui.sidebarOpen;
+    },
+    sidebarCollapsed() {
+      return this.$store.state.ui.sidebarCollapsed;
     },
   },
 
   mounted() {
     const update = () => {
-      this.isMobile = this.$responsive.isSm();
-      if (!this.isMobile) this.sidebarOpen = false;
+      this.$store.dispatch("ui/setMobile", this.$responsive.isSm());
     };
     update();
     window.addEventListener("resize", update);
@@ -96,17 +84,8 @@ export default {
   },
 
   methods: {
-    onStoreUpdate(next) {
-      this.$store.dispatch("chat/update", next);
-    },
-
-    setTheme(t) {
-      this.theme = t;
-      this.$theme.setTheme(t);
-    },
-
-    onToggleSidebarCollapse() {
-      this.sidebarCollapsed = !this.sidebarCollapsed;
+    closeSidebar() {
+      this.$store.dispatch("ui/closeSidebar");
     },
   },
 };

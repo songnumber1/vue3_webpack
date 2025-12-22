@@ -6,7 +6,7 @@
       type="button"
       class="hamburger"
       aria-label="Open sidebar"
-      @click="$emit('open-sidebar')"
+      @click="openSidebar"
     >
       ☰
     </button>
@@ -19,7 +19,7 @@
         :key="t"
         class="theme-btn"
         :class="{ active: theme === t }"
-        @click="$emit('theme-change', t)"
+        @click="setTheme(t)"
       >
         {{ t }}
       </button>
@@ -30,11 +30,23 @@
 <script>
 export default {
   name: "AppHeader",
-  props: {
-    theme: String,
-    isMobile: Boolean,
+  computed: {
+    theme() {
+      return this.$store.state.ui.theme;
+    },
+    isMobile() {
+      return this.$store.state.ui.isMobile;
+    },
   },
-  emits: ["theme-change", "open-sidebar"],
+  methods: {
+    openSidebar() {
+      this.$store.dispatch("ui/openSidebar");
+    },
+    setTheme(t) {
+      this.$store.dispatch("ui/setTheme", t);
+      this.$theme.setTheme(t);
+    },
+  },
 };
 </script>
 

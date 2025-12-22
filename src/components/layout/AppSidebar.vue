@@ -1,5 +1,5 @@
 <template>
-  <aside class="sidebar" :class="{ open: open, collapsed: collapsed }">
+  <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
     <div class="top-row">
       <!-- ✅ Desktop에서는 Sidebar에 햄버거(접기/펼치기), Mobile에서는 Header에 있으므로 Sidebar에선 닫기(X) -->
       <button
@@ -7,7 +7,7 @@
         type="button"
         class="hamburger"
         aria-label="Toggle sidebar"
-        @click="$emit('toggle-collapse')"
+        @click="toggleCollapse"
       >
         ☰
       </button>
@@ -17,12 +17,12 @@
         type="button"
         class="hamburger"
         aria-label="Close sidebar"
-        @click="$emit('close')"
+        @click="closeSidebar"
       >
         ✕
       </button>
 
-      <strong v-if="!collapsed" class="label">DS Assistant</strong>
+      <strong v-if="!sidebarCollapsed" class="label">DS Assistant</strong>
     </div>
 
     <!-- 상단 네비게이션 (Chat / Playground / Models) -->
@@ -42,11 +42,11 @@
       <!-- Models -->
       <div
         class="nav-section"
-        :class="{ collapsed: collapsed }"
+        :class="{ collapsed: sidebarCollapsed }"
         role="group"
         aria-label="Models"
       >
-        <div v-if="!collapsed" class="nav-section-label">Models</div>
+        <div v-if="!sidebarCollapsed" class="nav-section-label">Models</div>
 
         <button
           v-for="g in modelGroups"
@@ -64,7 +64,7 @@
       </div>
     </nav>
 
-    <template v-if="!collapsed">
+    <template v-if="!sidebarCollapsed">
       <!-- ✅ 채팅 리스트: 오늘/어제/MM-dd 그룹 -->
       <div class="chat-list" aria-label="Chat list">
         <template v-if="groupedChats.length">
@@ -121,19 +121,19 @@ function formatMMDD(ts) {
 export default {
   name: "AppSidebar",
 
-  props: {
-    store: {
-      type: Object,
-      default: () => ({ chats: [], activeChatId: null, draft: true }),
-    },
-    open: Boolean,
-    collapsed: Boolean,
-    isMobile: Boolean,
-  },
-
   computed: {
+    isMobile() {
+      return this.$store.state.ui.isMobile;
+    },
+    sidebarOpen() {
+      // desktop에서는 항상 open 처리
+      return this.isMobile ? this.$store.state.ui.sidebarOpen : true;
+    },
+    sidebarCollapsed() {
+      return this.$store.state.ui.sidebarCollapsed;
+    },
     safeStore() {
-      const s = this.store && typeof this.store === "object" ? this.store : {};
+      const s = this.$store.getters["chat/safeStore"];
       return {
         chats: Array.isArray(s.chats) ? s.chats : [],
         activeChatId: s.activeChatId ?? null,
@@ -216,6 +216,12 @@ export default {
   },
 
   methods: {
+    toggleCollapse() {
+      this.$store.dispatch("ui/toggleCollapse");
+    },
+    closeSidebar() {
+      this.$store.dispatch("ui/closeSidebar");
+    },
     iconForGroup(id) {
       if (id === "ds") return "DS";
       if (id === "spec") return "SP";
@@ -238,8 +244,8 @@ export default {
       if (chat?.modelGroupId) this.$store.dispatch("model/setGroup", chat.modelGroupId);
       if (chat?.modelId) this.$store.dispatch("model/setModel", chat.modelId);
 
-      this.$emit("store:update", s);
-      if (this.isMobile) this.$emit("close");
+      this.$store.dispatch("chat/update", s);
+      if (this.isMobile) this.closeSidebar();
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
 
@@ -250,7 +256,7 @@ export default {
         s.activeChatId = null;
         s.draft = true;
       }
-      this.$emit("store:update", s);
+      this.$store.dispatch("chat/update", s);
     },
 
     setModelGroup(groupId) {
@@ -267,9 +273,10 @@ export default {
       // Vuex 모델 상태도 동기화
       this.$store.dispatch("model/setGroup", groupId);
 
-      this.$emit("store:update", s);
+      this.$store.dispatch("chat/update", s);
+      this.$store.dispatch("prompt/onModelChanged");
 
-      if (this.isMobile) this.$emit("close");
+      if (this.isMobile) this.closeSidebar();
       if (this.$route.path !== "/chat") this.$router.push("/chat");
     },
   },

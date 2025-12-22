@@ -13,19 +13,12 @@
       <!-- 새 대화(draft) -->
       <NewChatLanding
         v-if="showLanding"
-        :model-groups="modelGroups"
-        :model-group-id="currentModelGroupId"
-        :model-id="currentModelId"
-        @model="setModel"
-        @pick="applySuggestion"
       />
 
       <!-- 채팅 메시지 리스트 -->
       <ChatMessageList
         v-else
         ref="messageList"
-        :messages="messages"
-        :render="render"
       />
     </div>
 
@@ -47,12 +40,11 @@
 </template>
 
 <script>
-import { md } from "@/utils/markdown";
 import {
   createChatFromFirstMessage,
   touchChatOnMessage,
 } from "@/storage/chatStore";
-import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
+import { MODEL_GROUPS } from "@/constants/models";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import InputHeader from "@/components/chat/InputHeader.vue";
@@ -68,60 +60,35 @@ export default {
     InputHeader,
   },
 
-  props: {
-    store: {
-      type: Object,
-      default: () => ({ chats: [], activeChatId: null, draft: true }),
-    },
-  },
-
-  emits: ["store:update"],
-
   data() {
-    return {
-      input: "",
-    };
+    return {};
   },
 
   computed: {
     safeStore() {
-      const s = this.store && typeof this.store === "object" ? this.store : {};
-      const fallbackGroup =
-        this.$store?.state?.model?.groupId || MODEL_GROUPS?.[0]?.id || "ds";
-      const groupId = s.activeModelGroupId || fallbackGroup;
-
-      return {
-        chats: Array.isArray(s.chats) ? s.chats : [],
-        activeChatId: s.activeChatId ?? null,
-        draft: s.draft ?? !s.activeChatId,
-        activeModelGroupId: groupId,
-        activeModelId:
-          s.activeModelId || this.$store?.state?.model?.modelId || getDefaultModelId(groupId),
-      };
+      return this.$store.getters["chat/safeStore"];
     },
 
     showLanding() {
-      return !!this.safeStore.draft;
+      return !!this.$store.getters["chat/isDraft"];
     },
 
     showRoomHeader() {
       // ✅ "이전 대화방 접속"일 때만: activeChatId 존재 + draft=false
-      return !!this.safeStore.activeChatId && !this.safeStore.draft;
+      return !!this.safeStore.activeChatId && !this.$store.getters["chat/isDraft"];
     },
 
     activeChatTitle() {
-      const chat = (this.safeStore.chats || []).find(
-        (c) => c.id === this.safeStore.activeChatId
-      );
-      return chat ? chat.title : "Chat";
+      return this.$store.getters["chat/activeChatTitle"];
     },
 
-    messages() {
-      if (this.showLanding) return [];
-      const chat = (this.safeStore.chats || []).find(
-        (c) => c.id === this.safeStore.activeChatId
-      );
-      return chat ? (Array.isArray(chat.messages) ? chat.messages : []) : [];
+    input: {
+      get() {
+        return this.$store.getters["input/text"];
+      },
+      set(v) {
+        this.$store.dispatch("input/setText", v);
+      },
     },
 
     currentModelGroupId() {
@@ -139,46 +106,10 @@ export default {
       return g ? g.label : this.currentModelGroupId;
     },
 
-    modelGroups() {
-      return MODEL_GROUPS;
-    },
   },
 
   methods: {
-    render(text) {
-      return md.render(String(text ?? ""));
-    },
-
-    applySuggestion(payload) {
-      // ✅ 예제 클릭 시: input에만 채우고, 전송은 사용자가 Enter/Send로만
-      const text =
-        typeof payload === "string"
-          ? payload
-          : payload && typeof payload === "object"
-          ? payload.text || payload.title || ""
-          : "";
-      this.input = String(text ?? "");
-    },
-
-    // Landing(ModelSelect)에서 modelId(string)만 넘어옵니다.
-    setModel(modelId) {
-      // Vuex 모델 상태 업데이트
-      this.$store.dispatch("model/setModel", modelId);
-
-      const groupId = this.$store.state.model.groupId;
-      const s = { ...this.safeStore };
-      s.activeModelGroupId = groupId;
-      s.activeModelId = modelId;
-
-      // 현재 채팅방이 있으면 그 채팅에도 모델 반영
-      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
-      if (chat) {
-        chat.modelGroupId = groupId;
-        chat.modelId = modelId;
-      }
-
-      this.$emit("store:update", s);
-    },
+    // 모델 변경은 Landing에서 store로 직접 처리
 
     onKeydown(e) {
       if (e.key === "Enter" && !e.shiftKey) {
@@ -212,8 +143,8 @@ export default {
         touchChatOnMessage(chat, msg);
       }
 
-      this.input = "";
-      this.$emit("store:update", s);
+      this.$store.dispatch("input/clear");
+      this.$store.dispatch("chat/update", s);
 
       this.$nextTick(() => {
         const list = this.$refs.messageList;

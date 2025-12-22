@@ -13,6 +13,7 @@
 <script>
 import ChatMessageUser from "./ChatMessageUser.vue";
 import ChatMessageAssistant from "./ChatMessageAssistant.vue";
+import { md } from "@/utils/markdown";
 
 export default {
   name: "ChatMessageList",
@@ -22,18 +23,16 @@ export default {
     ChatMessageAssistant,
   },
 
-  props: {
-    messages: {
-      type: Array,
-      required: true,
-    },
-    render: {
-      type: Function,
-      required: true,
+  computed: {
+    messages() {
+      return this.$store.getters["chat/activeMessages"];
     },
   },
 
   methods: {
+    render(text) {
+      return md.render(String(text ?? ""));
+    },
     resolveComponent(role) {
       return role === "user" ? "ChatMessageUser" : "ChatMessageAssistant";
     },
