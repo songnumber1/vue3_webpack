@@ -24,4 +24,13 @@ export default {
   toggleCollapse({ commit }) {
     commit("TOGGLE_COLLAPSE");
   },
+
+
+  setAssistantsExpanded({ commit }, v) {
+    commit("SET_ASSISTANTS_EXPANDED", v);
+  },
+
+  toggleAssistantsExpanded({ commit }) {
+    commit("TOGGLE_ASSISTANTS_EXPANDED");
+  },
 };

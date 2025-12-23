@@ -3,29 +3,46 @@
     {
       "id": "ds",
       "label": "DS Assistant",
-      "modelIds": [
-        "ds-default",
-        "ds-fast",
-        "ds-pro"
-      ]
+      "modelIds": ["ds-default", "ds-fast", "ds-pro"]
     },
     {
       "id": "spec",
       "label": "Spec Assistant",
-      "modelIds": [
-        "spec-default",
-        "spec-review"
-      ]
+      "modelIds": ["spec-default", "spec-review"]
     },
     {
       "id": "ops",
       "label": "Ops Assistant",
-      "modelIds": [
-        "ops-default",
-        "ops-debug"
-      ]
+      "modelIds": ["ops-default", "ops-debug"]
+    },
+
+    {
+      "id": "design",
+      "label": "Design Assistant",
+      "modelIds": ["design-default", "design-pro"]
+    },
+    {
+      "id": "dev",
+      "label": "Dev Assistant",
+      "modelIds": ["dev-default", "dev-pro"]
+    },
+    {
+      "id": "qa",
+      "label": "QA Assistant",
+      "modelIds": ["qa-default", "qa-pro"]
+    },
+    {
+      "id": "data",
+      "label": "Data Assistant",
+      "modelIds": ["data-default", "data-pro"]
+    },
+    {
+      "id": "biz",
+      "label": "Biz Assistant",
+      "modelIds": ["biz-default", "biz-pro"]
     }
   ],
+
   "models": [
     {
       "id": "ds-default",
@@ -48,6 +65,7 @@
       "assistant_id": "ds",
       "del_yn": false
     },
+
     {
       "id": "spec-default",
       "name_ko": "Default",
@@ -62,6 +80,7 @@
       "assistant_id": "spec",
       "del_yn": false
     },
+
     {
       "id": "ops-default",
       "name_ko": "Default",
@@ -75,8 +94,84 @@
       "name_en": "Debug",
       "assistant_id": "ops",
       "del_yn": false
+    },
+
+    {
+      "id": "design-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "design",
+      "del_yn": false
+    },
+    {
+      "id": "design-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "design",
+      "del_yn": false
+    },
+
+    {
+      "id": "dev-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "dev",
+      "del_yn": false
+    },
+    {
+      "id": "dev-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "dev",
+      "del_yn": false
+    },
+
+    {
+      "id": "qa-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "qa",
+      "del_yn": false
+    },
+    {
+      "id": "qa-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "qa",
+      "del_yn": false
+    },
+
+    {
+      "id": "data-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "data",
+      "del_yn": false
+    },
+    {
+      "id": "data-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "data",
+      "del_yn": false
+    },
+
+    {
+      "id": "biz-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "biz",
+      "del_yn": false
+    },
+    {
+      "id": "biz-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "biz",
+      "del_yn": false
     }
   ],
+
   "promptTemplates": [
     {
       "delYN": false,
@@ -90,14 +185,12 @@
             "title": "Temp Assistant",
             "content": "는 임시 Assistant입니다."
           },
-          "en": {
-            "title": "Temp Assistant",
-            "content": "is temp Assistant"
-          }
+          "en": { "title": "Temp Assistant", "content": "is temp Assistant" }
         }
       },
       "promptTemplateName": "직접입력"
     },
+
     {
       "delYN": false,
       "default": true,
@@ -107,6 +200,7 @@
       "promptTemplate": {},
       "promptTemplateName": "직접입력"
     },
+
     {
       "delYN": false,
       "default": false,
@@ -119,188 +213,155 @@
           "ko": "언어",
           "type": "radio",
           "content": [
-            {
-              "tag": "영어",
-              "en": "English",
-              "ko": "영어로"
-            },
-            {
-              "tag": "한국어",
-              "en": "Korean",
-              "ko": "한국어로"
-            }
-          ]
-        },
-        "style": {
-          "en": "Style",
-          "ko": "스타일",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "기본",
-              "en": "Default",
-              "ko": "기본"
-            },
-            {
-              "tag": "정중하게",
-              "en": "Polite",
-              "ko": "정중하게"
-            },
-            {
-              "tag": "친근하게",
-              "en": "Friendly",
-              "ko": "친근하게"
-            }
-          ]
-        },
-        "length": {
-          "en": "Length",
-          "ko": "길이",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "기본",
-              "en": "Default",
-              "ko": "기본"
-            },
-            {
-              "tag": "짧게",
-              "en": "Short",
-              "ko": "짧게"
-            },
-            {
-              "tag": "길게",
-              "en": "Long",
-              "ko": "길게"
-            }
+            { "tag": "영어", "en": "English", "ko": "영어로" },
+            { "tag": "한국어", "en": "Korean", "ko": "한국어로" }
           ]
         }
       },
       "promptTemplateName": "메일"
     },
+
     {
       "delYN": false,
-      "default": false,
-      "promptTemplateOrder": 2,
-      "modelId": "spec-default",
-      "promptTemplateId": "ddddfadf-0000-0000-0000-000000000001",
-      "promptTemplate": {
-        "language": {
-          "en": "Language",
-          "ko": "언어",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "영어",
-              "en": "English",
-              "ko": "영어로"
-            },
-            {
-              "tag": "한국어",
-              "en": "Korean",
-              "ko": "한국어로"
-            }
-          ]
-        },
-        "style": {
-          "en": "Style",
-          "ko": "스타일",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "기본",
-              "en": "Default",
-              "ko": "기본"
-            },
-            {
-              "tag": "정중하게",
-              "en": "Polite",
-              "ko": "정중하게"
-            },
-            {
-              "tag": "친근하게",
-              "en": "Friendly",
-              "ko": "친근하게"
-            }
-          ]
-        }
-      },
-      "promptTemplateName": "번역"
-    },
-    {
-      "delYN": false,
-      "default": false,
-      "promptTemplateOrder": 3,
-      "modelId": "spec-default",
-      "promptTemplateId": "eeeeedfadf-0000-0000-0000-000000000001",
-      "promptTemplate": {
-        "language": {
-          "en": "Language",
-          "ko": "언어",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "영어",
-              "en": "English",
-              "ko": "영어로"
-            },
-            {
-              "tag": "한국어",
-              "en": "Korean",
-              "ko": "한국어로"
-            }
-          ]
-        },
-        "style": {
-          "en": "Style",
-          "ko": "스타일",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "문단식",
-              "en": "Paragraph",
-              "ko": "문단식"
-            },
-            {
-              "tag": "개조식",
-              "en": "Bullet",
-              "ko": "개조식"
-            }
-          ]
-        },
-        "length": {
-          "en": "Length",
-          "ko": "길이",
-          "type": "radio",
-          "content": [
-            {
-              "tag": "기본",
-              "en": "Default",
-              "ko": "기본"
-            },
-            {
-              "tag": "짧게",
-              "en": "Short",
-              "ko": "짧게"
-            },
-            {
-              "tag": "길게",
-              "en": "Long",
-              "ko": "길게"
-            }
-          ]
-        }
-      },
-      "promptTemplateName": "요약"
-    },
-    {
-      "delYN": false,
-      "default": false,
-      "promptTemplateOrder": 4,
-      "modelId": "spec-default",
-      "promptTemplateId": "fffffadf-0000-0000-0000-000000000001",
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "ds-fast",
+      "promptTemplateId": "pt-ds-fast-direct",
       "promptTemplate": {},
-      "promptTemplateName": "코드"
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "ds-pro",
+      "promptTemplateId": "pt-ds-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "spec-review",
+      "promptTemplateId": "pt-spec-review-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "ops-default",
+      "promptTemplateId": "pt-ops-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "ops-debug",
+      "promptTemplateId": "pt-ops-debug-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "design-default",
+      "promptTemplateId": "pt-design-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "design-pro",
+      "promptTemplateId": "pt-design-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "dev-default",
+      "promptTemplateId": "pt-dev-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "dev-pro",
+      "promptTemplateId": "pt-dev-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "qa-default",
+      "promptTemplateId": "pt-qa-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "qa-pro",
+      "promptTemplateId": "pt-qa-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "data-default",
+      "promptTemplateId": "pt-data-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "data-pro",
+      "promptTemplateId": "pt-data-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "biz-default",
+      "promptTemplateId": "pt-biz-default-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
+    },
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "biz-pro",
+      "promptTemplateId": "pt-biz-pro-direct",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
     }
   ]
 }

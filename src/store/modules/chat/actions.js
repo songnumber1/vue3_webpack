@@ -21,4 +21,33 @@ export default {
 
     dispatch("update", s);
   },
+
+  resetForNewAssistant({ getters, commit }, groupId) {
+    const prev = getters.safeStore || {};
+
+    const next = normalizeStore({
+      chats: prev.chats || [], // ✅ 채팅 목록은 유지
+      activeChatId: null, // ❗ 핵심
+      draft: true, // ❗ 핵심
+      activeModelGroupId: groupId,
+      activeModelId: null, // normalizeStore가 기본값 보정
+    });
+
+    commit("SET_STORE", next);
+    saveStore(next);
+  },
+
+  selectChat({ getters, dispatch }, chatId) {
+    const s = { ...(getters.safeStore || {}) };
+    s.activeChatId = chatId;
+    s.draft = false;
+
+    const chat = (s.chats || []).find((c) => c.id === chatId);
+    if (chat) {
+      if (chat.modelGroupId) s.activeModelGroupId = chat.modelGroupId;
+      if (chat.modelId) s.activeModelId = chat.modelId;
+    }
+
+    dispatch("update", s);
+  },
 };
