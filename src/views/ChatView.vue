@@ -11,15 +11,10 @@
     <!-- 메시지 영역 -->
     <div class="messages">
       <!-- 새 대화(draft) -->
-      <NewChatLanding
-        v-if="showLanding"
-      />
+      <NewChatLanding v-if="showLanding" />
 
       <!-- 채팅 메시지 리스트 -->
-      <ChatMessageList
-        v-else
-        ref="messageList"
-      />
+      <ChatMessageList v-else ref="messageList" />
     </div>
 
     <!-- 입력 영역 (기존 그대로) -->
@@ -43,6 +38,10 @@
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import InputHeader from "@/components/chat/InputHeader.vue";
+import {
+  createChatFromFirstMessage,
+  touchChatOnMessage,
+} from "../storage/chatStore";
 
 export default {
   name: "ChatView",
@@ -68,7 +67,9 @@ export default {
 
     showRoomHeader() {
       // ✅ "이전 대화방 접속"일 때만: activeChatId 존재 + draft=false
-      return !!this.safeStore.activeChatId && !this.$store.getters["chat/isDraft"];
+      return (
+        !!this.safeStore.activeChatId && !this.$store.getters["chat/isDraft"]
+      );
     },
 
     activeChatTitle() {
@@ -95,7 +96,6 @@ export default {
     currentModelGroupLabel() {
       return this.$store.getters["model/groupLabel"];
     },
-
   },
 
   methods: {
@@ -190,7 +190,7 @@ export default {
   background: var(--bg-surface);
 }
 
-.input-main{
+.input-main {
   display: flex;
   align-items: flex-end;
   gap: 10px;
@@ -207,7 +207,7 @@ textarea {
   outline: none;
 }
 
-textarea:focus{
+textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }

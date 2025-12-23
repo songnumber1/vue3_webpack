@@ -1,17 +1,17 @@
 import { createStore } from "vuex";
 
-import chat from "./modules/chat";
+import ui from "./modules/ui";
 import model from "./modules/model";
 import prompt from "./modules/prompt";
-import ui from "./modules/ui";
+import chat from "./modules/chat";
 import input from "./modules/input";
 
 export default createStore({
   modules: {
-    chat,
+    input,
+    ui,
     model,
     prompt,
-    ui,
-    input,
+    chat,
   },
 });
