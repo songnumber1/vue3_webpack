@@ -103,7 +103,6 @@
 </template>
 
 <script>
-import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
 
 function startOfDay(d) {
   const x = new Date(d);
@@ -133,23 +132,18 @@ export default {
       return this.$store.state.ui.sidebarCollapsed;
     },
     safeStore() {
-      const s = this.$store.getters["chat/safeStore"];
+      const s = this.$store.getters["chat/safeStore"] || {};
       return {
         chats: Array.isArray(s.chats) ? s.chats : [],
         activeChatId: s.activeChatId ?? null,
         draft: s.draft ?? !s.activeChatId,
-        activeModelGroupId:
-          s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds",
-        activeModelId:
-          s.activeModelId ||
-          getDefaultModelId(
-            s.activeModelGroupId || MODEL_GROUPS?.[0]?.id || "ds"
-          ),
+        activeModelGroupId: s.activeModelGroupId || this.$store.state.model.groupId,
+        activeModelId: s.activeModelId || this.$store.state.model.modelId,
       };
     },
 
     modelGroups() {
-      return MODEL_GROUPS;
+      return this.$store.getters["model/groups"];
     },
 
     groupedChats() {
@@ -229,6 +223,11 @@ export default {
       return "M";
     },
 
+    defaultModelId(groupId) {
+      const g = (this.modelGroups || []).find((x) => x.id === groupId) || (this.modelGroups || [])[0];
+      return g?.models?.[0]?.id || "";
+    },
+
     selectChat(id) {
       const s = { ...this.safeStore };
       s.activeChatId = id;
@@ -241,7 +240,7 @@ export default {
       }
 
       // Vuex 모델 상태도 동기화
-      if (chat?.modelGroupId) this.$store.dispatch("model/setGroup", chat.modelGroupId);
+      if (chat?.modelGroupId) this.$store.dispatch("model/selectGroup", chat.modelGroupId);
       if (chat?.modelId) this.$store.dispatch("model/setModel", chat.modelId);
 
       this.$store.dispatch("chat/update", s);
@@ -268,10 +267,10 @@ export default {
 
       // 모델 그룹/기본 모델
       s.activeModelGroupId = groupId;
-      s.activeModelId = getDefaultModelId(groupId);
+      s.activeModelId = this.defaultModelId(groupId);
 
       // Vuex 모델 상태도 동기화
-      this.$store.dispatch("model/setGroup", groupId);
+      this.$store.dispatch("model/selectGroup", groupId);
 
       this.$store.dispatch("chat/update", s);
       this.$store.dispatch("prompt/onModelChanged");

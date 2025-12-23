@@ -1,6 +1,17 @@
-import { MODEL_GROUPS, getDefaultModelId } from "@/constants/models";
+import rawData from "@/data/data.json";
 
 const KEY = "ds_chat_store_v2";
+
+const GROUPS = Array.isArray(rawData?.assistants) ? rawData.assistants : [];
+
+function getDefaultGroupId() {
+  return GROUPS?.[0]?.id || "ds";
+}
+
+function getDefaultModelId(groupId) {
+  const g = GROUPS.find((x) => x.id === groupId) || GROUPS[0];
+  return g?.models?.[0]?.id || "";
+}
 
 function nowId() {
   return Date.now().toString();
@@ -14,7 +25,7 @@ export function loadStore() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) {
-      const firstGroup = MODEL_GROUPS?.[0]?.id || "ds";
+      const firstGroup = getDefaultGroupId();
       return {
         chats: [],
         activeChatId: null,
@@ -24,7 +35,7 @@ export function loadStore() {
       };
     }
     const parsed = JSON.parse(raw);
-    const fallbackGroup = MODEL_GROUPS?.[0]?.id || "ds";
+    const fallbackGroup = getDefaultGroupId();
     const groupId = parsed.activeModelGroupId || fallbackGroup;
 
     return {
@@ -35,7 +46,7 @@ export function loadStore() {
       activeModelId: parsed.activeModelId || getDefaultModelId(groupId),
     };
   } catch (e) {
-    const firstGroup = MODEL_GROUPS?.[0]?.id || "ds";
+    const firstGroup = getDefaultGroupId();
     return {
       chats: [],
       activeChatId: null,
@@ -107,7 +118,7 @@ function normalizeChat(chat) {
 
 export function normalizeStore(s) {
   const safe = s && typeof s === "object" ? s : {};
-  const fallbackGroup = MODEL_GROUPS?.[0]?.id || "ds";
+  const fallbackGroup = getDefaultGroupId();
   const groupId = safe.activeModelGroupId || fallbackGroup;
 
   const chats = (Array.isArray(safe.chats) ? safe.chats : []).map(normalizeChat);

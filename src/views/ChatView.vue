@@ -40,19 +40,12 @@
 </template>
 
 <script>
-import {
-  createChatFromFirstMessage,
-  touchChatOnMessage,
-} from "@/storage/chatStore";
-import { MODEL_GROUPS } from "@/constants/models";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import InputHeader from "@/components/chat/InputHeader.vue";
 
 export default {
   name: "ChatView",
-
-  modelGroupsConst: MODEL_GROUPS,
 
   components: {
     NewChatLanding,
@@ -100,10 +93,7 @@ export default {
     },
 
     currentModelGroupLabel() {
-      const g = (MODEL_GROUPS || []).find(
-        (x) => x.id === this.currentModelGroupId
-      );
-      return g ? g.label : this.currentModelGroupId;
+      return this.$store.getters["model/groupLabel"];
     },
 
   },

@@ -1,147 +1,276 @@
-[
-  {
-    "delYN": false,
-    "default": true,
-    "promptTemplateOrder": 0,
-    "modelId": "ds-default",
-    "promptTemplateId": "aaasdfadf-0000-0000-0000-000000000001",
-    "promptTemplate": {
-      "html": {
-        "ko": {
-          "title": "Temp Assistant",
-          "content": "는 임시 Assistant입니다."
+{
+  "assistants": [
+    {
+      "id": "ds",
+      "label": "DS Assistant",
+      "models": [
+        {
+          "id": "ds-default",
+          "label": "Default"
         },
-        "en": {
-          "title": "Temp Assistant",
-          "content": "is temp Assistant"
+        {
+          "id": "ds-fast",
+          "label": "Fast"
+        },
+        {
+          "id": "ds-pro",
+          "label": "Pro"
         }
-      }
+      ]
     },
-    "promptTemplateName": "직접입력"
-  },
-
-  {
-    "delYN": false,
-    "default": true,
-    "promptTemplateOrder": 0,
-    "modelId": "spec-default",
-    "promptTemplateId": "bbbbdfadf-0000-0000-0000-000000000001",
-    "promptTemplate": {},
-    "promptTemplateName": "직접입력"
-  },
-  {
-    "delYN": false,
-    "default": false,
-    "promptTemplateOrder": 1,
-    "modelId": "spec-default",
-    "promptTemplateId": "ccccfadf-0000-0000-0000-000000000001",
-    "promptTemplate": {
-      "language": {
-        "en": "Language",
-        "ko": "언어",
-        "type": "radio",
-        "content": [
-          { "tag": "영어", "en": "English", "ko": "영어로" },
-          { "tag": "한국어", "en": "Korean", "ko": "한국어로" }
-        ]
-      },
-      "style": {
-        "en": "Style",
-        "ko": "스타일",
-        "type": "radio",
-        "content": [
-          { "tag": "기본", "en": "Default", "ko": "기본" },
-          { "tag": "정중하게", "en": "Polite", "ko": "정중하게" },
-          { "tag": "친근하게", "en": "Friendly", "ko": "친근하게" }
-        ]
-      },
-      "length": {
-        "en": "Length",
-        "ko": "길이",
-        "type": "radio",
-        "content": [
-          { "tag": "기본", "en": "Default", "ko": "기본" },
-          { "tag": "짧게", "en": "Short", "ko": "짧게" },
-          { "tag": "길게", "en": "Long", "ko": "길게" }
-        ]
-      }
+    {
+      "id": "spec",
+      "label": "Spec Assistant",
+      "models": [
+        {
+          "id": "spec-default",
+          "label": "Default"
+        },
+        {
+          "id": "spec-review",
+          "label": "Review"
+        }
+      ]
     },
-    "promptTemplateName": "메일"
-  },
-  {
-    "delYN": false,
-    "default": false,
-    "promptTemplateOrder": 2,
-    "modelId": "spec-default",
-    "promptTemplateId": "ddddfadf-0000-0000-0000-000000000001",
-    "promptTemplate": {
-      "language": {
-        "en": "Language",
-        "ko": "언어",
-        "type": "radio",
-        "content": [
-          { "tag": "영어", "en": "English", "ko": "영어로" },
-          { "tag": "한국어", "en": "Korean", "ko": "한국어로" }
-        ]
+    {
+      "id": "ops",
+      "label": "Ops Assistant",
+      "models": [
+        {
+          "id": "ops-default",
+          "label": "Default"
+        },
+        {
+          "id": "ops-debug",
+          "label": "Debug"
+        }
+      ]
+    }
+  ],
+  "promptTemplates": [
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "ds-default",
+      "promptTemplateId": "aaasdfadf-0000-0000-0000-000000000001",
+      "promptTemplate": {
+        "html": {
+          "ko": {
+            "title": "Temp Assistant",
+            "content": "는 임시 Assistant입니다."
+          },
+          "en": {
+            "title": "Temp Assistant",
+            "content": "is temp Assistant"
+          }
+        }
       },
-      "style": {
-        "en": "Style",
-        "ko": "스타일",
-        "type": "radio",
-        "content": [
-          { "tag": "기본", "en": "Default", "ko": "기본" },
-          { "tag": "정중하게", "en": "Polite", "ko": "정중하게" },
-          { "tag": "친근하게", "en": "Friendly", "ko": "친근하게" }
-        ]
-      }
+      "promptTemplateName": "직접입력"
     },
-    "promptTemplateName": "번역"
-  },
-  {
-    "delYN": false,
-    "default": false,
-    "promptTemplateOrder": 3,
-    "modelId": "spec-default",
-    "promptTemplateId": "eeeeedfadf-0000-0000-0000-000000000001",
-    "promptTemplate": {
-      "language": {
-        "en": "Language",
-        "ko": "언어",
-        "type": "radio",
-        "content": [
-          { "tag": "영어", "en": "English", "ko": "영어로" },
-          { "tag": "한국어", "en": "Korean", "ko": "한국어로" }
-        ]
-      },
-      "style": {
-        "en": "Style",
-        "ko": "스타일",
-        "type": "radio",
-        "content": [
-          { "tag": "문단식", "en": "Paragraph", "ko": "문단식" },
-          { "tag": "개조식", "en": "Bullet", "ko": "개조식" }
-        ]
-      },
-      "length": {
-        "en": "Length",
-        "ko": "길이",
-        "type": "radio",
-        "content": [
-          { "tag": "기본", "en": "Default", "ko": "기본" },
-          { "tag": "짧게", "en": "Short", "ko": "짧게" },
-          { "tag": "길게", "en": "Long", "ko": "길게" }
-        ]
-      }
+    {
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "modelId": "spec-default",
+      "promptTemplateId": "bbbbdfadf-0000-0000-0000-000000000001",
+      "promptTemplate": {},
+      "promptTemplateName": "직접입력"
     },
-    "promptTemplateName": "요약"
-  },
-  {
-    "delYN": false,
-    "default": false,
-    "promptTemplateOrder": 4,
-    "modelId": "spec-default",
-    "promptTemplateId": "fffffadf-0000-0000-0000-000000000001",
-    "promptTemplate": {},
-    "promptTemplateName": "코드"
-  }
-]
+    {
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 1,
+      "modelId": "spec-default",
+      "promptTemplateId": "ccccfadf-0000-0000-0000-000000000001",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
+          ]
+        }
+      },
+      "promptTemplateName": "메일"
+    },
+    {
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 2,
+      "modelId": "spec-default",
+      "promptTemplateId": "ddddfadf-0000-0000-0000-000000000001",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        }
+      },
+      "promptTemplateName": "번역"
+    },
+    {
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 3,
+      "modelId": "spec-default",
+      "promptTemplateId": "eeeeedfadf-0000-0000-0000-000000000001",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "문단식",
+              "en": "Paragraph",
+              "ko": "문단식"
+            },
+            {
+              "tag": "개조식",
+              "en": "Bullet",
+              "ko": "개조식"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
+          ]
+        }
+      },
+      "promptTemplateName": "요약"
+    },
+    {
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 4,
+      "modelId": "spec-default",
+      "promptTemplateId": "fffffadf-0000-0000-0000-000000000001",
+      "promptTemplate": {},
+      "promptTemplateName": "코드"
+    }
+  ]
+}
