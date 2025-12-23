@@ -3,48 +3,78 @@
     {
       "id": "ds",
       "label": "DS Assistant",
-      "models": [
-        {
-          "id": "ds-default",
-          "label": "Default"
-        },
-        {
-          "id": "ds-fast",
-          "label": "Fast"
-        },
-        {
-          "id": "ds-pro",
-          "label": "Pro"
-        }
+      "modelIds": [
+        "ds-default",
+        "ds-fast",
+        "ds-pro"
       ]
     },
     {
       "id": "spec",
       "label": "Spec Assistant",
-      "models": [
-        {
-          "id": "spec-default",
-          "label": "Default"
-        },
-        {
-          "id": "spec-review",
-          "label": "Review"
-        }
+      "modelIds": [
+        "spec-default",
+        "spec-review"
       ]
     },
     {
       "id": "ops",
       "label": "Ops Assistant",
-      "models": [
-        {
-          "id": "ops-default",
-          "label": "Default"
-        },
-        {
-          "id": "ops-debug",
-          "label": "Debug"
-        }
+      "modelIds": [
+        "ops-default",
+        "ops-debug"
       ]
+    }
+  ],
+  "models": [
+    {
+      "id": "ds-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "ds",
+      "del_yn": false
+    },
+    {
+      "id": "ds-fast",
+      "name_ko": "Fast",
+      "name_en": "Fast",
+      "assistant_id": "ds",
+      "del_yn": false
+    },
+    {
+      "id": "ds-pro",
+      "name_ko": "Pro",
+      "name_en": "Pro",
+      "assistant_id": "ds",
+      "del_yn": false
+    },
+    {
+      "id": "spec-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "spec",
+      "del_yn": false
+    },
+    {
+      "id": "spec-review",
+      "name_ko": "Review",
+      "name_en": "Review",
+      "assistant_id": "spec",
+      "del_yn": false
+    },
+    {
+      "id": "ops-default",
+      "name_ko": "Default",
+      "name_en": "Default",
+      "assistant_id": "ops",
+      "del_yn": false
+    },
+    {
+      "id": "ops-debug",
+      "name_ko": "Debug",
+      "name_en": "Debug",
+      "assistant_id": "ops",
+      "del_yn": false
     }
   ],
   "promptTemplates": [

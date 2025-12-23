@@ -1,6 +1,7 @@
 import rawData from "@/data/data.json";
+import { JSON_KEYS } from "@/constants/jsonKeys";
 
-const RAW = rawData?.promptTemplates ?? rawData ?? [];
+const RAW = rawData?.[JSON_KEYS.PROMPT_TEMPLATES] ?? rawData ?? [];
 
 function byOrder(a,b){ return (a.promptTemplateOrder??0)-(b.promptTemplateOrder??0); }
 function safeArray(v){ return Array.isArray(v)?v:[]; }

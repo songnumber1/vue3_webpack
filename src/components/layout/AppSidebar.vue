@@ -104,6 +104,9 @@
 
 <script>
 
+import rawData from "@/data/data.json";
+import { JSON_KEYS } from "@/constants/jsonKeys";
+
 function startOfDay(d) {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
@@ -224,8 +227,21 @@ export default {
     },
 
     defaultModelId(groupId) {
-      const g = (this.modelGroups || []).find((x) => x.id === groupId) || (this.modelGroups || [])[0];
-      return g?.models?.[0]?.id || "";
+      const groups = Array.isArray(rawData?.[JSON_KEYS.ASSISTANTS]) ? rawData[JSON_KEYS.ASSISTANTS] : [];
+      const models = Array.isArray(rawData?.[JSON_KEYS.MODELS]) ? rawData[JSON_KEYS.MODELS] : [];
+      const group = groups.find((x) => x?.[JSON_KEYS.ID] === groupId) || groups[0];
+      const modelIds = Array.isArray(group?.[JSON_KEYS.MODEL_IDS]) ? group[JSON_KEYS.MODEL_IDS] : [];
+      const byId = new Set(modelIds);
+
+      const list = models.filter((m) => {
+        if (!m) return false;
+        const okAssistant = m[JSON_KEYS.ASSISTANT_ID] === groupId;
+        const okId = byId.size ? byId.has(m[JSON_KEYS.ID]) : true;
+        const okDel = m[JSON_KEYS.DEL_YN] === false;
+        return okAssistant && okId && okDel;
+      });
+
+      return list?.[0]?.[JSON_KEYS.ID] || "";
     },
 
     selectChat(id) {

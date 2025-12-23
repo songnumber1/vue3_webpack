@@ -1,16 +1,29 @@
 import rawData from "@/data/data.json";
+import { JSON_KEYS } from "@/constants/jsonKeys";
 
 const KEY = "ds_chat_store_v2";
 
-const GROUPS = Array.isArray(rawData?.assistants) ? rawData.assistants : [];
+const GROUPS = Array.isArray(rawData?.[JSON_KEYS.ASSISTANTS]) ? rawData[JSON_KEYS.ASSISTANTS] : [];
+const MODELS = Array.isArray(rawData?.[JSON_KEYS.MODELS]) ? rawData[JSON_KEYS.MODELS] : [];
 
 function getDefaultGroupId() {
-  return GROUPS?.[0]?.id || "ds";
+  return GROUPS?.[0]?.[JSON_KEYS.ID] || "ds";
 }
 
 function getDefaultModelId(groupId) {
-  const g = GROUPS.find((x) => x.id === groupId) || GROUPS[0];
-  return g?.models?.[0]?.id || "";
+  const group = GROUPS.find((x) => x?.[JSON_KEYS.ID] === groupId) || GROUPS[0];
+  const modelIds = Array.isArray(group?.[JSON_KEYS.MODEL_IDS]) ? group[JSON_KEYS.MODEL_IDS] : [];
+  const byId = new Set(modelIds);
+
+  const list = MODELS.filter((m) => {
+    if (!m) return false;
+    const okAssistant = m[JSON_KEYS.ASSISTANT_ID] === groupId;
+    const okId = byId.size ? byId.has(m[JSON_KEYS.ID]) : true;
+    const okDel = m[JSON_KEYS.DEL_YN] === false;
+    return okAssistant && okId && okDel;
+  });
+
+  return list?.[0]?.[JSON_KEYS.ID] || "";
 }
 
 function nowId() {
