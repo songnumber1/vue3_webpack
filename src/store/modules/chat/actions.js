@@ -50,4 +50,31 @@ export default {
 
     dispatch("update", s);
   },
+  
+  deleteChat({ state, commit }, chatId) {
+    const s = state.store;
+
+    // 1️⃣ 해당 채팅 제거
+    const nextChats = (s.chats || []).filter((c) => c.id !== chatId);
+
+    // 2️⃣ activeChatId가 삭제 대상이면 draft 상태로 전환
+    let nextActiveChatId = s.activeChatId;
+    let nextDraft = s.draft;
+
+    if (s.activeChatId === chatId) {
+      nextActiveChatId = null;
+      nextDraft = true;
+    }
+
+    const next = {
+      ...s,
+      chats: nextChats,
+      activeChatId: nextActiveChatId,
+      draft: nextDraft,
+    };
+
+    // 3️⃣ store 반영 + localStorage 저장
+    commit("SET_STORE", next);
+    saveStore(next);
+  },
 };
