@@ -28,22 +28,32 @@
 </template>
 
 <script>
+import { useUiStore } from "@/stores/uiStore";
+
 export default {
   name: "AppHeader",
+
   computed: {
-    theme() {
-      return this.$store.state.ui.theme;
+    store() {
+      return useUiStore();
     },
+
+    theme() {
+      return this.store.theme;
+    },
+
     isMobile() {
-      return this.$store.state.ui.isMobile;
+      return this.store.isMobile;
     },
   },
+
   methods: {
     openSidebar() {
-      this.$store.dispatch("ui/openSidebar");
+      this.store.openSidebar();
     },
+
     setTheme(t) {
-      this.$store.dispatch("ui/setTheme", t);
+      this.store.setTheme(t);
       this.$theme.setTheme(t);
     },
   },

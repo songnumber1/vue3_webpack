@@ -67,7 +67,6 @@ export default {
       }
     };
 
-    // 🔹 init
     let initial = "light";
     try {
       initial = localStorage.getItem(STORAGE_KEY) || "light";

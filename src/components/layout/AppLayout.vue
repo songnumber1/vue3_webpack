@@ -6,10 +6,7 @@
     <!-- ✅ Header 아래에 Sidebar + Main -->
     <div class="body">
       <!-- DESKTOP -->
-      <AppSidebar
-        v-if="!isMobile"
-        :class="{ collapsed: sidebarCollapsed }"
-      />
+      <AppSidebar v-if="!isMobile" :class="{ collapsed: sidebarCollapsed }" />
 
       <!-- MOBILE overlay -->
       <AppSidebar
@@ -39,40 +36,45 @@
 import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
+import { useUiStore } from "@/stores/uiStore";
+import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "AppLayout",
+
   components: { AppHeader, AppSidebar, AppFooter },
 
-  data() {
-    return {
-      // UI 상태는 Vuex(ui 모듈)로 이동
-    };
-  },
-
   created() {
-    const t = this.$theme.getTheme();
-    this.$store.dispatch("ui/initTheme", t);
+    const ui = useUiStore();
+    const chat = useChatStore();
 
-    // 초기 템플릿 선택 보정
-    this.$store.dispatch("prompt/onModelChanged");
+    const t = this.$theme.getTheme();
+    ui.initTheme(t);
+
+    chat.ensureDefaults();
   },
 
   computed: {
+    uiStore() {
+      return useUiStore();
+    },
+
     isMobile() {
-      return this.$store.state.ui.isMobile;
+      return this.uiStore.isMobile;
     },
+
     sidebarOpen() {
-      return this.$store.state.ui.sidebarOpen;
+      return this.uiStore.sidebarOpen;
     },
+
     sidebarCollapsed() {
-      return this.$store.state.ui.sidebarCollapsed;
+      return this.uiStore.sidebarCollapsed;
     },
   },
 
   mounted() {
     const update = () => {
-      this.$store.dispatch("ui/setMobile", this.$responsive.isSm());
+      this.uiStore.setMobile(this.$responsive.isSm());
     };
     update();
     window.addEventListener("resize", update);
@@ -85,7 +87,7 @@ export default {
 
   methods: {
     closeSidebar() {
-      this.$store.dispatch("ui/closeSidebar");
+      this.uiStore.closeSidebar();
     },
   },
 };

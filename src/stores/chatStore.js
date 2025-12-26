@@ -1,0 +1,380 @@
+import { defineStore } from "pinia";
+import { useDataStore } from "./dataStore";
+import { JSON_KEYS } from "@/constants/jsonKeys";
+
+const LS_KEY = "ds_chat_state_v3";
+
+function nowTs() {
+  return Date.now();
+}
+
+function safeParse(jsonStr, fallback) {
+  try {
+    return JSON.parse(jsonStr);
+  } catch {
+    return fallback;
+  }
+}
+
+function persistableState(state) {
+  return {
+    assistantId: state.assistantId,
+    modelId: state.modelId,
+    chats: state.chats,
+    activeChatId: state.activeChatId,
+    // prompt ui
+    selectedPromptId: state.selectedPromptId,
+    promptOptions: state.promptOptions,
+  };
+}
+
+export const useChatStore = defineStore("chat", {
+  state: () => ({
+    assistantId: null,
+    modelId: null,
+
+    chats: [],
+    activeChatId: null,
+
+    // current room messages & input
+    messages: [],
+    inputText: "",
+
+    // ✅ prompt header (prompts by model_id)
+    selectedPromptId: null,
+    promptOptions: {},
+
+    // UI locks (prevent navigation during streaming etc.)
+    isLocked: false,
+  }),
+
+  getters: {
+    /** 현재 assistant의 모델 목록 (UI용) */
+    currentModels() {
+      const ds = useDataStore();
+      if (!this.assistantId) return [];
+
+      return ds.modelsByAssistant(this.assistantId).map((m) => ({
+        model_id: m[JSON_KEYS.MODEL_ID],
+        name_ko: m.name_ko,
+        name_en: m.name_en,
+        default: m[JSON_KEYS.DEFAULT_YN] === true,
+      }));
+    },
+
+    activeChat(state) {
+      return state.chats.find((c) => c.id === state.activeChatId) || null;
+    },
+
+    activeChatTitle() {
+      return this.activeChat?.title || "";
+    },
+
+    /** prompts for current model */
+    currentPrompts() {
+      const ds = useDataStore();
+      if (!this.modelId) return [];
+      return ds
+        .promptsByModel(this.modelId)
+        .filter((p) => p?.delYN !== true)
+        .sort(
+          (a, b) =>
+            (a?.promptTemplateOrder ?? 0) - (b?.promptTemplateOrder ?? 0)
+        );
+    },
+
+    currentPrompt() {
+      if (!this.selectedPromptId) return null;
+      return (
+        this.currentPrompts.find(
+          (p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId
+        ) || null
+      );
+    },
+  },
+
+  actions: {
+    /** load persisted + ensure assistant/model defaults */
+    ensureDefaults() {
+      const ds = useDataStore();
+
+      // 1) restore
+      const saved = safeParse(localStorage.getItem(LS_KEY) || "null", null);
+      if (saved && typeof saved === "object") {
+        this.assistantId = saved.assistantId ?? this.assistantId;
+        this.modelId = saved.modelId ?? this.modelId;
+        this.chats = Array.isArray(saved.chats) ? saved.chats : [];
+        this.activeChatId = saved.activeChatId ?? this.activeChatId;
+        this.selectedPromptId = saved.selectedPromptId ?? this.selectedPromptId;
+        this.promptOptions =
+          saved.promptOptions && typeof saved.promptOptions === "object"
+            ? saved.promptOptions
+            : {};
+      }
+
+      // 2) assistant default
+      if (!this.assistantId) {
+        const first = ds.uiAssistants?.[0];
+        this.assistantId = first
+          ? first.id
+          : ds.assistants?.[0]?.[JSON_KEYS.ASSISTANT_ID] ?? null;
+      }
+
+      // 3) model default: first default=true else first model
+      if (!this.modelId && this.assistantId) {
+        const models = ds.modelsByAssistant(this.assistantId);
+        const first =
+          models.find((m) => m?.[JSON_KEYS.DEFAULT_YN] === true) ||
+          models[0] ||
+          null;
+        this.modelId = first ? first[JSON_KEYS.MODEL_ID] : null;
+      }
+
+      // 4) active chat restore messages
+      if (this.activeChatId) {
+        this._loadMessagesFromActiveChat();
+      } else {
+        this.messages = [];
+      }
+
+      // 5) prompt default
+      this._syncPromptDefault();
+
+      this._persist();
+    },
+
+    _persist() {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(persistableState(this)));
+      } catch {
+        // ignore
+      }
+    },
+
+    /** ensure selectedPromptId matches current model */
+    _syncPromptDefault() {
+      const list = this.currentPrompts;
+      if (!list.length) {
+        this.selectedPromptId = null;
+        this.promptOptions = {};
+        return;
+      }
+
+      const exists =
+        this.selectedPromptId &&
+        list.some((p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId);
+      if (!exists) {
+        const first = list.find((p) => p?.default === true) || list[0];
+        this.selectedPromptId = first?.[JSON_KEYS.PROMPT_ID] ?? null;
+        this.promptOptions = {};
+      }
+    },
+
+    /** ensure messages are loaded from active chat */
+    _loadMessagesFromActiveChat() {
+      const chat = this.activeChat;
+      const msgs = Array.isArray(chat?.messages) ? chat.messages : [];
+      // ✅ guard: only user/ai roles
+      this.messages = msgs
+        .filter((m) => m && (m.role === "user" || m.role === "assistant"))
+        .map((m) => ({ ...m }));
+    },
+
+    /** Assistant 선택 → 첫 모델 자동 선택 */
+    selectAssistant(assistantId) {
+      if (this.isLocked) return;
+
+      const ds = useDataStore();
+      this.assistantId = assistantId;
+
+      const models = ds.modelsByAssistant(assistantId);
+      const first =
+        models.find((m) => m?.[JSON_KEYS.DEFAULT_YN] === true) ||
+        models[0] ||
+        null;
+      this.modelId = first ? first[JSON_KEYS.MODEL_ID] : null;
+
+      // prompt reset for new model
+      this.selectedPromptId = null;
+      this.promptOptions = {};
+      this.activeChatId = null;
+      this.messages = [];
+      this.inputText = "";
+
+      this._syncPromptDefault();
+
+      this._persist();
+    },
+
+    /** 모델 직접 선택 */
+    setModel(modelId) {
+      if (this.isLocked) return;
+      this.modelId = modelId;
+
+      this.selectedPromptId = null;
+      this.promptOptions = {};
+      this._syncPromptDefault();
+
+      this._persist();
+    },
+
+    /** prompt 선택 (InputHeader) */
+    selectPrompt(promptId) {
+      if (this.isLocked) return;
+      this.selectedPromptId = promptId;
+      this.promptOptions = {};
+      this._persist();
+    },
+
+    setPromptOption(key, value) {
+      this.promptOptions = { ...this.promptOptions, [key]: value };
+      this._persist();
+    },
+
+    setInputText(v) {
+      this.inputText = v;
+    },
+
+    /** 새 채팅방 생성 + 라우팅은 Sidebar가 처리 */
+    createChat(text) {
+      if (this.isLocked) return null;
+
+      const id = String(nowTs());
+      const ts = nowTs();
+      const chat = {
+        id,
+        title: "New chat",
+        createdAt: ts,
+        lastAt: ts,
+        assistantId: this.assistantId,
+        modelId: this.modelId,
+        messages: [],
+      };
+      this.chats = [chat, ...this.chats];
+      this.activeChatId = id;
+      this.messages = [];
+      this.inputText = text;
+
+      this._persist();
+      return id;
+    },
+
+    /** 채팅방 선택 → 메시지 로드 */
+    selectChat(id) {
+      if (this.isLocked) return;
+      this.activeChatId = id;
+      this._loadMessagesFromActiveChat();
+
+      // sync assistant/model to chat meta
+      const chat = this.activeChat;
+      if (chat) {
+        this.assistantId = chat.assistantId;
+        this.modelId = chat.modelId;
+        this._syncPromptDefault();
+      }
+
+      this._persist();
+    },
+
+    /** 채팅방 삭제 */
+    deleteChat(id) {
+      if (this.isLocked) return;
+
+      const idx = this.chats.findIndex((c) => c.id === id);
+      if (idx < 0) return;
+
+      const nextChats = [...this.chats];
+      nextChats.splice(idx, 1);
+      this.chats = nextChats;
+
+      if (this.activeChatId === id) {
+        this.activeChatId = this.chats[0]?.id ?? null;
+        if (this.activeChatId) this._loadMessagesFromActiveChat();
+        else this.messages = [];
+      }
+
+      this._persist();
+    },
+
+    lock() {
+      this.isLocked = true;
+    },
+
+    unlock() {
+      this.isLocked = false;
+    },
+
+    /** example 클릭 시 input에 주입 */
+    applyExampleText(text) {
+      this.inputText = String(text ?? "");
+    },
+
+    /** send: user message append + dummy assistant reply */
+    send() {
+      if (this.isLocked) return;
+      const text = String(this.inputText ?? "").trim();
+
+      console.log("▶️ Sending message:", text);
+
+      if (!text) return;
+
+      console.log("▶️ Sending message:", this.messages);
+
+      // ensure room
+      if (!this.activeChatId) {
+        this.createChat(text);
+      }
+
+      const prompt = this.currentPrompt;
+      const promptName = prompt?.promptTemplateName || prompt?.name_ko || "";
+      const opts = this.promptOptions || {};
+      const optionLines = Object.keys(opts)
+        .map((k) => `${k}: ${opts[k]}`)
+        .join(", ");
+
+      const finalText = promptName
+        ? `${text}\n\n(${promptName}${optionLines ? " · " + optionLines : ""})`
+        : text;
+
+      const userMsg = { role: "user", text: finalText, ts: nowTs() };
+      this.messages = [...this.messages, userMsg];
+
+      // update room
+      const title =
+        this.activeChat?.title && this.activeChat.title !== "New chat"
+          ? this.activeChat.title
+          : text.length > 24
+          ? text.slice(0, 24) + "…"
+          : text;
+
+      const updated = {
+        ...this.activeChat,
+        title,
+        lastAt: nowTs(),
+        assistantId: this.assistantId,
+        modelId: this.modelId,
+        messages: this.messages,
+      };
+
+      this.chats = this.chats.map((c) => (c.id === updated.id ? updated : c));
+
+      // demo assistant response (replace with API later)
+      const aiMsg = {
+        role: "assistant",
+        text: `✅ (샘플 응답)\n\n요청하신 내용: ${text}\n\n- 선택된 modelId: ${this.modelId}\n- 선택된 assistantId: ${this.assistantId}`,
+        ts: nowTs() + 1,
+      };
+      this.messages = [...this.messages, aiMsg];
+
+      const updated2 = {
+        ...updated,
+        messages: this.messages,
+        lastAt: nowTs() + 2,
+      };
+      this.chats = this.chats.map((c) => (c.id === updated2.id ? updated2 : c));
+
+      this.inputText = "";
+      this._persist();
+    },
+  },
+});

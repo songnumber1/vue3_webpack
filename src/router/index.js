@@ -10,8 +10,10 @@ export default createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "", redirect: "/chat" },
-        { path: "chat", component: ChatView },
+        { path: "", redirect: "/main" },
+        // ✅ NewChatLanding 전용(라우터 분리)
+        { path: "main", name: "main", component: ChatView },
+        { path: "chat/:id?", name: "chat", component: ChatView, props: true },
         { path: "playground", component: PlaygroundView },
       ],
     },

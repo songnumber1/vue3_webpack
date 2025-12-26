@@ -29,7 +29,7 @@
 
     <!-- 상단 네비게이션 -->
     <nav class="nav" aria-label="Primary navigation">
-      <router-link to="/chat" aria-label="Chat" class="nav-item">
+      <router-link to="/main" aria-label="Chat" class="nav-item">
         <span class="icon">💬</span>
         <span class="text">Chat</span>
       </router-link>
@@ -116,40 +116,65 @@
 </template>
 
 <script>
-import rawData from "@/data/data.json";
-import { JSON_KEYS } from "@/constants/jsonKeys";
 import { PINNED_ASSISTANT_IDS } from "@/constants/pinnedAssistants";
+import { useUiStore } from "@/stores/uiStore";
+import { useChatStore } from "@/stores/chatStore";
+import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "AppSidebar",
 
   computed: {
+    uiStore() {
+      return useUiStore();
+    },
+    chatStore() {
+      return useChatStore();
+    },
+    dataStore() {
+      return useDataStore();
+    },
+
     isMobile() {
-      return this.$store.state.ui?.isMobile || false;
+      return this.uiStore.isMobile;
     },
     sidebarOpen() {
-      return this.isMobile ? this.$store.state.ui.sidebarOpen : true;
+      return this.uiStore.sidebarOpen;
     },
     sidebarCollapsed() {
-      return this.$store.state.ui?.sidebarCollapsed || false;
+      return this.uiStore.sidebarCollapsed;
+    },
+    assistantsExpanded() {
+      return this.uiStore.assistantsExpanded;
+    },
+
+    chats() {
+      return this.chatStore.chats || [];
+    },
+    activeChatId() {
+      return this.chatStore.activeChatId;
+    },
+    activeAssistantId() {
+      return this.chatStore.assistantId;
+    },
+
+    assistants() {
+      return this.dataStore.uiAssistants || [];
     },
 
     safeStore() {
-      const s = this.$store.getters["chat/safeStore"] || {};
       return {
-        chats: Array.isArray(s.chats) ? s.chats : [],
-        activeChatId: s.activeChatId ?? null,
-        activeModelGroupId:
-          s.activeModelGroupId || this.$store.state.model.groupId,
+        chats: Array.isArray(this.chats) ? this.chats : [],
+        activeChatId: this.activeChatId ?? null,
+        activeModelGroupId: this.activeAssistantId,
       };
     },
 
     modelGroups() {
-      return this.$store.getters["model/groups"] || [];
-    },
-
-    assistantsExpanded() {
-      return this.$store.state.ui.assistantsExpanded;
+      return (this.assistants || []).map((a) => ({
+        id: a.id,
+        label: a.label,
+      }));
     },
 
     displayedAssistants() {
@@ -166,14 +191,12 @@ export default {
       const chats = [...this.safeStore.chats].sort(
         (a, b) => (b.lastAt || 0) - (a.lastAt || 0)
       );
-
       if (!chats.length) return [];
 
       const today = new Date().toDateString();
       const y = new Date();
       y.setDate(y.getDate() - 1);
       const yesterday = y.toDateString();
-
       const map = new Map();
 
       chats.forEach((c) => {
@@ -197,30 +220,46 @@ export default {
 
   methods: {
     toggleAssistants() {
-      this.$store.dispatch("ui/toggleAssistantsExpanded");
+      this.uiStore.toggleAssistantsExpanded();
     },
     toggleCollapse() {
-      this.$store.dispatch("ui/toggleCollapse");
+      this.uiStore.toggleCollapse();
     },
     closeSidebar() {
-      this.$store.dispatch("ui/closeSidebar");
+      this.uiStore.closeSidebar();
     },
+
     iconForGroup(id) {
-      if (id === "ds") return "DS";
-      if (id === "spec") return "SP";
-      if (id === "ops") return "OP";
+      if (id === "5cf09b7e-af22-4895-b127-499ddfa907ef") return "DS";
+      if (id === "a3ab57b9-0d19-4347-b0ce-e6bdd896230c") return "SP";
+      if (id === "301bda52-09de-4ba3-a2b2-19c6e6e31c7b") return "OP";
       return "M";
     },
+
+    /** ✅ assistant 선택은 여기서 트리거만 */
     setModelGroup(groupId) {
-      this.$store.dispatch("model/selectGroup", groupId);
-      this.$store.dispatch("chat/resetForNewAssistant", groupId);
-      this.$store.dispatch("prompt/onModelChanged");
+      if (this.chatStore.isLocked) return;
+
+      this.chatStore.selectAssistant(groupId);
+
+      if (this.$route.path !== "/main") {
+        this.$router.push("/main");
+      }
+      if (this.isMobile) {
+        this.closeSidebar();
+      }
     },
+
     selectChat(id) {
-      this.$store.dispatch("chat/selectChat", id);
+      if (this.chatStore.isLocked) return;
+      this.chatStore.selectChat(id);
+      if (this.$route.name !== "chat") this.$router.push(`/chat/${id}`);
+      if (this.isMobile) this.closeSidebar();
     },
+
     deleteChat(id) {
-      this.$store.dispatch("chat/deleteChat", id);
+      if (this.chatStore.isLocked) return;
+      this.chatStore.deleteChat(id);
     },
   },
 };

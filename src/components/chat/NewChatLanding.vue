@@ -1,86 +1,86 @@
 <template>
-  <div class="landing" role="region" aria-label="New chat landing">
+  <div class="landing">
     <div class="hero">
-      <div class="logo" aria-hidden="true">✨</div>
       <h1 class="title">무엇을 도와드릴까요?</h1>
-      <p class="subtitle">
-        새 대화를 시작해보세요. 아래 예시를 눌러 바로 입력할 수도 있어요.
-      </p>
 
-      <!-- ✅ 모델 그룹은 이미 선택되어 있으므로, 모델 옵션만 표시 -->
+      <!-- 모델 선택 -->
       <ModelSelect
-        :models="currentModels"
-        :model-id="currentModelId"
-        @update:model="setModel"
+        v-if="models.length"
+        :models="models"
+        :currentModelId="modelId"
+        @update:model="onSelectModel"
       />
     </div>
 
-    <div class="grid" role="list" aria-label="Suggestions">
+    <!-- 모델 기준 예제 -->
+    <div class="grid">
       <button
-        v-for="(s, i) in suggestions"
-        :key="i"
-        type="button"
+        v-for="e in examples"
+        :key="e.example_id"
         class="card"
-        role="listitem"
-        @click="pickSuggestion(s.text)"
+        @click="pick(e)"
       >
-        <div class="card-title">{{ s.title }}</div>
-        <div class="card-desc">{{ s.desc }}</div>
+        <div class="card-title">
+          {{ e.title_ko }}
+        </div>
+        <div class="card-desc">
+          {{ e.desc_ko }}
+        </div>
       </button>
+
+      <div v-if="!examples.length" class="empty">
+        선택한 모델에 연결된 예제가 없습니다.
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import ModelSelect from "@/components/common/ModelSelect.vue";
+import { useChatStore } from "@/stores/chatStore";
+import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "NewChatLanding",
   components: { ModelSelect },
+  emits: ["pick"],
 
   computed: {
-    currentModels() {
-      return this.$store.getters["model/modelsForGroup"];
+    chat() {
+      return useChatStore();
     },
-    currentModelId() {
-      return this.$store.state.model.modelId;
+    data() {
+      return useDataStore();
     },
-  },
 
-  data() {
-    return {
-      suggestions: [
-        {
-          title: "요약해줘",
-          desc: "긴 내용을 핵심만 요약해볼게요.",
-          text: "다음 내용을 요약해줘: ",
-        },
-        {
-          title: "메일 초안",
-          desc: "상황에 맞는 메일을 작성해볼게요.",
-          text: "다음 상황으로 메일 초안을 작성해줘: ",
-        },
-        {
-          title: "기획 아이디어",
-          desc: "아이디어를 여러 개 제안해볼게요.",
-          text: "다음 주제의 기획 아이디어를 제안해줘: ",
-        },
-        {
-          title: "버그 원인",
-          desc: "에러 원인을 함께 추적해볼게요.",
-          text: "다음 오류 로그 원인을 분석해줘: ",
-        },
-      ],
-    };
+    assistantId() {
+      return this.chat.assistantId;
+    },
+
+    modelId() {
+      return this.chat.modelId;
+    },
+
+    models() {
+      if (!this.assistantId) return [];
+
+      return this.data.modelsByAssistant(this.assistantId);
+    },
+
+    examples() {
+      if (!this.modelId) return [];
+      return this.data.examplesByModel(this.modelId);
+    },
   },
 
   methods: {
-    setModel(modelId) {
-      this.$store.dispatch("model/setModel", modelId);
-      this.$store.dispatch("prompt/onModelChanged");
+    /** 모델 변경 시 모든 상태 동기화 */
+    onSelectModel(modelId) {
+      this.chat.setModel(modelId);
     },
-    pickSuggestion(text) {
-      this.$store.dispatch("input/setText", String(text ?? ""));
+
+    pick(example) {
+      this.$emit("pick", example.input || "");
     },
   },
 };
@@ -92,7 +92,6 @@ export default {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 18px;
   padding: 18px;
 }
@@ -124,7 +123,6 @@ export default {
   font-size: 13px;
   margin: 0;
   color: var(--text-muted);
-  max-width: 560px;
 }
 
 .grid {
@@ -161,9 +159,11 @@ export default {
   color: var(--text-muted);
 }
 
-@media (max-width: 720px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+.empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 20px 0;
 }
 </style>

@@ -14,6 +14,7 @@
 import ChatMessageUser from "./ChatMessageUser.vue";
 import ChatMessageAssistant from "./ChatMessageAssistant.vue";
 import { md } from "@/utils/markdown";
+import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "ChatMessageList",
@@ -24,8 +25,12 @@ export default {
   },
 
   computed: {
+    store() {
+      return useChatStore();
+    },
+
     messages() {
-      return this.$store.getters["chat/activeMessages"];
+      return this.store.messages;
     },
   },
 
@@ -33,6 +38,7 @@ export default {
     render(text) {
       return md.render(String(text ?? ""));
     },
+
     resolveComponent(role) {
       return role === "user" ? "ChatMessageUser" : "ChatMessageAssistant";
     },

@@ -1,25 +1,21 @@
 <template>
   <div class="chat-box">
-    <!-- ✅ 이전 대화방 접속 시에만 채팅방 헤더 표시 -->
     <div v-if="showRoomHeader" class="room-header">
       <strong class="room-title">{{ activeChatTitle }}</strong>
-      <span class="room-sub">
-        {{ currentModelGroupLabel }} · {{ currentModelId }}
-      </span>
+      <span class="room-sub"> {{ assistantLabel }} · {{ modelId }} </span>
     </div>
 
-    <!-- 메시지 영역 -->
-    <div class="messages">
-      <!-- ✅ 새 대화 (Assistant 선택 or + New Chat) -->
-      <NewChatLanding v-if="showLanding" />
+    <div class="messages" ref="messagesWrap">
+      <!-- ✅ NewChatLanding: /main (draft) -->
+      <NewChatLanding v-if="showLanding" @pick="applySuggestion" />
 
-      <!-- ✅ 실제 채팅 메시지 -->
-      <ChatMessageList v-else-if="safeStore.activeChatId" ref="messageList" />
+      <!-- ✅ Chat messages -->
+      <ChatMessageList v-else ref="messageList" />
     </div>
 
-    <!-- 입력 영역 -->
     <div class="input-row">
-      <InputHeader class="input-header" />
+      <InputHeader />
+      <PromptTemplateForm />
 
       <div class="input-main">
         <textarea
@@ -28,7 +24,9 @@
           placeholder="메시지를 입력하세요"
           @keydown="onKeydown"
         />
-        <button type="button" @click="send">Send</button>
+        <button type="button" class="send" :disabled="isLocked" @click="send">
+          Send
+        </button>
       </div>
     </div>
   </div>
@@ -38,61 +36,87 @@
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import InputHeader from "@/components/chat/InputHeader.vue";
-import {
-  createChatFromFirstMessage,
-  touchChatOnMessage,
-} from "../storage/chatStore";
+import PromptTemplateForm from "@/components/chat/PromptTemplateForm.vue";
+import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "ChatView",
-
   components: {
     NewChatLanding,
     ChatMessageList,
     InputHeader,
+    PromptTemplateForm,
   },
 
   computed: {
-    safeStore() {
-      return this.$store.getters["chat/safeStore"];
+    chat() {
+      return useChatStore();
     },
-
-    // ✅ 핵심 수정: activeChatId 기준
-    showLanding() {
-      return !this.safeStore.activeChatId;
-    },
-
-    showRoomHeader() {
-      return !!this.safeStore.activeChatId;
-    },
-
-    activeChatTitle() {
-      return this.$store.getters["chat/activeChatTitle"];
-    },
-
     input: {
       get() {
-        return this.$store.getters["input/text"];
+        return this.chat.inputText;
       },
       set(v) {
-        this.$store.dispatch("input/setText", v);
+        this.chat.setInputText(v);
       },
     },
-
-    currentModelGroupId() {
-      return this.$store.state.model.groupId;
+    isLocked() {
+      return this.chat.isLocked;
     },
-
-    currentModelId() {
-      return this.$store.state.model.modelId;
+    activeChatId() {
+      return this.chat.activeChatId;
     },
-
-    currentModelGroupLabel() {
-      return this.$store.getters["model/groupLabel"];
+    activeChatTitle() {
+      return this.chat.activeChatTitle;
+    },
+    assistantLabel() {
+      return this.chat.assistantId;
+    },
+    modelId() {
+      return this.chat.modelId;
+    },
+    showLanding() {
+      // ✅ landing route: /main (no active chat yet) or no room selected
+      return this.$route.name === "main" || !this.activeChatId;
+    },
+    showRoomHeader() {
+      return !this.showLanding && !!this.activeChatId;
     },
   },
 
+  watch: {
+    // auto scroll on message change
+    "chat.messages": {
+      handler() {
+        this.$nextTick(() => this.scrollToBottom());
+      },
+      deep: true,
+    },
+  },
+
+  mounted() {
+    this.scrollToBottom();
+  },
+
   methods: {
+    applySuggestion(text) {
+      this.chat.applyExampleText(text);
+    },
+
+    send() {
+      if (this.isLocked) return;
+
+      // ensure room route
+      if (!this.activeChatId) {
+        const id = this.chat.createChat(this.input);
+
+        if (id) this.$router.push(`/chat/${id}`);
+      }
+
+      this.chat.send();
+      this.$nextTick(() => this.scrollToBottom());
+    },
+
     onKeydown(e) {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -100,92 +124,88 @@ export default {
       }
     },
 
-    send() {
-      const text = String(this.input ?? "").trim();
-      if (!text) return;
-
-      const s = { ...this.safeStore };
-
-      // ✅ 새 대화에서 첫 메시지 → 채팅 생성
-      if (!s.activeChatId) {
-        const chat = createChatFromFirstMessage(text);
-        chat.modelGroupId = s.activeModelGroupId;
-        chat.modelId = s.activeModelId;
-        chat.messages = [];
-        s.chats = [chat, ...(s.chats || [])];
-        s.activeChatId = chat.id;
-      }
-
-      const chat = (s.chats || []).find((c) => c.id === s.activeChatId);
-      if (chat) {
-        const msg = { role: "user", text, ts: Date.now() };
-        chat.messages.push(msg);
-        touchChatOnMessage(chat, msg);
-      }
-
-      this.$store.dispatch("input/clear");
-      this.$store.dispatch("chat/update", s);
-
-      this.$nextTick(() => {
-        const list = this.$refs.messageList;
-        if (list?.scrollToBottom) list.scrollToBottom();
-      });
+    scrollToBottom() {
+      const wrap = this.$refs.messagesWrap;
+      if (!wrap) return;
+      wrap.scrollTop = wrap.scrollHeight;
     },
   },
 };
 </script>
 
 <style scoped>
-/* 기존 스타일 그대로 */
 .chat-box {
   height: 100%;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
+
 .room-header {
   height: 52px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 14px;
+  justify-content: space-between;
+  padding: 0 16px;
 }
+
 .room-title {
-  font-size: 13px;
-  color: var(--text-primary);
+  font-weight: 800;
 }
+
 .room-sub {
   font-size: 12px;
-  color: var(--text-muted);
-  margin-left: auto;
+  color: var(--muted);
 }
+
 .messages {
   flex: 1;
   min-height: 0;
   overflow: auto;
+  padding: 16px;
 }
+
 .input-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 14px;
   border-top: 1px solid var(--border);
-  background: var(--bg-surface);
+  background: var(--bg);
+  padding: 12px;
+  display: grid;
+  gap: 10px;
 }
+
 .input-main {
   display: flex;
-  align-items: flex-end;
   gap: 10px;
+  align-items: flex-end;
 }
+
 textarea {
   flex: 1;
-  resize: none;
+  min-height: 56px;
+  max-height: 180px;
+  resize: vertical;
   border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-primary);
-  border-radius: 14px;
+  background: var(--bg-surface);
+  color: var(--text);
+  border-radius: 12px;
   padding: 10px 12px;
+  outline: none;
+}
+
+.send {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 </style>

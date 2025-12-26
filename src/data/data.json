@@ -1,367 +1,2954 @@
 {
   "assistants": [
     {
-      "id": "ds",
-      "label": "DS Assistant",
-      "modelIds": ["ds-default", "ds-fast", "ds-pro"]
+      "assistant_id": "5cf09b7e-af22-4895-b127-499ddfa907ef",
+      "delYN": false,
+      "name_ko": "DS Assistant",
+      "name_en": "DS Assistant",
+      "desc_ko": "범용 질의 응답 어시스턴트",
+      "desc_en": "General-purpose Q&A assistant",
+      "modelIds": [
+        "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+        "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+        "4f899c01-8a0c-4fb0-838f-8e0da97a85cf"
+      ]
     },
     {
-      "id": "spec",
-      "label": "Spec Assistant",
-      "modelIds": ["spec-default", "spec-review"]
+      "assistant_id": "a3ab57b9-0d19-4347-b0ce-e6bdd896230c",
+      "delYN": false,
+      "name_ko": "Spec Assistant",
+      "name_en": "Spec Assistant",
+      "desc_ko": "문서/스펙 작성 및 검토 어시스턴트",
+      "desc_en": "Specification writing & review assistant",
+      "modelIds": [
+        "8c32af4d-8ad4-4ce4-b268-660262f21625",
+        "8b33f814-f537-421d-9701-abe056ea1be4"
+      ]
     },
     {
-      "id": "ops",
-      "label": "Ops Assistant",
-      "modelIds": ["ops-default", "ops-debug"]
-    },
-
-    {
-      "id": "design",
-      "label": "Design Assistant",
-      "modelIds": ["design-default", "design-pro"]
-    },
-    {
-      "id": "dev",
-      "label": "Dev Assistant",
-      "modelIds": ["dev-default", "dev-pro"]
+      "assistant_id": "301bda52-09de-4ba3-a2b2-19c6e6e31c7b",
+      "delYN": false,
+      "name_ko": "Ops Assistant",
+      "name_en": "Ops Assistant",
+      "desc_ko": "운영/장애 대응 어시스턴트",
+      "desc_en": "Operations & incident response assistant",
+      "modelIds": [
+        "54d5d58c-9bec-4320-857c-0202682b62c4",
+        "724ccbb5-393f-48a8-912e-2ea06afb90a4"
+      ]
     },
     {
-      "id": "qa",
-      "label": "QA Assistant",
-      "modelIds": ["qa-default", "qa-pro"]
+      "assistant_id": "7bac8271-d5af-4ff4-ae0c-77a35bebfaa5",
+      "delYN": false,
+      "name_ko": "Design Assistant",
+      "name_en": "Design Assistant",
+      "desc_ko": "UI/UX 및 디자인 어시스턴트",
+      "desc_en": "UI/UX and design assistant",
+      "modelIds": [
+        "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+        "f8290691-aaf3-4afd-9584-8994590b50d9"
+      ]
     },
     {
-      "id": "data",
-      "label": "Data Assistant",
-      "modelIds": ["data-default", "data-pro"]
+      "assistant_id": "5bfc63be-dc7f-47dc-86f1-8206014ec466",
+      "delYN": false,
+      "name_ko": "Dev Assistant",
+      "name_en": "Dev Assistant",
+      "desc_ko": "개발 생산성 어시스턴트",
+      "desc_en": "Developer productivity assistant",
+      "modelIds": [
+        "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+        "0c697845-32e0-46ff-bad9-29174ba698f6"
+      ]
     },
     {
-      "id": "biz",
-      "label": "Biz Assistant",
-      "modelIds": ["biz-default", "biz-pro"]
+      "assistant_id": "7ef054a2-285b-4001-8f2a-22a831f0c08b",
+      "delYN": false,
+      "name_ko": "QA Assistant",
+      "name_en": "QA Assistant",
+      "desc_ko": "테스트 및 품질 어시스턴트",
+      "desc_en": "Testing & quality assistant",
+      "modelIds": [
+        "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+        "3aa52fd7-37e6-43d9-9876-eae182f928c9"
+      ]
+    },
+    {
+      "assistant_id": "888db3e9-f80c-4849-bd19-82846e657c5a",
+      "delYN": false,
+      "name_ko": "Data Assistant",
+      "name_en": "Data Assistant",
+      "desc_ko": "데이터 분석/처리 어시스턴트",
+      "desc_en": "Data analysis & processing assistant",
+      "modelIds": [
+        "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+        "6dbde66f-cc33-4010-9c37-b9060fd0a056"
+      ]
+    },
+    {
+      "assistant_id": "234847ee-728a-454c-864d-5a974258410e",
+      "delYN": false,
+      "name_ko": "Biz Assistant",
+      "name_en": "Biz Assistant",
+      "desc_ko": "비즈니스 전략/문서 어시스턴트",
+      "desc_en": "Business strategy & docs assistant",
+      "modelIds": [
+        "f1489c35-b887-4b1e-8747-728f6b440d5c",
+        "86c24e80-807e-47d7-a748-32e17c1deae1"
+      ]
     }
   ],
-
   "models": [
     {
-      "id": "ds-default",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "assistant_id": "5cf09b7e-af22-4895-b127-499ddfa907ef",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "ds",
-      "del_yn": false
+      "desc_ko": "DS Assistant - Default 모델",
+      "desc_en": "DS Assistant - Default model"
     },
     {
-      "id": "ds-fast",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "assistant_id": "5cf09b7e-af22-4895-b127-499ddfa907ef",
+      "delYN": false,
       "name_ko": "Fast",
       "name_en": "Fast",
-      "assistant_id": "ds",
-      "del_yn": false
+      "desc_ko": "DS Assistant - Fast 모델",
+      "desc_en": "DS Assistant - Fast model"
     },
     {
-      "id": "ds-pro",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "assistant_id": "5cf09b7e-af22-4895-b127-499ddfa907ef",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "ds",
-      "del_yn": false
+      "desc_ko": "DS Assistant - Pro 모델",
+      "desc_en": "DS Assistant - Pro model"
     },
-
     {
-      "id": "spec-default",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "assistant_id": "a3ab57b9-0d19-4347-b0ce-e6bdd896230c",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "spec",
-      "del_yn": false
+      "desc_ko": "Spec Assistant - Default 모델",
+      "desc_en": "Spec Assistant - Default model"
     },
     {
-      "id": "spec-review",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "assistant_id": "a3ab57b9-0d19-4347-b0ce-e6bdd896230c",
+      "delYN": false,
       "name_ko": "Review",
       "name_en": "Review",
-      "assistant_id": "spec",
-      "del_yn": false
+      "desc_ko": "Spec Assistant - Review 모델",
+      "desc_en": "Spec Assistant - Review model"
     },
-
     {
-      "id": "ops-default",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "assistant_id": "301bda52-09de-4ba3-a2b2-19c6e6e31c7b",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "ops",
-      "del_yn": false
+      "desc_ko": "Ops Assistant - Default 모델",
+      "desc_en": "Ops Assistant - Default model"
     },
     {
-      "id": "ops-debug",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "assistant_id": "301bda52-09de-4ba3-a2b2-19c6e6e31c7b",
+      "delYN": false,
       "name_ko": "Debug",
       "name_en": "Debug",
-      "assistant_id": "ops",
-      "del_yn": false
+      "desc_ko": "Ops Assistant - Debug 모델",
+      "desc_en": "Ops Assistant - Debug model"
     },
-
     {
-      "id": "design-default",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "assistant_id": "7bac8271-d5af-4ff4-ae0c-77a35bebfaa5",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "design",
-      "del_yn": false
+      "desc_ko": "Design Assistant - Default 모델",
+      "desc_en": "Design Assistant - Default model"
     },
     {
-      "id": "design-pro",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "assistant_id": "7bac8271-d5af-4ff4-ae0c-77a35bebfaa5",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "design",
-      "del_yn": false
+      "desc_ko": "Design Assistant - Pro 모델",
+      "desc_en": "Design Assistant - Pro model"
     },
-
     {
-      "id": "dev-default",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "assistant_id": "5bfc63be-dc7f-47dc-86f1-8206014ec466",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "dev",
-      "del_yn": false
+      "desc_ko": "Dev Assistant - Default 모델",
+      "desc_en": "Dev Assistant - Default model"
     },
     {
-      "id": "dev-pro",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "assistant_id": "5bfc63be-dc7f-47dc-86f1-8206014ec466",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "dev",
-      "del_yn": false
+      "desc_ko": "Dev Assistant - Pro 모델",
+      "desc_en": "Dev Assistant - Pro model"
     },
-
     {
-      "id": "qa-default",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "assistant_id": "7ef054a2-285b-4001-8f2a-22a831f0c08b",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "qa",
-      "del_yn": false
+      "desc_ko": "QA Assistant - Default 모델",
+      "desc_en": "QA Assistant - Default model"
     },
     {
-      "id": "qa-pro",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "assistant_id": "7ef054a2-285b-4001-8f2a-22a831f0c08b",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "qa",
-      "del_yn": false
+      "desc_ko": "QA Assistant - Pro 모델",
+      "desc_en": "QA Assistant - Pro model"
     },
-
     {
-      "id": "data-default",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "assistant_id": "888db3e9-f80c-4849-bd19-82846e657c5a",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "data",
-      "del_yn": false
+      "desc_ko": "Data Assistant - Default 모델",
+      "desc_en": "Data Assistant - Default model"
     },
     {
-      "id": "data-pro",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "assistant_id": "888db3e9-f80c-4849-bd19-82846e657c5a",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "data",
-      "del_yn": false
+      "desc_ko": "Data Assistant - Pro 모델",
+      "desc_en": "Data Assistant - Pro model"
     },
-
     {
-      "id": "biz-default",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "assistant_id": "234847ee-728a-454c-864d-5a974258410e",
+      "delYN": false,
       "name_ko": "Default",
       "name_en": "Default",
-      "assistant_id": "biz",
-      "del_yn": false
+      "desc_ko": "Biz Assistant - Default 모델",
+      "desc_en": "Biz Assistant - Default model"
     },
     {
-      "id": "biz-pro",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "assistant_id": "234847ee-728a-454c-864d-5a974258410e",
+      "delYN": false,
       "name_ko": "Pro",
       "name_en": "Pro",
-      "assistant_id": "biz",
-      "del_yn": false
+      "desc_ko": "Biz Assistant - Pro 모델",
+      "desc_en": "Biz Assistant - Pro model"
     }
   ],
-
-  "promptTemplates": [
+  "prompts": [
     {
+      "prompts_id": "e56b51e6-2d6d-4afb-899c-e0757027669e",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "ds-default",
-      "promptTemplateId": "aaasdfadf-0000-0000-0000-000000000001",
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
       "promptTemplate": {
         "html": {
           "ko": {
             "title": "Temp Assistant",
             "content": "는 임시 Assistant입니다."
           },
-          "en": { "title": "Temp Assistant", "content": "is temp Assistant" }
+          "en": {
+            "title": "Temp Assistant",
+            "content": "is temp Assistant"
+          }
         }
-      },
-      "promptTemplateName": "직접입력"
+      }
     },
-
     {
+      "prompts_id": "1913ceda-43d1-4c1f-9608-63b33f118407",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "spec-default",
-      "promptTemplateId": "bbbbdfadf-0000-0000-0000-000000000001",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "779f029c-4927-4788-8fd0-575844b10139",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
+    },
+    {
+      "prompts_id": "54f0c2ea-e3ab-48f1-a722-f713e684d81c",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "default": true,
+      "promptTemplateOrder": 0,
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
+    },
+    {
+      "prompts_id": "76a89b88-ea28-4328-b67d-61bc26966ddb",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
       "delYN": false,
       "default": false,
       "promptTemplateOrder": 1,
-      "modelId": "spec-default",
-      "promptTemplateId": "ccccfadf-0000-0000-0000-000000000001",
+      "name_ko": "메일",
+      "name_en": "Mail",
+      "desc_ko": "메일 작성 템플릿",
+      "desc_en": "Email writing template",
+      "promptTemplateName": "메일",
       "promptTemplate": {
         "language": {
           "en": "Language",
           "ko": "언어",
           "type": "radio",
           "content": [
-            { "tag": "영어", "en": "English", "ko": "영어로" },
-            { "tag": "한국어", "en": "Korean", "ko": "한국어로" }
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
           ]
         }
-      },
-      "promptTemplateName": "메일"
+      }
     },
-
     {
+      "prompts_id": "ef54a1a1-3a98-419d-a8b7-7e643e419f76",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 2,
+      "name_ko": "번역",
+      "name_en": "Translate",
+      "desc_ko": "번역 템플릿",
+      "desc_en": "Translation template",
+      "promptTemplateName": "번역",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "prompts_id": "f7cc5c77-f3ea-4819-9b14-4fd180ceb9bb",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 3,
+      "name_ko": "요약",
+      "name_en": "Summary",
+      "desc_ko": "요약 템플릿",
+      "desc_en": "Summary template",
+      "promptTemplateName": "요약",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "문단식",
+              "en": "Paragraph",
+              "ko": "문단식"
+            },
+            {
+              "tag": "개조식",
+              "en": "Bullet",
+              "ko": "개조식"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "prompts_id": "28ab100f-5d4e-4909-a896-356defa0afe1",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 4,
+      "name_ko": "코드",
+      "name_en": "Code",
+      "desc_ko": "코드 생성/리뷰 템플릿",
+      "desc_en": "Code generation/review template",
+      "promptTemplateName": "코드",
+      "promptTemplate": {}
+    },
+    {
+      "prompts_id": "07200273-b398-485c-89f2-a6208437daaa",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "ds-fast",
-      "promptTemplateId": "pt-ds-fast-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "b46705ca-1e3e-424b-ad25-b3e4a4f839e0",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 1,
+      "name_ko": "메일",
+      "name_en": "Mail",
+      "desc_ko": "메일 작성 템플릿",
+      "desc_en": "Email writing template",
+      "promptTemplateName": "메일",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "prompts_id": "049cb6a4-65be-40fb-8056-1046c9721ef5",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 2,
+      "name_ko": "번역",
+      "name_en": "Translate",
+      "desc_ko": "번역 템플릿",
+      "desc_en": "Translation template",
+      "promptTemplateName": "번역",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "정중하게",
+              "en": "Polite",
+              "ko": "정중하게"
+            },
+            {
+              "tag": "친근하게",
+              "en": "Friendly",
+              "ko": "친근하게"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "prompts_id": "7c49b06c-de2d-4cb6-817a-dd933981242a",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 3,
+      "name_ko": "요약",
+      "name_en": "Summary",
+      "desc_ko": "요약 템플릿",
+      "desc_en": "Summary template",
+      "promptTemplateName": "요약",
+      "promptTemplate": {
+        "language": {
+          "en": "Language",
+          "ko": "언어",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "영어",
+              "en": "English",
+              "ko": "영어로"
+            },
+            {
+              "tag": "한국어",
+              "en": "Korean",
+              "ko": "한국어로"
+            }
+          ]
+        },
+        "style": {
+          "en": "Style",
+          "ko": "스타일",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "문단식",
+              "en": "Paragraph",
+              "ko": "문단식"
+            },
+            {
+              "tag": "개조식",
+              "en": "Bullet",
+              "ko": "개조식"
+            }
+          ]
+        },
+        "length": {
+          "en": "Length",
+          "ko": "길이",
+          "type": "radio",
+          "content": [
+            {
+              "tag": "기본",
+              "en": "Default",
+              "ko": "기본"
+            },
+            {
+              "tag": "짧게",
+              "en": "Short",
+              "ko": "짧게"
+            },
+            {
+              "tag": "길게",
+              "en": "Long",
+              "ko": "길게"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "prompts_id": "d6bfde7d-5b77-4229-bea9-567b9028ec52",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "default": false,
+      "promptTemplateOrder": 4,
+      "name_ko": "코드",
+      "name_en": "Code",
+      "desc_ko": "코드 생성/리뷰 템플릿",
+      "desc_en": "Code generation/review template",
+      "promptTemplateName": "코드",
+      "promptTemplate": {}
+    },
+    {
+      "prompts_id": "dd927e91-4beb-476f-8299-072223a801b1",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "ds-pro",
-      "promptTemplateId": "pt-ds-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "99bb2d89-585d-4cc9-a18a-54fa544853c2",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "spec-review",
-      "promptTemplateId": "pt-spec-review-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "43b08997-2515-46b4-a83e-eec92148cdec",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "ops-default",
-      "promptTemplateId": "pt-ops-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "67f77b5f-d851-4063-bc5f-c95d426e01f2",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "ops-debug",
-      "promptTemplateId": "pt-ops-debug-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "3369f157-2f11-46ca-bbc3-163748fc308f",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "design-default",
-      "promptTemplateId": "pt-design-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "3c17d474-86ff-402b-8b23-399a0b0c382c",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "design-pro",
-      "promptTemplateId": "pt-design-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "4f8669cc-1153-400c-887f-5458fd529c63",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "dev-default",
-      "promptTemplateId": "pt-dev-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "62d53911-86f8-4df4-b72f-d98d3e436c4a",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "dev-pro",
-      "promptTemplateId": "pt-dev-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "ac1176f5-2548-4902-9143-fcb87cc221a3",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "qa-default",
-      "promptTemplateId": "pt-qa-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "a0b871c6-acda-42c7-bf51-ac2c7324e3d1",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "qa-pro",
-      "promptTemplateId": "pt-qa-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
-
     {
+      "prompts_id": "32354693-20ea-4d7d-b0e3-8a075c42f0b1",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "data-default",
-      "promptTemplateId": "pt-data-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
     },
     {
+      "prompts_id": "352f7dec-4f47-44f0-a1da-979da5f06a77",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
       "delYN": false,
       "default": true,
       "promptTemplateOrder": 0,
-      "modelId": "data-pro",
-      "promptTemplateId": "pt-data-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
-    },
-
+      "name_ko": "직접입력",
+      "name_en": "Direct Input",
+      "desc_ko": "자유롭게 입력합니다.",
+      "desc_en": "Free-form input.",
+      "promptTemplateName": "직접입력",
+      "promptTemplate": {}
+    }
+  ],
+  "examples": [
     {
+      "exapmle_id": "7b04a4c2-4cf0-41ca-883d-8bd141610a4f",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
       "delYN": false,
-      "default": true,
-      "promptTemplateOrder": 0,
-      "modelId": "biz-default",
-      "promptTemplateId": "pt-biz-default-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: DS Assistant/Default",
+      "hint": "요약/정리"
     },
     {
+      "exapmle_id": "4889bf08-a2fb-4be9-b429-dcc1a61f1a81",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
       "delYN": false,
-      "default": true,
-      "promptTemplateOrder": 0,
-      "modelId": "biz-pro",
-      "promptTemplateId": "pt-biz-pro-direct",
-      "promptTemplate": {},
-      "promptTemplateName": "직접입력"
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: DS Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "2a877352-2156-477a-afdf-b5b30f3b3c5c",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: DS Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "d1e1cf52-3608-494b-850b-5c92885c0ce7",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: DS Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "93e15a4b-7aa9-41a7-9812-242fc854655a",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: DS Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "1845b765-0403-4ae5-a052-e1786a6cc74d",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: DS Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "d86b7823-adb3-4116-9d80-aff2fd13492e",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: DS Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "b8852cc2-348f-4a2a-b6e4-6ea1b62c004c",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: DS Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "4335734b-8fee-4d56-917e-288d7335f93a",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: DS Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "870023cf-0f9e-4582-be6c-1723610ee8e3",
+      "model_id": "4ad651c7-4ebd-49bc-91dd-fa7b9660eab3",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: DS Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "1fc1c805-bb30-40e6-b828-293d154a75f1",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: DS Assistant/Fast",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "da62b7cb-5f59-427a-8779-6697e067169a",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: DS Assistant/Fast",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "87323a47-5af0-4b9c-ab06-5b32ef1a0e17",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: DS Assistant/Fast",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "c3586dd6-86bb-4609-9b32-2e087af43a44",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: DS Assistant/Fast",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "283e2183-c2e5-4507-8c7f-af3b04c57bf3",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: DS Assistant/Fast",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "c772c972-29c1-4b0f-a9ff-1f3c5da5380c",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: DS Assistant/Fast",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "bfc9e1a3-aba8-4b50-9eab-d0c8c5e95f95",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: DS Assistant/Fast",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "d5da6d70-0792-48f8-80a4-bdeeb25d17c6",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: DS Assistant/Fast",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "f6a1d2d2-2d9c-4f48-801c-b57d347f4cba",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: DS Assistant/Fast",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "6e9f5813-58ff-40c6-9b86-844878f5b0b2",
+      "model_id": "4cb13a57-3a58-438f-8ca2-28aabc4c975e",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: DS Assistant/Fast",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "e31f9705-e1b4-4516-afdd-a6871fa43735",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: DS Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "0ee7d046-1bc8-410e-be57-a737ee317947",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: DS Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "8d49ff7c-190b-4303-b66f-241ffc5e0d8d",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: DS Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "936d5e43-51f2-40a1-92c7-3238c0d47b44",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: DS Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "5ee6d1ae-3117-4dc2-bf26-201de6c94b11",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: DS Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "b3785d90-560c-43dd-8240-601468163667",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: DS Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "2800a478-b7c6-4224-9f3b-81dad4015b80",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: DS Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "f407789d-8a75-46b0-9206-022fff14c821",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: DS Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "49e08194-ea2a-4970-9375-82fe8c749297",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: DS Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "9d4f3b38-22af-48c3-97e4-587a797ba1a0",
+      "model_id": "4f899c01-8a0c-4fb0-838f-8e0da97a85cf",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: DS Assistant/Pro",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "d7979398-f1b5-45cf-a9fe-d7fe7a7a23cf",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Spec Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "fda35da3-9881-4d5b-9ed7-ccfdf82d4d53",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Spec Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "a425b56a-eccc-4a4f-9c15-73b2ab0f97f8",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Spec Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "018ebdbc-041c-4c54-97bb-114bc192ed15",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Spec Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "4f7afdec-643d-4c24-b4df-6f7aad067cab",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Spec Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "772d4a74-037f-4186-8944-6d869614811d",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Spec Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "f046ad1e-d0aa-4942-87cc-4fc5cf44d88e",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Spec Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "8bd1cb0c-cfb1-4771-a5b1-19ca128a9240",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Spec Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "a12d281d-ff69-4e9b-9ce4-0d51c57d9b79",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Spec Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "811d52c7-0168-4787-b2c0-d805add83519",
+      "model_id": "8c32af4d-8ad4-4ce4-b268-660262f21625",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Spec Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "1cc11abc-7be6-4bad-984d-c84aad0242b4",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Spec Assistant/Review",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "68c8ec53-1e93-40b6-8d59-98c7de789529",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Spec Assistant/Review",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "570c0843-9d24-4ad4-b035-253529c67bec",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Spec Assistant/Review",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "051544f0-522d-452a-90fd-972e7b25d7f6",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Spec Assistant/Review",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "3d9ca965-fc91-4fa6-814c-516a9e098cdd",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Spec Assistant/Review",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "3587b567-aac9-4e0e-8b02-a9a561369287",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Spec Assistant/Review",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "f4838e32-effa-400a-b041-893a11e2d99b",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Spec Assistant/Review",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "014d22de-0553-44ab-a9e9-fce03d845c1e",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Spec Assistant/Review",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "0bf96bef-80ee-4ab8-996f-17129e449591",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Spec Assistant/Review",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "6a723ab9-98dc-4b53-a554-f149ba6016e5",
+      "model_id": "8b33f814-f537-421d-9701-abe056ea1be4",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Spec Assistant/Review",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "828fb080-7774-4744-a53b-2831f0dc39de",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Ops Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "558eea07-40db-4230-b4b7-ba816c4bdca2",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Ops Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "9524bc5e-989d-4617-a383-d761af86ddfe",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Ops Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "301d99e5-6064-4a50-b1a8-20e19e2432ff",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Ops Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "fdda9c81-d686-4750-a2e0-78d138adea16",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Ops Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "93b97360-6ad6-455b-917e-2a4fcfba44b6",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Ops Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "ce801832-0a4e-4140-ac35-eb1247040d42",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Ops Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "fba003f7-4ead-406e-ad69-b2cb6d93093d",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Ops Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "bf1a29a7-7ee8-4b47-b2a2-577d855b82c5",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Ops Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "1ac7ac48-d575-4132-ac66-75812499f58a",
+      "model_id": "54d5d58c-9bec-4320-857c-0202682b62c4",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Ops Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "9bcb15cf-3ed4-45e4-9a28-c1a698d14670",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Ops Assistant/Debug",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "d50fa874-e1ef-4fa5-a51d-83a4ce22f429",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Ops Assistant/Debug",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "83481705-d042-4b61-9d5a-d2a8a93525f6",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Ops Assistant/Debug",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "cd08c76b-9757-4960-bbcb-9c6fe390bf25",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Ops Assistant/Debug",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "bcc91a2c-fe82-4c99-a7ee-f0fcac6f9c38",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Ops Assistant/Debug",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "5153f6ad-89af-4faa-8ae4-254f53bbb046",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Ops Assistant/Debug",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "c12b5a83-b8f0-4132-b8a8-7b7deab65908",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Ops Assistant/Debug",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "5bb04c0a-e84e-4f81-b764-c6ec2bdcbf4a",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Ops Assistant/Debug",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "0da357a8-a600-4510-a6d2-949654cee9ee",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Ops Assistant/Debug",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "a35039b6-ecdf-4c14-9e87-1e9c1b5aa3f4",
+      "model_id": "724ccbb5-393f-48a8-912e-2ea06afb90a4",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Ops Assistant/Debug",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "fb3e5ba1-fe32-4740-8eb7-b476b543ec6f",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Design Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "f22b98c2-b0be-4348-9840-42df315994a9",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Design Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "962fd74f-9c0c-4990-ac98-422331d91c29",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Design Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "a02943f0-cb43-40fe-badc-533392f147ea",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Design Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "4c8f08fb-5ce5-493c-982f-6713712f6792",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Design Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "5b289010-a816-4eeb-a249-aea058eedd48",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Design Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "3adaede8-08bd-4da8-8c1c-890130c50b9e",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Design Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "f33c74f2-ef9a-4033-812b-c8d6b7e5660a",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Design Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "3d1f360a-ed59-45b9-b000-479afeb9e226",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Design Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "3856bb43-f17c-4ece-a91a-e25e1dba0284",
+      "model_id": "4475ab90-7d8c-48d2-a7cc-fb1c4cdaa202",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Design Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "2c18322c-c648-4925-bbe8-eef66a89eac8",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Design Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "465d6280-f161-447e-8aac-5c348e0ac1de",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Design Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "e78bb22d-bc45-4738-9085-75c9781ffa73",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Design Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "3c2f647e-be77-4790-bcb4-99d0123a0aed",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Design Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "ce686dcf-4dc5-440f-aaf7-0cc0f7ba5009",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Design Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "d29ee8f9-72d4-47e5-a3c1-6809b2de4b9a",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Design Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "b4038103-d6e5-4a9d-92a8-4ed612fc4a03",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Design Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "a8b5fe99-1827-4b97-a322-694ed1a12d6e",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Design Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "d72c6566-fd20-4b70-916f-63b7de0572e0",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Design Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "19b4290e-b27f-4214-85fe-84990da3533e",
+      "model_id": "f8290691-aaf3-4afd-9584-8994590b50d9",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Design Assistant/Pro",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "1784b75b-ab33-45de-a0d0-49eaa89ba274",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Dev Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "cad78ae2-3a0a-4586-a4fd-695a2541aeb4",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Dev Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "9a68509f-c0a8-473d-9813-33dc250e9d08",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Dev Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "da0df637-ffc9-42fa-8957-2dbea9ebd626",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Dev Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "1cfb2bf0-0e31-421c-a6f0-d0000c18786c",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Dev Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "cb0fcf3e-4e03-424a-b704-8e8cccb66d73",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Dev Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "85a55b09-db19-4fd8-89ef-6484b1360266",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Dev Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "5bff809e-64c0-4e91-928f-81f7eb55b556",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Dev Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "d4af9bf0-25fe-438c-80d0-bfafba8f01ac",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Dev Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "4354fe81-8e25-497d-8528-5d9111fbdd0b",
+      "model_id": "4561f174-092f-4a2e-8cbb-f7247f17c6f4",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Dev Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "751f0179-7219-47c9-b71f-af4a5807b155",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Dev Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "274dc339-d08f-40ba-9a0b-0cc13c2f222d",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Dev Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "74315dcb-27e3-4661-a419-e75c65f7a89c",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Dev Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "59ffd2ae-1e7b-47a2-96f3-b443fe886014",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Dev Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "68465688-2f85-4fe7-8f08-03e6548f1de5",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Dev Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "91f55c9c-b755-4166-8ac5-bbe453463c68",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Dev Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "10502581-1d8a-4d63-8739-93c1c907dd5f",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Dev Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "edd48b25-a18e-4742-affb-3326c066e0c0",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Dev Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "ac357ac0-0e04-415d-a58f-bca5b1125421",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Dev Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "2df772fc-f81d-496f-91d4-ccd284821ffc",
+      "model_id": "0c697845-32e0-46ff-bad9-29174ba698f6",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Dev Assistant/Pro",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "8700dc9d-0902-49a6-8e58-b7f07b912272",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: QA Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "7cc901e4-dc21-47c4-a223-44fc1d4487f3",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: QA Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "7732cf3d-2045-44f5-917d-17e37d7fa261",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: QA Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "a36d80f4-492b-41e4-8f44-a3c7ec436743",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: QA Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "f1d5be90-6b37-4d24-abdc-d69932b119ce",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: QA Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "4a8215e6-11c4-4998-b63f-6322d9b20e56",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: QA Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "a142d0ec-a987-41af-aa48-a9bbb995b624",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: QA Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "f7e64b0c-b50e-47c8-a711-f7b4b902f7a7",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: QA Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "43531298-428b-40b9-bc87-c6ae4e6b635f",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: QA Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "860ee505-d75c-4d5a-96ad-13b07981d855",
+      "model_id": "21d978fc-57a4-4a6a-bcb7-4cc540e78e2a",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: QA Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "c16e77d3-13cd-4102-a07a-7e391f3c9f24",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: QA Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "0797acbe-4990-4d5a-8c0b-a17c1dbc3bf5",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: QA Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "c3062efb-2a59-4939-913d-375e0d36e592",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: QA Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "1c02aabf-fe04-44ad-9a45-f32798c85b7c",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: QA Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "09210013-8ef2-4306-8e04-b0580ac8b32c",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: QA Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "e9959f2a-63a0-4dad-8d7f-3f75df90e2a1",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: QA Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "17527886-3f06-443b-820b-eef56bd7bfbc",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: QA Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "5bf30a28-1874-4500-9575-6b990c3c56d0",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: QA Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "a5a406d1-43aa-499b-aa32-0363dc2d07cc",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: QA Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "e1e5ea28-6232-4562-a483-5f395be9b4b9",
+      "model_id": "3aa52fd7-37e6-43d9-9876-eae182f928c9",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: QA Assistant/Pro",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "adae25f2-c4dd-4512-a7e0-3b38beca9b34",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Data Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "bca285fd-2df3-4c87-90c4-1d496252ca24",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Data Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "814e1953-c54e-4ee4-99e3-6b2e8ac7b239",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Data Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "6a8634bc-c88f-4ec5-8342-868e75dd3dd2",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Data Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "fa3dd0b6-9eae-4b7f-a4bc-66248c427713",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Data Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "f9575cc4-3f10-4ecc-8b9c-05afb172048f",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Data Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "ed2ab385-182d-49a5-a55e-82c4117c3232",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Data Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "bed0465b-adf2-4043-b53e-3e44c2635489",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Data Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "d1c717fa-5b42-498d-a4f8-4a980ea8bf61",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Data Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "6de3f9fa-1596-4387-9405-b40c0d140c89",
+      "model_id": "979132c3-acf7-4743-8ac2-ccd4e0d96a97",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Data Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "39bed342-8163-4daf-ade8-c37978aabd69",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Data Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "ddaf55eb-1610-42a8-864d-c491c1e7398b",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Data Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "719916ca-6dce-4388-b803-57ba4d20e0ea",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Data Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "35040cf3-e657-4787-a5f6-a0ea58154f94",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Data Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "5bd529ed-8cbe-497c-9001-6ee4617257a7",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Data Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "a37337ad-a66a-4727-9f2a-b93047c9e77e",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Data Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "340dd167-1397-4369-b54b-bcfa519a723a",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Data Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "7b153b0b-53c4-40b7-85bb-faaf6dde22f4",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Data Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "f997a9db-ba9a-43e0-82c6-54fc771174df",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Data Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "1a69d57c-d3cc-4181-8395-85173391575d",
+      "model_id": "6dbde66f-cc33-4010-9c37-b9060fd0a056",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Data Assistant/Pro",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "af6486ed-7a01-4ca1-ba2e-a826b56d4ee4",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Biz Assistant/Default",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "6d9fc2f2-216a-47b3-a962-16887e51a448",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Biz Assistant/Default",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "5f742f82-cc0d-4df4-ac27-15f45f100821",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Biz Assistant/Default",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "88a37003-cc4e-4ba0-ab63-1dd23562b69a",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Biz Assistant/Default",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "fe781009-b42f-49c2-8617-3a9ec2810b9b",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Biz Assistant/Default",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "c99f481b-4917-425d-9b6e-a43eecb91652",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Biz Assistant/Default",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "aade41ea-0a7f-4447-b37d-a72024ab3596",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Biz Assistant/Default",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "03fad077-79aa-42b1-8e9f-756c58433d68",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Biz Assistant/Default",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "07dcf038-a805-4447-9ca6-bfc50a986d7f",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Biz Assistant/Default",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "331eacf3-4af1-4199-8307-af4cf7cc4d25",
+      "model_id": "f1489c35-b887-4b1e-8747-728f6b440d5c",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Biz Assistant/Default",
+      "hint": "프롬프트"
+    },
+    {
+      "exapmle_id": "041838da-ac41-431f-a370-1418ba984f09",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "빠른 시작",
+      "name_en": "Quick Start",
+      "desc_ko": "기본적인 요청 예시",
+      "desc_en": "Basic request example",
+      "order": 0,
+      "input": "아래 주제에 대해 핵심만 정리해줘: Biz Assistant/Pro",
+      "hint": "요약/정리"
+    },
+    {
+      "exapmle_id": "6d4b93f8-3456-4580-8aed-d73c2430a65f",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "체크리스트",
+      "name_en": "Checklist",
+      "desc_ko": "항목별 체크리스트 요청",
+      "desc_en": "Ask for a checklist",
+      "order": 1,
+      "input": "다음 작업을 위한 체크리스트를 만들어줘: Biz Assistant/Pro",
+      "hint": "체크리스트"
+    },
+    {
+      "exapmle_id": "153d75f6-ed72-48b7-901d-b96dd8bfa7ec",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "비교",
+      "name_en": "Comparison",
+      "desc_ko": "두 가지를 비교해줘",
+      "desc_en": "Compare two items",
+      "order": 2,
+      "input": "A와 B의 차이점과 장단점을 비교해줘: Biz Assistant/Pro",
+      "hint": "비교"
+    },
+    {
+      "exapmle_id": "e6d03cf7-38e3-4734-9866-b34b08efb502",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "리스크",
+      "name_en": "Risks",
+      "desc_ko": "리스크/주의사항 도출",
+      "desc_en": "Identify risks/caveats",
+      "order": 3,
+      "input": "이 접근의 리스크와 주의사항을 정리해줘: Biz Assistant/Pro",
+      "hint": "리스크"
+    },
+    {
+      "exapmle_id": "c3b9a978-8fe1-49e6-8dc7-98084cf69453",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "단계",
+      "name_en": "Steps",
+      "desc_ko": "단계별 절차 요청",
+      "desc_en": "Step-by-step procedure",
+      "order": 4,
+      "input": "이 작업을 단계별로 진행하는 방법을 알려줘: Biz Assistant/Pro",
+      "hint": "단계"
+    },
+    {
+      "exapmle_id": "422dd206-ce88-44f1-a22a-242a06a96552",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "예시 생성",
+      "name_en": "Generate Examples",
+      "desc_ko": "예시 문장 생성",
+      "desc_en": "Generate example phrases",
+      "order": 5,
+      "input": "이 주제에 대한 예시 5개를 만들어줘: Biz Assistant/Pro",
+      "hint": "예시"
+    },
+    {
+      "exapmle_id": "d302f172-25f5-492c-9086-7116b7c084ff",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "리팩토링",
+      "name_en": "Refactor",
+      "desc_ko": "코드/설계 개선 요청",
+      "desc_en": "Ask for improvements",
+      "order": 6,
+      "input": "아래 코드를 더 안전하고 확장 가능하게 리팩토링해줘: Biz Assistant/Pro",
+      "hint": "개선"
+    },
+    {
+      "exapmle_id": "747879e6-d5eb-4584-94aa-9b74e3071e95",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "테이블 정리",
+      "name_en": "Table Summary",
+      "desc_ko": "표 형태로 정리",
+      "desc_en": "Summarize in a table",
+      "order": 7,
+      "input": "아래 내용을 표로 정리해줘: Biz Assistant/Pro",
+      "hint": "표"
+    },
+    {
+      "exapmle_id": "d7d40df5-32ae-44cd-8ea4-588711df8ac7",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "에러 분석",
+      "name_en": "Error Analysis",
+      "desc_ko": "에러 원인 및 해결",
+      "desc_en": "Analyze and fix errors",
+      "order": 8,
+      "input": "다음 오류의 원인과 해결 방법을 알려줘: Biz Assistant/Pro",
+      "hint": "디버그"
+    },
+    {
+      "exapmle_id": "7c170253-13ca-4c7c-b7ae-584b33be170f",
+      "model_id": "86c24e80-807e-47d7-a748-32e17c1deae1",
+      "delYN": false,
+      "name_ko": "프롬프트 작성",
+      "name_en": "Prompting",
+      "desc_ko": "프롬프트 템플릿 작성",
+      "desc_en": "Write a prompt template",
+      "order": 9,
+      "input": "이 목적에 맞는 프롬프트 템플릿을 만들어줘: Biz Assistant/Pro",
+      "hint": "프롬프트"
     }
   ]
 }

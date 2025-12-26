@@ -1,13 +1,16 @@
 <template>
-  <div class="model-select" role="group" aria-label="Model selection">
-    <label class="field">
-      <span class="label">모델</span>
-      <select :value="modelId" @change="onModelChange">
-        <option v-for="m in models" :key="m.id" :value="m.id">
-          {{ m.label }}
-        </option>
-      </select>
-    </label>
+  <div class="model-select">
+    <select
+      class="model-select-box"
+      v-model="selected"
+      :disabled="!models.length"
+    >
+      <option v-if="!models.length" value="">모델 없음</option>
+
+      <option v-for="m in models" :key="m.model_id" :value="m.model_id">
+        {{ m.name_ko || m.name_en }}
+      </option>
+    </select>
   </div>
 </template>
 
@@ -15,55 +18,44 @@
 export default {
   name: "ModelSelect",
   props: {
-    models: {
-      type: Array,
-      default: () => [],
-    },
-    modelId: {
-      type: String,
-      default: "",
-    },
+    models: { type: Array, default: () => [] },
+    currentModelId: { type: String, default: "" },
   },
-  emits: ["update:model"],
-  methods: {
-    onModelChange(e) {
-      this.$emit("update:model", e.target.value);
+  emits: ["select"],
+  computed: {
+    // ✅ 부모(store)의 modelId를 select의 value로 강제
+    selected: {
+      get() {
+        return this.currentModelId || "";
+      },
+      set(v) {
+        const modelId = v || null;
+        this.$emit("select", modelId);
+      },
     },
   },
 };
 </script>
 
 <style scoped>
-.model-select{
-  display: grid;
-  gap: 10px;
-  width: 100%;
-  max-width: 520px;
+.model-select {
+  display: inline-flex;
+  align-items: center;
 }
 
-.field{
-  display: grid;
-  gap: 8px;
-}
-
-.label{
-  font-size: 12px;
-  color: var(--text-muted);
-  text-align: left;
-}
-
-select{
-  width: 100%;
+.model-select-box {
+  min-width: 160px;
+  padding: 6px 10px;
+  font-size: 13px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
   color: var(--text-primary);
-  border-radius: 12px;
-  padding: 10px 12px;
-  outline: none;
+  cursor: pointer;
 }
 
-select:focus{
+.model-select-box:focus {
+  outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
 }
 </style>
