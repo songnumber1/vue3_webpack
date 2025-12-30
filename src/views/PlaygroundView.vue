@@ -383,9 +383,16 @@ export default {
 
   methods: {
     async open(size) {
-      console.log("Playground open:", size);
-      const result = await openModal(SampleFormModal, {}, size);
-      console.log("modal result:", result);
+      const result = await openModal(
+        SampleFormModal,
+        {},
+        {
+          size, // sm | md | lg
+          draggable: size !== "sm" ? true : false,
+          resizable: size !== "sm" ? true : false,
+          title: "Sample Form",
+        }
+      );
 
       if (result) {
         console.log("저장됨:", result);

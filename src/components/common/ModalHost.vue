@@ -1,28 +1,52 @@
 <template>
   <BaseModal
     v-if="state.visible"
-    :visible="state.visible"
-    :size="state.size"
-    v-bind="state.props"
+    :size="state.options.size"
+    :draggable="state.options.draggable"
+    :resizable="state.options.resizable"
+    :title="state.options.title"
+    @close="onCancel"
   >
-    <component :is="state.component" v-bind="state.props" />
+    <!-- Body -->
+    <component :is="state.component" ref="bodyRef" v-bind="state.props" />
+
+    <!-- Footer -->
+    <template #footer>
+      <button @click="onCancel">Cancel</button>
+      <button class="primary" @click="onConfirm">Confirm</button>
+    </template>
   </BaseModal>
 </template>
 
 <script>
-import { useModalManager } from "@/plugins/modalManager";
 import BaseModal from "@/components/common/BaseModal.vue";
+import { useModalManager } from "@/plugins/modalManager";
 
 export default {
   name: "ModalHost",
-  components: {
-    BaseModal,
+  components: { BaseModal },
+
+  data() {
+    return {
+      state: useModalManager().state,
+    };
   },
 
-  setup() {
-    const { state } = useModalManager();
-    console.log("ModalHost mounted, visible:", state.visible);
-    return { state };
+  methods: {
+    onCancel() {
+      this.state.props?.onCancel?.();
+    },
+
+    async onConfirm() {
+      await this.$nextTick();
+
+      let result;
+      if (this.$refs.bodyRef?.getValue) {
+        result = this.$refs.bodyRef.getValue();
+      }
+
+      this.state.props?.onConfirm?.(result);
+    },
   },
 };
 </script>

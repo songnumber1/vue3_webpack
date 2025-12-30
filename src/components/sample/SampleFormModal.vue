@@ -1,24 +1,13 @@
 <template>
   <div>
     <p>Sample Form Modal</p>
-
     <input v-model="value" placeholder="값 입력" />
-
-    <div style="margin-top: 12px">
-      <button @click="onCancel">Cancel</button>
-      <button @click="submit">Confirm</button>
-    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: "SampleFormModal",
-
-  props: {
-    onConfirm: Function,
-    onCancel: Function,
-  },
 
   data() {
     return {
@@ -27,9 +16,12 @@ export default {
   },
 
   methods: {
-    submit() {
-      this.onConfirm(this.value);
+    getValue() {
+      return this.value;
     },
   },
+
+  // 🔑 Vue 3에서 setup 외부 접근 허용
+  expose: ["getValue"],
 };
 </script>

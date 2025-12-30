@@ -4,18 +4,25 @@ const state = reactive({
   visible: false,
   component: null,
   props: {},
-  size: "md",
+  options: {
+    size: "md",
+    draggable: true,
+    resizable: true,
+    title: "Modal",
+  },
 });
 
-export function openModal(component, props = {}, size = "md") {
-  console.log("openModal called with size:", size);
-
+export function openModal(component, props = {}, options = {}) {
   state.visible = true;
   state.component = markRaw(component);
-  state.size = size;
 
-  console.log("component type:", state.component);
-  console.log("Modal state after open:", { ...state });
+  state.options = {
+    size: options.size || "md",
+    draggable: options.draggable ?? true,
+    resizable: options.resizable ?? true,
+    title: options.title || "Modal",
+  };
+
   return new Promise((resolve) => {
     state.props = {
       ...props,
