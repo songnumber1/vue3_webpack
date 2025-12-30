@@ -52,8 +52,8 @@ export default {
     size: { type: String, default: "md" }, // sm | md | lg
     title: { type: String, default: "Modal" },
 
-    draggable: { type: Boolean, default: true },
-    resizable: { type: Boolean, default: true },
+    draggable: { type: Boolean, default: false },
+    resizable: { type: Boolean, default: false },
   },
 
   data() {

@@ -39,7 +39,12 @@ export default {
       const ok = await openModal(
         ConfirmModal,
         { message: "정말 저장할까요?" },
-        { size: "sm", title: "확인" }
+        {
+          size: "sm",
+          title: "확인",
+          draggable: false,
+          resizable: false,
+        }
       );
 
       if (ok) {
