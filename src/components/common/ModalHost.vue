@@ -40,11 +40,17 @@ export default {
     async onConfirm() {
       await this.$nextTick();
 
-      let result;
-      if (this.$refs.bodyRef?.getValue) {
-        result = this.$refs.bodyRef.getValue();
+      const body = this.$refs.bodyRef;
+
+      if (body?.validate) {
+        const ok = body.validate();
+        if (ok !== true) {
+          alert(ok);
+          return;
+        }
       }
 
+      const result = body?.getPayload?.();
       this.state.props?.onConfirm?.(result);
     },
   },

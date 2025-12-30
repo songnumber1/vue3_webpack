@@ -16,12 +16,17 @@ export default {
   },
 
   methods: {
-    getValue() {
-      return this.value;
+    validate() {
+      return true;
+    },
+
+    getPayload() {
+      return {
+        value: this.value,
+      };
     },
   },
 
-  // 🔑 Vue 3에서 setup 외부 접근 허용
-  expose: ["getValue"],
+  expose: ["validate", "getPayload"],
 };
 </script>
