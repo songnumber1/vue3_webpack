@@ -1,5 +1,5 @@
+<!-- src/components/common/BaseModal.vue -->
 <template>
-  <!-- Overlay -->
   <div class="modal-overlay">
     <vue-draggable-resizable
       class="vdr-modal"
@@ -16,18 +16,15 @@
       :prevent-deactivation="true"
     >
       <div class="modal">
-        <!-- Header (drag handle only) -->
         <div class="modal-header" :class="{ disabled: !draggable }">
           <strong>{{ title }}</strong>
-          <button class="close" type="button" @click="$emit('close')">×</button>
+          <button class="close" @click="$emit('close')">×</button>
         </div>
 
-        <!-- Body -->
         <div class="modal-body">
           <slot />
         </div>
 
-        <!-- Footer -->
         <div class="modal-footer">
           <slot name="footer">
             <button @click="$emit('close')">Cancel</button>
@@ -45,13 +42,11 @@ import "vue-draggable-resizable/style.css";
 
 export default {
   name: "BaseModal",
-
   components: { VueDraggableResizable },
 
   props: {
-    size: { type: String, default: "md" }, // sm | md | lg
+    size: { type: String, default: "md" },
     title: { type: String, default: "Modal" },
-
     draggable: { type: Boolean, default: false },
     resizable: { type: Boolean, default: false },
   },
@@ -82,14 +77,8 @@ export default {
 
   methods: {
     center() {
-      this.x = Math.max(
-        0,
-        Math.floor((window.innerWidth - this.modalSize.w) / 2)
-      );
-      this.y = Math.max(
-        0,
-        Math.floor((window.innerHeight - this.modalSize.h) / 2)
-      );
+      this.x = Math.max(0, (window.innerWidth - this.modalSize.w) / 2);
+      this.y = Math.max(0, (window.innerHeight - this.modalSize.h) / 2);
     },
   },
 };

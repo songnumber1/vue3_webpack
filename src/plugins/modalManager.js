@@ -1,3 +1,4 @@
+// src/plugins/modalManager.js
 import { reactive, readonly, markRaw } from "vue";
 
 let uid = 0;
@@ -18,17 +19,15 @@ export function openModal(component, props = {}, options = {}) {
   });
 }
 
-export function closeTopModal(result = null) {
+export function closeModal(result = null) {
   const top = state.stack.pop();
-  if (top) {
-    top.resolve(result);
-  }
+  if (top) top.resolve(result);
 }
 
 export function useModalManager() {
   return {
     state: readonly(state),
     openModal,
-    closeTopModal,
+    closeModal,
   };
 }

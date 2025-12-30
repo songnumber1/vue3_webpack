@@ -25,7 +25,9 @@ export default {
 
   methods: {
     validate() {
-      return true;
+      const result = !(this.name === "" || this.email === "");
+
+      return result;
     },
 
     getPayload() {

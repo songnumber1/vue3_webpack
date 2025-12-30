@@ -5,8 +5,8 @@
       :key="m.id"
       :size="m.options?.size || 'md'"
       :title="m.options?.title || 'Modal'"
-      :draggable="m.options?.draggable !== false"
-      :resizable="m.options?.resizable !== false"
+      :draggable="isTop(i) && m.options?.draggable !== false"
+      :resizable="isTop(i) && m.options?.resizable !== false"
       :style="{ zIndex: 10000 + i }"
       @close="onCancel(i)"
     >
@@ -22,7 +22,7 @@
 
 <script>
 import BaseModal from "@/components/common/BaseModal.vue";
-import { useModalManager, closeTopModal } from "@/plugins/modalManager";
+import { useModalManager } from "@/plugins/modalManager";
 
 export default {
   name: "ModalHost",
@@ -30,23 +30,32 @@ export default {
 
   data() {
     return {
-      state: useModalManager().state,
+      modal: useModalManager(),
     };
   },
 
+  computed: {
+    state() {
+      return this.modal.state;
+    },
+  },
+
   methods: {
+    isTop(index) {
+      return index === this.state.stack.length - 1;
+    },
+
     onCancel(index) {
-      if (index === this.state.stack.length - 1) {
-        closeTopModal(null);
+      if (this.isTop(index)) {
+        this.modal.closeModal(null);
       }
     },
 
     onConfirm(index) {
-      if (index !== this.state.stack.length - 1) return;
+      if (!this.isTop(index)) return;
 
       const body = this.$refs.bodies?.[index];
-
-      const validate = body?.validate?.() ? body.validate() : true;
+      const validate = body?.validate ? body.validate() : true;
 
       if (!validate) {
         return;
@@ -58,7 +67,7 @@ export default {
         payload = body.getPayload();
       }
 
-      closeTopModal(payload);
+      this.modal.closeModal(payload);
     },
   },
 };
