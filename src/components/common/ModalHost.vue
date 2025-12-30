@@ -1,26 +1,28 @@
 <template>
-  <BaseModal
-    v-if="state.visible"
-    :size="state.options.size"
-    :draggable="state.options.draggable"
-    :resizable="state.options.resizable"
-    :title="state.options.title"
-    @close="onCancel"
-  >
-    <!-- Body -->
-    <component :is="state.component" ref="bodyRef" v-bind="state.props" />
+  <div>
+    <BaseModal
+      v-for="(m, i) in state.stack"
+      :key="m.id"
+      :size="m.options?.size || 'md'"
+      :title="m.options?.title || 'Modal'"
+      :draggable="m.options?.draggable !== false"
+      :resizable="m.options?.resizable !== false"
+      :style="{ zIndex: 10000 + i }"
+      @close="onCancel(i)"
+    >
+      <component :is="m.component" ref="bodies" v-bind="m.props" />
 
-    <!-- Footer -->
-    <template #footer>
-      <button @click="onCancel">Cancel</button>
-      <button class="primary" @click="onConfirm">Confirm</button>
-    </template>
-  </BaseModal>
+      <template #footer>
+        <button @click="onCancel(i)">Cancel</button>
+        <button class="primary" @click="onConfirm(i)">Confirm</button>
+      </template>
+    </BaseModal>
+  </div>
 </template>
 
 <script>
 import BaseModal from "@/components/common/BaseModal.vue";
-import { useModalManager } from "@/plugins/modalManager";
+import { useModalManager, closeTopModal } from "@/plugins/modalManager";
 
 export default {
   name: "ModalHost",
@@ -33,25 +35,30 @@ export default {
   },
 
   methods: {
-    onCancel() {
-      this.state.props?.onCancel?.();
+    onCancel(index) {
+      if (index === this.state.stack.length - 1) {
+        closeTopModal(null);
+      }
     },
 
-    async onConfirm() {
-      await this.$nextTick();
+    onConfirm(index) {
+      if (index !== this.state.stack.length - 1) return;
 
-      const body = this.$refs.bodyRef;
+      const body = this.$refs.bodies?.[index];
 
-      if (body?.validate) {
-        const ok = body.validate();
-        if (ok !== true) {
-          alert(ok);
-          return;
-        }
+      const validate = body?.validate?.() ? body.validate() : true;
+
+      if (!validate) {
+        return;
       }
 
-      const result = body?.getPayload?.();
-      this.state.props?.onConfirm?.(result);
+      let payload = null;
+
+      if (body?.getPayload) {
+        payload = body.getPayload();
+      }
+
+      closeTopModal(payload);
     },
   },
 };
