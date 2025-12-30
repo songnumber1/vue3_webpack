@@ -383,7 +383,9 @@ export default {
 
   methods: {
     async open(size) {
+      console.log("Playground open:", size);
       const result = await openModal(SampleFormModal, {}, size);
+      console.log("modal result:", result);
 
       if (result) {
         console.log("저장됨:", result);

@@ -1,33 +1,28 @@
 <template>
-  <teleport to="body">
-    <div v-if="state.visible" class="modal-backdrop" @click.self="onCancel">
-      <div class="modal" :class="sizeClass">
-        <component :is="state.component" v-bind="state.props" />
-      </div>
-    </div>
-  </teleport>
+  <BaseModal
+    v-if="state.visible"
+    :visible="state.visible"
+    :size="state.size"
+    v-bind="state.props"
+  >
+    <component :is="state.component" v-bind="state.props" />
+  </BaseModal>
 </template>
 
 <script>
 import { useModalManager } from "@/plugins/modalManager";
+import BaseModal from "@/components/common/BaseModal.vue";
 
 export default {
   name: "ModalHost",
+  components: {
+    BaseModal,
+  },
+
   setup() {
     const { state } = useModalManager();
+    console.log("ModalHost mounted, visible:", state.visible);
     return { state };
-  },
-  computed: {
-    sizeClass() {
-      if (this.$responsive?.isSm?.()) return "mobile";
-      return this.state.size;
-    },
-  },
-  methods: {
-    onCancel() {
-      // backdrop 클릭 = 취소
-      this.state.props?.onCancel?.();
-    },
   },
 };
 </script>

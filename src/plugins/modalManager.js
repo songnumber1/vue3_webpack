@@ -1,7 +1,5 @@
 import { reactive, readonly, markRaw } from "vue";
 
-let resolver = null;
-
 const state = reactive({
   visible: false,
   component: null,
@@ -10,15 +8,17 @@ const state = reactive({
 });
 
 export function openModal(component, props = {}, size = "md") {
+  console.log("openModal called with size:", size);
+
   state.visible = true;
   state.component = markRaw(component);
   state.size = size;
 
+  console.log("component type:", state.component);
+  console.log("Modal state after open:", { ...state });
   return new Promise((resolve) => {
-    resolver = resolve;
     state.props = {
       ...props,
-      // 모달에서 호출할 콜백 주입
       onConfirm: (data) => {
         resolve(data);
         closeModal();
@@ -35,7 +35,6 @@ export function closeModal() {
   state.visible = false;
   state.component = null;
   state.props = {};
-  resolver = null;
 }
 
 export function useModalManager() {

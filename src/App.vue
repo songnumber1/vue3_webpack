@@ -1,7 +1,7 @@
 <!-- src/App.vue -->
 <template>
   <router-view />
-  <modal-host />
+  <ModalHost />
 </template>
 
 <script>

@@ -25,4 +25,6 @@ app.use(router);
 app.use(responsiveManager);
 app.use(themeManager);
 
+app.config.compilerOptions.isCustomElement = () => false;
+
 app.mount("#app");
