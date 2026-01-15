@@ -1,26 +1,40 @@
 const path = require("path");
-const StyleLintPlugin = require("stylelint-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 
-const resolve = (dir) => path.join(__dirname, dir);
 module.exports = {
-  productionSourceMap: "true",
-
-  configureWebpack: {
-    mode: "production",
-    devtool: "hidden-source-map",
+  entry: path.resolve(__dirname, "src/main.js"),
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.[contenthash].js",
+    clean: true,
+    publicPath: "/",
   },
   resolve: {
-    alias: {
-      main: resolve("src"), // 추가 alias 설정
-    },
+    extensions: [".js", ".vue", ".json"],
+    alias: { "@": path.resolve(__dirname, "src") },
+  },
+  module: {
+    rules: [
+      { test: /\.vue$/, loader: "vue-loader" },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: { loader: "babel-loader" },
+      },
+      { test: /\.css$/, use: ["style-loader", "css-loader"] },
+    ],
   },
   plugins: [
-    new StyleLintPlugin({
-      files: ["src/**/*.{vue,scss}"],
-      emitError: true,
-      emitWarning: true,
-      failOnError: false,
-      failOnWarning: false,
-    }),
+    new VueLoaderPlugin(),
+    new HtmlWebpackPlugin({ template: path.resolve(__dirname, "public/index.html") }),
   ],
+  devServer: {
+    port: 5173,
+    hot: true,
+    historyApiFallback: true,
+    static: { directory: path.resolve(__dirname, "public") },
+  },
+  performance: { hints: false },
+  devtool: "source-map",
 };
