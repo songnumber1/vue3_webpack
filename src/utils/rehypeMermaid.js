@@ -5,14 +5,15 @@ import remarkGfm from "remark-gfm";
 import remarkRehype from "remark-rehype";
 import rehypeStringify from "rehype-stringify";
 import rehypeRaw from "rehype-raw";
+import rehypeKatex from "rehype-katex";
 import { visit } from "unist-util-visit";
 import mermaid from "mermaid";
 
 /* ================== constants ================== */
 
 /**
- * runtime mermaid로 처리할 diagram 타입들
- * ❗ 여기 없는 타입은 "무조건 코드블록"
+ * runtime mermaid로만 처리할 diagram 타입
+ * ❗ 여기에 없으면 무조건 코드블록
  */
 export const RUNTIME_MERMAID_TYPES = [
   "flowchart",
@@ -30,7 +31,6 @@ export const RUNTIME_MERMAID_TYPES = [
 export function extractMermaidType(code) {
   if (!code) return "";
   const lines = String(code).split("\n");
-
   for (const l of lines) {
     const t = l.trim().toLowerCase();
     if (t) return t.split(/\s+/)[0];
@@ -52,7 +52,7 @@ export function remarkMermaidSplit({ isCompleted } = {}) {
       const code = node.value || "";
       const type = extractMermaidType(code);
 
-      // ❌ 지원 안 하는 타입 → 코드블록
+      // ❌ 지원 안 함 → 코드블록
       if (!RUNTIME_MERMAID_TYPES.includes(type)) {
         parent.children.splice(index, 1, {
           type: "code",
@@ -150,10 +150,11 @@ export function createStreamProcessor({ showLineNumbers = true } = {}) {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkMath)
+    .use(remarkMath) // ⬅️ LaTeX 파싱
     .use(remarkMermaidSplit, { isCompleted: false })
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
+    .use(rehypeKatex) // ⬅️ KaTeX 렌더
     .use(rehypeCodeblockUI, { showLineNumbers })
     .use(rehypeStringify, { allowDangerousHtml: true });
 }
@@ -162,10 +163,11 @@ export function createCompletedProcessor({ showLineNumbers = true } = {}) {
   return unified()
     .use(remarkParse)
     .use(remarkGfm)
-    .use(remarkMath)
+    .use(remarkMath) // ⬅️ LaTeX 파싱
     .use(remarkMermaidSplit, { isCompleted: true })
     .use(remarkRehype, { allowDangerousHtml: true })
     .use(rehypeRaw)
+    .use(rehypeKatex) // ⬅️ KaTeX 렌더
     .use(rehypeCodeblockUI, { showLineNumbers })
     .use(rehypeStringify, { allowDangerousHtml: true });
 }
@@ -196,8 +198,8 @@ export async function renderRuntimeMermaid(rootEl, store) {
     try {
       await mermaid.run({ nodes: [el] });
       el.classList.remove("mermaid-fallback");
-    } catch (err) {
-      // ✅ 여기서만 처리
+    } catch {
+      // ❗ 문법 오류 → 코드블록 fallback
       el.textContent = source;
       el.classList.add("code-only");
     }

@@ -27,6 +27,7 @@
 
 <script>
 import Markdown from "@/components/Markdown.vue";
+import "katex/dist/katex.min.css";
 
 export default {
   name: "App",
