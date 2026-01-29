@@ -46,7 +46,7 @@ export default {
           title: "확인",
           draggable: false,
           resizable: false,
-        }
+        },
       );
 
       if (ok) {

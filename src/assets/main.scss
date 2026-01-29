@@ -789,3 +789,98 @@ pre {
   align-items: center;
   gap: var(--space-2);
 }
+
+.note {
+  width: 288px;
+  max-height: 280px;
+  border-radius: 2px;
+  padding: 12px 12px 12px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.note-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.note-title {
+  font-size: 14px;
+  font-weight: 600;
+  flex: 1;
+}
+
+.note-close {
+  width: 24px;
+  height: 24px;
+
+  border: 1px solid transparent;
+  border-radius: 50%;
+
+  background: transparent;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: rgba(0, 0, 0, 0.6); /* 🔥 핵심 */
+
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.note-close:hover {
+  color: rgba(0, 0, 0, 0.9);
+  border-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.06);
+  transform: scale(1.05);
+}
+
+.note-content {
+  margin-left: 26px;
+  font-size: 13px;
+}
+
+/* Types */
+.note--success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left: 5px solid #22c55e;
+}
+.note--error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-left: 5px solid #ef4444;
+}
+.note--warning {
+  background: #fffbeb;
+  color: #78350f;
+  border-left: 5px solid #f59e0b;
+}
+.note--info {
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-left: 5px solid #3b82f6;
+}
+
+.note--success .note-close {
+  color: #065f46;
+}
+.note--info .note-close {
+  color: #1e3a8a;
+}
+.note--warning .note-close {
+  color: #92400e;
+}
+.note--error .note-close {
+  color: #7f1d1d;
+}
