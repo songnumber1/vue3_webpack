@@ -11,11 +11,9 @@
       |
       <button class="btn btn-ghost" @click="showNote('error')">error</button> |
       <button class="btn btn-danger" @click="showNote('warning')">
-        warning</button
-      >| <button class="btn btn-danger" @click="showNote('info')">info</button>|
+        warning</button>| <button class="btn btn-danger" @click="showNote('info')">info</button>|
       <button class="btn btn-danger" @click="showNote('progress')">
-        progress</button
-      >| <button class="btn btn-danger" @click="showNote('link')">link</button>|
+        progress</button>| <button class="btn btn-danger" @click="showNote('link')">link</button>|
     </div>
   </section>
 </template>
@@ -39,9 +37,9 @@ export default {
       if (type === "link") {
         addNote({
           component: LinkNote,
+          title: "복사 완료",
           props: {
             type: "info",
-            title: "업로드 완료",
             content: "파일 업로드가 완료되었습니다.",
             href: "https://example.com/files",
             linkText: "파일 확인",
@@ -50,9 +48,9 @@ export default {
       } else if (type === "progress") {
         addNote({
           component: ProgressNote,
+          title: "복사 완료",
           props: {
             type: "warning",
-            title: "업로드 중",
             percent: 42,
             duration: 5000, // 5초 후 자동 종료
           },

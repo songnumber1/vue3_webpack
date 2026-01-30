@@ -11,7 +11,7 @@ export const noteStore = reactive({
 
   // 🌍 전역 옵션
   options: {
-    rotationDefault: false, // ✅ 기본 rotation ON
+    rotationDefault: true, // ✅ 기본 rotation ON
   },
 });
 
