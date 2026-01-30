@@ -6,8 +6,7 @@
 
       <div class="pg-meta">
         <span class="pg-pill">
-          width: <b>{{ width }}</b
-          >px
+          width: <b>{{ width }}</b>px
         </span>
         <span class="pg-pill">
           breakpoint: <b>{{ bpLabel }}</b>
@@ -17,13 +16,8 @@
 
     <!-- Tabs -->
     <div class="pg-tabs">
-      <button
-        v-for="t in tabs"
-        :key="t.key"
-        class="pg-tab"
-        :class="{ active: activeTab === t.key }"
-        @click="activeTab = t.key"
-      >
+      <button v-for="t in tabs" :key="t.key" class="pg-tab" :class="{ active: activeTab === t.key }"
+        @click="activeTab = t.key">
         {{ t.label }}
       </button>
     </div>
@@ -36,6 +30,7 @@
 </template>
 
 <script>
+import { markRaw } from "vue";
 import PlaygroudData from "@/components/sample/PlayGroudData.vue";
 import PlaygroundNavigator from "@/components/sample/PlaygroundNavigator.vue";
 import PlaygroundTheme from "@/components/sample/PlaygroundTheme.vue";
@@ -50,16 +45,16 @@ export default {
       activeTab: "data",
       demoSwitch: true,
       tabs: [
-        { key: "data", label: "Data", component: PlaygroudData },
+        { key: "data", label: "Data", component: markRaw(PlaygroudData), },
         {
           key: "navigators",
           label: "Navigators",
           component: PlaygroundNavigator,
         },
-        { key: "theme", label: "Theme", component: PlaygroundTheme },
-        { key: "modal", label: "Modal", component: PlaygroudModal },
-        { key: "storage", label: "Storage", component: PlaygroudStorage },
-        { key: "Note", label: "Note", component: PlaygroundNote },
+        { key: "theme", label: "Theme", component: markRaw(PlaygroundTheme) },
+        { key: "modal", label: "Modal", component: markRaw(PlaygroudModal) },
+        { key: "storage", label: "Storage", component: markRaw(PlaygroudStorage) },
+        { key: "Note", label: "Note", component: markRaw(PlaygroundNote) },
       ],
       rows: [
         {
