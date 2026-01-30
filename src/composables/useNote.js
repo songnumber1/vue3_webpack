@@ -1,6 +1,6 @@
 // src/composables/useNote.js
 import { readonly } from "vue";
-import { noteStore, MAX_NOTES } from "@/storage/noteStore";
+import { noteStore, getMaxNote, getOptionRotation } from "@/storage/noteStore";
 
 let seq = 0;
 
@@ -21,16 +21,19 @@ function addNote(payload = {}) {
   const usedNotes = noteStore.slots.filter(Boolean);
 
   // 🔥 priority error는 무조건 밀어넣기
-  const forceRotation = priority === "error";
+  // const forceRotation = priority === "error";
+  const forceRotation = false;
 
   // rotation 결정
   const rotationEnabled =
     forceRotation ||
-    (isRotation !== undefined ? isRotation : noteStore.options.rotationDefault);
+    (isRotation !== undefined ? isRotation : getOptionRotation());
 
   // 슬롯 가득 찬 경우
-  if (usedNotes.length >= MAX_NOTES) {
-    if (!rotationEnabled) return;
+  if (usedNotes.length >= getMaxNote()) {
+    if (!rotationEnabled) {
+      return;
+    }
 
     // 가장 오래된 note 제거 (id 최소)
     const oldestId = Math.min(...usedNotes.map((n) => n.id));

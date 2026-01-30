@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 
-export const MAX_NOTES = 4;
+let MAX_NOTES = 4;
 
 export const noteStore = reactive({
   // slots
@@ -11,9 +11,39 @@ export const noteStore = reactive({
 
   // 🌍 전역 옵션
   options: {
-    rotationDefault: true, // ✅ 기본 rotation ON
+    rotationDefault: false, // ✅ 기본 rotation ON
   },
 });
+
+export function setMaxNote(next) {
+  const n = Number(next);
+  if (!Number.isFinite(n) || n <= 0) return;
+
+  noteStore.options.maxNotes = n;
+
+  const alive = noteStore.slots.filter(Boolean);
+
+  // 최신 n개 유지
+  const kept = alive.sort((a, b) => a.id - b.id).slice(-n);
+
+  noteStore.slots.length = 0;
+  noteStore.slots.push(
+    ...kept,
+    ...Array(Math.max(0, n - kept.length)).fill(null),
+  );
+}
+
+export function getMaxNote() {
+  return noteStore.slots.length;
+}
+
+export function setOptionRotation(rotation) {
+  noteStore.options.rotationDefault = rotation;
+}
+
+export function getOptionRotation() {
+  return noteStore.options.rotationDefault;
+}
 
 export const INFO_SVG = `
 <svg viewBox="0 0 24 24" width="18" height="18"

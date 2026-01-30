@@ -15,6 +15,23 @@
       <button class="btn btn-danger" @click="showNote('progress')">
         progress</button>| <button class="btn btn-danger" @click="showNote('link')">link</button>|
     </div>
+
+    <div class="btn-row btn-container">
+      <div class="field">
+        <label>Max Note Count</label>
+        <input class="input" type="number" v-model.number="noteMax" />
+      </div>
+
+      <button class="btn btn-primary" @click="setMaxNoteApply">적용</button>
+    </div>
+
+
+    <div class="btn-row btn-container">
+      <label>Note Rotation</label>
+      <input class="input" type="checkbox" id="checkbox" v-model="rotationDefault">
+      <label for="checkbox"></label>
+      <button class="btn btn-primary" @click="setNoteOptions">적용</button>
+    </div>
   </section>
 </template>
 
@@ -22,6 +39,7 @@
 import { useNote } from "@/composables/useNote";
 import LinkNote from "@/components/note/LinkNote";
 import ProgressNote from "@/components/note/ProgressNote";
+import { setMaxNote, getMaxNote, getOptionRotation, setOptionRotation } from "../../storage/noteStore";
 
 export default {
   name: "PlaygroundStorage",
@@ -31,7 +49,20 @@ export default {
     width: { type: Number, default: 1200 },
   },
 
+  data() {
+    return {
+      noteMax: getMaxNote(),
+      rotationDefault: getOptionRotation(),
+    }
+  },
+
   methods: {
+    setMaxNoteApply() {
+      setMaxNote(this.noteMax)
+    },
+    setNoteOptions() {
+      setOptionRotation(this.rotationDefault);
+    },
     showNote(type) {
       const { addNote } = useNote();
       if (type === "link") {
