@@ -1,5 +1,5 @@
 // src/composables/useNote.js
-import { readonly } from "vue";
+import { readonly, markRaw } from "vue";
 import { noteStore, getMaxNote, getOptionRotation } from "@/storage/noteStore";
 
 let seq = 0;
@@ -29,7 +29,7 @@ function addNote(payload = {}) {
     content,
     duration,
     priority,
-    component,
+    component: component ? markRaw(component) : null,
     props,
   };
 
