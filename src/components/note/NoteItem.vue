@@ -1,108 +1,123 @@
 <template>
-  <div
-    ref="root"
-    class="note"
-    :class="`note--${note.type}`"
-    @mouseenter="onEnter"
-    @mouseleave="onLeave"
-  >
+  <div class="note-item" :class="typeClass" @mouseenter="pauseTimer" @mouseleave="resumeTimer">
     <div class="note-header">
-      <span class="note-icon" v-html="iconSvg" />
-      <strong class="note-title">{{ note.title }}</strong>
-      <button
-        class="note-close"
-        type="button"
-        aria-label="닫기"
-        @click="$emit('close')"
-        v-html="closeSvg"
-      ></button>
+      <div class="note-left">
+        <!-- icon -->
+        <span class="note-icon" v-html="iconSvg" />
+
+        <strong class="note-title">
+          {{ note.title }}
+        </strong>
+      </div>
+
+      <!-- close -->
+      <button class="note-close" v-html="closeSvg" @click="close" />
     </div>
 
-    <div class="note-content">
-      <NoteDefaultContent :content="note.content" />
+    <div class="note-body">
+      {{ note.content }}
     </div>
   </div>
 </template>
 
-<script>
-import NoteDefaultContent from "./NoteDefaultContent.vue";
-
+<script setup>
+import { computed, onMounted, onBeforeUnmount } from "vue";
 import {
+  INFO_SVG,
   WARNING_SVG,
   SUCCESS_SVG,
   ERROR_SVG,
-  INFO_SVG,
   CLOSE_SVG,
 } from "@/storage/noteStore";
 
-export default {
-  name: "NoteItem",
-  components: { NoteDefaultContent },
-
-  props: {
-    note: { type: Object, required: true },
+const props = defineProps({
+  note: {
+    type: Object,
+    required: true,
   },
+});
 
-  data() {
-    return {
-      timer: null,
-      startAt: 0,
-      remaining: 0,
-    };
-  },
+const emit = defineEmits(["close"]);
 
-  computed: {
-    iconSvg() {
-      switch (this.note.type) {
-        case "success":
-          return SUCCESS_SVG;
-        case "error":
-          return ERROR_SVG;
-        case "warning":
-          return WARNING_SVG;
-        default:
-          return INFO_SVG;
-      }
-    },
+/* =========================
+   type → class
+========================= */
+const typeClass = computed(() => {
+  return `note-${props.note.type || "info"}`;
+});
 
-    closeSvg() {
-      return CLOSE_SVG;
-    },
-  },
+/* =========================
+   type → svg
+========================= */
+const iconSvg = computed(() => {
+  switch (props.note.type) {
+    case "success":
+      return SUCCESS_SVG;
+    case "warn":
+    case "warning":
+      return WARNING_SVG;
+    case "error":
+      return ERROR_SVG;
+    default:
+      return INFO_SVG;
+  }
+});
 
-  mounted() {
-    this.$nextTick(() => {
-      this.$emit("height", this.$refs.root.offsetHeight);
-    });
+const closeSvg = CLOSE_SVG;
 
-    this.remaining = this.note.duration;
-    this.startTimer();
-  },
+/* =========================
+   Auto close with hover pause
+========================= */
 
-  beforeUnmount() {
-    clearTimeout(this.timer);
-  },
+const duration = props.note.duration ?? 5000;
 
-  methods: {
-    startTimer() {
-      this.startAt = Date.now();
-      clearTimeout(this.timer);
-      this.timer = setTimeout(this.close, this.remaining);
-    },
-    pauseTimer() {
-      clearTimeout(this.timer);
-      const elapsed = Date.now() - this.startAt;
-      this.remaining = Math.max(this.remaining - elapsed, 0);
-    },
-    onEnter() {
-      this.pauseTimer();
-    },
-    onLeave() {
-      if (this.remaining > 0) this.startTimer();
-    },
-    close() {
-      this.$emit("close");
-    },
-  },
-};
+let timerId = null;
+let startedAt = 0;
+let remaining = duration;
+
+/** start timer */
+function startTimer() {
+  if (!remaining || remaining <= 0) return;
+
+  startedAt = Date.now();
+  timerId = setTimeout(close, remaining);
+}
+
+/** pause on hover */
+function pauseTimer() {
+  if (!timerId) return;
+
+  clearTimeout(timerId);
+  timerId = null;
+
+  const elapsed = Date.now() - startedAt;
+  remaining = Math.max(0, remaining - elapsed);
+}
+
+/** resume on mouse leave */
+function resumeTimer() {
+  if (!remaining || remaining <= 0) return;
+  startTimer();
+}
+
+/** close note */
+function close() {
+  if (timerId) {
+    clearTimeout(timerId);
+    timerId = null;
+  }
+  emit("close", props.note.id);
+}
+
+onMounted(() => {
+  if (duration > 0) {
+    startTimer();
+  }
+});
+
+onBeforeUnmount(() => {
+  if (timerId) {
+    clearTimeout(timerId);
+  }
+});
 </script>

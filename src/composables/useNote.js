@@ -1,33 +1,59 @@
-// src/core/note/useNote.js
+// src/composables/useNote.js
 import { readonly } from "vue";
-// import { noteStore, MAX_NOTES } from "./noteStore";
 import { noteStore, MAX_NOTES } from "@/storage/noteStore";
 
 let seq = 0;
 
 function addNote(payload = {}) {
-  let lastUsedIndex = -1;
+  const {
+    type = "info",
+    title = "",
+    content = "",
+    duration = 5000,
+    component = null,
+    props = {},
 
-  for (let i = MAX_NOTES - 1; i >= 0; i--) {
-    if (noteStore.slots[i] !== null) {
-      lastUsedIndex = i;
-      break;
+    // 옵션
+    isRotation,
+    priority,
+  } = payload;
+
+  const usedNotes = noteStore.slots.filter(Boolean);
+
+  // 🔥 priority error는 무조건 밀어넣기
+  const forceRotation = priority === "error";
+
+  // rotation 결정
+  const rotationEnabled =
+    forceRotation ||
+    (isRotation !== undefined ? isRotation : noteStore.options.rotationDefault);
+
+  // 슬롯 가득 찬 경우
+  if (usedNotes.length >= MAX_NOTES) {
+    if (!rotationEnabled) return;
+
+    // 가장 오래된 note 제거 (id 최소)
+    const oldestId = Math.min(...usedNotes.map((n) => n.id));
+    const removeIdx = noteStore.slots.findIndex((n) => n?.id === oldestId);
+
+    if (removeIdx !== -1) {
+      noteStore.slots.splice(removeIdx, 1);
+      noteStore.slots.push(null);
     }
   }
 
-  if (lastUsedIndex >= MAX_NOTES - 1) return;
-
-  const nextIndex = lastUsedIndex + 1;
+  const nextIndex = noteStore.slots.findIndex((n) => n === null);
+  if (nextIndex === -1) return;
 
   noteStore.slots[nextIndex] = {
     id: ++seq,
-    type: payload.type || "info",
-    title: payload.title || "",
-    content: payload.content || "",
-    duration: payload.duration ?? 5000,
-
-    component: payload.component || null,
-    props: payload.props || {},
+    type,
+    title,
+    content,
+    duration,
+    priority,
+    component,
+    props,
   };
 }
 

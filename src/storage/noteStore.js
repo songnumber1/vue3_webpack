@@ -1,11 +1,18 @@
-// src/core/note/noteStore.js
 import { reactive } from "vue";
 
 export const MAX_NOTES = 4;
 
 export const noteStore = reactive({
+  // slots
   slots: Array(MAX_NOTES).fill(null),
+
+  // height for animation
   slotHeights: Array(MAX_NOTES).fill(0),
+
+  // 🌍 전역 옵션
+  options: {
+    rotationDefault: false, // ✅ 기본 rotation ON
+  },
 });
 
 export const INFO_SVG = `

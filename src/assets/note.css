@@ -1,0 +1,133 @@
+/* =========================================================
+   NOTE (global – scoped style has priority)
+   - DO NOT override layout / padding / flex from scoped
+========================================================= */
+
+/* card size / shape only */
+.note-item {
+  padding: 16px;
+
+  max-height: 280px;
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* header */
+.note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.note-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.note-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* close */
+.note-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* body */
+.note-body {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow-y: auto;
+}
+
+/* SVG inherits text color */
+.note-item svg {
+  color: inherit;
+}
+
+/* =========================================================
+   NOTE TYPES (visual only)
+========================================================= */
+
+.note-success {
+  background: #ecfdf5;
+  color: #065f46;
+  border-left: 5px solid #22c55e;
+}
+
+.note-error {
+  background: #fef2f2;
+  color: #7f1d1d;
+  border-left: 5px solid #ef4444;
+}
+
+.note-warning,
+.note-warn {
+  background: #fffbeb;
+  color: #78350f;
+  border-left: 5px solid #f59e0b;
+}
+
+.note-info {
+  background: #eff6ff;
+  color: #1e3a8a;
+  border-left: 5px solid #3b82f6;
+}
+
+/* =========================================================
+   CLOSE button – hover effect only
+   (base layout is handled by scoped)
+========================================================= */
+
+.note-close:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  transform: scale(1.05);
+}
+
+/* =========================================================
+   ANIMATION (TransitionGroup)
+========================================================= */
+
+.note-shift-move {
+  transition: transform 0.35s ease;
+}
+
+.note-shift-enter-active {
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.note-shift-leave-active {
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+  position: absolute;
+}
+
+.note-shift-enter-from {
+  opacity: 0;
+  transform: translateY(-12px);
+}
+
+.note-shift-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}

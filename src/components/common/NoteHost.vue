@@ -1,73 +1,77 @@
 <template>
-  <div class="note-host">
-    <div
-      v-for="(note, idx) in slots"
-      :key="`slot-${idx}`"
-      class="note-slot"
-      :style="{ minHeight: slotHeights[idx] + 'px' }"
-    >
-      <!-- Custom Note -->
-      <component
-        v-if="note && note.component"
-        :is="note.component"
-        v-bind="note.props || {}"
-        @close="removeNote(note.id)"
-        @height="setSlotHeight(idx, $event)"
-      />
-
-      <!-- Default Note -->
-      <NoteItem
-        v-else-if="note"
-        :note="note"
-        @close="removeNote(note.id)"
-        @height="setSlotHeight(idx, $event)"
-      />
-    </div>
+  <div class="note-host" :style="{ top: `${topOffset}px` }">
+    <TransitionGroup name="note-shift" tag="div" class="note-stack">
+      <div v-for="note in visibleNotes" :key="note.id" class="note-wrapper">
+        <NoteItem :note="note" @close="removeNote(note.id)" />
+      </div>
+    </TransitionGroup>
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import { useNote } from "@/composables/useNote";
 import NoteItem from "@/components/note/NoteItem.vue";
 
-export default {
-  name: "NoteHost",
-  components: { NoteItem },
+const { slots, removeNote } = useNote();
 
-  computed: {
-    slots() {
-      return useNote().slots;
-    },
-    slotHeights() {
-      return useNote().slotHeights;
-    },
-  },
+/**
+ * 실제 표시되는 note만
+ */
+const visibleNotes = computed(() =>
+  slots.filter(Boolean),
+);
 
-  methods: {
-    removeNote(id) {
-      useNote().removeNote(id);
-    },
-    setSlotHeight(idx, height) {
-      useNote().setSlotHeight(idx, height);
-    },
-  },
-};
-</script>
+/**
+ * Header 기준 top offset
+ */
+const topOffset = ref(20);
 
-<style>
-.note-host {
-  position: fixed;
-  top: 112px;
-  right: 20px;
-  width: 288px;
-  z-index: 9999;
+function calcTopOffset() {
+  const header =
+    document.querySelector("header") ||
+    document.getElementById("app-header");
 
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  if (!header) {
+    topOffset.value = 20;
+    return;
+  }
+
+  const rect = header.getBoundingClientRect();
+  topOffset.value = rect.bottom + 20; // ✅ header 아래 정확히 20px
 }
 
-.note-slot {
-  width: 288px;
+onMounted(() => {
+  calcTopOffset();
+  window.addEventListener("resize", calcTopOffset);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", calcTopOffset);
+});
+</script>
+
+<style scoped>
+.note-host {
+  position: fixed;
+  right: 20px;
+  /* ✅ 우측 정확히 20px */
+  width: 280px;
+  z-index: 9999;
+}
+
+/* stack layout */
+.note-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+/* note 간격 */
+.note-wrapper {
+  margin-bottom: 18px;
+}
+
+.note-wrapper:last-child {
+  margin-bottom: 0;
 }
 </style>
