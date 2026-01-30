@@ -12,43 +12,17 @@ function addNote(payload = {}) {
     duration = 5000,
     component = null,
     props = {},
-
-    // 옵션
     isRotation,
     priority,
   } = payload;
 
-  const usedNotes = noteStore.slots.filter(Boolean);
+  const max = getMaxNote();
 
-  // 🔥 priority error는 무조건 밀어넣기
-  // const forceRotation = priority === "error";
-  const forceRotation = false;
-
-  // rotation 결정
   const rotationEnabled =
-    forceRotation ||
+    priority === "error" ||
     (isRotation !== undefined ? isRotation : getOptionRotation());
 
-  // 슬롯 가득 찬 경우
-  if (usedNotes.length >= getMaxNote()) {
-    if (!rotationEnabled) {
-      return;
-    }
-
-    // 가장 오래된 note 제거 (id 최소)
-    const oldestId = Math.min(...usedNotes.map((n) => n.id));
-    const removeIdx = noteStore.slots.findIndex((n) => n?.id === oldestId);
-
-    if (removeIdx !== -1) {
-      noteStore.slots.splice(removeIdx, 1);
-      noteStore.slots.push(null);
-    }
-  }
-
-  const nextIndex = noteStore.slots.findIndex((n) => n === null);
-  if (nextIndex === -1) return;
-
-  noteStore.slots[nextIndex] = {
+  const newNote = {
     id: ++seq,
     type,
     title,
@@ -58,6 +32,27 @@ function addNote(payload = {}) {
     component,
     props,
   };
+
+  // 1️⃣ 살아있는 note만 정리
+  let alive = noteStore.slots.filter(Boolean);
+
+  // 2️⃣ 가득 찬 경우 rotation
+  if (alive.length >= max) {
+    if (!rotationEnabled) return;
+
+    alive = alive.sort((a, b) => a.id - b.id).slice(1); // oldest 제거
+  }
+
+  // 3️⃣ 새 note는 항상 마지막
+  alive.push(newNote);
+
+  // 4️⃣ 🔥 slots "교체 ❌ / 내용 수정 ⭕"
+  noteStore.slots.splice(
+    0,
+    noteStore.slots.length,
+    ...alive,
+    ...Array(Math.max(0, max - alive.length)).fill(null),
+  );
 }
 
 function removeNote(id) {
