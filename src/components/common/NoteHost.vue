@@ -8,47 +8,70 @@
   </div>
 </template>
 
-<script setup>
-import { computed, ref, onMounted, onBeforeUnmount } from "vue";
-import { useNote } from "@/composables/useNote";
+<script>
 import NoteItem from "@/components/note/NoteItem.vue";
+import { useNote } from "@/composables/useNote";
 
-const { slots, removeNote } = useNote();
+export default {
+  name: "NoteHost",
+  components: { NoteItem },
 
-/**
- * 실제 표시되는 note만
- */
-const visibleNotes = computed(() =>
-  slots.filter(Boolean),
-);
+  data() {
+    return {
+      topOffset: 20,
+      noteApi: null,
+      _onResize: null,
+    };
+  },
 
-/**
- * Header 기준 top offset
- */
-const topOffset = ref(20);
+  computed: {
+    slots() {
+      // noteApi가 준비되기 전 안전 가드
+      return this.noteApi?.slots || [];
+    },
+    visibleNotes() {
+      return (this.slots || []).filter(Boolean);
+    },
+  },
 
-function calcTopOffset() {
-  const header =
-    document.querySelector("header") ||
-    document.getElementById("app-header");
+  created() {
+    // 전역 note store 연결
+    this.noteApi = useNote();
+  },
 
-  if (!header) {
-    topOffset.value = 20;
-    return;
-  }
+  mounted() {
+    this.calcTopOffset();
+    this._onResize = () => this.calcTopOffset();
+    window.addEventListener("resize", this._onResize);
+  },
 
-  const rect = header.getBoundingClientRect();
-  topOffset.value = rect.bottom + 20; // ✅ header 아래 정확히 20px
-}
+  beforeUnmount() {
+    if (this._onResize) {
+      window.removeEventListener("resize", this._onResize);
+      this._onResize = null;
+    }
+  },
 
-onMounted(() => {
-  calcTopOffset();
-  window.addEventListener("resize", calcTopOffset);
-});
+  methods: {
+    removeNote(id) {
+      this.noteApi?.removeNote?.(id);
+    },
 
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", calcTopOffset);
-});
+    calcTopOffset() {
+      const header =
+        document.querySelector("header") ||
+        document.getElementById("app-header");
+
+      if (!header) {
+        this.topOffset = 20;
+        return;
+      }
+
+      const rect = header.getBoundingClientRect();
+      this.topOffset = rect.bottom + 20; // ✅ header 아래 정확히 20px
+    },
+  },
+};
 </script>
 
 <style scoped>
