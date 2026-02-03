@@ -69,7 +69,7 @@ export const WARNING_SVG = `
     width="2"
     height="7"
     rx="1"
-    fill="#fff"
+    fill="currentColor"
   />
 
   <!-- exclamation dot -->
@@ -79,7 +79,7 @@ export const WARNING_SVG = `
     width="2"
     height="2"
     rx="1"
-    fill="#fff"
+    fill="currentColor"
   />
 </svg>`;
 

@@ -5,6 +5,27 @@
    ========================================================= */
 
 :root {
+  /* overlay */
+  --overlay-backdrop: rgba(0, 0, 0, 0.35);
+
+
+  /* notes (themeable) */
+  --note-success-bg: #ecfdf5;
+  --note-success-text: #065f46;
+  --note-success-accent: #22c55e;
+  --note-error-bg: #fef2f2;
+  --note-error-text: #7f1d1d;
+  --note-error-accent: #ef4444;
+  --note-warn-bg: #fffbeb;
+  --note-warn-text: #78350f;
+  --note-warn-accent: #f59e0b;
+  --note-info-bg: #eff6ff;
+  --note-info-text: #1e3a8a;
+  --note-info-accent: #3b82f6;
+
+  /* shadows */
+  --shadow-lg: var(--shadow-md, 0 12px 34px rgba(0,0,0,0.25));
+
   /* layout sizing tokens (can be overridden per-theme) */
   --header-height: 56px;
   --sidebar-width: 280px;
@@ -268,7 +289,7 @@ body {
 }
 
 .bubble {
-  max-width: 70%;
+  max-width: min(70%, var(--bubble-max-width));
   padding: 10px 12px;
   border-radius: 12px;
   background: var(--chat-bubble-ai-bg);
@@ -277,7 +298,7 @@ body {
 
 .msg.user .bubble {
   background: var(--chat-bubble-user-bg);
-  color: #ffffff;
+  color: var(--chat-bubble-user-text);
 }
 
 /* =========================================================
@@ -403,7 +424,7 @@ body {
 
 .tabs .active {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--chat-bubble-user-text);
   border-color: transparent;
 }
 

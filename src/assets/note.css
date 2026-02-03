@@ -67,28 +67,28 @@
 ========================================================= */
 
 .note-success {
-  background: #ecfdf5;
-  color: #065f46;
-  border-left: 5px solid #22c55e;
+  background: var(--note-success-bg);
+  color: var(--note-success-text);
+  border-left: 5px solid var(--note-success-accent);
 }
 
 .note-error {
-  background: #fef2f2;
-  color: #7f1d1d;
-  border-left: 5px solid #ef4444;
+  background: var(--note-error-bg);
+  color: var(--note-error-text);
+  border-left: 5px solid var(--note-error-accent);
 }
 
 .note-warning,
 .note-warn {
-  background: #fffbeb;
-  color: #78350f;
-  border-left: 5px solid #f59e0b;
+  background: var(--note-warn-bg);
+  color: var(--note-warn-text);
+  border-left: 5px solid var(--note-warn-accent);
 }
 
 .note-info {
-  background: #eff6ff;
-  color: #1e3a8a;
-  border-left: 5px solid #3b82f6;
+  background: var(--note-info-bg);
+  color: var(--note-info-text);
+  border-left: 5px solid var(--note-info-accent);
 }
 
 /* =========================================================

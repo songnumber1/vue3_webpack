@@ -47,4 +47,22 @@
   --layout-padding: var(--space-4);
   --chat-padding: var(--space-4);
 
+  
+  /* overlay */
+  --overlay-backdrop: rgba(0,0,0,0.45);
+  --danger-contrast: #ffffff;
+
+  /* notes */
+  --note-success-bg: #0b3a24;
+  --note-success-text: #d1fae5;
+  --note-success-accent: #34d399;
+  --note-error-bg: #3a1220;
+  --note-error-text: #ffe4e6;
+  --note-error-accent: #fb7185;
+  --note-warn-bg: #3a2a0b;
+  --note-warn-text: #ffedd5;
+  --note-warn-accent: #fbbf24;
+  --note-info-bg: #0b2a5a;
+  --note-info-text: #dbeafe;
+  --note-info-accent: #60a5fa;
 }

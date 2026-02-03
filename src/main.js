@@ -5,6 +5,7 @@ import router from "./router";
 
 import responsiveManager from "./plugins/responsiveManager";
 import themeManager from "./plugins/themeManager";
+import layoutManager from "./plugins/layoutManager";
 
 import "./assets/tokens/spacing.css";
 import "./assets/tokens/typography.css";
@@ -25,6 +26,7 @@ app.use(router);
 
 app.use(responsiveManager);
 app.use(themeManager);
+app.use(layoutManager);
 
 app.config.compilerOptions.isCustomElement = () => false;
 

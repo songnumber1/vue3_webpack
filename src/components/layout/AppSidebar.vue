@@ -267,8 +267,8 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: 280px;
-  min-width: 280px;
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
   border-right: 1px solid var(--border);
   background: var(--bg-surface);
   display: flex;
@@ -280,8 +280,8 @@ export default {
 }
 
 .sidebar.collapsed {
-  width: 76px;
-  min-width: 76px;
+  width: var(--sidebar-collapsed-width);
+  min-width: var(--sidebar-collapsed-width);
   padding: 14px 10px;
 }
 

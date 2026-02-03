@@ -89,7 +89,7 @@ export default {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--overlay-backdrop);
   z-index: 9999;
 }
 
@@ -126,19 +126,19 @@ export default {
 .modal {
   width: 100%;
   height: 100%;
-  background: #ffffff;
+  background: var(--bg-surface);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow-lg);
 }
 
 /* Header */
 .modal-header {
   height: 44px;
   padding: 0 12px;
-  background: #f5f5f5;
+  background: var(--bg-elevated);
 
   display: flex;
   justify-content: space-between;
@@ -162,7 +162,7 @@ export default {
 /* Footer */
 .modal-footer {
   padding: 12px 16px;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--border);
 
   display: flex;
   justify-content: flex-end;
@@ -173,15 +173,15 @@ export default {
 button {
   padding: 6px 14px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
   cursor: pointer;
 }
 
 button.primary {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: #ffffff;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-contrast);
 }
 
 /* Close button */

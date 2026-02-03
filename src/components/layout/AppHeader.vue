@@ -14,6 +14,7 @@
     <strong class="title">DS Assistant</strong>
 
     <div class="themes">
+      <button type="button" class="gear" aria-label="Layout settings" @click="openLayoutSettings">⚙</button>
       <button
         v-for="t in $theme.THEMES"
         :key="t"
@@ -48,6 +49,9 @@ export default {
   },
 
   methods: {
+    openLayoutSettings() {
+      openModal(LayoutSettings, {}, { title: 'Layout & Theme Settings', size: 'md' });
+    },
     openSidebar() {
       this.store.openSidebar();
     },
@@ -63,7 +67,7 @@ export default {
 <style scoped>
 .header {
   width: 100%;
-  height: 56px;
+  height: var(--header-height);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -114,7 +118,21 @@ export default {
 
 .theme-btn.active {
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
   border-color: transparent;
+}
+
+.gear {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.gear:hover {
+  background: var(--bg-soft);
 }
 </style>

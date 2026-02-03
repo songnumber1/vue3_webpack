@@ -63,4 +63,8 @@
   --layout-padding: var(--space-4);
   --chat-padding: var(--space-4);
 
+  
+  /* overlay */
+  --overlay-backdrop: rgba(0,0,0,0.35);
+  --danger-contrast: #ffffff;
 }
