@@ -1,23 +1,14 @@
 
 <template>
   <div class="p">
-    <div class="row">
-      <div class="lbl2">Height</div>
-      <input class="range" type="range" min="34" max="64" v-model.number="pv.inputHeight" />
-      <span class="val">{{ pv.inputHeight }}px</span>
-    </div>
+    <p class="hint">
+      InputHeader / 입력 컴포넌트는 실제 서비스에서 상태(store)를 직접 가져와야 합니다.
+      Preview에서 렌더/버튼 반응 등을 확인하세요.
+    </p>
   </div>
 </template>
-
-<script>
-import { useLayoutPreviewStore } from "@/stores/layoutPreviewStore";
-export default { computed: { pv() { return useLayoutPreviewStore(); } } };
-</script>
-
+<script>export default {};</script>
 <style scoped>
-.p { display:flex; flex-direction: column; gap: 10px; }
-.row { display:flex; align-items:center; gap: 10px; }
-.lbl2 { width: 110px; font-size: 12px; color: var(--muted); }
-.range { flex:1; }
-.val { width: 60px; font-size: 12px; color: var(--muted); text-align: right; }
+.p { display:flex; flex-direction: column; gap: 12px; }
+.hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
 </style>

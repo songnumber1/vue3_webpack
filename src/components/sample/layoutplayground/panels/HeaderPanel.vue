@@ -2,60 +2,58 @@
 <template>
   <div class="p">
     <div class="row">
-      <label class="lbl"><input type="checkbox" v-model="pv.showHeader" /> Show header</label>
-    </div>
-
-    <div class="row">
-      <div class="lbl2">Title</div>
-      <input class="in" v-model="pv.headerTitle" />
-    </div>
-
-    <div class="row">
-      <div class="lbl2">Height</div>
-      <input class="range" type="range" min="40" max="88" v-model.number="pv.headerHeight" />
-      <span class="val">{{ pv.headerHeight }}px</span>
-    </div>
-
-    <div class="row">
-      <div class="lbl2">Theme (preview only)</div>
-      <select class="sel" v-model="pv.theme">
-        <option value="light">light</option>
-        <option value="dark">dark</option>
-        <option value="dim">dim</option>
-        <option value="summer">summer</option>
+      <div class="lbl2">Theme</div>
+      <select class="sel" v-model="theme" @change="applyTheme">
+        <option v-for="t in themes" :key="t" :value="t">{{ t }}</option>
       </select>
     </div>
 
+    <div class="row">
+      <div class="lbl2">Mobile</div>
+      <label class="chk"><input type="checkbox" v-model="isMobile" @change="applyMobile" /> isMobile</label>
+    </div>
+
     <p class="hint">
-      이 설정은 Playground Preview에만 적용됩니다. 실제 AppHeader는 영향이 없습니다.
+      Preview에서 <b>실제 AppHeader</b>가 store를 직접 import하여 정상 동작하는지 확인하세요.
     </p>
   </div>
 </template>
 
 <script>
-import { useLayoutPreviewStore } from "@/stores/layoutPreviewStore";
+import { patchPreviewStore } from "@/stores/previewBridge";
+
 export default {
-  computed: {
-    pv() { return useLayoutPreviewStore(); }
+  data() {
+    return {
+      themes: ["light","dim","dark","summer"],
+      theme: "light",
+      isMobile: false,
+    };
+  },
+  methods: {
+    applyTheme() {
+      patchPreviewStore({ ui: { theme: this.theme } });
+    },
+    applyMobile() {
+      patchPreviewStore({ ui: { isMobile: this.isMobile } });
+    },
+  },
+  mounted() {
+    // initial patch so preview matches UI
+    this.applyTheme();
+    this.applyMobile();
   }
 };
 </script>
 
 <style scoped>
-.p { display:flex; flex-direction: column; gap: 10px; }
+.p { display:flex; flex-direction: column; gap: 12px; }
 .row { display:flex; align-items:center; gap: 10px; }
-.lbl { font-size: 13px; color: var(--text); }
-.lbl2 { width: 110px; font-size: 12px; color: var(--muted); }
-.in, .sel {
-  flex:1;
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-  padding: 0 10px;
+.lbl2 { width: 90px; font-size: 12px; color: var(--muted); }
+.sel {
+  flex:1; height: 34px; border-radius: 10px; border: 1px solid var(--border);
+  background: transparent; color: var(--text); padding: 0 10px;
 }
-.range { flex:1; }
-.val { width: 60px; font-size: 12px; color: var(--muted); text-align: right; }
-.hint { margin: 0; font-size: 12px; color: var(--muted); }
+.chk { font-size: 12px; color: var(--text); display:flex; align-items:center; gap: 8px; }
+.hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
 </style>

@@ -1,0 +1,12 @@
+
+/* Fallback tokens used by Layout Playground if theme tokens are missing. */
+:root{
+  --bg: #0b1220;
+  --card: rgba(255,255,255,0.06);
+  --card2: rgba(255,255,255,0.04);
+  --border: rgba(255,255,255,0.08);
+  --text: #e5e7eb;
+  --muted: rgba(229,231,235,0.7);
+  --primary: #3b82f6;
+  --chip: rgba(255,255,255,0.08);
+}

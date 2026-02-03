@@ -15,6 +15,7 @@ import "./assets/themes/dim.css";
 import "./assets/themes/dark.css";
 import "./assets/themes/summer.css";
 import "./assets/playground.css";
+import "./assets/preview-fallback.css";
 import "./assets/main.scss";
 import "./assets/note.css";
 

@@ -2,36 +2,54 @@
 <template>
   <div class="p">
     <div class="row">
-      <label class="lbl"><input type="checkbox" v-model="pv.showSidebar" /> Show sidebar</label>
+      <div class="lbl2">Sidebar open</div>
+      <label class="chk"><input type="checkbox" v-model="sidebarOpen" @change="apply" /> open</label>
     </div>
 
     <div class="row">
-      <div class="lbl2">Title</div>
-      <input class="in" v-model="pv.sidebarTitle" />
+      <div class="lbl2">Collapsed</div>
+      <label class="chk"><input type="checkbox" v-model="sidebarCollapsed" @change="apply" /> collapsed</label>
     </div>
 
     <div class="row">
-      <div class="lbl2">Width</div>
-      <input class="range" type="range" min="180" max="360" v-model.number="pv.sidebarWidth" />
-      <span class="val">{{ pv.sidebarWidth }}px</span>
+      <div class="lbl2">Assistants</div>
+      <label class="chk"><input type="checkbox" v-model="assistantsExpanded" @change="apply" /> expanded</label>
     </div>
+
+    <p class="hint">Preview에서 <b>실제 AppSidebar</b>가 router + stores로 정상 동작하는지 확인하세요.</p>
   </div>
 </template>
 
 <script>
-import { useLayoutPreviewStore } from "@/stores/layoutPreviewStore";
-export default { computed: { pv() { return useLayoutPreviewStore(); } } };
+import { patchPreviewStore } from "@/stores/previewBridge";
+
+export default {
+  data() {
+    return {
+      sidebarOpen: true,
+      sidebarCollapsed: false,
+      assistantsExpanded: true,
+    };
+  },
+  methods: {
+    apply() {
+      patchPreviewStore({ ui: {
+        sidebarOpen: this.sidebarOpen,
+        sidebarCollapsed: this.sidebarCollapsed,
+        assistantsExpanded: this.assistantsExpanded,
+      }});
+    },
+  },
+  mounted() {
+    this.apply();
+  }
+};
 </script>
 
 <style scoped>
-.p { display:flex; flex-direction: column; gap: 10px; }
+.p { display:flex; flex-direction: column; gap: 12px; }
 .row { display:flex; align-items:center; gap: 10px; }
-.lbl { font-size: 13px; color: var(--text); }
-.lbl2 { width: 110px; font-size: 12px; color: var(--muted); }
-.in {
-  flex:1; height: 34px; border-radius: 10px; border: 1px solid var(--border);
-  background: transparent; color: var(--text); padding: 0 10px;
-}
-.range { flex:1; }
-.val { width: 60px; font-size: 12px; color: var(--muted); text-align: right; }
+.lbl2 { width: 120px; font-size: 12px; color: var(--muted); }
+.chk { font-size: 12px; color: var(--text); display:flex; align-items:center; gap: 8px; }
+.hint { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.4; }
 </style>
