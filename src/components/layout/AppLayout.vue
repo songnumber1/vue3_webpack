@@ -1,16 +1,16 @@
 <template>
   <div class="layout">
     <!-- ✅ Header는 전체 너비 -->
-    <AppHeader v-if="layout.showHeader" />
+    <AppHeader />
 
     <!-- ✅ Header 아래에 Sidebar + Main -->
     <div class="body">
       <!-- DESKTOP -->
-      <AppSidebar v-if="layout.showSidebar && !isMobile" :class="{ collapsed: sidebarCollapsed }" />
+      <AppSidebar v-if="!isMobile" :class="{ collapsed: sidebarCollapsed }" />
 
       <!-- MOBILE overlay -->
       <AppSidebar
-        v-if="layout.showSidebar && isMobile"
+        v-if="isMobile"
         class="mobile-sidebar"
         :class="{ open: sidebarOpen }"
       />
@@ -20,7 +20,7 @@
           <router-view />
         </main>
 
-        <AppFooter v-if="layout.showFooter" />
+        <AppFooter />
       </div>
 
       <div
@@ -37,7 +37,6 @@ import AppHeader from "./AppHeader.vue";
 import AppSidebar from "./AppSidebar.vue";
 import AppFooter from "./AppFooter.vue";
 import { useUiStore } from "@/stores/uiStore";
-import { useLayoutStore } from "@/stores/layoutStore";
 import { useChatStore } from "@/stores/chatStore";
 
 export default {
@@ -56,11 +55,6 @@ export default {
   },
 
   computed: {
-    // ✅ Layout visibility & sizing (root CSS vars are applied by layoutManager plugin)
-    layout() {
-      return useLayoutStore();
-    },
-
     uiStore() {
       return useUiStore();
     },
@@ -130,8 +124,8 @@ export default {
 .mobile-sidebar {
   position: fixed;
   left: 0;
-  top: var(--header-height); /* header height */
-  height: calc(100vh - var(--header-height));
+  top: 56px; /* header height */
+  height: calc(100vh - 56px);
   z-index: 80;
 }
 

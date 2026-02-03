@@ -142,7 +142,7 @@ export default {
 }
 
 .room-header {
-  height: var(--room-header-height);
+  height: 52px;
   border-bottom: 1px solid var(--border);
   background: var(--bg-surface);
   display: flex;
@@ -161,11 +161,10 @@ export default {
 }
 
 .messages {
-  font-size: var(--message-font-size);
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: var(--messages-padding);
+  padding: 16px;
 }
 
 .input-row {
@@ -184,8 +183,8 @@ export default {
 
 textarea {
   flex: 1;
-  min-height: var(--input-min-height);
-  max-height: var(--input-max-height);
+  min-height: 56px;
+  max-height: 180px;
   resize: vertical;
   border: 1px solid var(--border);
   background: var(--bg-surface);

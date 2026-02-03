@@ -1,26 +1,11 @@
 <template>
-  <aside
-    class="sidebar"
-    :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }"
-  >
+  <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
     <div class="top-row">
-      <button
-        v-if="!isMobile"
-        type="button"
-        class="hamburger"
-        aria-label="Toggle sidebar"
-        @click="toggleCollapse"
-      >
+      <button v-if="!isMobile" type="button" class="hamburger" aria-label="Toggle sidebar" @click="toggleCollapse">
         ☰
       </button>
 
-      <button
-        v-else
-        type="button"
-        class="hamburger"
-        aria-label="Close sidebar"
-        @click="closeSidebar"
-      >
+      <button v-else type="button" class="hamburger" aria-label="Close sidebar" @click="closeSidebar">
         ✕
       </button>
 
@@ -41,35 +26,19 @@
 
       <div class="nav-divider" aria-hidden="true" />
 
-      <div
-        class="nav-section"
-        :class="{ collapsed: sidebarCollapsed }"
-        role="group"
-        aria-label="Assistant"
-      >
+      <div class="nav-section" :class="{ collapsed: sidebarCollapsed }" role="group" aria-label="Assistant">
         <!-- ✅ 기존 label 줄 + 버튼만 추가 -->
         <div v-if="!sidebarCollapsed" class="nav-section-head">
           <div class="nav-section-label">Assistant</div>
 
-          <button
-            v-if="canToggleAssistants"
-            type="button"
-            class="nav-more"
-            @click="toggleAssistants"
-          >
+          <button v-if="canToggleAssistants" type="button" class="nav-more" @click="toggleAssistants">
             {{ assistantsExpanded ? "축소" : "더보기" }}
           </button>
         </div>
 
         <!-- ❗ 기존 버튼 렌더 구조 그대로 -->
-        <button
-          v-for="g in displayedAssistants"
-          :key="g.id"
-          type="button"
-          class="nav-item nav-btn"
-          :class="{ active: safeStore.activeModelGroupId === g.id }"
-          @click="setModelGroup(g.id)"
-        >
+        <button v-for="g in displayedAssistants" :key="g.id" type="button" class="nav-item nav-btn"
+          :class="{ active: safeStore.activeModelGroupId === g.id }" @click="setModelGroup(g.id)">
           <span class="icon model-icon">
             {{ iconForGroup(g.id) }}
           </span>
@@ -85,24 +54,12 @@
           <div v-for="(g, gi) in groupedChats" :key="gi" class="chat-group">
             <div class="chat-group-title">{{ g.label }}</div>
 
-            <div
-              v-for="c in g.items"
-              :key="c.id"
-              class="chat-item"
-              :class="{ active: safeStore.activeChatId === c.id }"
-            >
-              <button
-                type="button"
-                class="chat-title"
-                @click="selectChat(c.id)"
-              >
+            <div v-for="c in g.items" :key="c.id" class="chat-item"
+              :class="{ active: safeStore.activeChatId === c.id }">
+              <button type="button" class="chat-title" @click="selectChat(c.id)">
                 {{ c.title }}
               </button>
-              <button
-                type="button"
-                class="chat-del"
-                @click.stop="deleteChat(c.id)"
-              >
+              <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
                 🗑
               </button>
             </div>
@@ -205,8 +162,8 @@ export default {
           d.toDateString() === today
             ? "오늘"
             : d.toDateString() === yesterday
-            ? "어제"
-            : `${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+              ? "어제"
+              : `${String(d.getMonth() + 1).padStart(2, "0")}-${String(
                 d.getDate()
               ).padStart(2, "0")}`;
 
@@ -267,8 +224,8 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
+  width: 280px;
+  min-width: 280px;
   border-right: 1px solid var(--border);
   background: var(--bg-surface);
   display: flex;
@@ -280,8 +237,8 @@ export default {
 }
 
 .sidebar.collapsed {
-  width: var(--sidebar-collapsed-width);
-  min-width: var(--sidebar-collapsed-width);
+  width: 76px;
+  min-width: 76px;
   padding: 14px 10px;
 }
 
@@ -458,6 +415,7 @@ export default {
   padding: 4px 8px;
   cursor: pointer;
 }
+
 .nav-more:hover {
   background: var(--bg-soft);
   color: var(--text-primary);
