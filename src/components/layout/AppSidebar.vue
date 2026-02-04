@@ -241,6 +241,32 @@ export default {
   padding: 14px;
   transition: width 0.2s ease, min-width 0.2s ease;
   overflow: hidden;
+
+  /* ensures internal scroll areas can size correctly */
+  height: 100%;
+  min-height: 0;
+}
+
+/* =========================
+ * Mobile drawer behavior
+ * - Vue applies the class on component root, so the <aside> becomes:
+ *   class="sidebar mobile-sidebar open"
+ * ========================= */
+.sidebar.mobile-sidebar {
+  width: min(84vw, 340px);
+  min-width: min(84vw, 340px);
+  border-right: 1px solid var(--sidebar-border, var(--border));
+  background: var(--sidebar-bg-mobile, var(--sidebar-bg, var(--bg-surface)));
+  background-image: none;
+  backdrop-filter: none;
+
+  transform: translateX(-105%);
+  transition: transform 0.18s ease;
+  box-shadow: var(--shadow-lg, 0 18px 50px rgba(0,0,0,0.18));
+}
+
+.sidebar.mobile-sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar.collapsed {
@@ -372,6 +398,7 @@ export default {
   min-height: 0;
   overflow: auto;
   padding-right: 2px;
+  flex: 1;
 }
 
 .chat-group-title {

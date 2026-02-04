@@ -11,6 +11,17 @@
       <AppIcon name="menu" />
     </button>
 
+    <!-- ✅ WEB(Desktop) : Sidebar 전체 숨김/표시 토글 -->
+    <button
+      v-else
+      type="button"
+      class="icon-btn"
+      :aria-label="sidebarHidden ? 'Show sidebar' : 'Hide sidebar'"
+      @click="toggleSidebarHidden"
+    >
+      <AppIcon :name="sidebarHidden ? 'panel-right' : 'panel-left'" />
+    </button>
+
     <div class="brand">
       <div class="logo" aria-hidden="true">DS</div>
       <strong class="title">DS Assistant</strong>
@@ -52,11 +63,19 @@ export default {
     isMobile() {
       return this.store.isMobile;
     },
+
+    sidebarHidden() {
+      return this.store.sidebarHidden;
+    },
   },
 
   methods: {
     openSidebar() {
       this.store.openSidebar();
+    },
+
+    toggleSidebarHidden() {
+      this.store.toggleSidebarHidden();
     },
 
     setTheme(t) {

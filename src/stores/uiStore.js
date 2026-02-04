@@ -18,6 +18,7 @@ function save(state) {
         theme: state.theme,
         isMobile: state.isMobile,
         sidebarOpen: state.sidebarOpen,
+        sidebarHidden: state.sidebarHidden,
       })
     );
   } catch (e) {
@@ -32,6 +33,8 @@ export const useUiStore = defineStore("ui", {
       theme: base.theme || "light",
       isMobile: !!base.isMobile,
       sidebarOpen: base.sidebarOpen !== undefined ? !!base.sidebarOpen : true,
+      // ✅ Desktop-only: fully hide sidebar (persisted)
+      sidebarHidden: base.sidebarHidden !== undefined ? !!base.sidebarHidden : false,
       sidebarCollapsed: false,
       assistantsExpanded: false,
       navLocked: false,
@@ -71,6 +74,22 @@ export const useUiStore = defineStore("ui", {
 
     toggleSidebar() {
       this.sidebarOpen = !this.sidebarOpen;
+      save(this);
+    },
+
+    /* ===== desktop sidebar visibility ===== */
+    showSidebar() {
+      this.sidebarHidden = false;
+      save(this);
+    },
+
+    hideSidebar() {
+      this.sidebarHidden = true;
+      save(this);
+    },
+
+    toggleSidebarHidden() {
+      this.sidebarHidden = !this.sidebarHidden;
       save(this);
     },
 

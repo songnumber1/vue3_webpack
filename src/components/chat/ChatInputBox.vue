@@ -63,7 +63,7 @@
     </div>
 
     <div class="actions">
-      <button type="button" class="send" :disabled="isLocked" @click="send">
+      <button type="button" class="btn btn-primary send" :disabled="isLocked" @click="send">
         Send
       </button>
     </div>
@@ -272,17 +272,7 @@ textarea {
 .actions { display: flex; justify-content: flex-end; }
 
 .send {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
-}
-
-.send:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  height: 42px;
+  padding: 0 16px;
 }
 </style>

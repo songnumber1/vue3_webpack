@@ -117,6 +117,7 @@ export default {
   font-size: 26px;
   margin: 0;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
@@ -136,15 +137,19 @@ export default {
 
 .card {
   text-align: left;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   border-radius: 16px;
   padding: 14px;
   cursor: pointer;
+  box-shadow: var(--shadow-xs);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .card:hover {
-  background: var(--bg-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
 }
 
 .card-title {

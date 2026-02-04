@@ -6,7 +6,10 @@
     <!-- ✅ Header 아래에 Sidebar + Main -->
     <div class="body">
       <!-- DESKTOP -->
-      <AppSidebar v-if="!isMobile" :class="{ collapsed: sidebarCollapsed }" />
+      <AppSidebar
+        v-if="!isMobile && !sidebarHidden"
+        :class="{ collapsed: sidebarCollapsed }"
+      />
 
       <!-- MOBILE overlay -->
       <AppSidebar
@@ -70,6 +73,10 @@ export default {
 
     sidebarCollapsed() {
       return this.uiStore.sidebarCollapsed;
+    },
+
+    sidebarHidden() {
+      return this.uiStore.sidebarHidden;
     },
   },
 

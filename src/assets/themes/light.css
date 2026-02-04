@@ -82,6 +82,8 @@
   --header-border: rgba(148, 163, 184, 0.35);
 
   --sidebar-bg: rgba(255, 255, 255, 0.78);
+  /* Mobile drawer should be opaque for readability */
+  --sidebar-bg-mobile: #ffffff;
   --sidebar-bg-gradient: radial-gradient(900px 600px at -10% -20%, rgba(37, 99, 235, 0.18), transparent 50%),
     radial-gradient(700px 480px at 110% 20%, rgba(6, 182, 212, 0.14), transparent 55%);
   --sidebar-border: rgba(148, 163, 184, 0.35);
