@@ -2,6 +2,11 @@
 <template>
   <div class="p">
     <div class="row">
+      <div class="lbl2">Mobile</div>
+      <label class="chk"><input type="checkbox" v-model="isMobile" @change="apply" /> isMobile</label>
+    </div>
+
+    <div class="row">
       <div class="lbl2">Sidebar open</div>
       <label class="chk"><input type="checkbox" v-model="sidebarOpen" @change="apply" /> open</label>
     </div>
@@ -26,6 +31,7 @@ import { patchPreviewStore } from "@/stores/previewBridge";
 export default {
   data() {
     return {
+      isMobile: false,
       sidebarOpen: true,
       sidebarCollapsed: false,
       assistantsExpanded: true,
@@ -34,6 +40,7 @@ export default {
   methods: {
     apply() {
       patchPreviewStore({ ui: {
+        isMobile: this.isMobile,
         sidebarOpen: this.sidebarOpen,
         sidebarCollapsed: this.sidebarCollapsed,
         assistantsExpanded: this.assistantsExpanded,

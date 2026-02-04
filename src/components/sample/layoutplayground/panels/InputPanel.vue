@@ -1,6 +1,6 @@
 <template>
   <div class="p">
-    <ChatContextPanel />
+    <ChatContextPanel variant="input" />
     <p class="hint">
       ✅ ChatInput은 Assistant/Model에 따라 <b>InputMode</b>가 바뀌고,
       mode에 따라 입력 폼이 바뀌어야 합니다.

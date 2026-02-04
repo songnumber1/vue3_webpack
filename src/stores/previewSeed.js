@@ -20,6 +20,17 @@ function seedBaseState() {
   const chat = useChatStore();
   const prompt = usePromptStore();
 
+  // ✅ Respect persisted chat state (localStorage) so preview does not reset
+  // after sending a message or switching tabs.
+  // If a user already has chats saved, we only ensure derived defaults.
+  try {
+    chat.ensureDefaults?.();
+  } catch (e) {
+    // ignore
+  }
+
+  const hasPersistedChats = Array.isArray(chat.chats) && chat.chats.length > 0;
+
   // Pick first assistant/model from existing data.json (no touching getters)
   const firstAssistant = (ds.uiAssistants || [])[0];
   if (firstAssistant?.id) {
@@ -37,6 +48,22 @@ function seedBaseState() {
   const now = Date.now();
   const a1 = chat.assistantId;
   const m1 = chat.modelId;
+
+  // If we already have chats from localStorage, do NOT overwrite.
+  // (Otherwise, demo seed is useful for first-time preview experience.)
+  if (hasPersistedChats) {
+    // ensure prompt store matches
+    if (chat.modelId) prompt.setModel(chat.modelId);
+    // ensure messages are loaded
+    if (chat.activeChatId) {
+      try {
+        chat.selectChat(chat.activeChatId);
+      } catch (e) {
+        // ignore
+      }
+    }
+    return;
+  }
 
   // build a few context-specific rooms so changing assistant/model really changes the list & messages
   const chats = [];

@@ -1,6 +1,6 @@
 <template>
   <div class="p">
-    <ChatContextPanel />
+    <ChatContextPanel variant="messages" />
     <p class="hint">ChatMessageList는 <b>store.messages</b>를 렌더하므로, selector 변경 시 반드시 store.messages도 함께 바뀌어야 합니다.</p>
   </div>
 </template>

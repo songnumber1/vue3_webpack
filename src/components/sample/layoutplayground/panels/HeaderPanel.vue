@@ -8,11 +8,6 @@
       </select>
     </div>
 
-    <div class="row">
-      <div class="lbl2">Mobile</div>
-      <label class="chk"><input type="checkbox" v-model="isMobile" @change="applyMobile" /> isMobile</label>
-    </div>
-
     <p class="hint">
       Preview에서 <b>실제 AppHeader</b>가 store를 직접 import하여 정상 동작하는지 확인하세요.
     </p>
@@ -27,21 +22,16 @@ export default {
     return {
       themes: ["light","dim","dark","summer"],
       theme: "light",
-      isMobile: false,
     };
   },
   methods: {
     applyTheme() {
       patchPreviewStore({ ui: { theme: this.theme } });
     },
-    applyMobile() {
-      patchPreviewStore({ ui: { isMobile: this.isMobile } });
-    },
   },
   mounted() {
     // initial patch so preview matches UI
     this.applyTheme();
-    this.applyMobile();
   }
 };
 </script>

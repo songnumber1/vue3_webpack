@@ -1,6 +1,6 @@
 <template>
   <div class="p">
-    <ChatContextPanel />
+    <ChatContextPanel variant="main" />
     <p class="hint">
       Main/ChatView는 Assistant + Model + InputMode 조합에 따라
       랜딩/메시지/입력 UI가 바뀌어야 합니다.

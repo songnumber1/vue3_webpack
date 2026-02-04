@@ -3,6 +3,8 @@ import { useDataStore } from "./dataStore";
 import { JSON_KEYS } from "@/constants/jsonKeys";
 
 const LS_KEY = "ds_chat_state_v3";
+// ✅ Legacy key (older build) – migrate once if present.
+const LEGACY_LS_KEY = "ds_chat_store_v2";
 
 function nowTs() {
   return Date.now();
@@ -13,6 +15,50 @@ function safeParse(jsonStr, fallback) {
     return JSON.parse(jsonStr);
   } catch {
     return fallback;
+  }
+}
+
+function migrateLegacyV2IfNeeded() {
+  try {
+    const hasV3 = !!localStorage.getItem(LS_KEY);
+    if (hasV3) return null;
+    const raw = localStorage.getItem(LEGACY_LS_KEY);
+    if (!raw) return null;
+    const v2 = JSON.parse(raw);
+    if (!v2 || typeof v2 !== "object") return null;
+
+    const assistantId = v2.activeModelGroupId || null;
+    const modelId = v2.activeModelId || null;
+    const chats = Array.isArray(v2.chats) ? v2.chats : [];
+
+    // v2 chats did not carry assistant/model meta; attach current context.
+    const migratedChats = chats.map((c) => {
+      const cc = c && typeof c === "object" ? c : {};
+      return {
+        id: String(cc.id ?? ""),
+        title: cc.title || "New chat",
+        createdAt: typeof cc.createdAt === "number" ? cc.createdAt : nowTs(),
+        lastAt:
+          typeof cc.lastAt === "number"
+            ? cc.lastAt
+            : typeof cc.createdAt === "number"
+              ? cc.createdAt
+              : nowTs(),
+        assistantId: cc.assistantId || assistantId,
+        modelId: cc.modelId || modelId,
+        messages: Array.isArray(cc.messages) ? cc.messages : [],
+      };
+    });
+
+    return {
+      assistantId,
+      modelId,
+      inputMode: "direct",
+      chats: migratedChats,
+      activeChatId: v2.activeChatId ?? null,
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -59,7 +105,9 @@ export const useChatStore = defineStore("chat", {
     /** assistant name (UI) */
     assistantLabel() {
       const ds = useDataStore();
-      const found = (ds.uiAssistants || []).find((a) => a.id === this.assistantId);
+      const found = (ds.uiAssistants || []).find(
+        (a) => a.id === this.assistantId,
+      );
       return found?.label || this.assistantId || "";
     },
 
@@ -122,7 +170,7 @@ export const useChatStore = defineStore("chat", {
         .filter((p) => p?.delYN !== true)
         .sort(
           (a, b) =>
-            (a?.promptTemplateOrder ?? 0) - (b?.promptTemplateOrder ?? 0)
+            (a?.promptTemplateOrder ?? 0) - (b?.promptTemplateOrder ?? 0),
         );
     },
 
@@ -130,7 +178,7 @@ export const useChatStore = defineStore("chat", {
       if (!this.selectedPromptId) return null;
       return (
         this.currentPrompts.find(
-          (p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId
+          (p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId,
         ) || null
       );
     },
@@ -152,8 +200,10 @@ export const useChatStore = defineStore("chat", {
     ensureDefaults() {
       const ds = useDataStore();
 
-      // 1) restore
-      const saved = safeParse(localStorage.getItem(LS_KEY) || "null", null);
+      // 1) restore (v3) or migrate (v2)
+      const migrated = migrateLegacyV2IfNeeded();
+      const saved =
+        migrated || safeParse(localStorage.getItem(LS_KEY) || "null", null);
       if (saved && typeof saved === "object") {
         this.assistantId = saved.assistantId ?? this.assistantId;
         this.modelId = saved.modelId ?? this.modelId;
@@ -172,7 +222,7 @@ export const useChatStore = defineStore("chat", {
         const first = ds.uiAssistants?.[0];
         this.assistantId = first
           ? first.id
-          : ds.assistants?.[0]?.[JSON_KEYS.ASSISTANT_ID] ?? null;
+          : (ds.assistants?.[0]?.[JSON_KEYS.ASSISTANT_ID] ?? null);
       }
 
       // 3) model default: first default=true else first model
@@ -314,11 +364,16 @@ export const useChatStore = defineStore("chat", {
       const keys = kw[this.inputMode] || [];
       if (keys.length) {
         const found = (this.currentPrompts || []).find((p) => {
-          const name = (p?.name_ko || p?.promptTemplateName || "").toLowerCase();
+          const name = (
+            p?.name_ko ||
+            p?.promptTemplateName ||
+            ""
+          ).toLowerCase();
           return keys.some((k) => name.includes(String(k).toLowerCase()));
         });
         if (found) {
-          this.selectedPromptId = found?.[JSON_KEYS.PROMPT_ID] ?? this.selectedPromptId;
+          this.selectedPromptId =
+            found?.[JSON_KEYS.PROMPT_ID] ?? this.selectedPromptId;
           this.promptOptions = {};
         }
       }
@@ -386,7 +441,10 @@ export const useChatStore = defineStore("chat", {
 
     _pickMostRecentChatId() {
       const list = (this.chats || [])
-        .filter((c) => c?.assistantId === this.assistantId && c?.modelId === this.modelId)
+        .filter(
+          (c) =>
+            c?.assistantId === this.assistantId && c?.modelId === this.modelId,
+        )
         .sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
       return list?.[0]?.id ?? null;
     },
@@ -460,8 +518,8 @@ export const useChatStore = defineStore("chat", {
         this.activeChat?.title && this.activeChat.title !== "New chat"
           ? this.activeChat.title
           : text.length > 24
-          ? text.slice(0, 24) + "…"
-          : text;
+            ? text.slice(0, 24) + "…"
+            : text;
 
       const updated = {
         ...this.activeChat,

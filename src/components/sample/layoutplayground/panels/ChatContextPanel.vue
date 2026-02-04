@@ -1,31 +1,28 @@
 <template>
   <div class="p">
-    <div class="row">
+    <!-- Assistant / Model (default: enabled) -->
+    <div class="row" v-if="showAssistant">
       <div class="lbl">Assistant</div>
-      <select class="sel" v-model="assistantId" @change="onAssistant">
+      <select class="sel" v-model="assistantId" :disabled="lockAssistantModel" @change="onAssistant">
         <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
       </select>
     </div>
 
-    <div class="row">
+    <div class="row" v-if="showModel">
       <div class="lbl">Model</div>
-      <select class="sel" v-model="modelId" @change="onModel">
+      <select class="sel" v-model="modelId" :disabled="lockAssistantModel" @change="onModel">
         <option v-for="m in models" :key="m.model_id" :value="m.model_id">{{ m.name_ko || m.name_en }}</option>
       </select>
     </div>
 
-    <div class="row">
-      <div class="lbl">Input</div>
-      <select class="sel" v-model="inputMode" @change="onMode">
-        <option v-for="m in modes" :key="m.id" :value="m.id">{{ m.label }}</option>
-      </select>
-    </div>
-
-    <div class="row">
+    <!-- Chat selector: ONLY for ChatMessageList tab -->
+    <div class="row" v-if="showChat">
       <div class="lbl">Chat</div>
       <select class="sel" v-model="activeChatId" @change="onChat">
         <option value="">(draft)</option>
-        <option v-for="c in chatIds" :key="c" :value="c">{{ c }}</option>
+        <option v-for="c in chatOptions" :key="c.id" :value="c.id">
+          {{ c.title || c.id }}
+        </option>
       </select>
     </div>
 
@@ -41,6 +38,8 @@ import { useDataStore } from "@/stores/dataStore";
 import { JSON_KEYS } from "@/constants/jsonKeys";
 import { patchPreviewStore } from "@/stores/previewBridge";
 
+const LS_KEY = "ds_chat_state_v3";
+
 function pickDefaultModel(ds, assistantId) {
   const list = ds.modelsByAssistant(assistantId) || [];
   const first = list.find((m) => m?.[JSON_KEYS.DEFAULT_YN] === true) || list[0] || null;
@@ -49,11 +48,14 @@ function pickDefaultModel(ds, assistantId) {
 
 export default {
   name: "ChatContextPanel",
+  props: {
+    // main | input | messages
+    variant: { type: String, default: "main" },
+  },
   data() {
     return {
       assistantId: "",
       modelId: "",
-      inputMode: "direct",
       activeChatId: "",
     };
   },
@@ -64,6 +66,20 @@ export default {
     assistants() {
       return this.ds.uiAssistants || [];
     },
+
+    showAssistant() {
+      // for message list, show assistant/model but locked
+      return true;
+    },
+    showModel() {
+      return true;
+    },
+    showChat() {
+      return this.variant === "messages";
+    },
+    lockAssistantModel() {
+      return this.variant === "messages";
+    },
     models() {
       if (!this.assistantId) return [];
       return (this.ds.modelsByAssistant(this.assistantId) || []).map((m) => ({
@@ -73,25 +89,24 @@ export default {
         default: m[JSON_KEYS.DEFAULT_YN] === true,
       }));
     },
-    modes() {
-      // mirror chatStore.availableInputModes (simple heuristic)
-      if (this.assistantId === "a3ab57b9-0d19-4347-b0ce-e6bdd896230c") {
-        return [
-          { id: "direct", label: "직접" },
-          { id: "email", label: "메일" },
-          { id: "translate", label: "번역" },
-          { id: "summary", label: "요약" },
-          { id: "code", label: "코드" },
-        ];
+    chatOptions() {
+      // ✅ Use persisted storage so selector reflects *real* chats.
+      // This works because preview sub-app and panels share the same origin/localStorage.
+      try {
+        const saved = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+        const list = Array.isArray(saved?.chats) ? saved.chats : [];
+        return [...list]
+          .filter((c) => c && typeof c === "object")
+          .sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0))
+          .map((c) => ({
+            id: c.id,
+            title: c.title,
+            assistantId: c.assistantId,
+            modelId: c.modelId,
+          }));
+      } catch {
+        return [];
       }
-      return [{ id: "direct", label: "직접" }];
-    },
-    chatIds() {
-      // previewSeed provides these demo rooms
-      if (this.assistantId === "a3ab57b9-0d19-4347-b0ce-e6bdd896230c") {
-        return ["preview-spec-1", "preview-spec-2"];
-      }
-      return ["preview-chat-1", "preview-chat-2"];
     },
   },
   methods: {
@@ -99,28 +114,33 @@ export default {
       patchPreviewStore({ chat: partial });
     },
     onAssistant() {
+      if (this.lockAssistantModel) return;
       // patch assistant first; model will follow default
       this.patch({ assistantId: this.assistantId });
       const def = pickDefaultModel(this.ds, this.assistantId);
       this.modelId = def;
       if (def) this.patch({ modelId: def });
 
-      this.inputMode = this.modes?.[0]?.id || "direct";
-      this.patch({ inputMode: this.inputMode });
-
+      // reset active chat (draft)
       this.activeChatId = "";
-      this.patch({ activeChatId: "" });
+      if (this.showChat) this.patch({ activeChatId: "" });
     },
     onModel() {
+      if (this.lockAssistantModel) return;
       this.patch({ modelId: this.modelId });
       this.activeChatId = "";
-      this.patch({ activeChatId: "" });
-    },
-    onMode() {
-      this.patch({ inputMode: this.inputMode });
+      if (this.showChat) this.patch({ activeChatId: "" });
     },
     onChat() {
-      this.patch({ activeChatId: this.activeChatId || null });
+      const id = this.activeChatId || null;
+      this.patch({ activeChatId: id });
+
+      // ✅ reflect assistant/model of the selected chat in UI (locked)
+      const found = this.chatOptions.find((c) => c.id === id);
+      if (found) {
+        this.assistantId = found.assistantId || this.assistantId;
+        this.modelId = found.modelId || this.modelId;
+      }
     },
   },
   mounted() {
@@ -128,12 +148,23 @@ export default {
     const first = this.assistants?.[0];
     this.assistantId = first?.id || "";
     this.modelId = this.assistantId ? pickDefaultModel(this.ds, this.assistantId) : "";
-    this.inputMode = this.modes?.[0]?.id || "direct";
 
-    // patch preview to match
-    if (this.assistantId) this.patch({ assistantId: this.assistantId });
-    if (this.modelId) this.patch({ modelId: this.modelId });
-    this.patch({ inputMode: this.inputMode });
+    // patch preview to match (assistant/model only)
+    if (this.variant !== "messages") {
+      if (this.assistantId) this.patch({ assistantId: this.assistantId });
+      if (this.modelId) this.patch({ modelId: this.modelId });
+    } else {
+      // messages tab: default to most recent chat if exists
+      const firstChat = this.chatOptions?.[0];
+      if (firstChat?.id) {
+        this.activeChatId = firstChat.id;
+        this.assistantId = firstChat.assistantId || this.assistantId;
+        this.modelId = firstChat.modelId || this.modelId;
+        this.patch({ activeChatId: firstChat.id });
+      } else {
+        this.patch({ activeChatId: null });
+      }
+    }
   },
 };
 </script>
