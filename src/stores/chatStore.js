@@ -30,6 +30,9 @@ function persistableState(state) {
 
 export const useChatStore = defineStore("chat", {
   state: () => ({
+    // ✅ runtime init guard (so components can work without AppLayout parent)
+    _initialized: false,
+
     assistantId: null,
     modelId: null,
 
@@ -94,6 +97,17 @@ export const useChatStore = defineStore("chat", {
   },
 
   actions: {
+    /**
+     * ✅ Safe init for "standalone components".
+     * - Idempotent.
+     * - Any component may call this to make sure data defaults exist.
+     */
+    ensureInitialized() {
+      if (this._initialized) return;
+      this.ensureDefaults();
+      this._initialized = true;
+    },
+
     /** load persisted + ensure assistant/model defaults */
     ensureDefaults() {
       const ds = useDataStore();

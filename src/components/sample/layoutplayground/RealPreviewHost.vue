@@ -13,6 +13,9 @@ import themeManager from "@/plugins/themeManager";
 
 import { seedPreviewStores, enablePreviewBridge } from "@/stores/previewSeed";
 
+// ✅ Real view for router-view previews (AppLayout / Main)
+import ChatView from "@/views/ChatView.vue";
+
 // ✅ runtime-only build safe stubs (render functions, no template strings)
 const Stub = defineComponent({
   name: "PreviewStub",
@@ -62,9 +65,9 @@ export default {
       const router = createRouter({
         history: createMemoryHistory(),
         routes: [
-          { path: "/", name: "home", component: Stub },
-          { path: "/main", name: "main", component: Stub },
-          { path: "/chat/:id", name: "chat", component: Stub },
+          { path: "/", redirect: "/main" },
+          { path: "/main", name: "main", component: ChatView },
+          { path: "/chat/:id", name: "chat", component: ChatView },
           { path: "/playground", name: "playground", component: Stub },
         ],
       });

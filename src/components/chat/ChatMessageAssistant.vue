@@ -1,6 +1,6 @@
 <template>
   <div class="msg assistant">
-    <div class="bubble" v-html="render(message.text)" />
+    <div class="bubble" v-html="render(text)" />
   </div>
 </template>
 
@@ -16,6 +16,14 @@ export default {
     render: {
       type: Function,
       required: true,
+    },
+  },
+
+  computed: {
+    // ✅ tolerate multiple legacy field names
+    text() {
+      const m = this.message || {};
+      return m.text ?? m.content ?? m.message ?? "";
     },
   },
 };

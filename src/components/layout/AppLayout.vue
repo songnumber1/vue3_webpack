@@ -51,7 +51,8 @@ export default {
     const t = this.$theme.getTheme();
     ui.initTheme(t);
 
-    chat.ensureDefaults();
+    // ✅ allow AppLayout OR any standalone component to init chat state
+    chat.ensureInitialized();
   },
 
   computed: {

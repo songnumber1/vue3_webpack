@@ -19,6 +19,9 @@ import "./assets/preview-fallback.css";
 import "./assets/main.scss";
 import "./assets/note.css";
 
+// KaTeX base styles (used by markdown-it-katex)
+import "katex/dist/katex.min.css";
+
 const app = createApp(App);
 
 app.use(createPinia());

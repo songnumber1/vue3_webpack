@@ -20,6 +20,10 @@ import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "InputHeader",
+  created() {
+    // ✅ standalone-safe
+    this.chat.ensureInitialized();
+  },
   computed: {
     chat() {
       return useChatStore();

@@ -38,9 +38,7 @@
 </template>
 
 <script>
-import { markRaw, defineComponent, h } from "vue";
-
-const StubMain = defineComponent({ name: "StubMain", render: () => h("div", { style: "padding:12px;color:var(--muted);font-size:12px;" }, "Main preview: 실제 앱에서는 router-view 영역입니다. (탭에서 다른 컴포넌트 DI 검증에 집중)") });
+import { markRaw } from "vue";
 
 import RealPreviewHost from "./RealPreviewHost.vue";
 
@@ -48,8 +46,10 @@ import RealPreviewHost from "./RealPreviewHost.vue";
 import AppHeader from "@/components/layout/AppHeader.vue";
 import AppFooter from "@/components/layout/AppFooter.vue";
 import AppSidebar from "@/components/layout/AppSidebar.vue";
+import AppLayout from "@/components/layout/AppLayout.vue";
+import ChatView from "@/views/ChatView.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
-import InputHeader from "@/components/chat/InputHeader.vue";
+import ChatInputBox from "@/components/chat/ChatInputBox.vue";
 
 // Panels (preview-store editor)
 import HeaderPanel from "./panels/HeaderPanel.vue";
@@ -68,9 +68,10 @@ export default {
       tabs: [
         { key: "header", label: "Header", component: markRaw(AppHeader), panel: markRaw(HeaderPanel), mode: "block" },
         { key: "sidebar", label: "Sidebar", component: markRaw(AppSidebar), panel: markRaw(SidebarPanel), mode: "block" },
-        { key: "main", label: "Main", component: markRaw(StubMain), panel: markRaw(MainPanel), mode: "block" },
+        { key: "layout", label: "AppLayout (Full)", component: markRaw(AppLayout), panel: markRaw(MainPanel), mode: "layout" },
+        { key: "main", label: "Main (ChatView)", component: markRaw(ChatView), panel: markRaw(MainPanel), mode: "block" },
         { key: "messages", label: "ChatMessageList", component: markRaw(ChatMessageList), panel: markRaw(MessagesPanel), mode: "block" },
-        { key: "input", label: "ChatInput", component: markRaw(InputHeader), panel: markRaw(InputPanel), mode: "block" },
+        { key: "input", label: "ChatInput", component: markRaw(ChatInputBox), panel: markRaw(InputPanel), mode: "block" },
         { key: "footer", label: "Footer", component: markRaw(AppFooter), panel: markRaw(FooterPanel), mode: "block" },
       ],
     };

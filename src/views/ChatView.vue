@@ -48,6 +48,11 @@ export default {
     PromptTemplateForm,
   },
 
+  created() {
+    // ✅ standalone-safe (ChatView can be mounted without AppLayout)
+    this.chat.ensureInitialized();
+  },
+
   computed: {
     chat() {
       return useChatStore();

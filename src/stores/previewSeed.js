@@ -41,8 +41,9 @@ function seedBaseState() {
   ];
   chat.activeChatId = "preview-chat-1";
   chat.messages = [
-    { id: "m1", role: "user", content: "미리보기: DI 없이 store를 직접 쓰는지 확인" },
-    { id: "m2", role: "assistant", content: "확인용 응답입니다. 실제 컴포넌트가 store를 직접 import합니다." },
+    // NOTE: message field is `text` across the app
+    { id: "m1", role: "user", text: "미리보기: DI 없이 store를 직접 쓰는지 확인" },
+    { id: "m2", role: "assistant", text: "확인용 응답입니다. 실제 컴포넌트가 store를 직접 import합니다." },
   ];
 }
 

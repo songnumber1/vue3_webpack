@@ -45,6 +45,9 @@ import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "PromptTemplateForm",
+  created() {
+    this.chat.ensureInitialized();
+  },
   computed: {
     chat() {
       return useChatStore();

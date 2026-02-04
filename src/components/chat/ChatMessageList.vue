@@ -34,6 +34,11 @@ export default {
     },
   },
 
+  created() {
+    // ✅ standalone-safe (works even when AppLayout is not mounted)
+    this.store.ensureInitialized();
+  },
+
   methods: {
     render(text) {
       return md.render(String(text ?? ""));
