@@ -323,12 +323,9 @@ export const useChatStore = defineStore("chat", {
       this.selectedPromptId = null;
       this.promptOptions = {};
 
-      // ✅ switch to most recent chat for this assistant/model, else draft
-      const best = this._pickMostRecentChatId();
-      this.activeChatId = best;
-      if (best) this._loadMessagesFromActiveChat();
-      else this.messages = [];
-
+      // ✅ always start "new chat" on assistant selection (do not auto-open history)
+      this.activeChatId = null;
+      this.messages = [];
       this.inputText = "";
 
       this._syncPromptDefault();
@@ -404,7 +401,7 @@ export const useChatStore = defineStore("chat", {
     },
 
     /** 새 채팅방 생성 + 라우팅은 Sidebar가 처리 */
-    createChat(text) {
+    createChat() {
       if (this.isLocked) return null;
 
       const id = String(nowTs());
@@ -421,7 +418,7 @@ export const useChatStore = defineStore("chat", {
       this.chats = [chat, ...this.chats];
       this.activeChatId = id;
       this.messages = [];
-      this.inputText = text;
+      this.inputText = "";
 
       this._persist();
       return id;
@@ -498,7 +495,7 @@ export const useChatStore = defineStore("chat", {
 
       // ensure room
       if (!this.activeChatId) {
-        this.createChat(text);
+        this.createChat();
       }
 
       const prompt = this.currentPrompt;

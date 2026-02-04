@@ -16,6 +16,8 @@
           rows="2"
           placeholder="메시지를 입력하세요"
           @keydown="onKeydown"
+          @compositionstart="isComposing = true"
+          @compositionend="isComposing = false"
         />
       </div>
 
@@ -79,7 +81,8 @@ export default {
 
   data() {
     return {
-      email: { to: "", subject: "", body: "" },
+      isComposing: false,
+            email: { to: "", subject: "", body: "" },
       tr: { from: "ko", to: "en", text: "" },
       sum: { style: "bullet", limit: "", text: "" },
       code: { lang: "", task: "", text: "" },
@@ -130,20 +133,19 @@ export default {
         this.chat.setInputText(composed);
       }
 
-      // ✅ ensure chat room exists
-      if (!this.activeChatId) {
-        const id = this.chat.createChat(this.input);
-        // if router exists (preview/app), navigate to room
-        if (id && this.$router) {
-          try {
-            this.$router.push(`/chat/${id}`);
-          } catch (e) {
-            // ignore
-          }
+      const wasNew = !this.activeChatId;
+
+      // ✅ send (store will create chat room on first submit)
+      this.chat.send();
+
+      // ✅ if this was a new chat, navigate to newly created room (when router exists)
+      if (wasNew && this.chat.activeChatId && this.$router) {
+        try {
+          this.$router.push(`/chat/${this.chat.activeChatId}`);
+        } catch (e) {
+          // ignore
         }
       }
-
-      this.chat.send();
     },
 
     composeTextByMode() {
@@ -166,7 +168,7 @@ export default {
     },
 
     onKeydown(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
+      if (e.key === "Enter" && !e.shiftKey && !e.isComposing && !this.isComposing) {
         e.preventDefault();
         this.send();
       }
