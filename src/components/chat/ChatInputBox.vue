@@ -42,8 +42,21 @@
           <input class="in" v-model="email.subject" placeholder="제목" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" ref="taEmail" v-model="email.body" rows="3" placeholder="내용" @keydown="onKeydown" />
-          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+          <textarea
+            class="composer-ta"
+            ref="taEmail"
+            v-model="email.body"
+            rows="3"
+            placeholder="내용"
+            @keydown="onKeydown"
+          />
+          <button
+            type="button"
+            class="send-btn"
+            :disabled="isLocked"
+            @click="send"
+            aria-label="Send"
+          >
             <AppIcon name="send" size="sm" />
           </button>
         </div>
@@ -52,12 +65,29 @@
       <!-- TRANSLATE -->
       <div v-else-if="inputMode === 'translate'" class="form">
         <div class="row">
-          <input class="in" v-model="tr.from" placeholder="원문 언어 (예: ko)" />
+          <input
+            class="in"
+            v-model="tr.from"
+            placeholder="원문 언어 (예: ko)"
+          />
           <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" ref="taTranslate" v-model="tr.text" rows="3" placeholder="번역할 텍스트" @keydown="onKeydown" />
-          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+          <textarea
+            class="composer-ta"
+            ref="taTranslate"
+            v-model="tr.text"
+            rows="3"
+            placeholder="번역할 텍스트"
+            @keydown="onKeydown"
+          />
+          <button
+            type="button"
+            class="send-btn"
+            :disabled="isLocked"
+            @click="send"
+            aria-label="Send"
+          >
             <AppIcon name="send" size="sm" />
           </button>
         </div>
@@ -74,8 +104,21 @@
           <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" ref="taSummary" v-model="sum.text" rows="3" placeholder="요약할 텍스트" @keydown="onKeydown" />
-          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+          <textarea
+            class="composer-ta"
+            ref="taSummary"
+            v-model="sum.text"
+            rows="3"
+            placeholder="요약할 텍스트"
+            @keydown="onKeydown"
+          />
+          <button
+            type="button"
+            class="send-btn"
+            :disabled="isLocked"
+            @click="send"
+            aria-label="Send"
+          >
             <AppIcon name="send" size="sm" />
           </button>
         </div>
@@ -84,12 +127,33 @@
       <!-- CODE -->
       <div v-else-if="inputMode === 'code'" class="form">
         <div class="row">
-          <input class="in" v-model="code.lang" placeholder="언어 (예: java, js)" />
-          <input class="in" v-model="code.task" placeholder="요청 (예: 리팩토링, 버그 수정)" />
+          <input
+            class="in"
+            v-model="code.lang"
+            placeholder="언어 (예: java, js)"
+          />
+          <input
+            class="in"
+            v-model="code.task"
+            placeholder="요청 (예: 리팩토링, 버그 수정)"
+          />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" ref="taCode" v-model="code.text" rows="3" placeholder="코드/설명" @keydown="onKeydown" />
-          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+          <textarea
+            class="composer-ta"
+            ref="taCode"
+            v-model="code.text"
+            rows="3"
+            placeholder="코드/설명"
+            @keydown="onKeydown"
+          />
+          <button
+            type="button"
+            class="send-btn"
+            :disabled="isLocked"
+            @click="send"
+            aria-label="Send"
+          >
             <AppIcon name="send" size="sm" />
           </button>
         </div>
@@ -176,37 +240,53 @@ export default {
   },
 
   methods: {
-    focusActiveEditor() {
+    // ✅ 현재 모드의 textarea(ref)에서 "보이는 값"을 직접 가져와서 store에 확정
+    _getActiveEditorText() {
       const mode = this.inputMode || "direct";
-      const map = {
+      const refMap = {
         direct: "taDirect",
         email: "taEmail",
         translate: "taTranslate",
         summary: "taSummary",
         code: "taCode",
       };
-      const key = map[mode] || "taDirect";
-      this.$nextTick(() => {
-        const el = this.$refs[key];
-        if (el && typeof el.focus === "function") el.focus();
-      });
+      const key = refMap[mode] || "taDirect";
+      const el = this.$refs[key];
+
+      // Vue ref가 textarea DOM이면 value로 읽음
+      if (el && typeof el.value === "string") {
+        return el.value;
+      }
+      // fallback: store bound value
+      if (mode === "direct") return String(this.input || "");
+      if (mode === "email") return String(this.email.body || "");
+      if (mode === "translate") return String(this.tr.text || "");
+      if (mode === "summary") return String(this.sum.text || "");
+      if (mode === "code") return String(this.code.text || "");
+      return "";
     },
 
     send() {
       if (this.isLocked) return;
 
-      // ✅ compose final message by inputMode
-      if (this.inputMode !== "direct") {
-        const composed = this.composeTextByMode();
-        this.chat.setInputText(composed);
+      // ✅ 항상 최신 editor 값을 기반으로 최종 텍스트 확정
+      let finalText = "";
+
+      if (this.inputMode === "direct") {
+        finalText = String(this._getActiveEditorText() || "").trim();
+      } else {
+        finalText = String(this.composeTextByMode() || "").trim();
       }
+
+      if (!finalText) return;
+
+      // ✅ store send는 inputText만 봄 → 여기서 확정
+      this.chat.setInputText(finalText);
 
       const wasNew = !this.activeChatId;
 
-      // ✅ send (store will create chat room on first submit)
       this.chat.send();
 
-      // ✅ if this was a new chat, navigate to newly created room (when router exists)
       if (wasNew && this.chat.activeChatId && this.$router) {
         try {
           this.$router.push(`/chat/${this.chat.activeChatId}`);
@@ -218,25 +298,41 @@ export default {
 
     composeTextByMode() {
       if (this.inputMode === "email") {
-        const to = this.email.to.trim();
-        const subject = this.email.subject.trim();
-        const body = this.email.body.trim();
+        const to = (this.email.to || "").trim();
+        const subject = (this.email.subject || "").trim();
+        const body = String(
+          this._getActiveEditorText() || this.email.body || "",
+        ).trim();
         return `메일 작성\n- To: ${to || "(미지정)"}\n- Subject: ${subject || "(미지정)"}\n\n${body}`;
       }
       if (this.inputMode === "translate") {
-        return `번역 요청\n- From: ${this.tr.from}\n- To: ${this.tr.to}\n\n${this.tr.text}`;
+        const text = String(
+          this._getActiveEditorText() || this.tr.text || "",
+        ).trim();
+        return `번역 요청\n- From: ${this.tr.from}\n- To: ${this.tr.to}\n\n${text}`;
       }
       if (this.inputMode === "summary") {
-        return `요약 요청\n- Style: ${this.sum.style}\n- Limit: ${this.sum.limit || "(미지정)"}\n\n${this.sum.text}`;
+        const text = String(
+          this._getActiveEditorText() || this.sum.text || "",
+        ).trim();
+        return `요약 요청\n- Style: ${this.sum.style}\n- Limit: ${this.sum.limit || "(미지정)"}\n\n${text}`;
       }
       if (this.inputMode === "code") {
-        return `코드 작업 요청\n- Lang: ${this.code.lang || "(미지정)"}\n- Task: ${this.code.task || "(미지정)"}\n\n${this.code.text}`;
+        const text = String(
+          this._getActiveEditorText() || this.code.text || "",
+        ).trim();
+        return `코드 작업 요청\n- Lang: ${this.code.lang || "(미지정)"}\n- Task: ${this.code.task || "(미지정)"}\n\n${text}`;
       }
       return String(this.input || "");
     },
 
     onKeydown(e) {
-      if (e.key === "Enter" && !e.shiftKey && !e.isComposing && !this.isComposing) {
+      if (
+        e.key === "Enter" &&
+        !e.shiftKey &&
+        !e.isComposing &&
+        !this.isComposing
+      ) {
         e.preventDefault();
         this.send();
       }
@@ -299,7 +395,11 @@ export default {
   padding: 10px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 80%, transparent), var(--bg-elevated));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-surface) 80%, transparent),
+    var(--bg-elevated)
+  );
   box-shadow: var(--shadow-sm);
 }
 
@@ -312,7 +412,7 @@ export default {
   background: color-mix(in srgb, var(--bg) 60%, transparent);
   color: var(--text-primary);
   border-radius: 14px;
-  padding: 12px 60px 52px 12px;
+  padding: 12px 60px 52px 12px; /* ✅ 그대로 유지 */
   outline: none;
   line-height: 1.4;
 }
@@ -322,22 +422,35 @@ export default {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
+/* ✅ UI/UX 유지 + 위치/겹침만 해결 */
 .send-btn {
   width: 44px;
   height: 44px;
   border-radius: 14px;
   border: 1px solid transparent;
-  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-2, var(--accent))
+  );
   color: var(--accent-contrast);
   position: absolute;
-  right: 12px;
-  bottom: 12px;
+
+  /* 🔧 너무 바닥/우측에 붙어서 스크롤 가림 → 살짝 띄움 */
+  right: 30px;
+  bottom: 25px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-md);
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+
+  /* 🔧 클릭이 textarea에 먹히는 케이스 방지 */
+  z-index: 2;
 }
 
 .send-btn:hover {
@@ -367,5 +480,4 @@ export default {
     max-height: 140px;
   }
 }
-
 </style>
