@@ -1,12 +1,12 @@
 <template>
   <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
     <div class="top-row">
-      <button v-if="!isMobile" type="button" class="hamburger" aria-label="Toggle sidebar" @click="toggleCollapse">
-        ☰
+      <button v-if="!isMobile" type="button" class="icon-btn" aria-label="Toggle sidebar" @click="toggleCollapse">
+        <AppIcon :name="sidebarCollapsed ? 'panel-right' : 'panel-left'" />
       </button>
 
-      <button v-else type="button" class="hamburger" aria-label="Close sidebar" @click="closeSidebar">
-        ✕
+      <button v-else type="button" class="icon-btn" aria-label="Close sidebar" @click="closeSidebar">
+        <AppIcon name="x" />
       </button>
 
       <strong v-if="!sidebarCollapsed" class="label">DS Assistant</strong>
@@ -15,12 +15,12 @@
     <!-- 상단 네비게이션 -->
     <nav class="nav" aria-label="Primary navigation">
       <router-link to="/main" aria-label="Chat" class="nav-item">
-        <span class="icon">💬</span>
+        <span class="icon"><AppIcon name="chat" /></span>
         <span class="text">Chat</span>
       </router-link>
 
       <router-link to="/playground" aria-label="Playground" class="nav-item">
-        <span class="icon">🧪</span>
+        <span class="icon"><AppIcon name="beaker" /></span>
         <span class="text">Playground</span>
       </router-link>
 
@@ -32,6 +32,7 @@
           <div class="nav-section-label">Assistant</div>
 
           <button v-if="canToggleAssistants" type="button" class="nav-more" @click="toggleAssistants">
+            <AppIcon :name="assistantsExpanded ? 'chevron-left' : 'chevron-right'" size="sm" muted />
             {{ assistantsExpanded ? "축소" : "더보기" }}
           </button>
         </div>
@@ -39,8 +40,8 @@
         <!-- ❗ 기존 버튼 렌더 구조 그대로 -->
         <button v-for="g in displayedAssistants" :key="g.id" type="button" class="nav-item nav-btn"
           :class="{ active: safeStore.activeModelGroupId === g.id }" @click="setModelGroup(g.id)">
-          <span class="icon model-icon">
-            {{ iconForGroup(g.id) }}
+          <span class="icon model-icon" aria-hidden="true">
+            <AppIcon name="sparkles" size="sm" />
           </span>
           <span class="text">{{ g.label }}</span>
         </button>
@@ -60,7 +61,7 @@
                 {{ c.title }}
               </button>
               <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
-                🗑
+                <AppIcon name="trash" size="sm" muted />
               </button>
             </div>
           </div>
@@ -73,6 +74,7 @@
 </template>
 
 <script>
+import AppIcon from "@/components/common/AppIcon.vue";
 import { PINNED_ASSISTANT_IDS } from "@/constants/pinnedAssistants";
 import { useUiStore } from "@/stores/uiStore";
 import { useChatStore } from "@/stores/chatStore";
@@ -80,6 +82,8 @@ import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "AppSidebar",
+
+  components: { AppIcon },
 
   computed: {
     uiStore() {
@@ -226,10 +230,11 @@ export default {
 
 <style scoped>
 .sidebar {
-  width: 280px;
-  min-width: 280px;
-  border-right: 1px solid var(--border);
-  background: var(--bg-surface);
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  border-right: 1px solid var(--sidebar-border, var(--border));
+  background: var(--sidebar-bg, var(--bg-surface));
+  background-image: var(--sidebar-bg-gradient, none);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -239,8 +244,8 @@ export default {
 }
 
 .sidebar.collapsed {
-  width: 76px;
-  min-width: 76px;
+  width: var(--sidebar-collapsed-width);
+  min-width: var(--sidebar-collapsed-width);
   padding: 14px 10px;
 }
 
@@ -250,17 +255,26 @@ export default {
   gap: 10px;
 }
 
-.hamburger {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  background: var(--bg-surface);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
+  box-shadow: var(--shadow-sm);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 
-.hamburger:hover {
-  background: var(--bg-soft);
+.icon-btn:hover {
+  transform: translateY(-1px);
+}
+
+.icon-btn:active {
+  transform: translateY(0);
 }
 
 .label {
@@ -287,11 +301,13 @@ export default {
   color: var(--text-primary);
   background: transparent;
   cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
 .nav-item:hover {
-  background: var(--bg-soft);
-  border-color: var(--border);
+  background: var(--sidebar-hover-bg, var(--bg-soft));
+  border-color: color-mix(in srgb, var(--border) 70%, transparent);
+  transform: translateY(-1px);
 }
 
 .nav-btn {
@@ -299,8 +315,9 @@ export default {
 }
 
 .nav-item.active {
-  background: var(--bg-soft);
-  border-color: var(--border);
+  background: linear-gradient(135deg, var(--sidebar-active-bg, var(--bg-soft)), var(--sidebar-active-bg-2, var(--bg-elevated)));
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  box-shadow: var(--shadow-xs, none);
 }
 
 .nav-divider {
@@ -332,11 +349,10 @@ export default {
 }
 
 .model-icon {
-  font-size: 11px;
-  font-weight: 700;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 2px 0;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  box-shadow: var(--shadow-xs, none);
 }
 
 .text {
@@ -374,8 +390,8 @@ export default {
 }
 
 .chat-item.active {
-  background: var(--bg-soft);
-  border-color: var(--border);
+  background: var(--sidebar-active-bg, var(--bg-soft));
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
 }
 
 .chat-title {
@@ -392,7 +408,14 @@ export default {
   background: transparent;
   border: none;
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.9;
+  border-radius: 10px;
+  padding: 6px;
+  transition: background 0.15s ease;
+}
+
+.chat-del:hover {
+  background: var(--sidebar-hover-bg, var(--bg-soft));
 }
 
 .chat-empty {

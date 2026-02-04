@@ -125,14 +125,14 @@ export default {
 .mobile-sidebar {
   position: fixed;
   left: 0;
-  top: 56px; /* header height */
-  height: calc(100vh - 56px);
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
   z-index: 80;
 }
 
 .backdrop {
   position: fixed;
-  inset: 56px 0 0 0; /* below header */
+  inset: var(--header-height) 0 0 0; /* below header */
   background: rgba(0, 0, 0, 0.35);
   z-index: 70;
 }

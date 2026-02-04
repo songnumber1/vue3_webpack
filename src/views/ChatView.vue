@@ -103,9 +103,10 @@ export default {
 }
 
 .room-header {
-  height: 52px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-surface);
+  height: 56px;
+  border-bottom: 1px solid var(--header-border, var(--border));
+  background: color-mix(in srgb, var(--bg-surface) 75%, transparent);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -125,7 +126,57 @@ export default {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 16px;
+  padding: 18px;
+}
+
+/* =========================
+   Message bubbles (modern)
+   ========================= */
+:deep(.msg) {
+  display: flex;
+  margin: 10px 0;
+}
+
+:deep(.msg.user) {
+  justify-content: flex-end;
+}
+
+:deep(.msg.assistant) {
+  justify-content: flex-start;
+}
+
+:deep(.msg .bubble) {
+  max-width: min(760px, 92%);
+  border-radius: 16px;
+  padding: 12px 14px;
+  line-height: 1.5;
+  font-size: 14px;
+  box-shadow: var(--shadow-xs, none);
+  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+:deep(.msg.user .bubble) {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  color: var(--accent-contrast);
+  border-color: transparent;
+}
+
+:deep(.msg.assistant .bubble) {
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  color: var(--text-primary);
+}
+
+/* markdown content inside bubbles */
+:deep(.bubble p) {
+  margin: 0.35em 0;
+}
+
+:deep(.bubble pre) {
+  background: var(--chat-code-bg);
+  color: var(--chat-code-text);
+  border-radius: 14px;
+  padding: 12px;
+  overflow: auto;
 }
 
 </style>

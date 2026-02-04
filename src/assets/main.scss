@@ -43,6 +43,9 @@
   --panel: var(--bg-surface);
   --panel-2: var(--bg-elevated);
 
+  /* soft hover surface */
+  --bg-soft: color-mix(in srgb, var(--bg-muted) 70%, var(--bg-surface));
+
   --text: var(--text-primary);
   --muted: var(--text-muted);
 
