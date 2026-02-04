@@ -171,4 +171,13 @@ export default {
   color: var(--text-muted);
   padding: 20px 0;
 }
+
+@media (max-width: 520px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .landing {
+    padding: 14px;
+  }
+}
 </style>

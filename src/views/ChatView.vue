@@ -13,7 +13,7 @@
       <ChatMessageList v-else ref="messageList" />
     </div>
 
-    <ChatInputBox />
+    <ChatInputBox ref="inputBox" />
   </div>
 </template>
 
@@ -81,6 +81,13 @@ export default {
   methods: {
     applySuggestion(text) {
       this.chat.applyExampleText(text);
+      // ✅ move focus to active editor so Enter works immediately
+      this.$nextTick(() => {
+        const ib = this.$refs.inputBox;
+        if (ib && typeof ib.focusActiveEditor === "function") {
+          ib.focusActiveEditor();
+        }
+      });
     },
 
     // send/onKeydown handled by ChatInputBox
@@ -179,4 +186,13 @@ export default {
   overflow: auto;
 }
 
+
+@media (max-width: 520px) {
+  .messages {
+    padding: 12px;
+  }
+  .room-header {
+    padding: 0 12px;
+  }
+}
 </style>

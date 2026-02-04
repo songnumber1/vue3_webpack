@@ -15,6 +15,7 @@
       <div v-if="inputMode === 'direct'" class="composer">
         <textarea
           v-model="input"
+          ref="taDirect"
           class="composer-ta"
           rows="2"
           placeholder="메시지를 입력하세요…"
@@ -41,7 +42,7 @@
           <input class="in" v-model="email.subject" placeholder="제목" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" v-model="email.body" rows="3" placeholder="내용" />
+          <textarea class="composer-ta" ref="taEmail" v-model="email.body" rows="3" placeholder="내용" @keydown="onKeydown" />
           <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
             <AppIcon name="send" size="sm" />
           </button>
@@ -55,7 +56,7 @@
           <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" v-model="tr.text" rows="3" placeholder="번역할 텍스트" />
+          <textarea class="composer-ta" ref="taTranslate" v-model="tr.text" rows="3" placeholder="번역할 텍스트" @keydown="onKeydown" />
           <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
             <AppIcon name="send" size="sm" />
           </button>
@@ -73,7 +74,7 @@
           <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" v-model="sum.text" rows="3" placeholder="요약할 텍스트" />
+          <textarea class="composer-ta" ref="taSummary" v-model="sum.text" rows="3" placeholder="요약할 텍스트" @keydown="onKeydown" />
           <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
             <AppIcon name="send" size="sm" />
           </button>
@@ -87,7 +88,7 @@
           <input class="in" v-model="code.task" placeholder="요청 (예: 리팩토링, 버그 수정)" />
         </div>
         <div class="composer">
-          <textarea class="composer-ta" v-model="code.text" rows="3" placeholder="코드/설명" />
+          <textarea class="composer-ta" ref="taCode" v-model="code.text" rows="3" placeholder="코드/설명" @keydown="onKeydown" />
           <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
             <AppIcon name="send" size="sm" />
           </button>
@@ -175,6 +176,22 @@ export default {
   },
 
   methods: {
+    focusActiveEditor() {
+      const mode = this.inputMode || "direct";
+      const map = {
+        direct: "taDirect",
+        email: "taEmail",
+        translate: "taTranslate",
+        summary: "taSummary",
+        code: "taCode",
+      };
+      const key = map[mode] || "taDirect";
+      this.$nextTick(() => {
+        const el = this.$refs[key];
+        if (el && typeof el.focus === "function") el.focus();
+      });
+    },
+
     send() {
       if (this.isLocked) return;
 
@@ -277,10 +294,8 @@ export default {
 }
 
 .composer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: end;
+  position: relative;
+  display: block;
   padding: 10px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
@@ -292,12 +307,12 @@ export default {
   width: 100%;
   min-height: 52px;
   max-height: 200px;
-  resize: vertical;
+  resize: none;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--bg) 60%, transparent);
   color: var(--text-primary);
   border-radius: 14px;
-  padding: 10px 12px;
+  padding: 12px 60px 52px 12px;
   outline: none;
   line-height: 1.4;
 }
@@ -314,6 +329,9 @@ export default {
   border: 1px solid transparent;
   background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
   color: var(--accent-contrast);
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -340,5 +358,14 @@ export default {
   .row {
     grid-template-columns: 1fr;
   }
+  .chat-input {
+    padding: 10px;
+    max-height: 42vh;
+    overflow: auto;
+  }
+  .composer-ta {
+    max-height: 140px;
+  }
 }
+
 </style>
