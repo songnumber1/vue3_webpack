@@ -70,6 +70,30 @@
       <path d="M9 18l6-6-6-6" />
     </template>
 
+    <template v-else-if="name === 'chevron-down'">
+      <path d="M6 9l6 6 6-6" />
+    </template>
+
+    <!-- send -->
+    <template v-else-if="name === 'send'">
+      <path d="M22 2L11 13" />
+      <path d="M22 2l-7 20-4-9-9-4z" />
+    </template>
+
+    <!-- sidebar show/hide (distinct from collapse) -->
+    <template v-else-if="name === 'sidebar-show'">
+      <path d="M4 4h16v16H4z" />
+      <path d="M9 4v16" />
+      <path d="M13 12h6" />
+      <path d="M16 9l3 3-3 3" />
+    </template>
+    <template v-else-if="name === 'sidebar-hide'">
+      <path d="M4 4h16v16H4z" />
+      <path d="M9 4v16" />
+      <path d="M11 12h6" />
+      <path d="M14 9l-3 3 3 3" />
+    </template>
+
     <!-- sparkles (used for assistants) -->
     <template v-else-if="name === 'sparkles'">
       <path d="M12 2l1.2 3.6L17 7l-3.8 1.4L12 12l-1.2-3.6L7 7l3.8-1.4L12 2z" />

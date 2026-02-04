@@ -1,15 +1,23 @@
 <template>
-  <div v-if="prompts.length" class="ih">
-    <button
+  <div v-if="prompts.length" class="ih" role="radiogroup" aria-label="Input mode">
+    <label
       v-for="p in prompts"
       :key="p.prompts_id"
-      type="button"
-      class="ih-btn"
+      class="ih-opt"
       :class="{ active: selectedId === p.prompts_id }"
-      @click="select(p.prompts_id)"
     >
-      {{ labelFor(p) }}
-    </button>
+      <input
+        class="ih-radio"
+        type="radio"
+        name="promptMode"
+        :checked="selectedId === p.prompts_id"
+        @change="select(p.prompts_id)"
+      />
+      <span class="ih-pill">
+        <span class="ih-dot" aria-hidden="true" />
+        <span class="ih-label">{{ labelFor(p) }}</span>
+      </span>
+    </label>
   </div>
 
   <div v-else class="ih-empty">선택한 모델에 연결된 템플릿이 없습니다.</div>
@@ -60,26 +68,56 @@ export default {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  padding: 2px 0;
 }
 
-.ih-btn {
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 12px;
+.ih-opt {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.ih-radio {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
   cursor: pointer;
 }
 
-.ih-btn:hover {
-  background: var(--bg-surface);
+.ih-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg-surface) 60%, transparent);
+  color: var(--text-primary);
+  font-size: 12px;
+  box-shadow: var(--shadow-xs, none);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.ih-btn.active {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(100, 149, 237, 0.15);
-  font-weight: 800;
+.ih-opt:hover .ih-pill {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.ih-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-muted) 70%, transparent);
+}
+
+.ih-opt.active .ih-pill {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  border-color: transparent;
+  color: var(--accent-contrast);
+}
+
+.ih-opt.active .ih-dot {
+  background: rgba(255, 255, 255, 0.8);
 }
 
 .ih-empty {

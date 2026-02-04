@@ -4,21 +4,34 @@
          Playground provides context controls on the left panel.
          In main flow, assistant selection is done via Sidebar, and model via templates/model default. -->
 
-    <InputHeader />
-    <PromptTemplateForm />
+    <div class="input-top">
+      <InputHeader />
+      <PromptTemplateForm />
+    </div>
 
     <!-- mode-specific body (keeps the component usable even without parents) -->
     <div class="mode-body">
       <!-- DIRECT -->
-      <div v-if="inputMode === 'direct'" class="input-main">
+      <div v-if="inputMode === 'direct'" class="composer">
         <textarea
           v-model="input"
+          class="composer-ta"
           rows="2"
-          placeholder="메시지를 입력하세요"
+          placeholder="메시지를 입력하세요…"
           @keydown="onKeydown"
           @compositionstart="isComposing = true"
           @compositionend="isComposing = false"
         />
+
+        <button
+          type="button"
+          class="send-btn"
+          :disabled="isLocked"
+          @click="send"
+          aria-label="Send"
+        >
+          <AppIcon name="send" size="sm" />
+        </button>
       </div>
 
       <!-- EMAIL -->
@@ -27,7 +40,12 @@
           <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
           <input class="in" v-model="email.subject" placeholder="제목" />
         </div>
-        <textarea class="ta" v-model="email.body" rows="3" placeholder="내용" />
+        <div class="composer">
+          <textarea class="composer-ta" v-model="email.body" rows="3" placeholder="내용" />
+          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+            <AppIcon name="send" size="sm" />
+          </button>
+        </div>
       </div>
 
       <!-- TRANSLATE -->
@@ -36,7 +54,12 @@
           <input class="in" v-model="tr.from" placeholder="원문 언어 (예: ko)" />
           <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
         </div>
-        <textarea class="ta" v-model="tr.text" rows="3" placeholder="번역할 텍스트" />
+        <div class="composer">
+          <textarea class="composer-ta" v-model="tr.text" rows="3" placeholder="번역할 텍스트" />
+          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+            <AppIcon name="send" size="sm" />
+          </button>
+        </div>
       </div>
 
       <!-- SUMMARY -->
@@ -49,7 +72,12 @@
           </select>
           <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
         </div>
-        <textarea class="ta" v-model="sum.text" rows="3" placeholder="요약할 텍스트" />
+        <div class="composer">
+          <textarea class="composer-ta" v-model="sum.text" rows="3" placeholder="요약할 텍스트" />
+          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+            <AppIcon name="send" size="sm" />
+          </button>
+        </div>
       </div>
 
       <!-- CODE -->
@@ -58,14 +86,13 @@
           <input class="in" v-model="code.lang" placeholder="언어 (예: java, js)" />
           <input class="in" v-model="code.task" placeholder="요청 (예: 리팩토링, 버그 수정)" />
         </div>
-        <textarea class="ta" v-model="code.text" rows="3" placeholder="코드/설명" />
+        <div class="composer">
+          <textarea class="composer-ta" v-model="code.text" rows="3" placeholder="코드/설명" />
+          <button type="button" class="send-btn" :disabled="isLocked" @click="send" aria-label="Send">
+            <AppIcon name="send" size="sm" />
+          </button>
+        </div>
       </div>
-    </div>
-
-    <div class="actions">
-      <button type="button" class="btn btn-primary send" :disabled="isLocked" @click="send">
-        Send
-      </button>
     </div>
   </div>
 </template>
@@ -74,18 +101,15 @@
 import InputHeader from "./InputHeader.vue";
 import PromptTemplateForm from "./PromptTemplateForm.vue";
 import { useChatStore } from "@/stores/chatStore";
+import AppIcon from "@/components/common/AppIcon.vue";
 
 export default {
   name: "ChatInputBox",
-  components: { InputHeader, PromptTemplateForm },
+  components: { InputHeader, PromptTemplateForm, AppIcon },
 
   data() {
     return {
       isComposing: false,
-            email: { to: "", subject: "", body: "" },
-      tr: { from: "ko", to: "en", text: "" },
-      sum: { style: "bullet", limit: "", text: "" },
-      code: { lang: "", task: "", text: "" },
     };
   },
 
@@ -111,19 +135,46 @@ export default {
     isLocked() {
       return this.chat.isLocked;
     },
+
+    // ✅ bind drafts to store (so example clicks update the visible editor)
+    email: {
+      get() {
+        return this.chat.modeDrafts.email;
+      },
+      set(v) {
+        this.chat.modeDrafts.email = { ...v };
+      },
+    },
+    tr: {
+      get() {
+        return this.chat.modeDrafts.translate;
+      },
+      set(v) {
+        this.chat.modeDrafts.translate = { ...v };
+      },
+    },
+    sum: {
+      get() {
+        return this.chat.modeDrafts.summary;
+      },
+      set(v) {
+        this.chat.modeDrafts.summary = { ...v };
+      },
+    },
+    code: {
+      get() {
+        return this.chat.modeDrafts.code;
+      },
+      set(v) {
+        this.chat.modeDrafts.code = { ...v };
+      },
+    },
     activeChatId() {
       return this.chat.activeChatId;
     },
   },
 
   methods: {
-    resetModeDrafts() {
-      this.email = { to: "", subject: "", body: "" };
-      this.tr = { from: "ko", to: "en", text: "" };
-      this.sum = { style: "bullet", limit: "", text: "" };
-      this.code = { lang: "", task: "", text: "" };
-    },
-
     send() {
       if (this.isLocked) return;
 
@@ -186,93 +237,108 @@ export default {
   gap: 10px;
 }
 
-.top {
+.input-top {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
-.field { display: grid; gap: 6px; }
-.lbl { font-size: 12px; color: var(--muted); }
+.mode-body {
+  display: grid;
+  gap: 10px;
+}
 
+.form {
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.in,
 .sel {
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text);
-  padding: 0 10px;
-}
-
-.modes {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.mode {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.mode.active {
-  background: var(--bg-surface);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(100, 149, 237, 0.15);
-  font-weight: 800;
-}
-
-.mode-body { display: grid; gap: 10px; }
-
-.form { display: grid; gap: 10px; }
-.row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
-.in {
   height: 40px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text);
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
+  color: var(--text-primary);
   padding: 0 12px;
   outline: none;
-}
-.ta {
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text);
-  padding: 10px 12px;
-  outline: none;
-  resize: vertical;
+  box-shadow: var(--shadow-xs, none);
 }
 
-.input-main {
-  display: flex;
+.in:focus,
+.sel:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 10px;
-  align-items: flex-end;
+  align-items: end;
+  padding: 10px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 80%, transparent), var(--bg-elevated));
+  box-shadow: var(--shadow-sm);
 }
 
-textarea {
-  flex: 1;
-  min-height: 56px;
-  max-height: 180px;
+.composer-ta {
+  width: 100%;
+  min-height: 52px;
+  max-height: 200px;
   resize: vertical;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text);
-  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text-primary);
+  border-radius: 14px;
   padding: 10px 12px;
   outline: none;
+  line-height: 1.4;
 }
 
-.actions { display: flex; justify-content: flex-end; }
+.composer-ta:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
 
-.send {
-  height: 42px;
-  padding: 0 16px;
+.send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  color: var(--accent-contrast);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.send-btn:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.1);
+}
+
+.send-btn:active {
+  transform: translateY(0);
+}
+
+.send-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

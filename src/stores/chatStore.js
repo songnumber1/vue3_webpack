@@ -88,6 +88,14 @@ export const useChatStore = defineStore("chat", {
     messages: [],
     inputText: "",
 
+    // ✅ mode drafts (so example clicks can populate the visible editor)
+    modeDrafts: {
+      email: { to: "", subject: "", body: "" },
+      translate: { from: "ko", to: "en", text: "" },
+      summary: { style: "bullet", limit: "", text: "" },
+      code: { lang: "", task: "", text: "" },
+    },
+
     // ✅ prompt header (prompts by model_id)
     selectedPromptId: null,
     promptOptions: {},
@@ -400,6 +408,21 @@ export const useChatStore = defineStore("chat", {
       this.inputText = v;
     },
 
+    setModeDraft(mode, patch) {
+      const m = String(mode || "direct");
+      if (!this.modeDrafts[m]) return;
+      this.modeDrafts[m] = { ...this.modeDrafts[m], ...(patch || {}) };
+    },
+
+    resetModeDrafts() {
+      this.modeDrafts = {
+        email: { to: "", subject: "", body: "" },
+        translate: { from: "ko", to: "en", text: "" },
+        summary: { style: "bullet", limit: "", text: "" },
+        code: { lang: "", task: "", text: "" },
+      };
+    },
+
     /** 새 채팅방 생성 + 라우팅은 Sidebar가 처리 */
     createChat() {
       if (this.isLocked) return null;
@@ -477,9 +500,20 @@ export const useChatStore = defineStore("chat", {
       this.isLocked = false;
     },
 
-    /** example 클릭 시 input에 주입 */
+    /** example 클릭 시 현재 모드의 입력에 주입 */
     applyExampleText(text) {
-      this.inputText = String(text ?? "");
+      const t = String(text ?? "");
+      const mode = this.inputMode || "direct";
+      if (mode === "email") this.setModeDraft("email", { body: t });
+      else if (mode === "translate") this.setModeDraft("translate", { text: t });
+      else if (mode === "summary") this.setModeDraft("summary", { text: t });
+      else if (mode === "code") this.setModeDraft("code", { text: t });
+      else this.inputText = t;
+
+      // also keep a plain draft for quick switching back to direct
+      if (mode !== "direct") {
+        this.inputText = t;
+      }
     },
 
     /** send: user message append + dummy assistant reply */

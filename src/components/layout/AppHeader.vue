@@ -19,7 +19,7 @@
       :aria-label="sidebarHidden ? 'Show sidebar' : 'Hide sidebar'"
       @click="toggleSidebarHidden"
     >
-      <AppIcon :name="sidebarHidden ? 'panel-right' : 'panel-left'" />
+      <AppIcon :name="sidebarHidden ? 'sidebar-show' : 'sidebar-hide'" />
     </button>
 
     <div class="brand">
