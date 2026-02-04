@@ -106,7 +106,8 @@ export default {
     },
 
     chats() {
-      return this.chatStore.chats || [];
+      // ✅ selector(assistant/model) changes should change visible chat list
+      return this.chatStore.chatsForCurrentContext || [];
     },
     activeChatId() {
       return this.chatStore.activeChatId;

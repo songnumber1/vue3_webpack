@@ -13,30 +13,14 @@
       <ChatMessageList v-else ref="messageList" />
     </div>
 
-    <div class="input-row">
-      <InputHeader />
-      <PromptTemplateForm />
-
-      <div class="input-main">
-        <textarea
-          v-model="input"
-          rows="2"
-          placeholder="메시지를 입력하세요"
-          @keydown="onKeydown"
-        />
-        <button type="button" class="send" :disabled="isLocked" @click="send">
-          Send
-        </button>
-      </div>
-    </div>
+    <ChatInputBox />
   </div>
 </template>
 
 <script>
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
-import InputHeader from "@/components/chat/InputHeader.vue";
-import PromptTemplateForm from "@/components/chat/PromptTemplateForm.vue";
+import ChatInputBox from "@/components/chat/ChatInputBox.vue";
 import { useChatStore } from "@/stores/chatStore";
 
 export default {
@@ -44,8 +28,7 @@ export default {
   components: {
     NewChatLanding,
     ChatMessageList,
-    InputHeader,
-    PromptTemplateForm,
+    ChatInputBox,
   },
 
   created() {
@@ -57,14 +40,6 @@ export default {
     chat() {
       return useChatStore();
     },
-    input: {
-      get() {
-        return this.chat.inputText;
-      },
-      set(v) {
-        this.chat.setInputText(v);
-      },
-    },
     isLocked() {
       return this.chat.isLocked;
     },
@@ -75,7 +50,7 @@ export default {
       return this.chat.activeChatTitle;
     },
     assistantLabel() {
-      return this.chat.assistantId;
+      return this.chat.assistantLabel;
     },
     modelId() {
       return this.chat.modelId;
@@ -108,26 +83,7 @@ export default {
       this.chat.applyExampleText(text);
     },
 
-    send() {
-      if (this.isLocked) return;
-
-      // ensure room route
-      if (!this.activeChatId) {
-        const id = this.chat.createChat(this.input);
-
-        if (id) this.$router.push(`/chat/${id}`);
-      }
-
-      this.chat.send();
-      this.$nextTick(() => this.scrollToBottom());
-    },
-
-    onKeydown(e) {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        this.send();
-      }
-    },
+    // send/onKeydown handled by ChatInputBox
 
     scrollToBottom() {
       const wrap = this.$refs.messagesWrap;
@@ -172,45 +128,4 @@ export default {
   padding: 16px;
 }
 
-.input-row {
-  border-top: 1px solid var(--border);
-  background: var(--bg);
-  padding: 12px;
-  display: grid;
-  gap: 10px;
-}
-
-.input-main {
-  display: flex;
-  gap: 10px;
-  align-items: flex-end;
-}
-
-textarea {
-  flex: 1;
-  min-height: 56px;
-  max-height: 180px;
-  resize: vertical;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text);
-  border-radius: 12px;
-  padding: 10px 12px;
-  outline: none;
-}
-
-.send {
-  height: 40px;
-  padding: 0 14px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: var(--accent);
-  color: white;
-  cursor: pointer;
-}
-
-.send:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 </style>

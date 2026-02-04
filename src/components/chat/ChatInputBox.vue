@@ -1,15 +1,91 @@
 <template>
   <div class="chat-input">
+    <div class="top">
+      <div class="field">
+        <div class="lbl">Assistant</div>
+        <select class="sel" :value="assistantId" @change="onPickAssistant($event.target.value)">
+          <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div class="lbl">Model</div>
+        <select class="sel" :value="modelId" @change="onPickModel($event.target.value)">
+          <option v-for="m in models" :key="m.model_id" :value="m.model_id">{{ m.name_ko || m.name_en }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modes" v-if="modes.length">
+      <button
+        v-for="m in modes"
+        :key="m.id"
+        type="button"
+        class="mode"
+        :class="{ active: inputMode === m.id }"
+        @click="chat.setInputMode(m.id)"
+      >
+        {{ m.label }}
+      </button>
+    </div>
+
     <InputHeader />
     <PromptTemplateForm />
 
-    <div class="input-main">
-      <textarea
-        v-model="input"
-        rows="2"
-        placeholder="메시지를 입력하세요"
-        @keydown="onKeydown"
-      />
+    <!-- mode-specific body (keeps the component usable even without parents) -->
+    <div class="mode-body">
+      <!-- DIRECT -->
+      <div v-if="inputMode === 'direct'" class="input-main">
+        <textarea
+          v-model="input"
+          rows="2"
+          placeholder="메시지를 입력하세요"
+          @keydown="onKeydown"
+        />
+      </div>
+
+      <!-- EMAIL -->
+      <div v-else-if="inputMode === 'email'" class="form">
+        <div class="row">
+          <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
+          <input class="in" v-model="email.subject" placeholder="제목" />
+        </div>
+        <textarea class="ta" v-model="email.body" rows="3" placeholder="내용" />
+      </div>
+
+      <!-- TRANSLATE -->
+      <div v-else-if="inputMode === 'translate'" class="form">
+        <div class="row">
+          <input class="in" v-model="tr.from" placeholder="원문 언어 (예: ko)" />
+          <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
+        </div>
+        <textarea class="ta" v-model="tr.text" rows="3" placeholder="번역할 텍스트" />
+      </div>
+
+      <!-- SUMMARY -->
+      <div v-else-if="inputMode === 'summary'" class="form">
+        <div class="row">
+          <select class="sel" v-model="sum.style">
+            <option value="bullet">불릿</option>
+            <option value="short">짧게</option>
+            <option value="detailed">자세히</option>
+          </select>
+          <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
+        </div>
+        <textarea class="ta" v-model="sum.text" rows="3" placeholder="요약할 텍스트" />
+      </div>
+
+      <!-- CODE -->
+      <div v-else-if="inputMode === 'code'" class="form">
+        <div class="row">
+          <input class="in" v-model="code.lang" placeholder="언어 (예: java, js)" />
+          <input class="in" v-model="code.task" placeholder="요청 (예: 리팩토링, 버그 수정)" />
+        </div>
+        <textarea class="ta" v-model="code.text" rows="3" placeholder="코드/설명" />
+      </div>
+    </div>
+
+    <div class="actions">
       <button type="button" class="send" :disabled="isLocked" @click="send">
         Send
       </button>
@@ -21,10 +97,20 @@
 import InputHeader from "./InputHeader.vue";
 import PromptTemplateForm from "./PromptTemplateForm.vue";
 import { useChatStore } from "@/stores/chatStore";
+import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "ChatInputBox",
   components: { InputHeader, PromptTemplateForm },
+
+  data() {
+    return {
+      email: { to: "", subject: "", body: "" },
+      tr: { from: "ko", to: "en", text: "" },
+      sum: { style: "bullet", limit: "", text: "" },
+      code: { lang: "", task: "", text: "" },
+    };
+  },
 
   created() {
     this.chat.ensureInitialized();
@@ -33,6 +119,27 @@ export default {
   computed: {
     chat() {
       return useChatStore();
+    },
+    ds() {
+      return useDataStore();
+    },
+    assistants() {
+      return this.ds.uiAssistants || [];
+    },
+    assistantId() {
+      return this.chat.assistantId;
+    },
+    modelId() {
+      return this.chat.modelId;
+    },
+    models() {
+      return this.chat.currentModels || [];
+    },
+    modes() {
+      return this.chat.availableInputModes || [];
+    },
+    inputMode() {
+      return this.chat.inputMode || "direct";
     },
     input: {
       get() {
@@ -51,8 +158,31 @@ export default {
   },
 
   methods: {
+    onPickAssistant(id) {
+      this.chat.selectAssistant(id);
+      // reset mode-local drafts
+      this.resetModeDrafts();
+    },
+    onPickModel(id) {
+      this.chat.setModel(id);
+      this.resetModeDrafts();
+    },
+
+    resetModeDrafts() {
+      this.email = { to: "", subject: "", body: "" };
+      this.tr = { from: "ko", to: "en", text: "" };
+      this.sum = { style: "bullet", limit: "", text: "" };
+      this.code = { lang: "", task: "", text: "" };
+    },
+
     send() {
       if (this.isLocked) return;
+
+      // ✅ compose final message by inputMode
+      if (this.inputMode !== "direct") {
+        const composed = this.composeTextByMode();
+        this.chat.setInputText(composed);
+      }
 
       // ✅ ensure chat room exists
       if (!this.activeChatId) {
@@ -68,6 +198,25 @@ export default {
       }
 
       this.chat.send();
+    },
+
+    composeTextByMode() {
+      if (this.inputMode === "email") {
+        const to = this.email.to.trim();
+        const subject = this.email.subject.trim();
+        const body = this.email.body.trim();
+        return `메일 작성\n- To: ${to || "(미지정)"}\n- Subject: ${subject || "(미지정)"}\n\n${body}`;
+      }
+      if (this.inputMode === "translate") {
+        return `번역 요청\n- From: ${this.tr.from}\n- To: ${this.tr.to}\n\n${this.tr.text}`;
+      }
+      if (this.inputMode === "summary") {
+        return `요약 요청\n- Style: ${this.sum.style}\n- Limit: ${this.sum.limit || "(미지정)"}\n\n${this.sum.text}`;
+      }
+      if (this.inputMode === "code") {
+        return `코드 작업 요청\n- Lang: ${this.code.lang || "(미지정)"}\n- Task: ${this.code.task || "(미지정)"}\n\n${this.code.text}`;
+      }
+      return String(this.input || "");
     },
 
     onKeydown(e) {
@@ -89,6 +238,70 @@ export default {
   gap: 10px;
 }
 
+.top {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field { display: grid; gap: 6px; }
+.lbl { font-size: 12px; color: var(--muted); }
+
+.sel {
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
+  padding: 0 10px;
+}
+
+.modes {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.mode.active {
+  background: var(--bg-surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(100, 149, 237, 0.15);
+  font-weight: 800;
+}
+
+.mode-body { display: grid; gap: 10px; }
+
+.form { display: grid; gap: 10px; }
+.row { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+.in {
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
+  padding: 0 12px;
+  outline: none;
+}
+.ta {
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text);
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+}
+
 .input-main {
   display: flex;
   gap: 10px;
@@ -107,6 +320,8 @@ textarea {
   padding: 10px 12px;
   outline: none;
 }
+
+.actions { display: flex; justify-content: flex-end; }
 
 .send {
   height: 40px;

@@ -20,6 +20,7 @@ function persistableState(state) {
   return {
     assistantId: state.assistantId,
     modelId: state.modelId,
+    inputMode: state.inputMode,
     chats: state.chats,
     activeChatId: state.activeChatId,
     // prompt ui
@@ -35,6 +36,9 @@ export const useChatStore = defineStore("chat", {
 
     assistantId: null,
     modelId: null,
+
+    // ✅ input mode depends on assistant/model
+    inputMode: "direct",
 
     chats: [],
     activeChatId: null,
@@ -52,6 +56,42 @@ export const useChatStore = defineStore("chat", {
   }),
 
   getters: {
+    /** assistant name (UI) */
+    assistantLabel() {
+      const ds = useDataStore();
+      const found = (ds.uiAssistants || []).find((a) => a.id === this.assistantId);
+      return found?.label || this.assistantId || "";
+    },
+
+    /** input modes available by assistant */
+    availableInputModes() {
+      // Spec Assistant: richer input modes
+      const id = this.assistantId;
+      if (id === "a3ab57b9-0d19-4347-b0ce-e6bdd896230c") {
+        return [
+          { id: "direct", label: "직접" },
+          { id: "email", label: "메일" },
+          { id: "translate", label: "번역" },
+          { id: "summary", label: "요약" },
+          { id: "code", label: "코드" },
+        ];
+      }
+      // Default: keep it simple
+      return [{ id: "direct", label: "직접" }];
+    },
+
+    /** chats filtered by current assistant+model (so switching selector changes list/content) */
+    chatsForCurrentContext(state) {
+      const aid = state.assistantId;
+      const mid = state.modelId;
+      return (state.chats || []).filter((c) => {
+        if (!c) return false;
+        if (aid && c.assistantId !== aid) return false;
+        if (mid && c.modelId !== mid) return false;
+        return true;
+      });
+    },
+
     /** 현재 assistant의 모델 목록 (UI용) */
     currentModels() {
       const ds = useDataStore();
@@ -117,6 +157,7 @@ export const useChatStore = defineStore("chat", {
       if (saved && typeof saved === "object") {
         this.assistantId = saved.assistantId ?? this.assistantId;
         this.modelId = saved.modelId ?? this.modelId;
+        this.inputMode = saved.inputMode ?? this.inputMode;
         this.chats = Array.isArray(saved.chats) ? saved.chats : [];
         this.activeChatId = saved.activeChatId ?? this.activeChatId;
         this.selectedPromptId = saved.selectedPromptId ?? this.selectedPromptId;
@@ -151,10 +192,19 @@ export const useChatStore = defineStore("chat", {
         this.messages = [];
       }
 
+      // 4.5) input mode sanity
+      this._syncInputModeDefault();
+
       // 5) prompt default
       this._syncPromptDefault();
 
       this._persist();
+    },
+
+    _syncInputModeDefault() {
+      const modes = this.availableInputModes;
+      const ok = modes.some((m) => m.id === this.inputMode);
+      if (!ok) this.inputMode = modes[0]?.id || "direct";
     },
 
     _persist() {
@@ -208,11 +258,20 @@ export const useChatStore = defineStore("chat", {
         null;
       this.modelId = first ? first[JSON_KEYS.MODEL_ID] : null;
 
+      // input mode default per assistant
+      this.inputMode = "direct";
+      this._syncInputModeDefault();
+
       // prompt reset for new model
       this.selectedPromptId = null;
       this.promptOptions = {};
-      this.activeChatId = null;
-      this.messages = [];
+
+      // ✅ switch to most recent chat for this assistant/model, else draft
+      const best = this._pickMostRecentChatId();
+      this.activeChatId = best;
+      if (best) this._loadMessagesFromActiveChat();
+      else this.messages = [];
+
       this.inputText = "";
 
       this._syncPromptDefault();
@@ -225,9 +284,44 @@ export const useChatStore = defineStore("chat", {
       if (this.isLocked) return;
       this.modelId = modelId;
 
+      // ✅ switch room by assistant/model
+      const best = this._pickMostRecentChatId();
+      this.activeChatId = best;
+      if (best) this._loadMessagesFromActiveChat();
+      else this.messages = [];
+
       this.selectedPromptId = null;
       this.promptOptions = {};
       this._syncPromptDefault();
+
+      this._persist();
+    },
+
+    /** input mode 선택 (UI tabs) */
+    setInputMode(modeId) {
+      if (this.isLocked) return;
+      this.inputMode = modeId || "direct";
+      this._syncInputModeDefault();
+
+      // ✅ optional: auto-pick a prompt that matches mode (Spec assistant)
+      const kw = {
+        email: ["메일", "email"],
+        translate: ["번역", "translate"],
+        summary: ["요약", "summ"],
+        code: ["코드", "code"],
+        direct: [],
+      };
+      const keys = kw[this.inputMode] || [];
+      if (keys.length) {
+        const found = (this.currentPrompts || []).find((p) => {
+          const name = (p?.name_ko || p?.promptTemplateName || "").toLowerCase();
+          return keys.some((k) => name.includes(String(k).toLowerCase()));
+        });
+        if (found) {
+          this.selectedPromptId = found?.[JSON_KEYS.PROMPT_ID] ?? this.selectedPromptId;
+          this.promptOptions = {};
+        }
+      }
 
       this._persist();
     },
@@ -290,6 +384,13 @@ export const useChatStore = defineStore("chat", {
       this._persist();
     },
 
+    _pickMostRecentChatId() {
+      const list = (this.chats || [])
+        .filter((c) => c?.assistantId === this.assistantId && c?.modelId === this.modelId)
+        .sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
+      return list?.[0]?.id ?? null;
+    },
+
     /** 채팅방 삭제 */
     deleteChat(id) {
       if (this.isLocked) return;
@@ -302,8 +403,9 @@ export const useChatStore = defineStore("chat", {
       this.chats = nextChats;
 
       if (this.activeChatId === id) {
-        this.activeChatId = this.chats[0]?.id ?? null;
-        if (this.activeChatId) this._loadMessagesFromActiveChat();
+        const best = this._pickMostRecentChatId();
+        this.activeChatId = best;
+        if (best) this._loadMessagesFromActiveChat();
         else this.messages = [];
       }
 
