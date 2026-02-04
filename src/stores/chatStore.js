@@ -38,12 +38,7 @@ function migrateLegacyV2IfNeeded() {
         id: String(cc.id ?? ""),
         title: cc.title || "New chat",
         createdAt: typeof cc.createdAt === "number" ? cc.createdAt : nowTs(),
-        lastAt:
-          typeof cc.lastAt === "number"
-            ? cc.lastAt
-            : typeof cc.createdAt === "number"
-              ? cc.createdAt
-              : nowTs(),
+        lastAt: typeof cc.lastAt === "number" ? cc.lastAt : (typeof cc.createdAt === "number" ? cc.createdAt : nowTs()),
         assistantId: cc.assistantId || assistantId,
         modelId: cc.modelId || modelId,
         messages: Array.isArray(cc.messages) ? cc.messages : [],
@@ -105,27 +100,17 @@ export const useChatStore = defineStore("chat", {
     /** assistant name (UI) */
     assistantLabel() {
       const ds = useDataStore();
-      const found = (ds.uiAssistants || []).find(
-        (a) => a.id === this.assistantId,
-      );
+      const found = (ds.uiAssistants || []).find((a) => a.id === this.assistantId);
       return found?.label || this.assistantId || "";
     },
 
-    /** input modes available by assistant */
+    /** input modes available by assistant (kept for internal validation) */
     availableInputModes() {
-      // Spec Assistant: richer input modes
       const id = this.assistantId;
       if (id === "a3ab57b9-0d19-4347-b0ce-e6bdd896230c") {
-        return [
-          { id: "direct", label: "직접" },
-          { id: "email", label: "메일" },
-          { id: "translate", label: "번역" },
-          { id: "summary", label: "요약" },
-          { id: "code", label: "코드" },
-        ];
+        return ["direct", "email", "translate", "summary", "code"];
       }
-      // Default: keep it simple
-      return [{ id: "direct", label: "직접" }];
+      return ["direct"];
     },
 
     /** chats filtered by current assistant+model (so switching selector changes list/content) */
@@ -170,7 +155,7 @@ export const useChatStore = defineStore("chat", {
         .filter((p) => p?.delYN !== true)
         .sort(
           (a, b) =>
-            (a?.promptTemplateOrder ?? 0) - (b?.promptTemplateOrder ?? 0),
+            (a?.promptTemplateOrder ?? 0) - (b?.promptTemplateOrder ?? 0)
         );
     },
 
@@ -178,7 +163,7 @@ export const useChatStore = defineStore("chat", {
       if (!this.selectedPromptId) return null;
       return (
         this.currentPrompts.find(
-          (p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId,
+          (p) => p?.[JSON_KEYS.PROMPT_ID] === this.selectedPromptId
         ) || null
       );
     },
@@ -202,8 +187,7 @@ export const useChatStore = defineStore("chat", {
 
       // 1) restore (v3) or migrate (v2)
       const migrated = migrateLegacyV2IfNeeded();
-      const saved =
-        migrated || safeParse(localStorage.getItem(LS_KEY) || "null", null);
+      const saved = migrated || safeParse(localStorage.getItem(LS_KEY) || "null", null);
       if (saved && typeof saved === "object") {
         this.assistantId = saved.assistantId ?? this.assistantId;
         this.modelId = saved.modelId ?? this.modelId;
@@ -222,7 +206,7 @@ export const useChatStore = defineStore("chat", {
         const first = ds.uiAssistants?.[0];
         this.assistantId = first
           ? first.id
-          : (ds.assistants?.[0]?.[JSON_KEYS.ASSISTANT_ID] ?? null);
+          : ds.assistants?.[0]?.[JSON_KEYS.ASSISTANT_ID] ?? null;
       }
 
       // 3) model default: first default=true else first model
@@ -243,18 +227,39 @@ export const useChatStore = defineStore("chat", {
       }
 
       // 4.5) input mode sanity
-      this._syncInputModeDefault();
+      this._syncInputModeFromPrompt();
 
       // 5) prompt default
       this._syncPromptDefault();
+
+      // 5.1) input mode derived from prompt
+      this._syncInputModeFromPrompt();
 
       this._persist();
     },
 
     _syncInputModeDefault() {
-      const modes = this.availableInputModes;
-      const ok = modes.some((m) => m.id === this.inputMode);
-      if (!ok) this.inputMode = modes[0]?.id || "direct";
+      // deprecated (kept only to avoid breaking imports in older code paths)
+      const list = this.availableInputModes || ["direct"];
+      if (!list.includes(this.inputMode)) this.inputMode = list[0] || "direct";
+    },
+
+    _deriveInputModeFromPrompt(p) {
+      const ko = String(p?.name_ko || p?.promptTemplateName || "");
+      const en = String(p?.name_en || "");
+      const hay = `${ko} ${en}`.toLowerCase();
+      if (hay.includes("메일") || hay.includes("mail") || hay.includes("email")) return "email";
+      if (hay.includes("번역") || hay.includes("translate")) return "translate";
+      if (hay.includes("요약") || hay.includes("summary")) return "summary";
+      if (hay.includes("코드") || hay.includes("code")) return "code";
+      return "direct";
+    },
+
+    _syncInputModeFromPrompt() {
+      const p = this.currentPrompt || this.currentPrompts?.find((x) => x?.default === true) || this.currentPrompts?.[0];
+      const mode = this._deriveInputModeFromPrompt(p);
+      const allowed = this.availableInputModes || ["direct"];
+      this.inputMode = allowed.includes(mode) ? mode : (allowed[0] || "direct");
     },
 
     _persist() {
@@ -282,6 +287,9 @@ export const useChatStore = defineStore("chat", {
         this.selectedPromptId = first?.[JSON_KEYS.PROMPT_ID] ?? null;
         this.promptOptions = {};
       }
+
+      // ✅ keep input mode aligned with prompt selection
+      this._syncInputModeFromPrompt();
     },
 
     /** ensure messages are loaded from active chat */
@@ -308,9 +316,8 @@ export const useChatStore = defineStore("chat", {
         null;
       this.modelId = first ? first[JSON_KEYS.MODEL_ID] : null;
 
-      // input mode default per assistant
+      // input mode will be derived from prompt
       this.inputMode = "direct";
-      this._syncInputModeDefault();
 
       // prompt reset for new model
       this.selectedPromptId = null;
@@ -325,6 +332,7 @@ export const useChatStore = defineStore("chat", {
       this.inputText = "";
 
       this._syncPromptDefault();
+      this._syncInputModeFromPrompt();
 
       this._persist();
     },
@@ -343,6 +351,7 @@ export const useChatStore = defineStore("chat", {
       this.selectedPromptId = null;
       this.promptOptions = {};
       this._syncPromptDefault();
+      this._syncInputModeFromPrompt();
 
       this._persist();
     },
@@ -364,16 +373,11 @@ export const useChatStore = defineStore("chat", {
       const keys = kw[this.inputMode] || [];
       if (keys.length) {
         const found = (this.currentPrompts || []).find((p) => {
-          const name = (
-            p?.name_ko ||
-            p?.promptTemplateName ||
-            ""
-          ).toLowerCase();
+          const name = (p?.name_ko || p?.promptTemplateName || "").toLowerCase();
           return keys.some((k) => name.includes(String(k).toLowerCase()));
         });
         if (found) {
-          this.selectedPromptId =
-            found?.[JSON_KEYS.PROMPT_ID] ?? this.selectedPromptId;
+          this.selectedPromptId = found?.[JSON_KEYS.PROMPT_ID] ?? this.selectedPromptId;
           this.promptOptions = {};
         }
       }
@@ -386,6 +390,7 @@ export const useChatStore = defineStore("chat", {
       if (this.isLocked) return;
       this.selectedPromptId = promptId;
       this.promptOptions = {};
+      this._syncInputModeFromPrompt();
       this._persist();
     },
 
@@ -441,10 +446,7 @@ export const useChatStore = defineStore("chat", {
 
     _pickMostRecentChatId() {
       const list = (this.chats || [])
-        .filter(
-          (c) =>
-            c?.assistantId === this.assistantId && c?.modelId === this.modelId,
-        )
+        .filter((c) => c?.assistantId === this.assistantId && c?.modelId === this.modelId)
         .sort((a, b) => (b.lastAt || 0) - (a.lastAt || 0));
       return list?.[0]?.id ?? null;
     },
@@ -518,8 +520,8 @@ export const useChatStore = defineStore("chat", {
         this.activeChat?.title && this.activeChat.title !== "New chat"
           ? this.activeChat.title
           : text.length > 24
-            ? text.slice(0, 24) + "…"
-            : text;
+          ? text.slice(0, 24) + "…"
+          : text;
 
       const updated = {
         ...this.activeChat,

@@ -106,8 +106,9 @@ export default {
     },
 
     chats() {
-      // ✅ selector(assistant/model) changes should change visible chat list
-      return this.chatStore.chatsForCurrentContext || [];
+      // ✅ Sidebar chat list should NOT depend on assistant selection.
+      // Show all chats so users can always access history.
+      return this.chatStore.chats || [];
     },
     activeChatId() {
       return this.chatStore.activeChatId;

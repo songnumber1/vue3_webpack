@@ -1,33 +1,8 @@
 <template>
   <div class="chat-input">
-    <div class="top">
-      <div class="field">
-        <div class="lbl">Assistant</div>
-        <select class="sel" :value="assistantId" @change="onPickAssistant($event.target.value)">
-          <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <div class="lbl">Model</div>
-        <select class="sel" :value="modelId" @change="onPickModel($event.target.value)">
-          <option v-for="m in models" :key="m.model_id" :value="m.model_id">{{ m.name_ko || m.name_en }}</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="modes" v-if="modes.length">
-      <button
-        v-for="m in modes"
-        :key="m.id"
-        type="button"
-        class="mode"
-        :class="{ active: inputMode === m.id }"
-        @click="chat.setInputMode(m.id)"
-      >
-        {{ m.label }}
-      </button>
-    </div>
+    <!-- NOTE: Assistant/Model selectors are intentionally NOT rendered in main UI.
+         Playground provides context controls on the left panel.
+         In main flow, assistant selection is done via Sidebar, and model via templates/model default. -->
 
     <InputHeader />
     <PromptTemplateForm />
@@ -97,7 +72,6 @@
 import InputHeader from "./InputHeader.vue";
 import PromptTemplateForm from "./PromptTemplateForm.vue";
 import { useChatStore } from "@/stores/chatStore";
-import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "ChatInputBox",
@@ -120,24 +94,6 @@ export default {
     chat() {
       return useChatStore();
     },
-    ds() {
-      return useDataStore();
-    },
-    assistants() {
-      return this.ds.uiAssistants || [];
-    },
-    assistantId() {
-      return this.chat.assistantId;
-    },
-    modelId() {
-      return this.chat.modelId;
-    },
-    models() {
-      return this.chat.currentModels || [];
-    },
-    modes() {
-      return this.chat.availableInputModes || [];
-    },
     inputMode() {
       return this.chat.inputMode || "direct";
     },
@@ -158,16 +114,6 @@ export default {
   },
 
   methods: {
-    onPickAssistant(id) {
-      this.chat.selectAssistant(id);
-      // reset mode-local drafts
-      this.resetModeDrafts();
-    },
-    onPickModel(id) {
-      this.chat.setModel(id);
-      this.resetModeDrafts();
-    },
-
     resetModeDrafts() {
       this.email = { to: "", subject: "", body: "" };
       this.tr = { from: "ko", to: "en", text: "" };

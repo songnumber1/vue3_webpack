@@ -8,7 +8,7 @@
       :class="{ active: selectedId === p.prompts_id }"
       @click="select(p.prompts_id)"
     >
-      {{ p.name_ko }}
+      {{ labelFor(p) }}
     </button>
   </div>
 
@@ -34,10 +34,22 @@ export default {
     selectedId() {
       return this.chat.selectedPromptId;
     },
+    isKo() {
+      try {
+        return String(navigator.language || "").toLowerCase().startsWith("ko");
+      } catch {
+        return true;
+      }
+    },
   },
   methods: {
     select(id) {
       this.chat.selectPrompt(id);
+    },
+    labelFor(p) {
+      const ko = p?.name_ko || p?.promptTemplateName;
+      const en = p?.name_en || ko;
+      return this.isKo ? (ko || en) : (en || ko);
     },
   },
 };
