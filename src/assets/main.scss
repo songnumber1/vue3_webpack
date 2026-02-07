@@ -828,3 +828,95 @@ pre {
   align-items: center;
   gap: var(--space-2);
 }
+
+
+/* =========================================================
+   MARKDOWN TABLE ACTIONS (copy / csv)
+   ========================================================= */
+
+.md-table {
+  margin: 10px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.md-table-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--panel-2) 80%, transparent);
+}
+
+.md-btn {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.md-btn:hover {
+  background: color-mix(in srgb, var(--bg) 70%, var(--accent) 10%);
+  border-color: color-mix(in srgb, var(--line) 70%, var(--accent) 30%);
+}
+
+.md-btn:active {
+  transform: translateY(1px);
+}
+
+.md-table-scroll {
+  overflow: auto;
+  max-width: 100%;
+}
+
+.bubble table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.bubble thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: left;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--panel-2) 85%, transparent);
+  color: var(--text);
+  border-bottom: 1px solid var(--line);
+}
+
+.bubble th,
+.bubble td {
+  padding: 10px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
+  vertical-align: top;
+}
+
+.bubble tbody tr:hover td {
+  background: color-mix(in srgb, var(--bg-soft) 90%, transparent);
+}
+
+/* Mermaid inside bubble */
+.bubble .mermaid {
+  display: block;
+  overflow-x: auto;
+}
+
+.bubble .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* KaTeX block spacing (rehype-katex outputs MathML + annotations; KaTeX CSS still applies) */
+.bubble .katex-display {
+  margin: 10px 0;
+}
