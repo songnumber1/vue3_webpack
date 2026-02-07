@@ -308,17 +308,6 @@ body {
   box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
 }
 
-.msg-card.assistant::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2px;
-  height: 100%;
-  background: var(--accent, #2563eb);
-  border-radius: 2px 0 0 2px;
-}
-
 .msg-head {
   display: flex;
   align-items: center;
@@ -558,11 +547,9 @@ body {
 
 /* chat bubble + markdown */
 .md {
-  background: var(--chat-bubble-ai-bg);
   color: var(--chat-text-primary);
 }
 .msg.user .md {
-  background: var(--chat-bubble-user-bg);
   color: #fff;
 }
 
