@@ -98,6 +98,14 @@
       <path d="M21 15l-5-5-4 4-2-2-4 4" />
     </template>
 
+    <!-- zoom (magnifier) -->
+    <template v-else-if="name === 'zoom'">
+      <circle cx="11" cy="11" r="6" />
+      <path d="M20 20l-3.5-3.5" />
+      <path d="M11 8v6" />
+      <path d="M8 11h6" />
+    </template>
+
     <!-- sidebar show/hide (distinct from collapse) -->
     <template v-else-if="name === 'sidebar-show'">
       <path d="M4 4h16v16H4z" />
