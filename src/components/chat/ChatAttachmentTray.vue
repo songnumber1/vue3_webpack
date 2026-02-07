@@ -55,7 +55,7 @@ export default {
 
 <style scoped>
 .tray {
-  margin-top: 8px;
+  margin: 10px 0 8px;
 }
 
 .tray-list {
@@ -69,7 +69,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 8px 38px 8px 10px;
   border-radius: 14px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
@@ -119,7 +119,7 @@ export default {
 .file-name {
   font-size: 12px;
   color: var(--text-primary);
-  max-width: 200px;
+  max-width: 176px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -144,7 +144,13 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  opacity: 0.85;
 }
+
+.chip:hover .rm {
+  opacity: 1;
+}
+
 
 .rm:hover {
   color: var(--text-primary);

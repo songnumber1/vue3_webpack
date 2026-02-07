@@ -31,6 +31,13 @@
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
+
+        <ChatAttachmentTray
+          :items="pendingFiles"
+          @remove="removePending"
+        />
+
+
         <textarea
           v-model="input"
           ref="taDirect"
@@ -52,14 +59,7 @@
             <div class="drop-text">파일을 여기에 놓아 첨부</div>
             <div class="drop-sub">pdf · doc/docx · jpg · png</div>
           </div>
-        </div>
-
-        <ChatAttachmentTray
-          :items="pendingFiles"
-          @remove="removePending"
-        />
-
-        <button
+        </div>        <button
           type="button"
           class="attach-btn"
           :disabled="isLocked"
