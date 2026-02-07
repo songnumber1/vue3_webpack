@@ -9,10 +9,28 @@
       <PromptTemplateForm />
     </div>
 
+    <!-- hidden file picker (shared across modes) -->
+    <input
+      ref="filePicker"
+      class="file-input"
+      type="file"
+      multiple
+      :accept="acceptString"
+      @change="onFilePicked"
+    />
+
     <!-- mode-specific body (keeps the component usable even without parents) -->
     <div class="mode-body">
       <!-- DIRECT -->
-      <div v-if="inputMode === 'direct'" class="composer">
+      <div
+        v-if="inputMode === 'direct'"
+        class="composer"
+        :class="{ dragging: isDragging }"
+        @dragenter.prevent="onDragEnter"
+        @dragover.prevent="onDragOver"
+        @dragleave.prevent="onDragLeave"
+        @drop.prevent="onDrop"
+      >
         <textarea
           v-model="input"
           ref="taDirect"
@@ -22,7 +40,34 @@
           @keydown="onKeydown"
           @compositionstart="isComposing = true"
           @compositionend="isComposing = false"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
         />
+
+        <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+          <div class="drop-card">
+            <AppIcon name="paperclip" size="md" />
+            <div class="drop-text">파일을 여기에 놓아 첨부</div>
+            <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+          </div>
+        </div>
+
+        <ChatAttachmentTray
+          :items="pendingFiles"
+          @remove="removePending"
+        />
+
+        <button
+          type="button"
+          class="attach-btn"
+          :disabled="isLocked"
+          @click="openPicker"
+          aria-label="Attach files"
+        >
+          <AppIcon name="paperclip" size="sm" />
+        </button>
 
         <button
           type="button"
@@ -41,7 +86,14 @@
           <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
           <input class="in" v-model="email.subject" placeholder="제목" />
         </div>
-        <div class="composer">
+        <div
+          class="composer"
+          :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
+        >
           <textarea
             class="composer-ta"
             ref="taEmail"
@@ -50,6 +102,17 @@
             placeholder="내용"
             @keydown="onKeydown"
           />
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+            <AppIcon name="paperclip" size="sm" />
+          </button>
           <button
             type="button"
             class="send-btn"
@@ -72,7 +135,14 @@
           />
           <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
         </div>
-        <div class="composer">
+        <div
+          class="composer"
+          :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
+        >
           <textarea
             class="composer-ta"
             ref="taTranslate"
@@ -81,6 +151,17 @@
             placeholder="번역할 텍스트"
             @keydown="onKeydown"
           />
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+            <AppIcon name="paperclip" size="sm" />
+          </button>
           <button
             type="button"
             class="send-btn"
@@ -103,7 +184,14 @@
           </select>
           <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
         </div>
-        <div class="composer">
+        <div
+          class="composer"
+          :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
+        >
           <textarea
             class="composer-ta"
             ref="taSummary"
@@ -112,6 +200,17 @@
             placeholder="요약할 텍스트"
             @keydown="onKeydown"
           />
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+            <AppIcon name="paperclip" size="sm" />
+          </button>
           <button
             type="button"
             class="send-btn"
@@ -138,7 +237,14 @@
             placeholder="요청 (예: 리팩토링, 버그 수정)"
           />
         </div>
-        <div class="composer">
+        <div
+          class="composer"
+          :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
+        >
           <textarea
             class="composer-ta"
             ref="taCode"
@@ -147,6 +253,17 @@
             placeholder="코드/설명"
             @keydown="onKeydown"
           />
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+            <AppIcon name="paperclip" size="sm" />
+          </button>
           <button
             type="button"
             class="send-btn"
@@ -167,14 +284,17 @@ import InputHeader from "./InputHeader.vue";
 import PromptTemplateForm from "./PromptTemplateForm.vue";
 import { useChatStore } from "@/stores/chatStore";
 import AppIcon from "@/components/common/AppIcon.vue";
+import ChatAttachmentTray from "./ChatAttachmentTray.vue";
 
 export default {
   name: "ChatInputBox",
-  components: { InputHeader, PromptTemplateForm, AppIcon },
+  components: { InputHeader, PromptTemplateForm, AppIcon, ChatAttachmentTray },
 
   data() {
     return {
       isComposing: false,
+      isDragging: false,
+      _dragCounter: 0,
     };
   },
 
@@ -199,6 +319,15 @@ export default {
     },
     isLocked() {
       return this.chat.isLocked;
+    },
+
+    pendingFiles() {
+      return Array.isArray(this.chat.pendingFiles) ? this.chat.pendingFiles : [];
+    },
+
+    acceptString() {
+      // keep extension-based accept (mime is inconsistent for some browsers)
+      return ".pdf,.doc,.docx,.png,.jpg,.jpeg";
     },
 
     // ✅ bind drafts to store (so example clicks update the visible editor)
@@ -240,6 +369,105 @@ export default {
   },
 
   methods: {
+    openPicker() {
+      if (this.isLocked) return;
+      const el = this.$refs.filePicker;
+      if (el && typeof el.click === "function") el.click();
+    },
+
+    onFilePicked(e) {
+      const files = Array.from(e?.target?.files || []);
+      this.addFiles(files);
+      // reset value so picking same file again triggers change
+      if (e?.target) e.target.value = "";
+    },
+
+    onDragEnter(ev) {
+      if (!this._hasFiles(ev)) return;
+      this._dragCounter += 1;
+      this.isDragging = true;
+    },
+
+    onDragOver(ev) {
+      if (!this._hasFiles(ev)) return;
+      this.isDragging = true;
+    },
+
+    onDragLeave() {
+      this._dragCounter = Math.max(0, this._dragCounter - 1);
+      if (this._dragCounter === 0) this.isDragging = false;
+    },
+
+    onDrop(ev) {
+      if (!this._hasFiles(ev)) {
+        this.isDragging = false;
+        this._dragCounter = 0;
+        return;
+      }
+      const files = Array.from(ev?.dataTransfer?.files || []);
+      this.addFiles(files);
+      this.isDragging = false;
+      this._dragCounter = 0;
+    },
+
+    _hasFiles(ev) {
+      const dt = ev?.dataTransfer;
+      if (!dt) return false;
+      if (Array.isArray(dt.types) && dt.types.includes("Files")) return true;
+      if (dt.types && typeof dt.types.contains === "function") {
+        return dt.types.contains("Files");
+      }
+      return false;
+    },
+
+    addFiles(files) {
+      const next = [];
+      for (const f of files) {
+        const item = this._normalizeFile(f);
+        if (!item) continue;
+        // prevent exact duplicates by name+size+lastModified
+        const exists = this.pendingFiles.some(
+          (x) => x?.name === item.name && x?.size === item.size && x?.lastModified === item.lastModified
+        );
+        if (!exists) next.push(item);
+      }
+      if (next.length) this.chat.addPendingFiles(next);
+    },
+
+    removePending(id) {
+      const it = this.pendingFiles.find((x) => x?.id === id);
+      if (it?.previewUrl && String(it.previewUrl).startsWith("blob:")) {
+        try {
+          URL.revokeObjectURL(it.previewUrl);
+        } catch {
+          // ignore
+        }
+      }
+      this.chat.removePendingFile(id);
+    },
+
+    _normalizeFile(file) {
+      if (!file) return null;
+      const name = String(file.name || "").trim();
+      const ext = name.includes(".") ? name.split(".").pop().toLowerCase() : "";
+      const allowed = new Set(["pdf", "doc", "docx", "png", "jpg", "jpeg"]);
+      if (!allowed.has(ext)) return null;
+
+      const isImage = ext === "png" || ext === "jpg" || ext === "jpeg";
+      const previewUrl = isImage ? URL.createObjectURL(file) : null;
+
+      return {
+        id: `f_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+        file,
+        name,
+        ext,
+        type: file.type || "",
+        size: typeof file.size === "number" ? file.size : 0,
+        lastModified: typeof file.lastModified === "number" ? file.lastModified : 0,
+        kind: isImage ? "image" : "file",
+        previewUrl,
+      };
+    },
     // ✅ 현재 모드의 textarea(ref)에서 "보이는 값"을 직접 가져와서 store에 확정
     _getActiveEditorText() {
       const mode = this.inputMode || "direct";
@@ -278,7 +506,8 @@ export default {
         finalText = String(this.composeTextByMode() || "").trim();
       }
 
-      if (!finalText) return;
+      // ✅ allow "attachments only" send
+      if (!finalText && this.pendingFiles.length === 0) return;
 
       // ✅ store send는 inputText만 봄 → 여기서 확정
       this.chat.setInputText(finalText);
@@ -403,6 +632,86 @@ export default {
   box-shadow: var(--shadow-sm);
 }
 
+.composer.dragging {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.drop-overlay {
+  position: absolute;
+  inset: 10px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 65%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--accent) 60%, var(--border));
+  display: grid;
+  place-items: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.drop-card {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: var(--shadow-md);
+  color: var(--text-primary);
+}
+
+.drop-text {
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.drop-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.attach-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text-primary);
+  position: absolute;
+  left: 22px;
+  bottom: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    filter 0.15s ease;
+}
+
+.attach-btn:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  filter: saturate(1.05);
+}
+
+.attach-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .composer-ta {
   width: 100%;
   min-height: 52px;
@@ -412,7 +721,7 @@ export default {
   background: color-mix(in srgb, var(--bg) 60%, transparent);
   color: var(--text-primary);
   border-radius: 14px;
-  padding: 12px 60px 52px 12px; /* ✅ 그대로 유지 */
+  padding: 12px 60px 52px 54px; /* ✅ left padding for attach button */
   outline: none;
   line-height: 1.4;
 }

@@ -88,6 +88,9 @@ export const useChatStore = defineStore("chat", {
     messages: [],
     inputText: "",
 
+    // ✅ pending attachments for the current composer (UI-only for now)
+    pendingFiles: [],
+
     // ✅ mode drafts (so example clicks can populate the visible editor)
     modeDrafts: {
       email: { to: "", subject: "", body: "" },
@@ -178,6 +181,20 @@ export const useChatStore = defineStore("chat", {
   },
 
   actions: {
+    setPendingFiles(list) {
+      this.pendingFiles = Array.isArray(list) ? list : [];
+    },
+    addPendingFiles(items) {
+      const arr = Array.isArray(items) ? items : [];
+      this.pendingFiles = [...(this.pendingFiles || []), ...arr];
+    },
+    removePendingFile(id) {
+      this.pendingFiles = (this.pendingFiles || []).filter((x) => x?.id !== id);
+    },
+    clearPendingFiles() {
+      this.pendingFiles = [];
+    },
+
     /**
      * ✅ Safe init for "standalone components".
      * - Idempotent.
@@ -521,9 +538,13 @@ export const useChatStore = defineStore("chat", {
       if (this.isLocked) return;
       const text = String(this.inputText ?? "").trim();
 
+      const attachments = Array.isArray(this.pendingFiles)
+        ? this.pendingFiles
+        : [];
+
       console.log("▶️ Sending message:", text);
 
-      if (!text) return;
+      if (!text && attachments.length === 0) return;
 
       console.log("▶️ Sending message:", this.messages);
 
@@ -543,16 +564,30 @@ export const useChatStore = defineStore("chat", {
         ? `${text}\n\n(${promptName}${optionLines ? " · " + optionLines : ""})`
         : text;
 
-      const userMsg = { role: "user", text: finalText, ts: nowTs() };
+      const userMsg = {
+        role: "user",
+        text: finalText,
+        ts: nowTs(),
+        attachments: attachments.map((a) => ({
+          id: a.id,
+          name: a.name,
+          kind: a.kind,
+          ext: a.ext,
+          previewUrl: a.previewUrl,
+          size: a.size,
+          type: a.type,
+        })),
+      };
       this.messages = [...this.messages, userMsg];
 
       // update room
+      const titleSeed = text || attachments?.[0]?.name || "New chat";
       const title =
         this.activeChat?.title && this.activeChat.title !== "New chat"
           ? this.activeChat.title
-          : text.length > 24
-          ? text.slice(0, 24) + "…"
-          : text;
+          : titleSeed.length > 24
+          ? titleSeed.slice(0, 24) + "…"
+          : titleSeed;
 
       const updated = {
         ...this.activeChat,
@@ -568,7 +603,11 @@ export const useChatStore = defineStore("chat", {
       // demo assistant response (replace with API later)
       const aiMsg = {
         role: "assistant",
-        text: `✅ (샘플 응답)\n\n요청하신 내용: ${text}\n\n- 선택된 modelId: ${this.modelId}\n- 선택된 assistantId: ${this.assistantId}`,
+        text: `✅ (샘플 응답)\n\n요청하신 내용: ${text || "(텍스트 없음)"}` +
+          (attachments.length
+            ? `\n\n첨부: ${attachments.map((a) => a.name).join(", ")}`
+            : "") +
+          `\n\n- 선택된 modelId: ${this.modelId}\n- 선택된 assistantId: ${this.assistantId}`,
         ts: nowTs() + 1,
       };
       this.messages = [...this.messages, aiMsg];
@@ -581,6 +620,9 @@ export const useChatStore = defineStore("chat", {
       this.chats = this.chats.map((c) => (c.id === updated2.id ? updated2 : c));
 
       this.inputText = "";
+
+      // ✅ clear pending attachments after send
+      this.pendingFiles = [];
       this._persist();
     },
   },

@@ -80,6 +80,24 @@
       <path d="M22 2l-7 20-4-9-9-4z" />
     </template>
 
+    <!-- paperclip / attach -->
+    <template v-else-if="name === 'paperclip'">
+      <path d="M21 12.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.9-8.9a3.5 3.5 0 1 1 5 5l-8.5 8.5a2 2 0 0 1-2.8-2.8L16 7.7" />
+    </template>
+
+    <!-- file -->
+    <template v-else-if="name === 'file'">
+      <path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+    </template>
+
+    <!-- image -->
+    <template v-else-if="name === 'image'">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+      <path d="M21 15l-5-5-4 4-2-2-4 4" />
+    </template>
+
     <!-- sidebar show/hide (distinct from collapse) -->
     <template v-else-if="name === 'sidebar-show'">
       <path d="M4 4h16v16H4z" />
