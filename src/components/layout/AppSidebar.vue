@@ -57,10 +57,14 @@
 
             <div v-for="c in g.items" :key="c.id" class="chat-item"
               :class="{ active: safeStore.activeChatId === c.id }">
-              <button type="button" class="chat-title" @click="selectChat(c.id)">
-                {{ c.title }}
+              <button type="button" class="chat-main" @click="selectChat(c.id)">
+                <div class="chat-title-row">
+                  <div class="chat-title">{{ c.title }}</div>
+                  <div class="chat-time">{{ formatChatTime(c.lastAt || c.createdAt) }}</div>
+                </div>
+                <div class="chat-snippet">{{ chatSnippet(c) }}</div>
               </button>
-              <button type="button" class="chat-del" @click.stop="deleteChat(c.id)">
+              <button type="button" class="chat-del" aria-label="Delete chat" @click.stop="deleteChat(c.id)">
                 <AppIcon name="trash" size="sm" muted />
               </button>
             </div>
@@ -223,6 +227,30 @@ export default {
     deleteChat(id) {
       if (this.chatStore.isLocked) return;
       this.chatStore.deleteChat(id);
+    },
+
+
+    formatChatTime(ts) {
+      if (!ts) return "";
+      const d = new Date(ts);
+      const now = new Date();
+      const sameDay = d.toDateString() === now.toDateString();
+      if (sameDay) {
+        return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      }
+      // MM/DD
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${mm}/${dd}`;
+    },
+
+    chatSnippet(chat) {
+      const msgs = Array.isArray(chat?.messages) ? chat.messages : [];
+      if (!msgs.length) return "새 대화를 시작해보세요.";
+      const last = msgs[msgs.length - 1];
+      const text = String(last?.text ?? "").replace(/\s+/g, " ").trim();
+      if (!text) return last?.role === "assistant" ? "응답이 도착했어요." : "메시지를 보냈어요.";
+      return text.length > 60 ? text.slice(0, 60) + "…" : text;
     },
   },
 };
@@ -391,66 +419,177 @@ export default {
   display: none;
 }
 
+
 .chat-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
   min-height: 0;
   overflow: auto;
-  padding-right: 2px;
+  padding-right: 4px;
   flex: 1;
+}
+
+/* nicer scrollbars (webkit) */
+.chat-list::-webkit-scrollbar {
+  width: 10px;
+}
+.chat-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 20%, transparent);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+.chat-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .chat-group-title {
-  font-size: 12px;
+  display: inline-flex;
+  align-self: flex-start;
+  font-size: 11px;
+  letter-spacing: 0.2px;
   color: var(--text-muted);
-  padding: 6px 10px 2px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
 .chat-item {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 8px;
-  border-radius: 12px;
-  border: 1px solid transparent;
+  align-items: stretch;
+  gap: 10px;
+  padding: 10px 10px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-surface) 92%, transparent),
+    color-mix(in srgb, var(--bg-elevated) 92%, transparent)
+  );
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.chat-item::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.chat-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--border));
 }
 
 .chat-item.active {
-  background: var(--sidebar-active-bg, var(--bg-soft));
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 10%, var(--bg-surface)),
+    color-mix(in srgb, var(--accent) 6%, var(--bg-elevated))
+  );
 }
 
-.chat-title {
+.chat-item.active::before {
+  background: var(--accent);
+}
+
+.chat-main {
   flex: 1;
+  min-width: 0;
   text-align: left;
   background: transparent;
   border: none;
-  color: var(--text-primary);
   cursor: pointer;
+  padding: 2px 2px 2px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.chat-title {
   font-size: 13px;
+  font-weight: 650;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-time {
+  flex: none;
+  font-size: 11px;
+  color: var(--text-muted);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.chat-snippet {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.35;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .chat-del {
+  flex: none;
+  align-self: center;
   background: transparent;
   border: none;
   cursor: pointer;
-  opacity: 0.9;
-  border-radius: 10px;
-  padding: 6px;
-  transition: background 0.15s ease;
+  opacity: 0;
+  pointer-events: none;
+  border-radius: 12px;
+  padding: 8px;
+  transition: opacity 0.12s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.chat-item:hover .chat-del,
+.chat-item.active .chat-del {
+  opacity: 0.95;
+  pointer-events: auto;
 }
 
 .chat-del:hover {
-  background: var(--sidebar-hover-bg, var(--bg-soft));
+  background: color-mix(in srgb, var(--danger) 10%, var(--bg-soft));
+  transform: translateY(-1px);
 }
 
 .chat-empty {
   color: var(--text-muted);
   font-size: 12px;
-  padding: 8px 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed color-mix(in srgb, var(--border) 75%, transparent);
+  background: color-mix(in srgb, var(--bg-elevated) 70%, transparent);
 }
-
 .nav-section-head {
   display: flex;
   align-items: center;
