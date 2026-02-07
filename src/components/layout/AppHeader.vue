@@ -27,6 +27,15 @@
       <strong class="title">DS Assistant</strong>
     </div>
 
+    <!-- ✅ Sidebar가 화면에서 사라지면(Desktop hidden / Mobile drawer closed)
+         Header 우측에 Assistant selector를 노출해서 항상 선택 가능하도록 유지 -->
+    <div v-if="showAssistantSelector" class="assistant-select" aria-label="Assistant selector">
+      <select class="assistant-native" :value="selectedAssistantId" @change="onAssistantChange">
+        <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
+      </select>
+      <AppIcon name="chevron-down" size="sm" muted class="assistant-caret" />
+    </div>
+
     <div class="themes">
       <button
         v-for="t in $theme.THEMES"
@@ -45,6 +54,8 @@
 <script>
 import AppIcon from "@/components/common/AppIcon.vue";
 import { useUiStore } from "@/stores/uiStore";
+import { useChatStore } from "@/stores/chatStore";
+import { useDataStore } from "@/stores/dataStore";
 
 export default {
   name: "AppHeader",
@@ -54,6 +65,14 @@ export default {
   computed: {
     store() {
       return useUiStore();
+    },
+
+    chatStore() {
+      return useChatStore();
+    },
+
+    dataStore() {
+      return useDataStore();
     },
 
     theme() {
@@ -66,6 +85,27 @@ export default {
 
     sidebarHidden() {
       return this.store.sidebarHidden;
+    },
+
+    sidebarOpen() {
+      return this.store.sidebarOpen;
+    },
+
+    showAssistantSelector() {
+      // Desktop: sidebarHidden일 때
+      // Mobile: drawer가 닫혀있을 때(= sidebar가 화면에 없음)
+      const base = this.sidebarHidden || (this.isMobile && !this.sidebarOpen);
+      return base && (this.assistants || []).length > 0;
+    },
+
+    assistants() {
+      return this.dataStore.uiAssistants || [];
+    },
+
+    selectedAssistantId() {
+      // header는 단독 렌더링될 수도 있으니 안전 init
+      this.chatStore.ensureInitialized();
+      return this.chatStore.assistantId;
     },
   },
 
@@ -81,6 +121,19 @@ export default {
     setTheme(t) {
       this.store.setTheme(t);
       this.$theme.setTheme(t);
+    },
+
+    onAssistantChange(e) {
+      const id = e?.target?.value;
+      if (!id) return;
+      if (this.chatStore.isLocked) return;
+
+      this.chatStore.selectAssistant(id);
+
+      // Sidebar에서 선택했을 때와 동일하게: main으로 이동
+      if (this.$route?.path !== "/main") {
+        this.$router.push("/main");
+      }
     },
   },
 };
@@ -160,6 +213,44 @@ export default {
   gap: 6px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.assistant-select {
+  margin-left: auto;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* native select (keeps UI/UX minimal & consistent) */
+.assistant-native {
+  height: 34px;
+  padding: 0 34px 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
+  box-shadow: var(--shadow-xs, none);
+  color: var(--text-primary);
+  font-size: 12px;
+  appearance: none;
+  cursor: pointer;
+  max-width: min(44vw, 240px);
+}
+
+.assistant-native:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.assistant-caret {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+}
+
+/* When selector is present, themes shouldn't steal the auto margin */
+.assistant-select + .themes {
+  margin-left: 10px;
 }
 
 .theme-btn {
