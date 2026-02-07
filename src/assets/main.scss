@@ -8,7 +8,6 @@
   /* overlay */
   --overlay-backdrop: rgba(0, 0, 0, 0.35);
 
-
   /* notes (themeable) */
   --note-success-bg: #ecfdf5;
   --note-success-text: #065f46;
@@ -24,7 +23,7 @@
   --note-info-accent: #3b82f6;
 
   /* shadows */
-  --shadow-lg: var(--shadow-md, 0 12px 34px rgba(0,0,0,0.25));
+  --shadow-lg: var(--shadow-md, 0 12px 34px rgba(0, 0, 0, 0.25));
 
   /* layout sizing tokens (can be overridden per-theme) */
   --header-height: 56px;
@@ -276,57 +275,134 @@ body {
 .messages {
   flex: 1;
   overflow: auto;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
-  background: var(--panel);
+
+  /* cleaner container (bubble-free) */
+  border: none;
+  border-radius: 0;
+  padding: 20px 18px 28px;
+  background: transparent;
 }
 
+/* One message row */
 .msg {
   display: flex;
-  margin-bottom: 10px;
+  margin: 0 0 18px 0;
 }
 
 .msg.user {
   justify-content: flex-end;
 }
 
-.bubble {
-  max-width: min(70%, var(--bubble-max-width));
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: var(--chat-bubble-ai-bg);
-  color: var(--chat-text-primary);
+.msg.assistant {
+  justify-content: flex-start;
 }
 
-.msg.user .bubble {
-  background: var(--chat-bubble-user-bg);
-  color: var(--chat-bubble-user-text);
+/* Card */
+.msg-card {
+  position: relative;
+  width: min(860px, 100%);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 18px 18px;
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+}
+
+.msg-card.assistant::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--accent, #2563eb);
+  border-radius: 2px 0 0 2px;
+}
+
+.msg-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+}
+
+.msg-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  background: rgba(148, 163, 184, 0.22);
+  color: var(--text);
+  flex: 0 0 auto;
+}
+
+.avatar.assistant {
+  background: rgba(37, 99, 235, 0.92);
+  color: #fff;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.time {
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.msg-body {
+  color: var(--text);
+}
+
+/* legacy bubble class safety (shouldn't be used, but keep harmless) */
+.bubble {
+  max-width: 100%;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
 }
 
 /* =========================================================
    MARKDOWN / CONTENT INSIDE BUBBLE
+   ======================================================
    ========================================================= */
 
-.bubble p,
-.bubble li,
-.bubble span {
+.md p,
+.md li,
+.md span {
   color: var(--chat-text-primary);
 }
 
-.bubble h1,
-.bubble h2,
-.bubble h3 {
+.md h1,
+.md h2,
+.md h3 {
   color: var(--chat-text-primary);
   font-weight: 600;
 }
 
-.bubble a {
+.md a {
   color: #60a5fa;
   text-decoration: underline;
 }
 
-.bubble blockquote {
+.md blockquote {
   border-left: 4px solid var(--accent);
   padding-left: 12px;
   margin: 12px 0;
@@ -334,7 +410,7 @@ body {
 }
 
 /* inline code */
-.bubble code {
+.md code {
   background: var(--chat-code-bg);
   color: var(--chat-code-text);
   padding: 2px 6px;
@@ -344,7 +420,7 @@ body {
 
 /* code block */
 .hljs,
-.bubble pre {
+.md pre {
   background: var(--chat-code-bg);
   color: var(--chat-code-text);
   padding: 12px;
@@ -354,12 +430,12 @@ body {
 }
 
 /* KaTeX */
-.bubble .katex {
+.md .katex {
   color: var(--chat-text-primary);
   font-size: 1em;
 }
 
-.bubble .katex-display {
+.md .katex-display {
   overflow-x: auto;
   padding: 8px 0;
 }
@@ -456,7 +532,7 @@ body {
     z-index: 10;
   }
 
-  .bubble {
+  .md {
     max-width: 88%;
     font-size: 14px;
   }
@@ -481,37 +557,37 @@ body {
 }
 
 /* chat bubble + markdown */
-.bubble {
+.md {
   background: var(--chat-bubble-ai-bg);
   color: var(--chat-text-primary);
 }
-.msg.user .bubble {
+.msg.user .md {
   background: var(--chat-bubble-user-bg);
   color: #fff;
 }
 
-.bubble h1,
-.bubble h2,
-.bubble h3,
-.bubble p,
-.bubble li {
+.md h1,
+.md h2,
+.md h3,
+.md p,
+.md li {
   color: var(--chat-text-primary);
 }
 
-.bubble blockquote {
+.md blockquote {
   border-left: 4px solid var(--accent);
   padding-left: 12px;
   color: var(--chat-text-secondary);
 }
 
-.bubble code {
+.md code {
   background: var(--chat-code-bg);
   color: var(--chat-code-text);
   padding: 2px 6px;
   border-radius: 6px;
 }
 .hljs,
-.bubble pre {
+.md pre {
   background: var(--chat-code-bg);
   color: var(--chat-code-text);
   padding: 12px;
@@ -539,7 +615,7 @@ pre {
 
 /* mobile */
 @media (max-width: 768px) {
-  .bubble {
+  .md {
     max-width: 88%;
   }
   .input-row {
@@ -586,13 +662,13 @@ pre {
   width: 100%;
 }
 
-.msg .bubble {
+.msg .md {
   margin-left: 0;
   margin-right: 0;
 }
 
 /* optional: center content visually */
-.msg.ai .bubble {
+.msg.ai .md {
   margin-right: auto;
 }
 
@@ -632,9 +708,17 @@ pre {
   font-weight: 800;
   cursor: pointer;
   color: var(--text-primary);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-surface) 88%, white), var(--bg-elevated));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-surface) 88%, white),
+    var(--bg-elevated)
+  );
   box-shadow: var(--shadow-xs);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .btn:hover {
@@ -667,7 +751,11 @@ pre {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-2, var(--accent))
+  );
   border-color: transparent;
   color: var(--text-inverse);
 }
@@ -829,7 +917,6 @@ pre {
   gap: var(--space-2);
 }
 
-
 /* =========================================================
    MARKDOWN TABLE ACTIONS (copy / csv)
    ========================================================= */
@@ -860,7 +947,10 @@ pre {
   color: var(--text);
   font-size: 12px;
   cursor: pointer;
-  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.05s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .md-btn:hover {
@@ -877,13 +967,13 @@ pre {
   max-width: 100%;
 }
 
-.bubble table {
+.md table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
 }
 
-.bubble thead th {
+.md thead th {
   position: sticky;
   top: 0;
   z-index: 1;
@@ -894,29 +984,29 @@ pre {
   border-bottom: 1px solid var(--line);
 }
 
-.bubble th,
-.bubble td {
+.md th,
+.md td {
   padding: 10px 12px;
   border-bottom: 1px solid color-mix(in srgb, var(--line) 60%, transparent);
   vertical-align: top;
 }
 
-.bubble tbody tr:hover td {
+.md tbody tr:hover td {
   background: color-mix(in srgb, var(--bg-soft) 90%, transparent);
 }
 
 /* Mermaid inside bubble */
-.bubble .mermaid {
+.md .mermaid {
   display: block;
   overflow-x: auto;
 }
 
-.bubble .mermaid svg {
+.md .mermaid svg {
   max-width: 100%;
   height: auto;
 }
 
 /* KaTeX block spacing (rehype-katex outputs MathML + annotations; KaTeX CSS still applies) */
-.bubble .katex-display {
+.md .katex-display {
   margin: 10px 0;
 }
