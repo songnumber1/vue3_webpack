@@ -1,0 +1,5 @@
+:root { --ui-scale: 0.67; }
+@media (max-width: 768px) { :root { --ui-scale: 0.44; } }
+
+html, body, #app { overflow-x: hidden; }
+* { max-width:100%; box-sizing:border-box; }

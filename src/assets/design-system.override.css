@@ -57,3 +57,9 @@ input[type="checkbox"] {
   width: calc(var(--control-h) * 0.45);
   height: calc(var(--control-h) * 0.45);
 }
+
+
+/* ui-scale */
+button, input, select, textarea {
+  font-size: calc(14px * var(--ui-scale));
+}
