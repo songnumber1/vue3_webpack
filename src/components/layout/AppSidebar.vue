@@ -310,8 +310,8 @@ export default {
 }
 
 .icon-btn {
-  width: var(--icon-btn);
-  height: var(--icon-btn);
+  width: 38px;
+  height: 38px;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
@@ -332,7 +332,7 @@ export default {
 }
 
 .label {
-  font-size: var(--text-md);
+  font-size: 14px;
   color: var(--text-muted);
   letter-spacing: 0.2px;
 }
@@ -388,7 +388,7 @@ export default {
 }
 
 .nav-section-label {
-  font-size: var(--text-xs);
+  font-size: 12px;
   color: var(--text-muted);
   padding: 8px 10px 2px;
 }
@@ -453,7 +453,7 @@ export default {
 .chat-group-title {
   display: inline-flex;
   align-self: flex-start;
-  font-size: var(--text-xs);
+  font-size: 11px;
   letter-spacing: 0.2px;
   color: var(--text-muted);
   padding: 6px 10px;
@@ -530,7 +530,7 @@ export default {
 }
 
 .chat-title {
-  font-size: var(--text-sm);
+  font-size: 13px;
   font-weight: 650;
   color: var(--text-primary);
   overflow: hidden;
@@ -540,7 +540,7 @@ export default {
 
 .chat-time {
   flex: none;
-  font-size: var(--text-xs);
+  font-size: 11px;
   color: var(--text-muted);
   padding: 2px 8px;
   border-radius: 999px;
@@ -549,7 +549,7 @@ export default {
 }
 
 .chat-snippet {
-  font-size: var(--text-xs);
+  font-size: 12px;
   color: var(--text-muted);
   line-height: 1.35;
   overflow: hidden;
@@ -584,7 +584,7 @@ export default {
 
 .chat-empty {
   color: var(--text-muted);
-  font-size: var(--text-xs);
+  font-size: 12px;
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px dashed color-mix(in srgb, var(--border) 75%, transparent);
@@ -602,7 +602,7 @@ export default {
   background: transparent;
   color: var(--text-muted);
   border-radius: 999px;
-  font-size: var(--text-xs);
+  font-size: 12px;
   padding: 4px 8px;
   cursor: pointer;
 }
@@ -612,9 +612,5 @@ export default {
   color: var(--text-primary);
 }
 
-:global(:root.bp-sm) .sb-item,
-:global(:root.bp-sm) .nav-item,
-:global(:root.bp-sm) .assistant-item{
-  min-height: var(--icon-btn);
-}
+@media(max-width:640px){.sidebar, .sidebar *{font-size:12.5px}.sidebar .close-btn{width:28px;height:28px}}
 </style>

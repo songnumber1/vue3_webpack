@@ -89,7 +89,7 @@ export default {
 }
 
 .ptf-sub {
-  font-size: var(--opt-font);
+  font-size: 12px;
   color: var(--muted);
 }
 
@@ -104,7 +104,7 @@ export default {
 }
 
 .ptf-label {
-  font-size: var(--opt-font);
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -124,8 +124,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: var(--opt-h);
-  padding: 0 var(--opt-pad-x);
+  padding: 6px 10px;
   border: 1px solid var(--border);
   background: var(--bg);
   border-radius: 999px;
@@ -138,12 +137,15 @@ export default {
 }
 
 .ptf-option-text {
-  font-size: var(--opt-font);
+  font-size: 12px;
 }
 
 .ptf-note,
 .ptf-empty {
-  font-size: var(--opt-font);
+  font-size: 12px;
   color: var(--muted);
 }
+
+.example-list{padding:12px 12px;margin:6px 0}
+@media(max-width:640px){.example-list{padding:12px 12px;margin:6px 0}}
 </style>

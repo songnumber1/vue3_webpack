@@ -6,8 +6,6 @@ import router from "./router";
 import responsiveManager from "./plugins/responsiveManager";
 import themeManager from "./plugins/themeManager";
 
-import "./assets/design-system.override.css";
-import "./assets/responsive-fixes.css";
 import "./assets/tokens/spacing.css";
 import "./assets/tokens/typography.css";
 import "./assets/tokens/radius.css";

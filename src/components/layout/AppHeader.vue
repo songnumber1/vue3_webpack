@@ -183,8 +183,8 @@ export default {
 }
 
 .icon-btn {
-  width: var(--icon-btn);
-  height: var(--icon-btn);
+  width: var(--control-h);
+  height: var(--control-h);
   border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
@@ -213,7 +213,7 @@ export default {
 
 .logo {
   width: 34px;
-  height: var(--icon-btn);
+  height: var(--control-h);
   border-radius: var(--control-radius);
   display: inline-flex;
   align-items: center;
@@ -267,7 +267,7 @@ export default {
 
 /* native select (keeps UI/UX minimal & consistent) */
 .assistant-native {
-  height: var(--icon-btn);
+  height: var(--control-h);
   padding: 0 calc(var(--control-pad-x) + 22px) 0 var(--control-pad-x);
   border-radius: var(--control-radius);
   border: 1px solid var(--border);
@@ -299,7 +299,7 @@ export default {
 }
 
 .theme-native {
-  height: var(--icon-btn);
+  height: var(--control-h);
   padding: 0 calc(var(--control-pad-x) + 22px) 0 var(--control-pad-x);
   border-radius: var(--control-radius);
   border: 1px solid var(--border);
@@ -324,14 +324,13 @@ export default {
 }
 
 .theme-btn {
-  height: var(--pill-h);
-  padding: 0 var(--pill-pad-x);
+  padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: color-mix(in srgb, var(--bg-surface) 70%, transparent);
   color: var(--text-primary);
   cursor: pointer;
-  font-size: var(--text-xs);
+  font-size: 12px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
