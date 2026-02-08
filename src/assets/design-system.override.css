@@ -26,29 +26,3 @@ input[type="radio"],input[type="checkbox"] {
   width: calc(var(--control-h) * .45) !important;
   height: calc(var(--control-h) * .45) !important;
 }
-
-
-
-/* === Responsive Density (AUTO ADDED) === */
-:root {
-  --ui-scale: 1;
-
-  --control-h: calc(40px * var(--ui-scale));
-  --control-h-sm: calc(36px * var(--ui-scale));
-  --control-h-xs: calc(32px * var(--ui-scale));
-
-  --fs-base: calc(14px * var(--ui-scale));
-  --fs-sm: calc(13px * var(--ui-scale));
-  --fs-xs: calc(12px * var(--ui-scale));
-
-  --px-base: calc(16px * var(--ui-scale));
-  --px-sm: calc(12px * var(--ui-scale));
-}
-
-@media (max-width: 640px) {
-  :root {
-    --ui-scale: 0.9;
-  }
-}
-
-input[type="file"]{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}

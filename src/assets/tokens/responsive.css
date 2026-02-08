@@ -1,13 +1,21 @@
-
 :root{
   /* Breakpoint-aware UI tokens (mobile-first) */
-  --control-h: 44px;           /* min touch target */
-  --control-radius: 16px;
-  --control-pad-x: 14px;
+  /* tuned for dashboard-like density */
+  --control-h: 40px;
+  --control-radius: 14px;
+  --control-pad-x: 12px;
 
-  --pill-pad-y: 8px;
-  --pill-pad-x: 12px;
+  /* chips/pills (input mode tabs) */
+  --chip-h: 30px;
+  --pill-pad-y: 5px;
+  --pill-pad-x: 10px;
   --pill-font: var(--text-sm);
+
+  /* header selects/buttons */
+  --header-control-h: 34px;
+
+  /* attach/send icon buttons */
+  --action-btn: 36px;
 
   --page-pad: 14px;
   --page-gap: 14px;
@@ -16,7 +24,6 @@
   --card-gap: 12px;
   --grid-cols: 1;
 
-  /* container */
   --container-max: 1100px;
 }
 
@@ -25,28 +32,47 @@
     --page-pad: 16px;
     --title-size: 26px;
     --grid-cols: 2;
+
+    --chip-h: 30px;
+    --header-control-h: 34px;
+    --action-btn: 36px;
   }
 }
 
 @media (min-width: 768px){
   :root{
-    --control-h: 48px;
+    --control-h: 42px;
     --page-pad: 18px;
     --page-gap: 16px;
-    --pill-pad-y: 9px;
-    --pill-pad-x: 14px;
+
+    --chip-h: 30px;
+    --pill-pad-y: 5px;
+    --pill-pad-x: 10px;
+
+    --header-control-h: 34px;
+    --action-btn: 38px;
   }
 }
 
 @media (min-width: 1024px){
   :root{
-    --control-h: 52px;
+    --control-h: 44px;
     --page-pad: 18px;
     --page-gap: 18px;
     --title-size: 28px;
     --card-gap: 14px;
     --grid-cols: 2;
+
+    --chip-h: 30px;
+    --header-control-h: 34px;
+    --action-btn: 38px;
   }
 }
 
-input[type="file"]{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+input[type="file"]{
+  position:absolute!important;
+  width:1px!important;
+  height:1px!important;
+  opacity:0!important;
+  pointer-events:none!important
+}

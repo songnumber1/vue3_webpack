@@ -9,5 +9,3 @@
   --space-7: 32px;
   --space-8: 40px;
 }
-
-input[type="file"]{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}

@@ -131,5 +131,3 @@
   opacity: 0;
   transform: translateY(12px);
 }
-
-input[type="file"]{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}

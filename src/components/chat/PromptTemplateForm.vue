@@ -145,7 +145,4 @@ export default {
   font-size: 12px;
   color: var(--muted);
 }
-
-.example-list{padding:12px 12px;margin:6px 0}
-@media(max-width:640px){.example-list{padding:12px 12px;margin:6px 0}}
 </style>

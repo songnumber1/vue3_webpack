@@ -620,10 +620,9 @@ export default {
 
 .composer {
   /* breakpoint-aware sizing (auto via :root.bp-*) */
-  --attach-size: calc(var(--control-h) - 12px);
-  --send-size: var(--control-h);
-
-  position: relative;
+  --attach-size: var(--action-btn);
+  --send-size: var(--action-btn);
+position: relative;
   display: block;
   padding: var(--space-3);
   border-radius: 18px;
@@ -728,9 +727,9 @@ export default {
   /* ✅ space reserved for attach/send buttons (responsive) */
   padding:
     var(--space-3)
-    calc(var(--control-h) + var(--space-4))
-    calc(var(--control-h) + var(--space-3))
-    calc(var(--control-h) + var(--space-4));
+    calc(var(--action-btn) + var(--space-4))
+    calc(var(--action-btn) + var(--space-3))
+    calc(var(--action-btn) + var(--space-4));
   outline: none;
   line-height: 1.4;
 }
@@ -742,8 +741,8 @@ export default {
 
 /* ✅ UI/UX 유지 + 위치/겹침만 해결 */
 .send-btn {
-  width: var(--control-h);
-  height: var(--control-h);
+  width: var(--send-size);
+  height: var(--send-size);
   border-radius: var(--control-radius);
   border: 1px solid transparent;
   background: linear-gradient(
@@ -798,6 +797,4 @@ export default {
     max-height: 140px;
   }
 }
-
-@media(max-width:640px){.attach-btn,.send-btn{width:28px;height:28px}}
 </style>

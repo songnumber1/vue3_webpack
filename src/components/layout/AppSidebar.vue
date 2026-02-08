@@ -611,6 +611,4 @@ export default {
   background: var(--bg-soft);
   color: var(--text-primary);
 }
-
-@media(max-width:640px){.sidebar, .sidebar *{font-size:12.5px}.sidebar .close-btn{width:28px;height:28px}}
 </style>

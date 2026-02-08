@@ -78,11 +78,11 @@ export default {
   -webkit-appearance: none;
   -moz-appearance: none;
   min-width: 0;
-  height: var(--control-h);
+  height: var(--header-control-h, var(--control-h));
   padding: 0 calc(var(--control-pad-x) + 26px) 0 var(--control-pad-x);
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
-  border-radius: 14px;
+  border-radius: 12px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--bg) 55%, transparent);
   color: var(--text-primary);

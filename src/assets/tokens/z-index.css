@@ -6,5 +6,3 @@
   --z-modal: 50;
   --z-toast: 60;
 }
-
-input[type="file"]{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
