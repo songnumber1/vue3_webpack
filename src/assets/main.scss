@@ -83,6 +83,16 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Ensure scroll works reliably on mobile browsers (flex + overflow)
+   - Without min-height:0 on flex children, overflow areas may not scroll.
+   - Keep behavior the same: scrolling happens inside .content.
+*/
+html,
+body,
+#app {
+  height: 100%;
+}
+
 /* =========================================================
    LAYOUT
    ========================================================= */
@@ -188,12 +198,17 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  min-width: 0;
 }
 
 .content {
   flex: 1;
   padding: var(--layout-padding);
   overflow: auto;
+  min-height: 0;
+  min-width: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* =========================================================

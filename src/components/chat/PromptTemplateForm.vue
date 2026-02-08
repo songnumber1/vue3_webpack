@@ -1,7 +1,7 @@
 <template>
   <div v-if="prompt" class="ptf">
-        <slot name="top" />
-<div v-if="hasTemplate" class="ptf-body">
+    <slot name="top" />
+    <div v-if="hasTemplate" class="ptf-body">
       <div
         v-for="(cfg, key) in prompt.promptTemplate"
         :key="key"
@@ -9,7 +9,6 @@
       >
         <div class="ptf-label">
           {{ cfg.ko || key }}
-          <span class="ptf-label-en" v-if="cfg.en">({{ cfg.en }})</span>
         </div>
 
         <div class="ptf-options" v-if="cfg.type === 'radio'">
@@ -114,8 +113,48 @@ export default {
   flex-wrap: wrap;
 }
 
-/* desktop/tablet: keep options in one row when possible */
-@media (min-width: 600px) {
+/* =========================================================
+   Desktop: ALL option groups in ONE ROW
+   - Requirement: in Mail/Translate/Summary, show Language + Style + Length in a single line.
+   - We keep mobile layout as-is (stacked).
+   - This is intentionally layout-only (no logic changes).
+   ========================================================= */
+@media (min-width: 768px) {
+  .ptf-body {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ptf-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .ptf-label {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .ptf-options {
+    flex-wrap: nowrap;
+    overflow: visible;
+  }
+
+  .ptf-option {
+    white-space: nowrap;
+  }
+}
+
+/* tablet: keep options in one row within a section */
+@media (min-width: 600px) and (max-width: 767px) {
   .ptf-options {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -221,7 +260,4 @@ export default {
     grid-template-columns: 1fr;
   }
 }
-
-
-
 </style>
