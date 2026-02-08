@@ -1,3 +1,4 @@
+html,body{height:100%;overflow:hidden;}
 /* =========================================================
    Theme variable aliases
    - Actual theme palettes live in /assets/themes/*.css and are switched by themeManager (data-theme attr)
@@ -89,8 +90,8 @@ body {
 
 .layout {
   display: flex;
-  height: 100vh;
 }
+
 
 .sidebar {
   width: 260px;
@@ -996,4 +997,11 @@ pre {
 /* KaTeX block spacing (rehype-katex outputs MathML + annotations; KaTeX CSS still applies) */
 .md .katex-display {
   margin: 10px 0;
+}
+
+
+@media (max-width: 520px) {
+  .content {
+    padding: 12px;
+  }
 }

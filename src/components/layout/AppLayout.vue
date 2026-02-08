@@ -103,10 +103,17 @@ export default {
 
 <style scoped>
 .layout {
-  height: 100vh;
+  /* Mobile browsers: avoid 100vh jumping (address bar). Use dvh when supported */
   display: flex;
   flex-direction: column;
   background: var(--bg);
+}
+
+@supports (height: 100dvh) {
+  .layout {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
 }
 
 .body {
@@ -126,8 +133,9 @@ export default {
 .content {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: auto;
 }
+
 
 .mobile-sidebar {
   position: fixed;
@@ -135,6 +143,12 @@ export default {
   top: var(--header-height);
   height: calc(100vh - var(--header-height));
   z-index: 80;
+}
+
+@supports (height: 100dvh) {
+  .mobile-sidebar {
+    height: calc(100dvh - var(--header-height));
+  }
 }
 
 .backdrop {

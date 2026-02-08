@@ -10,7 +10,7 @@ export default { name: "AppFooter" };
 
 <style scoped lang="scss">
 .footer {
-  height: 44px;
+  min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,6 +20,7 @@ export default { name: "AppFooter" };
   border-top: 1px solid var(--header-border, var(--border));
   background: color-mix(in srgb, var(--bg-surface) 75%, transparent);
   backdrop-filter: blur(10px);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .text {
