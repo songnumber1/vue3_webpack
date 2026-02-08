@@ -1,21 +1,21 @@
 
 :root{
   /* Breakpoint-aware UI tokens (mobile-first) */
-  --control-h: 38px;           /* min touch target */
-  --control-radius: 14px;
-  --control-pad-x: 12px;
+  --control-h: calc(38px * var(--ui-scale));           /* min touch target */
+  --control-radius: calc(14px * var(--ui-scale));
+  --control-pad-x: calc(12px * var(--ui-scale));
 
-  --pill-pad-y: 6px;
-  --pill-pad-x: 10px;
+  --pill-pad-y: calc(6px * var(--ui-scale));
+  --pill-pad-x: calc(10px * var(--ui-scale));
   --pill-font: var(--text-sm);
 
-  --page-pad: 12px;
-  --page-gap: 10px;
+  --page-pad: calc(12px * var(--ui-scale));
+  --page-gap: calc(10px * var(--ui-scale));
 
-  --chat-pad: 12px; /* chat vertical padding */
+  --chat-pad: calc(12px * var(--ui-scale)); /* chat vertical padding */
 
-  --title-size: 20px;
-  --card-gap: 10px;
+  --title-size: calc(20px * var(--ui-scale));
+  --card-gap: calc(10px * var(--ui-scale));
   --grid-cols: 1;
 
   /* container */
@@ -24,31 +24,31 @@
 
 @media (min-width: 640px){
   :root{
-    --page-pad: 16px;
-    --title-size: 26px;
+    --page-pad: calc(16px * var(--ui-scale));
+    --title-size: calc(26px * var(--ui-scale));
     --grid-cols: 2;
   }
 }
 
 @media (min-width: 768px){
   :root{
-    --control-h: 44px;
-    --page-pad: 18px;
-    --chat-pad: 18px;
-    --page-gap: 16px;
-    --pill-pad-y: 9px;
-    --pill-pad-x: 14px;
+    --control-h: calc(44px * var(--ui-scale));
+    --page-pad: calc(18px * var(--ui-scale));
+    --chat-pad: calc(18px * var(--ui-scale));
+    --page-gap: calc(16px * var(--ui-scale));
+    --pill-pad-y: calc(9px * var(--ui-scale));
+    --pill-pad-x: calc(14px * var(--ui-scale));
   }
 }
 
 @media (min-width: 1024px){
   :root{
-    --control-h: 52px;
-    --page-pad: 18px;
-    --chat-pad: 20px;
-    --page-gap: 18px;
-    --title-size: 28px;
-    --card-gap: 14px;
+    --control-h: calc(52px * var(--ui-scale));
+    --page-pad: calc(18px * var(--ui-scale));
+    --chat-pad: calc(20px * var(--ui-scale));
+    --page-gap: calc(18px * var(--ui-scale));
+    --title-size: calc(28px * var(--ui-scale));
+    --card-gap: calc(14px * var(--ui-scale));
     --grid-cols: 2;
   }
 }

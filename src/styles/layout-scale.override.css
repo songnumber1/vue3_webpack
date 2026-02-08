@@ -1,0 +1,22 @@
+
+:root{
+  --header-height: calc(56px * var(--ui-scale));
+  --sidebar-width: calc(280px * var(--ui-scale));
+  --title-size: calc(20px * var(--ui-scale));
+}
+
+.header{
+  height: var(--header-height);
+  padding-left: calc(var(--page-pad) * 1);
+  padding-right: calc(var(--page-pad) * 1);
+}
+.sidebar{
+  width: var(--sidebar-width);
+}
+
+@media (max-width: 768px){
+  :root{
+    /* mobile is already scaled by ui-scale, keep it slightly tighter */
+    --title-size: calc(18px * var(--ui-scale));
+  }
+}

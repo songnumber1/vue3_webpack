@@ -32,6 +32,7 @@
           @remove="removePending"
         />
 
+        <div class="ta-shell">
         <textarea
           ref="taDirect"
           v-model="input"
@@ -46,11 +47,6 @@
         <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
           <div class="drop-card">
             <AppIcon name="paperclip" size="md" />
-            <div class="drop-text">파일을 여기에 놓아 첨부</div>
-            <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-          </div>
-        </div>
-
         <div class="tool-actions">
           <button
             type="button"
@@ -72,6 +68,12 @@
             <AppIcon name="send" size="sm" />
           </button>
         </div>
+        </div>
+            <div class="drop-text">파일을 여기에 놓아 첨부</div>
+            <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+          </div>
+        </div>
+
       </div>
 
       <!-- EMAIL -->
@@ -95,6 +97,7 @@
             @remove="removePending"
           />
 
+        <div class="ta-shell">
           <textarea
             class="composer-ta"
             ref="taEmail"
@@ -107,11 +110,6 @@
           <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
             <div class="drop-card">
               <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-
           <div class="tool-actions">
             <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
               <AppIcon name="paperclip" size="sm" />
@@ -120,6 +118,12 @@
               <AppIcon name="send" size="sm" />
             </button>
           </div>
+        </div>
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -134,16 +138,12 @@
           @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
           <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
 
+        <div class="ta-shell">
           <textarea class="composer-ta" ref="taTranslate" v-model="tr.text" rows="3" placeholder="번역할 텍스트" @keydown="onKeydown" />
 
           <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
             <div class="drop-card">
               <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-
           <div class="tool-actions">
             <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
               <AppIcon name="paperclip" size="sm" />
@@ -152,6 +152,12 @@
               <AppIcon name="send" size="sm" />
             </button>
           </div>
+        </div>
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -170,16 +176,12 @@
           @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
           <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
 
+        <div class="ta-shell">
           <textarea class="composer-ta" ref="taSummary" v-model="sum.text" rows="3" placeholder="요약할 텍스트" @keydown="onKeydown" />
 
           <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
             <div class="drop-card">
               <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-
           <div class="tool-actions">
             <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
               <AppIcon name="paperclip" size="sm" />
@@ -188,6 +190,12 @@
               <AppIcon name="send" size="sm" />
             </button>
           </div>
+        </div>
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -202,16 +210,12 @@
           @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
           <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
 
+        <div class="ta-shell">
           <textarea class="composer-ta" ref="taCode" v-model="code.text" rows="3" placeholder="코드/설명" @keydown="onKeydown" />
 
           <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
             <div class="drop-card">
               <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-
           <div class="tool-actions">
             <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
               <AppIcon name="paperclip" size="sm" />
@@ -220,6 +224,12 @@
               <AppIcon name="send" size="sm" />
             </button>
           </div>
+        </div>
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -604,6 +614,7 @@ export default {
   color: var(--text-primary);
   border-radius: var(--control-radius);
   padding: 12px;
+  padding-bottom: calc(12px + var(--control-h));
   outline: none;
   line-height: 1.4;
 }
@@ -615,9 +626,19 @@ export default {
 
 /* tool actions stay visible and never overlap textarea */
 .tool-actions{
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
+  pointer-events: none;
+}
+.tool-actions > *{ pointer-events: auto; }
+
+.ta-shell{
+  position: relative;
 }
 
 /* drag overlay */

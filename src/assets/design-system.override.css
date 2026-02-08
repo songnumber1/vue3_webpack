@@ -6,7 +6,8 @@
 */
 
 :root {
-  --density-scale: 1;
+  /* global UI scaling: Desktop ~2/3, Mobile ~ (2/3 of desktop) via ui-scale.css */
+  --density-scale: var(--ui-scale, 1);
 
   /* spacing */
   --space-xs: calc(6px * var(--density-scale));
@@ -15,14 +16,14 @@
   --space-lg: calc(16px * var(--density-scale));
 
   /* typography */
-  --font-xs: 12px;
-  --font-sm: 13px;
-  --font-md: 14px;
-  --font-lg: 16px;
+  --font-xs: calc(12px * var(--density-scale));
+  --font-sm: calc(13px * var(--density-scale));
+  --font-md: calc(14px * var(--density-scale));
+  --font-lg: calc(16px * var(--density-scale));
 
-  /* controls (mobile-first) */
-  --control-h: 38px;
-  --radius: 14px;
+  /* controls */
+  --control-h: calc(38px * var(--density-scale));
+  --radius: calc(14px * var(--density-scale));
 }
 
 @media (min-width: 640px) {
@@ -63,3 +64,5 @@ input[type="checkbox"] {
 button, input, select, textarea {
   font-size: calc(14px * var(--ui-scale));
 }
+
+label{ font-size: var(--font-sm); }
