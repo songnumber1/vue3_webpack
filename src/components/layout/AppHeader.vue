@@ -32,9 +32,19 @@
     <div class="right">
       <!-- ✅ Sidebar가 화면에서 사라지면(Desktop hidden / Mobile drawer closed)
            Header 우측에 Assistant selector를 노출해서 항상 선택 가능하도록 유지 -->
-      <div v-if="showAssistantSelector" class="assistant-select" aria-label="Assistant selector">
-        <select class="assistant-native" :value="selectedAssistantId" @change="onAssistantChange">
-          <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
+      <div
+        v-if="showAssistantSelector"
+        class="assistant-select"
+        aria-label="Assistant selector"
+      >
+        <select
+          class="assistant-native"
+          :value="selectedAssistantId"
+          @change="onAssistantChange"
+        >
+          <option v-for="a in assistants" :key="a.id" :value="a.id">
+            {{ a.label }}
+          </option>
         </select>
         <AppIcon name="chevron-down" size="sm" muted class="assistant-caret" />
       </div>
@@ -56,7 +66,9 @@
 
         <div v-else class="theme-select">
           <select class="theme-native" :value="theme" @change="onThemeChange">
-            <option v-for="t in $theme.THEMES" :key="t" :value="t">{{ t }}</option>
+            <option v-for="t in $theme.THEMES" :key="t" :value="t">
+              {{ t }}
+            </option>
           </select>
           <AppIcon name="chevron-down" size="sm" muted class="theme-caret" />
         </div>
@@ -166,7 +178,6 @@ export default {
 </script>
 
 <style scoped>
-
 .header {
   width: 100%;
   height: var(--header-height);
@@ -193,7 +204,9 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .icon-btn:hover {
@@ -221,7 +234,11 @@ export default {
   font-weight: 800;
   font-size: 12px;
   color: var(--accent-contrast);
-  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-2, var(--accent))
+  );
   box-shadow: var(--shadow-sm);
 }
 
@@ -335,7 +352,9 @@ export default {
   align-items: center;
   gap: 8px;
   box-shadow: var(--shadow-xs, none);
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .theme-btn:hover {
@@ -343,7 +362,11 @@ export default {
 }
 
 .theme-btn.active {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-2, var(--accent))
+  );
   color: #fff;
   border-color: transparent;
 }
@@ -373,9 +396,12 @@ export default {
   }
 }
 
-@media (max-width: 420px){
-  .title{ max-width: 84px; }
-  .right{ gap: 8px; }
+@media (max-width: 420px) {
+  .title {
+    max-width: 84px;
+  }
+  .right {
+    gap: 8px;
+  }
 }
-
 </style>

@@ -1,15 +1,30 @@
 <template>
-  <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
+  <aside
+    class="sidebar"
+    :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }"
+  >
     <div class="top-row">
-      <button v-if="!isMobile" type="button" class="icon-btn" aria-label="Toggle sidebar" @click="toggleCollapse">
+      <button
+        v-if="!isMobile"
+        type="button"
+        class="icon-btn"
+        aria-label="Toggle sidebar"
+        @click="toggleCollapse"
+      >
         <AppIcon :name="sidebarCollapsed ? 'panel-right' : 'panel-left'" />
       </button>
 
-      <button v-else type="button" class="icon-btn" aria-label="Close sidebar" @click="closeSidebar">
+      <button
+        v-else
+        type="button"
+        class="icon-btn"
+        aria-label="Close sidebar"
+        @click="closeSidebar"
+      >
         <AppIcon name="x" />
       </button>
 
-      <strong v-if="!sidebarCollapsed" class="label">DS Assistant</strong>
+      <strong v-if="!sidebarCollapsed">Menu</strong>
     </div>
 
     <!-- 상단 네비게이션 -->
@@ -26,20 +41,40 @@
 
       <div class="nav-divider" aria-hidden="true" />
 
-      <div class="nav-section" :class="{ collapsed: sidebarCollapsed }" role="group" aria-label="Assistant">
+      <div
+        class="nav-section"
+        :class="{ collapsed: sidebarCollapsed }"
+        role="group"
+        aria-label="Assistant"
+      >
         <!-- ✅ 기존 label 줄 + 버튼만 추가 -->
         <div v-if="!sidebarCollapsed" class="nav-section-head">
           <div class="nav-section-label">Assistant</div>
 
-          <button v-if="canToggleAssistants" type="button" class="nav-more" @click="toggleAssistants">
-            <AppIcon :name="assistantsExpanded ? 'chevron-left' : 'chevron-right'" size="sm" muted />
+          <button
+            v-if="canToggleAssistants"
+            type="button"
+            class="nav-more"
+            @click="toggleAssistants"
+          >
+            <AppIcon
+              :name="assistantsExpanded ? 'chevron-left' : 'chevron-right'"
+              size="sm"
+              muted
+            />
             {{ assistantsExpanded ? "축소" : "더보기" }}
           </button>
         </div>
 
         <!-- ❗ 기존 버튼 렌더 구조 그대로 -->
-        <button v-for="g in displayedAssistants" :key="g.id" type="button" class="nav-item nav-btn"
-          :class="{ active: safeStore.activeModelGroupId === g.id }" @click="setModelGroup(g.id)">
+        <button
+          v-for="g in displayedAssistants"
+          :key="g.id"
+          type="button"
+          class="nav-item nav-btn"
+          :class="{ active: safeStore.activeModelGroupId === g.id }"
+          @click="setModelGroup(g.id)"
+        >
           <span class="icon model-icon" aria-hidden="true">
             <AppIcon name="sparkles" size="sm" />
           </span>
@@ -55,16 +90,27 @@
           <div v-for="(g, gi) in groupedChats" :key="gi" class="chat-group">
             <div class="chat-group-title">{{ g.label }}</div>
 
-            <div v-for="c in g.items" :key="c.id" class="chat-item"
-              :class="{ active: safeStore.activeChatId === c.id }">
+            <div
+              v-for="c in g.items"
+              :key="c.id"
+              class="chat-item"
+              :class="{ active: safeStore.activeChatId === c.id }"
+            >
               <button type="button" class="chat-main" @click="selectChat(c.id)">
                 <div class="chat-title-row">
                   <div class="chat-title">{{ c.title }}</div>
-                  <div class="chat-time">{{ formatChatTime(c.lastAt || c.createdAt) }}</div>
+                  <div class="chat-time">
+                    {{ formatChatTime(c.lastAt || c.createdAt) }}
+                  </div>
                 </div>
                 <div class="chat-snippet">{{ chatSnippet(c) }}</div>
               </button>
-              <button type="button" class="chat-del" aria-label="Delete chat" @click.stop="deleteChat(c.id)">
+              <button
+                type="button"
+                class="chat-del"
+                aria-label="Delete chat"
+                @click.stop="deleteChat(c.id)"
+              >
                 <AppIcon name="trash" size="sm" muted />
               </button>
             </div>
@@ -156,7 +202,7 @@ export default {
 
     groupedChats() {
       const chats = [...this.safeStore.chats].sort(
-        (a, b) => (b.lastAt || 0) - (a.lastAt || 0)
+        (a, b) => (b.lastAt || 0) - (a.lastAt || 0),
       );
       if (!chats.length) return [];
 
@@ -174,8 +220,8 @@ export default {
             : d.toDateString() === yesterday
               ? "어제"
               : `${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-                d.getDate()
-              ).padStart(2, "0")}`;
+                  d.getDate(),
+                ).padStart(2, "0")}`;
 
         if (!map.has(label)) map.set(label, []);
         map.get(label).push(c);
@@ -229,7 +275,6 @@ export default {
       this.chatStore.deleteChat(id);
     },
 
-
     formatChatTime(ts) {
       if (!ts) return "";
       const d = new Date(ts);
@@ -248,8 +293,13 @@ export default {
       const msgs = Array.isArray(chat?.messages) ? chat.messages : [];
       if (!msgs.length) return "새 대화를 시작해보세요.";
       const last = msgs[msgs.length - 1];
-      const text = String(last?.text ?? "").replace(/\s+/g, " ").trim();
-      if (!text) return last?.role === "assistant" ? "응답이 도착했어요." : "메시지를 보냈어요.";
+      const text = String(last?.text ?? "")
+        .replace(/\s+/g, " ")
+        .trim();
+      if (!text)
+        return last?.role === "assistant"
+          ? "응답이 도착했어요."
+          : "메시지를 보냈어요.";
       return text.length > 60 ? text.slice(0, 60) + "…" : text;
     },
   },
@@ -267,7 +317,9 @@ export default {
   flex-direction: column;
   gap: 12px;
   padding: 14px;
-  transition: width 0.2s ease, min-width 0.2s ease;
+  transition:
+    width 0.2s ease,
+    min-width 0.2s ease;
   overflow: hidden;
 
   /* ensures internal scroll areas can size correctly */
@@ -290,7 +342,7 @@ export default {
 
   transform: translateX(-105%);
   transition: transform 0.18s ease;
-  box-shadow: var(--shadow-lg, 0 18px 50px rgba(0,0,0,0.18));
+  box-shadow: var(--shadow-lg, 0 18px 50px rgba(0, 0, 0, 0.18));
 }
 
 .sidebar.mobile-sidebar.open {
@@ -320,7 +372,9 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .icon-btn:hover {
@@ -355,7 +409,10 @@ export default {
   color: var(--text-primary);
   background: transparent;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .nav-item:hover {
@@ -369,7 +426,11 @@ export default {
 }
 
 .nav-item.active {
-  background: linear-gradient(135deg, var(--sidebar-active-bg, var(--bg-soft)), var(--sidebar-active-bg-2, var(--bg-elevated)));
+  background: linear-gradient(
+    135deg,
+    var(--sidebar-active-bg, var(--bg-soft)),
+    var(--sidebar-active-bg-2, var(--bg-elevated))
+  );
   border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
   box-shadow: var(--shadow-xs, none);
 }
@@ -418,7 +479,6 @@ export default {
 .sidebar.collapsed .text {
   display: none;
 }
-
 
 .chat-list {
   display: flex;
@@ -476,7 +536,11 @@ export default {
     color-mix(in srgb, var(--bg-elevated) 92%, transparent)
   );
   box-shadow: var(--shadow-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .chat-item::before {
@@ -568,7 +632,10 @@ export default {
   pointer-events: none;
   border-radius: 12px;
   padding: 8px;
-  transition: opacity 0.12s ease, background 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.12s ease,
+    background 0.15s ease,
+    transform 0.15s ease;
 }
 
 .chat-item:hover .chat-del,

@@ -1,12 +1,5 @@
 <template>
   <div v-if="prompt" class="ptf">
-    <div class="ptf-head">
-      <strong class="ptf-title">{{
-        prompt.promptTemplateName || prompt.name_ko
-      }}</strong>
-      <span class="ptf-sub">{{ prompt.desc_ko }}</span>
-    </div>
-
     <div v-if="hasTemplate" class="ptf-body">
       <div
         v-for="(cfg, key) in prompt.promptTemplate"
