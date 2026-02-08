@@ -31,10 +31,10 @@
   --sidebar-collapsed-width: 72px;
   --content-max-width: 900px;
 
-  /* component spacing tokens */
-  --layout-gap: var(--space-6);
-  --layout-padding: var(--space-4);
-  --chat-padding: var(--space-4);
+  /* component spacing tokens (responsive tokens -> tailwind-like scale) */
+  --layout-gap: var(--page-gap, var(--space-6));
+  --layout-padding: var(--page-pad, var(--space-4));
+  --chat-padding: var(--chat-pad, var(--page-pad, var(--space-4)));
   --chat-bubble-radius: var(--radius-lg);
 
   /* Map palette tokens (from /assets/themes/*.css) -> semantic tokens used by components */
@@ -1005,7 +1005,6 @@ pre {
 .md .katex-display {
   margin: 10px 0;
 }
-
 
 @media (max-width: 520px) {
   .content {

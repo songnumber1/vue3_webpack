@@ -28,7 +28,7 @@
         <div class="modal-footer">
           <slot name="footer">
             <button @click="$emit('close')">Cancel</button>
-            <button class="primary">Confirm</button>
+            <button class="btn btn-primary">Confirm</button>
           </slot>
         </div>
       </div>
@@ -52,27 +52,37 @@ export default {
   },
 
   data() {
-    return { x: 0, y: 0 };
+    return { x: 0, y: 0, vw: window.innerWidth, vh: window.innerHeight };
   },
 
   computed: {
     modalSize() {
-      const map = {
-        sm: { w: 400, h: 260 },
-        md: { w: 600, h: 420 },
-        lg: { w: 900, h: 600 },
+      // Responsive modal sizing (works well in mobile webview + desktop)
+      const presets = {
+        sm: { w: 420, h: 280 },
+        md: { w: 720, h: 520 },
+        lg: { w: 980, h: 680 },
       };
-      return map[this.size] || map.md;
+      const base = presets[this.size] || presets.md;
+
+      // Keep margins for small screens
+      const maxW = Math.max(320, this.vw - 24);
+      const maxH = Math.max(260, this.vh - 24);
+
+      const w = Math.min(base.w, maxW);
+      const h = Math.min(base.h, maxH);
+
+      return { w, h };
     },
   },
 
   mounted() {
-    this.center();
-    window.addEventListener("resize", this.center);
+    this.onResize();
+    window.addEventListener("resize", this.onResize);
   },
 
   beforeUnmount() {
-    window.removeEventListener("resize", this.center);
+    window.removeEventListener("resize", this.onResize);
   },
 
   methods: {
@@ -126,8 +136,8 @@ export default {
 .modal {
   width: 100%;
   height: 100%;
-  background: #ffffff;
-  border-radius: 12px;
+  background: var(--bg-surface, #ffffff);
+  border-radius: var(--radius-md, 12px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -136,9 +146,9 @@ export default {
 
 /* Header */
 .modal-header {
-  height: 44px;
-  padding: 0 12px;
-  background: #f5f5f5;
+  height: var(--control-h, 44px);
+  padding: 0 var(--space-3, 12px);
+  background: color-mix(in srgb, var(--bg-elevated, #f5f5f5) 70%, transparent);
 
   display: flex;
   justify-content: space-between;
@@ -155,14 +165,14 @@ export default {
 /* Body */
 .modal-body {
   flex: 1;
-  padding: 16px;
+  padding: var(--space-4, 16px);
   overflow: auto;
 }
 
 /* Footer */
 .modal-footer {
-  padding: 12px 16px;
-  border-top: 1px solid #e5e5e5;
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border-top: 1px solid var(--border, #e5e5e5);
 
   display: flex;
   justify-content: flex-end;
@@ -171,17 +181,18 @@ export default {
 
 /* Buttons */
 button {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
+  padding: 0 var(--control-pad-x, 14px);
+  height: var(--control-h, 44px);
+  border-radius: var(--control-radius, 12px);
+  border: 1px solid var(--border, #d1d5db);
+  background: var(--bg-surface, #ffffff);
   cursor: pointer;
 }
 
 button.primary {
-  background: #3b82f6;
-  border-color: #3b82f6;
-  color: #ffffff;
+  background: var(--primary, #3b82f6);
+  border-color: var(--primary, #3b82f6);
+  color: var(--primary-contrast, #ffffff);
 }
 
 /* Close button */

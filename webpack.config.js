@@ -44,11 +44,29 @@ module.exports = {
         },
       },
       {
-        test: /\.(sa|sc|c)ss$/,
+        test: /\.css$/,
         use: [
           "style-loader",
           {
             loader: "css-loader",
+            options: { sourceMap: true },
+          },
+          {
+            loader: "postcss-loader",
+            options: { sourceMap: true },
+          },
+        ],
+      },
+      {
+        test: /\.(sa|sc)ss$/,
+        use: [
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: { sourceMap: true },
+          },
+          {
+            loader: "postcss-loader",
             options: { sourceMap: true },
           },
           {

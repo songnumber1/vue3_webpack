@@ -13,7 +13,7 @@ export const BP = Object.freeze({
 // lg: >= LG_MIN
 export const BREAKPOINTS = Object.freeze({
   MD_MIN: 768,
-  LG_MIN: 992,
+  LG_MIN: 1024,
 });
 
 export function resolveBreakpoint(width) {

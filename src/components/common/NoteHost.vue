@@ -97,4 +97,16 @@ export default {
 .note-wrapper:last-child {
   margin-bottom: 0;
 }
+
+
+@media (max-width: 520px) {
+  .note-host {
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+  .note-wrapper {
+    margin-bottom: 12px;
+  }
+}
 </style>

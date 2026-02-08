@@ -133,7 +133,7 @@ export default {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 18px;
+  padding: var(--chat-padding);
 }
 
 /* =========================
@@ -189,7 +189,7 @@ export default {
 
 @media (max-width: 520px) {
   .messages {
-    padding: 12px;
+    padding: calc(var(--chat-padding) - 4px);
   }
   .room-header {
     padding: 0 12px;

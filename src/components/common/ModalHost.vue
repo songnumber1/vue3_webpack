@@ -14,7 +14,7 @@
 
       <template #footer>
         <button @click="onCancel(i)">Cancel</button>
-        <button class="primary" @click="onConfirm(i)">Confirm</button>
+        <button class="btn btn-primary" @click="onConfirm(i)">Confirm</button>
       </template>
     </BaseModal>
   </div>

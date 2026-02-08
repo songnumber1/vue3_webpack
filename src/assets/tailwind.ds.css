@@ -1,0 +1,9 @@
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl font-semibold transition
+           text-sm px-3 py-1.5 md:text-base md:px-4 md:py-2;
+  }
+  .btn-primary { @apply bg-primary text-white hover:bg-primary/90; }
+  .btn-danger { @apply bg-red-500 text-white hover:bg-red-600; }
+  .btn-ghost { @apply bg-transparent hover:bg-muted; }
+}
