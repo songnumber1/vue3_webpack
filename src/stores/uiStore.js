@@ -63,6 +63,10 @@ export const useUiStore = defineStore("ui", {
     /* ===== sidebar ===== */
     openSidebar() {
       this.sidebarOpen = true;
+      // Mobile drawer should always open expanded even if the desktop sidebar is collapsed.
+      if (this.isMobile) {
+        this.sidebarCollapsed = false;
+      }
       save(this);
     },
 

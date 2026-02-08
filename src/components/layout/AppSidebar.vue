@@ -5,17 +5,7 @@
   >
     <div class="top-row">
       <button
-        v-if="!isMobile"
-        type="button"
-        class="icon-btn"
-        aria-label="Toggle sidebar"
-        @click="toggleCollapse"
-      >
-        <AppIcon :name="sidebarCollapsed ? 'panel-right' : 'panel-left'" />
-      </button>
-
-      <button
-        v-else
+        v-if="isMobile"
         type="button"
         class="icon-btn"
         aria-label="Close sidebar"
@@ -120,6 +110,19 @@
         <div v-else class="chat-empty">아직 대화가 없어요.</div>
       </div>
     </template>
+
+    <!-- Desktop: move the collapse/expand control to the bottom (requested) -->
+    <div v-if="!isMobile" class="bottom-row" :class="{ collapsed: sidebarCollapsed }">
+      <button
+        type="button"
+        class="icon-btn"
+        aria-label="Toggle sidebar"
+        @click="toggleCollapse"
+      >
+        <AppIcon :name="sidebarCollapsed ? 'panel-right' : 'panel-left'" />
+      </button>
+      <span v-if="!sidebarCollapsed" class="bottom-label">메뉴 숨김</span>
+    </div>
   </aside>
 </template>
 
@@ -656,6 +659,25 @@ export default {
   border-radius: 12px;
   border: 1px dashed color-mix(in srgb, var(--border) 75%, transparent);
   background: color-mix(in srgb, var(--bg-elevated) 70%, transparent);
+}
+
+/* bottom collapse control (moved from header/top-row) */
+.bottom-row {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid var(--sidebar-border, var(--border));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bottom-row.collapsed {
+  justify-content: center;
+}
+
+.bottom-label {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 .nav-section-head {
   display: flex;

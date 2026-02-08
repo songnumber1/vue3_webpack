@@ -114,8 +114,8 @@ export default {
   flex-wrap: wrap;
 }
 
-/* desktop: keep options in one row when possible */
-@media (min-width: 720px) {
+/* desktop/tablet: keep options in one row when possible */
+@media (min-width: 600px) {
   .ptf-options {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -123,11 +123,13 @@ export default {
   }
   .ptf-option {
     white-space: nowrap;
+    flex: 0 0 auto;
   }
 }
 .ptf-option {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
   gap: 6px;
   padding: 6px 10px;
   border: 1px solid var(--border);
@@ -182,5 +184,44 @@ export default {
     grid-template-columns: 1fr;
   }
 }
+
+/*
+  NOTE: The email fields are rendered via a slot from the parent.
+  Scoped styles do NOT automatically apply to slotted content.
+  Keep the slot spacing/inputs consistent using ::v-slotted selectors.
+*/
+::v-slotted(.ptf-top) {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px; /* give breathing room before Language/Style rows */
+}
+
+::v-slotted(.ptf-email-row) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+::v-slotted(.ptf-email-in) {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+::v-slotted(.ptf-email-in:focus) {
+  border-color: var(--primary);
+}
+
+@media (max-width: 720px) {
+  ::v-slotted(.ptf-email-row) {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 
 </style>
