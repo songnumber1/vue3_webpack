@@ -23,30 +23,44 @@
     </button>
 
     <div class="brand">
-      <div class="logo" aria-hidden="true">DS</div>
+      <!-- ✅ Mobile에서는 헤더가 좁아지므로 DS 로고는 숨김 (요청사항) -->
+      <div v-if="!isMobile" class="logo" aria-hidden="true">DS</div>
       <strong class="title">DS Assistant</strong>
     </div>
 
-    <!-- ✅ Sidebar가 화면에서 사라지면(Desktop hidden / Mobile drawer closed)
-         Header 우측에 Assistant selector를 노출해서 항상 선택 가능하도록 유지 -->
-    <div v-if="showAssistantSelector" class="assistant-select" aria-label="Assistant selector">
-      <select class="assistant-native" :value="selectedAssistantId" @change="onAssistantChange">
-        <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
-      </select>
-      <AppIcon name="chevron-down" size="sm" muted class="assistant-caret" />
-    </div>
+    <!-- ✅ Right controls (assistant + theme) -->
+    <div class="right">
+      <!-- ✅ Sidebar가 화면에서 사라지면(Desktop hidden / Mobile drawer closed)
+           Header 우측에 Assistant selector를 노출해서 항상 선택 가능하도록 유지 -->
+      <div v-if="showAssistantSelector" class="assistant-select" aria-label="Assistant selector">
+        <select class="assistant-native" :value="selectedAssistantId" @change="onAssistantChange">
+          <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
+        </select>
+        <AppIcon name="chevron-down" size="sm" muted class="assistant-caret" />
+      </div>
 
-    <div class="themes">
-      <button
-        v-for="t in $theme.THEMES"
-        :key="t"
-        class="theme-btn"
-        :class="{ active: theme === t }"
-        @click="setTheme(t)"
-      >
-        <span class="theme-dot" aria-hidden="true" />
-        {{ t }}
-      </button>
+      <!-- ✅ Theme: Desktop에서는 버튼, Mobile에서는 select로 압축 -->
+      <div class="theme-control" aria-label="Theme selector">
+        <div v-if="!isMobile" class="themes">
+          <button
+            v-for="t in $theme.THEMES"
+            :key="t"
+            class="theme-btn"
+            :class="{ active: theme === t }"
+            @click="setTheme(t)"
+          >
+            <span class="theme-dot" aria-hidden="true" />
+            {{ t }}
+          </button>
+        </div>
+
+        <div v-else class="theme-select">
+          <select class="theme-native" :value="theme" @change="onThemeChange">
+            <option v-for="t in $theme.THEMES" :key="t" :value="t">{{ t }}</option>
+          </select>
+          <AppIcon name="chevron-down" size="sm" muted class="theme-caret" />
+        </div>
+      </div>
     </div>
   </header>
 </template>
@@ -121,6 +135,18 @@ export default {
     setTheme(t) {
       this.store.setTheme(t);
       this.$theme.setTheme(t);
+    },
+
+    onThemeChange(e) {
+      const t = e?.target?.value;
+      if (!t) return;
+      this.setTheme(t);
+    },
+
+    onThemeChange(e) {
+      const t = e?.target?.value;
+      if (!t) return;
+      this.setTheme(t);
     },
 
     onAssistantChange(e) {
@@ -207,8 +233,20 @@ export default {
   text-overflow: ellipsis;
 }
 
-.themes {
+.right {
   margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+}
+
+.themes {
   display: inline-flex;
   gap: 6px;
   align-items: center;
@@ -216,7 +254,6 @@ export default {
 }
 
 .assistant-select {
-  margin-left: auto;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -248,9 +285,36 @@ export default {
   pointer-events: none;
 }
 
-/* When selector is present, themes shouldn't steal the auto margin */
-.assistant-select + .themes {
-  margin-left: 10px;
+/* Mobile theme select */
+.theme-select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.theme-native {
+  height: 34px;
+  padding: 0 34px 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
+  box-shadow: var(--shadow-xs, none);
+  color: var(--text-primary);
+  font-size: 12px;
+  appearance: none;
+  cursor: pointer;
+  max-width: min(40vw, 160px);
+}
+
+.theme-native:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.theme-caret {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
 }
 
 .theme-btn {
@@ -292,6 +356,14 @@ export default {
   }
   .theme-btn {
     padding: 6px 8px;
+  }
+
+  .right {
+    gap: 8px;
+  }
+
+  .title {
+    max-width: 34vw;
   }
 }
 </style>
