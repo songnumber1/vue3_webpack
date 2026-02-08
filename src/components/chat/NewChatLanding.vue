@@ -106,7 +106,7 @@ export default {
 .logo {
   width: 56px;
   height: 56px;
-  border-radius: 16px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   border: 1px solid var(--border);
@@ -139,8 +139,8 @@ export default {
   text-align: left;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
-  border-radius: 16px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 12px;
   cursor: pointer;
   box-shadow: var(--shadow-xs);
   transition:
@@ -156,21 +156,21 @@ export default {
 }
 
 .card-title {
-  font-size: 14px;
+  font-size: 0.95rem;
   color: var(--text-primary);
   font-weight: 600;
   margin-bottom: 6px;
 }
 
 .card-desc {
-  font-size: 12px;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 
 .empty {
   grid-column: 1 / -1;
   text-align: center;
-  font-size: 12px;
+  font-size: 0.85rem;
   color: var(--text-muted);
   padding: 20px 0;
 }
@@ -180,7 +180,7 @@ export default {
     grid-template-columns: 1fr;
   }
   .landing {
-    padding: 14px;
+    padding: 12px;
   }
 }
 </style>

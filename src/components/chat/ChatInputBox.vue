@@ -68,7 +68,7 @@
 
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-primary btn-icon"
             :disabled="isLocked"
             @click="send"
             aria-label="Send"
@@ -79,7 +79,7 @@
       </div>
 
       <!-- 다른 모드들(email / translate / summary / code)은
-           이 구조를 그대로 재사용해야 함 -->
+           이 구조를 그대로 재사용 -->
     </div>
   </div>
 </template>
