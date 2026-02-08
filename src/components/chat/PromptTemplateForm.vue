@@ -3,8 +3,8 @@
     <slot name="top" />
 
     <div v-if="hasTemplate" class="ptf-body">
-      <!-- language + style row -->
-      <div class="ptf-row" v-if="lang || style">
+      <!-- options flow: language / style / length in ONE responsive row -->
+      <div class="ptf-flow" v-if="lang || style || length">
         <div v-if="lang" class="ptf-section">
           <div class="ptf-label">{{ lang.ko || "언어" }}</div>
           <div class="ptf-options" :class="{ collapsed: isMobile && !expanded }">
@@ -46,27 +46,26 @@
             </label>
           </div>
         </div>
-      </div>
 
-      <!-- length row -->
-      <div v-if="length" class="ptf-section length-row">
-        <div class="ptf-label">{{ length.ko || "길이" }}</div>
-        <div class="ptf-options" :class="{ collapsed: isMobile && !expanded }">
-          <label
-            v-for="c in length.content || []"
-            :key="c.tag"
-            class="ptf-option"
-            :class="{ active: chat.promptOptions?.length === c.tag }"
-          >
-            <input
-              type="radio"
-              name="length"
-              :value="c.tag"
-              :checked="chat.promptOptions?.length === c.tag"
-              @change="onPick('length', c.tag)"
-            />
-            <span class="ptf-option-text">{{ c.ko || c.tag }}</span>
-          </label>
+        <div v-if="length" class="ptf-section">
+          <div class="ptf-label">{{ length.ko || "길이" }}</div>
+          <div class="ptf-options" :class="{ collapsed: isMobile && !expanded }">
+            <label
+              v-for="c in length.content || []"
+              :key="c.tag"
+              class="ptf-option"
+              :class="{ active: chat.promptOptions?.length === c.tag }"
+            >
+              <input
+                type="radio"
+                name="length"
+                :value="c.tag"
+                :checked="chat.promptOptions?.length === c.tag"
+                @change="onPick('length', c.tag)"
+              />
+              <span class="ptf-option-text">{{ c.ko || c.tag }}</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -222,18 +221,24 @@ export default {
   gap: 14px;
 }
 
+.ptf-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: center;
+}
 .ptf-row {
   display: flex;
-  gap: 24px;
-  align-items: flex-start;
   flex-wrap: wrap;
+  gap: 14px 24px;
+  align-items: center;
 }
 
 .ptf-section {
   display: flex;
   gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .ptf-label {
@@ -246,8 +251,8 @@ export default {
    Options: grid wrap (no horizontal scroll)
    ========================================================= */
 .ptf-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(92px, max-content));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
 }
