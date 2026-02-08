@@ -1,6 +1,7 @@
 <template>
   <div v-if="prompt" class="ptf">
-    <div v-if="hasTemplate" class="ptf-body">
+        <slot name="top" />
+<div v-if="hasTemplate" class="ptf-body">
       <div
         v-for="(cfg, key) in prompt.promptTemplate"
         :key="key"
@@ -113,6 +114,17 @@ export default {
   flex-wrap: wrap;
 }
 
+/* desktop: keep options in one row when possible */
+@media (min-width: 720px) {
+  .ptf-options {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+  .ptf-option {
+    white-space: nowrap;
+  }
+}
 .ptf-option {
   display: inline-flex;
   align-items: center;
@@ -138,4 +150,37 @@ export default {
   font-size: 12px;
   color: var(--muted);
 }
+
+.ptf-top {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ptf-email-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ptf-email-in {
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.ptf-email-in:focus {
+  border-color: var(--primary);
+}
+
+@media (max-width: 720px) {
+  .ptf-email-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>

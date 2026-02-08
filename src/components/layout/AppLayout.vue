@@ -7,7 +7,7 @@
     <div class="body">
       <!-- DESKTOP -->
       <AppSidebar
-        v-if="!isMobile && !sidebarHidden"
+        v-if="!isMobile"
         :class="{ collapsed: sidebarCollapsed }"
       />
 
@@ -75,9 +75,6 @@ export default {
       return this.uiStore.sidebarCollapsed;
     },
 
-    sidebarHidden() {
-      return this.uiStore.sidebarHidden;
-    },
   },
 
   mounted() {

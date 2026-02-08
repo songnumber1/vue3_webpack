@@ -18,8 +18,7 @@ function save(state) {
         theme: state.theme,
         isMobile: state.isMobile,
         sidebarOpen: state.sidebarOpen,
-        sidebarHidden: state.sidebarHidden,
-      })
+})
     );
   } catch (e) {
     // ignore
@@ -33,8 +32,8 @@ export const useUiStore = defineStore("ui", {
       theme: base.theme || "light",
       isMobile: !!base.isMobile,
       sidebarOpen: base.sidebarOpen !== undefined ? !!base.sidebarOpen : true,
-      // ✅ Desktop-only: fully hide sidebar (persisted)
-      sidebarHidden: base.sidebarHidden !== undefined ? !!base.sidebarHidden : false,
+      // Desktop-only: sidebar is always visible; use collapse instead
+      sidebarHidden: false,
       sidebarCollapsed: false,
       assistantsExpanded: false,
       navLocked: false,

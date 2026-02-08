@@ -10,19 +10,7 @@
     >
       <AppIcon name="menu" />
     </button>
-
-    <!-- ✅ WEB(Desktop) : Sidebar 전체 숨김/표시 토글 -->
-    <button
-      v-else
-      type="button"
-      class="icon-btn"
-      :aria-label="sidebarHidden ? 'Show sidebar' : 'Hide sidebar'"
-      @click="toggleSidebarHidden"
-    >
-      <AppIcon :name="sidebarHidden ? 'sidebar-show' : 'sidebar-hide'" />
-    </button>
-
-    <div class="brand">
+<div class="brand">
       <!-- ✅ Mobile에서는 헤더가 좁아지므로 DS 로고는 숨김 (요청사항) -->
       <div v-if="!isMobile" class="logo" aria-hidden="true">DS</div>
       <strong class="title">DS Assistant</strong>
@@ -108,19 +96,18 @@ export default {
     isMobile() {
       return this.store.isMobile;
     },
-
-    sidebarHidden() {
-      return this.store.sidebarHidden;
+sidebarOpen() {
+      return this.store.sidebarOpen;
     },
 
-    sidebarOpen() {
-      return this.store.sidebarOpen;
+    sidebarCollapsed() {
+      return this.store.sidebarCollapsed;
     },
 
     showAssistantSelector() {
       // Desktop: sidebarHidden일 때
       // Mobile: drawer가 닫혀있을 때(= sidebar가 화면에 없음)
-      const base = this.sidebarHidden || (this.isMobile && !this.sidebarOpen);
+      const base = this.sidebarCollapsed || (this.isMobile && !this.sidebarOpen);
       return base && (this.assistants || []).length > 0;
     },
 

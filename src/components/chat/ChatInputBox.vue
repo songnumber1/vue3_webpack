@@ -6,9 +6,16 @@
 
     <div class="input-top">
       <InputHeader />
-      <PromptTemplateForm
-        v-if="inputMode !== 'direct' && inputMode !== 'code'"
-      />
+      <PromptTemplateForm v-if="inputMode !== 'direct' && inputMode !== 'code'">
+        <template v-if="inputMode === 'email'" #top>
+          <div class="ptf-top">
+            <div class="ptf-email-row">
+              <input class="ptf-email-in" v-model="email.to" placeholder="받는사람 (to)" />
+              <input class="ptf-email-in" v-model="email.subject" placeholder="제목" />
+            </div>
+          </div>
+        </template>
+      </PromptTemplateForm>
     </div>
 
     <!-- hidden file picker (shared across modes) -->
@@ -80,10 +87,6 @@
 
       <!-- EMAIL -->
       <div v-else-if="inputMode === 'email'" class="form">
-        <div class="row">
-          <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
-          <input class="in" v-model="email.subject" placeholder="제목" />
-        </div>
         <div
           class="composer"
           :class="{ dragging: isDragging }"
@@ -92,6 +95,7 @@
           @dragleave.prevent="onDragLeave"
           @drop.prevent="onDrop"
         >
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <textarea
             class="composer-ta"
             ref="taEmail"
@@ -107,7 +111,6 @@
               <div class="drop-sub">pdf · doc/docx · jpg · png</div>
             </div>
           </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <button
             type="button"
             class="attach-btn"
@@ -139,6 +142,7 @@
           @dragleave.prevent="onDragLeave"
           @drop.prevent="onDrop"
         >
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <textarea
             class="composer-ta"
             ref="taTranslate"
@@ -154,7 +158,6 @@
               <div class="drop-sub">pdf · doc/docx · jpg · png</div>
             </div>
           </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <button
             type="button"
             class="attach-btn"
@@ -201,7 +204,6 @@
               <div class="drop-sub">pdf · doc/docx · jpg · png</div>
             </div>
           </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <button
             type="button"
             class="attach-btn"
@@ -233,6 +235,7 @@
           @dragleave.prevent="onDragLeave"
           @drop.prevent="onDrop"
         >
+          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <textarea
             class="composer-ta"
             ref="taCode"
@@ -248,7 +251,6 @@
               <div class="drop-sub">pdf · doc/docx · jpg · png</div>
             </div>
           </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
           <button
             type="button"
             class="attach-btn"
@@ -713,6 +715,10 @@ export default {
 .attach-btn:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.composer :deep(.tray) {
+  margin-bottom: 10px;
 }
 
 .composer-ta {
