@@ -28,34 +28,18 @@
       <strong class="title">DS Assistant</strong>
     </div>
 
-    <!-- ✅ Center controls (mobile-first) -->
-    <div class="center">
-      <!-- ✅ Assistant selector: mobile에서는 중앙, desktop에서는 필요 시에만 노출 -->
-      <div
-        v-if="showAssistantSelector"
-        class="assistant-select"
-        aria-label="Assistant selector"
-      >
-        <select
-          class="assistant-native"
-          :value="selectedAssistantId"
-          @change="onAssistantChange"
-        >
-          <option v-for="a in assistants" :key="a.id" :value="a.id">
-            {{ a.label }}
-          </option>
-        </select>
-        <AppIcon
-          name="chevron-down"
-          size="sm"
-          muted
-          class="assistant-caret"
-        />
-      </div>
-    </div>
-
-    <!-- ✅ Right controls (theme) -->
+    <!-- ✅ Right controls (assistant + theme) -->
     <div class="right">
+      <!-- ✅ Sidebar가 화면에서 사라지면(Desktop hidden / Mobile drawer closed)
+           Header 우측에 Assistant selector를 노출해서 항상 선택 가능하도록 유지 -->
+      <div v-if="showAssistantSelector" class="assistant-select" aria-label="Assistant selector">
+        <select class="assistant-native" :value="selectedAssistantId" @change="onAssistantChange">
+          <option v-for="a in assistants" :key="a.id" :value="a.id">{{ a.label }}</option>
+        </select>
+        <AppIcon name="chevron-down" size="sm" muted class="assistant-caret" />
+      </div>
+
+      <!-- ✅ Theme: Desktop에서는 버튼, Mobile에서는 select로 압축 -->
       <div class="theme-control" aria-label="Theme selector">
         <div v-if="!isMobile" class="themes">
           <button
@@ -72,9 +56,7 @@
 
         <div v-else class="theme-select">
           <select class="theme-native" :value="theme" @change="onThemeChange">
-            <option v-for="t in $theme.THEMES" :key="t" :value="t">
-              {{ t }}
-            </option>
+            <option v-for="t in $theme.THEMES" :key="t" :value="t">{{ t }}</option>
           </select>
           <AppIcon name="chevron-down" size="sm" muted class="theme-caret" />
         </div>
@@ -384,43 +366,4 @@ export default {
     max-width: 34vw;
   }
 }
-
-.center {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Make controls shrink safely on small screens */
-.assistant-select {
-  max-width: 100%;
-}
-
-.assistant-native {
-  width: 100%;
-  max-width: min(56vw, 320px);
-}
-
-.theme-native {
-  max-width: min(28vw, 140px);
-}
-
-/* Mobile-first: hide brand text when space is tight */
-@media (max-width: 640px) {
-  .brand {
-    display: none;
-  }
-
-  .header {
-    padding: 0 10px;
-    gap: 8px;
-  }
-
-  .right {
-    gap: 8px;
-  }
-}
-
 </style>

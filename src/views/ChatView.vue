@@ -2,6 +2,7 @@
   <div class="chat-box">
     <div v-if="showRoomHeader" class="room-header">
       <strong class="room-title">{{ activeChatTitle }}</strong>
+      <span class="room-sub"> {{ assistantLabel }} · {{ modelId }} </span>
     </div>
 
     <div class="messages" ref="messagesWrap">
@@ -132,7 +133,7 @@ export default {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: var(--chat-padding);
+  padding: 18px;
 }
 
 /* =========================
@@ -162,11 +163,7 @@ export default {
 }
 
 :deep(.msg.user .bubble) {
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent-2, var(--accent))
-  );
+  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
   color: var(--accent-contrast);
   border-color: transparent;
 }
@@ -188,6 +185,7 @@ export default {
   padding: 12px;
   overflow: auto;
 }
+
 
 @media (max-width: 520px) {
   .messages {

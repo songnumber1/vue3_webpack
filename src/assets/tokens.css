@@ -1,0 +1,39 @@
+
+/* === Design Tokens : Mobile First === */
+:root {
+  --density-scale: 1;
+  --space-xs: calc(6px * var(--density-scale));
+  --space-sm: calc(8px * var(--density-scale));
+  --space-md: calc(12px * var(--density-scale));
+  --space-lg: calc(16px * var(--density-scale));
+  --font-xs: 12px;
+  --font-sm: 13px;
+  --font-md: 14px;
+  --font-lg: 16px;
+  --control-h: max(44px, calc(40px * var(--density-scale)));
+  --radius: 14px;
+  --bg: #ffffff;
+  --surface: #f7f7f8;
+  --text: #111111;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+}
+[data-density="compact"] { --density-scale: 0.9; }
+[data-density="normal"] { --density-scale: 1; }
+[data-density="comfortable"] { --density-scale: 1.1; }
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --surface: #1a1c22;
+  --text: #f5f6f7;
+  --text-muted: #9ca3af;
+  --border: #2a2d36;
+}
+@media (min-width: 640px) {
+  :root { --font-md: 15px; --control-h: 44px; }
+}
+@media (min-width: 768px) {
+  :root { --space-lg: calc(20px * var(--density-scale)); --font-lg: 17px; --control-h: 48px; }
+}
+@media (min-width: 1024px) {
+  :root { --space-lg: calc(24px * var(--density-scale)); --font-lg: 18px; --control-h: 52px; }
+}
