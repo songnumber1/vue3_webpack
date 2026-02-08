@@ -42,7 +42,9 @@ export default {
 </script>
 
 <style scoped>
+
 .ms {
+  max-width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -65,6 +67,7 @@ export default {
 }
 
 .ms-wrap {
+  max-width: 100%;
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -74,9 +77,9 @@ export default {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  min-width: 220px;
-  height: 40px;
-  padding: 0 40px 0 14px;
+  min-width: 0;
+  height: var(--control-h);
+  padding: 0 calc(var(--control-pad-x) + 26px) 0 var(--control-pad-x);
   font-size: 13px;
   font-weight: 600;
   border-radius: 14px;
@@ -120,4 +123,8 @@ export default {
     min-width: 0;
   }
 }
+
+
+.ms-select { box-sizing: border-box; }
+
 </style>

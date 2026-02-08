@@ -87,13 +87,14 @@ export default {
 </script>
 
 <style scoped>
+
 .landing {
   height: 100%;
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 18px;
+  gap: var(--page-gap);
+  padding: var(--page-pad);
 }
 
 .hero {
@@ -114,7 +115,7 @@ export default {
 }
 
 .title {
-  font-size: 26px;
+  font-size: var(--title-size);
   margin: 0;
   color: var(--text-primary);
   letter-spacing: -0.02em;
@@ -128,8 +129,8 @@ export default {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  gap: var(--card-gap);
   max-width: 760px;
   margin: 0 auto;
   width: 100%;
@@ -180,4 +181,5 @@ export default {
     padding: 14px;
   }
 }
+
 </style>

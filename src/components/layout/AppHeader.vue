@@ -166,13 +166,14 @@ export default {
 </script>
 
 <style scoped>
+
 .header {
   width: 100%;
   height: var(--header-height);
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
+  padding: 0 var(--page-pad);
   border-bottom: 1px solid var(--header-border, var(--border));
   background: var(--header-bg, var(--bg-surface));
   position: sticky;
@@ -182,9 +183,9 @@ export default {
 }
 
 .icon-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
+  width: var(--control-h);
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   box-shadow: var(--shadow-sm);
@@ -212,8 +213,8 @@ export default {
 
 .logo {
   width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -225,6 +226,11 @@ export default {
 }
 
 .title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+
   font-size: 14px;
   color: var(--text-primary);
   letter-spacing: 0.2px;
@@ -261,9 +267,9 @@ export default {
 
 /* native select (keeps UI/UX minimal & consistent) */
 .assistant-native {
-  height: 34px;
-  padding: 0 34px 0 12px;
-  border-radius: 12px;
+  height: var(--control-h);
+  padding: 0 calc(var(--control-pad-x) + 22px) 0 var(--control-pad-x);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   box-shadow: var(--shadow-xs, none);
@@ -293,9 +299,9 @@ export default {
 }
 
 .theme-native {
-  height: 34px;
-  padding: 0 34px 0 12px;
-  border-radius: 12px;
+  height: var(--control-h);
+  padding: 0 calc(var(--control-pad-x) + 22px) 0 var(--control-pad-x);
+  border-radius: var(--control-radius);
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   box-shadow: var(--shadow-xs, none);
@@ -366,4 +372,10 @@ export default {
     max-width: 34vw;
   }
 }
+
+@media (max-width: 420px){
+  .title{ max-width: 84px; }
+  .right{ gap: 8px; }
+}
+
 </style>

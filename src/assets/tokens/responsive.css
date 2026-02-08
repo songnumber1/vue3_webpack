@@ -1,0 +1,50 @@
+
+:root{
+  /* Breakpoint-aware UI tokens (mobile-first) */
+  --control-h: 44px;           /* min touch target */
+  --control-radius: 16px;
+  --control-pad-x: 14px;
+
+  --pill-pad-y: 8px;
+  --pill-pad-x: 12px;
+  --pill-font: var(--text-sm);
+
+  --page-pad: 14px;
+  --page-gap: 14px;
+
+  --title-size: 24px;
+  --card-gap: 12px;
+  --grid-cols: 1;
+
+  /* container */
+  --container-max: 1100px;
+}
+
+@media (min-width: 640px){
+  :root{
+    --page-pad: 16px;
+    --title-size: 26px;
+    --grid-cols: 2;
+  }
+}
+
+@media (min-width: 768px){
+  :root{
+    --control-h: 48px;
+    --page-pad: 18px;
+    --page-gap: 16px;
+    --pill-pad-y: 9px;
+    --pill-pad-x: 14px;
+  }
+}
+
+@media (min-width: 1024px){
+  :root{
+    --control-h: 52px;
+    --page-pad: 18px;
+    --page-gap: 18px;
+    --title-size: 28px;
+    --card-gap: 14px;
+    --grid-cols: 2;
+  }
+}

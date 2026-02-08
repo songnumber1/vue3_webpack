@@ -64,6 +64,7 @@ export default {
 </script>
 
 <style scoped>
+
 .ih {
   display: flex;
   gap: 8px;
@@ -85,15 +86,17 @@ export default {
 }
 
 .ih-pill {
+  min-height: var(--control-h);
+
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: var(--pill-pad-y) var(--pill-pad-x);
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: color-mix(in srgb, var(--bg-surface) 60%, transparent);
   color: var(--text-primary);
-  font-size: 12px;
+  font-size: var(--pill-font);
   box-shadow: var(--shadow-xs, none);
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
@@ -121,8 +124,9 @@ export default {
 }
 
 .ih-empty {
-  font-size: 12px;
+  font-size: var(--pill-font);
   color: var(--muted);
   padding: 4px 0;
 }
+
 </style>
