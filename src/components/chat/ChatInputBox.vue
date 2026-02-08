@@ -573,6 +573,7 @@ export default {
 </script>
 
 <style scoped>
+
 .chat-input {
   border-top: 1px solid var(--border);
   background: var(--bg);
@@ -801,4 +802,17 @@ export default {
     max-height: 140px;
   }
 }
+
+/* =========================================================
+   Mobile keyboard: keep input area visible
+   ========================================================= */
+@media (max-width: 720px) {
+  .chat-input {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
 </style>
