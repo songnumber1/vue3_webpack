@@ -133,7 +133,7 @@ export default {
   flex: 1;
   min-height: 0;
   overflow: auto;
-  padding: 18px;
+  padding: var(--chat-padding);
 }
 
 /* =========================

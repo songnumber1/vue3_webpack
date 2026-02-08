@@ -1005,3 +1005,69 @@ pre {
     padding: 12px;
   }
 }
+
+
+/* =========================================================
+   Responsive tokens (mobile-first)
+   Breakpoints:
+   - sm: 640px
+   - md: 768px
+   - lg: 1024px
+   - xl: 1280px
+   ========================================================= */
+
+:root{
+  /* Mobile-first spacing */
+  --header-height: 52px;
+  --layout-padding: var(--space-3);
+  --layout-gap: var(--space-4);
+  --chat-padding: var(--space-3);
+}
+
+/* sm */
+@media (min-width: 640px){
+  :root{
+    --header-height: 56px;
+    --layout-padding: var(--space-4);
+    --layout-gap: var(--space-5);
+    --chat-padding: var(--space-4);
+  }
+}
+
+/* md */
+@media (min-width: 768px){
+  :root{
+    --header-height: 60px;
+    --layout-padding: var(--space-5);
+  }
+}
+
+/* lg */
+@media (min-width: 1024px){
+  :root{
+    --header-height: 64px;
+    --layout-padding: var(--space-6);
+  }
+}
+
+/* Simple responsive helpers (no Tailwind)
+   - Use: class="hide-sm" / "hide-md" / "hide-lg"
+*/
+.hide-sm{ display: none !important; }
+@media (min-width: 640px){ .hide-sm{ display: initial !important; } }
+
+.hide-md{ display: none !important; }
+@media (min-width: 768px){ .hide-md{ display: initial !important; } }
+
+.hide-lg{ display: none !important; }
+@media (min-width: 1024px){ .hide-lg{ display: initial !important; } }
+
+.only-sm{ display: initial !important; }
+@media (min-width: 640px){ .only-sm{ display: none !important; } }
+
+.only-md{ display: none !important; }
+@media (min-width: 768px){ .only-md{ display: initial !important; } }
+@media (min-width: 1024px){ .only-md{ display: none !important; } }
+
+.only-lg{ display: none !important; }
+@media (min-width: 1024px){ .only-lg{ display: initial !important; } }

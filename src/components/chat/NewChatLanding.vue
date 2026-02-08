@@ -92,8 +92,8 @@ export default {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 18px;
+  gap: var(--layout-gap);
+  padding: var(--layout-padding);
 }
 
 .hero {
@@ -140,7 +140,7 @@ export default {
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   border-radius: 16px;
-  padding: 14px;
+  padding: var(--layout-padding);
   cursor: pointer;
   box-shadow: var(--shadow-xs);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
@@ -177,7 +177,7 @@ export default {
     grid-template-columns: 1fr;
   }
   .landing {
-    padding: 14px;
+    padding: var(--layout-padding);
   }
 }
 </style>
