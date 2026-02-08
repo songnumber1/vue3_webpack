@@ -31,7 +31,12 @@
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
-        <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
+
+        <ChatAttachmentTray
+          :items="pendingFiles"
+          @remove="removePending"
+        />
+
 
         <textarea
           v-model="input"
@@ -54,8 +59,7 @@
             <div class="drop-text">파일을 여기에 놓아 첨부</div>
             <div class="drop-sub">pdf · doc/docx · jpg · png</div>
           </div>
-        </div>
-        <button
+        </div>        <button
           type="button"
           class="attach-btn"
           :disabled="isLocked"
@@ -106,13 +110,7 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button
-            type="button"
-            class="attach-btn"
-            :disabled="isLocked"
-            @click="openPicker"
-            aria-label="Attach"
-          >
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -161,13 +159,7 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button
-            type="button"
-            class="attach-btn"
-            :disabled="isLocked"
-            @click="openPicker"
-            aria-label="Attach"
-          >
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -216,13 +208,7 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button
-            type="button"
-            class="attach-btn"
-            :disabled="isLocked"
-            @click="openPicker"
-            aria-label="Attach"
-          >
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -239,6 +225,18 @@
 
       <!-- CODE -->
       <div v-else-if="inputMode === 'code'" class="form">
+        <div class="row">
+          <input
+            class="in"
+            v-model="code.lang"
+            placeholder="언어 (예: java, js)"
+          />
+          <input
+            class="in"
+            v-model="code.task"
+            placeholder="요청 (예: 리팩토링, 버그 수정)"
+          />
+        </div>
         <div
           class="composer"
           :class="{ dragging: isDragging }"
@@ -263,13 +261,7 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button
-            type="button"
-            class="attach-btn"
-            :disabled="isLocked"
-            @click="openPicker"
-            aria-label="Attach"
-          >
+          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -330,9 +322,7 @@ export default {
     },
 
     pendingFiles() {
-      return Array.isArray(this.chat.pendingFiles)
-        ? this.chat.pendingFiles
-        : [];
+      return Array.isArray(this.chat.pendingFiles) ? this.chat.pendingFiles : [];
     },
 
     acceptString() {
@@ -437,10 +427,7 @@ export default {
         if (!item) continue;
         // prevent exact duplicates by name+size+lastModified
         const exists = this.pendingFiles.some(
-          (x) =>
-            x?.name === item.name &&
-            x?.size === item.size &&
-            x?.lastModified === item.lastModified,
+          (x) => x?.name === item.name && x?.size === item.size && x?.lastModified === item.lastModified
         );
         if (!exists) next.push(item);
       }
@@ -476,8 +463,7 @@ export default {
         ext,
         type: file.type || "",
         size: typeof file.size === "number" ? file.size : 0,
-        lastModified:
-          typeof file.lastModified === "number" ? file.lastModified : 0,
+        lastModified: typeof file.lastModified === "number" ? file.lastModified : 0,
         kind: isImage ? "image" : "file",
         previewUrl,
       };

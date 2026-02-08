@@ -1,4 +1,3 @@
-html,body{height:100%;overflow:hidden;}
 /* =========================================================
    Theme variable aliases
    - Actual theme palettes live in /assets/themes/*.css and are switched by themeManager (data-theme attr)
@@ -90,8 +89,16 @@ body {
 
 .layout {
   display: flex;
+  height: 100vh;
+  min-height: 100vh;
 }
 
+@supports (height: 100dvh) {
+  .layout {
+    height: 100dvh;
+    min-height: 100dvh;
+  }
+}
 
 .sidebar {
   width: 260px;

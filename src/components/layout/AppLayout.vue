@@ -104,6 +104,8 @@ export default {
 <style scoped>
 .layout {
   /* Mobile browsers: avoid 100vh jumping (address bar). Use dvh when supported */
+  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: var(--bg);
