@@ -52,7 +52,7 @@
 /* body */
 .note-body {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   line-height: 1.45;
   overflow-y: auto;
 }
