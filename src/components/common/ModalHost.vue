@@ -93,13 +93,13 @@ export default {
 }
 
 .modal.sm {
-  width: 360px;
+  width: min(360px, 92vw);
 }
 .modal.md {
-  width: 520px;
+  width: min(520px, 92vw);
 }
 .modal.lg {
-  width: 720px;
+  width: min(720px, 92vw);
 }
 
 .modal.mobile {

@@ -79,7 +79,7 @@ export default {
   position: fixed;
   right: 20px;
   /* ✅ 우측 정확히 20px */
-  width: 280px;
+  width: min(280px, 92vw);
   z-index: 9999;
 }
 

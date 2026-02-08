@@ -1,28 +1,59 @@
+/* === Responsive Design System Override (ENTRY ONLY) ===
+   Goal:
+   - Keep touch targets reasonable on mobile (>=38px)
+   - Avoid overly-large controls on desktop that cause wrapping / horizontal overflow
+   - Avoid heavy global `!important` overrides that can break layout
+*/
 
-/* === Responsive Design System Override (ENTRY ONLY) === */
 :root {
   --density-scale: 1;
+
+  /* spacing */
   --space-xs: calc(6px * var(--density-scale));
   --space-sm: calc(8px * var(--density-scale));
   --space-md: calc(12px * var(--density-scale));
   --space-lg: calc(16px * var(--density-scale));
+
+  /* typography */
   --font-xs: 12px;
   --font-sm: 13px;
   --font-md: 14px;
   --font-lg: 16px;
-  --control-h: max(44px, calc(40px * var(--density-scale)));
+
+  /* controls (mobile-first) */
+  --control-h: 38px;
   --radius: 14px;
 }
-@media (min-width: 640px) { :root { --font-md: 15px; } }
-@media (min-width: 768px) { :root { --space-lg: calc(20px * var(--density-scale)); --font-lg: 17px; --control-h: 48px; } }
-@media (min-width: 1024px){ :root { --space-lg: calc(24px * var(--density-scale)); --font-lg: 18px; --control-h: 52px; } }
 
-button,input,select,textarea,[role="button"],
-.ih-pill,.chip,.tag,.option,.toggle,.badge {
-  min-height: var(--control-h) !important;
-  font-size: var(--font-md) !important;
+@media (min-width: 640px) {
+  :root { --font-md: 15px; --control-h: 40px; }
 }
-input[type="radio"],input[type="checkbox"] {
-  width: calc(var(--control-h) * .45) !important;
-  height: calc(var(--control-h) * .45) !important;
+@media (min-width: 768px) {
+  :root { --space-lg: calc(20px * var(--density-scale)); --font-lg: 17px; --control-h: 42px; }
+}
+@media (min-width: 1024px) {
+  :root { --space-lg: calc(24px * var(--density-scale)); --font-lg: 18px; --control-h: 44px; }
+}
+
+/* Light-touch baseline for common controls.
+   (Most components already use var(--control-h) in their own styles) */
+button,
+input,
+select,
+textarea,
+[role="button"],
+.ih-pill,
+.chip,
+.tag,
+.option,
+.toggle,
+.badge {
+  min-height: var(--control-h);
+  font-size: var(--font-md);
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  width: calc(var(--control-h) * 0.45);
+  height: calc(var(--control-h) * 0.45);
 }

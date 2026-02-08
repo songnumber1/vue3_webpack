@@ -103,6 +103,7 @@ export default {
 
 <style scoped>
 .chat-box {
+  overflow-x: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;

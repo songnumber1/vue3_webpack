@@ -178,9 +178,10 @@ export default {
 @media (max-width: 520px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: 8px;
   }
-  .landing {
-    padding: 12px;
-  }
+  .card { padding: 10px; }
+  .landing { padding: 10px; }
 }
+
 </style>

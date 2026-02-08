@@ -83,6 +83,19 @@ body {
   font-family: var(--font-sans);
 }
 
+
+
+html, body, #app {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+/* Prevent long inline content from forcing horizontal scroll */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
 /* =========================================================
    LAYOUT
    ========================================================= */

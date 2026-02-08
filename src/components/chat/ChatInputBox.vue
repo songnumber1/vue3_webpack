@@ -5,7 +5,7 @@
       <PromptTemplateForm />
     </div>
 
-    <!-- hidden file picker -->
+    <!-- hidden file picker (shared across modes) -->
     <input
       ref="filePicker"
       class="file-input"
@@ -26,14 +26,12 @@
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
-        <!-- attachments -->
         <ChatAttachmentTray
           v-if="pendingFiles.length"
           :items="pendingFiles"
           @remove="removePending"
         />
 
-        <!-- textarea -->
         <textarea
           ref="taDirect"
           v-model="input"
@@ -45,7 +43,6 @@
           @compositionend="isComposing = false"
         />
 
-        <!-- drag overlay -->
         <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
           <div class="drop-card">
             <AppIcon name="paperclip" size="md" />
@@ -54,7 +51,6 @@
           </div>
         </div>
 
-        <!-- tool actions -->
         <div class="tool-actions">
           <button
             type="button"
@@ -78,8 +74,155 @@
         </div>
       </div>
 
-      <!-- 다른 모드들(email / translate / summary / code)은
-           이 구조를 그대로 재사용 -->
+      <!-- EMAIL -->
+      <div v-else-if="inputMode === 'email'" class="form">
+        <div class="row">
+          <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
+          <input class="in" v-model="email.subject" placeholder="제목" />
+        </div>
+
+        <div
+          class="composer"
+          :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter"
+          @dragover.prevent="onDragOver"
+          @dragleave.prevent="onDragLeave"
+          @drop.prevent="onDrop"
+        >
+          <ChatAttachmentTray
+            v-if="pendingFiles.length"
+            :items="pendingFiles"
+            @remove="removePending"
+          />
+
+          <textarea
+            class="composer-ta"
+            ref="taEmail"
+            v-model="email.body"
+            rows="3"
+            placeholder="내용"
+            @keydown="onKeydown"
+          />
+
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
+          <div class="tool-actions">
+            <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
+              <AppIcon name="paperclip" size="sm" />
+            </button>
+            <button type="button" class="btn btn-primary btn-icon" :disabled="isLocked" @click="send" aria-label="Send">
+              <AppIcon name="send" size="sm" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRANSLATE -->
+      <div v-else-if="inputMode === 'translate'" class="form">
+        <div class="row">
+          <input class="in" v-model="tr.from" placeholder="원문 언어 (예: ko)" />
+          <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
+        </div>
+
+        <div class="composer" :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
+          <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
+
+          <textarea class="composer-ta" ref="taTranslate" v-model="tr.text" rows="3" placeholder="번역할 텍스트" @keydown="onKeydown" />
+
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
+          <div class="tool-actions">
+            <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
+              <AppIcon name="paperclip" size="sm" />
+            </button>
+            <button type="button" class="btn btn-primary btn-icon" :disabled="isLocked" @click="send" aria-label="Send">
+              <AppIcon name="send" size="sm" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div v-else-if="inputMode === 'summary'" class="form">
+        <div class="row">
+          <select class="sel" v-model="sum.style">
+            <option value="bullet">불릿</option>
+            <option value="short">짧게</option>
+            <option value="detailed">자세히</option>
+          </select>
+          <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
+        </div>
+
+        <div class="composer" :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
+          <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
+
+          <textarea class="composer-ta" ref="taSummary" v-model="sum.text" rows="3" placeholder="요약할 텍스트" @keydown="onKeydown" />
+
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
+          <div class="tool-actions">
+            <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
+              <AppIcon name="paperclip" size="sm" />
+            </button>
+            <button type="button" class="btn btn-primary btn-icon" :disabled="isLocked" @click="send" aria-label="Send">
+              <AppIcon name="send" size="sm" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE -->
+      <div v-else-if="inputMode === 'code'" class="form">
+        <div class="row">
+          <input class="in" v-model="code.lang" placeholder="언어 (예: java, js)" />
+          <input class="in" v-model="code.task" placeholder="요청 (예: 리팩토링, 버그 수정)" />
+        </div>
+
+        <div class="composer" :class="{ dragging: isDragging }"
+          @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
+          <ChatAttachmentTray v-if="pendingFiles.length" :items="pendingFiles" @remove="removePending" />
+
+          <textarea class="composer-ta" ref="taCode" v-model="code.text" rows="3" placeholder="코드/설명" @keydown="onKeydown" />
+
+          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
+            <div class="drop-card">
+              <AppIcon name="paperclip" size="md" />
+              <div class="drop-text">파일을 여기에 놓아 첨부</div>
+              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
+            </div>
+          </div>
+
+          <div class="tool-actions">
+            <button type="button" class="btn btn-ghost btn-icon" :disabled="isLocked" @click="openPicker" aria-label="Attach files">
+              <AppIcon name="paperclip" size="sm" />
+            </button>
+            <button type="button" class="btn btn-primary btn-icon" :disabled="isLocked" @click="send" aria-label="Send">
+              <AppIcon name="send" size="sm" />
+            </button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
@@ -382,73 +525,67 @@ export default {
 </script>
 
 <style scoped>
-.chat-input {
+.chat-input{
   border-top: 1px solid var(--border);
   background: var(--bg);
-  padding: 12px;
+  padding: var(--chat-pad);
   display: grid;
-  gap: 10px;
+  gap: var(--page-gap);
 }
 
-.input-top {
+.input-top{ display: grid; gap: var(--page-gap); }
+
+.mode-body{ display: grid; gap: var(--page-gap); }
+
+.form{ display: grid; gap: var(--page-gap); }
+
+.row{
   display: grid;
-  gap: 10px;
+  gap: var(--page-gap);
+  grid-template-columns: 1fr;
 }
 
-.mode-body {
-  display: grid;
-  gap: 10px;
+@media (min-width: 768px){
+  .row{ grid-template-columns: 1fr 1fr; }
 }
 
-.form {
-  display: grid;
-  gap: 10px;
-}
-
-.row {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: 1fr 1fr;
-}
-
-.in,
-.sel {
-  height: 40px;
-  border-radius: 14px;
+.in,.sel{
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   color: var(--text-primary);
-  padding: 0 12px;
+  padding: 0 var(--control-pad-x);
   outline: none;
   box-shadow: var(--shadow-xs, none);
+  min-width: 0;
 }
 
-.in:focus,
-.sel:focus {
+.in:focus,.sel:focus{
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
-.composer {
+.composer{
   position: relative;
-  display: block;
+  display: grid;
+  gap: 10px;
   padding: 10px;
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: linear-gradient(
-    180deg,
+  background: linear-gradient(180deg,
     color-mix(in srgb, var(--bg-surface) 80%, transparent),
     var(--bg-elevated)
   );
   box-shadow: var(--shadow-sm);
 }
 
-.composer.dragging {
+.composer.dragging{
   border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-.file-input {
+.file-input{
   position: absolute;
   width: 1px;
   height: 1px;
@@ -457,7 +594,34 @@ export default {
   pointer-events: none;
 }
 
-.drop-overlay {
+.composer-ta{
+  width: 100%;
+  min-height: 52px;
+  max-height: 220px;
+  resize: none;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text-primary);
+  border-radius: var(--control-radius);
+  padding: 12px;
+  outline: none;
+  line-height: 1.4;
+}
+
+.composer-ta:focus{
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* tool actions stay visible and never overlap textarea */
+.tool-actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* drag overlay */
+.drop-overlay{
   position: absolute;
   inset: 10px;
   border-radius: 16px;
@@ -469,7 +633,7 @@ export default {
   pointer-events: none;
 }
 
-.drop-card {
+.drop-card{
   display: grid;
   gap: 6px;
   text-align: center;
@@ -481,123 +645,6 @@ export default {
   color: var(--text-primary);
 }
 
-.drop-text {
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.drop-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.attach-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-  color: var(--text-primary);
-  position: absolute;
-  left: 22px;
-  bottom: 25px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    filter 0.15s ease;
-}
-
-.attach-btn:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  filter: saturate(1.05);
-}
-
-.attach-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.composer-ta {
-  width: 100%;
-  min-height: 52px;
-  max-height: 200px;
-  resize: none;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-  color: var(--text-primary);
-  border-radius: 14px;
-  padding: 12px 60px 52px 54px; /* ✅ left padding for attach button */
-  outline: none;
-  line-height: 1.4;
-}
-
-.composer-ta:focus {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-/* ✅ UI/UX 유지 + 위치/겹침만 해결 */
-.send-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent-2, var(--accent))
-  );
-  color: var(--accent-contrast);
-  position: absolute;
-
-  /* 🔧 너무 바닥/우측에 붙어서 스크롤 가림 → 살짝 띄움 */
-  right: 30px;
-  bottom: 25px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
-
-  /* 🔧 클릭이 textarea에 먹히는 케이스 방지 */
-  z-index: 2;
-}
-
-.send-btn:hover {
-  transform: translateY(-1px);
-  filter: saturate(1.1);
-}
-
-.send-btn:active {
-  transform: translateY(0);
-}
-
-.send-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-@media (max-width: 520px) {
-  .row {
-    grid-template-columns: 1fr;
-  }
-  .chat-input {
-    padding: 10px;
-    max-height: 42vh;
-    overflow: auto;
-  }
-  .composer-ta {
-    max-height: 140px;
-  }
-}
+.drop-text{ font-size: 13px; font-weight: 650; }
+.drop-sub{ font-size: 12px; color: var(--text-muted); }
 </style>
