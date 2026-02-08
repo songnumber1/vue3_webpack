@@ -6,13 +6,13 @@
     </div>
 
     <div class="btn-row btn-container">
-      <button class="btn btn-primary btn-sm" @click="open('sm')">
+      <button class="btn btn-primary" @click="open('sm')">
         Open SM
       </button>
-      <button class="btn btn-primary btn-md" @click="open('md')">
+      <button class="btn btn-primary" @click="open('md')">
         Open MD
       </button>
-      <button class="btn btn-primary btn-lg" @click="open('lg')">
+      <button class="btn btn-primary" @click="open('lg')">
         Open LG
       </button>
     </div>

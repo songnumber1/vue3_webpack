@@ -1,18 +1,22 @@
 <template>
   <div class="msg assistant">
     <div class="msg-card assistant">
+      <!-- header -->
       <div class="msg-head">
         <div class="msg-head-left">
           <div class="avatar assistant" aria-hidden="true">AI</div>
+
           <div class="meta">
             <div class="name">Assistant</div>
           </div>
         </div>
+
         <div class="msg-head-right">
           <span class="time">{{ formattedTime }}</span>
         </div>
       </div>
 
+      <!-- body -->
       <div class="msg-body">
         <div class="md" v-html="render(text)" />
       </div>
@@ -34,7 +38,8 @@ export default {
     },
     formattedTime() {
       const m = this.message || {};
-      const raw = m.createdAt ?? m.created_at ?? m.time ?? m.ts ?? m.timestamp ?? m.at;
+      const raw =
+        m.createdAt ?? m.created_at ?? m.time ?? m.ts ?? m.timestamp ?? m.at;
       const d = raw ? new Date(raw) : new Date();
       if (Number.isNaN(d.getTime())) return "";
       const yyyy = d.getFullYear();

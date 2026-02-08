@@ -21,12 +21,18 @@
           <div class="file-icon" aria-hidden="true">
             <AppIcon :name="iconFor(it)" size="sm" />
           </div>
+
           <div class="file-meta">
-            <div class="file-name" :title="it.name">{{ it.name }}</div>
-            <div class="file-ext">{{ it.ext.toUpperCase() }}</div>
+            <div class="file-name" :title="it.name">
+              {{ it.name }}
+            </div>
+            <div class="file-ext">
+              {{ it.ext.toUpperCase() }}
+            </div>
           </div>
         </div>
 
+        <!-- remove -->
         <button
           v-if="!readonly"
           type="button"
@@ -40,7 +46,7 @@
     </div>
   </div>
 
-  <!-- Image viewer (teleport to body to avoid layout constraints) -->
+  <!-- Image viewer -->
   <teleport to="body">
     <div
       v-if="viewer.open"
@@ -51,11 +57,19 @@
     >
       <div class="viewer-card">
         <div class="viewer-top">
-          <div class="viewer-title" :title="viewer.title">{{ viewer.title }}</div>
-          <button type="button" class="viewer-close" @click="closeViewer" aria-label="Close">
+          <div class="viewer-title" :title="viewer.title">
+            {{ viewer.title }}
+          </div>
+          <button
+            type="button"
+            class="btn btn-ghost btn-icon"
+            @click="closeViewer"
+            aria-label="Close"
+          >
             <AppIcon name="x" size="sm" />
           </button>
         </div>
+
         <div class="viewer-body">
           <img class="viewer-img" :src="viewer.src" :alt="viewer.title" />
         </div>
@@ -242,7 +256,6 @@ export default {
 .chip:hover .rm {
   opacity: 1;
 }
-
 
 .rm:hover {
   color: var(--text-primary);

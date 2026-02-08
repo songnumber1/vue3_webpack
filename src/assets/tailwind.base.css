@@ -3,3 +3,5 @@
 @tailwind utilities;
 
 /* If you need to opt-out of Tailwind preflight for a specific element, do it here. */
+
+@import "./tailwind.ds.css";

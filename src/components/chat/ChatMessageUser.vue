@@ -1,22 +1,29 @@
 <template>
   <div class="msg user">
     <div class="msg-card">
+      <!-- header -->
       <div class="msg-head">
         <div class="msg-head-left">
-          <div class="avatar user" aria-hidden="true">{{ avatarText }}</div>
+          <div class="avatar user" aria-hidden="true">
+            {{ avatarText }}
+          </div>
+
           <div class="meta">
             <div class="name">{{ displayName }}</div>
           </div>
         </div>
+
         <div class="msg-head-right">
           <span class="time">{{ formattedTime }}</span>
         </div>
       </div>
 
+      <!-- body -->
       <div class="msg-body">
         <div class="md" v-html="render(text)" />
       </div>
 
+      <!-- attachments -->
       <ChatAttachmentTray
         v-if="attachments.length"
         class="msg-attachments"
@@ -61,7 +68,8 @@ export default {
     },
     formattedTime() {
       const m = this.message || {};
-      const raw = m.createdAt ?? m.created_at ?? m.time ?? m.ts ?? m.timestamp ?? m.at;
+      const raw =
+        m.createdAt ?? m.created_at ?? m.time ?? m.ts ?? m.timestamp ?? m.at;
       const d = raw ? new Date(raw) : new Date();
       if (Number.isNaN(d.getTime())) return "";
       const yyyy = d.getFullYear();

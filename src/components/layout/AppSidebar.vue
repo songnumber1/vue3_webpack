@@ -1,11 +1,11 @@
 <template>
   <aside class="sidebar" :class="{ open: sidebarOpen, collapsed: sidebarCollapsed }">
     <div class="top-row">
-      <button v-if="!isMobile" type="button" class="icon-btn" aria-label="Toggle sidebar" @click="toggleCollapse">
+      <button v-if="!isMobile" type="button" class="btn btn-ghost btn-icon" aria-label="Toggle sidebar" @click="toggleCollapse">
         <AppIcon :name="sidebarCollapsed ? 'panel-right' : 'panel-left'" />
       </button>
 
-      <button v-else type="button" class="icon-btn" aria-label="Close sidebar" @click="closeSidebar">
+      <button v-else type="button" class="btn btn-ghost btn-icon" aria-label="Close sidebar" @click="closeSidebar">
         <AppIcon name="x" />
       </button>
 

@@ -87,7 +87,6 @@ export default {
 </script>
 
 <style scoped>
-
 .landing {
   height: 100%;
   min-height: 0;
@@ -144,7 +143,10 @@ export default {
   padding: 14px;
   cursor: pointer;
   box-shadow: var(--shadow-xs);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .card:hover {
@@ -181,5 +183,4 @@ export default {
     padding: 14px;
   }
 }
-
 </style>

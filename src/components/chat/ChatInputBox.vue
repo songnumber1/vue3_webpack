@@ -1,15 +1,11 @@
 <template>
   <div class="chat-input">
-    <!-- NOTE: Assistant/Model selectors are intentionally NOT rendered in main UI.
-         Playground provides context controls on the left panel.
-         In main flow, assistant selection is done via Sidebar, and model via templates/model default. -->
-
     <div class="input-top">
       <InputHeader />
       <PromptTemplateForm />
     </div>
 
-    <!-- hidden file picker (shared across modes) -->
+    <!-- hidden file picker -->
     <input
       ref="filePicker"
       class="file-input"
@@ -19,7 +15,6 @@
       @change="onFilePicked"
     />
 
-    <!-- mode-specific body (keeps the component usable even without parents) -->
     <div class="mode-body">
       <!-- DIRECT -->
       <div
@@ -31,91 +26,49 @@
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
-
+        <!-- attachments -->
         <ChatAttachmentTray
+          v-if="pendingFiles.length"
           :items="pendingFiles"
           @remove="removePending"
         />
 
-
+        <!-- textarea -->
         <textarea
-          v-model="input"
           ref="taDirect"
+          v-model="input"
           class="composer-ta"
           rows="2"
           placeholder="메시지를 입력하세요…"
           @keydown="onKeydown"
           @compositionstart="isComposing = true"
           @compositionend="isComposing = false"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
         />
 
+        <!-- drag overlay -->
         <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
           <div class="drop-card">
             <AppIcon name="paperclip" size="md" />
             <div class="drop-text">파일을 여기에 놓아 첨부</div>
             <div class="drop-sub">pdf · doc/docx · jpg · png</div>
           </div>
-        </div>        <button
-          type="button"
-          class="attach-btn"
-          :disabled="isLocked"
-          @click="openPicker"
-          aria-label="Attach files"
-        >
-          <AppIcon name="paperclip" size="sm" />
-        </button>
-
-        <button
-          type="button"
-          class="send-btn"
-          :disabled="isLocked"
-          @click="send"
-          aria-label="Send"
-        >
-          <AppIcon name="send" size="sm" />
-        </button>
-      </div>
-
-      <!-- EMAIL -->
-      <div v-else-if="inputMode === 'email'" class="form">
-        <div class="row">
-          <input class="in" v-model="email.to" placeholder="받는사람 (to)" />
-          <input class="in" v-model="email.subject" placeholder="제목" />
         </div>
-        <div
-          class="composer"
-          :class="{ dragging: isDragging }"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
-        >
-          <textarea
-            class="composer-ta"
-            ref="taEmail"
-            v-model="email.body"
-            rows="3"
-            placeholder="내용"
-            @keydown="onKeydown"
-          />
-          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
-            <div class="drop-card">
-              <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
-            <AppIcon name="paperclip" size="sm" />
-          </button>
+
+        <!-- tool actions -->
+        <div class="tool-actions">
           <button
             type="button"
-            class="send-btn"
+            class="btn btn-ghost btn-icon"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach files"
+          >
+            <AppIcon name="paperclip" size="sm" />
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-primary"
             :disabled="isLocked"
             @click="send"
             aria-label="Send"
@@ -125,156 +78,8 @@
         </div>
       </div>
 
-      <!-- TRANSLATE -->
-      <div v-else-if="inputMode === 'translate'" class="form">
-        <div class="row">
-          <input
-            class="in"
-            v-model="tr.from"
-            placeholder="원문 언어 (예: ko)"
-          />
-          <input class="in" v-model="tr.to" placeholder="목표 언어 (예: en)" />
-        </div>
-        <div
-          class="composer"
-          :class="{ dragging: isDragging }"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
-        >
-          <textarea
-            class="composer-ta"
-            ref="taTranslate"
-            v-model="tr.text"
-            rows="3"
-            placeholder="번역할 텍스트"
-            @keydown="onKeydown"
-          />
-          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
-            <div class="drop-card">
-              <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
-            <AppIcon name="paperclip" size="sm" />
-          </button>
-          <button
-            type="button"
-            class="send-btn"
-            :disabled="isLocked"
-            @click="send"
-            aria-label="Send"
-          >
-            <AppIcon name="send" size="sm" />
-          </button>
-        </div>
-      </div>
-
-      <!-- SUMMARY -->
-      <div v-else-if="inputMode === 'summary'" class="form">
-        <div class="row">
-          <select class="sel" v-model="sum.style">
-            <option value="bullet">불릿</option>
-            <option value="short">짧게</option>
-            <option value="detailed">자세히</option>
-          </select>
-          <input class="in" v-model="sum.limit" placeholder="분량 (예: 5줄)" />
-        </div>
-        <div
-          class="composer"
-          :class="{ dragging: isDragging }"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
-        >
-          <textarea
-            class="composer-ta"
-            ref="taSummary"
-            v-model="sum.text"
-            rows="3"
-            placeholder="요약할 텍스트"
-            @keydown="onKeydown"
-          />
-          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
-            <div class="drop-card">
-              <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
-            <AppIcon name="paperclip" size="sm" />
-          </button>
-          <button
-            type="button"
-            class="send-btn"
-            :disabled="isLocked"
-            @click="send"
-            aria-label="Send"
-          >
-            <AppIcon name="send" size="sm" />
-          </button>
-        </div>
-      </div>
-
-      <!-- CODE -->
-      <div v-else-if="inputMode === 'code'" class="form">
-        <div class="row">
-          <input
-            class="in"
-            v-model="code.lang"
-            placeholder="언어 (예: java, js)"
-          />
-          <input
-            class="in"
-            v-model="code.task"
-            placeholder="요청 (예: 리팩토링, 버그 수정)"
-          />
-        </div>
-        <div
-          class="composer"
-          :class="{ dragging: isDragging }"
-          @dragenter.prevent="onDragEnter"
-          @dragover.prevent="onDragOver"
-          @dragleave.prevent="onDragLeave"
-          @drop.prevent="onDrop"
-        >
-          <textarea
-            class="composer-ta"
-            ref="taCode"
-            v-model="code.text"
-            rows="3"
-            placeholder="코드/설명"
-            @keydown="onKeydown"
-          />
-          <div v-if="isDragging" class="drop-overlay" aria-hidden="true">
-            <div class="drop-card">
-              <AppIcon name="paperclip" size="md" />
-              <div class="drop-text">파일을 여기에 놓아 첨부</div>
-              <div class="drop-sub">pdf · doc/docx · jpg · png</div>
-            </div>
-          </div>
-          <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
-            <AppIcon name="paperclip" size="sm" />
-          </button>
-          <button
-            type="button"
-            class="send-btn"
-            :disabled="isLocked"
-            @click="send"
-            aria-label="Send"
-          >
-            <AppIcon name="send" size="sm" />
-          </button>
-        </div>
-      </div>
+      <!-- 다른 모드들(email / translate / summary / code)은
+           이 구조를 그대로 재사용해야 함 -->
     </div>
   </div>
 </template>
@@ -322,7 +127,9 @@ export default {
     },
 
     pendingFiles() {
-      return Array.isArray(this.chat.pendingFiles) ? this.chat.pendingFiles : [];
+      return Array.isArray(this.chat.pendingFiles)
+        ? this.chat.pendingFiles
+        : [];
     },
 
     acceptString() {
@@ -427,7 +234,10 @@ export default {
         if (!item) continue;
         // prevent exact duplicates by name+size+lastModified
         const exists = this.pendingFiles.some(
-          (x) => x?.name === item.name && x?.size === item.size && x?.lastModified === item.lastModified
+          (x) =>
+            x?.name === item.name &&
+            x?.size === item.size &&
+            x?.lastModified === item.lastModified,
         );
         if (!exists) next.push(item);
       }
@@ -463,7 +273,8 @@ export default {
         ext,
         type: file.type || "",
         size: typeof file.size === "number" ? file.size : 0,
-        lastModified: typeof file.lastModified === "number" ? file.lastModified : 0,
+        lastModified:
+          typeof file.lastModified === "number" ? file.lastModified : 0,
         kind: isImage ? "image" : "file",
         previewUrl,
       };

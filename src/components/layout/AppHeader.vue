@@ -4,7 +4,7 @@
     <button
       v-if="isMobile"
       type="button"
-      class="icon-btn"
+      class="btn btn-ghost btn-icon"
       aria-label="Open sidebar"
       @click="openSidebar"
     >
@@ -15,7 +15,7 @@
     <button
       v-else
       type="button"
-      class="icon-btn"
+      class="btn btn-ghost btn-icon"
       :aria-label="sidebarHidden ? 'Show sidebar' : 'Hide sidebar'"
       @click="toggleSidebarHidden"
     >
@@ -45,7 +45,7 @@
           <button
             v-for="t in $theme.THEMES"
             :key="t"
-            class="theme-btn"
+            class="btn btn-ghost"
             :class="{ active: theme === t }"
             @click="setTheme(t)"
           >

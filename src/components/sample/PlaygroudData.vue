@@ -29,26 +29,26 @@
         <div class="preview-title">Buttons</div>
         <div class="preview-body">
           <div class="btn-row">
-            <button class="btn btn-primary btn-sm">Primary SM</button>
-            <button class="btn btn-primary btn-md">Primary MD</button>
-            <button class="btn btn-primary btn-lg">Primary LG</button>
+            <button class="btn btn-primary">Primary SM</button>
+            <button class="btn btn-primary">Primary MD</button>
+            <button class="btn btn-primary">Primary LG</button>
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-ghost btn-sm">Ghost SM</button>
-            <button class="btn btn-ghost btn-md">Ghost MD</button>
-            <button class="btn btn-ghost btn-lg">Ghost LG</button>
+            <button class="btn btn-ghost">Ghost SM</button>
+            <button class="btn btn-ghost">Ghost MD</button>
+            <button class="btn btn-ghost">Ghost LG</button>
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-danger btn-sm">Danger SM</button>
-            <button class="btn btn-danger btn-md">Danger MD</button>
-            <button class="btn btn-danger btn-lg">Danger LG</button>
+            <button class="btn btn-danger">Danger SM</button>
+            <button class="btn btn-danger">Danger MD</button>
+            <button class="btn btn-danger">Danger LG</button>
           </div>
 
           <div class="btn-row">
-            <button class="btn btn-primary btn-md" disabled>Disabled</button>
-            <button class="btn btn-ghost btn-md" disabled>Disabled</button>
+            <button class="btn btn-primary" disabled>Disabled</button>
+            <button class="btn btn-ghost" disabled>Disabled</button>
           </div>
         </div>
       </div>
