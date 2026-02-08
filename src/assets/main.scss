@@ -745,6 +745,27 @@ pre {
   font-size: var(--text-md);
 }
 
+/* =========================
+   Auto breakpoint sizing
+   - responsiveManager binds :root.bp-sm / :root.bp-md / :root.bp-lg
+   - If no explicit size class is provided, components inherit sizing by breakpoint
+========================= */
+
+:root.bp-sm .btn:not(.btn-sm):not(.btn-md):not(.btn-lg) {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+:root.bp-md .btn:not(.btn-sm):not(.btn-md):not(.btn-lg) {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+:root.bp-lg .btn:not(.btn-sm):not(.btn-md):not(.btn-lg) {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+}
+
 .btn-primary {
   background: linear-gradient(
     135deg,
@@ -777,6 +798,36 @@ pre {
   padding: var(--space-1) var(--space-2);
 }
 
+.label-sm {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.label-md {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.label-lg {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+}
+
+:root.bp-sm .label:not(.label-sm):not(.label-md):not(.label-lg) {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+:root.bp-md .label:not(.label-sm):not(.label-md):not(.label-lg) {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+:root.bp-lg .label:not(.label-sm):not(.label-md):not(.label-lg) {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+}
+
 .badge {
   border-radius: 999px;
   border: 1px solid var(--border);
@@ -784,6 +835,36 @@ pre {
   font-weight: 900;
   font-size: var(--text-xs);
   background: var(--bg-muted);
+}
+
+.badge-sm {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.badge-md {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.badge-lg {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+}
+
+:root.bp-sm .badge:not(.badge-sm):not(.badge-md):not(.badge-lg) {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+}
+
+:root.bp-md .badge:not(.badge-sm):not(.badge-md):not(.badge-lg) {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+:root.bp-lg .badge:not(.badge-sm):not(.badge-md):not(.badge-lg) {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
 }
 
 .badge-success {
@@ -833,8 +914,38 @@ pre {
   border-radius: var(--radius-md);
   border: 1px solid var(--border);
   padding: var(--space-2) var(--space-3);
+  min-height: var(--control-h);
+  font-size: var(--text-sm);
   outline: none;
   background: var(--bg-surface);
+}
+
+.input-sm, .select-sm, .textarea-sm { padding: var(--space-1) var(--space-2); font-size: var(--text-xs); min-height: calc(var(--control-h) - var(--space-2)); }
+.input-md, .select-md, .textarea-md { padding: var(--space-2) var(--space-3); font-size: var(--text-sm); min-height: var(--control-h); }
+.input-lg, .select-lg, .textarea-lg { padding: var(--space-3) var(--space-4); font-size: var(--text-md); min-height: calc(var(--control-h) + var(--space-2)); }
+
+:root.bp-sm .input:not(.input-sm):not(.input-md):not(.input-lg),
+:root.bp-sm .select:not(.select-sm):not(.select-md):not(.select-lg),
+:root.bp-sm .textarea:not(.textarea-sm):not(.textarea-md):not(.textarea-lg) {
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-xs);
+  min-height: calc(var(--control-h) - var(--space-2));
+}
+
+:root.bp-md .input:not(.input-sm):not(.input-md):not(.input-lg),
+:root.bp-md .select:not(.select-sm):not(.select-md):not(.select-lg),
+:root.bp-md .textarea:not(.textarea-sm):not(.textarea-md):not(.textarea-lg) {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  min-height: var(--control-h);
+}
+
+:root.bp-lg .input:not(.input-sm):not(.input-md):not(.input-lg),
+:root.bp-lg .select:not(.select-sm):not(.select-md):not(.select-lg),
+:root.bp-lg .textarea:not(.textarea-sm):not(.textarea-md):not(.textarea-lg) {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-md);
+  min-height: calc(var(--control-h) + var(--space-2));
 }
 
 /* =========================
@@ -848,8 +959,13 @@ pre {
 }
 
 .switch {
-  width: 44px;
-  height: 26px;
+  --sw-w: 44px;
+  --sw-h: 26px;
+  --knob: 22px;
+  --sw-tx: calc(var(--sw-w) - var(--knob) - 2px);
+
+  width: var(--sw-w);
+  height: var(--sw-h);
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg-muted);
@@ -858,8 +974,8 @@ pre {
 }
 
 .switch .knob {
-  width: 22px;
-  height: 22px;
+  width: var(--knob);
+  height: var(--knob);
   border-radius: 999px;
   background: var(--bg-surface);
   position: absolute;
@@ -874,8 +990,12 @@ pre {
 }
 
 .switch.on .knob {
-  transform: translateX(18px);
+  transform: translateX(var(--sw-tx));
 }
+
+:root.bp-sm .switch { --sw-w: 40px; --sw-h: 24px; --knob: 20px; }
+:root.bp-md .switch { --sw-w: 44px; --sw-h: 26px; --knob: 22px; }
+:root.bp-lg .switch { --sw-w: 48px; --sw-h: 28px; --knob: 24px; }
 
 /* =========================
    Rows / Lists

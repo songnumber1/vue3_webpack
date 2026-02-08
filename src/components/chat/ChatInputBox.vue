@@ -31,12 +31,7 @@
         @dragleave.prevent="onDragLeave"
         @drop.prevent="onDrop"
       >
-
-        <ChatAttachmentTray
-          :items="pendingFiles"
-          @remove="removePending"
-        />
-
+        <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
 
         <textarea
           v-model="input"
@@ -59,25 +54,28 @@
             <div class="drop-text">파일을 여기에 놓아 첨부</div>
             <div class="drop-sub">pdf · doc/docx · jpg · png</div>
           </div>
-        </div>        <button
-          type="button"
-          class="attach-btn"
-          :disabled="isLocked"
-          @click="openPicker"
-          aria-label="Attach files"
-        >
-          <AppIcon name="paperclip" size="sm" />
-        </button>
+        </div>
+        <div class="composer-actions">
+          <button
+            type="button"
+            class="attach-btn"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach files"
+          >
+            <AppIcon name="paperclip" size="sm" />
+          </button>
 
-        <button
-          type="button"
-          class="send-btn"
-          :disabled="isLocked"
-          @click="send"
-          aria-label="Send"
-        >
-          <AppIcon name="send" size="sm" />
-        </button>
+          <button
+            type="button"
+            class="send-btn"
+            :disabled="isLocked"
+            @click="send"
+            aria-label="Send"
+          >
+            <AppIcon name="send" size="sm" />
+          </button>
+        </div>
       </div>
 
       <!-- EMAIL -->
@@ -110,7 +108,13 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+          <button
+            type="button"
+            class="attach-btn"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach"
+          >
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -159,7 +163,13 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+          <button
+            type="button"
+            class="attach-btn"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach"
+          >
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -208,7 +218,13 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+          <button
+            type="button"
+            class="attach-btn"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach"
+          >
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -261,7 +277,13 @@
             </div>
           </div>
           <ChatAttachmentTray :items="pendingFiles" @remove="removePending" />
-          <button type="button" class="attach-btn" :disabled="isLocked" @click="openPicker" aria-label="Attach">
+          <button
+            type="button"
+            class="attach-btn"
+            :disabled="isLocked"
+            @click="openPicker"
+            aria-label="Attach"
+          >
             <AppIcon name="paperclip" size="sm" />
           </button>
           <button
@@ -322,7 +344,9 @@ export default {
     },
 
     pendingFiles() {
-      return Array.isArray(this.chat.pendingFiles) ? this.chat.pendingFiles : [];
+      return Array.isArray(this.chat.pendingFiles)
+        ? this.chat.pendingFiles
+        : [];
     },
 
     acceptString() {
@@ -427,7 +451,10 @@ export default {
         if (!item) continue;
         // prevent exact duplicates by name+size+lastModified
         const exists = this.pendingFiles.some(
-          (x) => x?.name === item.name && x?.size === item.size && x?.lastModified === item.lastModified
+          (x) =>
+            x?.name === item.name &&
+            x?.size === item.size &&
+            x?.lastModified === item.lastModified,
         );
         if (!exists) next.push(item);
       }
@@ -463,7 +490,8 @@ export default {
         ext,
         type: file.type || "",
         size: typeof file.size === "number" ? file.size : 0,
-        lastModified: typeof file.lastModified === "number" ? file.lastModified : 0,
+        lastModified:
+          typeof file.lastModified === "number" ? file.lastModified : 0,
         kind: isImage ? "image" : "file",
         previewUrl,
       };
@@ -579,16 +607,8 @@ export default {
   gap: 10px;
 }
 
-.input-top {
-  display: grid;
-  gap: 10px;
-}
-
-.mode-body {
-  display: grid;
-  gap: 10px;
-}
-
+.input-top,
+.mode-body,
 .form {
   display: grid;
   gap: 10px;
@@ -600,16 +620,22 @@ export default {
   grid-template-columns: 1fr 1fr;
 }
 
+@media (max-width: 520px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* inputs */
 .in,
 .sel {
-  height: 40px;
-  border-radius: 14px;
+  height: var(--control-h);
+  border-radius: var(--control-radius);
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   color: var(--text-primary);
-  padding: 0 12px;
+  padding: 0 var(--control-pad-x);
   outline: none;
-  box-shadow: var(--shadow-xs, none);
 }
 
 .in:focus,
@@ -618,10 +644,13 @@ export default {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
 }
 
+/* === composer === */
 .composer {
   position: relative;
-  display: block;
-  padding: 10px;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--space-3);
+  padding: var(--space-3);
   border-radius: 18px;
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   background: linear-gradient(
@@ -637,18 +666,77 @@ export default {
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent);
 }
 
-.file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
+/* textarea */
+.composer-ta {
+  width: 100%;
+  min-height: calc(var(--control-h) + var(--space-3));
+  max-height: 200px;
+  resize: none;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text-primary);
+  border-radius: var(--control-radius);
+  padding: var(--space-3);
+  outline: none;
+  line-height: 1.4;
 }
 
+.composer-ta:focus {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* attachment preview */
+.attachment-preview {
+  margin-bottom: var(--space-2);
+}
+
+/* action row */
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* buttons */
+.attach-btn,
+.send-btn {
+  width: var(--attach-size);
+  height: var(--attach-size);
+  border-radius: calc(var(--control-radius) - 4px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attach-btn {
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--bg) 60%, transparent);
+  color: var(--text-primary);
+}
+
+.send-btn {
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--accent) 85%, white),
+    var(--accent)
+  );
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.attach-btn:disabled,
+.send-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* drag overlay */
 .drop-overlay {
   position: absolute;
-  inset: 10px;
+  inset: var(--space-3);
   border-radius: 16px;
   background: color-mix(in srgb, var(--bg) 65%, transparent);
   border: 1px dashed color-mix(in srgb, var(--accent) 60%, var(--border));
@@ -667,7 +755,6 @@ export default {
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
   border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
   box-shadow: var(--shadow-md);
-  color: var(--text-primary);
 }
 
 .drop-text {
@@ -680,110 +767,10 @@ export default {
   color: var(--text-muted);
 }
 
-.attach-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-  color: var(--text-primary);
-  position: absolute;
-  left: 22px;
-  bottom: 25px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 2;
-  transition:
-    transform 0.15s ease,
-    border-color 0.15s ease,
-    filter 0.15s ease;
-}
-
-.attach-btn:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
-  filter: saturate(1.05);
-}
-
-.attach-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.composer-ta {
-  width: 100%;
-  min-height: 52px;
-  max-height: 200px;
-  resize: none;
-  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
-  background: color-mix(in srgb, var(--bg) 60%, transparent);
-  color: var(--text-primary);
-  border-radius: 14px;
-  padding: 12px 60px 52px 54px; /* ✅ left padding for attach button */
-  outline: none;
-  line-height: 1.4;
-}
-
-.composer-ta:focus {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
-}
-
-/* ✅ UI/UX 유지 + 위치/겹침만 해결 */
-.send-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid transparent;
-  background: linear-gradient(
-    135deg,
-    var(--accent),
-    var(--accent-2, var(--accent))
-  );
-  color: var(--accent-contrast);
-  position: absolute;
-
-  /* 🔧 너무 바닥/우측에 붙어서 스크롤 가림 → 살짝 띄움 */
-  right: 30px;
-  bottom: 25px;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: var(--shadow-md);
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    filter 0.15s ease;
-
-  /* 🔧 클릭이 textarea에 먹히는 케이스 방지 */
-  z-index: 2;
-}
-
-.send-btn:hover {
-  transform: translateY(-1px);
-  filter: saturate(1.1);
-}
-
-.send-btn:active {
-  transform: translateY(0);
-}
-
-.send-btn:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
+/* mobile */
 @media (max-width: 520px) {
-  .row {
-    grid-template-columns: 1fr;
-  }
   .chat-input {
     padding: 10px;
-    max-height: 42vh;
-    overflow: auto;
   }
   .composer-ta {
     max-height: 140px;

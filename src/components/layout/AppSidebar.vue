@@ -310,8 +310,8 @@ export default {
 }
 
 .icon-btn {
-  width: 38px;
-  height: 38px;
+  width: var(--icon-btn);
+  height: var(--icon-btn);
   border-radius: 12px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, var(--bg-surface), var(--bg-elevated));
@@ -332,7 +332,7 @@ export default {
 }
 
 .label {
-  font-size: 14px;
+  font-size: var(--text-md);
   color: var(--text-muted);
   letter-spacing: 0.2px;
 }
@@ -388,7 +388,7 @@ export default {
 }
 
 .nav-section-label {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   padding: 8px 10px 2px;
 }
@@ -453,7 +453,7 @@ export default {
 .chat-group-title {
   display: inline-flex;
   align-self: flex-start;
-  font-size: 11px;
+  font-size: var(--text-xs);
   letter-spacing: 0.2px;
   color: var(--text-muted);
   padding: 6px 10px;
@@ -530,7 +530,7 @@ export default {
 }
 
 .chat-title {
-  font-size: 13px;
+  font-size: var(--text-sm);
   font-weight: 650;
   color: var(--text-primary);
   overflow: hidden;
@@ -540,7 +540,7 @@ export default {
 
 .chat-time {
   flex: none;
-  font-size: 11px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   padding: 2px 8px;
   border-radius: 999px;
@@ -549,7 +549,7 @@ export default {
 }
 
 .chat-snippet {
-  font-size: 12px;
+  font-size: var(--text-xs);
   color: var(--text-muted);
   line-height: 1.35;
   overflow: hidden;
@@ -584,7 +584,7 @@ export default {
 
 .chat-empty {
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--text-xs);
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px dashed color-mix(in srgb, var(--border) 75%, transparent);
@@ -602,7 +602,7 @@ export default {
   background: transparent;
   color: var(--text-muted);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: var(--text-xs);
   padding: 4px 8px;
   cursor: pointer;
 }
@@ -610,5 +610,11 @@ export default {
 .nav-more:hover {
   background: var(--bg-soft);
   color: var(--text-primary);
+}
+
+:global(:root.bp-sm) .sb-item,
+:global(:root.bp-sm) .nav-item,
+:global(:root.bp-sm) .assistant-item{
+  min-height: var(--icon-btn);
 }
 </style>

@@ -86,7 +86,8 @@ export default {
 }
 
 .ih-pill {
-  min-height: var(--control-h);
+  height: var(--pill-h);
+  min-height: var(--pill-h);
 
   display: inline-flex;
   align-items: center;

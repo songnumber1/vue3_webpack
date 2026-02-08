@@ -1,28 +1,21 @@
+/* === Design System Overrides: density + component sizing (no Tailwind) === */
+/* Goal: dashboard-like compact density on desktop, touch-friendly on mobile. */
 
-/* === Responsive Design System Override (ENTRY ONLY) === */
-:root {
-  --density-scale: 1;
-  --space-xs: calc(6px * var(--density-scale));
-  --space-sm: calc(8px * var(--density-scale));
-  --space-md: calc(12px * var(--density-scale));
-  --space-lg: calc(16px * var(--density-scale));
-  --font-xs: 12px;
-  --font-sm: 13px;
-  --font-md: 14px;
-  --font-lg: 16px;
-  --control-h: max(44px, calc(40px * var(--density-scale)));
-  --radius: 14px;
-}
-@media (min-width: 640px) { :root { --font-md: 15px; } }
-@media (min-width: 768px) { :root { --space-lg: calc(20px * var(--density-scale)); --font-lg: 17px; --control-h: 48px; } }
-@media (min-width: 1024px){ :root { --space-lg: calc(24px * var(--density-scale)); --font-lg: 18px; --control-h: 52px; } }
+:root{
+  /* density: compact(default) | cozy | comfortable */
+  --density: 0.92;
 
-button,input,select,textarea,[role="button"],
-.ih-pill,.chip,.tag,.option,.toggle,.badge {
-  min-height: var(--control-h) !important;
-  font-size: var(--font-md) !important;
+  /* derived helpers */
+  --ui-round: 1;
 }
-input[type="radio"],input[type="checkbox"] {
-  width: calc(var(--control-h) * .45) !important;
-  height: calc(var(--control-h) * .45) !important;
-}
+
+/* allow opt-in density mode via data-density on <html> */
+:root[data-density="compact"]{ --density: 0.92; }
+:root[data-density="cozy"]{ --density: 1.00; }
+:root[data-density="comfortable"]{ --density: 1.08; }
+
+/* If you ever want automatic comfortable on very small screens, keep compact as default */
+:root.bp-sm{ --density: 1.00; }
+
+/* Prevent legacy global rules from forcing huge controls.
+   (Intentionally NO !important min-height overrides here.) */

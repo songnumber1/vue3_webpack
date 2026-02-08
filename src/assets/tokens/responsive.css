@@ -1,50 +1,58 @@
 
 :root{
-  /* Breakpoint-aware UI tokens (mobile-first) */
-  --control-h: 44px;           /* min touch target */
-  --control-radius: 16px;
-  --control-pad-x: 14px;
+  /* Breakpoint-aware UI tokens (dashboard-first) */
+  --control-h: calc(36px * var(--density));
+  --control-radius: calc(12px * var(--density));
+  --control-pad-x: calc(12px * var(--density));
 
-  --pill-pad-y: 8px;
-  --pill-pad-x: 12px;
+  /* icon buttons */
+  --icon-btn: calc(34px * var(--density));
+
+  /* pills/chips */
+  --pill-h: calc(32px * var(--density));
+  --pill-pad-y: calc(6px * var(--density));
+  --pill-pad-x: calc(12px * var(--density));
   --pill-font: var(--text-sm);
 
-  --page-pad: 14px;
-  --page-gap: 14px;
+  /* option chips (radio-like) */
+  --opt-h: calc(30px * var(--density));
+  --opt-pad-x: calc(12px * var(--density));
+  --opt-font: var(--text-sm);
 
-  --title-size: 24px;
-  --card-gap: 12px;
-  --grid-cols: 1;
+  /* page */
+  --page-pad: calc(14px * var(--density));
+  --page-gap: calc(14px * var(--density));
+
+  --title-size: calc(24px * var(--density));
+  --card-gap: calc(12px * var(--density));
+  --grid-cols: 2;
 
   /* container */
   --container-max: 1100px;
+
+  /* attachment/send square */
+  --attach-size: calc(38px * var(--density));
 }
 
-@media (min-width: 640px){
-  :root{
-    --page-pad: 16px;
-    --title-size: 26px;
-    --grid-cols: 2;
-  }
+/* DOM breakpoint overrides (set by responsiveManager) */
+:root.bp-md{
+  --control-h: calc(38px * var(--density));
+  --pill-h: calc(34px * var(--density));
+  --attach-size: calc(40px * var(--density));
+  --page-pad: calc(16px * var(--density));
+  --title-size: calc(26px * var(--density));
 }
 
-@media (min-width: 768px){
-  :root{
-    --control-h: 48px;
-    --page-pad: 18px;
-    --page-gap: 16px;
-    --pill-pad-y: 9px;
-    --pill-pad-x: 14px;
-  }
-}
-
-@media (min-width: 1024px){
-  :root{
-    --control-h: 52px;
-    --page-pad: 18px;
-    --page-gap: 18px;
-    --title-size: 28px;
-    --card-gap: 14px;
-    --grid-cols: 2;
-  }
+:root.bp-sm{
+  /* mobile: still compact, but touch-friendly */
+  --control-h: calc(40px * var(--density));
+  --control-radius: calc(14px * var(--density));
+  --pill-h: calc(36px * var(--density));
+  --opt-h: calc(34px * var(--density));
+  --attach-size: calc(42px * var(--density));
+  --page-pad: calc(12px * var(--density));
+  --page-gap: calc(12px * var(--density));
+  --title-size: calc(22px * var(--density));
+  --grid-cols: 1;
+  --icon-btn: calc(38px * var(--density));
 }

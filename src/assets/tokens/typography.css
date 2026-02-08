@@ -4,10 +4,18 @@
 
   --text-xs: 12px;
   --text-sm: 13px;
-  --text-md: 14px;
-  --text-lg: 16px;
-  --text-xl: 18px;
+  --text-md: 13.5px;
+  --text-lg: 15px;
+  --text-xl: 17px;
 
   --line-tight: 1.25;
   --line-normal: 1.5;
+}
+
+:root.bp-sm{
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 14.5px;
+  --text-xl: 16px;
 }

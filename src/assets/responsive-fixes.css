@@ -1,0 +1,67 @@
+
+/* === Common UI Fixes === */
+.mode-chip {
+  height: var(--control-h-sm);
+  padding: 0 var(--px-sm);
+  font-size: var(--fs-sm);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.lang-option {
+  height: var(--control-h-sm);
+  padding: 0 var(--px-sm);
+  font-size: var(--fs-sm);
+  display: inline-flex;
+  align-items: center;
+}
+
+.header-select {
+  height: var(--control-h);
+  font-size: var(--fs-base);
+  padding: 0 var(--px-base);
+}
+
+@media (max-width: 640px) {
+  .header-select {
+    height: var(--control-h-sm);
+    font-size: var(--fs-sm);
+    padding: 0 var(--px-sm);
+  }
+}
+
+.example-card {
+  padding: var(--px-base);
+  font-size: var(--fs-base);
+}
+
+@media (max-width: 640px) {
+  .example-card {
+    padding: var(--px-sm);
+    font-size: var(--fs-sm);
+  }
+}
+
+.sidebar-item {
+  height: 44px;
+  font-size: var(--fs-base);
+}
+
+@media (max-width: 640px) {
+  .sidebar-item {
+    height: 38px;
+    font-size: var(--fs-sm);
+  }
+}
+
+.attachment-preview {
+  margin-bottom: 8px;
+}
+
+.composer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

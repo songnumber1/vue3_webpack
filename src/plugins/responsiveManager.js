@@ -15,6 +15,16 @@ export default {
     const recompute = () => {
       state.width = typeof window !== "undefined" ? window.innerWidth : state.width;
       state.bp = resolveBreakpoint(state.width);
+
+      // ✅ Bind breakpoint to DOM for CSS (auto breakpoint classes)
+      // Enables selectors like :root.bp-sm .btn { ... }
+      if (typeof document !== "undefined") {
+        const root = document.documentElement;
+        const next = state.bp;
+        root.dataset.bp = String(next);
+        root.classList.remove("bp-sm", "bp-md", "bp-lg");
+        root.classList.add(`bp-${String(next).toLowerCase()}`);
+      }
     };
 
     // initialize
