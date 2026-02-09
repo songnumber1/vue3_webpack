@@ -22,12 +22,30 @@ module.exports = {
     },
   },
 
+  /**
+   * 🔥 DEV SERVER (HTTPS 강제)
+   */
   devServer: {
-    static: { directory: path.join(__dirname, "public") },
+    static: {
+      directory: path.join(__dirname, "public"),
+    },
+
     historyApiFallback: true,
     hot: true,
+
+    host: "localhost",
     port: 5174,
-    client: { overlay: true },
+
+    host: "0.0.0.0",
+
+    server: {
+      type: "https",
+    },
+
+    allowedHosts: "all", // iframe / 확장 대비
+    client: {
+      overlay: true,
+    },
   },
 
   module: {
@@ -76,10 +94,10 @@ module.exports = {
       template: path.resolve(__dirname, "public/index.html"),
     }),
 
-    // ✅ Vue 3 esm-bundler feature flag (경고 제거 핵심)
+    // ✅ Vue 3 esm-bundler feature flags
     new webpack.DefinePlugin({
-      __VUE_OPTIONS_API__: JSON.stringify(true), // Option API 사용
-      __VUE_PROD_DEVTOOLS__: JSON.stringify(!isProd), // prod에서 devtools off
+      __VUE_OPTIONS_API__: JSON.stringify(true),
+      __VUE_PROD_DEVTOOLS__: JSON.stringify(!isProd),
       __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
     }),
   ],

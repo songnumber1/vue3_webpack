@@ -10,8 +10,16 @@
         <template v-if="inputMode === 'email'" #top>
           <div class="ptf-top">
             <div class="ptf-email-row">
-              <input class="ptf-email-in" v-model="email.to" placeholder="받는사람 (to)" />
-              <input class="ptf-email-in" v-model="email.subject" placeholder="제목" />
+              <input
+                class="ptf-email-in"
+                v-model="email.to"
+                placeholder="받는사람 (to)"
+              />
+              <input
+                class="ptf-email-in"
+                v-model="email.subject"
+                placeholder="제목"
+              />
             </div>
           </div>
         </template>
@@ -398,8 +406,9 @@ export default {
     speechOptions() {
       return {
         lang: "ko-KR",
-        continuous: true,
+        continuous: false,
         interimResults: true,
+        maxAlternatives: 1,
       };
     },
   },
@@ -634,7 +643,6 @@ export default {
 </script>
 
 <style scoped>
-
 .chat-input {
   border-top: 1px solid var(--border);
   background: var(--bg);
@@ -875,5 +883,4 @@ export default {
     padding-bottom: calc(12px + env(safe-area-inset-bottom));
   }
 }
-
 </style>
