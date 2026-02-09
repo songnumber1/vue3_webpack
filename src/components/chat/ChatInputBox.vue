@@ -84,7 +84,7 @@
 
         <!-- ✅ input 있거나 첨부가 있으면 Send, 없으면 Mic -->
         <button
-          v-if="hasTextInput"
+          v-if="hasTextInput && !speechActive"
           type="button"
           class="send-btn"
           :disabled="isLocked"
@@ -321,6 +321,7 @@ export default {
       isDragging: false,
       _dragCounter: 0,
       _speech: null,
+      speechActive: false,
     };
   },
 
@@ -415,13 +416,13 @@ export default {
 
   methods: {
     onSpeechStarted() {
-      // no-op (hook for future)
+      this.speechActive = true;
     },
     onSpeechStopped() {
-      // no-op
+      this.speechActive = false;
     },
     onSpeechError() {
-      // no-op
+      this.speechActive = false;
     },
 
     _stopSpeechIfActive() {

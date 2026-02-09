@@ -20,12 +20,14 @@ export default {
   components: { AppIcon },
 
   props: {
-    /** current text in the editor (used as baseText when starting) */
+    /** current text in the editor (v-model) */
     modelValue: { type: String, default: "" },
     disabled: { type: Boolean, default: false },
-    /** optional speech options override (lang, interimResults, etc.) */
-    speechOptions: { type: Object, default: null },
+    /** optional speech options override */
+    speechOptions: { type: Object, default: () => ({}) },
   },
+
+  emits: ["update:modelValue", "started", "speaking", "stopped", "error"],
 
   data() {
     const speech = getSpeech();
@@ -40,7 +42,7 @@ export default {
     onToggle() {
       if (!this.speech || !this.supported) return;
 
-      // If active -> stop
+      // If active -> stop (cancel)
       if (this.speech.isActive()) {
         this.speech.stop();
         this.active = false;
@@ -48,16 +50,17 @@ export default {
         return;
       }
 
-      const baseText = String(this.modelValue || "").trim();
       const opts = this.speechOptions || {};
 
       const res = this.speech.start(
         {
-          baseText,
           onText: (text) => {
             this.active = this.speech.isActive();
             this.$emit("update:modelValue", text);
             this.$emit("speaking", text);
+          },
+          onFinal: (text) => {
+            this.$emit("update:modelValue", text);
           },
           onEnd: () => {
             this.active = false;
@@ -91,7 +94,9 @@ export default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
 }
 
 .mic-btn:hover {
