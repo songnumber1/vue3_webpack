@@ -24,14 +24,28 @@ function createInstance() {
     recognition,
     defaults: {
       lang: "ko-KR",
-      // IMPORTANT: Android Chrome is more stable with continuous=false
+
+      // ⚠️ 중요: Android Chrome에서는 continuous=false가 더 안정적임
       continuous: false,
+
+      // 음성 인식 중간 결과(interim)를 실시간으로 받음
       interimResults: true,
+
+      // 인식 결과 후보 개수 (1개가 가장 안정적)
       maxAlternatives: 1,
 
-      // optional behavior (can be overridden per start)
-      autoRestart: true,          // restart onend while active (best effort)
-      finalizeSilenceMs: 1200,    // finalize after silence (ms); set 0 to disable
+      // 음성 인식이 종료되었을 때 자동으로 재시작할지 여부
+      // false 권장: Android에서 마이크 깜빡임 방지
+      autoRestart: false,
+
+      // 일정 시간(침묵) 동안 음성이 없으면
+      // 현재 문장을 "확정(final)" 처리함 (ms 단위)
+      // 0으로 설정하면 문장 확정 기능 비활성화
+      finalizeSilenceMs: 3000,
+
+      // 문장 확정 이후에도 일정 시간 동안
+      // 추가 발화가 없으면 마이크를 자동으로 종료함 (ms 단위)
+      autoStopAfterSilenceMs: 5000,
     },
 
     active: false,
