@@ -76,7 +76,7 @@
 
         <!-- ✅ input 있거나 첨부가 있으면 Send, 없으면 Mic -->
         <button
-          v-if="canSend"
+          v-if="hasTextInput"
           type="button"
           class="send-btn"
           :disabled="isLocked"
@@ -88,6 +88,7 @@
 
         <SpeechMicButton
           v-else
+          class="send-btn"
           v-model="input"
           :disabled="isLocked"
           :speech-options="speechOptions"
@@ -387,10 +388,10 @@ export default {
       return this.chat.activeChatId;
     },
 
-    // ✅ Direct: input or attachments => can send. Otherwise show mic.
-    canSend() {
+    // ✅ Direct: text input only => can send. Attachments do NOT toggle send.
+    hasTextInput() {
       const txt = String(this.input || "").trim();
-      return txt.length > 0 || this.pendingFiles.length > 0;
+      return txt.length > 0;
     },
 
     // Default speech options (can be overridden by other components too)
@@ -568,8 +569,8 @@ export default {
         finalText = String(this.composeTextByMode() || "").trim();
       }
 
-      // ✅ allow "attachments only" send
-      if (!finalText && this.pendingFiles.length === 0) return;
+      // ✅ send button is shown only when text exists
+      if (!finalText) return;
 
       // ✅ store send는 inputText만 봄 → 여기서 확정
       this.chat.setInputText(finalText);
@@ -618,20 +619,15 @@ export default {
     },
 
     onKeydown(e) {
-      // ✅ typing starts => mic off
-      if (!this.isComposing) {
-        const k = e?.key;
-        const isModifier =
-          k === "Shift" ||
-          k === "Control" ||
-          k === "Alt" ||
-          k === "Meta" ||
-          k === "CapsLock";
-        if (!isModifier) this._stopSpeechIfActive();
-      }
+      // ✅ any real typing stops speech
+      const k = e?.key;
+      if (k && k.length === 1) this._stopSpeechIfActive();
 
-      // existing key handling (defined in store)
-      this.chat.onKeydown(e);
+      // ✅ Enter to send (Shift+Enter = newline). Avoid during IME composing.
+      if (k === "Enter" && !e.shiftKey && !this.isComposing) {
+        e.preventDefault();
+        if (this.hasTextInput) this.send();
+      }
     },
   },
 };
