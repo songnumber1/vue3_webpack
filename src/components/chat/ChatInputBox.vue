@@ -74,7 +74,9 @@
           <AppIcon name="paperclip" size="sm" />
         </button>
 
+        <!-- ✅ input 있거나 첨부가 있으면 Send, 없으면 Mic -->
         <button
+          v-if="canSend"
           type="button"
           class="send-btn"
           :disabled="isLocked"
@@ -83,6 +85,16 @@
         >
           <AppIcon name="send" size="sm" />
         </button>
+
+        <SpeechMicButton
+          v-else
+          v-model="input"
+          :disabled="isLocked"
+          :speech-options="speechOptions"
+          @started="onSpeechStarted"
+          @stopped="onSpeechStopped"
+          @error="onSpeechError"
+        />
       </div>
 
       <!-- EMAIL -->
@@ -281,21 +293,31 @@ import PromptTemplateForm from "./PromptTemplateForm.vue";
 import { useChatStore } from "@/stores/chatStore";
 import AppIcon from "@/components/common/AppIcon.vue";
 import ChatAttachmentTray from "./ChatAttachmentTray.vue";
+import SpeechMicButton from "./SpeechMicButton.vue";
+import { getSpeech } from "@/managers/speechManager";
 
 export default {
   name: "ChatInputBox",
-  components: { InputHeader, PromptTemplateForm, AppIcon, ChatAttachmentTray },
+  components: {
+    InputHeader,
+    PromptTemplateForm,
+    AppIcon,
+    ChatAttachmentTray,
+    SpeechMicButton,
+  },
 
   data() {
     return {
       isComposing: false,
       isDragging: false,
       _dragCounter: 0,
+      _speech: null,
     };
   },
 
   created() {
     this.chat.ensureInitialized();
+    this._speech = getSpeech();
   },
 
   computed: {
@@ -364,9 +386,44 @@ export default {
     activeChatId() {
       return this.chat.activeChatId;
     },
+
+    // ✅ Direct: input or attachments => can send. Otherwise show mic.
+    canSend() {
+      const txt = String(this.input || "").trim();
+      return txt.length > 0 || this.pendingFiles.length > 0;
+    },
+
+    // Default speech options (can be overridden by other components too)
+    speechOptions() {
+      return {
+        lang: "ko-KR",
+        continuous: true,
+        interimResults: true,
+      };
+    },
   },
 
   methods: {
+    onSpeechStarted() {
+      // no-op (hook for future)
+    },
+    onSpeechStopped() {
+      // no-op
+    },
+    onSpeechError() {
+      // no-op
+    },
+
+    _stopSpeechIfActive() {
+      const sp = this._speech;
+      if (sp && typeof sp.isActive === "function" && sp.isActive()) {
+        try {
+          sp.stop();
+        } catch {
+          // ignore
+        }
+      }
+    },
     openPicker() {
       if (this.isLocked) return;
       const el = this.$refs.filePicker;
@@ -499,6 +556,9 @@ export default {
     send() {
       if (this.isLocked) return;
 
+      // ✅ sending should stop speech
+      this._stopSpeechIfActive();
+
       // ✅ 항상 최신 editor 값을 기반으로 최종 텍스트 확정
       let finalText = "";
 
@@ -558,15 +618,20 @@ export default {
     },
 
     onKeydown(e) {
-      if (
-        e.key === "Enter" &&
-        !e.shiftKey &&
-        !e.isComposing &&
-        !this.isComposing
-      ) {
-        e.preventDefault();
-        this.send();
+      // ✅ typing starts => mic off
+      if (!this.isComposing) {
+        const k = e?.key;
+        const isModifier =
+          k === "Shift" ||
+          k === "Control" ||
+          k === "Alt" ||
+          k === "Meta" ||
+          k === "CapsLock";
+        if (!isModifier) this._stopSpeechIfActive();
       }
+
+      // existing key handling (defined in store)
+      this.chat.onKeydown(e);
     },
   },
 };

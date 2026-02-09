@@ -127,6 +127,34 @@
       <path d="M19 12l.8 2.4L22 15l-2.2.6L19 18l-.8-2.4L16 15l2.2-.6L19 12z" />
     </template>
 
+    <!-- grip / drag handle -->
+    <template v-else-if="name === 'grip'">
+      <path d="M9 5h.01" />
+      <path d="M9 12h.01" />
+      <path d="M9 19h.01" />
+      <path d="M15 5h.01" />
+      <path d="M15 12h.01" />
+      <path d="M15 19h.01" />
+    </template>
+
+    <!-- microphone -->
+    <template v-else-if="name === 'mic'">
+      <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3z" />
+      <path d="M19 11a7 7 0 0 1-14 0" />
+      <path d="M12 18v4" />
+      <path d="M8 22h8" />
+    </template>
+
+    <!-- microphone off -->
+    <template v-else-if="name === 'mic-off'">
+      <path d="M9 10V6a3 3 0 0 1 5.2-2" />
+      <path d="M15 10v1a3 3 0 0 1-4.5 2.6" />
+      <path d="M19 11a7 7 0 0 1-9.5 6.6" />
+      <path d="M12 18v4" />
+      <path d="M8 22h8" />
+      <path d="M3 3l18 18" />
+    </template>
+
     <!-- fallback: dot -->
     <template v-else>
       <circle cx="12" cy="12" r="1" />

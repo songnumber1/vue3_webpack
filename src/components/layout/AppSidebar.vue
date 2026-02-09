@@ -15,6 +15,17 @@
       </button>
 
       <strong v-if="!sidebarCollapsed">Menu</strong>
+
+      <!-- Assistant reorder toggle (next to Menu) -->
+      <button
+        type="button"
+        class="icon-btn icon-btn-sm"
+        :class="{ active: reorderMode }"
+        :aria-label="reorderMode ? 'Disable assistant reorder' : 'Enable assistant reorder'"
+        @click="toggleReorder"
+      >
+        <AppIcon name="grip" :muted="!reorderMode" />
+      </button>
     </div>
 
     <!-- 상단 네비게이션 -->
@@ -57,19 +68,35 @@
         </div>
 
         <!-- ❗ 기존 버튼 렌더 구조 그대로 -->
-        <button
-          v-for="g in displayedAssistants"
-          :key="g.id"
-          type="button"
-          class="nav-item nav-btn"
-          :class="{ active: safeStore.activeModelGroupId === g.id }"
-          @click="setModelGroup(g.id)"
-        >
-          <span class="icon model-icon" aria-hidden="true">
-            <AppIcon name="sparkles" size="sm" />
-          </span>
-          <span class="text">{{ g.label }}</span>
-        </button>
+        <transition-group name="reorder" tag="div" class="nav-section-list">
+          <button
+            v-for="g in displayedAssistants"
+            :key="g.id"
+            type="button"
+            class="nav-item nav-btn"
+            :class="{
+              active: safeStore.activeModelGroupId === g.id,
+              reorderable: reorderMode,
+              dragging: draggingId === g.id,
+              dropBefore: dragOverId === g.id && dropPos === 'before',
+              dropAfter: dragOverId === g.id && dropPos === 'after',
+            }"
+            :draggable="reorderMode"
+            @click="onAssistantClick(g.id)"
+            @dragstart="onDragStart($event, g.id)"
+            @dragend="onDragEnd"
+            @dragover.prevent="onDragOverItem($event, g.id)"
+            @dragenter.prevent="onDragEnterItem($event, g.id)"
+            @dragleave.prevent="onDragLeaveItem($event, g.id)"
+            @drop.prevent="onDropItem($event, g.id)"
+          >
+            <span class="icon model-icon" aria-hidden="true">
+              <AppIcon v-if="reorderMode" name="grip" size="sm" muted />
+              <AppIcon v-else name="sparkles" size="sm" />
+            </span>
+            <span class="text">{{ g.label }}</span>
+          </button>
+        </transition-group>
       </div>
     </nav>
 
@@ -187,10 +214,23 @@ export default {
     },
 
     modelGroups() {
-      return (this.assistants || []).map((a) => ({
+      const list = (this.assistants || []).map((a) => ({
         id: a.id,
         label: a.label,
       }));
+
+      // Apply persisted order (localStorage) while keeping any new ids appended
+      const order = this.orderedIds;
+      if (!Array.isArray(order) || !order.length) return list;
+
+      const idx = new Map();
+      order.forEach((id, i) => idx.set(id, i));
+      return [...list].sort((x, y) => {
+        const ax = idx.has(x.id) ? idx.get(x.id) : 999999;
+        const ay = idx.has(y.id) ? idx.get(y.id) : 999999;
+        if (ax !== ay) return ax - ay;
+        return String(x.label).localeCompare(String(y.label));
+      });
     },
 
     displayedAssistants() {
@@ -234,7 +274,155 @@ export default {
     },
   },
 
+  data() {
+    return {
+      reorderMode: false,
+      draggingId: null,
+      dragOverId: null,
+      dropPos: null,
+      orderedIds: [],
+      _justDropped: false,
+    };
+  },
+
+  created() {
+    this._loadAssistantOrder();
+  },
+
   methods: {
+    toggleReorder() {
+      this.reorderMode = !this.reorderMode;
+      // When turning off, clear any drag visuals
+      if (!this.reorderMode) {
+        this.draggingId = null;
+        this.dragOverId = null;
+        this.dropPos = null;
+      }
+    },
+
+    _loadAssistantOrder() {
+      try {
+        const raw = localStorage.getItem("ds_assistant_order_v1");
+        const arr = raw ? JSON.parse(raw) : [];
+        this.orderedIds = Array.isArray(arr) ? arr : [];
+      } catch {
+        this.orderedIds = [];
+      }
+    },
+
+    _saveAssistantOrder() {
+      try {
+        localStorage.setItem(
+          "ds_assistant_order_v1",
+          JSON.stringify(Array.isArray(this.orderedIds) ? this.orderedIds : []),
+        );
+      } catch {
+        // ignore
+      }
+    },
+
+    onAssistantClick(id) {
+      // Prevent accidental selection immediately after drop
+      if (this._justDropped) return;
+      this.setModelGroup(id);
+    },
+
+    onDragStart(ev, id) {
+      if (!this.reorderMode) return;
+      this.draggingId = id;
+      this._justDropped = false;
+
+      // make drag preview a bit nicer
+      try {
+        ev.dataTransfer.effectAllowed = "move";
+        ev.dataTransfer.setData("text/plain", String(id));
+      } catch {
+        // ignore
+      }
+    },
+
+    onDragEnd() {
+      if (!this.reorderMode) return;
+      this.draggingId = null;
+      this.dragOverId = null;
+      this.dropPos = null;
+      this._saveAssistantOrder();
+    },
+
+    onDragEnterItem(_ev, overId) {
+      if (!this.reorderMode) return;
+      this.dragOverId = overId;
+    },
+
+    onDragLeaveItem(_ev, overId) {
+      if (!this.reorderMode) return;
+      if (this.dragOverId === overId) {
+        this.dragOverId = null;
+        this.dropPos = null;
+      }
+    },
+
+    onDragOverItem(ev, overId) {
+      if (!this.reorderMode) return;
+      if (!this.draggingId || this.draggingId === overId) return;
+
+      const rect = ev.currentTarget?.getBoundingClientRect?.();
+      if (!rect) return;
+      const mid = rect.top + rect.height / 2;
+      const pos = ev.clientY < mid ? "before" : "after";
+
+      this.dragOverId = overId;
+      this.dropPos = pos;
+
+      // live reorder when cursor crosses 50% of the target item
+      this._reorderIds(this.draggingId, overId, pos);
+    },
+
+    onDropItem(_ev, overId) {
+      if (!this.reorderMode) return;
+      if (!this.draggingId || this.draggingId === overId) return;
+
+      // ensure final position persisted
+      this._reorderIds(this.draggingId, overId, this.dropPos || "after");
+      this._saveAssistantOrder();
+
+      this._justDropped = true;
+      setTimeout(() => {
+        this._justDropped = false;
+      }, 0);
+    },
+
+    _reorderIds(dragId, overId, pos) {
+      const ids = this.modelGroups.map((x) => x.id);
+
+      // build base order from current orderedIds + current ids
+      const base = Array.isArray(this.orderedIds) && this.orderedIds.length
+        ? [...this.orderedIds]
+        : [...ids];
+
+      // ensure all ids exist
+      ids.forEach((id) => {
+        if (!base.includes(id)) base.push(id);
+      });
+      // remove any unknown
+      const filtered = base.filter((id) => ids.includes(id));
+
+      const from = filtered.indexOf(dragId);
+      const to = filtered.indexOf(overId);
+      if (from < 0 || to < 0) {
+        this.orderedIds = filtered;
+        return;
+      }
+
+      filtered.splice(from, 1);
+      let insertAt = to;
+      if (pos === "after") insertAt = to + (from < to ? 0 : 1);
+      if (pos === "before") insertAt = to + (from < to ? -1 : 0);
+      insertAt = Math.max(0, Math.min(filtered.length, insertAt));
+      filtered.splice(insertAt, 0, dragId);
+
+      this.orderedIds = filtered;
+    },
     toggleAssistants() {
       this.uiStore.toggleAssistantsExpanded();
     },
@@ -380,6 +568,17 @@ export default {
     background 0.15s ease;
 }
 
+.icon-btn-sm {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  margin-left: 6px;
+}
+
+.icon-btn-sm.active {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+}
+
 .icon-btn:hover {
   transform: translateY(-1px);
 }
@@ -449,6 +648,46 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.nav-section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item.reorderable {
+  cursor: grab;
+}
+
+.nav-item.reorderable:active {
+  cursor: grabbing;
+}
+
+.nav-item.dragging {
+  opacity: 0.75;
+  transform: scale(0.98);
+}
+
+.nav-item.dropBefore {
+  box-shadow: 0 -2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.nav-item.dropAfter {
+  box-shadow: 0 2px 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+/* Transition-group FLIP */
+.reorder-move {
+  transition: transform 160ms ease;
+}
+.reorder-enter-active,
+.reorder-leave-active {
+  transition: opacity 120ms ease;
+}
+.reorder-enter-from,
+.reorder-leave-to {
+  opacity: 0.01;
 }
 
 .nav-section-label {
