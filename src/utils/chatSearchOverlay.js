@@ -24,6 +24,7 @@ export const DEFAULT_SEARCH_OPTIONS = {
   wholeWord: false,
   highlight: true,
   enableFirstLast: true,
+  autoScrollOnSearch: false,
   yieldEveryNodes: 250, // UI 프리징 방지용
 };
 
@@ -286,4 +287,30 @@ export function scrollToMatch({
     top: Math.max(0, targetTop),
     behavior: "smooth",
   });
+}
+
+export function computeViewportIndex(container, matches) {
+  if (!container || !matches?.length) return 0;
+
+  const visibleTop = container.scrollTop;
+  const visibleBottom = visibleTop + container.clientHeight;
+  const cRect = container.getBoundingClientRect();
+
+  for (let i = 0; i < matches.length; i++) {
+    const m = matches[i];
+    if (!m?.node) continue;
+
+    const r = document.createRange();
+    r.setStart(m.node, m.start);
+    r.setEnd(m.node, m.end);
+
+    const rect = r.getBoundingClientRect();
+    const top = rect.top - cRect.top + container.scrollTop;
+
+    if (top >= visibleTop && top <= visibleBottom) {
+      return i;
+    }
+  }
+
+  return 0; // 화면에 없으면 기본 0
 }

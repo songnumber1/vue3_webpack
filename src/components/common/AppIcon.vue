@@ -64,12 +64,29 @@
       <path d="M14 11v6" />
     </template>
 
-    <!-- chevron left/right -->
+    <template v-else-if="name === 'settings'">
+      <path d="M12 8a4 4 0 100 8 4 4 0 000-8z" />
+      <path
+        d="M2 12h2m16 0h2M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"
+      />
+    </template>
+
+    <template v-else-if="name === 'first'">
+      <path d="M6 4v16" />
+      <path d="M18 4l-8 8 8 8" />
+    </template>
+
     <template v-else-if="name === 'chevron-left'">
       <path d="M15 18l-6-6 6-6" />
     </template>
+
     <template v-else-if="name === 'chevron-right'">
       <path d="M9 18l6-6-6-6" />
+    </template>
+
+    <template v-else-if="name === 'last'">
+      <path d="M18 4v16" />
+      <path d="M6 4l8 8-8 8" />
     </template>
 
     <template v-else-if="name === 'chevron-down'">

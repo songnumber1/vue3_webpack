@@ -20,7 +20,9 @@
         title="Options"
         @click="toggleOptions"
       >
-        <span class="icon">⚙</span>
+        <span class="icon">
+          <AppIcon name="settings" size="sm" />
+        </span>
       </button>
 
       <!-- ✅ Regex 모드에서만 Search 버튼 표시 -->
@@ -32,7 +34,7 @@
         @click="runSearch"
       >
         <span class="icon">
-          <AppIcon name="search" size="xl" />
+          <AppIcon name="search" size="sm" />
         </span>
       </button>
 
@@ -50,7 +52,9 @@
         title="First"
         @click="first"
       >
-        <span class="icon">⏮</span>
+        <span class="icon">
+          <AppIcon name="first" size="sm" />
+        </span>
       </button>
 
       <!-- Prev -->
@@ -62,7 +66,7 @@
         @click="prev"
       >
         <span class="icon">
-          <AppIcon name="chevron-left" size="xl" />
+          <AppIcon name="chevron-left" size="sm" />
         </span>
       </button>
 
@@ -75,7 +79,7 @@
         @click="next"
       >
         <span class="icon">
-          <AppIcon name="chevron-right" size="xl" />
+          <AppIcon name="chevron-right" size="sm" />
         </span>
       </button>
 
@@ -88,13 +92,13 @@
         title="Last"
         @click="last"
       >
-        <span class="icon">⏭</span>
+        <span class="icon"><AppIcon name="last" size="sm" /> </span>
       </button>
 
       <!-- 닫기 -->
       <button type="button" class="btn" title="Close" @click="close">
         <span class="icon">
-          <AppIcon name="x" size="xl" />
+          <AppIcon name="x" size="sm" />
         </span>
       </button>
     </div>
@@ -155,6 +159,15 @@
           <label class="chk">
             <input
               type="checkbox"
+              :checked="options.autoScrollOnSearch"
+              @change="toggleAutoScroll"
+            />
+            <span>Auto scroll on search</span>
+          </label>
+
+          <label class="chk">
+            <input
+              type="checkbox"
               :checked="options.highlight"
               @change="toggleHighlight"
             />
@@ -196,6 +209,7 @@ import {
   scrollToMatch,
   DEFAULT_SEARCH_OPTIONS,
   mergeSearchOptions,
+  computeViewportIndex,
 } from "@/utils/chatSearchOverlay";
 
 export default {
@@ -262,7 +276,6 @@ export default {
       this.$nextTick(() => {
         this.$refs.input?.focus?.();
         this.setupContainerListener();
-        // keyword 모드는 즉시 검색, regex도 초기엔 실행해줘도 됨(원하면 제거 가능)
         this.runSearch();
       });
     },
@@ -276,31 +289,22 @@ export default {
       this.clear();
     },
 
-    // ✅ 빠졌던 함수: 옵션 패널 토글
     toggleOptions() {
       this.showOptions = !this.showOptions;
-      // 옵션 패널 열고 닫을 때 높이가 변하므로 overlay 위치 재계산
       this.$nextTick(() => this.scheduleRender());
     },
 
     // UI handlers
     onInput(e) {
       this.keyword = String(e?.target?.value ?? "");
-
-      // ✅ KEY 모드일 때만 key-in 즉시 검색
-      if (this.options.mode === "keyword") {
-        this.runSearch();
-      }
+      if (this.options.mode === "keyword") this.runSearch();
     },
 
     onEnter(e) {
-      // ✅ REGEX 모드: Enter는 "검색 실행"
       if (this.options.mode === "regex") {
         this.runSearch();
         return;
       }
-
-      // ✅ KEY 모드: Enter는 next / Shift+Enter는 prev
       if (e?.shiftKey) this.prev();
       else this.next();
     },
@@ -308,10 +312,6 @@ export default {
     // ===== options mutations =====
     setMode(mode) {
       this.options = mergeSearchOptions({ ...this.options, mode });
-
-      // 모드 변경 시:
-      // - keyword: 입력값 있으면 즉시 검색 결과를 보여주는 편이 자연스러움
-      // - regex: 기존 결과 유지 or 즉시 재검색(원하면 유지로 바꿔도 됨)
       this.runSearch();
     },
 
@@ -336,7 +336,15 @@ export default {
         ...this.options,
         enableFirstLast: !this.options.enableFirstLast,
       });
-      // UI 옵션이라 re-search 불필요
+      // UI only
+    },
+
+    toggleAutoScroll() {
+      this.options = mergeSearchOptions({
+        ...this.options,
+        autoScrollOnSearch: !this.options.autoScrollOnSearch,
+      });
+      // 스크롤 옵션이므로 재검색/재스크롤은 하지 않음 (사용자가 원하면 다음 액션부터 반영)
     },
 
     toggleHighlight() {
@@ -358,7 +366,6 @@ export default {
         ...this.options,
         yieldEveryNodes: Number.isFinite(v) ? Math.max(10, v) : 250,
       });
-      // 검색 로직에 영향 -> 재검색
       this.runSearch();
     },
 
@@ -370,35 +377,36 @@ export default {
         if (!this.options.highlight) clearOverlay(c);
         else this.scheduleRender();
       }
-
       this.runSearch();
     },
 
-    // Navigation
+    // Navigation (autoScroll 옵션 반영)
     first() {
       if (!this.total) return;
       this.activeIndex = 0;
-      this.jumpToActive({ render: true, align: "start" });
+      this.jumpToActive({ render: true, align: "start", doScroll: true });
     },
 
     last() {
       if (!this.total) return;
       this.activeIndex = this.total - 1;
-      this.jumpToActive({ render: true, align: "end" });
+      this.jumpToActive({ render: true, align: "end", doScroll: true });
     },
 
     prev() {
       if (!this.total) return;
       this.activeIndex =
         this.activeIndex <= 0 ? this.total - 1 : this.activeIndex - 1;
-      this.jumpToActive({ render: true });
+
+      this.jumpToActive({ render: true, doScroll: true });
     },
 
     next() {
       if (!this.total) return;
       this.activeIndex =
         this.activeIndex >= this.total - 1 ? 0 : this.activeIndex + 1;
-      this.jumpToActive({ render: true });
+
+      this.jumpToActive({ render: true, doScroll: true });
     },
 
     // Core search
@@ -436,16 +444,12 @@ export default {
       if (!c) return;
 
       const kw = String(this.keyword || "").trim();
-
-      // ✅ regex 모드에서 "빈 값"이면 clear
       if (!kw) {
         this.cancel();
         this.clear();
         return;
       }
 
-      // ✅ regex 모드에서는 입력중 자동검색하지 않으므로,
-      // enter/click 외에도 openWith 시점에서 호출되면 검색됨 (원하면 조건 추가 가능)
       this.cancel();
       const controller = new AbortController();
       this._abort = controller;
@@ -467,9 +471,15 @@ export default {
         if (controller.signal.aborted) return;
 
         this.matches = matches;
-        this.activeIndex = computeInitialIndex(matches, this._anchorMsgId);
 
-        this.jumpToActive({ render: true, align: "start" });
+        if (this.options.autoScrollOnSearch) {
+          this.activeIndex = computeInitialIndex(matches, this._anchorMsgId);
+          this.jumpToActive({ render: true, align: "start", doScroll: true });
+        } else {
+          // 🔥 현재 화면 기준 activeIndex 계산
+          this.activeIndex = computeViewportIndex(c, matches);
+          this.scheduleRender(); // 스크롤 유지
+        }
       } catch (e) {
         if (e?.name !== "AbortError") console.warn("[chat-search] failed", e);
       } finally {
@@ -477,19 +487,21 @@ export default {
       }
     },
 
-    jumpToActive({ render = true, align = "center" } = {}) {
+    jumpToActive({ render = true, align = "center", doScroll = true } = {}) {
       const c = this.getContainer();
       if (!c || !this.total) {
         if (c) clearOverlay(c);
         return;
       }
 
-      scrollToMatch({
-        container: c,
-        matches: this.matches,
-        activeIndex: this.activeIndex,
-        align,
-      });
+      if (doScroll) {
+        scrollToMatch({
+          container: c,
+          matches: this.matches,
+          activeIndex: this.activeIndex,
+          align,
+        });
+      }
 
       if (render) this.scheduleRender();
     },
