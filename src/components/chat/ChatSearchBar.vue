@@ -258,63 +258,70 @@ export default {
   },
 
   methods: {
+    // 검색 대상 컨테이너 반환
     getContainer() {
       return (
-        this.containerEl ||
+        this.containerEl || // 외부에서 전달된 컨테이너 우선
         document.querySelector(".body-contents") ||
         document.querySelector(".messages") ||
         null
       );
     },
 
-    // Public API
+    // 검색창 열기 + 초기 검색 실행
     openWith({ anchorMsgId = null, keyword = "" } = {}) {
       this.open = true;
       this._anchorMsgId = anchorMsgId;
       if (keyword != null) this.keyword = String(keyword || "");
 
       this.$nextTick(() => {
-        this.$refs.input?.focus?.();
-        this.setupContainerListener();
-        this.runSearch();
+        this.$refs.input?.focus?.(); // 입력창 포커스
+        this.setupContainerListener(); // 스크롤 감지 시작
+        this.runSearch(); // 초기 검색 실행
       });
     },
 
+    // 검색창 닫기 + 상태 초기화
     close() {
       this.open = false;
       this.showOptions = false;
       this._anchorMsgId = null;
-      this.cancel();
-      this.teardownContainerListener();
-      this.clear();
+      this.cancel(); // 진행 중 검색 취소
+      this.teardownContainerListener(); // 스크롤 감지 제거
+      this.clear(); // overlay 및 matches 초기화
     },
 
+    // 옵션 패널 열기/닫기
     toggleOptions() {
       this.showOptions = !this.showOptions;
-      this.$nextTick(() => this.scheduleRender());
+      this.$nextTick(() => this.scheduleRender()); // 레이아웃 변경 후 overlay 재계산
     },
 
-    // UI handlers
+    // 입력 시 (KEY 모드일 때만 자동 검색)
     onInput(e) {
       this.keyword = String(e?.target?.value ?? "");
       if (this.options.mode === "keyword") this.runSearch();
     },
 
+    // Enter 키 처리
     onEnter(e) {
       if (this.options.mode === "regex") {
+        // REGEX 모드는 Enter = 검색 실행
         this.runSearch();
         return;
       }
+      // KEY 모드는 Enter = 다음, Shift+Enter = 이전
       if (e?.shiftKey) this.prev();
       else this.next();
     },
 
-    // ===== options mutations =====
+    // 검색 모드 변경 (keyword / regex)
     setMode(mode) {
       this.options = mergeSearchOptions({ ...this.options, mode });
-      this.runSearch();
+      this.runSearch(); // 모드 변경 시 재검색
     },
 
+    // 대소문자 옵션 토글
     toggleCaseSensitive() {
       this.options = mergeSearchOptions({
         ...this.options,
@@ -323,6 +330,7 @@ export default {
       this.runSearch();
     },
 
+    // 완전 단어 일치 옵션 토글
     toggleWholeWord() {
       this.options = mergeSearchOptions({
         ...this.options,
@@ -331,22 +339,24 @@ export default {
       this.runSearch();
     },
 
+    // First/Last 버튼 표시 여부 토글 (UI 전용)
     toggleFirstLast() {
       this.options = mergeSearchOptions({
         ...this.options,
         enableFirstLast: !this.options.enableFirstLast,
       });
-      // UI only
     },
 
+    // 검색 시 자동 스크롤 여부 토글
     toggleAutoScroll() {
       this.options = mergeSearchOptions({
         ...this.options,
         autoScrollOnSearch: !this.options.autoScrollOnSearch,
       });
-      // 스크롤 옵션이므로 재검색/재스크롤은 하지 않음 (사용자가 원하면 다음 액션부터 반영)
+      // 즉시 재검색은 하지 않음 (다음 검색부터 반영)
     },
 
+    // 하이라이트 표시 여부 토글
     toggleHighlight() {
       this.options = mergeSearchOptions({
         ...this.options,
@@ -356,19 +366,22 @@ export default {
       const c = this.getContainer();
       if (!c) return;
 
+      // 끄면 overlay 제거, 켜면 재렌더
       if (!this.options.highlight) clearOverlay(c);
       else this.scheduleRender();
     },
 
+    // yieldEveryNodes 값 변경 (성능 관련 옵션)
     onYieldEveryNodes(e) {
       const v = Number(e?.target?.value ?? 250);
       this.options = mergeSearchOptions({
         ...this.options,
         yieldEveryNodes: Number.isFinite(v) ? Math.max(10, v) : 250,
       });
-      this.runSearch();
+      this.runSearch(); // DOM 스캔 로직 영향 → 재검색 필요
     },
 
+    // 옵션 초기화
     resetOptions() {
       this.options = mergeSearchOptions(DEFAULT_SEARCH_OPTIONS);
 
@@ -377,39 +390,53 @@ export default {
         if (!this.options.highlight) clearOverlay(c);
         else this.scheduleRender();
       }
+
       this.runSearch();
     },
 
-    // Navigation (autoScroll 옵션 반영)
+    /* =========================
+     Navigation 영역
+  ========================== */
+
+    // 첫 번째 매칭으로 이동
     first() {
       if (!this.total) return;
       this.activeIndex = 0;
       this.jumpToActive({ render: true, align: "start", doScroll: true });
     },
 
+    // 마지막 매칭으로 이동
     last() {
       if (!this.total) return;
       this.activeIndex = this.total - 1;
       this.jumpToActive({ render: true, align: "end", doScroll: true });
     },
 
+    // 이전 매칭으로 이동
     prev() {
       if (!this.total) return;
+
       this.activeIndex =
         this.activeIndex <= 0 ? this.total - 1 : this.activeIndex - 1;
 
       this.jumpToActive({ render: true, doScroll: true });
     },
 
+    // 다음 매칭으로 이동
     next() {
       if (!this.total) return;
+
       this.activeIndex =
         this.activeIndex >= this.total - 1 ? 0 : this.activeIndex + 1;
 
       this.jumpToActive({ render: true, doScroll: true });
     },
 
-    // Core search
+    /* =========================
+     검색 제어
+  ========================== */
+
+    // 현재 진행 중인 검색 취소
     cancel() {
       if (this._abort) {
         try {
@@ -419,6 +446,7 @@ export default {
       }
     },
 
+    // 검색 결과 초기화
     clear() {
       const c = this.getContainer();
       if (c) clearOverlay(c);
@@ -426,6 +454,7 @@ export default {
       this.activeIndex = 0;
     },
 
+    // 검색 대상 루트 노드 추출
     getRoots() {
       const c = this.getContainer();
       if (!c) return [];
@@ -439,11 +468,16 @@ export default {
       return [c];
     },
 
+    // ==========================
+    // 실제 검색 실행
+    // ==========================
     async runSearch() {
       const c = this.getContainer();
       if (!c) return;
 
       const kw = String(this.keyword || "").trim();
+
+      // 검색어 없으면 초기화
       if (!kw) {
         this.cancel();
         this.clear();
@@ -455,6 +489,7 @@ export default {
       this._abort = controller;
 
       try {
+        // DOM 안정화 대기
         await this.$nextTick();
         await new Promise((r) => requestAnimationFrame(r));
         await new Promise((r) => requestAnimationFrame(r));
@@ -472,11 +507,13 @@ export default {
 
         this.matches = matches;
 
+        // autoScroll 옵션 분기 처리
         if (this.options.autoScrollOnSearch) {
+          // 기존 anchor 기준
           this.activeIndex = computeInitialIndex(matches, this._anchorMsgId);
           this.jumpToActive({ render: true, align: "start", doScroll: true });
         } else {
-          // 🔥 현재 화면 기준 activeIndex 계산
+          // 현재 화면 기준 index 계산
           this.activeIndex = computeViewportIndex(c, matches);
           this.scheduleRender(); // 스크롤 유지
         }
@@ -487,6 +524,7 @@ export default {
       }
     },
 
+    // 현재 activeIndex 위치로 이동
     jumpToActive({ render = true, align = "center", doScroll = true } = {}) {
       const c = this.getContainer();
       if (!c || !this.total) {
@@ -494,6 +532,7 @@ export default {
         return;
       }
 
+      // 스크롤 허용일 때만 이동
       if (doScroll) {
         scrollToMatch({
           container: c,
@@ -506,13 +545,17 @@ export default {
       if (render) this.scheduleRender();
     },
 
-    // Overlay reflow
+    /* =========================
+     Overlay 재렌더
+  ========================== */
+
     scheduleRender() {
       const c = this.getContainer();
       if (!c) return;
       if (!this.options.highlight) return;
 
       if (this._raf) cancelAnimationFrame(this._raf);
+
       this._raf = requestAnimationFrame(() => {
         this._raf = 0;
         renderOverlay({
@@ -525,26 +568,32 @@ export default {
       });
     },
 
+    // 화면 리사이즈 시 overlay 재계산
     onViewportChange() {
       if (!this.open) return;
       this.scheduleRender();
     },
 
+    // 스크롤 시 overlay 재계산
     onContainerScroll() {
       if (!this.open) return;
       this.scheduleRender();
     },
 
+    // 컨테이너 스크롤 이벤트 등록
     setupContainerListener() {
       const c = this.getContainer();
       if (!c || this._listening) return;
+
       c.addEventListener("scroll", this.onContainerScroll, { passive: true });
       this._listening = true;
     },
 
+    // 컨테이너 스크롤 이벤트 제거
     teardownContainerListener() {
       const c = this.getContainer();
       if (!c || !this._listening) return;
+
       c.removeEventListener("scroll", this.onContainerScroll);
       this._listening = false;
     },
