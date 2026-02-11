@@ -21,7 +21,9 @@
         type="button"
         class="icon-btn icon-btn-sm"
         :class="{ active: reorderMode }"
-        :aria-label="reorderMode ? 'Disable assistant reorder' : 'Enable assistant reorder'"
+        :aria-label="
+          reorderMode ? 'Disable assistant reorder' : 'Enable assistant reorder'
+        "
         @click="toggleReorder"
       >
         <AppIcon name="grip" :muted="!reorderMode" />
@@ -139,7 +141,11 @@
     </template>
 
     <!-- Desktop: move the collapse/expand control to the bottom (requested) -->
-    <div v-if="!isMobile" class="bottom-row" :class="{ collapsed: sidebarCollapsed }">
+    <div
+      v-if="!isMobile"
+      class="bottom-row"
+      :class="{ collapsed: sidebarCollapsed }"
+    >
       <button
         type="button"
         class="icon-btn"
@@ -396,9 +402,10 @@ export default {
       const ids = this.modelGroups.map((x) => x.id);
 
       // build base order from current orderedIds + current ids
-      const base = Array.isArray(this.orderedIds) && this.orderedIds.length
-        ? [...this.orderedIds]
-        : [...ids];
+      const base =
+        Array.isArray(this.orderedIds) && this.orderedIds.length
+          ? [...this.orderedIds]
+          : [...ids];
 
       // ensure all ids exist
       ids.forEach((id) => {

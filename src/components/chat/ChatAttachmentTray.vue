@@ -51,8 +51,15 @@
     >
       <div class="viewer-card">
         <div class="viewer-top">
-          <div class="viewer-title" :title="viewer.title">{{ viewer.title }}</div>
-          <button type="button" class="viewer-close" @click="closeViewer" aria-label="Close">
+          <div class="viewer-title" :title="viewer.title">
+            {{ viewer.title }}
+          </div>
+          <button
+            type="button"
+            class="viewer-close"
+            @click="closeViewer"
+            aria-label="Close"
+          >
             <AppIcon name="x" size="sm" />
           </button>
         </div>
@@ -242,7 +249,6 @@ export default {
 .chip:hover .rm {
   opacity: 1;
 }
-
 
 .rm:hover {
   color: var(--text-primary);

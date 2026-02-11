@@ -1,5 +1,5 @@
 <template>
-  <div class="msg assistant">
+  <div class="msg assistant" :data-chat-msg-id="msgId" data-chat-msg-root="1">
     <div class="msg-card assistant">
       <div class="msg-head">
         <div class="msg-head-left">
@@ -24,6 +24,7 @@
 export default {
   name: "ChatMessageAssistant",
   props: {
+    msgId: { type: String, required: true },
     message: { type: Object, required: true },
     render: { type: Function, required: true },
   },

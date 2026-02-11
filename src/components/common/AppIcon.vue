@@ -49,7 +49,9 @@
 
     <!-- beaker / lab -->
     <template v-else-if="name === 'beaker'">
-      <path d="M10 2v6.2L5.6 18.5A2.5 2.5 0 0 0 7.9 22h8.2a2.5 2.5 0 0 0 2.3-3.5L14 8.2V2" />
+      <path
+        d="M10 2v6.2L5.6 18.5A2.5 2.5 0 0 0 7.9 22h8.2a2.5 2.5 0 0 0 2.3-3.5L14 8.2V2"
+      />
       <path d="M8 12h8" />
     </template>
 
@@ -82,7 +84,9 @@
 
     <!-- paperclip / attach -->
     <template v-else-if="name === 'paperclip'">
-      <path d="M21 12.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.9-8.9a3.5 3.5 0 1 1 5 5l-8.5 8.5a2 2 0 0 1-2.8-2.8L16 7.7" />
+      <path
+        d="M21 12.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.9-8.9a3.5 3.5 0 1 1 5 5l-8.5 8.5a2 2 0 0 1-2.8-2.8L16 7.7"
+      />
     </template>
 
     <!-- file -->
@@ -96,6 +100,12 @@
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="M8.5 11a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
       <path d="M21 15l-5-5-4 4-2-2-4 4" />
+    </template>
+
+    <!-- search (magnifier) -->
+    <template v-else-if="name === 'search'">
+      <circle cx="11" cy="11" r="6" />
+      <path d="M20 20l-3.5-3.5" />
     </template>
 
     <!-- zoom (magnifier) -->
@@ -187,19 +197,21 @@ export default {
   width: 14px;
   height: 14px;
 }
-
 .size-sm {
   width: 16px;
   height: 16px;
 }
-
 .size-md {
   width: 18px;
   height: 18px;
 }
 
 .size-lg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+}
+.size-xl {
+  width: 28px;
+  height: 28px;
 }
 </style>

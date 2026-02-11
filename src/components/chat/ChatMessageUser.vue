@@ -1,5 +1,5 @@
 <template>
-  <div class="msg user">
+  <div class="msg user" :data-chat-msg-id="msgId" data-chat-msg-root="1">
     <div class="msg-card">
       <div class="msg-head">
         <div class="msg-head-left">
@@ -34,6 +34,7 @@ export default {
   name: "ChatMessageUser",
   components: { ChatAttachmentTray },
   props: {
+    msgId: { type: String, required: true },
     message: { type: Object, required: true },
     render: { type: Function, required: true },
   },

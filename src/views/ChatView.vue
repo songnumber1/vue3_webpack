@@ -1,15 +1,26 @@
 <template>
   <div class="chat-box">
     <div v-if="showRoomHeader" class="room-header">
-      <strong class="room-title">{{ activeChatTitle }}</strong>
-      <span class="room-sub"> {{ assistantLabel }} · {{ modelId }} </span>
+      <div class="room-left">
+        <strong class="room-title">{{ activeChatTitle }}</strong>
+      </div>
+
+      <div class="room-right">
+        <span class="room-sub">{{ assistantLabel }} · {{ modelId }}</span>
+        <button type="button" class="icon-btn" title="Search in chat" @click="toggleSearch">
+	          <AppIcon name="search" size="lg" />
+        </button>
+      </div>
     </div>
 
-    <div class="messages" ref="messagesWrap">
-      <!-- ✅ NewChatLanding: /main (draft) -->
-      <NewChatLanding v-if="showLanding" @pick="applySuggestion" />
+    <ChatConversationSearchBar
+      v-if="showRoomHeader"
+      ref="searchBar"
+	      :container-el="messagesWrapEl"
+    />
 
-      <!-- ✅ Chat messages -->
+    <div class="messages" ref="messagesWrap">
+      <NewChatLanding v-if="showLanding" @pick="applySuggestion" />
       <ChatMessageList v-else ref="messageList" />
     </div>
 
@@ -18,22 +29,33 @@
 </template>
 
 <script>
+import AppIcon from "@/components/common/AppIcon.vue";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import ChatInputBox from "@/components/chat/ChatInputBox.vue";
+import ChatConversationSearchBar from "@/components/chat/ChatConversationSearchBar.vue";
 import { useChatStore } from "@/stores/chatStore";
 
 export default {
   name: "ChatView",
   components: {
+    AppIcon,
     NewChatLanding,
     ChatMessageList,
     ChatInputBox,
+    ChatConversationSearchBar,
   },
 
   created() {
-    // ✅ standalone-safe (ChatView can be mounted without AppLayout)
     this.chat.ensureInitialized();
+  },
+
+  data() {
+    return {
+      // ⚠️ Do NOT pass $refs directly as props in template.
+      // $refs are not reactive; bind this once mounted.
+      messagesWrapEl: null,
+    };
   },
 
   computed: {
@@ -56,7 +78,6 @@ export default {
       return this.chat.modelId;
     },
     showLanding() {
-      // ✅ landing route: /main (no active chat yet) or no room selected
       return this.$route.name === "main" || !this.activeChatId;
     },
     showRoomHeader() {
@@ -65,7 +86,6 @@ export default {
   },
 
   watch: {
-    // auto scroll on message change
     "chat.messages": {
       handler() {
         this.$nextTick(() => this.scrollToBottom());
@@ -76,12 +96,17 @@ export default {
 
   mounted() {
     this.scrollToBottom();
+    this.messagesWrapEl = this.$refs.messagesWrap || null;
+    window.addEventListener("keydown", this.onGlobalKeydown);
+  },
+
+  beforeUnmount() {
+    window.removeEventListener("keydown", this.onGlobalKeydown);
   },
 
   methods: {
     applySuggestion(text) {
       this.chat.applyExampleText(text);
-      // ✅ move focus to active editor so Enter works immediately
       this.$nextTick(() => {
         const ib = this.$refs.inputBox;
         if (ib && typeof ib.focusActiveEditor === "function") {
@@ -90,7 +115,26 @@ export default {
       });
     },
 
-    // send/onKeydown handled by ChatInputBox
+    onGlobalKeydown(e) {
+      if (!this.showRoomHeader) return;
+      if ((e.ctrlKey || e.metaKey) && String(e.key).toLowerCase() === "f") {
+        e.preventDefault();
+        this.openSearch();
+      }
+    },
+
+    toggleSearch() {
+      const bar = this.$refs.searchBar;
+      if (!bar) return;
+      if (bar.open) bar.close();
+      else this.openSearch();
+    },
+
+    openSearch({ anchorMsgId = null, keyword = "" } = {}) {
+      const bar = this.$refs.searchBar;
+      if (!bar || typeof bar.openWith !== "function") return;
+      bar.openWith({ anchorMsgId, keyword });
+    },
 
     scrollToBottom() {
       const wrap = this.$refs.messagesWrap;
@@ -120,79 +164,51 @@ export default {
   padding: 0 16px;
 }
 
+.room-left {
+  min-width: 0;
+}
+
+.room-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .room-title {
-  font-weight: 800;
+  font-size: 14px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 60vw;
 }
 
 .room-sub {
   font-size: 12px;
   color: var(--muted);
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn:hover {
+  background: var(--bg-surface);
 }
 
 .messages {
   flex: 1;
+  overflow: auto;
   min-height: 0;
-  overflow: auto;
-  padding: 18px;
-}
-
-/* =========================
-   Message bubbles (modern)
-   ========================= */
-:deep(.msg) {
-  display: flex;
-  margin: 10px 0;
-}
-
-:deep(.msg.user) {
-  justify-content: flex-end;
-}
-
-:deep(.msg.assistant) {
-  justify-content: flex-start;
-}
-
-:deep(.msg .bubble) {
-  max-width: min(760px, 92%);
-  border-radius: 16px;
-  padding: 12px 14px;
-  line-height: 1.5;
-  font-size: 14px;
-  box-shadow: var(--shadow-xs, none);
-  border: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
-}
-
-:deep(.msg.user .bubble) {
-  background: linear-gradient(135deg, var(--accent), var(--accent-2, var(--accent)));
-  color: var(--accent-contrast);
-  border-color: transparent;
-}
-
-:deep(.msg.assistant .bubble) {
-  background: color-mix(in srgb, var(--bg-elevated) 85%, transparent);
-  color: var(--text-primary);
-}
-
-/* markdown content inside bubbles */
-:deep(.bubble p) {
-  margin: 0.35em 0;
-}
-
-:deep(.bubble pre) {
-  background: var(--chat-code-bg);
-  color: var(--chat-code-text);
-  border-radius: 14px;
-  padding: 12px;
-  overflow: auto;
-}
-
-
-@media (max-width: 520px) {
-  .messages {
-    padding: 12px;
-  }
-  .room-header {
-    padding: 0 12px;
-  }
+  padding: 16px 16px 12px;
 }
 </style>

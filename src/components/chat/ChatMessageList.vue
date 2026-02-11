@@ -2,8 +2,9 @@
   <div class="messages">
     <component
       v-for="(m, i) in messages"
-      :key="i"
+      :key="msgId(m, i)"
       :is="resolveComponent(m.role)"
+      :msgId="msgId(m, i)"
       :message="m"
       :render="render"
     />
@@ -53,6 +54,13 @@ export default {
   },
 
   methods: {
+    msgId(m, i) {
+      const role = m?.role === 'user' ? 'u' : 'a';
+      const ts = m?.id ?? m?.ts ?? m?.createdAt ?? m?.created_at ?? (Date.now() + i);
+      return role + "-" + ts + "-" + i;
+    },
+
+
     render(text) {
       return renderMarkdown(text);
     },

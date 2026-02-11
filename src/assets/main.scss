@@ -63,6 +63,24 @@
   --chat-bubble-ai-bg: var(--bg-elevated);
   --chat-code-bg: var(--code-bg, rgba(0, 0, 0, 0.08));
   --chat-code-text: var(--code-text, var(--text-primary));
+
+  /* chat search overlay (themeable) */
+  --chat-search-hit-bg: rgba(255, 225, 130, 0.55);
+  --chat-search-hit-active-bg: rgba(255, 190, 80, 0.70);
+  --chat-search-hit-radius: 4px;
+}
+
+/* =========================================================
+   CHAT SEARCH OVERLAY (global, because overlay nodes are injected by JS)
+   ========================================================= */
+
+.chat-search-overlay-layer .chat-search-hit {
+  border-radius: var(--chat-search-hit-radius);
+  background: var(--chat-search-hit-bg);
+}
+
+.chat-search-overlay-layer .chat-search-hit.is-active {
+  background: var(--chat-search-hit-active-bg);
 }
 /* =========================================================
    THEME TOKENS
