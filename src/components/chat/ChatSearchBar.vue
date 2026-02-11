@@ -23,16 +23,16 @@
         <span class="icon">⚙</span>
       </button>
 
-      <!-- 하이라이트 토글 -->
+      <!-- ✅ Regex 모드에서만 Search 버튼 표시 -->
       <button
+        v-if="options.mode === 'regex'"
         type="button"
         class="btn"
-        :class="{ on: options.highlight }"
-        title="Highlight"
-        @click="toggleHighlight"
+        title="Run search"
+        @click="runSearch"
       >
         <span class="icon">
-          <AppIcon name="search" size="xl" :muted="!options.highlight" />
+          <AppIcon name="search" size="xl" />
         </span>
       </button>
 
@@ -99,7 +99,7 @@
       </button>
     </div>
 
-    <!-- Options panel (collapsible, like sidebar "more") -->
+    <!-- Options panel -->
     <transition name="opt">
       <div v-if="showOptions" class="options">
         <div class="opt-row">
@@ -162,6 +162,20 @@
           </label>
         </div>
 
+        <div class="opt-num-grid">
+          <label class="num">
+            <span class="num-label">Yield(nodes)</span>
+            <input
+              class="num-input"
+              type="number"
+              min="0"
+              step="50"
+              :value="options.yieldEveryNodes"
+              @input="onYieldEveryNodes"
+            />
+          </label>
+        </div>
+
         <div class="opt-actions">
           <button type="button" class="btn btn-reset" @click="resetOptions">
             Reset
@@ -198,12 +212,14 @@ export default {
       keyword: "",
       matches: [],
       activeIndex: 0,
+
       showOptions: false,
       options: mergeSearchOptions(DEFAULT_SEARCH_OPTIONS),
 
       _abort: null,
       _raf: 0,
       _anchorMsgId: null,
+      _listening: false,
     };
   },
 
@@ -246,6 +262,7 @@ export default {
       this.$nextTick(() => {
         this.$refs.input?.focus?.();
         this.setupContainerListener();
+        // keyword 모드는 즉시 검색, regex도 초기엔 실행해줘도 됨(원하면 제거 가능)
         this.runSearch();
       });
     },
@@ -259,83 +276,101 @@ export default {
       this.clear();
     },
 
+    // ✅ 빠졌던 함수: 옵션 패널 토글
+    toggleOptions() {
+      this.showOptions = !this.showOptions;
+      // 옵션 패널 열고 닫을 때 높이가 변하므로 overlay 위치 재계산
+      this.$nextTick(() => this.scheduleRender());
+    },
+
     // UI handlers
     onInput(e) {
       this.keyword = String(e?.target?.value ?? "");
-      this.runSearch();
+
+      // ✅ KEY 모드일 때만 key-in 즉시 검색
+      if (this.options.mode === "keyword") {
+        this.runSearch();
+      }
     },
 
     onEnter(e) {
+      // ✅ REGEX 모드: Enter는 "검색 실행"
+      if (this.options.mode === "regex") {
+        this.runSearch();
+        return;
+      }
+
+      // ✅ KEY 모드: Enter는 next / Shift+Enter는 prev
       if (e?.shiftKey) this.prev();
       else this.next();
     },
 
-    toggleOptions() {
-      this.showOptions = !this.showOptions;
-      // Reflow overlay when options panel opens/closes (height changes)
-      this.$nextTick(() => this.scheduleRender());
-    },
-
-    // ===== options mutations (side-effect minimal) =====
+    // ===== options mutations =====
     setMode(mode) {
-      const next = mergeSearchOptions({ ...this.options, mode });
-      this.options = next;
+      this.options = mergeSearchOptions({ ...this.options, mode });
+
+      // 모드 변경 시:
+      // - keyword: 입력값 있으면 즉시 검색 결과를 보여주는 편이 자연스러움
+      // - regex: 기존 결과 유지 or 즉시 재검색(원하면 유지로 바꿔도 됨)
       this.runSearch();
     },
 
     toggleCaseSensitive() {
-      const next = mergeSearchOptions({
+      this.options = mergeSearchOptions({
         ...this.options,
         caseSensitive: !this.options.caseSensitive,
       });
-      this.options = next;
       this.runSearch();
     },
 
     toggleWholeWord() {
-      const next = mergeSearchOptions({
+      this.options = mergeSearchOptions({
         ...this.options,
         wholeWord: !this.options.wholeWord,
       });
-      this.options = next;
       this.runSearch();
     },
 
     toggleFirstLast() {
-      const next = mergeSearchOptions({
+      this.options = mergeSearchOptions({
         ...this.options,
         enableFirstLast: !this.options.enableFirstLast,
       });
-      this.options = next;
-      // no need to re-search; only UI changes
+      // UI 옵션이라 re-search 불필요
     },
 
     toggleHighlight() {
-      const next = mergeSearchOptions({
+      this.options = mergeSearchOptions({
         ...this.options,
         highlight: !this.options.highlight,
       });
-      this.options = next;
 
       const c = this.getContainer();
       if (!c) return;
 
-      // ✅ immediate on/off without re-search
-      if (!this.options.highlight) {
-        clearOverlay(c);
-      } else {
-        this.scheduleRender();
-      }
+      if (!this.options.highlight) clearOverlay(c);
+      else this.scheduleRender();
+    },
+
+    onYieldEveryNodes(e) {
+      const v = Number(e?.target?.value ?? 250);
+      this.options = mergeSearchOptions({
+        ...this.options,
+        yieldEveryNodes: Number.isFinite(v) ? Math.max(10, v) : 250,
+      });
+      // 검색 로직에 영향 -> 재검색
+      this.runSearch();
     },
 
     resetOptions() {
       this.options = mergeSearchOptions(DEFAULT_SEARCH_OPTIONS);
-      // highlight reset should apply immediately
+
       const c = this.getContainer();
       if (c) {
         if (!this.options.highlight) clearOverlay(c);
         else this.scheduleRender();
       }
+
       this.runSearch();
     },
 
@@ -386,6 +421,7 @@ export default {
     getRoots() {
       const c = this.getContainer();
       if (!c) return [];
+
       const roots = Array.from(c.querySelectorAll('[data-chat-msg-root="1"]'));
       if (roots.length) return roots;
 
@@ -400,13 +436,17 @@ export default {
       if (!c) return;
 
       const kw = String(this.keyword || "").trim();
-      this.cancel();
 
+      // ✅ regex 모드에서 "빈 값"이면 clear
       if (!kw) {
+        this.cancel();
         this.clear();
         return;
       }
 
+      // ✅ regex 모드에서는 입력중 자동검색하지 않으므로,
+      // enter/click 외에도 openWith 시점에서 호출되면 검색됨 (원하면 조건 추가 가능)
+      this.cancel();
       const controller = new AbortController();
       this._abort = controller;
 
@@ -429,7 +469,6 @@ export default {
         this.matches = matches;
         this.activeIndex = computeInitialIndex(matches, this._anchorMsgId);
 
-        // Scroll first, then render overlay (positions depend on scroll)
         this.jumpToActive({ render: true, align: "start" });
       } catch (e) {
         if (e?.name !== "AbortError") console.warn("[chat-search] failed", e);
@@ -469,6 +508,7 @@ export default {
           matches: this.matches,
           activeIndex: this.activeIndex,
           highlight: this.options.highlight,
+          options: this.options,
         });
       });
     },
@@ -698,6 +738,38 @@ export default {
 .opt-leave-to {
   opacity: 0;
   transform: translateY(-6px);
+}
+
+.opt-num-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  margin-top: 10px;
+}
+
+.num {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.num-label {
+  font-size: 12px;
+  color: var(--text-muted, var(--muted));
+}
+
+.num-input {
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  padding: 0 10px;
+  outline: none;
+}
+
+.num-input:focus {
+  border-color: var(--accent);
 }
 
 @media (max-width: 520px) {

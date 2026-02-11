@@ -1,8 +1,3 @@
-// src/utils/chatSearchOverlay.js
-// Overlay search/highlight without mutating markdown DOM.
-//
-// Notes:
-// - Scans text nodes under provided roots (defaults from SearchBar).
 /* eslint-disable no-continue */
 
 const OVERLAY_CLASS = "chat-search-overlay-layer";
@@ -20,27 +15,32 @@ function norm(s, caseSensitive) {
   return caseSensitive ? t : t.toLowerCase();
 }
 
-// === Search options (extensible) ===
-// Keep this object extensible: add new flags here later.
+/* =========================================================
+   DEFAULT OPTIONS (overlayWindow 완전 제거)
+========================================================= */
 export const DEFAULT_SEARCH_OPTIONS = {
   mode: "keyword", // keyword | regex
   caseSensitive: false,
   wholeWord: false,
   highlight: true,
   enableFirstLast: true,
-
-  overlayWindow: 0, // active 기준 ±60 match만 하이라이트 렌더이며 0으로 설정하면 전체 하이라이트
-  yieldEveryNodes: 250, // 텍스트 노드 250개마다 잠깐 쉬어서 UI 프리징 방지 0으로 설정하면 비활성화
+  yieldEveryNodes: 250, // UI 프리징 방지용
 };
 
 export function mergeSearchOptions(user = {}) {
   return { ...DEFAULT_SEARCH_OPTIONS, ...(user || {}) };
 }
 
+/* =========================================================
+   Overlay Layer
+========================================================= */
 export function ensureOverlayLayer(container) {
   if (!container) return null;
+
   const cs = window.getComputedStyle(container);
-  if (cs.position === "static") container.style.position = "relative";
+  if (cs.position === "static") {
+    container.style.position = "relative";
+  }
 
   let layer = container.querySelector(`:scope > .${OVERLAY_CLASS}`);
   if (!layer) {
@@ -52,6 +52,7 @@ export function ensureOverlayLayer(container) {
     layer.style.zIndex = "80";
     container.appendChild(layer);
   }
+
   return layer;
 }
 
@@ -59,6 +60,10 @@ export function clearOverlay(container) {
   const layer = container?.querySelector?.(`:scope > .${OVERLAY_CLASS}`);
   if (layer) layer.innerHTML = "";
 }
+
+/* =========================================================
+   Match Utilities
+========================================================= */
 
 function closestMsgId(textNode) {
   const el = textNode?.parentElement?.closest?.("[data-chat-msg-id]");
@@ -90,11 +95,13 @@ function matchWholeWordAt(raw, start, end, wholeWord) {
   return !isWordChar(prev) && !isWordChar(next);
 }
 
+/* =========================================================
+   MATCH SCAN (성능 안전 구조)
+========================================================= */
 export async function scanMatchesAsync({
   roots,
   keyword,
   signal,
-  // Backward-compat: allow direct caseSensitive flag
   caseSensitive = undefined,
   options = {},
 }) {
@@ -103,20 +110,22 @@ export async function scanMatchesAsync({
   if (!kRaw) return out;
 
   const opt = mergeSearchOptions(options);
-  if (typeof caseSensitive === "boolean") opt.caseSensitive = caseSensitive;
+  if (typeof caseSensitive === "boolean") {
+    opt.caseSensitive = caseSensitive;
+  }
 
   const mode = opt.mode || "keyword";
   const yieldEvery = Math.max(50, Number(opt.yieldEveryNodes || 250));
 
   let rx = null;
+
   if (mode === "regex") {
     try {
       const flags = opt.caseSensitive ? "g" : "gi";
       const body = opt.wholeWord ? `\\b(?:${kRaw})\\b` : kRaw;
       rx = new RegExp(body, flags);
     } catch {
-      // Invalid regex => no matches
-      return out;
+      return out; // invalid regex
     }
   }
 
@@ -127,7 +136,6 @@ export async function scanMatchesAsync({
     const root = roots[i];
     if (!root) continue;
 
-    // Let UI breathe between roots
     await sleep0();
 
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
@@ -140,8 +148,9 @@ export async function scanMatchesAsync({
     while ((node = walker.nextNode())) {
       if (signal?.aborted) throw abortErr();
 
-      // Yield periodically to keep UI responsive on huge DOMs
-      if (++seen % yieldEvery === 0) await sleep0();
+      if (++seen % yieldEvery === 0) {
+        await sleep0();
+      }
 
       const raw = node.nodeValue || "";
       if (!raw) continue;
@@ -159,12 +168,12 @@ export async function scanMatchesAsync({
 
           out.push({ node, start, end, msgId: closestMsgId(node) });
 
-          // Prevent infinite loop on zero-length match
           if (rx.lastIndex === start) rx.lastIndex = start + 1;
         }
       } else {
         const text = norm(raw, opt.caseSensitive);
         let from = 0;
+
         while (true) {
           const idx = text.indexOf(kNorm, from);
           if (idx === -1) break;
@@ -185,28 +194,26 @@ export async function scanMatchesAsync({
   return out;
 }
 
+/* =========================================================
+   VIEWPORT 기반 Overlay 렌더 (overlayWindow 제거)
+========================================================= */
 export function renderOverlay({
   container,
   matches,
   activeIndex = 0,
   highlight = true,
-  options = {},
 }) {
   const layer = ensureOverlayLayer(container);
   if (!layer) return;
+
   layer.innerHTML = "";
   if (!highlight || !matches?.length) return;
 
-  const opt = mergeSearchOptions(options);
-  const win = Math.max(0, Number(opt.overlayWindow ?? 60));
-  const from = win ? Math.max(0, activeIndex - win) : 0;
-  const to = win
-    ? Math.min(matches.length - 1, activeIndex + win)
-    : matches.length - 1;
-
+  const visibleTop = container.scrollTop;
+  const visibleBottom = visibleTop + container.clientHeight;
   const cRect = container.getBoundingClientRect();
 
-  for (let i = from; i <= to; i++) {
+  for (let i = 0; i < matches.length; i++) {
     const m = matches[i];
     if (!m?.node) continue;
 
@@ -216,24 +223,33 @@ export function renderOverlay({
     for (const rect of rects) {
       if (!rect || rect.width <= 0 || rect.height <= 0) continue;
 
+      const top = rect.top - cRect.top + container.scrollTop;
+
+      // ✅ 현재 화면 안에 있는 것만 하이라이트
+      if (top < visibleTop || top > visibleBottom) continue;
+
       const d = document.createElement("div");
       d.className = "chat-search-hit" + (i === activeIndex ? " is-active" : "");
+
       d.style.position = "absolute";
       d.style.left = rect.left - cRect.left + container.scrollLeft + "px";
       d.style.top = rect.top - cRect.top + container.scrollTop + "px";
       d.style.width = rect.width + "px";
       d.style.height = rect.height + "px";
       d.style.borderRadius = "4px";
-      // Keep colors here for consistent visibility across themes
       d.style.background =
         i === activeIndex
           ? "rgba(255, 190, 80, 0.70)"
           : "rgba(255, 225, 130, 0.55)";
+
       layer.appendChild(d);
     }
   }
 }
 
+/* =========================================================
+   Navigation Helpers
+========================================================= */
 export function computeInitialIndex(matches, anchorMsgId) {
   if (!matches?.length) return 0;
   if (!anchorMsgId) return 0;
@@ -257,11 +273,17 @@ export function scrollToMatch({
   const topInContainer = rect.top - cRect.top + container.scrollTop;
 
   let targetTop = topInContainer;
-  if (align === "center")
-    targetTop = topInContainer - container.clientHeight / 2;
-  else if (align === "start") targetTop = topInContainer - 8;
-  else if (align === "end")
-    targetTop = topInContainer - container.clientHeight + rect.height + 8;
 
-  container.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+  if (align === "center") {
+    targetTop = topInContainer - container.clientHeight / 2;
+  } else if (align === "start") {
+    targetTop = topInContainer - 8;
+  } else if (align === "end") {
+    targetTop = topInContainer - container.clientHeight + rect.height + 8;
+  }
+
+  container.scrollTo({
+    top: Math.max(0, targetTop),
+    behavior: "smooth",
+  });
 }
