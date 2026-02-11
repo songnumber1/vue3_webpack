@@ -7,16 +7,21 @@
 
       <div class="room-right">
         <span class="room-sub">{{ assistantLabel }} · {{ modelId }}</span>
-        <button type="button" class="icon-btn" title="Search in chat" @click="toggleSearch">
-	          <AppIcon name="search" size="lg" />
+        <button
+          type="button"
+          class="icon-btn"
+          title="Search in chat"
+          @click="toggleSearch"
+        >
+          <AppIcon name="search" size="lg" />
         </button>
       </div>
     </div>
 
-    <ChatConversationSearchBar
+    <ChatSearchBar
       v-if="showRoomHeader"
       ref="searchBar"
-	      :container-el="messagesWrapEl"
+      :container-el="messagesWrapEl"
     />
 
     <div class="messages" ref="messagesWrap">
@@ -33,7 +38,7 @@ import AppIcon from "@/components/common/AppIcon.vue";
 import NewChatLanding from "@/components/chat/NewChatLanding.vue";
 import ChatMessageList from "@/components/chat/ChatMessageList.vue";
 import ChatInputBox from "@/components/chat/ChatInputBox.vue";
-import ChatConversationSearchBar from "@/components/chat/ChatConversationSearchBar.vue";
+import ChatSearchBar from "@/components/chat/ChatSearchBar.vue";
 import { useChatStore } from "@/stores/chatStore";
 
 export default {
@@ -43,7 +48,7 @@ export default {
     NewChatLanding,
     ChatMessageList,
     ChatInputBox,
-    ChatConversationSearchBar,
+    ChatSearchBar,
   },
 
   created() {

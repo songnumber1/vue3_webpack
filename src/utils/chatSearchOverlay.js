@@ -1,5 +1,9 @@
 // src/utils/chatSearchOverlay.js
 // Overlay search/highlight without mutating markdown DOM.
+//
+// Notes:
+// - Scans text nodes under provided roots (defaults from SearchBar).
+/* eslint-disable no-continue */
 
 const OVERLAY_CLASS = "chat-search-overlay-layer";
 
@@ -17,12 +21,16 @@ function norm(s, caseSensitive) {
 }
 
 // === Search options (extensible) ===
+// Keep this object extensible: add new flags here later.
 export const DEFAULT_SEARCH_OPTIONS = {
-  mode: "keyword",        // keyword | regex
+  mode: "keyword", // keyword | regex
   caseSensitive: false,
   wholeWord: false,
   highlight: true,
   enableFirstLast: true,
+
+  overlayWindow: 0, // active 기준 ±60 match만 하이라이트 렌더이며 0으로 설정하면 전체 하이라이트
+  yieldEveryNodes: 250, // 텍스트 노드 250개마다 잠깐 쉬어서 UI 프리징 방지 0으로 설정하면 비활성화
 };
 
 export function mergeSearchOptions(user = {}) {
@@ -41,7 +49,7 @@ export function ensureOverlayLayer(container) {
     layer.style.position = "absolute";
     layer.style.inset = "0";
     layer.style.pointerEvents = "none";
-    layer.style.zIndex = "50";
+    layer.style.zIndex = "80";
     container.appendChild(layer);
   }
   return layer;
@@ -71,6 +79,17 @@ function rangeForMatch(m) {
   return r;
 }
 
+function isWordChar(ch) {
+  return /[0-9A-Za-z_]/.test(ch || "");
+}
+
+function matchWholeWordAt(raw, start, end, wholeWord) {
+  if (!wholeWord) return true;
+  const prev = raw[start - 1];
+  const next = raw[end];
+  return !isWordChar(prev) && !isWordChar(next);
+}
+
 export async function scanMatchesAsync({
   roots,
   keyword,
@@ -84,30 +103,18 @@ export async function scanMatchesAsync({
   if (!kRaw) return out;
 
   const opt = mergeSearchOptions(options);
-  // Backward-compat wins if explicitly provided
   if (typeof caseSensitive === "boolean") opt.caseSensitive = caseSensitive;
 
   const mode = opt.mode || "keyword";
-
-  // Helpers
-  const isWordChar = (ch) => /[0-9A-Za-z_]/.test(ch || "");
-
-  const matchWholeWordAt = (raw, start, end) => {
-    if (!opt.wholeWord) return true;
-    const prev = raw[start - 1];
-    const next = raw[end];
-    // For latin word searches: require non-word around it
-    return !isWordChar(prev) && !isWordChar(next);
-  };
+  const yieldEvery = Math.max(50, Number(opt.yieldEveryNodes || 250));
 
   let rx = null;
   if (mode === "regex") {
     try {
       const flags = opt.caseSensitive ? "g" : "gi";
-      // If wholeWord: wrap with boundaries (latin)
       const body = opt.wholeWord ? `\\b(?:${kRaw})\\b` : kRaw;
       rx = new RegExp(body, flags);
-    } catch (e) {
+    } catch {
       // Invalid regex => no matches
       return out;
     }
@@ -120,6 +127,7 @@ export async function scanMatchesAsync({
     const root = roots[i];
     if (!root) continue;
 
+    // Let UI breathe between roots
     await sleep0();
 
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
@@ -127,8 +135,14 @@ export async function scanMatchesAsync({
     });
 
     let node;
+    let seen = 0;
+
     while ((node = walker.nextNode())) {
       if (signal?.aborted) throw abortErr();
+
+      // Yield periodically to keep UI responsive on huge DOMs
+      if (++seen % yieldEvery === 0) await sleep0();
+
       const raw = node.nodeValue || "";
       if (!raw) continue;
 
@@ -137,8 +151,10 @@ export async function scanMatchesAsync({
         let m;
         while ((m = rx.exec(raw))) {
           if (signal?.aborted) throw abortErr();
+
           const start = m.index;
-          const end = start + (m[0]?.length || 0);
+          const len = m[0]?.length || 0;
+          const end = start + len;
           if (end <= start) break;
 
           out.push({ node, start, end, msgId: closestMsgId(node) });
@@ -156,7 +172,7 @@ export async function scanMatchesAsync({
           const start = idx;
           const end = idx + kRaw.length;
 
-          if (matchWholeWordAt(raw, start, end)) {
+          if (matchWholeWordAt(raw, start, end, opt.wholeWord)) {
             out.push({ node, start, end, msgId: closestMsgId(node) });
           }
 
@@ -174,16 +190,26 @@ export function renderOverlay({
   matches,
   activeIndex = 0,
   highlight = true,
+  options = {},
 }) {
   const layer = ensureOverlayLayer(container);
   if (!layer) return;
   layer.innerHTML = "";
   if (!highlight || !matches?.length) return;
 
+  const opt = mergeSearchOptions(options);
+  const win = Math.max(0, Number(opt.overlayWindow ?? 60));
+  const from = win ? Math.max(0, activeIndex - win) : 0;
+  const to = win
+    ? Math.min(matches.length - 1, activeIndex + win)
+    : matches.length - 1;
+
   const cRect = container.getBoundingClientRect();
 
-  for (let i = 0; i < matches.length; i++) {
+  for (let i = from; i <= to; i++) {
     const m = matches[i];
+    if (!m?.node) continue;
+
     const r = rangeForMatch(m);
     const rects = Array.from(r.getClientRects());
 
@@ -197,7 +223,12 @@ export function renderOverlay({
       d.style.top = rect.top - cRect.top + container.scrollTop + "px";
       d.style.width = rect.width + "px";
       d.style.height = rect.height + "px";
-      // Theme is handled via global CSS variables (no hard-coded colors here)
+      d.style.borderRadius = "4px";
+      // Keep colors here for consistent visibility across themes
+      d.style.background =
+        i === activeIndex
+          ? "rgba(255, 190, 80, 0.70)"
+          : "rgba(255, 225, 130, 0.55)";
       layer.appendChild(d);
     }
   }
@@ -214,7 +245,7 @@ export function scrollToMatch({
   container,
   matches,
   activeIndex,
-  align = "center", // start|center
+  align = "center", // start|center|end
 }) {
   const m = matches?.[activeIndex];
   if (!container || !m) return;
@@ -222,12 +253,15 @@ export function scrollToMatch({
   const r = rangeForMatch(m);
   const rect = r.getBoundingClientRect();
   const cRect = container.getBoundingClientRect();
+
   const topInContainer = rect.top - cRect.top + container.scrollTop;
 
   let targetTop = topInContainer;
   if (align === "center")
     targetTop = topInContainer - container.clientHeight / 2;
   else if (align === "start") targetTop = topInContainer - 8;
+  else if (align === "end")
+    targetTop = topInContainer - container.clientHeight + rect.height + 8;
 
   container.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
 }

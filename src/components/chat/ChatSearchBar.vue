@@ -126,22 +126,38 @@
 
         <div class="opt-grid">
           <label class="chk">
-            <input type="checkbox" :checked="options.caseSensitive" @change="toggleCaseSensitive" />
+            <input
+              type="checkbox"
+              :checked="options.caseSensitive"
+              @change="toggleCaseSensitive"
+            />
             <span>Case</span>
           </label>
 
           <label class="chk">
-            <input type="checkbox" :checked="options.wholeWord" @change="toggleWholeWord" />
+            <input
+              type="checkbox"
+              :checked="options.wholeWord"
+              @change="toggleWholeWord"
+            />
             <span>Whole word</span>
           </label>
 
           <label class="chk">
-            <input type="checkbox" :checked="options.enableFirstLast" @change="toggleFirstLast" />
+            <input
+              type="checkbox"
+              :checked="options.enableFirstLast"
+              @change="toggleFirstLast"
+            />
             <span>First/Last</span>
           </label>
 
           <label class="chk">
-            <input type="checkbox" :checked="options.highlight" @change="toggleHighlight" />
+            <input
+              type="checkbox"
+              :checked="options.highlight"
+              @change="toggleHighlight"
+            />
             <span>Highlight</span>
           </label>
         </div>
@@ -169,7 +185,7 @@ import {
 } from "@/utils/chatSearchOverlay";
 
 export default {
-  name: "ChatConversationSearchBar",
+  name: "ChatSearchBar",
   components: { AppIcon },
 
   props: {
@@ -268,25 +284,37 @@ export default {
     },
 
     toggleCaseSensitive() {
-      const next = mergeSearchOptions({ ...this.options, caseSensitive: !this.options.caseSensitive });
+      const next = mergeSearchOptions({
+        ...this.options,
+        caseSensitive: !this.options.caseSensitive,
+      });
       this.options = next;
       this.runSearch();
     },
 
     toggleWholeWord() {
-      const next = mergeSearchOptions({ ...this.options, wholeWord: !this.options.wholeWord });
+      const next = mergeSearchOptions({
+        ...this.options,
+        wholeWord: !this.options.wholeWord,
+      });
       this.options = next;
       this.runSearch();
     },
 
     toggleFirstLast() {
-      const next = mergeSearchOptions({ ...this.options, enableFirstLast: !this.options.enableFirstLast });
+      const next = mergeSearchOptions({
+        ...this.options,
+        enableFirstLast: !this.options.enableFirstLast,
+      });
       this.options = next;
       // no need to re-search; only UI changes
     },
 
     toggleHighlight() {
-      const next = mergeSearchOptions({ ...this.options, highlight: !this.options.highlight });
+      const next = mergeSearchOptions({
+        ...this.options,
+        highlight: !this.options.highlight,
+      });
       this.options = next;
 
       const c = this.getContainer();
@@ -326,13 +354,15 @@ export default {
 
     prev() {
       if (!this.total) return;
-      this.activeIndex = this.activeIndex <= 0 ? this.total - 1 : this.activeIndex - 1;
+      this.activeIndex =
+        this.activeIndex <= 0 ? this.total - 1 : this.activeIndex - 1;
       this.jumpToActive({ render: true });
     },
 
     next() {
       if (!this.total) return;
-      this.activeIndex = this.activeIndex >= this.total - 1 ? 0 : this.activeIndex + 1;
+      this.activeIndex =
+        this.activeIndex >= this.total - 1 ? 0 : this.activeIndex + 1;
       this.jumpToActive({ render: true });
     },
 
@@ -525,7 +555,10 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 .btn:hover {
@@ -569,7 +602,7 @@ export default {
   background: var(--bg-elevated);
   border-radius: 14px;
   padding: 10px 12px;
-  box-shadow: var(--shadow-sm, 0 10px 26px rgba(0,0,0,0.10));
+  box-shadow: var(--shadow-sm, 0 10px 26px rgba(0, 0, 0, 0.1));
 }
 
 .opt-row {
@@ -657,7 +690,9 @@ export default {
 
 .opt-enter-active,
 .opt-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 .opt-enter-from,
 .opt-leave-to {
