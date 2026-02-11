@@ -16,6 +16,19 @@ function norm(s, caseSensitive) {
   return caseSensitive ? t : t.toLowerCase();
 }
 
+// === Search options (extensible) ===
+export const DEFAULT_SEARCH_OPTIONS = {
+  mode: "keyword",        // keyword | regex
+  caseSensitive: false,
+  wholeWord: false,
+  highlight: true,
+  enableFirstLast: true,
+};
+
+export function mergeSearchOptions(user = {}) {
+  return { ...DEFAULT_SEARCH_OPTIONS, ...(user || {}) };
+}
+
 export function ensureOverlayLayer(container) {
   if (!container) return null;
   const cs = window.getComputedStyle(container);
@@ -28,7 +41,7 @@ export function ensureOverlayLayer(container) {
     layer.style.position = "absolute";
     layer.style.inset = "0";
     layer.style.pointerEvents = "none";
-    layer.style.zIndex = "5";
+    layer.style.zIndex = "50";
     container.appendChild(layer);
   }
   return layer;
@@ -62,15 +75,47 @@ export async function scanMatchesAsync({
   roots,
   keyword,
   signal,
-  caseSensitive = false,
+  // Backward-compat: allow direct caseSensitive flag
+  caseSensitive = undefined,
+  options = {},
 }) {
   const out = [];
   const kRaw = String(keyword ?? "");
   if (!kRaw) return out;
 
-  const k = norm(kRaw, caseSensitive);
+  const opt = mergeSearchOptions(options);
+  // Backward-compat wins if explicitly provided
+  if (typeof caseSensitive === "boolean") opt.caseSensitive = caseSensitive;
 
-  for (let i = 0; i < roots.length; i++) {
+  const mode = opt.mode || "keyword";
+
+  // Helpers
+  const isWordChar = (ch) => /[0-9A-Za-z_]/.test(ch || "");
+
+  const matchWholeWordAt = (raw, start, end) => {
+    if (!opt.wholeWord) return true;
+    const prev = raw[start - 1];
+    const next = raw[end];
+    // For latin word searches: require non-word around it
+    return !isWordChar(prev) && !isWordChar(next);
+  };
+
+  let rx = null;
+  if (mode === "regex") {
+    try {
+      const flags = opt.caseSensitive ? "g" : "gi";
+      // If wholeWord: wrap with boundaries (latin)
+      const body = opt.wholeWord ? `\\b(?:${kRaw})\\b` : kRaw;
+      rx = new RegExp(body, flags);
+    } catch (e) {
+      // Invalid regex => no matches
+      return out;
+    }
+  }
+
+  const kNorm = norm(kRaw, opt.caseSensitive);
+
+  for (let i = 0; i < (roots || []).length; i++) {
     if (signal?.aborted) throw abortErr();
     const root = roots[i];
     if (!root) continue;
@@ -85,19 +130,38 @@ export async function scanMatchesAsync({
     while ((node = walker.nextNode())) {
       if (signal?.aborted) throw abortErr();
       const raw = node.nodeValue || "";
-      const text = norm(raw, caseSensitive);
+      if (!raw) continue;
 
-      let from = 0;
-      while (true) {
-        const idx = text.indexOf(k, from);
-        if (idx === -1) break;
-        out.push({
-          node,
-          start: idx,
-          end: idx + kRaw.length,
-          msgId: closestMsgId(node),
-        });
-        from = idx + Math.max(1, kRaw.length);
+      if (rx) {
+        rx.lastIndex = 0;
+        let m;
+        while ((m = rx.exec(raw))) {
+          if (signal?.aborted) throw abortErr();
+          const start = m.index;
+          const end = start + (m[0]?.length || 0);
+          if (end <= start) break;
+
+          out.push({ node, start, end, msgId: closestMsgId(node) });
+
+          // Prevent infinite loop on zero-length match
+          if (rx.lastIndex === start) rx.lastIndex = start + 1;
+        }
+      } else {
+        const text = norm(raw, opt.caseSensitive);
+        let from = 0;
+        while (true) {
+          const idx = text.indexOf(kNorm, from);
+          if (idx === -1) break;
+
+          const start = idx;
+          const end = idx + kRaw.length;
+
+          if (matchWholeWordAt(raw, start, end)) {
+            out.push({ node, start, end, msgId: closestMsgId(node) });
+          }
+
+          from = idx + Math.max(1, kRaw.length);
+        }
       }
     }
   }

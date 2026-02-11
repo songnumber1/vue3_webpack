@@ -177,7 +177,7 @@ export default {
   name: "AppIcon",
   props: {
     name: { type: String, required: true },
-    size: { type: String, default: "md" }, // xs|sm|md|lg
+    size: { type: String, default: "md" }, // xs|sm|md|lg|xl
     muted: { type: Boolean, default: false },
   },
 };
