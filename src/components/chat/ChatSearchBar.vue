@@ -217,7 +217,8 @@ export default {
   components: { AppIcon },
 
   props: {
-    containerEl: { type: Object, default: null },
+    // ✅ DI 제거: 컨테이너 엘리먼트를 직접 주입하지 않고, 클래스명으로만 찾는다
+    containerClass: { type: String, default: "messages" },
   },
 
   data() {
@@ -234,6 +235,7 @@ export default {
       _raf: 0,
       _anchorMsgId: null,
       _listening: false,
+      _listeningEls: [],
 
       lastExecutedKeyword: "", // 🔥 추가: 마지막 실행된 검색어 저장
     };
@@ -262,8 +264,20 @@ export default {
   methods: {
     // 검색 대상 컨테이너 반환
     getContainer() {
+      // ✅ scope를 chat-box로 제한해 같은 클래스가 여러 개여도 안전하게 찾음
+      const scope = this.$el?.closest?.(".chat-box") || document;
+      const cls = String(this.containerClass || "messages").trim();
+      if (cls) {
+        const el =
+          scope.querySelector?.("." + cls) ||
+          document.querySelector?.("." + cls);
+        if (el) return el;
+      }
+
+      // fallback (legacy)
       return (
-        this.containerEl ||
+        scope.querySelector?.(".body-contents") ||
+        scope.querySelector?.(".messages") ||
         document.querySelector(".body-contents") ||
         document.querySelector(".messages") ||
         null
@@ -491,6 +505,9 @@ export default {
 
         this.matches = matches;
 
+        // ✅ 검색 결과가 테이블 내부일 수 있으니 scroll listener를 갱신
+        this.refreshScrollListeners();
+
         // 🔥 추가: 실행된 검색어 저장
         this.lastExecutedKeyword = kw;
 
@@ -556,19 +573,53 @@ export default {
       this.scheduleRender();
     },
 
+    refreshScrollListeners() {
+      if (!this.open) return;
+      if (!this._listening) return;
+      // DOM 구조(테이블 렌더 등)가 바뀔 수 있으므로 리스너 대상 재수집
+      this.teardownContainerListener();
+      this.setupContainerListener();
+    },
+
     setupContainerListener() {
       const c = this.getContainer();
       if (!c || this._listening) return;
 
-      c.addEventListener("scroll", this.onContainerScroll, { passive: true });
+      // ✅ root container 스크롤
+      const els = new Set();
+      els.add(c);
+
+      // ✅ 테이블/코드 등 내부 스크롤 컨테이너도 함께 리스닝 (md-table-scroll)
+      // - 검색 결과가 테이블 내부에 있을 때, 테이블 스크롤에서도 overlay 재계산 필요
+      const nested = Array.from(c.querySelectorAll(".md-table-scroll"));
+      nested.forEach((el) => els.add(el));
+
+      // ✅ (옵션) 코드블럭 스크롤도 감지하고 싶으면 클래스 추가 가능
+      // const codeNested = Array.from(c.querySelectorAll("pre"));
+      // codeNested.forEach((el) => els.add(el));
+
+      this._listeningEls = Array.from(els);
+
+      // scroll 이벤트는 bubble이 약하므로 요소별로 직접 리스너 등록
+      this._listeningEls.forEach((el) => {
+        el.addEventListener("scroll", this.onContainerScroll, {
+          passive: true,
+        });
+      });
+
+      // resize / layout 변동용
       this._listening = true;
     },
-
     teardownContainerListener() {
-      const c = this.getContainer();
-      if (!c || !this._listening) return;
+      if (!this._listening) return;
 
-      c.removeEventListener("scroll", this.onContainerScroll);
+      (this._listeningEls || []).forEach((el) => {
+        try {
+          el.removeEventListener("scroll", this.onContainerScroll);
+        } catch (_) {}
+      });
+
+      this._listeningEls = [];
       this._listening = false;
     },
   },

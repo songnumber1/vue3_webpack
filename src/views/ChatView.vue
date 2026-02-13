@@ -21,7 +21,7 @@
     <ChatSearchBar
       v-if="showRoomHeader"
       ref="searchBar"
-      :container-el="messagesWrapEl"
+      container-class="messages"
     />
 
     <div class="messages" ref="messagesWrap">

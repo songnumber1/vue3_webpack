@@ -38,6 +38,69 @@ export function mergeSearchOptions(user = {}) {
 }
 
 /* =========================================================
+   Scroll / Overlay container helpers
+========================================================= */
+
+function getOverflowStyle(cs) {
+  return `${cs.overflow || ""} ${cs.overflowY || ""} ${cs.overflowX || ""}`.toLowerCase();
+}
+
+function isScrollable(el) {
+  if (!el || el === document.body || el === document.documentElement) return false;
+  if (!(el instanceof Element)) return false;
+
+  const cs = window.getComputedStyle(el);
+  const overflow = getOverflowStyle(cs);
+  const canScrollY = /(auto|scroll|overlay)/.test(overflow) && el.scrollHeight > el.clientHeight + 1;
+  const canScrollX = /(auto|scroll|overlay)/.test(overflow) && el.scrollWidth > el.clientWidth + 1;
+
+  return canScrollY || canScrollX;
+}
+
+/**
+ * ✅ 텍스트 노드가 속한 "가장 가까운 스크롤 컨테이너"를 찾아 반환
+ * - 내부에 스크롤(예: md-table-scroll)이 있으면 그 컨테이너를 반환
+ * - 없으면 rootContainer를 반환
+ */
+export function resolveOverlayContainer(textNode, rootContainer) {
+  if (!rootContainer || !textNode) return rootContainer || null;
+
+  let el = textNode.parentElement;
+  while (el && el !== rootContainer) {
+    if (isScrollable(el)) return el;
+    el = el.parentElement;
+  }
+  return rootContainer;
+}
+
+/**
+ * rootContainer ~ 텍스트노드 사이의 "스크롤 가능한 조상"들을 (outer -> inner) 순서로 반환
+ * - rootContainer가 scrollable이면 포함됨
+ */
+function collectScrollableAncestors(textNode, rootContainer) {
+  const chain = [];
+  if (!rootContainer || !textNode) return chain;
+
+  const els = [];
+  let el = textNode.parentElement;
+  while (el) {
+    els.push(el);
+    if (el === rootContainer) break;
+    el = el.parentElement;
+  }
+
+  // els: inner -> outer, reverse then pick scrollables
+  for (let i = els.length - 1; i >= 0; i--) {
+    const e = els[i];
+    if (e === rootContainer || isScrollable(e)) {
+      // rootContainer는 항상 포함, 중복 방지
+      if (!chain.includes(e)) chain.push(e);
+    }
+  }
+  return chain;
+}
+
+/* =========================================================
    Overlay Layer 생성 / 제거
 ========================================================= */
 
@@ -52,7 +115,7 @@ export function ensureOverlayLayer(container) {
     container.style.position = "relative";
   }
 
-  // 기존 overlay 존재 여부 확인
+  // 기존 overlay 존재 여부 확인 (직계 자식 우선)
   let layer = container.querySelector(`:scope > .${OVERLAY_CLASS}`);
 
   if (!layer) {
@@ -70,8 +133,16 @@ export function ensureOverlayLayer(container) {
 
 // overlay 내용 초기화
 export function clearOverlay(container) {
-  const layer = container?.querySelector?.(`:scope > .${OVERLAY_CLASS}`);
-  if (layer) layer.innerHTML = "";
+  if (!container) return;
+
+  // root container 자신이든, 내부 scroll container든 overlay가 생길 수 있으므로
+  // 범위 내 모든 overlay layer를 정리
+  const layers = container.querySelectorAll(`.${OVERLAY_CLASS}`);
+  layers.forEach((layer) => {
+    try {
+      layer.innerHTML = "";
+    } catch (_) {}
+  });
 }
 
 /* =========================================================
@@ -224,11 +295,29 @@ export async function scanMatchesAsync({
 }
 
 /* =========================================================
-   Viewport 기준 Overlay 렌더
-   - 현재 화면에 보이는 매칭만 표시
+   Viewport 기준 Overlay 렌더 (nested scroll 지원)
 ========================================================= */
-export function renderOverlay({
+
+/**
+ * ✅ 매칭별 overlayContainer를 계산하여 m._overlayContainer 에 저장
+ * - rootContainer가 바뀌거나 matches가 새로 만들어지면 다시 호출
+ */
+export function attachMatchOverlayContainers(rootContainer, matches) {
+  const set = new Set();
+  if (!rootContainer || !matches?.length) return set;
+
+  for (const m of matches) {
+    const oc = resolveOverlayContainer(m?.node, rootContainer);
+    m._overlayContainer = oc || rootContainer;
+    set.add(m._overlayContainer);
+  }
+  return set;
+}
+
+// overlay container 단위 렌더 (내부 스크롤 지원)
+function renderOverlayForContainer({
   container,
+  rootContainer,
   matches,
   activeIndex = 0,
   highlight = true,
@@ -244,9 +333,16 @@ export function renderOverlay({
   const visibleBottom = visibleTop + container.clientHeight; // 화면 하단
   const cRect = container.getBoundingClientRect();
 
+  // rootContainer가 아니라면 overlay가 container 내부에서만 그려지도록
+  // (container clip/overflow 는 container 자체 스타일에 의해 처리됨)
+
   for (let i = 0; i < matches.length; i++) {
     const m = matches[i];
     if (!m?.node) continue;
+
+    // 이 컨테이너에 속한 매칭만
+    const oc = m._overlayContainer || resolveOverlayContainer(m.node, rootContainer);
+    if (oc !== container) continue;
 
     const r = rangeForMatch(m);
     const rects = Array.from(r.getClientRects());
@@ -257,12 +353,12 @@ export function renderOverlay({
       const top = rect.top - cRect.top + container.scrollTop;
 
       // 현재 화면에 보이지 않으면 skip
-      if (top < visibleTop || top > visibleBottom) continue;
+      if (top + rect.height < visibleTop || top > visibleBottom) continue;
 
       const d = document.createElement("div");
       d.className = "chat-search-hit" + (i === activeIndex ? " is-active" : "");
 
-      // 위치 계산
+      // 위치 계산 (container 기준)
       d.style.position = "absolute";
       d.style.left = rect.left - cRect.left + container.scrollLeft + "px";
       d.style.top = rect.top - cRect.top + container.scrollTop + "px";
@@ -281,6 +377,39 @@ export function renderOverlay({
   }
 }
 
+/**
+ * ✅ 기존 API 유지
+ * - rootContainer(기본 messages) + 내부 스크롤(md-table-scroll 등) 모두 overlay 지원
+ */
+export function renderOverlay({
+  container: rootContainer,
+  matches,
+  activeIndex = 0,
+  highlight = true,
+}) {
+  if (!rootContainer) return;
+
+  // 기존 overlay 전체 정리 후 재렌더
+  clearOverlay(rootContainer);
+
+  if (!highlight || !matches?.length) return;
+
+  // matches에 overlayContainer 메타가 없으면 붙여준다
+  const containers = attachMatchOverlayContainers(rootContainer, matches);
+  containers.add(rootContainer);
+
+  // 컨테이너별 렌더
+  containers.forEach((c) => {
+    renderOverlayForContainer({
+      container: c,
+      rootContainer,
+      matches,
+      activeIndex,
+      highlight,
+    });
+  });
+}
+
 /* =========================================================
    Navigation Helpers
 ========================================================= */
@@ -294,23 +423,16 @@ export function computeInitialIndex(matches, anchorMsgId) {
   return idx >= 0 ? idx : 0;
 }
 
-// 특정 매칭 위치로 스크롤 이동
-export function scrollToMatch({
-  container,
-  matches,
-  activeIndex,
-  align = "center", // start|center|end
-}) {
-  const m = matches?.[activeIndex];
-  if (!container || !m) return;
-
-  const r = rangeForMatch(m);
-  const rect = r.getBoundingClientRect();
+// 특정 컨테이너 기준 range 스크롤
+function scrollRangeInContainer(container, range, align) {
+  const rect = range.getBoundingClientRect();
   const cRect = container.getBoundingClientRect();
 
   const topInContainer = rect.top - cRect.top + container.scrollTop;
+  const leftInContainer = rect.left - cRect.left + container.scrollLeft;
 
   let targetTop = topInContainer;
+  let targetLeft = leftInContainer;
 
   if (align === "center") {
     targetTop = topInContainer - container.clientHeight / 2;
@@ -320,13 +442,37 @@ export function scrollToMatch({
     targetTop = topInContainer - container.clientHeight + rect.height + 8;
   }
 
+  // 수평도 약간 보정 (표 가로 스크롤 대응)
+  targetLeft = Math.max(0, leftInContainer - 12);
+
   container.scrollTo({
     top: Math.max(0, targetTop),
+    left: targetLeft,
     behavior: "smooth",
   });
 }
 
-// 현재 화면에 보이는 첫 매칭 인덱스 계산
+// 특정 매칭 위치로 스크롤 이동 (nested scroll 지원)
+export function scrollToMatch({
+  container: rootContainer,
+  matches,
+  activeIndex,
+  align = "center", // start|center|end
+}) {
+  const m = matches?.[activeIndex];
+  if (!rootContainer || !m) return;
+
+  const r = rangeForMatch(m);
+
+  // outer -> inner 순서로 모든 scroll container를 맞춰준다
+  const chain = collectScrollableAncestors(m.node, rootContainer);
+
+  for (const c of chain) {
+    scrollRangeInContainer(c, r, align);
+  }
+}
+
+// 현재 화면에 보이는 첫 매칭 인덱스 계산 (기본 rootContainer 기준)
 export function computeViewportIndex(container, matches) {
   if (!container || !matches?.length) return 0;
 
