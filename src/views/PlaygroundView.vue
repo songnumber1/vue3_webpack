@@ -38,6 +38,7 @@ import PlaygroudModal from "@/components/sample/PlaygroudModal.vue";
 import PlaygroudStorage from "@/components/sample/PlaygroudStorage.vue";
 import PlaygroundNote from "@/components/sample/PlaygroundNote.vue";
 import PlaygroundLayoutTab from "@/components/sample/PlaygroundLayoutTab.vue";
+import PlaygroundSearchSnippet from "@/components/sample/PlaygroundSearchSnippet.vue";
 
 export default {
   name: "PlaygroundView",
@@ -57,6 +58,8 @@ export default {
         { key: "storage", label: "Storage", component: markRaw(PlaygroudStorage) },
         { key: "Note", label: "Note", component: markRaw(PlaygroundNote) },
         { key: "Layout", label: "Layout", component: markRaw(PlaygroundLayoutTab) },
+        { key: "SearchSnippet", label: "SearchSnippet", component: markRaw(PlaygroundSearchSnippet) },
+
       ],
       rows: [
         {
