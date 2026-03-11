@@ -139,6 +139,7 @@ export function renderMarkdown(text) {
   console.log("input:", text);
   console.log("normalized:", normalized);
 
+  console.log("processor:", processor.processSync(normalized).toString());
   return processor.processSync(normalized).toString();
   // return processor.processSync(text).toString();
 }
