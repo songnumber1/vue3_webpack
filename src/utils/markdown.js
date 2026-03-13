@@ -7,14 +7,6 @@ import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import rehypeHighlight from "rehype-highlight";
 import { visit } from "unist-util-visit";
-import { createMarkdownDollarPlugin } from "@/plugins/markdownDollarPlugin";
-
-/**
- * Markdown $ normalize plugin
- */
-const dollarPlugin = createMarkdownDollarPlugin({
-  mathOddApply: true,
-});
 
 /**
  * rehype plugin: convert ```mermaid blocks into <div class="mermaid">
@@ -134,7 +126,7 @@ const processor = unified()
  * Markdown → HTML renderer
  */
 export function renderMarkdown(text) {
-  const normalized = dollarPlugin.process(String(text ?? ""));
+  const normalized = preprocessAnswer(text);
 
   console.log("input:", text);
   console.log("normalized:", normalized);
@@ -178,4 +170,255 @@ export async function runMermaidWithin(containerEl) {
   } catch (e) {
     console.warn("[mermaid] render failed", e);
   }
+}
+
+/**
+ * preprocessAnswer
+ *
+ * 목적
+ * --------------------------------------------------
+ * AI 응답을 markdown parser(rehype / remark / KaTeX) 실행 전에 정리
+ *
+ * 주요 기능
+ * --------------------------------------------------
+ * 1. currency 변환
+ *    $200 → ＄200
+ *    $200 million → ＄200 million
+ *
+ * 2. math 보호
+ *    $x+y$
+ *    $5\sqrt{2}$
+ *
+ * 3. markdown 보호
+ *    code block
+ *    inline code
+ *    URL
+ *    template literal
+ *
+ * 4. KaTeX escape
+ *    % → \%
+ */
+
+export function preprocessAnswer(text, options = {}) {
+  const { escapeChars = ["%"], debug = false } = options;
+
+  if (!text) return text;
+
+  let result = "";
+  let i = 0;
+
+  let inCodeBlock = false;
+  let inInlineCode = false;
+
+  while (i < text.length) {
+    const char = text[i];
+
+    /**
+     * --------------------------------------------------
+     * code block 보호
+     *
+     * ```
+     * code
+     * ```
+     * --------------------------------------------------
+     */
+    if (text.startsWith("```", i)) {
+      inCodeBlock = !inCodeBlock;
+      result += "```";
+      i += 3;
+      continue;
+    }
+
+    if (inCodeBlock) {
+      result += char;
+      i++;
+      continue;
+    }
+
+    /**
+     * --------------------------------------------------
+     * inline code 보호
+     *
+     * `code`
+     * --------------------------------------------------
+     */
+    if (char === "`") {
+      inInlineCode = !inInlineCode;
+      result += char;
+      i++;
+      continue;
+    }
+
+    if (inInlineCode) {
+      result += char;
+      i++;
+      continue;
+    }
+
+    /**
+     * --------------------------------------------------
+     * $ 처리 시작
+     * --------------------------------------------------
+     */
+    if (char === "$") {
+      const next = text[i + 1];
+
+      /**
+       * template literal 보호
+       *
+       * ${value}
+       */
+      if (next === "{") {
+        result += "$";
+        i++;
+        continue;
+      }
+
+      /**
+       * URL 보호
+       *
+       * https://example.com/$value
+       */
+      const before = result.slice(-20);
+
+      if (/https?:\/\/\S*$/.test(before)) {
+        result += "$";
+        i++;
+        continue;
+      }
+
+      /**
+       * --------------------------------------------------
+       * 수식 여부 검사
+       *
+       * $x+y$
+       * $5\sqrt{2}$
+       * --------------------------------------------------
+       */
+      const nextDollar = text.indexOf("$", i + 1);
+
+      if (nextDollar !== -1) {
+        const inside = text.substring(i + 1, nextDollar);
+
+        /**
+         * 수식 판단
+         *
+         * 연산자 또는 latex 명령어 포함
+         */
+        if (/[+\-*/=^]/.test(inside) || /\\[a-zA-Z]+/.test(inside)) {
+          result += "$" + inside + "$";
+          i = nextDollar + 1;
+          continue;
+        }
+      }
+
+      /**
+       * --------------------------------------------------
+       * currency 검사
+       * --------------------------------------------------
+       */
+
+      const after = text.substring(i + 1).trimStart();
+
+      const tokens = after.split(/\s+/);
+
+      const firstToken = tokens[0] || "";
+
+      /**
+       * punctuation 제거
+       *
+       * million,
+       * million.
+       * million...
+       * million's
+       */
+      const secondTokenRaw = tokens[1] || "";
+
+      const secondToken = secondTokenRaw.match(/[a-zA-Z가-힣]+/)?.[0] || "";
+
+      /**
+       * 숫자 패턴
+       */
+      const numberRegex = /^[+-]?[0-9][0-9,.]*/;
+
+      /**
+       * 연산자
+       */
+      const mathOperatorRegex = /[+\-*/=^]/;
+
+      /**
+       * 단어
+       */
+      const wordRegex = /^[a-zA-Z가-힣]+$/;
+
+      /**
+       * --------------------------------------------------
+       * currency case 1
+       *
+       * $200 million
+       * $200 dollars
+       */
+      if (
+        numberRegex.test(firstToken) &&
+        secondToken &&
+        wordRegex.test(secondToken) &&
+        !mathOperatorRegex.test(secondToken)
+      ) {
+        if (debug) {
+          console.log("currency detected:", firstToken, secondToken);
+        }
+
+        result += "＄";
+        i++;
+        continue;
+      }
+
+      /**
+       * --------------------------------------------------
+       * currency case 2
+       *
+       * $200
+       */
+      if (numberRegex.test(firstToken)) {
+        if (debug) {
+          console.log("currency detected:", firstToken);
+        }
+
+        result += "＄";
+        i++;
+        continue;
+      }
+
+      /**
+       * 일반 $
+       */
+      result += "$";
+      i++;
+      continue;
+    }
+
+    result += char;
+    i++;
+  }
+
+  /**
+   * --------------------------------------------------
+   * KaTeX escape
+   *
+   * % → \%
+   * --------------------------------------------------
+   */
+
+  escapeChars.forEach((c) => {
+    const regex = new RegExp(`(?<!\\\\)\\${c}`, "g");
+
+    result = result.replace(regex, "\\" + c);
+  });
+
+  if (debug) {
+    console.log("==== preprocess end ====");
+    console.log(result);
+  }
+
+  return result;
 }
