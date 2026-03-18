@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import AppLayout from "@/components/layout/AppLayout.vue";
 import ChatView from "@/views/ChatView.vue";
 import PlaygroundView from "@/views/PlaygroundView.vue";
+import RenderPage from "@/views/RenderPage.vue";
 
 export default createRouter({
   history: createWebHistory(),
@@ -16,6 +17,10 @@ export default createRouter({
         { path: "chat/:id?", name: "chat", component: ChatView, props: true },
         { path: "playground", component: PlaygroundView },
       ],
+    },
+    {
+      path: "/render",
+      component: RenderPage,
     },
   ],
 });

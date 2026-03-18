@@ -1,0 +1,141 @@
+{
+  "content1": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "label",
+        "props": {
+          "class": "label"
+        },
+        "text": "이름"
+      },
+      {
+        "type": "input",
+        "model": "name",
+        "props": {
+          "placeholder": "이름 입력",
+          "class": "input"
+        }
+      }
+    ]
+  },
+
+  "content2": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "input",
+        "model": "parent",
+        "props": {
+          "placeholder": "A 입력 시 비활성화",
+          "class": "input"
+        }
+      },
+      {
+        "type": "input",
+        "model": "child",
+        "props": {
+          "class": "input"
+        },
+        "disabled": "ctx.parent === 'A'"
+      }
+    ]
+  },
+
+  "content3": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "input",
+        "model": "parent",
+        "props": {
+          "placeholder": "A 입력 시 옵션 변경",
+          "class": "input"
+        }
+      },
+      {
+        "type": "select",
+        "model": "option",
+        "props": {
+          "class": "select"
+        },
+        "options": "ctx.parent === 'A' ? ['1','2'] : ['3','4']"
+      }
+    ]
+  },
+
+  "content4": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "label",
+        "text": "동의 여부",
+        "props": {
+          "class": "label"
+        }
+      },
+      {
+        "type": "checkbox",
+        "model": "agree",
+        "props": {
+          "class": "checkbox"
+        }
+      }
+    ]
+  },
+
+  "content5": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "button",
+        "text": "클릭",
+        "props": {
+          "class": "btn"
+        },
+        "events": {
+          "click": "handleClick"
+        }
+      }
+    ]
+  },
+
+  "content6": {
+    "type": "div",
+    "props": {
+      "class": "box"
+    },
+    "children": [
+      {
+        "type": "input",
+        "model": "name",
+        "props": {
+          "class": "input"
+        }
+      },
+      {
+        "type": "label",
+        "text": "이름이 비어있으면 숨김",
+        "condition": "ctx.name !== ''",
+        "props": {
+          "class": "label"
+        }
+      }
+    ]
+  }
+}
