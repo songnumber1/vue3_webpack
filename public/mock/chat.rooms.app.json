@@ -1,0 +1,6 @@
+{
+  "data": [
+    { "roomId": "a-201", "title": "앱 주문 문의", "updatedAt": "2026-04-14T16:40:00+09:00", "description": "안드로이드 앱 전용 설명" },
+    { "roomId": "a-202", "title": "앱 결제 문의", "updatedAt": "2026-04-14T15:20:00+09:00", "description": "푸시 연동 가능" }
+  ]
+}

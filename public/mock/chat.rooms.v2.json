@@ -1,0 +1,8 @@
+{
+  "result": {
+    "list": [
+      { "id": "v2-401", "name": "v2 통합 응답", "updated_at": "2026-04-14T12:30:00+09:00", "description": "v2 api response" },
+      { "id": "v2-402", "name": "v2 관리자 대화", "updated_at": "2026-04-14T11:25:00+09:00", "description": "추가 필드 가능" }
+    ]
+  }
+}

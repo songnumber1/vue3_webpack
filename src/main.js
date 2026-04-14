@@ -1,19 +1,18 @@
-import {createApp} from "vue";
-import AppVuetify from "./AppVuetify.vue";
-import router from "./router";
-import store from "./store";
-import vuetify from "./plugins/vuetify";
-import {loadFonts} from "./plugins/webfontloader";
-import ElementPlus from "element-plus";
-import "element-plus/dist/index.css";
-import "@/assets/css/variables.css";
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import { initializeAppConfig } from '@/config/appConfig';
+import { applyThemeAttributes } from '@/theme/themeManager';
+import '@/styles/reset.css';
+import '@/styles/variables.css';
+import '@/styles/base.css';
+import '@/styles/responsive.css';
 
-loadFonts();
+const appConfig = initializeAppConfig();
+applyThemeAttributes(appConfig);
 
-// createApp(AppVuetify)
-createApp(AppVuetify)
-  .use(router)
-  .use(store)
-  .use(vuetify)
-  .use(ElementPlus)
-  .mount("#app");
+const app = createApp(App);
+app.config.globalProperties.$appConfig = appConfig;
+app.provide('appConfig', appConfig);
+app.use(router);
+app.mount('#app');
