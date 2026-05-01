@@ -11,7 +11,6 @@
         @input="resize"
         @keydown.enter.exact.prevent="submit"
       />
-      <button class="mic-button" type="button" title="음성 입력">⌕</button>
       <button class="send-button" type="submit" :disabled="disabled || !text.trim()" title="전송">↗</button>
     </form>
     <p v-if="showHelp" class="prompt-help">API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서 확장하세요.</p>

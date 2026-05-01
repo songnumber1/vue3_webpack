@@ -37,11 +37,6 @@
       />
 
       <section v-if="messages.length === 0" class="empty-stage">
-        <div class="desktop-empty-actions">
-          <button class="top-icon" type="button" title="프로필">♙</button>
-          <button class="top-icon" type="button" title="설정" @click="toggleTheme">◐</button>
-        </div>
-
         <div class="empty-center">
           <h1>어디서부터 시작할까요?</h1>
           <PromptInput
@@ -60,7 +55,7 @@
 
         <div class="mobile-project-home">
           <div class="project-title">
-            <span class="folder-icon">▱</span>
+            <SvgIcon name="folder" class="folder-icon" />
             <h1>{{ activeProjectName }}</h1>
           </div>
           <button class="source-chip" type="button">소스</button>
@@ -95,12 +90,44 @@
 </template>
 
 <script setup>
-import { computed, defineComponent, h, nextTick, onMounted, ref } from 'vue'
+import { computed, defineComponent, h, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useAppContext } from '@/composables/useAppContext'
 import { streamText } from '@/utils/fakeStream'
 import ChatHeader from './ChatHeader.vue'
 import MessageList from './MessageList.vue'
 import PromptInput from './PromptInput.vue'
+
+const ICONS = {
+  pencil: '<path d="M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"/><path d="M13.4 7.1 16.9 10.6"/>',
+  search: '<circle cx="10.5" cy="10.5" r="5.8"/><path d="M15 15 20 20"/>',
+  cube: '<path d="M12 3 4.5 7.2v9.6L12 21l7.5-4.2V7.2L12 3Z"/><path d="m4.8 7.4 7.2 4.1 7.2-4.1"/><path d="M12 11.5V21"/>',
+  more: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
+  plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
+  folder: '<path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4.1l2.1 2.4H18a2.5 2.5 0 0 1 2.5 2.5v6.6A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5v-9Z"/>',
+  project: '<path d="M5 7.5h14l-2 9H3l2-9Z"/>'
+}
+
+const SvgIcon = defineComponent({
+  name: 'SvgIcon',
+  props: { name: { type: String, required: true } },
+  setup(props) {
+    return () => h('svg', {
+      class: 'nav-icon',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      innerHTML: ICONS[props.name] || ICONS.project,
+      'aria-hidden': 'true'
+    })
+  }
+})
+
+function icon(name) {
+  return h('span', { class: 'icon-wrap' }, [h(SvgIcon, { name })])
+}
 
 const SidebarContent = defineComponent({
   name: 'SidebarContent',
@@ -115,25 +142,24 @@ const SidebarContent = defineComponent({
     return () => h('div', { class: ['sidebar-content', props.mobile ? 'sidebar-content--mobile' : ''] }, [
       h('div', { class: 'sidebar-top' }, [
         h('div', { class: 'sidebar-title' }, 'ChatGPT'),
-        h('div', { class: 'sidebar-top-actions' }, [
-          props.mobile ? h('button', { class: 'sidebar-round', type: 'button', onClick: () => emit('close'), title: '닫기' }, '×') : h('button', { class: 'sidebar-round', type: 'button', title: '접기' }, '◐'),
-          props.mobile ? h('button', { class: 'sidebar-round', type: 'button', title: '검색' }, '⌕') : null
-        ])
+        props.mobile ? h('div', { class: 'sidebar-top-actions' }, [
+          h('button', { class: 'sidebar-round', type: 'button', onClick: () => emit('close'), title: '닫기' }, '×')
+        ]) : null
       ]),
       h('nav', { class: 'quick-menu' }, [
-        h('button', { class: 'quick-item active', type: 'button', onClick: () => emit('new-chat') }, [h('span', '✎'), '새 채팅']),
-        h('button', { class: 'quick-item', type: 'button' }, [h('span', '⌕'), '채팅 검색']),
-        h('button', { class: 'quick-item', type: 'button' }, [h('span', '⌬'), 'Codex']),
-        h('button', { class: 'quick-item', type: 'button' }, [h('span', '⋯'), '더 보기'])
+        h('button', { class: 'quick-item active', type: 'button', onClick: () => emit('new-chat') }, [icon('pencil'), '새 채팅']),
+        h('button', { class: 'quick-item', type: 'button' }, [icon('search'), '채팅 검색']),
+        h('button', { class: 'quick-item', type: 'button' }, [icon('cube'), 'Codex']),
+        h('button', { class: 'quick-item', type: 'button' }, [icon('more'), '더 보기'])
       ]),
       h('div', { class: 'section-label' }, '프로젝트'),
       h('div', { class: 'project-list' }, [
-        h('button', { class: 'project-item new-project', type: 'button' }, [h('span', '▱＋'), '새 프로젝트']),
+        h('button', { class: 'project-item new-project', type: 'button' }, [icon('plus'), '새 프로젝트']),
         ...props.projects.map((project) => h('button', {
           class: ['project-item', project.id === props.activeProjectId ? 'selected' : ''],
           type: 'button'
-        }, [h('span', '▱'), project.name])),
-        h('button', { class: 'project-item', type: 'button' }, [h('span', '⋯'), '모든 프로젝트'])
+        }, [icon('folder'), project.name])),
+        h('button', { class: 'project-item', type: 'button' }, [icon('more'), '모든 프로젝트'])
       ]),
       h('div', { class: 'section-label' }, '최근'),
       h('div', { class: 'sidebar-history' }, props.histories.map((item) => h('button', {
@@ -141,19 +167,20 @@ const SidebarContent = defineComponent({
         type: 'button',
         onClick: () => emit('select-history', item)
       }, item.title))),
-      props.mobile ? h('button', { class: 'mobile-new-chat-fab', type: 'button', onClick: () => emit('new-chat') }, [h('span', '✎'), '채팅']) : null,
+      props.mobile ? h('button', { class: 'mobile-new-chat-fab', type: 'button', onClick: () => emit('new-chat') }, [icon('pencil'), '채팅']) : null,
       h('div', { class: 'sidebar-user' }, [h('div', { class: 'user-avatar' }, '민'), h('div', [h('strong', '민우 송'), h('small', 'Plus')])])
     ])
   }
 })
 
-const { platform, theme } = useAppContext()
+const { theme } = useAppContext()
 const listRef = ref(null)
 const isGenerating = ref(false)
 const themeName = ref(theme.current)
 const drawerOpen = ref(false)
 const selectedModel = ref('gpt-5-thinking')
 const activeProjectId = ref(1)
+let mobileMediaQuery = null
 
 const models = [
   { id: 'gpt-5-thinking', label: 'ChatGPT', description: 'GPT-5.5 Thinking 스타일 데모' },
@@ -189,6 +216,10 @@ const suggestions = [
 
 function scrollBottom() {
   nextTick(() => listRef.value?.scrollToBottom?.())
+}
+
+function closeDrawerOnViewportChange() {
+  drawerOpen.value = false
 }
 
 function startNewChat() {
@@ -235,5 +266,16 @@ function createDemoResponse(prompt) {
   return `입력한 내용: **${prompt}**\n\n현재 선택된 모델은 **${models.find((model) => model.id === selectedModel.value)?.label}** 입니다.\n\n이 프로젝트는 실제 API 통신 없이 ChatGPT 스타일의 웹/모바일 UI를 재현합니다.\n\n- 웹: 좌측 고정 사이드바 + 중앙 시작 화면\n- 모바일: 좌측 Drawer 메뉴 + 상단 모델 선택 + 하단 고정 입력창\n- 공통: Vue 3 Composition API, bootstrap/resolver 구조, CSS variable 테마\n\n실제 API 연동은 \`src/core/resolver/api.js\`와 \`src/core/resolver/axios.js\`를 확장하면 됩니다.`
 }
 
-onMounted(scrollBottom)
+onMounted(() => {
+  drawerOpen.value = false
+  mobileMediaQuery = window.matchMedia?.('(max-width: 900px)')
+  mobileMediaQuery?.addEventListener?.('change', closeDrawerOnViewportChange)
+  window.addEventListener('resize', closeDrawerOnViewportChange)
+  scrollBottom()
+})
+
+onBeforeUnmount(() => {
+  mobileMediaQuery?.removeEventListener?.('change', closeDrawerOnViewportChange)
+  window.removeEventListener('resize', closeDrawerOnViewportChange)
+})
 </script>

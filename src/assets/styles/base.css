@@ -13,4 +13,4 @@ button, textarea { font-family: inherit; }
 button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: 0.58; }
 .app-shell { height: 100%; width: 100%; }
-.app-shell--mobile { max-width: 560px; margin: 0 auto; background: var(--surface); }
+.app-shell--mobile { max-width: none; margin: 0; background: var(--surface); }
