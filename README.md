@@ -1,17 +1,15 @@
 # Vue 3 ChatGPT Style WebApp
 
-Vue 3 Composition API + Webpack(Vue CLI) 기반의 ChatGPT 스타일 UI/UX 샘플입니다.
+Vue 3 Composition API + Webpack 기반의 ChatGPT 스타일 반응형 UI 샘플입니다.
 
-## 포함 기능
+## 포함 사항
 
-- `main.js`는 `bootstrap()`만 호출
-- Android/Web/Mobile-Web 플랫폼 resolver
-- Base + Android override 방식의 axios/api/router/storage/feature/theme resolver
-- 모바일 크기 또는 모바일 브라우저에서는 AndroidLayout 적용
-- API 없이 동작하는 가짜 스트리밍 채팅 UI
-- 라이트/다크 테마 CSS variable 구조
-- 추후 테마 추가가 쉬운 `src/assets/styles/themes.css` 구조
-- 반응형 PC/모바일 레이아웃
+- `main.js -> bootstrap()` 앱 시작 구조
+- 플랫폼 / 레이아웃 / axios / interceptor / api / router / bridge / storage / theme resolver
+- Web ChatGPT 스타일 좌측 고정 사이드바 + 중앙 시작 화면
+- Mobile ChatGPT 스타일 Drawer 메뉴 + 상단 모델 선택 + 하단 고정 입력창
+- CSS variable 기반 light / dark 테마
+- API 없이 동작하는 fake streaming 채팅
 
 ## 실행
 
@@ -19,8 +17,6 @@ Vue 3 Composition API + Webpack(Vue CLI) 기반의 ChatGPT 스타일 UI/UX 샘�
 npm install
 npm run serve
 ```
-
-브라우저에서 `http://localhost:8080`으로 접속합니다.
 
 ## 빌드
 
@@ -31,26 +27,18 @@ npm run build
 ## 주요 파일
 
 ```text
-src/main.js
 src/core/bootstrap.js
 src/core/resolver/*
-src/layouts/WebLayout.vue
-src/layouts/AndroidLayout.vue
-src/components/chat/*
+src/components/chat/ChatShell.vue
+src/components/chat/ChatHeader.vue
+src/components/chat/PromptInput.vue
 src/assets/styles/themes.css
+src/assets/styles/chat.css
 ```
 
-## 테마 추가 방법
+## 설계 기준
 
-`src/assets/styles/themes.css`에 아래처럼 새 테마를 추가하면 됩니다.
-
-```css
-:root[data-theme='blue'] {
-  --bg: #eff6ff;
-  --surface: #ffffff;
-  --text: #0f172a;
-  --primary: #2563eb;
-}
-```
-
-그 후 `src/core/resolver/theme.js`의 `allowedThemes`에 `blue`를 추가하세요.
+- 웹/모바일 프로젝트를 분리하지 않고 레이아웃과 CSS만 반응형으로 분리합니다.
+- 공통 로직은 ChatShell 내부 상태와 resolver 계층에 둡니다.
+- 모바일 메뉴는 좌측 Drawer로 제공하고, Drawer 안에서 프로젝트/최근 대화/새 채팅을 선택할 수 있습니다.
+- 모델 선택은 ChatGPT 모바일처럼 상단 `ChatGPT` selector에서 dropdown으로 변경합니다.
