@@ -1,18 +1,9 @@
-const {defineConfig} = require("@vue/cli-service");
+const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
-  // chainWebpack: (config) => {
-  //   config.module.rules.delete("eslint");
-  // },
-
-  // transpileDependencies: true,
-
+  transpileDependencies: true,
   devServer: {
-    proxy: "http://localhost:8080",
-  },
-  pluginOptions: {
-    vuetify: {
-      // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-    },
-  },
-});
+    port: 8080,
+    historyApiFallback: true
+  }
+})

@@ -1,0 +1,16 @@
+* { box-sizing: border-box; }
+html, body, #app { width: 100%; height: 100%; margin: 0; }
+body {
+  font-family: var(--font-family);
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, var(--bg-gradient-a), transparent 34%),
+    radial-gradient(circle at top right, var(--bg-gradient-b), transparent 30%),
+    var(--bg);
+  overflow: hidden;
+}
+button, textarea { font-family: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.58; }
+.app-shell { height: 100%; width: 100%; }
+.app-shell--mobile { max-width: 560px; margin: 0 auto; background: var(--surface); }
