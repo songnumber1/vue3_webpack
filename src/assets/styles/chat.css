@@ -1804,3 +1804,97 @@ body,
     line-height: 1.58;
   }
 }
+
+/* Stable chat viewport/keyboard patch for PC Chrome, Android Chrome and Android WebView. */
+.chatgpt-shell {
+  height: var(--app-height);
+  max-height: var(--app-height);
+  overflow: hidden;
+}
+.chat-workspace {
+  height: var(--app-height);
+  max-height: var(--app-height);
+  min-height: 0;
+}
+.empty-stage,
+.message-list {
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.message-list-anchor {
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+.prompt-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 25;
+}
+.prompt-box textarea {
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+}
+
+@media (max-width: 900px) {
+  .chatgpt-shell,
+  .app-shell--mobile .chatgpt-shell {
+    grid-template-columns: 1fr;
+    height: var(--app-height);
+    max-height: var(--app-height);
+  }
+  .chat-workspace,
+  .app-shell--mobile .chat-workspace {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    height: var(--app-height);
+    max-height: var(--app-height);
+    overflow: hidden;
+  }
+  .message-list,
+  .app-shell--mobile .message-list {
+    padding-bottom: 16px;
+    overflow-y: auto;
+  }
+  .empty-stage,
+  .app-shell--mobile .empty-stage {
+    overflow-y: auto;
+    padding-bottom: 16px;
+  }
+  .prompt-wrap,
+  .app-shell--mobile .prompt-wrap,
+  .prompt-wrap--floating,
+  .app-shell--mobile .prompt-wrap--floating,
+  .mobile-bottom-prompt,
+  .app-shell--mobile .mobile-bottom-prompt {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    display: block;
+    width: 100%;
+    background: var(--mobile-bg);
+  }
+  .desktop-center-prompt,
+  .app-shell--mobile .desktop-center-prompt {
+    display: none !important;
+  }
+  .chatgpt-shell--keyboard-open .mobile-topbar,
+  .app-shell--mobile .chatgpt-shell--keyboard-open .mobile-topbar {
+    height: 44px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .chatgpt-shell--keyboard-open .round-icon,
+  .app-shell--mobile .chatgpt-shell--keyboard-open .round-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .chatgpt-shell--keyboard-open .model-trigger,
+  .app-shell--mobile .chatgpt-shell--keyboard-open .model-trigger {
+    height: 34px;
+    min-width: 100px;
+    font-size: 15px;
+  }
+}

@@ -1,5 +1,7 @@
 export function resolvePlatform() {
-  const hasAndroidBridge = typeof window !== 'undefined' && !!window.AndroidBridge
+  if (typeof window === 'undefined') return 'web'
+
+  const hasAndroidBridge = !!window.AndroidBridge
   if (hasAndroidBridge) return 'android'
 
   const ua = navigator.userAgent || ''

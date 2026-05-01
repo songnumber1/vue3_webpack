@@ -14,3 +14,19 @@ button { cursor: pointer; }
 button:disabled { cursor: not-allowed; opacity: 0.58; }
 .app-shell { height: 100%; width: 100%; }
 .app-shell--mobile { max-width: none; margin: 0; background: var(--surface); }
+
+/* Android Chrome/WebView safe viewport variables. Updated by useViewportGuard. */
+:root {
+  --app-height: 100vh;
+  --app-width: 100vw;
+}
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+html, body, #app, .app-shell {
+  min-height: 0;
+  height: var(--app-height);
+  overscroll-behavior: none;
+}

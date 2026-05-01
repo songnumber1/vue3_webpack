@@ -1,0 +1,79 @@
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+
+const KEYBOARD_THRESHOLD = 120
+
+function getViewportSize() {
+  const visualViewport = typeof window !== 'undefined' ? window.visualViewport : null
+  return {
+    width: Math.round(visualViewport?.width || window.innerWidth || 0),
+    height: Math.round(visualViewport?.height || window.innerHeight || 0)
+  }
+}
+
+function setCssViewportVars(size) {
+  const height = Math.max(size.height || 0, 320)
+  const width = Math.max(size.width || 0, 320)
+  document.documentElement.style.setProperty('--app-height', `${height}px`)
+  document.documentElement.style.setProperty('--app-width', `${width}px`)
+  document.documentElement.style.setProperty('--vh', `${height * 0.01}px`)
+}
+
+/**
+ * Keeps the chat layout aligned with the real visible viewport.
+ * Android Chrome and Android WebView resize the visual viewport when the keyboard opens.
+ * This composable mirrors that size to CSS variables and exposes a keyboard-open flag.
+ */
+export function useViewportGuard(options = {}) {
+  const onChange = options.onChange || (() => {})
+  const viewportHeight = ref(0)
+  const viewportWidth = ref(0)
+  const keyboardOpen = ref(false)
+  const baselineHeight = ref(0)
+  let resizeTimer = null
+
+  const isCompact = computed(() => viewportWidth.value > 0 && viewportWidth.value <= 900)
+
+  function apply() {
+    const size = getViewportSize()
+    viewportHeight.value = size.height
+    viewportWidth.value = size.width
+    setCssViewportVars(size)
+
+    if (!baselineHeight.value || size.height > baselineHeight.value) {
+      baselineHeight.value = size.height
+    }
+
+    keyboardOpen.value = isCompact.value && baselineHeight.value - size.height > KEYBOARD_THRESHOLD
+    onChange({ ...size, keyboardOpen: keyboardOpen.value, isCompact: isCompact.value })
+  }
+
+  function scheduleApply() {
+    window.clearTimeout(resizeTimer)
+    apply()
+    resizeTimer = window.setTimeout(apply, 80)
+  }
+
+  onMounted(() => {
+    apply()
+    window.addEventListener('resize', scheduleApply, { passive: true })
+    window.addEventListener('orientationchange', scheduleApply, { passive: true })
+    window.visualViewport?.addEventListener('resize', scheduleApply, { passive: true })
+    window.visualViewport?.addEventListener('scroll', scheduleApply, { passive: true })
+  })
+
+  onBeforeUnmount(() => {
+    window.clearTimeout(resizeTimer)
+    window.removeEventListener('resize', scheduleApply)
+    window.removeEventListener('orientationchange', scheduleApply)
+    window.visualViewport?.removeEventListener('resize', scheduleApply)
+    window.visualViewport?.removeEventListener('scroll', scheduleApply)
+  })
+
+  return {
+    viewportHeight,
+    viewportWidth,
+    keyboardOpen,
+    isCompact,
+    refreshViewport: scheduleApply
+  }
+}

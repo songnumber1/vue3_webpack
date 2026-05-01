@@ -14,12 +14,17 @@
 <script setup>
 import { computed } from 'vue'
 import { renderMarkdown } from '@/utils/markdown'
+import { copyText } from '@/utils/clipboard'
 
 const props = defineProps({ message: { type: Object, required: true } })
 const avatar = computed(() => props.message.role === 'user' ? '나' : 'AI')
 const label = computed(() => props.message.role === 'user' ? 'You' : 'Assistant')
 const html = computed(() => renderMarkdown(props.message.content))
-function copy() {
-  navigator.clipboard?.writeText(props.message.content)
+async function copy() {
+  try {
+    await copyText(props.message.content)
+  } catch (error) {
+    console.warn('Failed to copy message.', error)
+  }
 }
 </script>

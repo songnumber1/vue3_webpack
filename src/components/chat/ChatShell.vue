@@ -1,5 +1,8 @@
 <template>
-  <div class="chatgpt-shell">
+  <div
+    class="chatgpt-shell"
+    :class="{'chatgpt-shell--keyboard-open': keyboardOpen}"
+  >
     <aside class="desktop-sidebar">
       <SidebarContent
         :histories="histories"
@@ -48,6 +51,8 @@
             :disabled="isGenerating"
             :show-help="false"
             @submit="handleSubmit"
+            @focus="handlePromptFocus"
+            @height-change="handlePromptResize"
           />
           <div class="suggestion-row">
             <button
@@ -97,6 +102,8 @@
         :disabled="isGenerating"
         :show-help="false"
         @submit="handleSubmit"
+        @focus="handlePromptFocus"
+        @height-change="handlePromptResize"
       />
       <PromptInput
         v-else
@@ -105,6 +112,8 @@
         :show-help="false"
         floating
         @submit="handleSubmit"
+        @focus="handlePromptFocus"
+        @height-change="handlePromptResize"
       />
     </main>
   </div>
@@ -115,13 +124,16 @@ import {
   computed,
   defineComponent,
   h,
-  nextTick,
   onBeforeUnmount,
   onMounted,
   ref,
 } from "vue";
 import {useAppContext} from "@/composables/useAppContext";
 import {streamText} from "@/utils/fakeStream";
+import {createId} from "@/utils/id";
+import {addMediaQueryListener} from "@/utils/dom";
+import {useAutoScroll} from "@/composables/useAutoScroll";
+import {useViewportGuard} from "@/composables/useViewportGuard";
 import ChatHeader from "./ChatHeader.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "./PromptInput.vue";
@@ -283,12 +295,16 @@ const SidebarContent = defineComponent({
 
 const {theme} = useAppContext();
 const listRef = ref(null);
+const {scrollToBottom} = useAutoScroll(listRef);
+const {keyboardOpen, refreshViewport} = useViewportGuard({
+  onChange: () => scrollBottom(),
+});
 const isGenerating = ref(false);
 const themeName = ref(theme.current);
 const drawerOpen = ref(false);
 const selectedModel = ref("gpt-5-thinking");
 const activeProjectId = ref(1);
-let mobileMediaQuery = null;
+let removeMobileMediaQueryListener = null;
 
 const models = [
   {
@@ -388,8 +404,17 @@ const suggestions = [
   },
 ];
 
-function scrollBottom() {
-  nextTick(() => listRef.value?.scrollToBottom?.());
+async function scrollBottom(options = {}) {
+  await scrollToBottom(options);
+}
+
+function handlePromptFocus() {
+  refreshViewport();
+  scrollBottom();
+}
+
+function handlePromptResize() {
+  scrollBottom();
 }
 
 function closeDrawerOnViewportChange() {
@@ -404,9 +429,9 @@ function startNewChat() {
 
 function loadHistory(item) {
   messages.value = [
-    {id: crypto.randomUUID(), role: "user", content: item.title},
+    {id: createId("message"), role: "user", content: item.title},
     {
-      id: crypto.randomUUID(),
+      id: createId("message"),
       role: "assistant",
       content: `${item.preview}\n\n이 화면은 저장된 대화를 선택했을 때의 샘플입니다. 실제 API나 저장소 없이 UI/UX 흐름만 재현합니다.`,
     },
@@ -424,9 +449,9 @@ async function handleSubmit(text) {
   const value = text.trim();
   if (!value || isGenerating.value) return;
 
-  messages.value.push({id: crypto.randomUUID(), role: "user", content: value});
+  messages.value.push({id: createId("message"), role: "user", content: value});
   const assistantMessage = {
-    id: crypto.randomUUID(),
+    id: createId("message"),
     role: "assistant",
     content: "",
   };
@@ -452,17 +477,17 @@ function createDemoResponse(prompt) {
 
 onMounted(() => {
   drawerOpen.value = false;
-  mobileMediaQuery = window.matchMedia?.("(max-width: 900px)");
-  mobileMediaQuery?.addEventListener?.("change", closeDrawerOnViewportChange);
+  const mobileMediaQuery = window.matchMedia?.("(max-width: 900px)");
+  removeMobileMediaQueryListener = addMediaQueryListener(
+    mobileMediaQuery,
+    closeDrawerOnViewportChange
+  );
   window.addEventListener("resize", closeDrawerOnViewportChange);
   scrollBottom();
 });
 
 onBeforeUnmount(() => {
-  mobileMediaQuery?.removeEventListener?.(
-    "change",
-    closeDrawerOnViewportChange
-  );
+  removeMobileMediaQueryListener?.();
   window.removeEventListener("resize", closeDrawerOnViewportChange);
 });
 </script>
