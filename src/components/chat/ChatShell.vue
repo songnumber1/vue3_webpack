@@ -130,6 +130,7 @@ import {
 } from "vue";
 import {useAppContext} from "@/composables/useAppContext";
 import {streamText} from "@/utils/fakeStream";
+import {loadMarkdownShowcase} from "@/utils/markdownSamples";
 import {createId} from "@/utils/id";
 import {addMediaQueryListener} from "@/utils/dom";
 import {useAutoScroll} from "@/composables/useAutoScroll";
@@ -421,8 +422,8 @@ function closeDrawerOnViewportChange() {
   drawerOpen.value = false;
 }
 
-function startNewChat() {
-  messages.value = [];
+async function startNewChat() {
+  await loadShowcaseConversation();
   drawerOpen.value = false;
   scrollBottom();
 }
@@ -470,12 +471,61 @@ async function handleSubmit(text) {
 }
 
 function createDemoResponse(prompt) {
-  return `입력한 내용: **${prompt}**\n\n현재 선택된 모델은 **${
+  return `# Markdown 응답 샘플
+
+입력한 내용: **${prompt}**
+
+현재 선택된 모델은 **${
     models.find((model) => model.id === selectedModel.value)?.label
-  }** 입니다.\n\n이 프로젝트는 실제 API 통신 없이 ChatGPT 스타일의 웹/모바일 UI를 재현합니다.\n\n- 웹: 좌측 고정 사이드바 + 중앙 시작 화면\n- 모바일: 좌측 Drawer 메뉴 + 상단 모델 선택 + 하단 고정 입력창\n- 공통: Vue 3 Composition API, bootstrap/resolver 구조, CSS variable 테마\n\n실제 API 연동은 \`src/core/resolver/api.js\`와 \`src/core/resolver/axios.js\`를 확장하면 됩니다.`;
+  }** 입니다.
+
+## 지원 기능
+
+- **KaTeX / LaTeX**: $E = mc^2$, $$\\int_0^1 x^2 dx = \\frac{1}{3}$$
+- **Code Block**
+
+\`\`\`js
+const message = 'unified markdown renderer'
+console.log(message)
+\`\`\`
+
+- **Table Wrapper**
+
+| 기능 | 처리 방식 |
+| --- | --- |
+| Table | rehypeTableWrapper |
+| Link | rehypeExternalLinks |
+
+- **외부 링크**: https://vuejs.org
+- **Mermaid**
+
+\`\`\`mermaid
+graph TD
+  A[User Markdown] --> B[Unified]
+  B --> C[Vue v-html]
+  C --> D[Mermaid post render]
+\`\`\`
+
+실제 전체 50개 유형 샘플은 대화방 최초 입장 시 \`public/samples/markdown-showcase.md\` 파일 내용으로 자동 표시됩니다.`;
 }
 
-onMounted(() => {
+async function loadShowcaseConversation() {
+  const markdown = await loadMarkdownShowcase();
+  messages.value = [
+    {
+      id: createId("message"),
+      role: "user",
+      content: "대화방 입장 시 Markdown 50가지 유형 샘플을 보여줘",
+    },
+    {
+      id: createId("message"),
+      role: "assistant",
+      content: markdown,
+    },
+  ];
+}
+
+onMounted(async () => {
   drawerOpen.value = false;
   const mobileMediaQuery = window.matchMedia?.("(max-width: 900px)");
   removeMobileMediaQueryListener = addMediaQueryListener(
@@ -483,6 +533,7 @@ onMounted(() => {
     closeDrawerOnViewportChange
   );
   window.addEventListener("resize", closeDrawerOnViewportChange);
+  await loadShowcaseConversation();
   scrollBottom();
 });
 

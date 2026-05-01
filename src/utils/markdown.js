@@ -1,53 +1,82 @@
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
+import { unified } from 'unified'
+import remarkParse from 'remark-parse'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import remarkRehype from 'remark-rehype'
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+import rehypeExternalLinks from 'rehype-external-links'
+import rehypeHighlight from 'rehype-highlight'
+import { visit } from 'unist-util-visit'
+
+function textContent(node) {
+  if (!node) return ''
+  if (typeof node.value === 'string') return node.value
+  if (!Array.isArray(node.children)) return ''
+  return node.children.map(textContent).join('')
 }
 
-function renderInline(value) {
-  return value
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-}
+function rehypeTableWrapper() {
+  return (tree) => {
+    visit(tree, 'element', (node, index, parent) => {
+      if (!parent || typeof index !== 'number') return
+      if (node.tagName !== 'table') return
 
-function renderBlock(block) {
-  const lines = block.split('\n')
-  const isList = lines.every((line) => /^\s*[-*]\s+/.test(line))
-  const isOrderedList = lines.every((line) => /^\s*\d+\.\s+/.test(line))
-
-  if (isList) {
-    return `<ul>${lines.map((line) => `<li>${renderInline(line.replace(/^\s*[-*]\s+/, ''))}</li>`).join('')}</ul>`
-  }
-  if (isOrderedList) {
-    return `<ol>${lines.map((line) => `<li>${renderInline(line.replace(/^\s*\d+\.\s+/, ''))}</li>`).join('')}</ol>`
-  }
-  if (/^#{1,3}\s+/.test(block)) {
-    const depth = Math.min(block.match(/^#+/)[0].length, 3)
-    return `<h${depth}>${renderInline(block.replace(/^#{1,3}\s+/, ''))}</h${depth}>`
-  }
-  return `<p>${renderInline(block).replace(/\n/g, '<br>')}</p>`
-}
-
-export function renderMarkdown(text) {
-  const escaped = escapeHtml(text)
-  const codeBlocks = []
-  const withoutCode = escaped.replace(/```([\s\S]*?)```/g, (_, code) => {
-    const token = `@@CODE_BLOCK_${codeBlocks.length}@@`
-    codeBlocks.push(`<pre><code>${code.trim()}</code></pre>`)
-    return token
-  })
-
-  const html = withoutCode
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => {
-      const codeIndex = block.match(/^@@CODE_BLOCK_(\d+)@@$/)?.[1]
-      if (codeIndex != null) return codeBlocks[Number(codeIndex)]
-      return renderBlock(block)
+      parent.children[index] = {
+        type: 'element',
+        tagName: 'div',
+        properties: { className: ['md-table-wrapper'] },
+        children: [node]
+      }
     })
-    .join('')
+  }
+}
 
+function rehypeMermaidBlock() {
+  return (tree) => {
+    visit(tree, 'element', (node, index, parent) => {
+      if (!parent || typeof index !== 'number') return
+      if (node.tagName !== 'pre') return
+
+      const codeNode = node.children?.[0]
+      const classNames = codeNode?.properties?.className || []
+      const isMermaid = codeNode?.tagName === 'code' && classNames.includes('language-mermaid')
+      if (!isMermaid) return
+
+      parent.children[index] = {
+        type: 'element',
+        tagName: 'div',
+        properties: {
+          className: ['mermaid', 'md-mermaid'],
+          'data-mermaid-pending': 'true'
+        },
+        children: [{ type: 'text', value: textContent(codeNode) }]
+      }
+    })
+  }
+}
+
+const processor = unified()
+  .use(remarkParse)
+  .use(remarkGfm)
+  .use(remarkMath)
+  .use(remarkRehype)
+  .use(rehypeKatex, { throwOnError: false, strict: false })
+  .use(rehypeHighlight, { ignoreMissing: true, detect: false })
+  .use(rehypeTableWrapper)
+  .use(rehypeMermaidBlock)
+  .use(rehypeExternalLinks, {
+    target: '_blank',
+    rel: ['nofollow', 'noopener', 'noreferrer']
+  })
+  .use(rehypeStringify)
+
+export async function renderMarkdown(text) {
+  const file = await processor.process(String(text ?? ''))
+  const html = String(file).trim()
   return html || '<p></p>'
+}
+
+export function isMarkdownRenderable(value) {
+  return value !== undefined && value !== null
 }
