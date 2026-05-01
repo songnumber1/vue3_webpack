@@ -95,6 +95,7 @@
         ref="listRef"
         :messages="messages"
         :loading="isGenerating"
+        @content-rendered="handleMessageContentRendered"
       />
 
       <PromptInput
@@ -300,7 +301,11 @@ const {theme} = useAppContext();
 const listRef = ref(null);
 const {scrollToBottom} = useAutoScroll(listRef);
 const {keyboardOpen, refreshViewport} = useViewportGuard({
-  onChange: () => scrollBottom(),
+  onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
+    if (isCompact && isKeyboardOpen) {
+      scrollBottom({stable: true});
+    }
+  },
 });
 const isGenerating = ref(false);
 const themeName = ref(theme.current);
@@ -308,6 +313,7 @@ const drawerOpen = ref(false);
 const selectedModel = ref("gpt-5-thinking");
 const activeProjectId = ref(1);
 let removeMobileMediaQueryListener = null;
+let forceBottomUntil = 0;
 
 const models = [
   {
@@ -415,17 +421,46 @@ const suggestions = [
   },
 ];
 
+function isCompactViewport() {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia?.("(max-width: 900px)")?.matches || window.innerWidth <= 900;
+}
+
+function markForceBottom(duration = 1800) {
+  forceBottomUntil = Date.now() + duration;
+}
+
+function shouldKeepForceBottom() {
+  return Date.now() <= forceBottomUntil;
+}
+
 async function scrollBottom(options = {}) {
   await scrollToBottom(options);
 }
 
+function handleMessageContentRendered() {
+  if (shouldKeepForceBottom()) {
+    scrollBottom({force: true, stable: true});
+  }
+}
+
 function handlePromptFocus() {
   refreshViewport();
-  scrollBottom();
+  if (isCompactViewport()) {
+    scrollBottom({force: true, stable: true});
+    return;
+  }
+
+  scrollBottom({stable: true});
 }
 
 function handlePromptResize() {
-  scrollBottom();
+  if (isCompactViewport()) {
+    scrollBottom({force: true, stable: true});
+    return;
+  }
+
+  scrollBottom({stable: true});
 }
 
 function closeDrawerOnViewportChange() {
@@ -435,14 +470,15 @@ function closeDrawerOnViewportChange() {
 async function startNewChat() {
   messages.value = [];
   drawerOpen.value = false;
-  scrollBottom();
+  forceBottomUntil = 0;
 }
 
 async function loadHistory(item) {
   if (item.type === "markdown-showcase") {
     await loadShowcaseConversation();
     drawerOpen.value = false;
-    scrollBottom({behavior: "auto"});
+    markForceBottom();
+    scrollBottom({behavior: "auto", force: true, stable: true});
     return;
   }
 
@@ -455,7 +491,8 @@ async function loadHistory(item) {
     },
   ];
   drawerOpen.value = false;
-  scrollBottom();
+  markForceBottom(1000);
+  scrollBottom({force: true, stable: true});
 }
 
 async function toggleTheme() {
@@ -463,6 +500,7 @@ async function toggleTheme() {
   themeName.value = theme.current;
   await nextTick();
   await renderMermaidInElement(document.querySelector(".message-list"), {force: true});
+  scrollBottom({stable: true});
 }
 
 async function handleSubmit(text) {
@@ -477,16 +515,16 @@ async function handleSubmit(text) {
   };
   messages.value.push(assistantMessage);
   isGenerating.value = true;
-  scrollBottom();
+  scrollBottom({force: true, stable: true});
 
   const response = createDemoResponse(value);
   await streamText(response, (chunk) => {
     assistantMessage.content = chunk;
-    scrollBottom();
+    scrollBottom({stable: true});
   });
 
   isGenerating.value = false;
-  scrollBottom();
+  scrollBottom({stable: true});
 }
 
 function createDemoResponse(prompt) {
@@ -552,7 +590,6 @@ onMounted(async () => {
     closeDrawerOnViewportChange
   );
   window.addEventListener("resize", closeDrawerOnViewportChange);
-  scrollBottom();
 });
 
 onBeforeUnmount(() => {

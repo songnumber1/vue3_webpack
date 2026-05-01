@@ -18,6 +18,7 @@ import { renderMermaidInElement } from '@/utils/mermaidRenderer'
 import { copyText } from '@/utils/clipboard'
 
 const props = defineProps({ message: { type: Object, required: true } })
+const emit = defineEmits(['rendered'])
 const avatar = computed(() => props.message.role === 'user' ? '나' : 'AI')
 const label = computed(() => props.message.role === 'user' ? 'You' : 'Assistant')
 const html = ref('<p></p>')
@@ -32,6 +33,7 @@ async function renderContent() {
   html.value = rendered
   await nextTick()
   await renderMermaidInElement(contentRef.value)
+  emit('rendered')
 }
 
 async function copy() {
