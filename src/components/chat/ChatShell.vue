@@ -123,6 +123,7 @@
 import {
   computed,
   defineComponent,
+  nextTick,
   h,
   onBeforeUnmount,
   onMounted,
@@ -131,6 +132,7 @@ import {
 import {useAppContext} from "@/composables/useAppContext";
 import {streamText} from "@/utils/fakeStream";
 import {loadMarkdownShowcase} from "@/utils/markdownSamples";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {createId} from "@/utils/id";
 import {addMediaQueryListener} from "@/utils/dom";
 import {useAutoScroll} from "@/composables/useAutoScroll";
@@ -378,6 +380,14 @@ const histories = ref([
     preview:
       "내가 알기로는 vue3에서 reactive로 선언된 변수에 새로운 객체를 할당하면 반응성이 깨질 수 있다고 들었는데 실제로는 어떤 상황에서 문제가 발생하는지 테스트용 긴 문장입니다",
   },
+  {
+    id: 50,
+    type: "markdown-showcase",
+    title:
+      "Markdown 통합 렌더링 50가지 샘플: KaTeX, LaTeX, Code Block, Table, Mermaid, 외부 링크",
+    preview:
+      "채팅방을 열면 unified 기반 Markdown 샘플 50가지를 확인할 수 있습니다. 수식, 코드블록, 표 래퍼, Mermaid, 외부 링크와 조합 예제가 포함됩니다.",
+  },
 ]);
 
 const messages = ref([]);
@@ -423,12 +433,19 @@ function closeDrawerOnViewportChange() {
 }
 
 async function startNewChat() {
-  await loadShowcaseConversation();
+  messages.value = [];
   drawerOpen.value = false;
   scrollBottom();
 }
 
-function loadHistory(item) {
+async function loadHistory(item) {
+  if (item.type === "markdown-showcase") {
+    await loadShowcaseConversation();
+    drawerOpen.value = false;
+    scrollBottom({behavior: "auto"});
+    return;
+  }
+
   messages.value = [
     {id: createId("message"), role: "user", content: item.title},
     {
@@ -441,9 +458,11 @@ function loadHistory(item) {
   scrollBottom();
 }
 
-function toggleTheme() {
+async function toggleTheme() {
   theme.toggle();
   themeName.value = theme.current;
+  await nextTick();
+  await renderMermaidInElement(document.querySelector(".message-list"), {force: true});
 }
 
 async function handleSubmit(text) {
@@ -506,7 +525,7 @@ graph TD
   C --> D[Mermaid post render]
 \`\`\`
 
-실제 전체 50개 유형 샘플은 대화방 최초 입장 시 \`public/samples/markdown-showcase.md\` 파일 내용으로 자동 표시됩니다.`;
+실제 전체 50개 유형 샘플은 사이드바의 마지막 최근 대화 \`Markdown 통합 렌더링 50가지 샘플\`을 선택하면 \`public/samples/markdown-showcase.md\` 파일 내용으로 표시됩니다.`;
 }
 
 async function loadShowcaseConversation() {
@@ -515,7 +534,7 @@ async function loadShowcaseConversation() {
     {
       id: createId("message"),
       role: "user",
-      content: "대화방 입장 시 Markdown 50가지 유형 샘플을 보여줘",
+      content: "Markdown 통합 렌더링 50가지 유형 샘플 채팅방을 열어줘",
     },
     {
       id: createId("message"),
@@ -533,7 +552,6 @@ onMounted(async () => {
     closeDrawerOnViewportChange
   );
   window.addEventListener("resize", closeDrawerOnViewportChange);
-  await loadShowcaseConversation();
   scrollBottom();
 });
 

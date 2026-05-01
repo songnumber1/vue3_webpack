@@ -2007,3 +2007,135 @@ body,
   .markdown-body pre { font-size: 12px; }
   .md-table-wrapper table { min-width: 520px; }
 }
+
+/* Markdown renderer additions */
+.markdown-body p,
+.markdown-body ul,
+.markdown-body ol,
+.markdown-body blockquote,
+.markdown-body table,
+.markdown-body pre {
+  margin-top: 0;
+}
+.markdown-body a {
+  color: var(--primary-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.markdown-body :not(pre) > code {
+  border-radius: 6px;
+  background: var(--surface-muted);
+  color: var(--text);
+  padding: 2px 5px;
+  font-size: .92em;
+}
+.markdown-body pre code {
+  white-space: pre;
+  color: inherit;
+}
+.md-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin: 14px 0;
+}
+.md-table-wrapper table {
+  width: 100%;
+  min-width: 520px;
+  border-collapse: collapse;
+  margin: 0;
+}
+.md-table-wrapper th,
+.md-table-wrapper td {
+  border-bottom: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+.md-table-wrapper th {
+  background: var(--surface-muted);
+  font-weight: 800;
+}
+.md-table-wrapper tr:last-child td {
+  border-bottom: 0;
+}
+.markdown-body blockquote {
+  border-left: 4px solid var(--primary);
+  color: var(--text-muted);
+  padding: 4px 0 4px 14px;
+  margin-left: 0;
+}
+.markdown-body .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+.md-mermaid {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 14px 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+}
+.md-mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+.md-mermaid[data-mermaid-error="true"] {
+  white-space: pre-wrap;
+  background: var(--code-bg);
+  color: var(--code-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+:root[data-theme='dark'] .md-mermaid,
+:root[data-theme='dark'] .md-mermaid svg {
+  background: #212121 !important;
+}
+:root[data-theme='dark'] .md-mermaid svg,
+:root[data-theme='dark'] .md-mermaid svg * {
+  color: #f4f4f4 !important;
+}
+:root[data-theme='dark'] .md-mermaid .node rect,
+:root[data-theme='dark'] .md-mermaid .node circle,
+:root[data-theme='dark'] .md-mermaid .node ellipse,
+:root[data-theme='dark'] .md-mermaid .node polygon,
+:root[data-theme='dark'] .md-mermaid .node path {
+  fill: #2f2f2f !important;
+  stroke: #d1d5db !important;
+}
+:root[data-theme='dark'] .md-mermaid .edgePath path,
+:root[data-theme='dark'] .md-mermaid path.flowchart-link,
+:root[data-theme='dark'] .md-mermaid .relationshipLine,
+:root[data-theme='dark'] .md-mermaid .messageLine0,
+:root[data-theme='dark'] .md-mermaid .messageLine1,
+:root[data-theme='dark'] .md-mermaid line {
+  stroke: #e5e7eb !important;
+}
+:root[data-theme='dark'] .md-mermaid marker path,
+:root[data-theme='dark'] .md-mermaid marker polygon,
+:root[data-theme='dark'] .md-mermaid marker circle {
+  fill: #e5e7eb !important;
+  stroke: #e5e7eb !important;
+}
+:root[data-theme='dark'] .md-mermaid text,
+:root[data-theme='dark'] .md-mermaid tspan,
+:root[data-theme='dark'] .md-mermaid .label,
+:root[data-theme='dark'] .md-mermaid .nodeLabel,
+:root[data-theme='dark'] .md-mermaid .edgeLabel,
+:root[data-theme='dark'] .md-mermaid .actor,
+:root[data-theme='dark'] .md-mermaid .messageText {
+  fill: #f4f4f4 !important;
+  color: #f4f4f4 !important;
+}
+:root[data-theme='dark'] .md-mermaid .edgeLabel,
+:root[data-theme='dark'] .md-mermaid .labelBkg,
+:root[data-theme='dark'] .md-mermaid .edgeLabel rect {
+  background: #111827 !important;
+  fill: #111827 !important;
+}

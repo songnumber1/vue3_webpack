@@ -1,6 +1,6 @@
 # Unified Markdown Showcase
 
-이 파일은 대화방 입장 시 자동으로 표시되는 `public/samples/markdown-showcase.md` 샘플입니다. 웹/Android WebView 공통 렌더링 검증을 위해 **KaTeX/LaTeX, code block, table wrapper, 외부 링크, Mermaid**와 조합 예제를 50가지로 구성했습니다.
+이 파일은 사이드바 최근 목록의 마지막 예제 채팅방을 선택했을 때 표시되는 `public/samples/markdown-showcase.md` 샘플입니다. 웹/Android WebView 공통 렌더링 검증을 위해 **KaTeX/LaTeX, code block, table wrapper, 외부 링크, Mermaid**와 조합 예제를 50가지로 구성했습니다.
 
 ## 01. 기본 제목/문단
 
