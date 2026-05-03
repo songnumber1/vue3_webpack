@@ -5,8 +5,14 @@ import {extendZodWithOpenApi} from "@asteasolutions/zod-to-openapi";
 extendZodWithOpenApi(z);
 
 export const LoginRequest = z.object({
-  username: z.string().openapi({description: "아이디"}),
-  password: z.string().openapi({description: "비밀번호"}),
+  username: z.string().openapi({
+    description: "아이디",
+    example: "admin",
+  }),
+  password: z.string().openapi({
+    description: "비밀번호",
+    example: "1234",
+  }),
 });
 
 export const LoginResponse = z.object({

@@ -1,10 +1,10 @@
-// src/bridge/openapi.js
 import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
 import {BridgeContract} from "./contract";
+import {BRIDGE_PATH} from "./bridgeConstants";
 
 export function generateOpenApi() {
   const registry = new OpenAPIRegistry();
@@ -18,9 +18,13 @@ export function generateOpenApi() {
 
     registry.registerPath({
       method: "post",
-      path: `/bridge/${type.toLowerCase()}`,
-      description: contract.description || type,
+
+      // 🔥 상수 사용
+      path: `${BRIDGE_PATH}${type.toLowerCase()}`,
+
+      description: `[Bridge] ${contract.description}`,
       tags: [contract.tag || "Default"],
+
       request: {
         body: {
           content: {
@@ -50,7 +54,10 @@ export function generateOpenApi() {
     info: {
       title: "Bridge 테스트 UI API",
       version: "2.3.1",
-      description: "Android ↔ Web Bridge API 문서",
+      description: `
+🚨 이 API는 HTTP 서버가 아닙니다.
+Native Bridge 테스트용 UI입니다.
+`,
     },
     tags: [
       {name: "User", description: "유저 관련 API"},

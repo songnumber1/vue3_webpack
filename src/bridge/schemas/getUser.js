@@ -7,6 +7,7 @@ extendZodWithOpenApi(z);
 export const GetUserRequest = z.object({
   id: z.number().openapi({
     description: "유저 ID",
+    example: 1,
   }),
 });
 
