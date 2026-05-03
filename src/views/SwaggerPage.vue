@@ -1,6 +1,9 @@
 <template>
   <div class="swagger-wrapper">
     <div id="swagger-ui"></div>
+
+    <!-- 🔥 하단 패널 -->
+    <BridgePanel />
   </div>
 </template>
 
@@ -8,6 +11,8 @@
 import {onMounted, onBeforeUnmount} from "vue";
 import SwaggerUI from "swagger-ui-dist/swagger-ui-es-bundle";
 import "swagger-ui-dist/swagger-ui.css";
+
+import BridgePanel from "@/components/bridge/BridgePanel.vue";
 
 import {generateOpenApi} from "@/bridge/openapi";
 import {callNative} from "@/bridge/bridgeClient";
@@ -22,13 +27,11 @@ onMounted(() => {
 
   window.fetch = async (input, init = {}) => {
     try {
-      // 🔥 URL normalize
       const url = typeof input === "string" ? input : input?.url || "";
 
       if (url.includes(BRIDGE_PATH)) {
         const type = url.split("/").pop().toUpperCase();
 
-        // 🔥 payload 안전 추출
         let payload = {};
 
         if (init?.body) {
@@ -38,11 +41,7 @@ onMounted(() => {
           payload = text ? JSON.parse(text) : {};
         }
 
-        console.log("[Swagger → Bridge]", type, payload);
-
         const result = await callNative(type, payload);
-
-        console.log("[Bridge → Swagger]", result);
 
         return new Response(
           JSON.stringify(
