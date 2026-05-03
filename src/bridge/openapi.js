@@ -47,8 +47,15 @@ export function generateOpenApi() {
   return generator.generateDocument({
     openapi: "3.0.0",
     info: {
-      title: "Bridge API",
-      version: "1.0.0",
+      title: "My Custom Bridge API",
+      version: "2.3.1",
+      description: "Android ↔ Web Bridge API 문서",
     },
+    servers: [
+      {
+        url: "http://localhost:8080",
+        description: "Local Dev",
+      },
+    ],
   });
 }
