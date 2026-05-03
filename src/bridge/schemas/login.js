@@ -1,8 +1,4 @@
-import {z} from "zod";
-import {extendZodWithOpenApi} from "@asteasolutions/zod-to-openapi";
-
-// 🔥 반드시 먼저 실행 (이 파일 기준 보장)
-extendZodWithOpenApi(z);
+import {z} from "../zod";
 
 export const LoginRequest = z.object({
   username: z.string().openapi({
@@ -16,5 +12,8 @@ export const LoginRequest = z.object({
 });
 
 export const LoginResponse = z.object({
-  token: z.string().openapi({description: "JWT 토큰"}),
+  token: z.string().openapi({
+    description: "JWT 토큰",
+    example: "mock.jwt.token",
+  }),
 });

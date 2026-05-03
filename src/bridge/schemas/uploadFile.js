@@ -1,8 +1,4 @@
-import {z} from "zod";
-import {extendZodWithOpenApi} from "@asteasolutions/zod-to-openapi";
-
-// 🔥 반드시 먼저 실행 (이 파일 기준 보장)
-extendZodWithOpenApi(z);
+import {z} from "../zod";
 
 export const UploadFileRequest = z.object({
   fileName: z.string().openapi({
@@ -10,11 +6,14 @@ export const UploadFileRequest = z.object({
     example: "test.png",
   }),
   fileSize: z.number().openapi({
-    description: "파일 크기",
+    description: "파일 크기(byte)",
     example: 1024,
   }),
 });
 
 export const UploadFileResponse = z.object({
-  url: z.string().openapi({description: "업로드된 파일 URL"}),
+  url: z.string().openapi({
+    description: "업로드된 파일 URL",
+    example: "https://mock.local/files/test.png",
+  }),
 });

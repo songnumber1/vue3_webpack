@@ -7,7 +7,7 @@ export const BridgeContract = {
     request: GetUserRequest,
     response: GetUserResponse,
     description: "유저 조회",
-    tag: "User", // 🔥 추가
+    tag: "User",
   },
 
   LOGIN: {

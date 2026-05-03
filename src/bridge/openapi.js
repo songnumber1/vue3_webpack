@@ -3,33 +3,40 @@ import {
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
+import {z} from "./zod";
 import {BridgeContract} from "./contract";
 import {BRIDGE_PATH} from "./bridgeConstants";
+
+const BridgeErrorResponse = z.object({
+  success: z.boolean().openapi({
+    description: "성공 여부",
+    example: false,
+  }),
+  error: z.string().openapi({
+    description: "오류 메시지",
+    example: "Invalid token",
+  }),
+});
 
 export function generateOpenApi() {
   const registry = new OpenAPIRegistry();
 
-  Object.entries(BridgeContract).forEach(([type, contract]) => {
-    const requestName = `${type}Request`;
-    const responseName = `${type}Response`;
+  registry.register("BridgeErrorResponse", BridgeErrorResponse);
 
-    registry.register(requestName, contract.request);
-    registry.register(responseName, contract.response);
+  Object.entries(BridgeContract).forEach(([type, contract]) => {
+    registry.register(`${type}Request`, contract.request);
+    registry.register(`${type}Response`, contract.response);
 
     registry.registerPath({
       method: "post",
-
-      // 🔥 상수 사용
       path: `${BRIDGE_PATH}${type.toLowerCase()}`,
-
-      description: `[Bridge] ${contract.description}`,
+      description: `[Bridge] ${contract.description || type}`,
       tags: [contract.tag || "Default"],
-
       request: {
         body: {
           content: {
             "application/json": {
-              schema: {$ref: `#/components/schemas/${requestName}`},
+              schema: contract.request,
             },
           },
         },
@@ -39,7 +46,15 @@ export function generateOpenApi() {
           description: "성공",
           content: {
             "application/json": {
-              schema: {$ref: `#/components/schemas/${responseName}`},
+              schema: contract.response,
+            },
+          },
+        },
+        400: {
+          description: "Bridge 오류",
+          content: {
+            "application/json": {
+              schema: BridgeErrorResponse,
             },
           },
         },
@@ -55,14 +70,17 @@ export function generateOpenApi() {
       title: "Bridge 테스트 UI API",
       version: "2.3.1",
       description: `
-🚨 이 API는 HTTP 서버가 아닙니다.
-Native Bridge 테스트용 UI입니다.
-`,
+이 문서는 HTTP 서버 API가 아니라 Android ↔ Web Native Bridge 테스트 문서입니다.
+
+- Swagger UI는 테스트 입력 UI로 사용합니다.
+- 실제 호출은 fetch override를 통해 Native Bridge로 전달됩니다.
+- 요청/응답은 Zod Contract 기준으로 검증됩니다.
+      `,
     },
     tags: [
-      {name: "User", description: "유저 관련 API"},
-      {name: "Auth", description: "인증 관련 API"},
-      {name: "File", description: "파일 관련 API"},
+      {name: "User", description: "유저 관련 Bridge"},
+      {name: "Auth", description: "인증 관련 Bridge"},
+      {name: "File", description: "파일 관련 Bridge"},
     ],
   });
 }
