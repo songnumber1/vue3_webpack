@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^7.3.4",
     "@vue/cli-service": "^5.0.8",
     "axios": "^1.6.8",
     "core-js": "^3.37.1",
@@ -20,9 +21,11 @@
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
+    "swagger-ui-dist": "^5.32.5",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
     "vue": "^3.4.21",
-    "vue-router": "^4.3.0"
+    "vue-router": "^4.3.0",
+    "zod": "^3.25.76"
   }
 }
