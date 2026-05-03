@@ -1,17 +1,28 @@
 import {reactive} from "vue";
 
 export const bridgeStore = reactive({
-  events: [],
+  groups: {}, // requestId 기준
 
   addEvent(event) {
-    this.events.unshift({
-      id: event.id || Date.now(),
-      time: new Date().toLocaleTimeString(),
-      ...event,
-    });
+    const {id} = event;
 
-    if (this.events.length > 100) {
-      this.events.pop();
+    if (!this.groups[id]) {
+      this.groups[id] = {
+        id,
+        type: event.type,
+        createdAt: new Date(),
+        open: true,
+        events: [],
+      };
     }
+
+    this.groups[id].events.push({
+      ...event,
+      time: new Date(),
+    });
+  },
+
+  get groupList() {
+    return Object.values(this.groups).sort((a, b) => b.createdAt - a.createdAt);
   },
 });

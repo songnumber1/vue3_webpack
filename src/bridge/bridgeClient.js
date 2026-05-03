@@ -6,7 +6,6 @@ export function callNative(type, payload, timeout = 5000) {
   return new Promise((resolve, reject) => {
     const requestId = `${Date.now()}_${Math.random()}`;
 
-    // REQUEST
     bridgeStore.addEvent({
       id: requestId,
       type,
@@ -50,7 +49,6 @@ export function callNative(type, payload, timeout = 5000) {
         })
       );
     } else {
-      // MOCK → 반드시 동일 흐름
       setTimeout(() => {
         window.__bridgeResponse({
           requestId,
@@ -62,7 +60,6 @@ export function callNative(type, payload, timeout = 5000) {
   });
 }
 
-// Android 응답
 window.__bridgeResponse = function (response) {
   const {requestId, data, error} = response;
 

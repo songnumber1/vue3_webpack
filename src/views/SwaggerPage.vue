@@ -1,9 +1,10 @@
 <template>
-  <div class="swagger-wrapper">
-    <div id="swagger-ui"></div>
-
-    <!-- 🔥 하단 패널 -->
+  <div class="layout">
     <BridgePanel />
+
+    <div class="swagger-area">
+      <div id="swagger-ui"></div>
+    </div>
   </div>
 </template>
 
@@ -87,8 +88,13 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.swagger-wrapper {
+.layout {
+  display: flex;
   height: 100dvh;
-  overflow-y: auto;
+}
+
+.swagger-area {
+  flex: 1;
+  overflow: auto;
 }
 </style>

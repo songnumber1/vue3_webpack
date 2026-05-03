@@ -1,40 +1,55 @@
 <template>
-  <div class="bridge-panel">
-    <div class="bridge-toggle" @click="toggle">
-      🧪 Bridge Panel {{ open ? "▼" : "▲" }}
+  <div class="bridge-panel" :class="{collapsed: !open}">
+    <!-- 접기 버튼 -->
+    <div class="toggle" @click="toggle">
+      <span class="icon">
+        {{ open ? "⟨" : "⟩" }}
+      </span>
     </div>
 
-    <div class="bridge-content" v-show="open">
-      <div class="panel-body">
-        <div
-          v-for="(e, i) in store.events"
-          :key="i"
-          class="event-card"
-          :class="e.status"
-        >
-          <!-- 헤더 -->
-          <div class="event-header">
-            <span class="badge">{{ e.status }}</span>
-            <span class="type">{{ e.type }}</span>
-            <span class="time">{{ e.time }}</span>
+    <!-- 본문 -->
+    <div class="content">
+      <!-- 헤더 -->
+      <div class="header">
+        <div class="title">Bridge</div>
+        <div class="count">
+          {{ store.groupList.length }}
+        </div>
+      </div>
+
+      <!-- 리스트 -->
+      <div class="list">
+        <div v-for="group in store.groupList" :key="group.id" class="group">
+          <!-- 그룹 헤더 -->
+          <div class="group-header" @click="group.open = !group.open">
+            <div class="left">
+              <span class="dot"></span>
+              <span class="type">{{ group.type }}</span>
+            </div>
+
+            <div class="right">
+              <span class="time">{{ format(group.createdAt) }}</span>
+              <span class="arrow" :class="{open: group.open}"></span>
+            </div>
           </div>
 
-          <!-- Payload -->
-          <div v-if="e.payload" class="block">
-            <div class="label">Request</div>
-            <pre>{{ pretty(e.payload) }}</pre>
-          </div>
+          <!-- 이벤트 -->
+          <div v-show="group.open" class="events">
+            <div
+              v-for="(e, i) in group.events"
+              :key="i"
+              class="item"
+              :class="e.status"
+            >
+              <div class="top">
+                <span class="badge">{{ e.status }}</span>
+                <span class="time">{{ format(e.time) }}</span>
+              </div>
 
-          <!-- Response -->
-          <div v-if="e.response" class="block">
-            <div class="label">Response</div>
-            <pre>{{ pretty(e.response) }}</pre>
-          </div>
-
-          <!-- Error -->
-          <div v-if="e.error" class="block error">
-            <div class="label">Error</div>
-            <pre>{{ e.error }}</pre>
+              <pre v-if="e.payload">{{ pretty(e.payload) }}</pre>
+              <pre v-if="e.response">{{ pretty(e.response) }}</pre>
+              <pre v-if="e.error" class="error">{{ e.error }}</pre>
+            </div>
           </div>
         </div>
       </div>
@@ -52,112 +67,191 @@ const toggle = () => {
   open.value = !open.value;
 };
 
-// JSON pretty 출력
-const pretty = (obj) => {
-  return JSON.stringify(obj, null, 2);
-};
+const pretty = (obj) => JSON.stringify(obj, null, 2);
+
+const format = (date) => new Date(date).toLocaleTimeString();
 </script>
 
 <style scoped>
 .bridge-panel {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 999999;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  width: 320px;
+  background: #f9fafb;
+  border-right: 1px solid #e5e7eb;
+  position: relative;
+  transition: width 0.2s ease;
 }
 
-.bridge-toggle {
-  background: #1f2937;
-  color: #e5e7eb;
-  padding: 10px;
-  text-align: center;
-  font-weight: 600;
+/* 접힘 상태 */
+.bridge-panel.collapsed {
+  width: 48px;
+}
+
+.bridge-panel.collapsed .content {
+  display: none;
+}
+
+/* 토글 버튼 */
+.toggle {
+  position: absolute;
+  top: 12px;
+  right: -14px;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  border-top: 1px solid #374151;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+  font-size: 12px;
+  color: #555;
 }
 
 /* 본문 */
-.bridge-content {
-  height: 320px;
-  background: #111827;
-  color: #e5e7eb;
+.content {
+  height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-/* 스크롤 */
-.panel-body {
-  overflow-y: auto;
-  padding: 10px;
-}
-
-/* 카드 */
-.event-card {
-  background: #1f2937;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-left: 4px solid transparent;
-}
-
-/* 상태별 색상 */
-.event-card.REQUEST {
-  border-color: #60a5fa;
-}
-.event-card.RESPONSE {
-  border-color: #34d399;
-}
-.event-card.ERROR {
-  border-color: #f87171;
+  padding: 12px;
 }
 
 /* 헤더 */
-.event-header {
+.header {
   display: flex;
-  align-items: center;
-  margin-bottom: 6px;
-  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.badge {
-  font-size: 11px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: #374151;
+.title {
+  font-size: 12px;
+  color: #111;
+}
+
+.count {
+  font-size: 12px;
+  color: #6b7280;
+  padding-right: 10px;
+}
+
+/* 리스트 */
+.list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* 그룹 */
+.group {
+  margin-bottom: 12px;
+}
+
+/* 그룹 헤더 */
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #eef2f7;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  background: #3b82f6;
+  border-radius: 50%;
 }
 
 .type {
   font-weight: 600;
+  font-size: 12px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .time {
-  margin-left: auto;
   font-size: 11px;
-  color: #9ca3af;
+  color: #6b7280;
 }
 
-/* 블록 */
-.block {
+.arrow {
+  font-size: 10px;
+}
+
+/* 이벤트 */
+.events {
   margin-top: 6px;
 }
 
-.label {
+.item {
+  background: white;
+  border-radius: 6px;
+  padding: 6px;
+  margin-top: 6px;
   font-size: 11px;
-  color: #9ca3af;
-  margin-bottom: 2px;
+  border-left: 3px solid transparent;
+}
+
+/* 상태 색상 */
+.item.REQUEST {
+  border-color: #3b82f6;
+}
+.item.RESPONSE {
+  border-color: #10b981;
+}
+.item.ERROR {
+  border-color: #ef4444;
+}
+
+/* 상단 */
+.top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 600;
 }
 
 pre {
-  background: #030712;
-  padding: 8px;
-  border-radius: 6px;
-  font-size: 11px;
+  background: #f3f4f6;
+  padding: 6px;
+  border-radius: 4px;
   overflow-x: auto;
 }
 
-.error pre {
-  color: #f87171;
+.error {
+  color: #ef4444;
+}
+
+.arrow {
+  width: 5px;
+  height: 5px;
+  border-right: 2px solid #6b7280;
+  border-bottom: 2px solid #6b7280;
+  transform: rotate(-45deg);
+  transition: transform 0.2s ease;
+}
+
+/* 펼쳐졌을 때 */
+.arrow.open {
+  transform: rotate(45deg);
 }
 </style>
