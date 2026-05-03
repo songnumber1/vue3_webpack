@@ -20,6 +20,7 @@ export function generateOpenApi() {
       method: "post",
       path: `/bridge/${type.toLowerCase()}`,
       description: contract.description || type,
+      tags: [contract.tag || "Default"],
       request: {
         body: {
           content: {
@@ -47,15 +48,14 @@ export function generateOpenApi() {
   return generator.generateDocument({
     openapi: "3.0.0",
     info: {
-      title: "My Custom Bridge API",
+      title: "Bridge 테스트 UI API",
       version: "2.3.1",
       description: "Android ↔ Web Bridge API 문서",
     },
-    servers: [
-      {
-        url: "http://localhost:8080",
-        description: "Local Dev",
-      },
+    tags: [
+      {name: "User", description: "유저 관련 API"},
+      {name: "Auth", description: "인증 관련 API"},
+      {name: "File", description: "파일 관련 API"},
     ],
   });
 }
