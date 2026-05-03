@@ -423,7 +423,10 @@ const suggestions = [
 
 function isCompactViewport() {
   if (typeof window === "undefined") return false;
-  return window.matchMedia?.("(max-width: 900px)")?.matches || window.innerWidth <= 900;
+  return (
+    window.matchMedia?.("(max-width: 900px)")?.matches ||
+    window.innerWidth <= 900
+  );
 }
 
 function markForceBottom(duration = 1800) {
@@ -499,7 +502,9 @@ async function toggleTheme() {
   theme.toggle();
   themeName.value = theme.current;
   await nextTick();
-  await renderMermaidInElement(document.querySelector(".message-list"), {force: true});
+  await renderMermaidInElement(document.querySelector(".message-list"), {
+    force: true,
+  });
   scrollBottom({stable: true});
 }
 
