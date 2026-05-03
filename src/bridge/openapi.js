@@ -14,7 +14,7 @@ const BridgeErrorResponse = z.object({
   }),
   error: z.string().openapi({
     description: "오류 메시지",
-    example: "Invalid token",
+    example: "Invalid request payload: GET_USER",
   }),
 });
 
@@ -68,12 +68,13 @@ export function generateOpenApi() {
     openapi: "3.0.0",
     info: {
       title: "Bridge 테스트 UI API",
-      version: "2.3.1",
+      version: "1.0.0",
       description: `
 이 문서는 HTTP 서버 API가 아니라 Android ↔ Web Native Bridge 테스트 문서입니다.
 
-- Swagger UI는 테스트 입력 UI로 사용합니다.
-- 실제 호출은 fetch override를 통해 Native Bridge로 전달됩니다.
+- Swagger UI는 Bridge 요청 테스트 입력 UI로 사용합니다.
+- 실제 호출은 fetch override를 통해 AndroidBridge로 전달됩니다.
+- AndroidBridge가 없는 일반 브라우저에서는 mock 응답으로 테스트됩니다.
 - 요청/응답은 Zod Contract 기준으로 검증됩니다.
       `,
     },

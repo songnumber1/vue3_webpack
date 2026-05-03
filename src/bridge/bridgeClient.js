@@ -1,6 +1,5 @@
 import {BridgeContract} from "./contract";
-import {bridgeStore} from "./bridgeStore";
-import {BRIDGE_STATUS, BRIDGE_TIMEOUT} from "./bridgeConstants";
+import {BRIDGE_TIMEOUT} from "./bridgeConstants";
 
 const callbacks = {};
 
@@ -18,26 +17,28 @@ function getContract(type) {
   return contract;
 }
 
-function validateRequest(type, payload) {
-  const contract = getContract(type);
-  const parsed = contract.request.safeParse(payload || {});
+function parseBySchema(schema, value, errorPrefix) {
+  const parsed = schema.safeParse(value || {});
 
   if (!parsed.success) {
-    throw new Error(`Invalid request payload: ${type}`);
+    const message = parsed.error?.errors
+      ?.map((error) => `${error.path.join(".") || "root"}: ${error.message}`)
+      .join(", ");
+
+    throw new Error(`${errorPrefix}${message ? ` - ${message}` : ""}`);
   }
 
   return parsed.data;
 }
 
+function validateRequest(type, payload) {
+  const contract = getContract(type);
+  return parseBySchema(contract.request, payload, `Invalid request payload: ${type}`);
+}
+
 function validateResponse(type, data) {
   const contract = getContract(type);
-  const parsed = contract.response.safeParse(data || {});
-
-  if (!parsed.success) {
-    throw new Error(`Invalid response payload: ${type}`);
-  }
-
-  return parsed.data;
+  return parseBySchema(contract.response, data, `Invalid response payload: ${type}`);
 }
 
 function createMockData(type, payload) {
@@ -79,123 +80,7 @@ function normalizeBridgeResponse(response) {
   return response || {};
 }
 
-function addEvent(event) {
-  bridgeStore.addEvent(event);
-}
-
-function addErrorEvent(requestId, type, error, payload) {
-  addEvent({
-    id: requestId,
-    type,
-    payload,
-    error: error instanceof Error ? error.message : String(error),
-    status: BRIDGE_STATUS.ERROR,
-  });
-}
-
-export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
-  return new Promise((resolve, reject) => {
-    const requestId = createRequestId();
-    let validPayload;
-
-    try {
-      validPayload = validateRequest(type, payload);
-    } catch (error) {
-      addErrorEvent(requestId, type, error, payload);
-      reject(error);
-      return;
-    }
-
-    addEvent({
-      id: requestId,
-      type,
-      payload: validPayload,
-      status: BRIDGE_STATUS.REQUEST,
-    });
-
-    let settled = false;
-
-    const finish = (callback) => {
-      if (settled) return;
-      settled = true;
-      clearTimeout(timer);
-      delete callbacks[requestId];
-      callback();
-    };
-
-    const timer = setTimeout(() => {
-      finish(() => {
-        const error = new Error("Bridge timeout");
-        addErrorEvent(requestId, type, error, validPayload);
-        reject(error);
-      });
-    }, timeout);
-
-    callbacks[requestId] = (response) => {
-      finish(() => {
-        try {
-          if (!response.success) {
-            throw new Error(response.error || "Bridge response error");
-          }
-
-          const data = validateResponse(type, response.data);
-          const normalizedResponse = {
-            success: true,
-            data,
-            error: null,
-          };
-
-          addEvent({
-            id: requestId,
-            type,
-            response: normalizedResponse,
-            status: BRIDGE_STATUS.RESPONSE,
-          });
-
-          resolve(normalizedResponse);
-        } catch (error) {
-          const normalizedError = {
-            success: false,
-            data: null,
-            error: error.message,
-          };
-
-          addEvent({
-            id: requestId,
-            type,
-            response: normalizedError,
-            error: error.message,
-            status: BRIDGE_STATUS.ERROR,
-          });
-
-          reject(error);
-        }
-      });
-    };
-
-    if (window.AndroidBridge && typeof window.AndroidBridge.postMessage === "function") {
-      window.AndroidBridge.postMessage(
-        JSON.stringify({
-          requestId,
-          type,
-          payload: validPayload,
-        })
-      );
-      return;
-    }
-
-    // AndroidBridge가 없는 웹 개발 환경에서도 Swagger Execute가 반드시 종료되도록 mock 응답을 동일 흐름으로 전달한다.
-    setTimeout(() => {
-      window.__bridgeResponse({
-        requestId,
-        data: createMockData(type, validPayload),
-        error: null,
-      });
-    }, 100);
-  });
-}
-
-window.__bridgeResponse = function (rawResponse) {
+function completeBridgeResponse(rawResponse) {
   const response = normalizeBridgeResponse(rawResponse);
   const {requestId, data, error} = response;
 
@@ -210,4 +95,74 @@ window.__bridgeResponse = function (rawResponse) {
     data,
     error,
   });
-};
+}
+
+export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
+  return new Promise((resolve, reject) => {
+    const requestId = createRequestId();
+    let validPayload;
+
+    try {
+      validPayload = validateRequest(type, payload);
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    let settled = false;
+
+    const timer = window.setTimeout(() => {
+      if (settled) return;
+
+      settled = true;
+      delete callbacks[requestId];
+      reject(new Error("Bridge timeout"));
+    }, timeout);
+
+    callbacks[requestId] = (response) => {
+      if (settled) return;
+
+      settled = true;
+      window.clearTimeout(timer);
+      delete callbacks[requestId];
+
+      try {
+        if (!response.success) {
+          throw new Error(response.error || "Bridge response error");
+        }
+
+        const data = validateResponse(type, response.data);
+
+        resolve({
+          success: true,
+          data,
+          error: null,
+        });
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    if (window.AndroidBridge && typeof window.AndroidBridge.postMessage === "function") {
+      window.AndroidBridge.postMessage(
+        JSON.stringify({
+          requestId,
+          type,
+          payload: validPayload,
+        })
+      );
+      return;
+    }
+
+    // 웹 브라우저 단독 테스트용 mock. Android 연결 시에는 위 AndroidBridge 분기를 사용한다.
+    window.setTimeout(() => {
+      completeBridgeResponse({
+        requestId,
+        data: createMockData(type, validPayload),
+        error: null,
+      });
+    }, 100);
+  });
+}
+
+window.__bridgeResponse = completeBridgeResponse;
