@@ -1,4 +1,9 @@
-import {BridgeContract} from "./contract";
+import {
+  AndroidToJsContract,
+  BridgeContract,
+  JsToAndroidContract,
+  WebApiContract,
+} from "./contract";
 import {BRIDGE_TIMEOUT} from "./bridgeConstants";
 
 const callbacks = {};
@@ -11,8 +16,8 @@ function createIsoDate() {
   return new Date().toISOString();
 }
 
-function getContract(type) {
-  const contract = BridgeContract[type];
+function getContract(type, contractMap = BridgeContract) {
+  const contract = contractMap[type];
 
   if (!contract) {
     throw new Error(`Unknown bridge type: ${type}`);
@@ -43,22 +48,22 @@ function createBridgeRequest(payload = {}) {
   };
 }
 
-function validateRequest(type, payload) {
-  const contract = getContract(type);
+function validateRequest(type, payload, contractMap = BridgeContract) {
+  const contract = getContract(type, contractMap);
   return parseBySchema(contract.request, createBridgeRequest(payload), `Invalid request payload: ${type}`);
 }
 
-function validateResponse(type, data) {
-  const contract = getContract(type);
+function validateResponse(type, data, contractMap = BridgeContract) {
+  const contract = getContract(type, contractMap);
   return parseBySchema(contract.response, data, `Invalid response payload: ${type}`);
 }
 
-function validateErrorResponse(type, data) {
-  const contract = getContract(type);
+function validateErrorResponse(type, data, contractMap = BridgeContract) {
+  const contract = getContract(type, contractMap);
   return parseBySchema(contract.error, data, `Invalid error response payload: ${type}`);
 }
 
-function createMockData(type, payload) {
+function createWebApiMockData(type, payload) {
   switch (type) {
     case "GET_USER":
       return {
@@ -81,7 +86,31 @@ function createMockData(type, payload) {
   }
 }
 
-function createSuccessResponse(request, data, message = "정상 처리되었습니다.") {
+function createNativeMockData(type, payload) {
+  switch (type) {
+    case "GET_APP_VERSION":
+      return {
+        platform: "web-mock",
+        appVersion: "1.0.0-mock",
+        buildNumber: "100",
+      };
+
+    case "GET_PUSH_TOKEN":
+      return {
+        token: "mock-push-token",
+      };
+
+    case "COPY_CLIPBOARD":
+      return {
+        copied: Boolean(payload.text),
+      };
+
+    default:
+      return {};
+  }
+}
+
+function createSuccessResponse(request, data, message = "정상 처리되었습니다.", meta = {}) {
   return {
     requestId: request.requestId,
     requestDate: request.requestDate,
@@ -90,7 +119,7 @@ function createSuccessResponse(request, data, message = "정상 처리되었습�
     code: "SUCCESS",
     data,
     message,
-    meta: {},
+    meta,
   };
 }
 
@@ -126,12 +155,10 @@ function normalizeBridgeResponse(response, request) {
     return createErrorResponse(request, "Empty bridge response", "EMPTY_RESPONSE");
   }
 
-  // 신규 표준 응답 포맷: BaseResponse / BaseResponseError
   if (typeof response.isSuccess === "boolean") {
     return response;
   }
 
-  // 기존 Android 응답 포맷 호환: { requestId, data, error }
   if (response.error) {
     return createErrorResponse(
       {
@@ -172,12 +199,33 @@ function completeBridgeResponse(rawResponse) {
   callback(rawResponse);
 }
 
+function throwIfErrorResponse(type, response, contractMap) {
+  if (response.isSuccess) return;
+
+  const errorResponse = validateErrorResponse(type, response, contractMap);
+  const error = new Error(errorResponse.message || errorResponse.error?.detail || "Bridge response error");
+  error.response = errorResponse;
+  throw error;
+}
+
+export function executeWebApi(type, payload = {}) {
+  const request = validateRequest(type, payload, WebApiContract);
+  const response = createSuccessResponse(
+    request,
+    createWebApiMockData(type, request),
+    "JS Web API mock 응답입니다.",
+    {category: "web-api"}
+  );
+
+  return Promise.resolve(validateResponse(type, response, WebApiContract));
+}
+
 export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
   return new Promise((resolve, reject) => {
     let validPayload;
 
     try {
-      validPayload = validateRequest(type, payload);
+      validPayload = validateRequest(type, payload, JsToAndroidContract);
     } catch (error) {
       reject(error);
       return;
@@ -203,15 +251,8 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 
       try {
         const response = normalizeBridgeResponse(rawResponse, validPayload);
-
-        if (!response.isSuccess) {
-          const errorResponse = validateErrorResponse(type, response);
-          const error = new Error(errorResponse.message || errorResponse.error?.detail || "Bridge response error");
-          error.response = errorResponse;
-          throw error;
-        }
-
-        resolve(validateResponse(type, response));
+        throwIfErrorResponse(type, response, JsToAndroidContract);
+        resolve(validateResponse(type, response, JsToAndroidContract));
       } catch (error) {
         reject(error);
       }
@@ -228,11 +269,53 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       return;
     }
 
-    // 웹 브라우저 단독 테스트용 mock. Android 연결 시에는 위 AndroidBridge 분기를 사용한다.
     window.setTimeout(() => {
-      completeBridgeResponse(createSuccessResponse(validPayload, createMockData(type, validPayload)));
+      completeBridgeResponse(createSuccessResponse(
+        validPayload,
+        createNativeMockData(type, validPayload),
+        "Android Bridge mock 응답입니다.",
+        {category: "js-to-android", runtime: "mock"}
+      ));
     }, 100);
   });
 }
 
+export function receiveNativeEvent(type, payload = {}) {
+  const request = validateRequest(type, payload, AndroidToJsContract);
+
+  window.dispatchEvent(new CustomEvent("android-to-js", {
+    detail: {
+      type,
+      payload: request,
+    },
+  }));
+
+  const globalHandlerName = `__${type}`;
+  const globalHandler = window[globalHandlerName];
+
+  if (typeof globalHandler === "function") {
+    globalHandler(request);
+  }
+
+  const response = createSuccessResponse(
+    request,
+    {
+      handled: true,
+      eventName: type,
+    },
+    "Android → JS 이벤트를 수신했습니다.",
+    {category: "android-to-js"}
+  );
+
+  return validateResponse(type, response, AndroidToJsContract);
+}
+
+export function executeContract(category, type, payload = {}) {
+  if (category === "web-api") return executeWebApi(type, payload);
+  if (category === "js-to-android") return callNative(type, payload);
+  if (category === "android-to-js") return Promise.resolve(receiveNativeEvent(type, payload));
+  return executeWebApi(type, payload);
+}
+
 window.__bridgeResponse = completeBridgeResponse;
+window.__receiveNativeEvent = receiveNativeEvent;

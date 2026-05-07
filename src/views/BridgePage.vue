@@ -1,23 +1,26 @@
 <template>
   <div class="container">
     <h2>Bridge Test Page</h2>
+    <p class="summary">Windows/Web에서는 mock으로 실행되고, Android WebView에서는 AndroidBridge가 있으면 real bridge로 전달됩니다.</p>
 
-    <!-- GET USER -->
     <div class="card">
-      <h3>GET_USER</h3>
+      <h3>REST / Web API - GET_USER</h3>
       <input v-model.number="userId" type="number" placeholder="User ID" />
       <button @click="handleGetUser">실행</button>
     </div>
 
-    <!-- LOGIN -->
     <div class="card">
-      <h3>LOGIN</h3>
-      <input v-model="username" placeholder="username" />
-      <input v-model="password" type="password" placeholder="password" />
-      <button @click="handleLogin">실행</button>
+      <h3>JS → Android - GET_APP_VERSION</h3>
+      <button @click="handleGetAppVersion">실행</button>
     </div>
 
-    <!-- 결과 -->
+    <div class="card">
+      <h3>Android → JS - ON_PUSH_CLICK</h3>
+      <input v-model="notificationId" placeholder="notificationId" />
+      <input v-model="route" placeholder="route" />
+      <button @click="handlePushClick">실행</button>
+    </div>
+
     <div class="result">
       <h3>결과</h3>
       <pre>{{ result }}</pre>
@@ -27,42 +30,55 @@
 
 <script setup>
 import {ref} from "vue";
-import {callNative} from "@/bridge/bridgeClient";
+import {callNative, executeWebApi, receiveNativeEvent} from "@/bridge/bridgeClient";
 
 const userId = ref(1);
-const username = ref("admin");
-const password = ref("1234");
-
+const notificationId = ref("notice-1000");
+const route = ref("/notice/1000");
 const result = ref("");
 
-// GET USER
+const printResult = (value) => {
+  result.value = JSON.stringify(value, null, 2);
+};
+
+const printError = (error) => {
+  result.value = `ERROR: ${error.message}\n${JSON.stringify(error.response || {}, null, 2)}`;
+};
+
 const handleGetUser = async () => {
   result.value = "Loading...";
 
   try {
-    const res = await callNative("GET_USER", {
-      id: userId.value,
-    });
-
-    result.value = JSON.stringify(res, null, 2);
-  } catch (e) {
-    result.value = "ERROR: " + e.message;
+    printResult(await executeWebApi("GET_USER", {id: userId.value}));
+  } catch (error) {
+    printError(error);
   }
 };
 
-// LOGIN
-const handleLogin = async () => {
+const handleGetAppVersion = async () => {
   result.value = "Loading...";
 
   try {
-    const res = await callNative("LOGIN", {
-      username: username.value,
-      password: password.value,
-    });
+    printResult(await callNative("GET_APP_VERSION", {}));
+  } catch (error) {
+    printError(error);
+  }
+};
 
-    result.value = JSON.stringify(res, null, 2);
-  } catch (e) {
-    result.value = "ERROR: " + e.message;
+const handlePushClick = () => {
+  result.value = "Loading...";
+
+  try {
+    printResult(receiveNativeEvent("ON_PUSH_CLICK", {
+      notificationId: notificationId.value,
+      route: route.value,
+      payload: {
+        type: "notice",
+        id: notificationId.value,
+      },
+    }));
+  } catch (error) {
+    printError(error);
   }
 };
 </script>
@@ -70,8 +86,13 @@ const handleLogin = async () => {
 <style scoped>
 .container {
   padding: 20px;
-  max-width: 600px;
+  max-width: 760px;
   margin: auto;
+}
+
+.summary {
+  color: #555;
+  line-height: 1.5;
 }
 
 .card {
@@ -83,8 +104,9 @@ const handleLogin = async () => {
 
 input {
   display: block;
+  box-sizing: border-box;
   margin-bottom: 8px;
-  padding: 6px;
+  padding: 8px;
   width: 100%;
 }
 
@@ -98,5 +120,6 @@ button {
   color: #0f0;
   padding: 10px;
   border-radius: 8px;
+  overflow: auto;
 }
 </style>
