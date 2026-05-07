@@ -4,7 +4,7 @@ import {
   JsToAndroidContract,
   WebApiContract,
 } from "./contract";
-import {BRIDGE_TIMEOUT} from "./bridgeConstants";
+import {BRIDGE_CATEGORY, BRIDGE_TIMEOUT} from "./bridgeConstants";
 
 const callbacks = {};
 
@@ -63,44 +63,30 @@ function validateErrorResponse(type, data, contractMap = BridgeContract) {
   return parseBySchema(contract.error, data, `Invalid error response payload: ${type}`);
 }
 
-function createWebApiMockData(type, payload) {
-  switch (type) {
-    case "GET_USER":
-      return {
-        id: payload.id,
-        name: "Mock User",
-      };
-
-    case "LOGIN":
-      return {
-        token: "mock.jwt.token",
-      };
-
-    case "UPLOAD_FILE":
-      return {
-        url: `https://mock.local/files/${payload.fileName}`,
-      };
-
-    default:
-      return {};
-  }
-}
-
-function createNativeMockData(type, payload) {
+async function runWebNativeRuntime(type, payload) {
   switch (type) {
     case "GET_APP_VERSION":
       return {
-        platform: "web-mock",
-        appVersion: "1.0.0-mock",
-        buildNumber: "100",
+        platform: "web-runtime",
+        appVersion: "web-dev-runtime",
+        buildNumber: "browser",
       };
 
     case "GET_PUSH_TOKEN":
       return {
-        token: "mock-push-token",
+        token: window.localStorage?.getItem("web_runtime_push_token") || `web-token-${payload.requestId}`,
       };
 
     case "COPY_CLIPBOARD":
+      if (navigator.clipboard?.writeText) {
+        try {
+          await navigator.clipboard.writeText(payload.text);
+        } catch (error) {
+          window.localStorage?.setItem("web_runtime_clipboard", payload.text);
+        }
+      } else {
+        window.localStorage?.setItem("web_runtime_clipboard", payload.text);
+      }
       return {
         copied: Boolean(payload.text),
       };
@@ -108,6 +94,28 @@ function createNativeMockData(type, payload) {
     default:
       return {};
   }
+}
+
+function getAndroidBridgeMethodName(type) {
+  const methodMap = {
+    GET_APP_VERSION: "getAppVersion",
+    GET_PUSH_TOKEN: "getPushToken",
+    COPY_CLIPBOARD: "copyClipboard",
+  };
+
+  return methodMap[type];
+}
+
+function callDirectAndroidBridge(type, payload) {
+  const methodName = getAndroidBridgeMethodName(type);
+  const bridge = window.AndroidBridge;
+
+  if (!bridge || !methodName || typeof bridge[methodName] !== "function") {
+    return null;
+  }
+
+  const raw = bridge[methodName](JSON.stringify(payload));
+  return Promise.resolve(raw);
 }
 
 function createSuccessResponse(request, data, message = "정상 처리되었습니다.", meta = {}) {
@@ -208,16 +216,132 @@ function throwIfErrorResponse(type, response, contractMap) {
   throw error;
 }
 
-export function executeWebApi(type, payload = {}) {
-  const request = validateRequest(type, payload, WebApiContract);
-  const response = createSuccessResponse(
+
+function getApiBaseUrl() {
+  const configured = process.env.VUE_APP_API_BASE_URL || "/api";
+  return configured.replace(/\/$/, "");
+}
+
+function interpolatePath(path, payload) {
+  return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) => encodeURIComponent(payload?.[key] ?? ""));
+}
+
+function buildBackendUrl(contract, payload) {
+  const rawPath = contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
+  const path = interpolatePath(rawPath, payload);
+  return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+function pickRequestBody(method, request) {
+  const normalizedMethod = method.toUpperCase();
+
+  if (normalizedMethod === "GET" || normalizedMethod === "HEAD") {
+    return undefined;
+  }
+
+  return JSON.stringify(request);
+}
+
+async function parseBackendBody(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const text = await response.text();
+
+  if (!text) return null;
+
+  if (contentType.includes("application/json")) {
+    return JSON.parse(text);
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    return text;
+  }
+}
+
+function normalizeBackendSuccess(request, backendBody, contract) {
+  if (backendBody && typeof backendBody === "object" && typeof backendBody.isSuccess === "boolean") {
+    return backendBody;
+  }
+
+  return createSuccessResponse(
     request,
-    createWebApiMockData(type, request),
-    "JS Web API mock 응답입니다.",
-    {category: "web-api"}
+    backendBody,
+    "Backend API를 실제 호출한 결과입니다.",
+    {
+      category: BRIDGE_CATEGORY.WEB_API,
+      runtime: "backend",
+      endpoint: contract.httpPath,
+      method: contract.httpMethod,
+    }
+  );
+}
+
+function normalizeBackendError(request, response, backendBody, contract) {
+  const status = response?.status || 500;
+  const statusText = response?.statusText || "Backend Error";
+  const backendMessage = backendBody?.message || backendBody?.error || backendBody?.detail;
+  const error = createErrorResponse(
+    request,
+    backendMessage || `${status} ${statusText}`,
+    `HTTP_${status}`
   );
 
-  return Promise.resolve(validateResponse(type, response, WebApiContract));
+  error.meta = {
+    category: BRIDGE_CATEGORY.WEB_API,
+    runtime: "backend",
+    endpoint: contract.httpPath,
+    method: contract.httpMethod,
+    status,
+    statusText,
+    raw: backendBody,
+  };
+
+  return error;
+}
+
+async function requestBackend(type, request, contract) {
+  const method = (contract.httpMethod || "POST").toUpperCase();
+  const url = buildBackendUrl(contract, request);
+  const response = await window.fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+    },
+    body: pickRequestBody(method, request),
+  });
+  const backendBody = await parseBackendBody(response);
+
+  if (!response.ok) {
+    return normalizeBackendError(request, response, backendBody, contract);
+  }
+
+  return normalizeBackendSuccess(request, backendBody, contract);
+}
+
+export async function executeWebApi(type, payload = {}) {
+  const contract = getContract(type, WebApiContract);
+  const request = validateRequest(type, payload, WebApiContract);
+
+  try {
+    const response = await requestBackend(type, request, contract);
+    throwIfErrorResponse(type, response, WebApiContract);
+    return validateResponse(type, response, WebApiContract);
+  } catch (error) {
+    if (error?.response) throw error;
+
+    const errorResponse = createErrorResponse(request, error, "BACKEND_CALL_ERROR");
+    errorResponse.meta = {
+      category: BRIDGE_CATEGORY.WEB_API,
+      runtime: "backend",
+      endpoint: contract.httpPath,
+      method: contract.httpMethod,
+    };
+
+    throwIfErrorResponse(type, errorResponse, WebApiContract);
+    return errorResponse;
+  }
 }
 
 export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
@@ -269,14 +393,31 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       return;
     }
 
-    window.setTimeout(() => {
-      completeBridgeResponse(createSuccessResponse(
-        validPayload,
-        createNativeMockData(type, validPayload),
-        "Android Bridge mock 응답입니다.",
-        {category: "js-to-android", runtime: "mock"}
-      ));
-    }, 100);
+    const directBridgeResult = callDirectAndroidBridge(type, validPayload);
+
+    if (directBridgeResult) {
+      directBridgeResult
+        .then((rawResponse) => {
+          completeBridgeResponse(normalizeBridgeResponse(rawResponse, validPayload));
+        })
+        .catch((error) => {
+          completeBridgeResponse(createErrorResponse(validPayload, error, "ANDROID_BRIDGE_ERROR"));
+        });
+      return;
+    }
+
+    runWebNativeRuntime(type, validPayload)
+      .then((data) => {
+        completeBridgeResponse(createSuccessResponse(
+          validPayload,
+          data,
+          "Web Native Runtime으로 실제 실행되었습니다.",
+          {category: "js-to-android", runtime: "web-native-runtime"}
+        ));
+      })
+      .catch((error) => {
+        completeBridgeResponse(createErrorResponse(validPayload, error, "WEB_NATIVE_RUNTIME_ERROR"));
+      });
   });
 }
 

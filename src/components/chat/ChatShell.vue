@@ -1,16 +1,83 @@
 <template>
   <div
     class="chatgpt-shell"
-    :class="{'chatgpt-shell--keyboard-open': keyboardOpen}"
+    :class="{'chatgpt-shell--keyboard-open': keyboardOpen, 'chatgpt-shell--sidebar-collapsed': sidebarCollapsed}"
   >
-    <aside class="desktop-sidebar">
+    <aside class="desktop-sidebar" :class="{'desktop-sidebar--collapsed': sidebarCollapsed}">
       <SidebarContent
+        v-if="!sidebarCollapsed"
         :histories="histories"
         :projects="projects"
         :active-project-id="activeProjectId"
         @new-chat="startNewChat"
         @select-history="loadHistory"
+        @toggle-collapse="sidebarCollapsed = true"
       />
+      <div v-else class="collapsed-sidebar" aria-label="접힌 사이드바">
+        <div class="collapsed-sidebar-actions">
+          <button
+            class="collapsed-icon-button"
+            type="button"
+            title="사이드바 열기"
+            aria-label="사이드바 열기"
+            @click="sidebarCollapsed = false"
+          >
+            <SvgIcon name="panel" />
+          </button>
+          <button
+            class="collapsed-icon-button"
+            type="button"
+            title="새 채팅"
+            aria-label="새 채팅"
+            @click="startNewChat"
+          >
+            <SvgIcon name="pencil" />
+          </button>
+          <button
+            class="collapsed-icon-button"
+            type="button"
+            title="채팅 검색"
+            aria-label="채팅 검색"
+            @click="collapsedRecentOpen = false"
+          >
+            <SvgIcon name="search" />
+          </button>
+          <button
+            class="collapsed-icon-button collapsed-icon-button--active"
+            type="button"
+            title="최근 채팅"
+            aria-label="최근 채팅"
+            @click="collapsedRecentOpen = !collapsedRecentOpen"
+          >
+            <SvgIcon name="chat" />
+          </button>
+        </div>
+
+        <transition name="collapsed-popover-fade">
+          <section v-if="collapsedRecentOpen" class="collapsed-recent-popover" aria-label="최근 채팅 목록">
+            <h2>최근 채팅</h2>
+            <button
+              v-for="item in histories"
+              :key="item.id"
+              class="collapsed-recent-item"
+              type="button"
+              @click="loadHistoryFromCollapsed(item)"
+            >
+              {{ item.title }}
+            </button>
+          </section>
+        </transition>
+
+        <button
+          class="collapsed-user-button"
+          type="button"
+          title="사용자"
+          aria-label="사용자"
+          @click="collapsedRecentOpen = false"
+        >
+          민
+        </button>
+      </div>
     </aside>
 
     <transition name="drawer-fade">
@@ -41,6 +108,8 @@
         :theme-name="themeName"
         @open-drawer="drawerOpen = true"
         @toggle-theme="toggleTheme"
+        @open-swagger="openSwagger"
+        @open-bridge="openBridge"
       />
 
       <section v-if="messages.length === 0" class="empty-stage">
@@ -130,6 +199,7 @@ import {
   onMounted,
   ref,
 } from "vue";
+import {useRouter} from "vue-router";
 import {useAppContext} from "@/composables/useAppContext";
 import {streamText} from "@/utils/fakeStream";
 import {loadMarkdownShowcase} from "@/utils/markdownSamples";
@@ -151,6 +221,8 @@ const ICONS = {
   plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
   folder:
     '<path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4.1l2.1 2.4H18a2.5 2.5 0 0 1 2.5 2.5v6.6A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5v-9Z"/>',
+  panel: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v16"/>',
+  chat: '<path d="M5 6.8A4 4 0 0 1 9 3h6a4 4 0 0 1 4 4v4.3a4 4 0 0 1-4 4H9.3L5 20v-4.7a4 4 0 0 1-1-2.7V6.8Z"/>',
   project: '<path d="M5 7.5h14l-2 9H3l2-9Z"/>',
 };
 
@@ -185,7 +257,7 @@ const SidebarContent = defineComponent({
     activeProjectId: {type: Number, required: true},
     mobile: {type: Boolean, default: false},
   },
-  emits: ["new-chat", "select-history", "close"],
+  emits: ["new-chat", "select-history", "close", "toggle-collapse"],
   setup(props, {emit}) {
     return () =>
       h(
@@ -199,20 +271,18 @@ const SidebarContent = defineComponent({
         [
           h("div", {class: "sidebar-top"}, [
             h("div", {class: "sidebar-title"}, "ChatGPT"),
-            props.mobile
-              ? h("div", {class: "sidebar-top-actions"}, [
-                  h(
-                    "button",
-                    {
-                      class: "sidebar-round",
-                      type: "button",
-                      onClick: () => emit("close"),
-                      title: "닫기",
-                    },
-                    "×"
-                  ),
-                ])
-              : null,
+            h("div", {class: "sidebar-top-actions"}, [
+              h(
+                "button",
+                {
+                  class: "sidebar-round",
+                  type: "button",
+                  onClick: () => props.mobile ? emit("close") : emit("toggle-collapse"),
+                  title: props.mobile ? "닫기" : "사이드바 숨기기",
+                },
+                props.mobile ? "×" : "☰"
+              ),
+            ]),
           ]),
           h("nav", {class: "quick-menu"}, [
             h(
@@ -297,6 +367,7 @@ const SidebarContent = defineComponent({
   },
 });
 
+const router = useRouter();
 const {theme} = useAppContext();
 const listRef = ref(null);
 const {scrollToBottom} = useAutoScroll(listRef);
@@ -310,6 +381,8 @@ const {keyboardOpen, refreshViewport} = useViewportGuard({
 const isGenerating = ref(false);
 const themeName = ref(theme.current);
 const drawerOpen = ref(false);
+const sidebarCollapsed = ref(false);
+const collapsedRecentOpen = ref(false);
 const selectedModel = ref("gpt-5-thinking");
 const activeProjectId = ref(1);
 let removeMobileMediaQueryListener = null;
@@ -468,12 +541,19 @@ function handlePromptResize() {
 
 function closeDrawerOnViewportChange() {
   drawerOpen.value = false;
+  collapsedRecentOpen.value = false;
 }
 
 async function startNewChat() {
   messages.value = [];
   drawerOpen.value = false;
+  collapsedRecentOpen.value = false;
   forceBottomUntil = 0;
+}
+
+async function loadHistoryFromCollapsed(item) {
+  collapsedRecentOpen.value = false;
+  await loadHistory(item);
 }
 
 async function loadHistory(item) {
@@ -506,6 +586,14 @@ async function toggleTheme() {
     force: true,
   });
   scrollBottom({stable: true});
+}
+
+function openSwagger() {
+  router.push("/swagger");
+}
+
+function openBridge() {
+  router.push("/bridge");
 }
 
 async function handleSubmit(text) {
@@ -589,6 +677,7 @@ async function loadShowcaseConversation() {
 
 onMounted(async () => {
   drawerOpen.value = false;
+  collapsedRecentOpen.value = false;
   const mobileMediaQuery = window.matchMedia?.("(max-width: 900px)");
   removeMobileMediaQueryListener = addMediaQueryListener(
     mobileMediaQuery,

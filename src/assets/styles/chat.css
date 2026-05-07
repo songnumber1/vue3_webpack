@@ -14,6 +14,62 @@
   background: var(--sidebar-bg);
 }
 
+.chatgpt-shell--sidebar-collapsed {
+  grid-template-columns: 68px minmax(0, 1fr);
+}
+
+.desktop-sidebar--collapsed {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.collapsed-sidebar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 8px;
+}
+
+.collapsed-nav-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--control-bg);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 900;
+  transition: background var(--duration-fast), transform var(--duration-fast), border-color var(--duration-fast);
+}
+
+.collapsed-nav-button:hover {
+  background: var(--control-hover);
+  transform: translateY(-1px);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.document-toggle svg,
+.test-toggle svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .sidebar-content {
   height: 100%;
   display: flex;
@@ -2215,4 +2271,184 @@ body,
     width: 38px;
     height: 38px;
   }
+}
+
+@media (max-width: 900px) {
+  .topbar-actions {
+    gap: 6px;
+  }
+
+  .topbar-actions .round-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .document-toggle svg,
+  .test-toggle svg {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+@media (max-width: 520px) {
+  .topbar-actions {
+    gap: 4px;
+  }
+
+  .topbar-actions .round-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Collapsed sidebar patch: ChatGPT-like rail with recent chat flyout. */
+.chatgpt-shell--sidebar-collapsed {
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.desktop-sidebar--collapsed {
+  position: relative;
+  display: block;
+  overflow: visible;
+  z-index: 80;
+}
+
+.collapsed-sidebar {
+  position: relative;
+  width: 48px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 6px;
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar-bg);
+}
+
+.collapsed-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.collapsed-icon-button,
+.collapsed-user-button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--duration-fast), color var(--duration-fast), transform var(--duration-fast);
+}
+
+.collapsed-icon-button:hover,
+.collapsed-icon-button--active,
+.collapsed-user-button:hover {
+  background: var(--control-hover);
+}
+
+.collapsed-icon-button .nav-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.collapsed-user-button {
+  margin-bottom: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.collapsed-recent-popover {
+  position: absolute;
+  left: calc(100% - 12px);
+  top: 122px;
+  width: 268px;
+  max-height: min(70dvh, 520px);
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-menu);
+  z-index: 100;
+}
+
+.collapsed-recent-popover h2 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.collapsed-recent-item {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collapsed-recent-item:hover {
+  color: var(--primary);
+}
+
+.collapsed-popover-fade-enter-active,
+.collapsed-popover-fade-leave-active {
+  transition: opacity 140ms ease, transform 140ms ease;
+}
+
+.collapsed-popover-fade-enter-from,
+.collapsed-popover-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+@media (max-width: 900px) {
+  .chatgpt-shell--sidebar-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-sidebar--collapsed,
+  .collapsed-sidebar {
+    display: none;
+  }
+}
+
+/* Header action patch: keep theme, document and test buttons aligned together. */
+.mobile-topbar .topbar-actions {
+  margin-left: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.mobile-topbar .theme-toggle,
+.mobile-topbar .document-toggle,
+.mobile-topbar .test-toggle {
+  position: static !important;
+  inset: auto !important;
 }

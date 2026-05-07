@@ -21,7 +21,7 @@ const CATEGORY_OPTIONS = [
   {
     value: BRIDGE_CATEGORY.WEB_API,
     label: "REST / Web API",
-    description: "JS에서 axios 또는 mock API를 호출하고 표준 응답으로 정규화하는 contract",
+    description: "JS에서 실제 backend API를 호출하고 표준 응답으로 정규화하는 contract",
   },
   {
     value: BRIDGE_CATEGORY.JS_TO_ANDROID,
@@ -122,11 +122,11 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
 이 문서는 HTTP 서버 Swagger만을 위한 문서가 아니라 WebView 기반 JS Runtime과 Android Bridge 간 contract를 함께 테스트하기 위한 문서입니다.
 
 - 상단 카테고리에서 REST / Web API, JS → Android, Android → JS contract를 전환할 수 있습니다.
-- REST / Web API는 JS에서 axios 또는 mock API를 호출한 뒤 표준 응답으로 정규화하는 흐름입니다.
+- REST / Web API는 JS에서 실제 backend API를 호출한 뒤 표준 응답으로 정규화하는 흐름입니다.
 - JS → Android는 JS가 Android Bridge에 버전, 푸시 토큰, 클립보드 등 네이티브 기능을 요청하는 흐름입니다.
 - Android → JS는 Android가 WebView의 JS 이벤트 핸들러를 호출하는 흐름을 Swagger에서 시뮬레이션합니다.
-- AndroidBridge가 없는 Windows/Web 브라우저에서는 mock 응답으로 테스트됩니다.
-- 실제 Android WebView에서는 AndroidBridge.postMessage가 있으면 real bridge로 전달됩니다.
+- AndroidBridge가 없는 Windows/Web 브라우저에서는 Web Native Runtime으로 JS → Android 흐름을 실제 비동기 실행합니다.
+- 실제 Android WebView에서는 AndroidBridge.postMessage 또는 직접 bridge method가 있으면 real bridge로 전달됩니다.
 - 모든 요청은 BaseRequest(requestId, requestDate)를 기본으로 포함합니다.
 - 모든 응답은 BaseResponse(requestId, requestDate, responseDate, isSuccess, code, data, message, meta)를 기본으로 포함합니다.
 - 모든 오류 응답은 BridgeErrorResponse를 공통으로 사용하고 error 키를 포함합니다.
@@ -135,7 +135,7 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
       `,
     },
     tags: [
-      {name: "REST / Web API", description: "JS axios/mock API contract"},
+      {name: "REST / Web API", description: "JS 실제 backend API contract"},
       {name: "JS → Android", description: "JS에서 Android Native Bridge로 요청하는 contract"},
       {name: "Android → JS", description: "Android에서 WebView JS로 전달하는 이벤트 contract"},
     ],
