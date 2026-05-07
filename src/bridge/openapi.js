@@ -24,8 +24,8 @@ export function generateOpenApi() {
   registry.register("BridgeErrorResponse", BridgeErrorResponse);
 
   Object.entries(BridgeContract).forEach(([type, contract]) => {
-    registry.register(`${type}Request`, contract.request);
-    registry.register(`${type}Response`, contract.response);
+    registry.register(`${type}_Request`, contract.request);
+    registry.register(`${type}_Response`, contract.response);
 
     registry.registerPath({
       method: "post",
