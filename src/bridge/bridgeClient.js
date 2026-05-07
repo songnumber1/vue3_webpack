@@ -4,7 +4,11 @@ import {BRIDGE_TIMEOUT} from "./bridgeConstants";
 const callbacks = {};
 
 function createRequestId() {
-  return `${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  return `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+}
+
+function createIsoDate() {
+  return new Date().toISOString();
 }
 
 function getContract(type) {
@@ -31,14 +35,27 @@ function parseBySchema(schema, value, errorPrefix) {
   return parsed.data;
 }
 
+function createBridgeRequest(payload = {}) {
+  return {
+    requestId: payload.requestId || createRequestId(),
+    requestDate: payload.requestDate || createIsoDate(),
+    ...payload,
+  };
+}
+
 function validateRequest(type, payload) {
   const contract = getContract(type);
-  return parseBySchema(contract.request, payload, `Invalid request payload: ${type}`);
+  return parseBySchema(contract.request, createBridgeRequest(payload), `Invalid request payload: ${type}`);
 }
 
 function validateResponse(type, data) {
   const contract = getContract(type);
   return parseBySchema(contract.response, data, `Invalid response payload: ${type}`);
+}
+
+function validateErrorResponse(type, data) {
+  const contract = getContract(type);
+  return parseBySchema(contract.error, data, `Invalid error response payload: ${type}`);
 }
 
 function createMockData(type, payload) {
@@ -64,25 +81,87 @@ function createMockData(type, payload) {
   }
 }
 
-function normalizeBridgeResponse(response) {
+function createSuccessResponse(request, data, message = "정상 처리되었습니다.") {
+  return {
+    requestId: request.requestId,
+    requestDate: request.requestDate,
+    responseDate: createIsoDate(),
+    isSuccess: true,
+    code: "SUCCESS",
+    data,
+    message,
+    meta: {},
+  };
+}
+
+function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
+  const message = error instanceof Error ? error.message : String(error || "Bridge response error");
+
+  return {
+    requestId: request?.requestId || createRequestId(),
+    requestDate: request?.requestDate || createIsoDate(),
+    responseDate: createIsoDate(),
+    isSuccess: false,
+    code,
+    data: null,
+    message,
+    meta: {},
+    error: {
+      type: code,
+      detail: message,
+    },
+  };
+}
+
+function normalizeBridgeResponse(response, request) {
   if (typeof response === "string") {
     try {
       return JSON.parse(response);
     } catch (error) {
-      return {
-        requestId: null,
-        data: null,
-        error: "Invalid bridge response JSON",
-      };
+      return createErrorResponse(request, "Invalid bridge response JSON", "INVALID_JSON");
     }
   }
 
-  return response || {};
+  if (!response) {
+    return createErrorResponse(request, "Empty bridge response", "EMPTY_RESPONSE");
+  }
+
+  // 신규 표준 응답 포맷: BaseResponse / BaseResponseError
+  if (typeof response.isSuccess === "boolean") {
+    return response;
+  }
+
+  // 기존 Android 응답 포맷 호환: { requestId, data, error }
+  if (response.error) {
+    return createErrorResponse(
+      {
+        requestId: response.requestId || request?.requestId,
+        requestDate: response.requestDate || request?.requestDate,
+      },
+      response.error,
+      "BRIDGE_ERROR"
+    );
+  }
+
+  return createSuccessResponse(
+    {
+      requestId: response.requestId || request?.requestId,
+      requestDate: response.requestDate || request?.requestDate,
+    },
+    response.data ?? response
+  );
 }
 
 function completeBridgeResponse(rawResponse) {
-  const response = normalizeBridgeResponse(rawResponse);
-  const {requestId, data, error} = response;
+  const requestId = typeof rawResponse === "string"
+    ? (() => {
+        try {
+          return JSON.parse(rawResponse)?.requestId;
+        } catch (error) {
+          return null;
+        }
+      })()
+    : rawResponse?.requestId;
 
   if (!requestId) return;
 
@@ -90,16 +169,11 @@ function completeBridgeResponse(rawResponse) {
 
   if (!callback) return;
 
-  callback({
-    success: !error,
-    data,
-    error,
-  });
+  callback(rawResponse);
 }
 
 export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
   return new Promise((resolve, reject) => {
-    const requestId = createRequestId();
     let validPayload;
 
     try {
@@ -109,6 +183,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       return;
     }
 
+    const {requestId} = validPayload;
     let settled = false;
 
     const timer = window.setTimeout(() => {
@@ -119,7 +194,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       reject(new Error("Bridge timeout"));
     }, timeout);
 
-    callbacks[requestId] = (response) => {
+    callbacks[requestId] = (rawResponse) => {
       if (settled) return;
 
       settled = true;
@@ -127,17 +202,16 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       delete callbacks[requestId];
 
       try {
-        if (!response.success) {
-          throw new Error(response.error || "Bridge response error");
+        const response = normalizeBridgeResponse(rawResponse, validPayload);
+
+        if (!response.isSuccess) {
+          const errorResponse = validateErrorResponse(type, response);
+          const error = new Error(errorResponse.message || errorResponse.error?.detail || "Bridge response error");
+          error.response = errorResponse;
+          throw error;
         }
 
-        const data = validateResponse(type, response.data);
-
-        resolve({
-          success: true,
-          data,
-          error: null,
-        });
+        resolve(validateResponse(type, response));
       } catch (error) {
         reject(error);
       }
@@ -156,11 +230,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 
     // 웹 브라우저 단독 테스트용 mock. Android 연결 시에는 위 AndroidBridge 분기를 사용한다.
     window.setTimeout(() => {
-      completeBridgeResponse({
-        requestId,
-        data: createMockData(type, validPayload),
-        error: null,
-      });
+      completeBridgeResponse(createSuccessResponse(validPayload, createMockData(type, validPayload)));
     }, 100);
   });
 }

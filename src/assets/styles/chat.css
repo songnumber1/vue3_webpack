@@ -2139,3 +2139,80 @@ body,
   background: #111827 !important;
   fill: #111827 !important;
 }
+
+/* Final alignment/full-width patch: keep the file structure unchanged and override older responsive rules. */
+.prompt-box,
+.app-shell--mobile .prompt-box {
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+}
+
+.attach-button,
+.send-button,
+.app-shell--mobile .attach-button,
+.app-shell--mobile .send-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.send-button,
+.app-shell--mobile .send-button {
+  width: 38px;
+  height: 38px;
+}
+
+.prompt-box textarea,
+.app-shell--mobile .prompt-box textarea {
+  align-self: center;
+}
+
+.message-list,
+.app-shell--mobile .message-list {
+  width: 100%;
+  max-width: 100%;
+}
+
+.message:not(.message--user),
+.app-shell--mobile .message:not(.message--user) {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  grid-template-columns: 38px minmax(0, 1fr);
+}
+
+.message:not(.message--user) .bubble,
+.app-shell--mobile .message:not(.message--user) .bubble {
+  width: 100%;
+  max-width: 100%;
+  justify-self: stretch;
+}
+
+@media (max-width: 900px) {
+  .message:not(.message--user),
+  .app-shell--mobile .message:not(.message--user) {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .prompt-box,
+  .app-shell--mobile .prompt-box {
+    grid-template-columns: 34px minmax(0, 1fr) 38px;
+    align-items: center;
+  }
+
+  .attach-button,
+  .app-shell--mobile .attach-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .send-button,
+  .app-shell--mobile .send-button {
+    width: 38px;
+    height: 38px;
+  }
+}

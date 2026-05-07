@@ -67,15 +67,25 @@ onMounted(() => {
         const payload = await parsePayload(input, init);
         const result = await callNative(type, payload);
 
-        return createJsonResponse(result.data, 200);
+        return createJsonResponse(result, 200);
       }
 
       return originalFetch(input, init);
     } catch (error) {
       return createJsonResponse(
-        {
-          success: false,
-          error: error.message,
+        error?.response || {
+          requestId: "swagger_error",
+          requestDate: new Date().toISOString(),
+          responseDate: new Date().toISOString(),
+          isSuccess: false,
+          code: "BRIDGE_ERROR",
+          data: null,
+          message: error.message,
+          meta: {},
+          error: {
+            type: "BRIDGE_ERROR",
+            detail: error.message,
+          },
         },
         400
       );

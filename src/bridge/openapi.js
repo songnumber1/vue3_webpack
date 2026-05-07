@@ -3,25 +3,27 @@ import {
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
-import {z} from "./zod";
 import {BridgeContract} from "./contract";
 import {BRIDGE_PATH} from "./bridgeConstants";
+import {BaseRequest, BaseResponse, BaseResponseError} from "./schemas/base";
 
-const BridgeErrorResponse = z.object({
-  success: z.boolean().openapi({
-    description: "성공 여부",
-    example: false,
-  }),
-  error: z.string().openapi({
-    description: "오류 메시지",
-    example: "Invalid request payload: GET_USER",
-  }),
-});
+function createErrorResponse(description, schema) {
+  return {
+    description,
+    content: {
+      "application/json": {
+        schema,
+      },
+    },
+  };
+}
 
 export function generateOpenApi() {
   const registry = new OpenAPIRegistry();
 
-  registry.register("BridgeErrorResponse", BridgeErrorResponse);
+  registry.register("BaseRequest", BaseRequest);
+  registry.register("BaseResponse", BaseResponse);
+  registry.register("BaseErrorResponse", BaseResponseError);
 
   Object.entries(BridgeContract).forEach(([type, contract]) => {
     registry.register(`${type}_Request`, contract.request);
@@ -50,14 +52,9 @@ export function generateOpenApi() {
             },
           },
         },
-        400: {
-          description: "Bridge 오류",
-          content: {
-            "application/json": {
-              schema: BridgeErrorResponse,
-            },
-          },
-        },
+        400: createErrorResponse("Bridge 요청 오류", contract.error),
+        401: createErrorResponse("Bridge 인증 오류", contract.error),
+        500: createErrorResponse("Bridge 서버 오류", contract.error),
       },
     });
   });
@@ -75,7 +72,10 @@ export function generateOpenApi() {
 - Swagger UI는 Bridge 요청 테스트 입력 UI로 사용합니다.
 - 실제 호출은 fetch override를 통해 AndroidBridge로 전달됩니다.
 - AndroidBridge가 없는 일반 브라우저에서는 mock 응답으로 테스트됩니다.
-- 요청/응답은 Zod Contract 기준으로 검증됩니다.
+- 요청/응답/오류 응답은 Zod Contract 기준으로 검증됩니다.
+- 모든 요청은 BaseRequest(requestId, requestDate)를 기본으로 포함합니다.
+- 모든 응답은 BaseResponse(requestId, requestDate, responseDate, isSuccess, code, data, message, meta)를 기본으로 포함합니다.
+- 모든 오류 응답은 BridgeErrorResponse를 공통으로 사용하고 error 키를 포함합니다.
       `,
     },
     tags: [

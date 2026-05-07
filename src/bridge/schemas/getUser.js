@@ -1,13 +1,14 @@
 import {z} from "../zod";
+import {BaseRequest, createResponseSchema} from "./base";
 
-export const GetUserRequest = z.object({
+export const GetUserRequest = BaseRequest.extend({
   id: z.number().openapi({
     description: "유저 ID",
     example: 1,
   }),
 });
 
-export const GetUserResponse = z.object({
+export const GetUserData = z.object({
   id: z.number().openapi({
     description: "유저 ID",
     example: 1,
@@ -17,3 +18,5 @@ export const GetUserResponse = z.object({
     example: "홍길동",
   }),
 });
+
+export const GetUserResponse = createResponseSchema(GetUserData);

@@ -1,6 +1,7 @@
 import {z} from "../zod";
+import {BaseRequest, createResponseSchema} from "./base";
 
-export const UploadFileRequest = z.object({
+export const UploadFileRequest = BaseRequest.extend({
   fileName: z.string().openapi({
     description: "파일명",
     example: "test.png",
@@ -11,9 +12,11 @@ export const UploadFileRequest = z.object({
   }),
 });
 
-export const UploadFileResponse = z.object({
+export const UploadFileData = z.object({
   url: z.string().openapi({
     description: "업로드된 파일 URL",
     example: "https://mock.local/files/test.png",
   }),
 });
+
+export const UploadFileResponse = createResponseSchema(UploadFileData);
