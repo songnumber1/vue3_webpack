@@ -1,5 +1,7 @@
-export function resolveUploadStrategy(platform, http, bridge) {
-  if (platform === 'android') {
+import { isNativeApp } from '@/core/config'
+
+export function resolveUploadStrategy(appInfo, http, bridge) {
+  if (isNativeApp(appInfo)) {
     return {
       upload: (fileMeta) => bridge?.uploadFile?.(JSON.stringify(fileMeta))
     }

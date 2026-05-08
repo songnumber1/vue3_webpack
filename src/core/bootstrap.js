@@ -1,6 +1,6 @@
 import {createApp} from "vue";
 import App from "@/App.vue";
-import {resolvePlatform} from "@/core/resolver/platform";
+import {resolveAppConfig} from "@/core/config";
 import {resolveLayout} from "@/core/resolver/layout";
 import {resolveAxios} from "@/core/resolver/axios";
 import {applyInterceptors} from "@/core/resolver/interceptor";
@@ -13,23 +13,25 @@ import {resolveErrorUI} from "@/core/resolver/errorUi";
 import {resolveUploadStrategy} from "@/core/resolver/upload";
 
 export async function bootstrap() {
-  const platform = resolvePlatform();
-  const bridge = resolveBridge(platform);
-  const storage = resolveStorage(platform, bridge);
+  const appInfo = resolveAppConfig();
+  const bridge = resolveBridge(appInfo);
+  const storage = resolveStorage(appInfo, bridge);
   const theme = resolveTheme(storage);
-  const axios = resolveAxios(platform);
-  const errorUI = resolveErrorUI(platform, bridge);
-  const upload = resolveUploadStrategy(platform, axios, bridge);
+  const axios = resolveAxios(appInfo);
+  const errorUI = resolveErrorUI(appInfo, bridge);
+  const upload = resolveUploadStrategy(appInfo, axios, bridge);
 
-  applyInterceptors(axios, platform, {bridge, errorUI});
+  applyInterceptors(axios, appInfo, {bridge, errorUI});
 
-  const api = resolveApi(platform, axios);
-  const router = resolveRouter(platform);
-  const Layout = resolveLayout(platform);
+  const api = resolveApi(appInfo, axios);
+  const router = resolveRouter(appInfo);
+  const Layout = resolveLayout(appInfo);
 
   const app = createApp(App);
   app.provide("appContext", {
-    platform,
+    appInfo,
+    platform: appInfo.platform,
+    env: appInfo.env,
     bridge,
     storage,
     theme,

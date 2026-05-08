@@ -1,5 +1,7 @@
-export function resolveErrorUI(platform, bridge) {
-  if (platform === 'android') {
+import { isNativeApp } from '@/core/config'
+
+export function resolveErrorUI(appInfo, bridge) {
+  if (isNativeApp(appInfo)) {
     return {
       notify(message) {
         bridge?.toast?.(message)

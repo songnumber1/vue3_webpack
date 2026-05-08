@@ -1,3 +1,5 @@
+import { isAndroidApp, isIosApp } from '@/core/config'
+
 const noopBridge = {
   getToken: () => null,
   getStorage: () => null,
@@ -13,7 +15,11 @@ const noopBridge = {
   uploadFile: () => Promise.reject(new Error('Native upload is not available.'))
 }
 
-export function resolveBridge(platform) {
-  if (platform === 'android' && window.AndroidBridge) return window.AndroidBridge
+export function resolveBridge(appInfo) {
+  if (isAndroidApp(appInfo) && window.AndroidBridge) return window.AndroidBridge
+  if (isIosApp(appInfo) && window.webkit?.messageHandlers?.AppBridge) {
+    return window.webkit.messageHandlers.AppBridge
+  }
+
   return noopBridge
 }

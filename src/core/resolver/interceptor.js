@@ -1,3 +1,5 @@
+import { isNativeApp } from '@/core/config'
+
 function applyWebRequestInterceptor(instance) {
   instance.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
@@ -10,13 +12,17 @@ function applyWebRequestInterceptor(instance) {
   });
 }
 
-function applyAndroidRequestInterceptor(instance, bridge) {
+function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   instance.interceptors.request.use((config) => {
-    const token = bridge?.getToken?.();
+    const token = bridge?.getToken?.() || appInfo?.token;
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    config.headers['X-App-Version'] = appInfo?.appVersion || '';
+    config.headers['X-App-Build-Version'] = appInfo?.appBuildVersion || '';
+    config.headers['X-Bridge-Version'] = appInfo?.bridgeVersion || '';
 
     return config;
   });
@@ -41,11 +47,11 @@ function applyResponseInterceptor(instance, errorUI) {
   );
 }
 
-export function applyInterceptors(instance, platform, context = {}) {
+export function applyInterceptors(instance, appInfo, context = {}) {
   const {bridge, errorUI} = context;
 
-  if (platform === "android") {
-    applyAndroidRequestInterceptor(instance, bridge);
+  if (isNativeApp(appInfo)) {
+    applyNativeRequestInterceptor(instance, bridge, appInfo);
   } else {
     applyWebRequestInterceptor(instance);
   }

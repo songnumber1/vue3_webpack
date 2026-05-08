@@ -1,3 +1,5 @@
+import { isNativeApp } from '@/core/config'
+
 function getLocalStorage() {
   try {
     if (typeof window === 'undefined') return null
@@ -25,7 +27,7 @@ function removeFallback(key) {
   memoryStorage.delete(key)
 }
 
-export function resolveStorage(platform, bridge) {
+export function resolveStorage(appInfo, bridge) {
   const local = getLocalStorage()
 
   const localStorageAdapter = {
@@ -40,7 +42,7 @@ export function resolveStorage(platform, bridge) {
     }
   }
 
-  if (platform === 'android') {
+  if (isNativeApp(appInfo)) {
     return {
       get(key) {
         return bridge?.getStorage?.(key) ?? localStorageAdapter.get(key)

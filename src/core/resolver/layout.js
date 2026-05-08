@@ -1,7 +1,7 @@
 import WebLayout from '@/layouts/WebLayout.vue'
 import AndroidLayout from '@/layouts/AndroidLayout.vue'
-import { isMobileLikePlatform } from './platform'
+import { isAndroidApp } from '@/core/config'
 
-export function resolveLayout(platform) {
-  return isMobileLikePlatform(platform) ? AndroidLayout : WebLayout
+export function resolveLayout(appInfo) {
+  return isAndroidApp(appInfo) ? AndroidLayout : WebLayout
 }

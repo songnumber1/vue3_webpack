@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 import ChatPage from "@/views/ChatPage.vue";
 import SwaggerPage from "@/views/SwaggerPage.vue";
+import { isAndroidApp, isIosApp } from '@/core/config'
 
 const baseRoutes = [
   {path: "/", name: "chat", component: ChatPage, meta: {title: "Chat"}},
@@ -14,11 +15,13 @@ const baseRoutes = [
 ];
 
 const androidRoutes = [];
+const iosRoutes = [];
 
-export function resolveRouter(platform) {
+export function resolveRouter(appInfo) {
   const routes = [
     ...baseRoutes,
-    ...(platform === "android" ? androidRoutes : []),
+    ...(isAndroidApp(appInfo) ? androidRoutes : []),
+    ...(isIosApp(appInfo) ? iosRoutes : []),
   ];
   return createRouter({history: createWebHistory(), routes});
 }

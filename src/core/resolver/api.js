@@ -1,3 +1,5 @@
+import { isAndroidApp } from '@/core/config'
+
 const baseApi = {
   getMe: (http) => http.get('/me'),
   sendMessage: (http, payload) => http.post('/chat/messages', payload),
@@ -8,10 +10,10 @@ const androidApi = {
   sendMessage: (http, payload) => http.post('/app/chat/messages', payload)
 }
 
-export function resolveApi(platform, http) {
+export function resolveApi(appInfo, http) {
   const apiMap = {
     ...baseApi,
-    ...(platform === 'android' ? androidApi : {})
+    ...(isAndroidApp(appInfo) ? androidApi : {})
   }
 
   return Object.fromEntries(

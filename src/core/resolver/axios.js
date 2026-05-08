@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { isAndroidApp, isIosApp } from '@/core/config'
 
 const baseConfig = {
   baseURL: process.env.VUE_APP_API_BASE_URL || '/api',
@@ -12,6 +13,13 @@ const androidOverride = {
   timeout: 20000,
   headers: {
     'X-Client-Platform': 'android-webview'
+  }
+}
+
+const iosOverride = {
+  timeout: 20000,
+  headers: {
+    'X-Client-Platform': 'ios-webview'
   }
 }
 
@@ -32,7 +40,12 @@ function mergeConfig(base, override) {
   }
 }
 
-export function resolveAxios(platform) {
-  const override = platform === 'android' ? androidOverride : webOverride
+export function resolveAxios(appInfo) {
+  const override = isAndroidApp(appInfo)
+    ? androidOverride
+    : isIosApp(appInfo)
+      ? iosOverride
+      : webOverride
+
   return axios.create(mergeConfig(baseConfig, override))
 }
