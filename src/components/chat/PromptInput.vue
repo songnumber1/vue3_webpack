@@ -17,9 +17,9 @@
             type="button"
             class="attachment-preview-thumb"
             :aria-label="`${file.name} 미리보기`"
-            @click="previewImage(file)"
+            @click.stop="previewImage(file)"
           >
-            <img :src="file.url" :alt="file.name" />
+            <img :src="getPreviewUrl(file)" :alt="file.name" @error="markPreviewError(file)" />
           </button>
           <div v-else class="attachment-preview-file" aria-hidden="true">
             📄
@@ -34,7 +34,8 @@
             type="button"
             class="attachment-preview-remove"
             :aria-label="`${file.name} 제거`"
-            @click="removeAttachment(file.id)"
+            @pointerdown.stop
+            @click.stop="removeAttachment(file.id)"
           >
             ×
           </button>
@@ -152,6 +153,15 @@ const fileAccept = ref("");
 const captureMode = ref(null);
 let lastHeight = 0;
 
+function getPreviewUrl(file) {
+  return file?.previewUrl || file?.url || "";
+}
+
+function markPreviewError(file) {
+  if (!file) return;
+  file.previewError = true;
+}
+
 const canSubmit = computed(
   () => text.value.trim().length > 0 || attachments.value.length > 0
 );
@@ -251,23 +261,72 @@ function addFiles(fileList) {
   if (!nextFiles.length) return;
 
   const mapped = nextFiles.map((file) => {
-    const isImage = file.type?.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file.name || "");
+    const isImage = isImageFile(file);
+    const objectUrl = URL.createObjectURL(file);
+
     return {
       id: createId("attachment"),
       name: file.name || "첨부 파일",
       size: file.size || 0,
-      type: file.type || "application/octet-stream",
+      type: file.type || inferMimeType(file.name) || "application/octet-stream",
       kind: isImage ? "image" : "file",
-      url: URL.createObjectURL(file),
+      url: objectUrl,
+      previewUrl: objectUrl,
+      previewError: false,
       file,
     };
   });
 
   attachments.value = [...attachments.value, ...mapped];
+
+  // 일부 Android WebView에서는 blob URL 이미지가 전체 미리보기에서 늦게 깨지는 경우가 있어
+  // 이미지 첨부만 data URL을 보조 previewUrl로 생성한다. 원본 파일/다운로드 URL은 유지한다.
+  mapped
+    .filter((file) => file.kind === "image")
+    .forEach((file) => hydrateImagePreviewUrl(file));
   nextTick(() => {
     resize();
     emit("height-change", lastHeight);
   });
+}
+
+function isImageFile(file) {
+  return Boolean(
+    file?.type?.startsWith("image/") ||
+      /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
+  );
+}
+
+function inferMimeType(name = "") {
+  const normalized = name.toLowerCase();
+  if (/\.png$/.test(normalized)) return "image/png";
+  if (/\.(jpg|jpeg)$/.test(normalized)) return "image/jpeg";
+  if (/\.gif$/.test(normalized)) return "image/gif";
+  if (/\.webp$/.test(normalized)) return "image/webp";
+  if (/\.bmp$/.test(normalized)) return "image/bmp";
+  if (/\.(heic|heif)$/.test(normalized)) return "image/heic";
+  return "";
+}
+
+function hydrateImagePreviewUrl(attachment) {
+  const sourceFile = attachment?.file;
+  if (!sourceFile || typeof FileReader === "undefined") return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = typeof reader.result === "string" ? reader.result : "";
+    if (!dataUrl) return;
+
+    const target = attachments.value.find((file) => file.id === attachment.id);
+    if (target) {
+      target.previewUrl = dataUrl;
+      target.previewError = false;
+    }
+  };
+  reader.onerror = () => {
+    attachment.previewError = true;
+  };
+  reader.readAsDataURL(sourceFile);
 }
 
 function removeAttachment(id) {
@@ -278,7 +337,7 @@ function removeAttachment(id) {
 }
 
 function previewImage(file) {
-  window.dispatchEvent(new CustomEvent("chat:image-preview", {detail: file}));
+  window.dispatchEvent(new CustomEvent("chat:image-preview", {detail: {...file, url: getPreviewUrl(file)}}));
 }
 
 function formatFileSize(size) {

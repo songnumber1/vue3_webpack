@@ -11,9 +11,9 @@
             type="button"
             class="message-image-card"
             :aria-label="`${file.name} 크게 보기`"
-            @click="openImage(file)"
+            @click.stop="openImage(file)"
           >
-            <img :src="file.url" :alt="file.name" @load="emitRendered" />
+            <img :src="getPreviewUrl(file)" :alt="file.name" @load="emitRendered" @error="emitRendered" />
           </button>
 
           <a
@@ -69,8 +69,12 @@ function emitRendered() {
   emit('rendered')
 }
 
+function getPreviewUrl(file) {
+  return file?.previewUrl || file?.url || ''
+}
+
 function openImage(file) {
-  window.dispatchEvent(new CustomEvent('chat:image-preview', { detail: file }))
+  window.dispatchEvent(new CustomEvent('chat:image-preview', { detail: { ...file, url: getPreviewUrl(file) } }))
 }
 
 function formatFileSize(size) {

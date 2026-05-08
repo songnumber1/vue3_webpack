@@ -3029,3 +3029,166 @@ body,
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
+
+
+/* Touch-safe attachment preview patch for Web, Android Chrome and Android WebView. */
+.attachment-preview-row {
+  gap: 10px;
+  padding-top: 8px;
+  padding-right: 4px;
+  touch-action: pan-x;
+}
+
+.attachment-preview-card {
+  position: relative;
+  min-height: 72px;
+  padding: 10px 44px 10px 10px;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-card--image {
+  width: 136px;
+  min-height: 132px;
+  padding: 10px 10px 38px;
+}
+
+.attachment-preview-thumb,
+.message-image-card {
+  cursor: zoom-in;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-remove {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 2px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: var(--prompt-bg, #fff);
+  color: var(--text, #111827);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+  font-size: 24px;
+  line-height: 1;
+  z-index: 5;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-remove::before {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+}
+
+.attachment-preview-remove:active {
+  transform: scale(0.96);
+}
+
+.attachment-preview-card--image .attachment-preview-remove {
+  top: -10px;
+  right: -10px;
+}
+
+.attachment-preview-card--image .attachment-preview-info {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  min-width: 0;
+}
+
+.attachment-preview-thumb img,
+.message-image-card img,
+.image-preview-large {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.image-preview-backdrop {
+  overscroll-behavior: contain;
+  touch-action: none;
+}
+
+.image-preview-stage {
+  width: auto;
+  max-width: min(96vw, 1120px);
+  max-height: calc(100dvh - 72px);
+  overflow: hidden;
+}
+
+.image-preview-large {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: calc(96vw - 36px);
+  max-height: calc(100dvh - 108px);
+  object-fit: contain;
+}
+
+.image-preview-close {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 900px) {
+  .attachment-preview-row {
+    padding-top: 12px;
+    padding-right: 14px;
+    padding-left: 2px;
+  }
+
+  .attachment-preview-card {
+    min-height: 76px;
+    padding-right: 48px;
+  }
+
+  .attachment-preview-card--image {
+    width: 132px;
+    min-height: 130px;
+    padding: 10px 10px 38px;
+  }
+
+  .attachment-preview-thumb {
+    height: 86px;
+  }
+
+  .attachment-preview-remove {
+    top: -10px;
+    right: -10px;
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 26px;
+  }
+
+  .image-preview-backdrop {
+    padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+  }
+
+  .image-preview-stage {
+    max-width: 100%;
+    max-height: calc(100dvh - 74px);
+  }
+
+  .image-preview-large {
+    max-width: calc(100vw - 28px);
+    max-height: calc(100dvh - 104px);
+  }
+}
