@@ -1,0 +1,172 @@
+/**
+ * Exception Pages
+ * 404 / Update / Error
+ */
+
+.exception-page {
+  min-height: var(--app-height, 100vh);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  background: var(--bg);
+
+  color: var(--text);
+}
+
+.exception-card {
+  width: min(100%, 420px);
+
+  padding: 32px 24px;
+
+  border-radius: 24px;
+
+  background: var(--surface);
+
+  border: 1px solid rgba(148, 163, 184, 0.16);
+
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+
+  text-align: center;
+}
+
+.exception-code {
+  margin: 0 0 10px;
+
+  font-size: 13px;
+  font-weight: 700;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+
+  color: #64748b;
+}
+
+.exception-title {
+  margin: 0;
+
+  font-size: 26px;
+  font-weight: 700;
+
+  line-height: 1.3;
+
+  color: var(--text);
+}
+
+.exception-description {
+  margin: 14px 0 0;
+
+  color: #64748b;
+
+  line-height: 1.7;
+
+  font-size: 15px;
+}
+
+.exception-info-list {
+  margin: 24px 0;
+
+  display: grid;
+  gap: 10px;
+}
+
+.exception-info-item {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 14px 16px;
+
+  border-radius: 14px;
+
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.exception-info-label {
+  color: #64748b;
+
+  font-size: 14px;
+}
+
+.exception-info-value {
+  font-weight: 700;
+
+  color: var(--text);
+}
+
+.exception-actions {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+
+  margin-top: 24px;
+}
+
+.exception-button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  min-height: 46px;
+
+  padding: 0 18px;
+
+  border: 0;
+
+  border-radius: 14px;
+
+  background: #111827;
+
+  color: #ffffff;
+
+  font-weight: 700;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.exception-button:hover {
+  background: #1f2937;
+}
+
+.exception-button--secondary {
+  background: transparent;
+
+  color: var(--text);
+
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.exception-button--secondary:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+@media (max-width: 480px) {
+  .exception-page {
+    padding: 18px;
+  }
+
+  .exception-card {
+    padding: 28px 20px;
+    border-radius: 20px;
+  }
+
+  .exception-title {
+    font-size: 22px;
+  }
+}
