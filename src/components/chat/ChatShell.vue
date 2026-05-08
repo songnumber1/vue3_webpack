@@ -80,6 +80,20 @@
         @content-rendered="handleMessageContentRendered"
       />
 
+      <div
+        v-if="previewImage"
+        class="image-preview-backdrop"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="previewImage.name"
+        @click="closeImagePreview"
+      >
+        <button type="button" class="image-preview-close" aria-label="닫기" @click.stop="closeImagePreview">×</button>
+        <div class="image-preview-stage" @click.stop>
+          <img class="image-preview-large" :src="previewImage.url" :alt="previewImage.name" />
+        </div>
+      </div>
+
       <PromptInput
         v-if="messages.length > 0"
         :disabled="isGenerating"
@@ -227,6 +241,7 @@ const histories = ref([
 ]);
 
 const messages = ref([]);
+const previewImage = ref(null);
 const activeProjectName = computed(
   () =>
     projects.find((project) => project.id === activeProjectId.value)?.name ||
@@ -301,7 +316,19 @@ function closeDrawerOnViewportChange() {
   collapsedRecentOpen.value = false;
 }
 
+function revokeMessageAttachments(items = messages.value) {
+  items.forEach((message) => {
+    if (!Array.isArray(message.attachments)) return;
+    message.attachments.forEach((file) => {
+      if (file?.url?.startsWith?.('blob:')) {
+        URL.revokeObjectURL(file.url);
+      }
+    });
+  });
+}
+
 async function startNewChat() {
+  revokeMessageAttachments();
   messages.value = [];
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
@@ -314,6 +341,8 @@ async function loadHistoryFromCollapsed(item) {
 }
 
 async function loadHistory(item) {
+  revokeMessageAttachments();
+
   if (item.type === "markdown-showcase") {
     await loadShowcaseConversation();
     drawerOpen.value = false;
@@ -349,12 +378,36 @@ function openSwagger() {
   router.push("/swagger");
 }
 
+function normalizePromptPayload(payload) {
+  if (typeof payload === "string") {
+    return {text: payload.trim(), attachments: []};
+  }
 
-async function handleSubmit(text) {
-  const value = text.trim();
-  if (!value || isGenerating.value) return;
+  return {
+    text: String(payload?.text || "").trim(),
+    attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
+  };
+}
 
-  messages.value.push({id: createId("message"), role: "user", content: value});
+function openImagePreview(event) {
+  previewImage.value = event.detail;
+}
+
+function closeImagePreview() {
+  previewImage.value = null;
+}
+
+
+async function handleSubmit(payload) {
+  const {text: value, attachments} = normalizePromptPayload(payload);
+  if ((!value && attachments.length === 0) || isGenerating.value) return;
+
+  messages.value.push({
+    id: createId("message"),
+    role: "user",
+    content: value,
+    attachments,
+  });
   const assistantMessage = {
     id: createId("message"),
     role: "assistant",
@@ -364,7 +417,7 @@ async function handleSubmit(text) {
   isGenerating.value = true;
   scrollBottom({force: true, stable: true});
 
-  const response = createDemoResponse(value);
+  const response = createDemoResponse(value, attachments);
   await streamText(response, (chunk) => {
     assistantMessage.content = chunk;
     scrollBottom({stable: true});
@@ -374,10 +427,13 @@ async function handleSubmit(text) {
   scrollBottom({stable: true});
 }
 
-function createDemoResponse(prompt) {
+function createDemoResponse(prompt, attachments = []) {
   return `# Markdown 응답 샘플
 
-입력한 내용: **${prompt}**
+입력한 내용: **${prompt || "첨부 파일만 전송"}**
+
+${attachments.length ? `첨부 파일 ${attachments.length}개를 확인했습니다. 이미지 파일은 대화 화면에서 ChatGPT처럼 크게 보기로 확인할 수 있습니다.
+` : ""}
 
 현재 선택된 모델은 **${
     models.find((model) => model.id === selectedModel.value)?.label
@@ -438,10 +494,13 @@ onMounted(async () => {
     closeDrawerOnViewportChange
   );
   window.addEventListener("resize", closeDrawerOnViewportChange);
+  window.addEventListener("chat:image-preview", openImagePreview);
 });
 
 onBeforeUnmount(() => {
+  revokeMessageAttachments();
   removeMobileMediaQueryListener?.();
   window.removeEventListener("resize", closeDrawerOnViewportChange);
+  window.removeEventListener("chat:image-preview", openImagePreview);
 });
 </script>
