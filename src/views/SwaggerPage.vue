@@ -13,14 +13,6 @@
           </svg>
           홈
         </RouterLink>
-        <RouterLink class="toolbar-link" to="/bridge" title="실제 호출 테스트" aria-label="실제 호출 테스트">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M9 3.5v5.2L4.6 17a2.5 2.5 0 0 0 2.2 3.7h10.4a2.5 2.5 0 0 0 2.2-3.7L15 8.7V3.5"/>
-            <path d="M8 3.5h8"/>
-            <path d="M7.2 15.5h9.6"/>
-          </svg>
-          테스트
-        </RouterLink>
         <select v-model="selectedCategory" class="category-select" @change="renderSwagger">
           <option
             v-for="option in categoryOptions"
@@ -43,109 +35,14 @@ import {RouterLink} from "vue-router";
 import SwaggerUI from "swagger-ui-dist/swagger-ui-es-bundle";
 import "swagger-ui-dist/swagger-ui.css";
 
-import {
-  ANDROID_TO_JS_PATH,
-  BRIDGE_CATEGORY,
-  JS_TO_ANDROID_PATH,
-  WEB_API_PATH,
-} from "@/bridge/bridgeConstants";
-import {executeContract} from "@/bridge/bridgeClient";
+import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
 import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
+import {installSwaggerRuntime, uninstallSwaggerRuntime} from "@/bridge/swaggerRuntime";
 
-let originalFetch = null;
 let swaggerInstance = null;
 
 const categoryOptions = getOpenApiCategoryOptions();
 const selectedCategory = ref(BRIDGE_CATEGORY.ALL);
-
-const getRequestUrl = (input) => {
-  return typeof input === "string" ? input : input?.url || "";
-};
-
-const parsePayload = async (input, init = {}) => {
-  const body = init?.body;
-
-  if (typeof body === "string") {
-    return body ? JSON.parse(body) : {};
-  }
-
-  if (body instanceof Blob) {
-    const text = await body.text();
-    return text ? JSON.parse(text) : {};
-  }
-
-  if (input instanceof Request) {
-    const text = await input.clone().text();
-    return text ? JSON.parse(text) : {};
-  }
-
-  return {};
-};
-
-const toContractType = (url) => {
-  return url.split("/").pop().toUpperCase();
-};
-
-const resolveCategoryFromUrl = (url) => {
-  if (url.includes(JS_TO_ANDROID_PATH)) return BRIDGE_CATEGORY.JS_TO_ANDROID;
-  if (url.includes(ANDROID_TO_JS_PATH)) return BRIDGE_CATEGORY.ANDROID_TO_JS;
-  if (url.includes(WEB_API_PATH)) return BRIDGE_CATEGORY.WEB_API;
-  return null;
-};
-
-const createJsonResponse = (body, status = 200) => {
-  return new Response(JSON.stringify(body), {
-    status,
-    statusText: status >= 200 && status < 300 ? "OK" : "Contract Error",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-};
-
-const createFallbackError = (error) => {
-  const now = new Date().toISOString();
-
-  return {
-    requestId: "swagger_error",
-    requestDate: now,
-    responseDate: now,
-    isSuccess: false,
-    code: "CONTRACT_ERROR",
-    data: null,
-    message: error?.message || "Contract execution failed",
-    meta: {},
-    error: {
-      type: "CONTRACT_ERROR",
-      detail: error?.message || "Contract execution failed",
-    },
-  };
-};
-
-const installFetchInterceptor = () => {
-  if (originalFetch) return;
-
-  originalFetch = window.fetch.bind(window);
-
-  window.fetch = async (input, init = {}) => {
-    try {
-      const url = getRequestUrl(input);
-      const category = resolveCategoryFromUrl(url);
-
-      if (category) {
-        const type = toContractType(url);
-        const payload = await parsePayload(input, init);
-        const result = await executeContract(category, type, payload);
-
-        return createJsonResponse(result, 200);
-      }
-
-      return originalFetch(input, init);
-    } catch (error) {
-      return createJsonResponse(error?.response || createFallbackError(error), 400);
-    }
-  };
-};
 
 const renderSwagger = async () => {
   const spec = generateOpenApi(selectedCategory.value);
@@ -166,17 +63,13 @@ const renderSwagger = async () => {
 };
 
 onMounted(() => {
-  installFetchInterceptor();
+  installSwaggerRuntime();
   renderSwagger();
 });
 
 onBeforeUnmount(() => {
   swaggerInstance = null;
-
-  if (originalFetch) {
-    window.fetch = originalFetch;
-    originalFetch = null;
-  }
+  uninstallSwaggerRuntime();
 });
 </script>
 

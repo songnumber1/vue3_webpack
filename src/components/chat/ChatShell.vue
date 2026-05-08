@@ -3,103 +3,17 @@
     class="chatgpt-shell"
     :class="{'chatgpt-shell--keyboard-open': keyboardOpen, 'chatgpt-shell--sidebar-collapsed': sidebarCollapsed}"
   >
-    <aside class="desktop-sidebar" :class="{'desktop-sidebar--collapsed': sidebarCollapsed}">
-      <SidebarContent
-        v-if="!sidebarCollapsed"
-        :histories="histories"
-        :projects="projects"
-        :active-project-id="activeProjectId"
-        @new-chat="startNewChat"
-        @select-history="loadHistory"
-        @toggle-collapse="sidebarCollapsed = true"
-      />
-      <div v-else class="collapsed-sidebar" aria-label="접힌 사이드바">
-        <div class="collapsed-sidebar-actions">
-          <button
-            class="collapsed-icon-button"
-            type="button"
-            title="사이드바 열기"
-            aria-label="사이드바 열기"
-            @click="sidebarCollapsed = false"
-          >
-            <SvgIcon name="panel" />
-          </button>
-          <button
-            class="collapsed-icon-button"
-            type="button"
-            title="새 채팅"
-            aria-label="새 채팅"
-            @click="startNewChat"
-          >
-            <SvgIcon name="pencil" />
-          </button>
-          <button
-            class="collapsed-icon-button"
-            type="button"
-            title="채팅 검색"
-            aria-label="채팅 검색"
-            @click="collapsedRecentOpen = false"
-          >
-            <SvgIcon name="search" />
-          </button>
-          <button
-            class="collapsed-icon-button collapsed-icon-button--active"
-            type="button"
-            title="최근 채팅"
-            aria-label="최근 채팅"
-            @click="collapsedRecentOpen = !collapsedRecentOpen"
-          >
-            <SvgIcon name="chat" />
-          </button>
-        </div>
-
-        <transition name="collapsed-popover-fade">
-          <section v-if="collapsedRecentOpen" class="collapsed-recent-popover" aria-label="최근 채팅 목록">
-            <h2>최근 채팅</h2>
-            <button
-              v-for="item in histories"
-              :key="item.id"
-              class="collapsed-recent-item"
-              type="button"
-              @click="loadHistoryFromCollapsed(item)"
-            >
-              {{ item.title }}
-            </button>
-          </section>
-        </transition>
-
-        <button
-          class="collapsed-user-button"
-          type="button"
-          title="사용자"
-          aria-label="사용자"
-          @click="collapsedRecentOpen = false"
-        >
-          민
-        </button>
-      </div>
-    </aside>
-
-    <transition name="drawer-fade">
-      <div
-        v-if="drawerOpen"
-        class="mobile-drawer-backdrop"
-        @click="drawerOpen = false"
-      ></div>
-    </transition>
-    <transition name="drawer-slide">
-      <aside v-if="drawerOpen" class="mobile-drawer">
-        <SidebarContent
-          :histories="histories"
-          :projects="projects"
-          :active-project-id="activeProjectId"
-          mobile
-          @new-chat="startNewChat"
-          @select-history="loadHistory"
-          @close="drawerOpen = false"
-        />
-      </aside>
-    </transition>
+    <ChatSidebar
+      :histories="histories"
+      :projects="projects"
+      :active-project-id="activeProjectId"
+      v-model:sidebar-collapsed="sidebarCollapsed"
+      v-model:drawer-open="drawerOpen"
+      v-model:collapsed-recent-open="collapsedRecentOpen"
+      @new-chat="startNewChat"
+      @select-history="loadHistory"
+      @select-history-collapsed="loadHistoryFromCollapsed"
+    />
 
     <main class="chat-workspace">
       <ChatHeader
@@ -109,7 +23,6 @@
         @open-drawer="drawerOpen = true"
         @toggle-theme="toggleTheme"
         @open-swagger="openSwagger"
-        @open-bridge="openBridge"
       />
 
       <section v-if="messages.length === 0" class="empty-stage">
@@ -139,7 +52,7 @@
 
         <div class="mobile-project-home">
           <div class="project-title">
-            <SvgIcon name="folder" class="folder-icon" />
+            <span class="folder-icon" aria-hidden="true">▣</span>
             <h1>{{ activeProjectName }}</h1>
           </div>
           <button class="source-chip" type="button">소스</button>
@@ -192,9 +105,7 @@
 <script setup>
 import {
   computed,
-  defineComponent,
   nextTick,
-  h,
   onBeforeUnmount,
   onMounted,
   ref,
@@ -209,163 +120,9 @@ import {addMediaQueryListener} from "@/utils/dom";
 import {useAutoScroll} from "@/composables/useAutoScroll";
 import {useViewportGuard} from "@/composables/useViewportGuard";
 import ChatHeader from "./ChatHeader.vue";
+import ChatSidebar from "./ChatSidebar.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "./PromptInput.vue";
-
-const ICONS = {
-  pencil:
-    '<path d="M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"/><path d="M13.4 7.1 16.9 10.6"/>',
-  search: '<circle cx="10.5" cy="10.5" r="5.8"/><path d="M15 15 20 20"/>',
-  cube: '<path d="M12 3 4.5 7.2v9.6L12 21l7.5-4.2V7.2L12 3Z"/><path d="m4.8 7.4 7.2 4.1 7.2-4.1"/><path d="M12 11.5V21"/>',
-  more: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>',
-  plus: '<path d="M12 5v14"/><path d="M5 12h14"/>',
-  folder:
-    '<path d="M3.5 7.5A2.5 2.5 0 0 1 6 5h4.1l2.1 2.4H18a2.5 2.5 0 0 1 2.5 2.5v6.6A2.5 2.5 0 0 1 18 19H6a2.5 2.5 0 0 1-2.5-2.5v-9Z"/>',
-  panel: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v16"/>',
-  chat: '<path d="M5 6.8A4 4 0 0 1 9 3h6a4 4 0 0 1 4 4v4.3a4 4 0 0 1-4 4H9.3L5 20v-4.7a4 4 0 0 1-1-2.7V6.8Z"/>',
-  project: '<path d="M5 7.5h14l-2 9H3l2-9Z"/>',
-};
-
-const SvgIcon = defineComponent({
-  name: "SvgIcon",
-  props: {name: {type: String, required: true}},
-  setup(props) {
-    return () =>
-      h("svg", {
-        class: "nav-icon",
-        viewBox: "0 0 24 24",
-        fill: "none",
-        stroke: "currentColor",
-        "stroke-width": "2",
-        "stroke-linecap": "round",
-        "stroke-linejoin": "round",
-        innerHTML: ICONS[props.name] || ICONS.project,
-        "aria-hidden": "true",
-      });
-  },
-});
-
-function icon(name) {
-  return h("span", {class: "icon-wrap"}, [h(SvgIcon, {name})]);
-}
-
-const SidebarContent = defineComponent({
-  name: "SidebarContent",
-  props: {
-    histories: {type: Array, required: true},
-    projects: {type: Array, required: true},
-    activeProjectId: {type: Number, required: true},
-    mobile: {type: Boolean, default: false},
-  },
-  emits: ["new-chat", "select-history", "close", "toggle-collapse"],
-  setup(props, {emit}) {
-    return () =>
-      h(
-        "div",
-        {
-          class: [
-            "sidebar-content",
-            props.mobile ? "sidebar-content--mobile" : "",
-          ],
-        },
-        [
-          h("div", {class: "sidebar-top"}, [
-            h("div", {class: "sidebar-title"}, "ChatGPT"),
-            h("div", {class: "sidebar-top-actions"}, [
-              h(
-                "button",
-                {
-                  class: "sidebar-round",
-                  type: "button",
-                  onClick: () => props.mobile ? emit("close") : emit("toggle-collapse"),
-                  title: props.mobile ? "닫기" : "사이드바 숨기기",
-                },
-                props.mobile ? "×" : "☰"
-              ),
-            ]),
-          ]),
-          h("nav", {class: "quick-menu"}, [
-            h(
-              "button",
-              {
-                class: "quick-item active",
-                type: "button",
-                onClick: () => emit("new-chat"),
-              },
-              [icon("pencil"), "새 채팅"]
-            ),
-            h("button", {class: "quick-item", type: "button"}, [
-              icon("search"),
-              "채팅 검색",
-            ]),
-            h("button", {class: "quick-item", type: "button"}, [
-              icon("cube"),
-              "Codex",
-            ]),
-            h("button", {class: "quick-item", type: "button"}, [
-              icon("more"),
-              "더 보기",
-            ]),
-          ]),
-          h("div", {class: "section-label"}, "프로젝트"),
-          h("div", {class: "project-list"}, [
-            h("button", {class: "project-item new-project", type: "button"}, [
-              icon("plus"),
-              "새 프로젝트",
-            ]),
-            ...props.projects.map((project) =>
-              h(
-                "button",
-                {
-                  class: [
-                    "project-item",
-                    project.id === props.activeProjectId ? "selected" : "",
-                  ],
-                  type: "button",
-                },
-                [icon("folder"), project.name]
-              )
-            ),
-            h("button", {class: "project-item", type: "button"}, [
-              icon("more"),
-              "모든 프로젝트",
-            ]),
-          ]),
-          h("div", {class: "section-label"}, "최근"),
-          h(
-            "div",
-            {class: "sidebar-history"},
-            props.histories.map((item) =>
-              h(
-                "button",
-                {
-                  class: "sidebar-history-item",
-                  type: "button",
-                  onClick: () => emit("select-history", item),
-                },
-                item.title
-              )
-            )
-          ),
-          props.mobile
-            ? h(
-                "button",
-                {
-                  class: "mobile-new-chat-fab",
-                  type: "button",
-                  onClick: () => emit("new-chat"),
-                },
-                [icon("pencil"), "채팅"]
-              )
-            : null,
-          h("div", {class: "sidebar-user"}, [
-            h("div", {class: "user-avatar"}, "민"),
-            h("div", [h("strong", "민우 송"), h("small", "Plus")]),
-          ]),
-        ]
-      );
-  },
-});
 
 const router = useRouter();
 const {theme} = useAppContext();
@@ -592,9 +349,6 @@ function openSwagger() {
   router.push("/swagger");
 }
 
-function openBridge() {
-  router.push("/bridge");
-}
 
 async function handleSubmit(text) {
   const value = text.trim();
