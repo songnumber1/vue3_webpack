@@ -14,6 +14,21 @@ import {resolveUploadStrategy} from "@/core/resolver/upload";
 
 export async function bootstrap() {
   const appInfo = resolveAppConfig();
+
+  // 테스트용 안드로이드 appInfo 예시
+  // const appInfo = {
+  //   env: "native",
+  //   platform: "android",
+  //   appVersion: "1.0.0",
+  //   appBuildVersion: "1.0.0",
+  //   bridgeVersion: "1.0.0",
+  //   token: "002f34df-6b64-48fb-8548-d502b7dbbcc7",
+  //   deviceId: null,
+  //   lastVersionInfo: {
+  //     version: "2.0.0",
+  //   },
+  // };
+
   const bridge = resolveBridge(appInfo);
   const storage = resolveStorage(appInfo, bridge);
   const theme = resolveTheme(storage);
