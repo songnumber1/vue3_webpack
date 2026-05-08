@@ -160,7 +160,7 @@ const captureMode = ref(null);
 let lastHeight = 0;
 
 function getPreviewUrl(file) {
-  return file?.previewUrl || file?.dataUrl || file?.url || "";
+  return file?.dataUrl || file?.previewUrl || file?.url || "";
 }
 
 function markPreviewError(file) {
@@ -355,7 +355,16 @@ function removeAttachment(id) {
 }
 
 function previewImage(file) {
-  window.dispatchEvent(new CustomEvent("chat:image-preview", {detail: {...file, url: getPreviewUrl(file)}}));
+  if (!file) return;
+  file.url = file.url || file.previewUrl || file.dataUrl || "";
+  window.dispatchEvent(
+    new CustomEvent("chat:image-preview", {
+      detail: {
+        ...file,
+        previewUrl: getPreviewUrl(file),
+      },
+    })
+  );
 }
 
 function formatFileSize(size) {

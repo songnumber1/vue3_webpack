@@ -3393,3 +3393,285 @@ body,
     right: -16px;
   }
 }
+
+/* =========================================================
+   FINAL ANDROID DRAWER + IMAGE PREVIEW FIX
+   - Android WebView can keep desktop breakpoint while using app-shell--mobile.
+   - Force mobile drawer content to be visible, scrollable and readable.
+   - Image preview no longer depends on browser default image loading UI.
+   ========================================================= */
+.app-shell--mobile .mobile-drawer-backdrop,
+.mobile-drawer-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  display: block !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  z-index: 800 !important;
+}
+
+.app-shell--mobile .mobile-drawer,
+.mobile-drawer {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  display: block !important;
+  width: min(88vw, 420px) !important;
+  height: var(--app-height, 100vh) !important;
+  max-height: var(--app-height, 100vh) !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+  color: var(--sidebar-text, #202123) !important;
+  z-index: 810 !important;
+  overflow: hidden !important;
+  box-shadow: 22px 0 54px rgba(15, 23, 42, 0.32) !important;
+  transform: translate3d(0, 0, 0);
+}
+
+.app-shell--mobile .sidebar-content--mobile,
+.mobile-drawer .sidebar-content--mobile {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  padding: calc(12px + env(safe-area-inset-top)) 0 calc(12px + env(safe-area-inset-bottom)) !important;
+  gap: 6px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+  color: var(--sidebar-text, #202123) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile > *,
+.mobile-drawer .sidebar-content--mobile > * {
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: inherit;
+}
+
+.app-shell--mobile .sidebar-content--mobile .sidebar-top,
+.mobile-drawer .sidebar-content--mobile .sidebar-top {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 0 0 auto !important;
+  min-height: 48px !important;
+  padding: 4px 16px 8px !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .sidebar-title,
+.mobile-drawer .sidebar-content--mobile .sidebar-title {
+  display: block !important;
+  color: var(--sidebar-text, #202123) !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .sidebar-round,
+.mobile-drawer .sidebar-content--mobile .sidebar-round {
+  flex: 0 0 auto !important;
+  width: 40px !important;
+  height: 40px !important;
+  color: var(--sidebar-text, #202123) !important;
+  background: var(--control-bg, #ffffff) !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .quick-menu,
+.app-shell--mobile .sidebar-content--mobile .project-list,
+.app-shell--mobile .sidebar-content--mobile .sidebar-history,
+.mobile-drawer .sidebar-content--mobile .quick-menu,
+.mobile-drawer .sidebar-content--mobile .project-list,
+.mobile-drawer .sidebar-content--mobile .sidebar-history {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 0 0 auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  gap: 2px !important;
+  padding: 0 !important;
+  color: var(--sidebar-text, #202123) !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .sidebar-history,
+.mobile-drawer .sidebar-content--mobile .sidebar-history {
+  flex: 1 1 auto !important;
+  min-height: 120px !important;
+  overflow-y: auto !important;
+  padding-bottom: 76px !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .quick-item,
+.app-shell--mobile .sidebar-content--mobile .project-item,
+.app-shell--mobile .sidebar-content--mobile .sidebar-history-item,
+.mobile-drawer .sidebar-content--mobile .quick-item,
+.mobile-drawer .sidebar-content--mobile .project-item,
+.mobile-drawer .sidebar-content--mobile .sidebar-history-item {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 8px 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--sidebar-text, #202123) !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .quick-item:hover,
+.app-shell--mobile .sidebar-content--mobile .project-item:hover,
+.app-shell--mobile .sidebar-content--mobile .sidebar-history-item:hover,
+.app-shell--mobile .sidebar-content--mobile .quick-item.active,
+.app-shell--mobile .sidebar-content--mobile .project-item.selected,
+.mobile-drawer .sidebar-content--mobile .quick-item:hover,
+.mobile-drawer .sidebar-content--mobile .project-item:hover,
+.mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
+.mobile-drawer .sidebar-content--mobile .quick-item.active,
+.mobile-drawer .sidebar-content--mobile .project-item.selected {
+  background: var(--sidebar-hover, #ececf1) !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .quick-item span,
+.app-shell--mobile .sidebar-content--mobile .project-item span,
+.mobile-drawer .sidebar-content--mobile .quick-item span,
+.mobile-drawer .sidebar-content--mobile .project-item span {
+  flex: 0 0 22px !important;
+  width: 22px !important;
+  color: var(--sidebar-icon, #4b5563) !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .section-label,
+.mobile-drawer .sidebar-content--mobile .section-label {
+  display: block !important;
+  flex: 0 0 auto !important;
+  padding: 12px 18px 4px !important;
+  color: var(--sidebar-section, #6b7280) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell--mobile .mobile-new-chat-fab,
+.mobile-drawer .mobile-new-chat-fab {
+  position: sticky !important;
+  align-self: flex-end !important;
+  right: auto !important;
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  z-index: 3 !important;
+  flex: 0 0 auto !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 8px 18px 8px auto !important;
+  padding: 0 20px !important;
+  border-radius: 999px !important;
+  background: var(--fab-bg, #111827) !important;
+  color: var(--fab-text, #ffffff) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+
+.app-shell--mobile .sidebar-content--mobile .sidebar-user,
+.mobile-drawer .sidebar-content--mobile .sidebar-user {
+  flex: 0 0 auto !important;
+  margin-top: 0 !important;
+  padding: 10px 18px 0 !important;
+  color: var(--sidebar-text, #202123) !important;
+}
+
+.image-preview-backdrop {
+  z-index: 1200 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: calc(18px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left)) !important;
+  background: rgba(0, 0, 0, 0.82) !important;
+}
+
+.image-preview-stage {
+  position: relative !important;
+  width: min(100%, 1120px) !important;
+  max-width: calc(100vw - 28px) !important;
+  height: auto !important;
+  max-height: calc(var(--app-height, 100vh) - 56px) !important;
+  min-height: 180px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border-radius: 16px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.image-preview-large {
+  display: block !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: calc(var(--app-height, 100vh) - 88px) !important;
+  object-fit: contain !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.36) !important;
+}
+
+.image-preview-large--hidden {
+  opacity: 0 !important;
+  position: absolute !important;
+  pointer-events: none !important;
+}
+
+.image-preview-loading,
+.image-preview-error {
+  min-width: 190px;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.28);
+}
+
+.image-preview-loading::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  border: 3px solid rgba(17, 24, 39, 0.18);
+  border-top-color: #111827;
+  border-radius: 999px;
+  animation: imagePreviewSpin 0.8s linear infinite;
+}
+
+@keyframes imagePreviewSpin {
+  to { transform: rotate(360deg); }
+}
+
+.image-preview-close {
+  z-index: 1210 !important;
+  width: 56px !important;
+  height: 56px !important;
+  top: calc(16px + env(safe-area-inset-top)) !important;
+  right: calc(16px + env(safe-area-inset-right)) !important;
+  font-size: 34px !important;
+  font-weight: 500 !important;
+}

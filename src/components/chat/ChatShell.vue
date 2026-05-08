@@ -100,10 +100,21 @@
           ×
         </button>
         <div class="image-preview-stage" @click.stop>
+          <div v-if="previewImage.loading" class="image-preview-loading" role="status">
+            이미지를 불러오는 중입니다...
+          </div>
+          <div v-if="previewImage.error" class="image-preview-error" role="alert">
+            이미지를 미리보기로 표시할 수 없습니다.
+          </div>
           <img
+            v-if="previewImage.url && !previewImage.error"
+            :key="previewImage.url"
             class="image-preview-large"
+            :class="{'image-preview-large--hidden': previewImage.loading}"
             :src="previewImage.url"
             :alt="previewImage.name"
+            @load="handlePreviewLoad"
+            @error="handlePreviewError"
           />
         </div>
       </div>
@@ -397,12 +408,104 @@ function normalizePromptPayload(payload) {
   };
 }
 
+function getPreviewSources(detail = {}) {
+  return [detail.dataUrl, detail.previewUrl, detail.url]
+    .filter((url) => typeof url === "string" && url.length > 0)
+    .filter((url, index, array) => array.indexOf(url) === index);
+}
+
+function readPreviewDataUrl(file) {
+  return new Promise((resolve) => {
+    if (!file || typeof FileReader === "undefined") {
+      resolve("");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
+    reader.onerror = () => resolve("");
+    reader.readAsDataURL(file);
+  });
+}
+
+async function hydrateOpenPreviewFromFile(targetPreview) {
+  const dataUrl = await readPreviewDataUrl(targetPreview?.file);
+  if (!dataUrl || previewImage.value?.id !== targetPreview.id) return;
+
+  previewImage.value = {
+    ...previewImage.value,
+    dataUrl,
+    url: dataUrl,
+    sources: [dataUrl, ...(previewImage.value.sources || [])].filter(
+      (url, index, array) => url && array.indexOf(url) === index
+    ),
+    loading: true,
+    error: false,
+  };
+}
+
 function openImagePreview(event) {
   const detail = event?.detail || {};
+  const sources = getPreviewSources(detail);
+  const firstUrl = sources[0] || "";
+
   previewImage.value = {
     ...detail,
-    url: detail.previewUrl || detail.dataUrl || detail.url || "",
+    url: firstUrl,
+    sources,
+    sourceIndex: 0,
+    loading: Boolean(firstUrl || detail.file),
+    error: !firstUrl && !detail.file,
   };
+
+  // Android WebView/Chrome에서 blob URL 전체 미리보기가 실패하는 경우가 있어,
+  // 원본 File이 있으면 data URL을 즉시 준비해 대체 소스로 사용한다.
+  if (detail.file && !detail.dataUrl) {
+    hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
+  }
+}
+
+function handlePreviewLoad() {
+  if (!previewImage.value) return;
+  previewImage.value.loading = false;
+  previewImage.value.error = false;
+}
+
+async function handlePreviewError() {
+  const current = previewImage.value;
+  if (!current) return;
+
+  const nextIndex = Number(current.sourceIndex || 0) + 1;
+  const nextUrl = current.sources?.[nextIndex];
+  if (nextUrl) {
+    previewImage.value = {
+      ...current,
+      url: nextUrl,
+      sourceIndex: nextIndex,
+      loading: true,
+      error: false,
+    };
+    return;
+  }
+
+  const dataUrl = await readPreviewDataUrl(current.file);
+  if (dataUrl && previewImage.value?.id === current.id) {
+    previewImage.value = {
+      ...previewImage.value,
+      dataUrl,
+      url: dataUrl,
+      sources: [dataUrl],
+      sourceIndex: 0,
+      loading: true,
+      error: false,
+    };
+    return;
+  }
+
+  if (previewImage.value?.id === current.id) {
+    previewImage.value.loading = false;
+    previewImage.value.error = true;
+  }
 }
 
 function closeImagePreview() {

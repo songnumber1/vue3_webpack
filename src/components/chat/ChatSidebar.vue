@@ -17,7 +17,7 @@
         </div>
 
         <nav class="quick-menu">
-          <button class="quick-item active" type="button" @click="$emit('new-chat')">
+          <button class="quick-item active" type="button" @click="handleNewChat">
             <Icon name="pencil" />
             새 채팅
           </button>
@@ -64,7 +64,7 @@
             :key="item.id"
             class="sidebar-history-item"
             type="button"
-            @click="$emit('select-history', item)"
+            @click="handleSelectHistory(item)"
           >
             {{ item.title }}
           </button>
@@ -95,7 +95,7 @@
             type="button"
             title="새 채팅"
             aria-label="새 채팅"
-            @click="$emit('new-chat')"
+            @click="handleNewChat"
           >
             <Icon name="pencil" bare />
           </button>
@@ -127,7 +127,7 @@
               :key="item.id"
               class="collapsed-recent-item"
               type="button"
-              @click="$emit('select-history-collapsed', item)"
+              @click="handleSelectHistoryCollapsed(item)"
             >
               {{ item.title }}
             </button>
@@ -173,7 +173,7 @@
           </div>
 
           <nav class="quick-menu">
-            <button class="quick-item active" type="button" @click="$emit('new-chat')">
+            <button class="quick-item active" type="button" @click="handleNewChat">
               <Icon name="pencil" />
               새 채팅
             </button>
@@ -220,13 +220,13 @@
               :key="item.id"
               class="sidebar-history-item"
               type="button"
-              @click="$emit('select-history', item)"
+              @click="handleSelectHistory(item)"
             >
               {{ item.title }}
             </button>
           </div>
 
-          <button class="mobile-new-chat-fab" type="button" @click="$emit('new-chat')">
+          <button class="mobile-new-chat-fab" type="button" @click="handleNewChat">
             <Icon name="pencil" />
             채팅
           </button>
@@ -313,4 +313,21 @@ function emitDrawerOpen(value) {
 function emitCollapsedRecentOpen(value) {
   emit("update:collapsedRecentOpen", value);
 }
+
+function handleNewChat() {
+  emit("new-chat");
+  emitDrawerOpen(false);
+  emitCollapsedRecentOpen(false);
+}
+
+function handleSelectHistory(item) {
+  emit("select-history", item);
+  emitDrawerOpen(false);
+}
+
+function handleSelectHistoryCollapsed(item) {
+  emit("select-history-collapsed", item);
+  emitCollapsedRecentOpen(false);
+}
+
 </script>
