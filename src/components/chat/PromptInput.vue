@@ -187,9 +187,24 @@ function toggleAttachMenu() {
 }
 
 function openFilePicker(type) {
+  if (props.disabled) return;
+
+  const input = fileInputRef.value;
+  if (!input) return;
+
+  // Android WebView는 input.click()이 사용자 터치 이벤트 체인에서
+  // 바로 실행되지 않으면 파일 선택창을 열지 않는 경우가 많다.
+  // 그래서 nextTick/requestAnimationFrame/setTimeout을 거치지 않고
+  // 메뉴 버튼 클릭 이벤트 안에서 즉시 네이티브 파일 선택 요청을 발생시킨다.
   attachMenuOpen.value = false;
-  fileAccept.value = type === "image" ? "image/*" : "";
-  nextTick(() => fileInputRef.value?.click());
+
+  const accept = type === "image" ? "image/*" : "";
+  fileAccept.value = accept;
+  input.setAttribute("accept", accept);
+
+  // 같은 파일을 다시 선택해도 change 이벤트가 발생하도록 초기화한다.
+  input.value = "";
+  input.click();
 }
 
 function handleFileChange(event) {
