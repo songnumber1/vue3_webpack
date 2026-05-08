@@ -398,7 +398,11 @@ function normalizePromptPayload(payload) {
 }
 
 function openImagePreview(event) {
-  previewImage.value = event.detail;
+  const detail = event?.detail || {};
+  previewImage.value = {
+    ...detail,
+    url: detail.previewUrl || detail.dataUrl || detail.url || "",
+  };
 }
 
 function closeImagePreview() {

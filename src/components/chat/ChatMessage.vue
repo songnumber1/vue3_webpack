@@ -70,7 +70,7 @@ function emitRendered() {
 }
 
 function getPreviewUrl(file) {
-  return file?.previewUrl || file?.url || ''
+  return file?.previewUrl || file?.dataUrl || file?.url || ''
 }
 
 function openImage(file) {

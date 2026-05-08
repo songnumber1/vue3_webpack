@@ -11,22 +11,26 @@
           :key="file.id"
           class="attachment-preview-card"
           :class="{'attachment-preview-card--image': file.kind === 'image'}"
+          :role="file.kind === 'image' ? 'button' : undefined"
+          :tabindex="file.kind === 'image' ? 0 : undefined"
+          :aria-label="file.kind === 'image' ? `${file.name} 미리보기` : undefined"
+          @click="handleAttachmentPreview(file)"
+          @keydown.enter.prevent="handleAttachmentPreview(file)"
+          @keydown.space.prevent="handleAttachmentPreview(file)"
         >
-          <button
+          <div
             v-if="file.kind === 'image'"
-            type="button"
             class="attachment-preview-thumb"
-            :aria-label="`${file.name} 미리보기`"
-            @click.stop="previewImage(file)"
+            aria-hidden="true"
           >
             <img :src="getPreviewUrl(file)" :alt="file.name" @error="markPreviewError(file)" />
-          </button>
+          </div>
           <div v-else class="attachment-preview-file" aria-hidden="true">
             📄
           </div>
 
           <div class="attachment-preview-info">
-            <strong>{{ file.name }}</strong>
+            <strong :title="file.name">{{ file.name }}</strong>
             <span>{{ formatFileSize(file.size) }}</span>
           </div>
 
@@ -35,7 +39,9 @@
             class="attachment-preview-remove"
             :aria-label="`${file.name} 제거`"
             @pointerdown.stop
-            @click.stop="removeAttachment(file.id)"
+            @mousedown.stop
+            @touchstart.stop
+            @click.stop.prevent="removeAttachment(file.id)"
           >
             ×
           </button>
@@ -154,7 +160,7 @@ const captureMode = ref(null);
 let lastHeight = 0;
 
 function getPreviewUrl(file) {
-  return file?.previewUrl || file?.url || "";
+  return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
 
 function markPreviewError(file) {
@@ -197,7 +203,10 @@ function submit() {
 
   emit("submit", {
     text: value,
-    attachments: attachments.value.map((file) => ({...file})),
+    // Android WebView에서는 FileReader가 완료되기 전에 전송하면
+    // 얕은 복사본이 data URL 갱신을 받지 못해 큰 미리보기가 깨질 수 있다.
+    // 메시지 영역에서도 같은 첨부 객체를 참조하게 하여 previewUrl 갱신이 유지되도록 한다.
+    attachments: attachments.value,
   });
 
   text.value = "";
@@ -272,6 +281,7 @@ function addFiles(fileList) {
       kind: isImage ? "image" : "file",
       url: objectUrl,
       previewUrl: objectUrl,
+      dataUrl: "",
       previewError: false,
       file,
     };
@@ -319,14 +329,22 @@ function hydrateImagePreviewUrl(attachment) {
 
     const target = attachments.value.find((file) => file.id === attachment.id);
     if (target) {
+      target.dataUrl = dataUrl;
       target.previewUrl = dataUrl;
       target.previewError = false;
+      attachment.dataUrl = dataUrl;
+      attachment.previewUrl = dataUrl;
     }
   };
   reader.onerror = () => {
     attachment.previewError = true;
   };
   reader.readAsDataURL(sourceFile);
+}
+
+function handleAttachmentPreview(file) {
+  if (file?.kind !== "image") return;
+  previewImage(file);
 }
 
 function removeAttachment(id) {
