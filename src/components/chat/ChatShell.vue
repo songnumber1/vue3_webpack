@@ -1,7 +1,10 @@
 <template>
   <div
     class="chatgpt-shell"
-    :class="{'chatgpt-shell--keyboard-open': keyboardOpen, 'chatgpt-shell--sidebar-collapsed': sidebarCollapsed}"
+    :class="{
+      'chatgpt-shell--keyboard-open': keyboardOpen,
+      'chatgpt-shell--sidebar-collapsed': sidebarCollapsed,
+    }"
   >
     <ChatSidebar
       :histories="histories"
@@ -65,7 +68,7 @@
               type="button"
               @click="loadHistory(item)"
             >
-              <strong>{{ item.title }}</strong>
+              <p>{{ item.title }}</p>
               <span>{{ item.preview }}</span>
             </button>
           </div>
@@ -88,9 +91,20 @@
         :aria-label="previewImage.name"
         @click="closeImagePreview"
       >
-        <button type="button" class="image-preview-close" aria-label="닫기" @click.stop="closeImagePreview">×</button>
+        <button
+          type="button"
+          class="image-preview-close"
+          aria-label="닫기"
+          @click.stop="closeImagePreview"
+        >
+          ×
+        </button>
         <div class="image-preview-stage" @click.stop>
-          <img class="image-preview-large" :src="previewImage.url" :alt="previewImage.name" />
+          <img
+            class="image-preview-large"
+            :src="previewImage.url"
+            :alt="previewImage.name"
+          />
         </div>
       </div>
 
@@ -117,13 +131,7 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 import {useAppContext} from "@/composables/useAppContext";
 import {streamText} from "@/utils/fakeStream";
@@ -320,7 +328,7 @@ function revokeMessageAttachments(items = messages.value) {
   items.forEach((message) => {
     if (!Array.isArray(message.attachments)) return;
     message.attachments.forEach((file) => {
-      if (file?.url?.startsWith?.('blob:')) {
+      if (file?.url?.startsWith?.("blob:")) {
         URL.revokeObjectURL(file.url);
       }
     });
@@ -397,7 +405,6 @@ function closeImagePreview() {
   previewImage.value = null;
 }
 
-
 async function handleSubmit(payload) {
   const {text: value, attachments} = normalizePromptPayload(payload);
   if ((!value && attachments.length === 0) || isGenerating.value) return;
@@ -432,8 +439,12 @@ function createDemoResponse(prompt, attachments = []) {
 
 입력한 내용: **${prompt || "첨부 파일만 전송"}**
 
-${attachments.length ? `첨부 파일 ${attachments.length}개를 확인했습니다. 이미지 파일은 대화 화면에서 ChatGPT처럼 크게 보기로 확인할 수 있습니다.
-` : ""}
+${
+  attachments.length
+    ? `첨부 파일 ${attachments.length}개를 확인했습니다. 이미지 파일은 대화 화면에서 ChatGPT처럼 크게 보기로 확인할 수 있습니다.
+`
+    : ""
+}
 
 현재 선택된 모델은 **${
     models.find((model) => model.id === selectedModel.value)?.label
