@@ -9,37 +9,64 @@ import {executeContract} from "./bridgeClient";
 let originalFetch = null;
 
 function getRequestUrl(input) {
-  return typeof input === "string" ? input : input?.url || "";
+  const rawUrl = typeof input === "string" ? input : input?.url || "";
+
+  try {
+    return new URL(rawUrl, window.location.origin).pathname;
+  } catch {
+    return String(rawUrl || "").split(/[?#]/)[0];
+  }
+}
+
+function canUseBlob(value) {
+  return typeof Blob !== "undefined" && value instanceof Blob;
+}
+
+function canUseRequest(value) {
+  return typeof Request !== "undefined" && value instanceof Request;
+}
+
+async function parseTextBody(text) {
+  if (!text) return {};
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {rawBody: text};
+  }
 }
 
 async function parsePayload(input, init = {}) {
   const body = init?.body;
 
   if (typeof body === "string") {
-    return body ? JSON.parse(body) : {};
+    return parseTextBody(body);
   }
 
-  if (body instanceof Blob) {
-    const text = await body.text();
-    return text ? JSON.parse(text) : {};
+  if (canUseBlob(body)) {
+    return parseTextBody(await body.text());
   }
 
-  if (input instanceof Request) {
-    const text = await input.clone().text();
-    return text ? JSON.parse(text) : {};
+  if (canUseRequest(input)) {
+    return parseTextBody(await input.clone().text());
+  }
+
+  if (body && typeof URLSearchParams !== "undefined" && body instanceof URLSearchParams) {
+    return Object.fromEntries(body.entries());
   }
 
   return {};
 }
 
-function toContractType(url) {
-  return url.split("/").pop().toUpperCase();
+function toContractType(pathname) {
+  const lastSegment = String(pathname || "").split("/").filter(Boolean).pop() || "";
+  return decodeURIComponent(lastSegment).toUpperCase();
 }
 
-function resolveCategoryFromUrl(url) {
-  if (url.includes(JS_TO_ANDROID_PATH)) return BRIDGE_CATEGORY.JS_TO_ANDROID;
-  if (url.includes(ANDROID_TO_JS_PATH)) return BRIDGE_CATEGORY.ANDROID_TO_JS;
-  if (url.includes(WEB_API_PATH)) return BRIDGE_CATEGORY.WEB_API;
+function resolveCategoryFromUrl(pathname) {
+  if (pathname.includes(JS_TO_ANDROID_PATH)) return BRIDGE_CATEGORY.JS_TO_ANDROID;
+  if (pathname.includes(ANDROID_TO_JS_PATH)) return BRIDGE_CATEGORY.ANDROID_TO_JS;
+  if (pathname.includes(WEB_API_PATH)) return BRIDGE_CATEGORY.WEB_API;
   return null;
 }
 
@@ -47,7 +74,7 @@ function createJsonResponse(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     statusText: status >= 200 && status < 300 ? "OK" : "Contract Error",
-    headers: {"Content-Type": "application/json"},
+    headers: {"Content-Type": "application/json; charset=utf-8"},
   });
 }
 
@@ -71,17 +98,17 @@ function createFallbackError(error) {
 }
 
 export function installSwaggerRuntime() {
-  if (originalFetch) return;
+  if (originalFetch || typeof window === "undefined" || typeof window.fetch !== "function") return;
 
   originalFetch = window.fetch.bind(window);
 
   window.fetch = async (input, init = {}) => {
     try {
-      const url = getRequestUrl(input);
-      const category = resolveCategoryFromUrl(url);
+      const pathname = getRequestUrl(input);
+      const category = resolveCategoryFromUrl(pathname);
 
       if (category) {
-        const type = toContractType(url);
+        const type = toContractType(pathname);
         const payload = await parsePayload(input, init);
         const result = await executeContract(category, type, payload);
 

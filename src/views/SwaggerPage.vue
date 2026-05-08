@@ -25,7 +25,12 @@
       </div>
     </div>
 
-    <div id="swagger-ui" :key="selectedCategory"></div>
+    <div v-if="renderError" class="swagger-error">
+      <strong>Swagger 렌더링 오류</strong>
+      <p>{{ renderError }}</p>
+    </div>
+
+    <div ref="swaggerRoot" class="swagger-root"></div>
   </div>
 </template>
 
@@ -38,46 +43,79 @@ import "swagger-ui-dist/swagger-ui.css";
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
 import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
 import {installSwaggerRuntime, uninstallSwaggerRuntime} from "@/bridge/swaggerRuntime";
+import {installWebViewCompat} from "@/utils/webviewCompat";
 
 let swaggerInstance = null;
 
+const swaggerRoot = ref(null);
+const renderError = ref("");
 const categoryOptions = getOpenApiCategoryOptions();
 const selectedCategory = ref(BRIDGE_CATEGORY.ALL);
 
+function clearSwaggerRoot() {
+  if (swaggerRoot.value) {
+    swaggerRoot.value.innerHTML = "";
+  }
+}
+
 const renderSwagger = async () => {
-  const spec = generateOpenApi(selectedCategory.value);
+  renderError.value = "";
 
-  await nextTick();
+  try {
+    installWebViewCompat();
+    const spec = generateOpenApi(selectedCategory.value);
 
-  const target = document.querySelector("#swagger-ui");
-  if (target) target.innerHTML = "";
+    await nextTick();
+    clearSwaggerRoot();
 
-  swaggerInstance = SwaggerUI({
-    spec,
-    dom_id: "#swagger-ui",
-    deepLinking: true,
-    displayRequestDuration: true,
-    docExpansion: "list",
-    defaultModelsExpandDepth: 2,
-  });
+    if (!swaggerRoot.value) return;
+
+    swaggerInstance = SwaggerUI({
+      spec,
+      domNode: swaggerRoot.value,
+      deepLinking: true,
+      displayRequestDuration: true,
+      docExpansion: "list",
+      defaultModelsExpandDepth: 2,
+      defaultModelExpandDepth: 2,
+      validatorUrl: null,
+      supportedSubmitMethods: ["get", "post", "put", "delete", "patch", "head", "options"],
+      tryItOutEnabled: false,
+    });
+  } catch (error) {
+    renderError.value = error?.message || "Swagger UI를 렌더링하지 못했습니다.";
+    console.error("[SwaggerPage] render failed", error);
+  }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  installWebViewCompat();
   installSwaggerRuntime();
-  renderSwagger();
+  await renderSwagger();
 });
 
 onBeforeUnmount(() => {
+  if (swaggerInstance?.getSystem) {
+    try {
+      swaggerInstance.getSystem().specActions.updateSpec("");
+    } catch {
+      // ignore swagger cleanup errors
+    }
+  }
   swaggerInstance = null;
+  clearSwaggerRoot();
   uninstallSwaggerRuntime();
 });
 </script>
 
 <style scoped>
 .swagger-page {
-  height: 100dvh;
+  width: 100%;
+  height: var(--app-height, 100vh);
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
   background: #ffffff;
+  color: #111827;
 }
 
 .swagger-toolbar {
@@ -159,6 +197,38 @@ onBeforeUnmount(() => {
   font-size: 14px;
 }
 
+.swagger-root {
+  min-height: calc(var(--app-height, 100vh) - 72px);
+  background: #ffffff;
+}
+
+.swagger-error {
+  margin: 16px 24px 0;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.swagger-error strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.swagger-error p {
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+:deep(.swagger-ui) {
+  color: #111827;
+}
+
+:deep(.swagger-ui .scheme-container) {
+  display: none;
+}
 
 :deep(.curl),
 :deep(.request-url) {
@@ -169,6 +239,7 @@ onBeforeUnmount(() => {
   .swagger-toolbar {
     align-items: stretch;
     flex-direction: column;
+    padding: 12px 14px;
   }
 
   .toolbar-actions {
@@ -183,6 +254,10 @@ onBeforeUnmount(() => {
 
   .category-select {
     width: 100%;
+  }
+
+  .swagger-root {
+    min-height: calc(var(--app-height, 100vh) - 132px);
   }
 }
 </style>
