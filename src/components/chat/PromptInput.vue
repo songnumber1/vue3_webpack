@@ -59,12 +59,13 @@
 
           <div v-if="attachMenuOpen" class="attach-menu" role="menu">
             <button
+              v-if="showCameraMenu"
               type="button"
               role="menuitem"
-              @click="openFilePicker('all')"
+              @click="openFilePicker('camera')"
             >
-              <span aria-hidden="true">📎</span>
-              <p>사진 및 파일 추가</p>
+              <span aria-hidden="true">📷</span>
+              <p>카메라로 촬영</p>
             </button>
             <button
               type="button"
@@ -73,6 +74,14 @@
             >
               <span aria-hidden="true">🖼️</span>
               <p>이미지 추가</p>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              @click="openFilePicker('all')"
+            >
+              <span aria-hidden="true">📎</span>
+              <p>파일 추가</p>
             </button>
           </div>
         </div>
@@ -107,6 +116,7 @@
         type="file"
         multiple
         :accept="fileAccept"
+        :capture="captureMode"
         @change="handleFileChange"
       />
     </form>
@@ -119,6 +129,8 @@
 
 <script setup>
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
+import {isAndroidApp} from "@/core/config";
+import {useAppContext} from "@/composables/useAppContext";
 import {createId} from "@/utils/id";
 
 const props = defineProps({
@@ -129,6 +141,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "focus", "blur", "height-change"]);
+const {appInfo} = useAppContext();
 const text = ref("");
 const textareaRef = ref(null);
 const fileInputRef = ref(null);
@@ -136,11 +149,16 @@ const attachButtonRef = ref(null);
 const attachments = ref([]);
 const attachMenuOpen = ref(false);
 const fileAccept = ref("");
+const captureMode = ref(null);
 let lastHeight = 0;
 
 const canSubmit = computed(
   () => text.value.trim().length > 0 || attachments.value.length > 0
 );
+
+// 웹 브라우저는 카메라가 없다는 운영 정책을 반영하고,
+// Android 앱 WebView에서만 카메라 촬영 메뉴를 노출한다.
+const showCameraMenu = computed(() => isAndroidApp(appInfo));
 
 function resize() {
   const el = textareaRef.value;
@@ -173,9 +191,9 @@ function submit() {
   });
 
   text.value = "";
-  attachments.value.forEach((file) => {
-    if (file.url) URL.revokeObjectURL(file.url);
-  });
+  // submit 이후 첨부 객체는 대화 메시지에서 계속 사용된다.
+  // 여기서 blob URL을 revoke하면 Android WebView에서 이미지/파일 미리보기가
+  // 늦게 로딩되는 순간 깨질 수 있으므로, 메시지 정리 시점(ChatShell)에서 회수한다.
   attachments.value = [];
   attachMenuOpen.value = false;
   nextTick(resize);
@@ -198,9 +216,19 @@ function openFilePicker(type) {
   // 메뉴 버튼 클릭 이벤트 안에서 즉시 네이티브 파일 선택 요청을 발생시킨다.
   attachMenuOpen.value = false;
 
-  const accept = type === "image" ? "image/*" : "";
+  const isCamera = type === "camera";
+  const accept = type === "image" || isCamera ? "image/*" : "";
+  const capture = isCamera ? "environment" : null;
+
   fileAccept.value = accept;
+  captureMode.value = capture;
   input.setAttribute("accept", accept);
+
+  if (capture) {
+    input.setAttribute("capture", capture);
+  } else {
+    input.removeAttribute("capture");
+  }
 
   // 같은 파일을 다시 선택해도 change 이벤트가 발생하도록 초기화한다.
   input.value = "";
@@ -223,7 +251,7 @@ function addFiles(fileList) {
   if (!nextFiles.length) return;
 
   const mapped = nextFiles.map((file) => {
-    const isImage = file.type?.startsWith("image/");
+    const isImage = file.type?.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file.name || "");
     return {
       id: createId("attachment"),
       name: file.name || "첨부 파일",
