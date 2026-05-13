@@ -50,6 +50,12 @@ export async function bootstrap() {
   const platformStore = usePlatformStore();
   platformStore.initialize(appInfo);
 
+  if (typeof window !== 'undefined' && Array.isArray(window.__pendingNativeEvents)) {
+    window.__pendingNativeEvents.splice(0).forEach((event) => {
+      platformStore.recordNativeEvent(event.type, event.payload);
+    });
+  }
+
   app.provide("appContext", {
     appInfo,
     platform: appInfo.platform,

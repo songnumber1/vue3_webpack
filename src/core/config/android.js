@@ -16,8 +16,9 @@ export const LAST_VERSION_INFO = Object.freeze({
 
 function readAndroidValue(bridge, methodName, fallback = null) {
   try {
-    const value = bridge?.[methodName]?.();
-    return value == null || value === "" ? fallback : String(value);
+    const member = bridge?.[methodName];
+    const value = typeof member === 'function' ? member.call(bridge) : member;
+    return value == null || value === '' ? fallback : String(value);
   } catch {
     return fallback;
   }
@@ -27,7 +28,7 @@ export function createAndroidConfig(bridge = window.AndroidBridge) {
   return {
     env: RUN_ENV.NATIVE,
     platform: PLATFORM.ANDROID,
-    appVersion: readAndroidValue(bridge, "getAppVersion", "1.0.0"),
+    appVersion: readAndroidValue(bridge, "getAppVersionName", "1.0.0"),
     appBuildVersion: readAndroidValue(bridge, "getAppBuildVersion", "1"),
     bridgeVersion: readAndroidValue(bridge, "getBridgeVersion", "1.0.0"),
     token: readAndroidValue(bridge, "getToken", createId("app")),

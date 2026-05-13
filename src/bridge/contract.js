@@ -27,6 +27,8 @@ import {
   StorageGetResponse,
   StorageSetRequest,
   StorageSetResponse,
+  StorageRemoveRequest,
+  StorageRemoveResponse,
   WriteLogRequest,
   WriteLogResponse,
 } from './schemas/native'
@@ -63,6 +65,7 @@ export const JsToAndroidContract = {
   CHECK_NETWORK: jsToAndroid(EmptyNativeRequest, CheckNetworkResponse, '네트워크 상태를 조회합니다.'),
   GET_STORAGE: jsToAndroid(StorageGetRequest, StorageGetResponse, 'Android secure storage에서 값을 조회합니다.', 'recommended'),
   SET_STORAGE: jsToAndroid(StorageSetRequest, StorageSetResponse, 'Android secure storage에 값을 저장합니다.', 'recommended'),
+  REMOVE_STORAGE: jsToAndroid(StorageRemoveRequest, StorageRemoveResponse, 'Android secure storage에서 값을 삭제합니다.', 'recommended'),
   CANCEL_REQUEST: jsToAndroid(CancelRequestRequest, CancelRequestResponse, '업로드/SSE 요청을 취소합니다.', 'recommended'),
   SET_BACK_HANDLER: jsToAndroid(SetBackHandlerRequest, SetBackHandlerResponse, '웹에서 Android 뒤로가기 제어 여부를 설정합니다.', 'recommended'),
   SHOW_TOAST: jsToAndroid(ShowToastRequest, ShowToastResponse, '네이티브 토스트를 표시합니다.', 'recommended'),

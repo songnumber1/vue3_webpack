@@ -5,6 +5,7 @@ import {
   WebApiContract,
 } from "./contract";
 import {BRIDGE_CATEGORY, BRIDGE_TIMEOUT} from "./bridgeConstants";
+import {getActivePinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
 
 const callbacks = {};
@@ -126,6 +127,7 @@ function getAndroidBridgeMethodName(type) {
     CHECK_NETWORK: "checkNetwork",
     GET_STORAGE: "getStorage",
     SET_STORAGE: "setStorage",
+    REMOVE_STORAGE: "removeStorage",
     CANCEL_REQUEST: "cancelRequest",
     SET_BACK_HANDLER: "setBackHandler",
     SHOW_TOAST: "showToast",
@@ -486,13 +488,16 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 
     if (canUsePostMessage) {
       try {
-        getAndroidBridge().postMessage(
+        const rawResponse = getAndroidBridge().postMessage(
           JSON.stringify({
             requestId,
             type,
             payload: validPayload,
           })
         );
+        if (rawResponse) {
+          completeBridgeResponse(normalizeBridgeResponse(rawResponse, validPayload));
+        }
       } catch (error) {
         const errorResponse = createErrorResponse(validPayload, error, "ANDROID_BRIDGE_ERROR");
         errorResponse.meta = {
@@ -554,9 +559,16 @@ export function receiveNativeEvent(type, payload = {}) {
   const request = validateBridgeRequest(type, parseNativePayload(payload), AndroidToJsContract);
 
   try {
-    usePlatformStore().recordNativeEvent(type, request);
+    const activePinia = getActivePinia();
+    if (activePinia) {
+      usePlatformStore(activePinia).recordNativeEvent(type, request);
+    } else {
+      window.__pendingNativeEvents = window.__pendingNativeEvents || [];
+      window.__pendingNativeEvents.push({type, payload: request});
+    }
   } catch (error) {
-    // Pinia가 초기화되기 전 Native 이벤트가 도착해도 bridge 응답은 유지합니다.
+    window.__pendingNativeEvents = window.__pendingNativeEvents || [];
+    window.__pendingNativeEvents.push({type, payload: request});
     console.warn("Failed to record native event.", error);
   }
 
