@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 
-import ChatPage from "@/views/ChatPage.vue";
+import MainPage from "@/views/MainPage.vue";
+const ChatPage = () => import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
 const SwaggerPage = () => import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
 
 const NotFoundPage = () => import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
@@ -19,8 +20,18 @@ const ANDROID_UPDATE_ROUTE_NAME = "android-update";
 const baseRoutes = [
   {
     path: "/",
+    name: "main",
+    component: MainPage,
+    meta: {
+      title: "Assistant",
+    },
+  },
+
+  {
+    path: "/chat/:id",
     name: "chat",
     component: ChatPage,
+    props: true,
     meta: {
       title: "Chat",
     },

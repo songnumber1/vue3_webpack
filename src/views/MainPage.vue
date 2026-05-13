@@ -1,5 +1,5 @@
 <template>
-  <ChatShell mode="chat" />
+  <ChatShell mode="main" />
 </template>
 
 <script setup>
