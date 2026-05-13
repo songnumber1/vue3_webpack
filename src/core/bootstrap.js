@@ -1,4 +1,6 @@
 import {createApp} from "vue";
+import {createPinia} from "pinia";
+import {usePlatformStore} from "@/stores/platformStore";
 import App from "@/App.vue";
 import {resolveAppConfig} from "@/core/config";
 import {resolveLayout} from "@/core/resolver/layout";
@@ -43,6 +45,11 @@ export async function bootstrap() {
   const Layout = resolveLayout(appInfo);
 
   const app = createApp(App);
+  const pinia = createPinia();
+  app.use(pinia);
+  const platformStore = usePlatformStore();
+  platformStore.initialize(appInfo);
+
   app.provide("appContext", {
     appInfo,
     platform: appInfo.platform,
@@ -54,6 +61,7 @@ export async function bootstrap() {
     api,
     errorUI,
     upload,
+    platformStore,
   });
 
   app.component("AppLayout", Layout);

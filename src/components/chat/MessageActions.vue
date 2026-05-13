@@ -8,7 +8,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { copyText } from '@/utils/clipboard'
+import { copyClipboardByPlatform } from '@/services/platformBridge'
 
 const props = defineProps({
   role: { type: String, required: true },
@@ -17,7 +17,7 @@ const props = defineProps({
 const feedback = ref('')
 function setFeedback(value) { feedback.value = feedback.value === value ? '' : value }
 async function copy() {
-  try { await copyText(props.content || '') }
+  try { await copyClipboardByPlatform(props.content || '') }
   catch (error) { console.warn('Failed to copy message.', error) }
 }
 </script>

@@ -5,6 +5,7 @@ import {
   WebApiContract,
 } from "./contract";
 import {BRIDGE_CATEGORY, BRIDGE_TIMEOUT} from "./bridgeConstants";
+import {usePlatformStore} from "@/stores/platformStore";
 
 const callbacks = {};
 
@@ -116,9 +117,21 @@ function validateBridgeErrorResponse(type, data, contractMap = BridgeContract, f
 
 function getAndroidBridgeMethodName(type) {
   const methodMap = {
-    GET_APP_VERSION: "getAppVersion",
+    OPEN_EXTERNAL_BROWSER: "openExternalBrowser",
+    OPEN_FILE_PICKER: "openFilePicker",
     GET_PUSH_TOKEN: "getPushToken",
+    GET_APP_VERSION: "getAppVersion",
     COPY_CLIPBOARD: "copyClipboard",
+    SHARE: "share",
+    CHECK_NETWORK: "checkNetwork",
+    GET_STORAGE: "getStorage",
+    SET_STORAGE: "setStorage",
+    CANCEL_REQUEST: "cancelRequest",
+    SET_BACK_HANDLER: "setBackHandler",
+    SHOW_TOAST: "showToast",
+    GET_DEVICE_INFO: "getDeviceInfo",
+    WRITE_LOG: "writeLog",
+    CLOSE_APP: "closeApp",
   };
 
   return methodMap[type];
@@ -540,6 +553,13 @@ export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
 export function receiveNativeEvent(type, payload = {}) {
   const request = validateBridgeRequest(type, parseNativePayload(payload), AndroidToJsContract);
 
+  try {
+    usePlatformStore().recordNativeEvent(type, request);
+  } catch (error) {
+    // Pinia가 초기화되기 전 Native 이벤트가 도착해도 bridge 응답은 유지합니다.
+    console.warn("Failed to record native event.", error);
+  }
+
   window.dispatchEvent(new CustomEvent("android-to-js", {
     detail: {
       type,
@@ -601,4 +621,11 @@ window.__receiveNativeEvent = (type, payload = {}) => {
 };
 window.onAppResume = createNativeEventHandler("ON_APP_RESUME");
 window.onBackPressed = createNativeEventHandler("ON_BACK_PRESSED");
+window.onFileSelected = createNativeEventHandler("ON_FILE_SELECTED");
+window.onNetworkChange = createNativeEventHandler("ON_NETWORK_CHANGE");
 window.onPushClick = createNativeEventHandler("ON_PUSH_CLICK");
+window.onSessionExpired = createNativeEventHandler("ON_SESSION_EXPIRED");
+window.onAppPause = createNativeEventHandler("ON_APP_PAUSE");
+window.onWebViewClose = createNativeEventHandler("ON_WEBVIEW_CLOSE");
+window.onRequestCancel = createNativeEventHandler("ON_REQUEST_CANCEL");
+window.onNativeError = createNativeEventHandler("ON_NATIVE_ERROR");

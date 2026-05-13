@@ -176,8 +176,8 @@
 
 <script setup>
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
-import {isAndroidApp} from "@/core/config";
-import {useAppContext} from "@/composables/useAppContext";
+import {usePlatformStore} from "@/stores/platformStore";
+import {openNativeFilePicker} from "@/services/platformBridge";
 import {createId} from "@/utils/id";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 
@@ -191,7 +191,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "focus", "blur", "height-change", "update:modelValue"]);
-const {appInfo} = useAppContext();
+const platformStore = usePlatformStore();
 const text = ref("");
 const textareaRef = ref(null);
 const fileInputRef = ref(null);
@@ -227,7 +227,7 @@ function markPreviewError(file) {
 }
 
 const canSubmit = computed(() => text.value.trim().length > 0 || attachments.value.length > 0);
-const showCameraMenu = computed(() => isAndroidApp(appInfo));
+const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 
 function syncViewportMode() {
   isMobileSheet.value = Boolean(window.matchMedia?.("(max-width: 900px)")?.matches || document.querySelector(".app-shell--mobile"));
@@ -308,11 +308,25 @@ function applyTool(tool) {
   });
 }
 
-function openFilePicker(type) {
+async function openFilePicker(type) {
   if (props.disabled) return;
+  attachMenuOpen.value = false;
+
+  if (platformStore.info.isAndroidApp) {
+    try {
+      await openNativeFilePicker({
+        source: type === "camera" ? "camera" : type === "image" ? "image" : "all",
+        multiple: type !== "camera",
+        accept: type === "image" || type === "camera" ? "image/*" : "",
+      });
+      return;
+    } catch (error) {
+      console.warn("Android file picker failed. Falling back to web input.", error);
+    }
+  }
+
   const input = fileInputRef.value;
   if (!input) return;
-  attachMenuOpen.value = false;
   const isCamera = type === "camera";
   const accept = type === "image" || isCamera ? "image/*" : "";
   const capture = isCamera ? "environment" : null;
@@ -323,6 +337,25 @@ function openFilePicker(type) {
   else input.removeAttribute("capture");
   input.value = "";
   input.click();
+}
+
+function handleNativeFileSelected(event) {
+  const detail = event?.detail || {};
+  if (detail.type !== "ON_FILE_SELECTED") return;
+  const nativeFiles = detail.payload?.files || [];
+  const mapped = nativeFiles.map((file) => ({
+    id: createId("attachment"),
+    name: file.name || "네이티브 첨부 파일",
+    size: file.size || 0,
+    type: file.type || inferMimeType(file.name) || "application/octet-stream",
+    kind: (file.type || "").startsWith("image/") ? "image" : "file",
+    url: file.uri || "",
+    previewUrl: file.uri || "",
+    dataUrl: "",
+    previewError: false,
+    nativeFile: file,
+  }));
+  if (mapped.length) attachments.value = [...attachments.value, ...mapped];
 }
 
 function handleFileChange(event) {
@@ -434,6 +467,7 @@ function handleDocumentClick(event) {
 
 onMounted(() => {
   syncViewportMode();
+  window.addEventListener("android-to-js", handleNativeFileSelected);
   resize();
   document.addEventListener("click", handleDocumentClick);
   window.addEventListener("resize", syncViewportMode, {passive: true});
@@ -441,6 +475,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  window.removeEventListener("android-to-js", handleNativeFileSelected);
   document.removeEventListener("click", handleDocumentClick);
   removeViewportListener?.();
   attachments.value.forEach((file) => {
