@@ -31,15 +31,7 @@
       <section v-if="messages.length === 0" class="empty-stage">
         <div class="empty-center">
           <h1>어디서부터 시작할까요?</h1>
-          <PromptInput
-            class="desktop-center-prompt"
-            :disabled="isGenerating"
-            :show-help="false"
-            @submit="handleSubmit"
-            @focus="handlePromptFocus"
-            @height-change="handlePromptResize"
-          />
-          <div class="suggestion-row">
+          <div class="suggestion-row suggestion-row--between">
             <button
               v-for="item in suggestions"
               :key="item.text"
@@ -51,6 +43,16 @@
               {{ item.text }}
             </button>
           </div>
+          <PromptInput
+            class="desktop-center-prompt"
+            v-model="selectedModel"
+            :models="models"
+            :disabled="isGenerating"
+            :show-help="false"
+            @submit="handleSubmit"
+            @focus="handlePromptFocus"
+            @height-change="handlePromptResize"
+          />
         </div>
 
         <div class="mobile-project-home">
@@ -121,6 +123,8 @@
 
       <PromptInput
         v-if="messages.length > 0"
+        v-model="selectedModel"
+        :models="models"
         :disabled="isGenerating"
         :show-help="false"
         @submit="handleSubmit"
@@ -130,6 +134,8 @@
       <PromptInput
         v-else
         class="mobile-bottom-prompt"
+        v-model="selectedModel"
+        :models="models"
         :disabled="isGenerating"
         :show-help="false"
         floating
@@ -181,11 +187,11 @@ let forceBottomUntil = 0;
 const models = [
   {
     id: "gpt-5-thinking",
-    label: "ChatGPT",
-    description: "GPT-5.5 Thinking 스타일 데모",
+    label: "빠른 모델",
+    description: "빠른 답변과 일반 작업용 모델",
   },
-  {id: "instant", label: "Instant", description: "빠른 답변용 UI 모드"},
-  {id: "coding", label: "Coding", description: "개발 작업에 맞춘 모드"},
+  {id: "balanced", label: "균형 모델", description: "정확도와 속도를 균형 있게 사용"},
+  {id: "coding", label: "코딩 모델", description: "개발 작업과 코드 분석에 최적화"},
 ];
 
 const projects = [

@@ -1,6 +1,6 @@
 <template>
   <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
-    <form class="prompt-box" @submit.prevent="submit">
+    <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
       <div
         v-if="attachments.length"
         class="attachment-preview-row"
@@ -18,22 +18,14 @@
           @keydown.enter.prevent="handleAttachmentPreview(file)"
           @keydown.space.prevent="handleAttachmentPreview(file)"
         >
-          <div
-            v-if="file.kind === 'image'"
-            class="attachment-preview-thumb"
-            aria-hidden="true"
-          >
+          <div v-if="file.kind === 'image'" class="attachment-preview-thumb" aria-hidden="true">
             <img :src="getPreviewUrl(file)" :alt="file.name" @error="markPreviewError(file)" />
           </div>
-          <div v-else class="attachment-preview-file" aria-hidden="true">
-            📄
-          </div>
-
+          <div v-else class="attachment-preview-file" aria-hidden="true">📄</div>
           <div class="attachment-preview-info">
             <strong :title="file.name">{{ file.name }}</strong>
             <span>{{ formatFileSize(file.size) }}</span>
           </div>
-
           <button
             type="button"
             class="attachment-preview-remove"
@@ -42,79 +34,97 @@
             @mousedown.stop
             @touchstart.stop
             @click.stop.prevent="removeAttachment(file.id)"
-          >
-            ×
-          </button>
+          >×</button>
         </div>
       </div>
 
-      <div class="prompt-input-row">
-        <div class="attach-menu-wrap">
-          <button
-            ref="attachButtonRef"
-            class="attach-button"
-            :class="{'attach-button--active': attachMenuOpen}"
-            type="button"
-            title="첨부"
-            aria-label="첨부"
-            :aria-expanded="attachMenuOpen"
-            :disabled="disabled"
-            @click="toggleAttachMenu"
-          >
-            ＋
-          </button>
+      <textarea
+        ref="textareaRef"
+        v-model="text"
+        :disabled="disabled"
+        :placeholder="placeholder"
+        rows="1"
+        @focus="handleFocus"
+        @blur="emit('blur')"
+        @input="resize"
+        @keydown.enter.exact.prevent="submit"
+        @paste="handlePaste"
+      />
 
-          <div v-if="attachMenuOpen" class="attach-menu" role="menu">
+      <div class="prompt-action-row">
+        <div class="prompt-left-actions">
+          <div class="prompt-selector-wrap" ref="modelSelectorRef">
             <button
-              v-if="showCameraMenu"
+              class="prompt-model-trigger"
               type="button"
-              role="menuitem"
-              @click="openFilePicker('camera')"
+              :disabled="disabled"
+              aria-label="모델 선택"
+              @click="openModelSelector"
             >
-              <span aria-hidden="true">📷</span>
-              <p>카메라로 촬영</p>
+              <span>{{ currentModel.label }}</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 7.5 10 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </button>
+            <div v-if="modelMenuOpen && !isMobileSheet" class="prompt-popover model-menu prompt-model-menu">
+              <button
+                v-for="model in models"
+                :key="model.id"
+                class="model-option"
+                :class="{active: model.id === modelValue}"
+                type="button"
+                @click="selectModel(model.id)"
+              >
+                <strong>{{ model.label }}</strong>
+                <small>{{ model.description }}</small>
+              </button>
+            </div>
+          </div>
+
+          <div class="prompt-selector-wrap" ref="plusSelectorRef">
             <button
+              class="prompt-icon-action"
+              :class="{'prompt-icon-action--active': toolMenuOpen}"
               type="button"
-              role="menuitem"
-              @click="openFilePicker('image')"
-            >
-              <span aria-hidden="true">🖼️</span>
-              <p>이미지 추가</p>
-            </button>
+              :disabled="disabled"
+              aria-label="도구"
+              @click="openToolSelector"
+            >＋</button>
+            <div v-if="toolMenuOpen && !isMobileSheet" class="prompt-popover prompt-tool-menu">
+              <button v-for="tool in tools" :key="tool.id" type="button" @click="applyTool(tool)">
+                <span aria-hidden="true">{{ tool.icon }}</span>
+                <p>{{ tool.label }}</p>
+              </button>
+            </div>
+          </div>
+
+          <div class="prompt-selector-wrap attach-menu-wrap" ref="attachButtonRef">
             <button
+              class="prompt-icon-action attach-button"
+              :class="{'prompt-icon-action--active': attachMenuOpen}"
               type="button"
-              role="menuitem"
-              @click="openFilePicker('all')"
+              title="첨부"
+              aria-label="첨부"
+              :disabled="disabled"
+              @click="openAttachSelector"
             >
-              <span aria-hidden="true">📎</span>
-              <p>파일 추가</p>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M21.4 11.6 12.1 20.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4.1 4.1 0 0 1 5.8 5.8l-9.4 9.4a2.2 2.2 0 1 1-3.1-3.1l8.6-8.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </button>
+            <div v-if="attachMenuOpen && !isMobileSheet" class="prompt-popover attach-menu" role="menu">
+              <button v-if="showCameraMenu" type="button" role="menuitem" @click="openFilePicker('camera')">
+                <span aria-hidden="true">📷</span><p>카메라로 촬영</p>
+              </button>
+              <button type="button" role="menuitem" @click="openFilePicker('image')">
+                <span aria-hidden="true">🖼️</span><p>이미지 추가</p>
+              </button>
+              <button type="button" role="menuitem" @click="openFilePicker('all')">
+                <span aria-hidden="true">📎</span><p>파일 추가</p>
+              </button>
+            </div>
           </div>
         </div>
 
-        <textarea
-          ref="textareaRef"
-          v-model="text"
-          :disabled="disabled"
-          :placeholder="placeholder"
-          rows="1"
-          @focus="handleFocus"
-          @blur="emit('blur')"
-          @input="resize"
-          @keydown.enter.exact.prevent="submit"
-          @paste="handlePaste"
-        />
-
-        <button
-          class="send-button"
-          type="submit"
-          :disabled="disabled || !canSubmit"
-          title="전송"
-          aria-label="전송"
-        >
-          ↗
-        </button>
+        <button class="send-button" type="submit" :disabled="disabled || !canSubmit" title="전송" aria-label="전송">↗</button>
       </div>
 
       <input
@@ -127,10 +137,40 @@
         @change="handleFileChange"
       />
     </form>
-    <p v-if="showHelp" class="prompt-help">
-      API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서
-      확장하세요.
-    </p>
+    <p v-if="showHelp" class="prompt-help">API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서 확장하세요.</p>
+
+    <BaseBottomSheet :open="modelMenuOpen && isMobileSheet" title="모델 선택" @close="modelMenuOpen = false">
+      <button
+        v-for="model in models"
+        :key="model.id"
+        class="bottom-sheet-option"
+        :class="{active: model.id === modelValue}"
+        type="button"
+        @click="selectModel(model.id)"
+      >
+        <strong>{{ model.label }}</strong>
+        <small>{{ model.description }}</small>
+      </button>
+    </BaseBottomSheet>
+
+    <BaseBottomSheet :open="toolMenuOpen && isMobileSheet" title="도구" @close="toolMenuOpen = false">
+      <button v-for="tool in tools" :key="tool.id" class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="applyTool(tool)">
+        <span aria-hidden="true">{{ tool.icon }}</span>
+        <strong>{{ tool.label }}</strong>
+      </button>
+    </BaseBottomSheet>
+
+    <BaseBottomSheet :open="attachMenuOpen && isMobileSheet" title="첨부" @close="attachMenuOpen = false">
+      <button v-if="showCameraMenu" class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('camera')">
+        <span aria-hidden="true">📷</span><strong>카메라로 촬영</strong>
+      </button>
+      <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('image')">
+        <span aria-hidden="true">🖼️</span><strong>이미지 추가</strong>
+      </button>
+      <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('all')">
+        <span aria-hidden="true">📎</span><strong>파일 추가</strong>
+      </button>
+    </BaseBottomSheet>
   </footer>
 </template>
 
@@ -139,25 +179,43 @@ import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {isAndroidApp} from "@/core/config";
 import {useAppContext} from "@/composables/useAppContext";
 import {createId} from "@/utils/id";
+import BaseBottomSheet from "./BaseBottomSheet.vue";
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
   floating: {type: Boolean, default: false},
   showHelp: {type: Boolean, default: true},
-  placeholder: {type: String, default: "무엇이든 물어보세요"},
+  placeholder: {type: String, default: "Gemini에게 물어보기"},
+  modelValue: {type: String, default: "gpt-5-thinking"},
+  models: {type: Array, default: () => []},
 });
 
-const emit = defineEmits(["submit", "focus", "blur", "height-change"]);
+const emit = defineEmits(["submit", "focus", "blur", "height-change", "update:modelValue"]);
 const {appInfo} = useAppContext();
 const text = ref("");
 const textareaRef = ref(null);
 const fileInputRef = ref(null);
 const attachButtonRef = ref(null);
+const modelSelectorRef = ref(null);
+const plusSelectorRef = ref(null);
 const attachments = ref([]);
 const attachMenuOpen = ref(false);
+const modelMenuOpen = ref(false);
+const toolMenuOpen = ref(false);
 const fileAccept = ref("");
 const captureMode = ref(null);
+const isMobileSheet = ref(false);
 let lastHeight = 0;
+let removeViewportListener = null;
+
+const fallbackModels = [{id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델"}];
+const currentModels = computed(() => (props.models.length ? props.models : fallbackModels));
+const currentModel = computed(() => currentModels.value.find((model) => model.id === props.modelValue) || currentModels.value[0]);
+const tools = [
+  {id: "image", icon: "▧", label: "이미지 만들기", prompt: "이미지 생성 프롬프트를 만들어줘"},
+  {id: "write", icon: "✎", label: "글쓰기 또는 편집", prompt: "아래 내용을 더 자연스럽게 다듬어줘"},
+  {id: "find", icon: "◎", label: "필요한 항목 찾기", prompt: "프로젝트에서 빠진 항목을 찾아줘"},
+];
 
 function getPreviewUrl(file) {
   return file?.dataUrl || file?.previewUrl || file?.url || "";
@@ -168,21 +226,18 @@ function markPreviewError(file) {
   file.previewError = true;
 }
 
-const canSubmit = computed(
-  () => text.value.trim().length > 0 || attachments.value.length > 0
-);
-
-// 웹 브라우저는 카메라가 없다는 운영 정책을 반영하고,
-// Android 앱 WebView에서만 카메라 촬영 메뉴를 노출한다.
+const canSubmit = computed(() => text.value.trim().length > 0 || attachments.value.length > 0);
 const showCameraMenu = computed(() => isAndroidApp(appInfo));
+
+function syncViewportMode() {
+  isMobileSheet.value = Boolean(window.matchMedia?.("(max-width: 900px)")?.matches || document.querySelector(".app-shell--mobile"));
+}
 
 function resize() {
   const el = textareaRef.value;
   if (!el) return;
   el.style.height = "auto";
-  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches
-    ? 136
-    : 160;
+  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches ? 136 : 160;
   const nextHeight = Math.min(Math.max(el.scrollHeight, 38), maxHeight);
   el.style.height = `${nextHeight}px`;
   el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
@@ -200,56 +255,72 @@ function handleFocus() {
 function submit() {
   const value = text.value.trim();
   if ((!value && attachments.value.length === 0) || props.disabled) return;
-
-  emit("submit", {
-    text: value,
-    // Android WebView에서는 FileReader가 완료되기 전에 전송하면
-    // 얕은 복사본이 data URL 갱신을 받지 못해 큰 미리보기가 깨질 수 있다.
-    // 메시지 영역에서도 같은 첨부 객체를 참조하게 하여 previewUrl 갱신이 유지되도록 한다.
-    attachments: attachments.value,
-  });
-
+  emit("submit", {text: value, attachments: attachments.value});
   text.value = "";
-  // submit 이후 첨부 객체는 대화 메시지에서 계속 사용된다.
-  // 여기서 blob URL을 revoke하면 Android WebView에서 이미지/파일 미리보기가
-  // 늦게 로딩되는 순간 깨질 수 있으므로, 메시지 정리 시점(ChatShell)에서 회수한다.
   attachments.value = [];
   attachMenuOpen.value = false;
+  modelMenuOpen.value = false;
+  toolMenuOpen.value = false;
   nextTick(resize);
 }
 
-function toggleAttachMenu() {
+function closeMenus(except = "") {
+  if (except !== "model") modelMenuOpen.value = false;
+  if (except !== "tool") toolMenuOpen.value = false;
+  if (except !== "attach") attachMenuOpen.value = false;
+}
+
+function openModelSelector() {
   if (props.disabled) return;
-  attachMenuOpen.value = !attachMenuOpen.value;
+  syncViewportMode();
+  const next = !modelMenuOpen.value;
+  closeMenus("model");
+  modelMenuOpen.value = next;
+}
+
+function openToolSelector() {
+  if (props.disabled) return;
+  syncViewportMode();
+  const next = !toolMenuOpen.value;
+  closeMenus("tool");
+  toolMenuOpen.value = next;
+}
+
+function openAttachSelector() {
+  if (props.disabled) return;
+  syncViewportMode();
+  const next = !attachMenuOpen.value;
+  closeMenus("attach");
+  attachMenuOpen.value = next;
+}
+
+function selectModel(id) {
+  emit("update:modelValue", id);
+  modelMenuOpen.value = false;
+}
+
+function applyTool(tool) {
+  text.value = text.value ? `${text.value}\n${tool.prompt}` : tool.prompt;
+  toolMenuOpen.value = false;
+  nextTick(() => {
+    textareaRef.value?.focus();
+    resize();
+  });
 }
 
 function openFilePicker(type) {
   if (props.disabled) return;
-
   const input = fileInputRef.value;
   if (!input) return;
-
-  // Android WebView는 input.click()이 사용자 터치 이벤트 체인에서
-  // 바로 실행되지 않으면 파일 선택창을 열지 않는 경우가 많다.
-  // 그래서 nextTick/requestAnimationFrame/setTimeout을 거치지 않고
-  // 메뉴 버튼 클릭 이벤트 안에서 즉시 네이티브 파일 선택 요청을 발생시킨다.
   attachMenuOpen.value = false;
-
   const isCamera = type === "camera";
   const accept = type === "image" || isCamera ? "image/*" : "";
   const capture = isCamera ? "environment" : null;
-
   fileAccept.value = accept;
   captureMode.value = capture;
   input.setAttribute("accept", accept);
-
-  if (capture) {
-    input.setAttribute("capture", capture);
-  } else {
-    input.removeAttribute("capture");
-  }
-
-  // 같은 파일을 다시 선택해도 change 이벤트가 발생하도록 초기화한다.
+  if (capture) input.setAttribute("capture", capture);
+  else input.removeAttribute("capture");
   input.value = "";
   input.click();
 }
@@ -268,11 +339,9 @@ function handlePaste(event) {
 function addFiles(fileList) {
   const nextFiles = Array.from(fileList || []);
   if (!nextFiles.length) return;
-
   const mapped = nextFiles.map((file) => {
     const isImage = isImageFile(file);
     const objectUrl = URL.createObjectURL(file);
-
     return {
       id: createId("attachment"),
       name: file.name || "첨부 파일",
@@ -286,14 +355,8 @@ function addFiles(fileList) {
       file,
     };
   });
-
   attachments.value = [...attachments.value, ...mapped];
-
-  // 일부 Android WebView에서는 blob URL 이미지가 전체 미리보기에서 늦게 깨지는 경우가 있어
-  // 이미지 첨부만 data URL을 보조 previewUrl로 생성한다. 원본 파일/다운로드 URL은 유지한다.
-  mapped
-    .filter((file) => file.kind === "image")
-    .forEach((file) => hydrateImagePreviewUrl(file));
+  mapped.filter((file) => file.kind === "image").forEach((file) => hydrateImagePreviewUrl(file));
   nextTick(() => {
     resize();
     emit("height-change", lastHeight);
@@ -301,10 +364,7 @@ function addFiles(fileList) {
 }
 
 function isImageFile(file) {
-  return Boolean(
-    file?.type?.startsWith("image/") ||
-      /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
-  );
+  return Boolean(file?.type?.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || ""));
 }
 
 function inferMimeType(name = "") {
@@ -321,12 +381,10 @@ function inferMimeType(name = "") {
 function hydrateImagePreviewUrl(attachment) {
   const sourceFile = attachment?.file;
   if (!sourceFile || typeof FileReader === "undefined") return;
-
   const reader = new FileReader();
   reader.onload = () => {
     const dataUrl = typeof reader.result === "string" ? reader.result : "";
     if (!dataUrl) return;
-
     const target = attachments.value.find((file) => file.id === attachment.id);
     if (target) {
       target.dataUrl = dataUrl;
@@ -357,14 +415,7 @@ function removeAttachment(id) {
 function previewImage(file) {
   if (!file) return;
   file.url = file.url || file.previewUrl || file.dataUrl || "";
-  window.dispatchEvent(
-    new CustomEvent("chat:image-preview", {
-      detail: {
-        ...file,
-        previewUrl: getPreviewUrl(file),
-      },
-    })
-  );
+  window.dispatchEvent(new CustomEvent("chat:image-preview", {detail: {...file, previewUrl: getPreviewUrl(file)}}));
 }
 
 function formatFileSize(size) {
@@ -375,19 +426,23 @@ function formatFileSize(size) {
 }
 
 function handleDocumentClick(event) {
-  if (!attachMenuOpen.value) return;
-  const root = attachButtonRef.value?.closest(".attach-menu-wrap");
-  if (root?.contains(event.target)) return;
-  attachMenuOpen.value = false;
+  if (isMobileSheet.value) return;
+  const roots = [attachButtonRef.value, modelSelectorRef.value, plusSelectorRef.value];
+  if (roots.some((root) => root?.contains(event.target))) return;
+  closeMenus();
 }
 
 onMounted(() => {
+  syncViewportMode();
   resize();
   document.addEventListener("click", handleDocumentClick);
+  window.addEventListener("resize", syncViewportMode, {passive: true});
+  removeViewportListener = () => window.removeEventListener("resize", syncViewportMode);
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleDocumentClick);
+  removeViewportListener?.();
   attachments.value.forEach((file) => {
     if (file.url) URL.revokeObjectURL(file.url);
   });

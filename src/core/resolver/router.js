@@ -1,11 +1,11 @@
 import {createRouter, createWebHistory} from "vue-router";
 
 import ChatPage from "@/views/ChatPage.vue";
-import SwaggerPage from "@/views/SwaggerPage.vue";
+const SwaggerPage = () => import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
 
-import NotFoundPage from "@/views/NotFoundPage.vue";
+const NotFoundPage = () => import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 
-import AndroidUpdate from "@/views/android/AndroidUpdate.vue";
+const AndroidUpdate = () => import(/* webpackChunkName: "android-update" */ "@/views/android/AndroidUpdate.vue");
 
 import {isAndroidApp, isIosApp} from "@/core/config";
 
