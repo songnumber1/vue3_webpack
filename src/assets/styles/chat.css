@@ -3933,6 +3933,7 @@ body,
   inset: 0;
   z-index: 1300;
   background: rgba(0, 0, 0, 0.45);
+  touch-action: none;
 }
 .bottom-sheet {
   position: fixed;
@@ -3941,36 +3942,62 @@ body,
   bottom: 0;
   z-index: 1310;
   width: 100%;
-  max-height: min(78dvh, 520px);
+  height: var(--bottom-sheet-height, min(calc(var(--vh, 1vh) * 78), 520px));
+  max-height: calc(var(--app-height, 100vh) - env(safe-area-inset-top));
+  min-height: 220px;
   display: flex;
   flex-direction: column;
   border-radius: 26px 26px 0 0;
   background: var(--menu-bg);
   color: var(--text);
   box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.28);
-  padding: 8px 12px calc(14px + env(safe-area-inset-bottom));
+  padding: 0 12px calc(14px + env(safe-area-inset-bottom));
+  overflow: hidden;
+  will-change: height, transform;
+}
+.bottom-sheet--dragging {
+  transition: none !important;
+  user-select: none;
+}
+.bottom-sheet--fullscreen {
+  border-radius: 18px 18px 0 0;
+}
+.bottom-sheet-drag-area {
+  flex: 0 0 auto;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: ns-resize;
 }
 .bottom-sheet-handle {
-  width: 42px;
-  height: 4px;
+  width: 46px;
+  height: 5px;
   border-radius: 999px;
   background: var(--control-border);
-  margin: 4px auto 8px;
+  margin: 0 auto;
 }
 .bottom-sheet-header {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 2px 4px 8px;
+  padding: 0 4px 10px;
 }
 .bottom-sheet-header h2 {
+  min-width: 0;
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 17px;
   font-weight: 900;
   letter-spacing: -0.03em;
 }
 .bottom-sheet-close {
+  flex: 0 0 auto;
   width: 38px;
   height: 38px;
   border: 0;
@@ -3981,8 +4008,10 @@ body,
   line-height: 1;
 }
 .bottom-sheet-body {
+  flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 4px 0 0;
   -webkit-overflow-scrolling: touch;
 }
@@ -4357,5 +4386,15 @@ body,
   }
   .sidebar-history--main {
     overflow-x: hidden;
+  }
+}
+
+/* Android WebView/Chrome bottom sheet fallback: avoid dvh-only sizing bugs. */
+@media (max-width: 900px) {
+  .bottom-sheet-option {
+    min-height: 50px;
+  }
+  .bottom-sheet-body > *:last-child {
+    margin-bottom: 8px;
   }
 }
