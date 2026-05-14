@@ -9,6 +9,8 @@ import AssistantRoot from "@/views/AssistantRoot.vue";
 import MainPage from "@/views/MainPage.vue";
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
+const SharedPage = () =>
+  import(/* webpackChunkName: "shared-chat" */ "@/views/SharedPage.vue");
 const SwaggerPage = () =>
   import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
 const NotFoundPage = () =>
@@ -33,7 +35,14 @@ const baseRoutes = [
         name: "chat",
         component: ChatPage,
         props: true,
-        meta: {title: "Chat"},
+        meta: {title: "Chat"}
+      },
+      {
+        path: "shared/:shareId",
+        name: "shared",
+        component: SharedPage,
+        props: true,
+        meta: {title: "Shared Chat"}
       },
       {
         path: "swagger",

@@ -1,5 +1,7 @@
-/** * @file MessageActions.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI */
+<!--
+@file MessageActions.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI
+-->
 
 <template>
   <div class="message-actions" :class="`message-actions--${role}`">

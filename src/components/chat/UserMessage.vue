@@ -1,5 +1,7 @@
-/** * @file UserMessage.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI */
+<!--
+@file UserMessage.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI
+-->
 
 <template>
   <article class="message message--user">

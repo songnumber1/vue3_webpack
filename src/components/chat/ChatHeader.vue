@@ -1,5 +1,7 @@
-/** * @file ChatHeader.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI */
+<!--
+@file ChatHeader.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI
+-->
 
 <template>
   <header
@@ -113,6 +115,6 @@ defineEmits([
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(
-  () => props.mode === "chat" && !props.isMobile
+  () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile
 );
 </script>

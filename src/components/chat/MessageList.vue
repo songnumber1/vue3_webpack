@@ -1,5 +1,7 @@
-/** * @file MessageList.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI */
+<!--
+@file MessageList.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI
+-->
 
 <template>
   <section

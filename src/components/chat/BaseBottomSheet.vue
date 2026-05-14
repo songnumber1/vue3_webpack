@@ -1,5 +1,7 @@
-/** * @file BaseBottomSheet.vue * @description Vue component used in the chat
-web application runtime. * @author OpenAI */
+<!--
+@file BaseBottomSheet.vue * @description Vue component used in the chat
+web application runtime. * @author OpenAI
+-->
 
 <template>
   <teleport to="body">

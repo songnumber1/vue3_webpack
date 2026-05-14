@@ -1,5 +1,7 @@
-/** * @file ChatSidebarIcon.vue * @description Vue component used in the chat
-web application runtime. * @author OpenAI */
+<!--
+@file ChatSidebarIcon.vue * @description Vue component used in the chat
+web application runtime. * @author OpenAI
+-->
 
 <template>
   <component :is="bare ? 'svg' : 'span'" v-bind="rootAttrs">
