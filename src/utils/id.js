@@ -1,5 +1,10 @@
 let fallbackCounter = 0
 
+/**
+ * WebView에서 crypto.randomUUID가 없을 때도 난수 바이트를 안전하게 생성합니다.
+ * @param {Uint8Array} bytes 난수를 채울 바이트 배열
+ * @returns {Uint8Array} 난수가 채워진 배열
+ */
 function getRandomValuesSafe(bytes) {
   const cryptoObj = globalThis.crypto || globalThis.msCrypto
   if (cryptoObj?.getRandomValues) {
@@ -13,6 +18,10 @@ function getRandomValuesSafe(bytes) {
   return bytes
 }
 
+/**
+ * crypto.randomUUID 미지원 환경을 위한 UUID v4 fallback 문자열을 생성합니다.
+ * @returns {string} UUID v4 형식 문자열
+ */
 function createUuidV4Fallback() {
   const bytes = getRandomValuesSafe(new Uint8Array(16))
   bytes[6] = (bytes[6] & 0x0f) | 0x40
@@ -22,6 +31,11 @@ function createUuidV4Fallback() {
   return `${hex.slice(0, 4).join('')}-${hex.slice(4, 6).join('')}-${hex.slice(6, 8).join('')}-${hex.slice(8, 10).join('')}-${hex.slice(10, 16).join('')}`
 }
 
+/**
+ * 메시지/임시 객체에서 사용하는 고유 id를 생성합니다.
+ * @param {string} [prefix='id'] fallback id 접두사
+ * @returns {string} crypto.randomUUID 또는 fallback id
+ */
 export function createId(prefix = 'id') {
   const cryptoObj = globalThis.crypto || globalThis.msCrypto
   if (typeof cryptoObj?.randomUUID === 'function') {

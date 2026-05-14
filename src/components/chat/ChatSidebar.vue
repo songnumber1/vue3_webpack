@@ -106,8 +106,9 @@
 </template>
 
 <script setup>
-import {computed, defineComponent, h, onBeforeUnmount, onMounted, ref} from 'vue'
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue'
 import BaseBottomSheet from './BaseBottomSheet.vue'
+import Icon from './ChatSidebarIcon.vue'
 
 const props = defineProps({
   histories: {type: Array, required: true},
@@ -125,32 +126,64 @@ const isMobileSheet = ref(false)
 const assistantSelectorRef = ref(null)
 const currentAssistant = computed(() => props.assistants.find((item) => item.id === props.selectedAssistantId) || props.assistants[0])
 
-const ICONS = {
-  pencil: '<path d="M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"/><path d="M13.4 7.1 16.9 10.6"/>',
-  search: '<circle cx="10.5" cy="10.5" r="5.8"/><path d="M15 15 20 20"/>',
-  panel: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v16"/>',
-  chat: '<path d="M5 6.8A4 4 0 0 1 9 3h6a4 4 0 0 1 4 4v4.3a4 4 0 0 1-4 4H9.3L5 20v-4.7a4 4 0 0 1-1-2.7V6.8Z"/>',
-}
-const Icon = defineComponent({
-  name: 'ChatSidebarIcon',
-  props: {name: {type: String, required: true}, bare: {type: Boolean, default: false}},
-  setup(iconProps) {
-    return () => {
-      const svg = h('svg', {class: 'nav-icon', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', innerHTML: ICONS[iconProps.name] || ICONS.chat, 'aria-hidden': 'true'})
-      return iconProps.bare ? svg : h('span', {class: 'icon-wrap'}, [svg])
-    }
-  },
-})
 
-function syncViewportMode() { isMobileSheet.value = Boolean(window.matchMedia?.('(max-width: 900px)')?.matches || document.querySelector('.app-shell--mobile')) }
-function openAssistantSelector() { syncViewportMode(); assistantMenuOpen.value = !assistantMenuOpen.value }
-function selectAssistant(id) { emit('update:selectedAssistantId', id); assistantMenuOpen.value = false }
+
+/**
+ * 현재 viewport가 모바일 bottom sheet 모드인지 동기화합니다.
+ * @returns {void}
+ */
+function syncViewportMode() {
+  isMobileSheet.value = Boolean(window.matchMedia?.('(max-width: 900px)')?.matches || document.querySelector('.app-shell--mobile'))
+}
+/**
+ * Assistant 선택 UI를 데스크톱 메뉴 또는 모바일 bottom sheet 형태로 엽니다.
+ * @returns {void}
+ */
+function openAssistantSelector() {
+  syncViewportMode()
+  assistantMenuOpen.value = !assistantMenuOpen.value
+}
+/**
+ * 선택한 Assistant id를 부모 컴포넌트에 전달합니다.
+ * @param {string} id 선택된 Assistant id
+ * @returns {void}
+ */
+function selectAssistant(id) {
+  emit('update:selectedAssistantId', id)
+  assistantMenuOpen.value = false
+}
+/** @param {boolean} value 사이드바 접힘 여부 */
 function emitSidebarCollapsed(value) { emit('update:sidebarCollapsed', value) }
+/** @param {boolean} value 모바일 drawer 표시 여부 */
 function emitDrawerOpen(value) { emit('update:drawerOpen', value) }
+/** @param {boolean} value 접힌 사이드바 최근 대화 팝오버 표시 여부 */
 function emitCollapsedRecentOpen(value) { emit('update:collapsedRecentOpen', value) }
-function handleNewChat() { emit('new-chat'); emitDrawerOpen(false); emitCollapsedRecentOpen(false) }
-function handleSelectHistory(item) { emit('select-history', item); emitDrawerOpen(false) }
-function handleSelectHistoryCollapsed(item) { emit('select-history-collapsed', item); emitCollapsedRecentOpen(false) }
+/** 새 채팅 생성을 요청하고 열린 보조 UI를 닫습니다. */
+function handleNewChat() {
+  emit('new-chat')
+  emitDrawerOpen(false)
+  emitCollapsedRecentOpen(false)
+}
+/**
+ * 대화 이력 선택 이벤트를 부모 컴포넌트에 전달합니다.
+ * @param {{id: string|number, title: string}} item 선택한 대화 이력
+ */
+function handleSelectHistory(item) {
+  emit('select-history', item)
+  emitDrawerOpen(false)
+}
+/**
+ * 접힌 사이드바 팝오버에서 대화 이력을 선택합니다.
+ * @param {{id: string|number, title: string}} item 선택한 대화 이력
+ */
+function handleSelectHistoryCollapsed(item) {
+  emit('select-history-collapsed', item)
+  emitCollapsedRecentOpen(false)
+}
+/**
+ * Assistant 메뉴 외부 클릭 시 데스크톱 dropdown을 닫습니다.
+ * @param {MouseEvent} event 문서 클릭 이벤트
+ */
 function handleDocumentClick(event) {
   if (isMobileSheet.value) return
   if (assistantSelectorRef.value?.contains(event.target)) return

@@ -32,11 +32,21 @@ const conversations = ref({})
 
 const currentAssistant = computed(() => assistants.find((item) => item.id === selectedAssistantId.value) || assistants[0])
 
+/**
+ * 대화 이력 id로 sidebar history 객체를 조회합니다.
+ * @param {string|number} id 조회할 history id
+ * @returns {{id: string|number, title: string, preview?: string, type?: string}|null}
+ */
 function getHistory(id) {
   const normalizedId = Number(id)
   return histories.value.find((item) => Number(item.id) === normalizedId) || null
 }
 
+/**
+ * 메시지 첨부파일 중 blob URL을 해제하여 메모리 누수를 방지합니다.
+ * @param {Array<{attachments?: Array<{url?: string}>}>} items 정리할 메시지 목록
+ * @returns {void}
+ */
 function revokeMessageAttachments(items = []) {
   items.forEach((message) => {
     if (!Array.isArray(message.attachments)) return
@@ -46,6 +56,11 @@ function revokeMessageAttachments(items = []) {
   })
 }
 
+/**
+ * 저장된 history 정보를 화면 표시용 메시지 목록으로 변환합니다.
+ * @param {{id: string|number, title: string, preview?: string, type?: string}|null} history 대화 이력
+ * @returns {Promise<Array<{id: string, role: string, content: string}>>}
+ */
 async function buildMessagesFromHistory(history) {
   if (!history) return []
   if (history.type === 'markdown-showcase') {
@@ -62,6 +77,11 @@ async function buildMessagesFromHistory(history) {
   ]
 }
 
+/**
+ * 대화방 메시지가 없으면 history 기반 샘플 메시지를 생성하고 캐시에 저장합니다.
+ * @param {string|number} historyId 대화 이력 id
+ * @returns {Promise<Array>} 대화 메시지 목록
+ */
 async function ensureConversation(historyId) {
   const history = getHistory(historyId)
   if (!history) return []
@@ -71,16 +91,29 @@ async function ensureConversation(historyId) {
   return conversations.value[history.id]
 }
 
+/**
+ * 대화방 메시지 목록을 교체합니다.
+ * @param {string|number} historyId 대화 이력 id
+ * @param {Array} messages 저장할 메시지 목록
+ */
 function setConversation(historyId, messages) {
   conversations.value[historyId] = messages
 }
 
+/**
+ * 대화방 메시지와 첨부 blob URL을 함께 정리합니다.
+ * @param {string|number} historyId 삭제할 대화 이력 id
+ */
 function clearConversation(historyId) {
   if (!historyId || !conversations.value[historyId]) return
   revokeMessageAttachments(conversations.value[historyId])
   delete conversations.value[historyId]
 }
 
+/**
+ * 채팅 화면에서 공유하는 모델, Assistant, history, conversation 상태를 제공합니다.
+ * @returns {{assistants: Array, currentAssistant: import('vue').ComputedRef, histories: import('vue').Ref<Array>, models: Array, selectedAssistantId: import('vue').Ref<string>, selectedModel: import('vue').Ref<string>, conversations: import('vue').Ref<Record<string, Array>>, getHistory: Function, ensureConversation: Function, setConversation: Function, clearConversation: Function, revokeMessageAttachments: Function}}
+ */
 export function useChatRuntime() {
   return {
     assistants,
