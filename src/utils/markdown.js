@@ -40,8 +40,55 @@ function rehypeTableWrapper() {
       parent.children[index] = {
         type: "element",
         tagName: "div",
-        properties: { className: ["md-table-wrapper"] },
-        children: [node]
+        properties: { className: ["md-table-card"] },
+        children: [
+          {
+            type: "element",
+            tagName: "div",
+            properties: { className: ["md-table-toolbar"] },
+            children: [
+              {
+                type: "element",
+                tagName: "strong",
+                properties: { className: ["md-table-title"] },
+                children: [{ type: "text", value: "테이블" }]
+              },
+              {
+                type: "element",
+                tagName: "div",
+                properties: { className: ["md-table-actions"] },
+                children: [
+                  {
+                    type: "element",
+                    tagName: "button",
+                    properties: {
+                      type: "button",
+                      className: ["md-table-action"],
+                      dataMdTableAction: "copy"
+                    },
+                    children: [{ type: "text", value: "테이블 복사" }]
+                  },
+                  {
+                    type: "element",
+                    tagName: "button",
+                    properties: {
+                      type: "button",
+                      className: ["md-table-action"],
+                      dataMdTableAction: "csv"
+                    },
+                    children: [{ type: "text", value: "CSV 다운로드" }]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: "element",
+            tagName: "div",
+            properties: { className: ["md-table-wrapper"] },
+            children: [node]
+          }
+        ]
       };
     });
   };

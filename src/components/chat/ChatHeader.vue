@@ -1,6 +1,6 @@
 <!--
-@file ChatHeader.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file ChatHeader.vue
+@description Chat workspace header with mobile navigation and desktop user controls.
 -->
 
 <template>
@@ -9,7 +9,7 @@ application runtime. * @author OpenAI
       <button
         class="round-icon menu-toggle"
         type="button"
-        aria-label="메뉴 열기"
+        :aria-label="t('chat.openSidebar')"
         @click="$emit('open-drawer')"
       >
         <span class="icon-lines"></span>
@@ -19,7 +19,7 @@ application runtime. * @author OpenAI
         v-if="showMobileAssistant"
         class="model-trigger model-trigger--assistant"
         type="button"
-        aria-label="Assistant 선택"
+        :aria-label="t('chat.assistantSelect')"
         @click="$emit('open-assistant')"
       >
         <span>{{ assistantLabel }}</span>
@@ -39,13 +39,21 @@ application runtime. * @author OpenAI
         <strong>{{ assistantLabel }}</strong>
         <span>{{ conversationTitle }}</span>
       </div>
+
+      <div v-else class="conversation-title-wrap conversation-title-wrap--main">
+        <strong>{{ assistantLabel }}</strong>
+        <span>{{ t("chat.startQuestion") }}</span>
+      </div>
     </div>
 
-    <div class="topbar-actions">
+    <div v-if="!isMobile" class="topbar-actions topbar-actions--desktop">
+      <button class="guide-link" type="button" @click="$emit('open-guide')">
+        {{ t("common.guide") }}
+      </button>
       <button
         class="round-icon theme-toggle"
         type="button"
-        aria-label="테마 전환"
+        :aria-label="t('common.theme')"
         @click="$emit('toggle-theme')"
       >
         <span class="theme-glyph" :class="{ 'theme-glyph--dark': themeName === 'dark' }"></span>
@@ -53,8 +61,8 @@ application runtime. * @author OpenAI
       <button
         class="round-icon document-toggle"
         type="button"
-        aria-label="Swagger 문서"
-        title="Swagger 문서"
+        :aria-label="t('common.swagger')"
+        :title="t('common.swagger')"
         @click="$emit('open-swagger')"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -66,26 +74,19 @@ application runtime. * @author OpenAI
           <path d="M8.5 15.5h7" />
         </svg>
       </button>
-      <button
-        class="round-icon settings-toggle"
-        type="button"
-        aria-label="설정"
-        title="설정"
-        @click="$emit('open-settings')"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
-          <path
-            d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2 3.4-.2-.1a1.7 1.7 0 0 0-2.1.4l-.1.1-3.4-2-.1-.2a1.7 1.7 0 0 0-1.8-1.1h-.2l-2 3.4-3.4-2 .1-.2a1.7 1.7 0 0 0-.4-2.1l-.1-.1 2-3.4.2.1A1.7 1.7 0 0 0 7.4 13v-.2a1.7 1.7 0 0 0 0-1.6V11l-3.4-2 2-3.4.2.1a1.7 1.7 0 0 0 2.1-.4l.1-.1 3.4 2 .1.2a1.7 1.7 0 0 0 1.8 1.1h.2l2-3.4 3.4 2-.1.2a1.7 1.7 0 0 0 .4 2.1l.1.1-2 3.4-.2-.1A1.7 1.7 0 0 0 16.6 13v.2a1.7 1.7 0 0 0 2.8 1.8Z"
-          />
-        </svg>
-      </button>
+      <UserMenu
+        @notice="$emit('open-notice')"
+        @personalization="$emit('open-personalization')"
+        @language="$emit('open-language')"
+      />
     </div>
   </header>
 </template>
 
 <script setup>
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
+import UserMenu from "@/components/menu/UserMenu.vue";
 
 const props = defineProps({
   mode: { type: String, default: "main" },
@@ -95,8 +96,19 @@ const props = defineProps({
   themeName: { type: String, default: "dark" }
 });
 
-defineEmits(["toggle-theme", "open-drawer", "open-swagger", "open-settings", "open-assistant"]);
+defineEmits([
+  "toggle-theme",
+  "open-drawer",
+  "open-swagger",
+  "open-settings",
+  "open-assistant",
+  "open-guide",
+  "open-notice",
+  "open-personalization",
+  "open-language"
+]);
 
+const { t } = useI18n();
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(

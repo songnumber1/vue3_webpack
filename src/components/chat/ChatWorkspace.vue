@@ -16,11 +16,15 @@
     @open-swagger="$emit('open-swagger')"
     @open-settings="$emit('open-settings')"
     @open-assistant="$emit('open-assistant')"
+    @open-guide="$emit('open-guide')"
+    @open-notice="$emit('open-notice')"
+    @open-personalization="$emit('open-personalization')"
+    @open-language="$emit('open-language')"
   />
 
   <section v-if="mode === 'main'" class="empty-stage empty-stage--main">
     <div class="empty-center">
-      <h1>어디서부터 시작할까요?</h1>
+      <h1>{{ t("chat.startQuestion") }}</h1>
       <div class="suggestion-row suggestion-row--between">
         <button
           v-for="item in suggestions"
@@ -58,7 +62,7 @@
       v-if="showScrollBottom"
       class="scroll-bottom-button"
       type="button"
-      aria-label="맨 아래로 이동"
+      :aria-label="t('chat.scrollBottom')"
       @click="$emit('scroll-bottom')"
     >
       ↓
@@ -82,11 +86,13 @@
 
 <script setup>
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "./PromptInput.vue";
 
+const { t } = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
 let composerResizeObserver = null;
@@ -153,6 +159,10 @@ defineEmits([
   "open-swagger",
   "open-settings",
   "open-assistant",
+  "open-guide",
+  "open-notice",
+  "open-personalization",
+  "open-language",
   "submit",
   "prompt-focus",
   "prompt-resize",

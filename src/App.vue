@@ -1,14 +1,24 @@
 <!--
-@file App.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file App.vue
+@description Root application component that applies layout and platform access guard.
 -->
 
 <template>
   <AppLayout>
     <section v-if="!platformStore.isAccess" class="access-denied-page" role="alert">
       <div class="access-denied-card">
-        <h1>지원하지 않는 접속 환경입니다.</h1>
-        <p>iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.</p>
+        <h1>
+          {{
+            locale === "ko" ? "지원하지 않는 접속 환경입니다." : "Unsupported access environment."
+          }}
+        </h1>
+        <p>
+          {{
+            locale === "ko"
+              ? "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다."
+              : "iOS app, iOS Chrome, and iOS Safari are not supported."
+          }}
+        </p>
         <dl>
           <div>
             <dt>env</dt>
@@ -33,6 +43,9 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
+import { useI18n } from "vue-i18n";
 import { usePlatformStore } from "@/stores/platformStore";
+
+const { locale } = useI18n();
 const platformStore = usePlatformStore();
 </script>

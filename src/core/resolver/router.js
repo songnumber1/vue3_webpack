@@ -23,6 +23,11 @@ const SharedPage = () => import(/* webpackChunkName: "shared-chat" */ "@/views/S
  */
 const SwaggerPage = () => import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
 /**
+ * GuidePage 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
+const GuidePage = () => import(/* webpackChunkName: "guide" */ "@/views/GuidePage.vue");
+/**
  * NotFoundPage 함수입니다.
  * @returns {*} 처리 결과를 반환합니다.
  */
@@ -63,6 +68,12 @@ const baseRoutes = [
         name: "swagger",
         component: SwaggerPage,
         meta: { title: "Swagger" }
+      },
+      {
+        path: "guide",
+        name: "guide",
+        component: GuidePage,
+        meta: { title: "Guide" }
       }
     ]
   }

@@ -45,7 +45,7 @@ application runtime. * @author OpenAI
         ref="textareaRef"
         v-model="text"
         :disabled="disabled"
-        :placeholder="placeholder"
+        :placeholder="placeholder || t('chat.promptPlaceholder')"
         rows="1"
         @focus="handleFocus"
         @blur="emit('blur')"
@@ -61,7 +61,7 @@ application runtime. * @author OpenAI
               class="prompt-model-trigger"
               type="button"
               :disabled="disabled"
-              aria-label="모델 선택"
+              :aria-label="t('chat.assistantSelect')"
               @click="openModelSelector"
             >
               <span>{{ currentModel.label }}</span>
@@ -100,7 +100,7 @@ application runtime. * @author OpenAI
               :class="{ 'prompt-icon-action--active': toolMenuOpen }"
               type="button"
               :disabled="disabled"
-              aria-label="도구"
+              aria-label="Tools"
               @click="openToolSelector"
             >
               ＋
@@ -118,8 +118,8 @@ application runtime. * @author OpenAI
               class="prompt-icon-action attach-button"
               :class="{ 'prompt-icon-action--active': attachMenuOpen }"
               type="button"
-              title="첨부"
-              aria-label="첨부"
+              :title="t('chat.attach')"
+              :aria-label="t('chat.attach')"
               :disabled="disabled"
               @click="openAttachSelector"
             >
@@ -146,15 +146,15 @@ application runtime. * @author OpenAI
                 @click="openFilePicker('camera')"
               >
                 <span aria-hidden="true">📷</span>
-                <p>카메라로 촬영</p>
+                <p>Camera</p>
               </button>
               <button type="button" role="menuitem" @click="openFilePicker('image')">
                 <span aria-hidden="true">🖼️</span>
-                <p>이미지 추가</p>
+                <p>Image</p>
               </button>
               <button type="button" role="menuitem" @click="openFilePicker('all')">
                 <span aria-hidden="true">📎</span>
-                <p>파일 추가</p>
+                <p>File</p>
               </button>
             </div>
           </div>
@@ -164,8 +164,8 @@ application runtime. * @author OpenAI
           class="send-button"
           type="submit"
           :disabled="disabled || !canSubmit"
-          title="전송"
-          aria-label="전송"
+          :title="t('chat.send')"
+          :aria-label="t('chat.send')"
         >
           ↗
         </button>
@@ -182,12 +182,12 @@ application runtime. * @author OpenAI
       />
     </form>
     <p v-if="showHelp" class="prompt-help">
-      API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서 확장하세요.
+      UI demo. Extend resolver/api.js for production integration.
     </p>
 
     <BaseBottomSheet
       :open="modelMenuOpen && isMobileSheet"
-      title="모델 선택"
+      :title="t('chat.assistantSelect')"
       @close="modelMenuOpen = false"
     >
       <button
@@ -205,7 +205,7 @@ application runtime. * @author OpenAI
 
     <BaseBottomSheet
       :open="toolMenuOpen && isMobileSheet"
-      title="도구"
+      title="Tools"
       @close="toolMenuOpen = false"
     >
       <button
@@ -222,7 +222,7 @@ application runtime. * @author OpenAI
 
     <BaseBottomSheet
       :open="attachMenuOpen && isMobileSheet"
-      title="첨부"
+      :title="t('chat.attach')"
       @close="attachMenuOpen = false"
     >
       <button
@@ -231,21 +231,21 @@ application runtime. * @author OpenAI
         type="button"
         @click="openFilePicker('camera')"
       >
-        <span aria-hidden="true">📷</span><strong>카메라로 촬영</strong>
+        <span aria-hidden="true">📷</span><strong>Camera</strong>
       </button>
       <button
         class="bottom-sheet-option bottom-sheet-option--row"
         type="button"
         @click="openFilePicker('image')"
       >
-        <span aria-hidden="true">🖼️</span><strong>이미지 추가</strong>
+        <span aria-hidden="true">🖼️</span><strong>Image</strong>
       </button>
       <button
         class="bottom-sheet-option bottom-sheet-option--row"
         type="button"
         @click="openFilePicker('all')"
       >
-        <span aria-hidden="true">📎</span><strong>파일 추가</strong>
+        <span aria-hidden="true">📎</span><strong>File</strong>
       </button>
     </BaseBottomSheet>
   </footer>
@@ -253,16 +253,19 @@ application runtime. * @author OpenAI
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { usePlatformStore } from "@/stores/platformStore";
 import { openNativeFilePicker } from "@/services/platformBridge";
 import { createId } from "@/utils/id";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 
+const { t } = useI18n();
+
 const props = defineProps({
   disabled: { type: Boolean, default: false },
   floating: { type: Boolean, default: false },
   showHelp: { type: Boolean, default: true },
-  placeholder: { type: String, default: "Gemini에게 물어보기" },
+  placeholder: { type: String, default: "" },
   modelValue: { type: String, default: "gpt-5-thinking" },
   models: { type: Array, default: () => [] }
 });
@@ -292,26 +295,26 @@ const currentModels = computed(() => (props.models.length ? props.models : fallb
 const currentModel = computed(
   () => currentModels.value.find((model) => model.id === props.modelValue) || currentModels.value[0]
 );
-const tools = [
+const tools = computed(() => [
   {
     id: "image",
     icon: "▧",
-    label: "이미지 만들기",
+    label: t("chat.suggestions.image"),
     prompt: "이미지 생성 프롬프트를 만들어줘"
   },
   {
     id: "write",
     icon: "✎",
-    label: "글쓰기 또는 편집",
+    label: t("chat.suggestions.writing"),
     prompt: "아래 내용을 더 자연스럽게 다듬어줘"
   },
   {
     id: "find",
     icon: "◎",
-    label: "필요한 항목 찾기",
+    label: t("chat.suggestions.search"),
     prompt: "프로젝트에서 빠진 항목을 찾아줘"
   }
-];
+]);
 
 /**
  * getPreviewUrl 처리 함수입니다.

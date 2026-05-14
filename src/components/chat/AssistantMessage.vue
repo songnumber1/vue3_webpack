@@ -24,6 +24,7 @@ web application runtime. * @author OpenAI
 import { nextTick, onMounted, ref, watch } from "vue";
 import { renderMarkdown } from "@/utils/markdown";
 import { openExternalBrowser } from "@/services/platformBridge";
+import { copyClipboardByPlatform } from "@/services/platformBridge";
 import { usePlatformStore } from "@/stores/platformStore";
 import { renderMermaidInElement } from "@/utils/mermaidRenderer";
 import MessageActions from "./MessageActions.vue";
@@ -47,6 +48,14 @@ let renderVersion = 0;
  * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
  */
 async function handleMarkdownClick(event) {
+  const tableActionButton = event.target?.closest?.("button[data-md-table-action]");
+  if (tableActionButton && contentRef.value?.contains(tableActionButton)) {
+    event.preventDefault();
+    event.stopPropagation();
+    await handleTableAction(tableActionButton);
+    return;
+  }
+
   const anchor = event.target?.closest?.("a[href]");
   if (!anchor || !contentRef.value?.contains(anchor)) return;
 
@@ -58,6 +67,73 @@ async function handleMarkdownClick(event) {
   event.preventDefault();
   event.stopPropagation();
   await openExternalBrowser(anchor.href);
+}
+
+/**
+ * Converts a rendered HTML table into tab-separated text for clipboard copying.
+ * @param {HTMLTableElement} table Rendered table element.
+ * @returns {string} Tab-separated table text.
+ */
+function tableToText(table) {
+  return Array.from(table.rows)
+    .map((row) =>
+      Array.from(row.cells)
+        .map((cell) => cell.innerText.replace(/\s+/g, " ").trim())
+        .join("\t")
+    )
+    .join("\n");
+}
+
+/**
+ * Converts a rendered HTML table into CSV content.
+ * @param {HTMLTableElement} table Rendered table element.
+ * @returns {string} CSV content.
+ */
+function tableToCsv(table) {
+  return Array.from(table.rows)
+    .map((row) =>
+      Array.from(row.cells)
+        .map((cell) => `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`)
+        .join(",")
+    )
+    .join("\n");
+}
+
+/**
+ * Downloads CSV text as a local file from the browser.
+ * @param {string} csv CSV content.
+ * @returns {void}
+ */
+function downloadCsv(csv) {
+  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `table-${Date.now()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Handles markdown table toolbar actions.
+ * @param {HTMLButtonElement} button Clicked table action button.
+ * @returns {Promise<void>} Action completion promise.
+ */
+async function handleTableAction(button) {
+  const card = button.closest(".md-table-card");
+  const table = card?.querySelector("table");
+  if (!table) return;
+
+  const action = button.dataset.mdTableAction;
+  if (action === "copy") {
+    await copyClipboardByPlatform(tableToText(table));
+    return;
+  }
+  if (action === "csv") {
+    downloadCsv(tableToCsv(table));
+  }
 }
 
 /**

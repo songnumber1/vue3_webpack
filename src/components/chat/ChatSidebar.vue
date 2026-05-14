@@ -1,6 +1,6 @@
 <!--
-@file ChatSidebar.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file ChatSidebar.vue
+@description Responsive chat sidebar with desktop history navigation and mobile service menu.
 -->
 
 <template>
@@ -11,7 +11,7 @@ application runtime. * @author OpenAI
           <button
             class="assistant-trigger"
             type="button"
-            aria-label="Assistant 선택"
+            :aria-label="t('chat.assistantSelect')"
             @click="openAssistantSelector"
           >
             <span>{{ currentAssistant.label }}</span>
@@ -44,8 +44,8 @@ application runtime. * @author OpenAI
           <button
             class="sidebar-round"
             type="button"
-            title="사이드바 숨기기"
-            aria-label="사이드바 숨기기"
+            :title="t('chat.hideSidebar')"
+            :aria-label="t('chat.hideSidebar')"
             @click="emitSidebarCollapsed(true)"
           >
             ☰
@@ -55,12 +55,14 @@ application runtime. * @author OpenAI
 
       <nav class="quick-menu quick-menu--assistant">
         <button class="quick-item active" type="button" @click="handleNewChat">
-          <Icon name="pencil" />새 채팅
+          <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
-        <button class="quick-item" type="button"><Icon name="search" />채팅 검색</button>
+        <button class="quick-item" type="button">
+          <Icon name="search" />{{ t("chat.chatSearch") }}
+        </button>
       </nav>
 
-      <div class="section-label">대화</div>
+      <div class="section-label">{{ t("chat.conversations") }}</div>
       <div class="sidebar-history sidebar-history--main">
         <button
           v-for="item in histories"
@@ -74,11 +76,6 @@ application runtime. * @author OpenAI
           <span>{{ item.title }}</span>
         </button>
       </div>
-
-      <div class="sidebar-user">
-        <div class="user-avatar">민</div>
-        <div><strong>민우 송</strong><small>Plus</small></div>
-      </div>
     </div>
 
     <div v-else class="collapsed-sidebar" aria-label="접힌 사이드바">
@@ -86,8 +83,8 @@ application runtime. * @author OpenAI
         <button
           class="collapsed-icon-button"
           type="button"
-          title="사이드바 열기"
-          aria-label="사이드바 열기"
+          :title="t('chat.openSidebar')"
+          :aria-label="t('chat.openSidebar')"
           @click="emitSidebarCollapsed(false)"
         >
           <Icon name="panel" bare />
@@ -95,8 +92,8 @@ application runtime. * @author OpenAI
         <button
           class="collapsed-icon-button"
           type="button"
-          title="새 채팅"
-          aria-label="새 채팅"
+          :title="t('chat.newChat')"
+          :aria-label="t('chat.newChat')"
           @click="handleNewChat"
         >
           <Icon name="pencil" bare />
@@ -104,8 +101,8 @@ application runtime. * @author OpenAI
         <button
           class="collapsed-icon-button"
           type="button"
-          title="채팅 검색"
-          aria-label="채팅 검색"
+          :title="t('chat.chatSearch')"
+          :aria-label="t('chat.chatSearch')"
           @click="emitCollapsedRecentOpen(false)"
         >
           <Icon name="search" bare />
@@ -113,8 +110,8 @@ application runtime. * @author OpenAI
         <button
           class="collapsed-icon-button collapsed-icon-button--active"
           type="button"
-          title="최근 채팅"
-          aria-label="최근 채팅"
+          :title="t('chat.recentChats')"
+          :aria-label="t('chat.recentChats')"
           @click="emitCollapsedRecentOpen(!collapsedRecentOpen)"
         >
           <Icon name="chat" bare />
@@ -125,9 +122,9 @@ application runtime. * @author OpenAI
         <section
           v-if="collapsedRecentOpen"
           class="collapsed-recent-popover"
-          aria-label="최근 채팅 목록"
+          :aria-label="t('chat.recentChats')"
         >
-          <h2>최근 채팅</h2>
+          <h2>{{ t("chat.recentChats") }}</h2>
           <button
             v-for="item in histories"
             :key="item.id"
@@ -140,16 +137,6 @@ application runtime. * @author OpenAI
           </button>
         </section>
       </transition>
-
-      <button
-        class="collapsed-user-button"
-        type="button"
-        title="사용자"
-        aria-label="사용자"
-        @click="emitCollapsedRecentOpen(false)"
-      >
-        민
-      </button>
     </div>
   </aside>
 
@@ -165,7 +152,7 @@ application runtime. * @author OpenAI
             <button
               class="assistant-trigger"
               type="button"
-              aria-label="Assistant 선택"
+              :aria-label="t('chat.assistantSelect')"
               @click="openAssistantSelector"
             >
               <span>{{ currentAssistant.label }}</span>
@@ -185,8 +172,8 @@ application runtime. * @author OpenAI
             <button
               class="sidebar-round"
               type="button"
-              title="닫기"
-              aria-label="닫기"
+              :title="t('common.close')"
+              :aria-label="t('common.close')"
               @click="emitDrawerOpen(false)"
             >
               ×
@@ -196,12 +183,39 @@ application runtime. * @author OpenAI
 
         <nav class="quick-menu quick-menu--assistant">
           <button class="quick-item active" type="button" @click="handleNewChat">
-            <Icon name="pencil" />새 채팅
+            <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
-          <button class="quick-item" type="button"><Icon name="search" />채팅 검색</button>
+          <button class="quick-item" type="button">
+            <Icon name="search" />{{ t("chat.chatSearch") }}
+          </button>
         </nav>
 
-        <div class="section-label">대화</div>
+        <details class="service-menu" open>
+          <summary>
+            <span>{{ t("menu.serviceMenu") }}</span>
+            <small>{{ t("menu.serviceMenuDescription") }}</small>
+          </summary>
+          <div class="service-menu-list">
+            <button class="service-menu-item" type="button" @click="openGuide">
+              <strong>{{ t("common.guide") }}</strong>
+              <small>{{ t("guide.subtitle") }}</small>
+            </button>
+            <button class="service-menu-item" type="button" @click="openNotice">
+              <strong>{{ t("common.notice") }}</strong>
+              <small>{{ t("menu.noticeSummary") }}</small>
+            </button>
+            <button class="service-menu-item" type="button" @click="openPersonalization">
+              <strong>{{ t("common.personalization") }}</strong>
+              <small>{{ t("menu.personalizationSummary") }}</small>
+            </button>
+            <button class="service-menu-item" type="button" @click="openLanguage">
+              <strong>{{ t("common.language") }}</strong>
+              <small>{{ t("menu.languageSummary") }}</small>
+            </button>
+          </div>
+        </details>
+
+        <div class="section-label">{{ t("chat.conversations") }}</div>
         <div class="sidebar-history sidebar-history--main">
           <button
             v-for="item in histories"
@@ -217,12 +231,32 @@ application runtime. * @author OpenAI
         </div>
 
         <button class="mobile-new-chat-fab" type="button" @click="handleNewChat">
-          <Icon name="pencil" />채팅
+          <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
 
-        <div class="sidebar-user">
+        <div class="sidebar-user sidebar-user--mobile">
           <div class="user-avatar">민</div>
-          <div><strong>민우 송</strong><small>Plus</small></div>
+          <div class="sidebar-user-main">
+            <strong>민우 송</strong><small>{{ t("common.plus") }}</small>
+          </div>
+          <div class="sidebar-user-actions">
+            <button
+              class="sidebar-user-action"
+              type="button"
+              :aria-label="t('common.theme')"
+              @click="toggleTheme"
+            >
+              <span class="theme-glyph"></span>
+            </button>
+            <button
+              class="sidebar-user-action"
+              type="button"
+              :aria-label="t('common.swagger')"
+              @click="openSwagger"
+            >
+              <span aria-hidden="true">文</span>
+            </button>
+          </div>
         </div>
       </div>
     </aside>
@@ -230,7 +264,7 @@ application runtime. * @author OpenAI
 
   <BaseBottomSheet
     :open="assistantMenuOpen && isMobileSheet"
-    title="Assistant 선택"
+    :title="t('chat.assistantSelect')"
     @close="assistantMenuOpen = false"
   >
     <button
@@ -249,6 +283,7 @@ application runtime. * @author OpenAI
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
 
@@ -269,8 +304,15 @@ const emit = defineEmits([
   "update:selectedAssistantId",
   "new-chat",
   "select-history",
-  "select-history-collapsed"
+  "select-history-collapsed",
+  "open-guide",
+  "open-notice",
+  "open-personalization",
+  "open-language",
+  "toggle-theme",
+  "open-swagger"
 ]);
+const { t } = useI18n();
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
@@ -280,7 +322,7 @@ const currentAssistant = computed(
 );
 
 /**
- * 현재 viewport가 모바일 bottom sheet 모드인지 동기화합니다.
+ * Synchronizes whether assistant selection should render as a mobile bottom sheet.
  * @returns {void}
  */
 function syncViewportMode() {
@@ -289,65 +331,139 @@ function syncViewportMode() {
     document.querySelector(".app-shell--mobile")
   );
 }
+
 /**
- * Assistant 선택 UI를 데스크톱 메뉴 또는 모바일 bottom sheet 형태로 엽니다.
+ * Opens or closes the assistant selector.
  * @returns {void}
  */
 function openAssistantSelector() {
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
+
 /**
- * 선택한 Assistant id를 부모 컴포넌트에 전달합니다.
- * @param {string} id 선택된 Assistant id
- * @returns {void}
- */
-/**
- * selectAssistant 처리 함수입니다.
- * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * Selects an assistant and closes the selector.
+ * @param {string} id Selected assistant id.
  * @returns {void}
  */
 function selectAssistant(id) {
   emit("update:selectedAssistantId", id);
   assistantMenuOpen.value = false;
 }
-/** @param {boolean} value 사이드바 접힘 여부 */
+
+/**
+ * Emits the sidebar collapsed state.
+ * @param {boolean} value Collapsed state.
+ * @returns {void}
+ */
 function emitSidebarCollapsed(value) {
   emit("update:sidebarCollapsed", value);
 }
-/** @param {boolean} value 모바일 drawer 표시 여부 */
+
+/**
+ * Emits the mobile drawer open state.
+ * @param {boolean} value Drawer open state.
+ * @returns {void}
+ */
 function emitDrawerOpen(value) {
   emit("update:drawerOpen", value);
 }
-/** @param {boolean} value 접힌 사이드바 최근 대화 팝오버 표시 여부 */
+
+/**
+ * Emits the collapsed recent popover open state.
+ * @param {boolean} value Popover open state.
+ * @returns {void}
+ */
 function emitCollapsedRecentOpen(value) {
   emit("update:collapsedRecentOpen", value);
 }
-/** 새 채팅 생성을 요청하고 열린 보조 UI를 닫습니다. */
+
+/**
+ * Starts a new chat and closes temporary sidebar surfaces.
+ * @returns {void}
+ */
 function handleNewChat() {
   emit("new-chat");
   emitDrawerOpen(false);
   emitCollapsedRecentOpen(false);
 }
+
 /**
- * 대화 이력 선택 이벤트를 부모 컴포넌트에 전달합니다.
- * @param {{id: string|number, title: string}} item 선택한 대화 이력
+ * Selects a history item from expanded sidebar.
+ * @param {{id: string|number, title: string}} item Selected history item.
+ * @returns {void}
  */
 function handleSelectHistory(item) {
   emit("select-history", item);
   emitDrawerOpen(false);
 }
+
 /**
- * 접힌 사이드바 팝오버에서 대화 이력을 선택합니다.
- * @param {{id: string|number, title: string}} item 선택한 대화 이력
+ * Selects a history item from collapsed sidebar popover.
+ * @param {{id: string|number, title: string}} item Selected history item.
+ * @returns {void}
  */
 function handleSelectHistoryCollapsed(item) {
   emit("select-history-collapsed", item);
   emitCollapsedRecentOpen(false);
 }
+
 /**
- * Assistant 메뉴 외부 클릭 시 데스크톱 dropdown을 닫습니다.
- * @param {MouseEvent} event 문서 클릭 이벤트
+ * Opens the guide page from mobile service menu.
+ * @returns {void}
+ */
+function openGuide() {
+  emitDrawerOpen(false);
+  emit("open-guide");
+}
+
+/**
+ * Opens notices from mobile service menu.
+ * @returns {void}
+ */
+function openNotice() {
+  emitDrawerOpen(false);
+  emit("open-notice");
+}
+
+/**
+ * Opens personalization from mobile service menu.
+ * @returns {void}
+ */
+function openPersonalization() {
+  emitDrawerOpen(false);
+  emit("open-personalization");
+}
+
+/**
+ * Opens language selector from mobile service menu.
+ * @returns {void}
+ */
+function openLanguage() {
+  emit("open-language");
+}
+
+/**
+ * Toggles the theme from the mobile user area.
+ * @returns {void}
+ */
+function toggleTheme() {
+  emit("toggle-theme");
+}
+
+/**
+ * Opens Swagger documentation from the mobile user area.
+ * @returns {void}
+ */
+function openSwagger() {
+  emitDrawerOpen(false);
+  emit("open-swagger");
+}
+
+/**
+ * Closes the desktop assistant menu when the user clicks outside.
+ * @param {MouseEvent} event Document click event.
+ * @returns {void}
  */
 function handleDocumentClick(event) {
   if (isMobileSheet.value) return;

@@ -1,6 +1,6 @@
 <!--
-@file MessageActions.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file MessageActions.vue
+@description Assistant/user message action bar.
 -->
 
 <template>
@@ -9,44 +9,50 @@ application runtime. * @author OpenAI
       v-if="role === 'assistant'"
       type="button"
       :class="{ active: feedback === 'like' }"
-      aria-label="좋아요"
+      :aria-label="locale === 'ko' ? '좋아요' : 'Like'"
       @click="setFeedback('like')"
     >
-      좋아요
+      {{ locale === "ko" ? "좋아요" : "Like" }}
     </button>
     <button
       v-if="role === 'assistant'"
       type="button"
       :class="{ active: feedback === 'dislike' }"
-      aria-label="싫어요"
+      :aria-label="locale === 'ko' ? '싫어요' : 'Dislike'"
       @click="setFeedback('dislike')"
     >
-      싫어요
+      {{ locale === "ko" ? "싫어요" : "Dislike" }}
     </button>
-    <button type="button" aria-label="복사하기" @click="copy">복사하기</button>
+    <button type="button" :aria-label="locale === 'ko' ? '복사하기' : 'Copy'" @click="copy">
+      {{ locale === "ko" ? "복사하기" : "Copy" }}
+    </button>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { copyClipboardByPlatform } from "@/services/platformBridge";
 
 const props = defineProps({
   role: { type: String, required: true },
   content: { type: String, default: "" }
 });
+const { locale } = useI18n();
 const feedback = ref("");
+
 /**
- * setFeedback 처리 함수입니다.
- * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * Toggles a feedback value on the current message.
+ * @param {'like'|'dislike'} value Feedback action.
  * @returns {void}
  */
 function setFeedback(value) {
   feedback.value = feedback.value === value ? "" : value;
 }
+
 /**
- * copy 처리 함수입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * Copies the message text through the platform clipboard bridge when available.
+ * @returns {Promise<void>} Copy completion promise.
  */
 async function copy() {
   try {

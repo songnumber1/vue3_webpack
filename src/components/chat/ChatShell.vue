@@ -20,6 +20,12 @@
     @update:collapsed-recent-open="collapsedRecentOpen = $event"
     @new-chat="startNewChat"
     @select-history="openHistory"
+    @open-guide="openGuide"
+    @open-notice="openNotice"
+    @open-personalization="openPersonalization"
+    @open-language="openLanguage"
+    @toggle-theme="toggleTheme"
+    @open-swagger="openSwagger"
   >
     <ChatWorkspace
       ref="workspaceRef"
@@ -41,6 +47,10 @@
       @open-swagger="openSwagger"
       @open-settings="openSettings"
       @open-assistant="openAssistantFromHeader"
+      @open-guide="openGuide"
+      @open-notice="openNotice"
+      @open-personalization="openPersonalization"
+      @open-language="openLanguage"
       @submit="submitIfWritable"
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
@@ -62,11 +72,34 @@
       @close="assistantSheetOpen = false"
       @select="selectAssistantFromSheet"
     />
+
+    <ResponsiveOverlay
+      :open="noticeOpen"
+      :is-mobile="isMobile"
+      :title="t('notice.title')"
+      :subtitle="t('notice.subtitle')"
+      @close="noticeOpen = false"
+    >
+      <NoticeView />
+    </ResponsiveOverlay>
+
+    <ResponsiveOverlay
+      :open="personalizationOpen"
+      :is-mobile="isMobile"
+      :title="t('personalization.title')"
+      :subtitle="t('personalization.subtitle')"
+      @close="personalizationOpen = false"
+    >
+      <PersonalizationView />
+    </ResponsiveOverlay>
+
+    <LanguageSheet :open="languageSheetOpen" @close="languageSheetOpen = false" />
   </ChatLayout>
 </template>
 
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useAppContext } from "@/composables/useAppContext";
 import { useAutoScroll } from "@/composables/useAutoScroll";
@@ -81,9 +114,14 @@ import ChatAssistantSheet from "./ChatAssistantSheet.vue";
 import ChatImagePreview from "./ChatImagePreview.vue";
 import ChatLayout from "./ChatLayout.vue";
 import ChatWorkspace from "./ChatWorkspace.vue";
+import LanguageSheet from "@/components/menu/LanguageSheet.vue";
+import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
+import NoticeView from "@/views/settings/NoticeView.vue";
+import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 
 const props = defineProps({ mode: { type: String, default: "main" } });
 
+const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const { theme } = useAppContext();
@@ -116,6 +154,9 @@ const isMobile = ref(false);
 const messages = ref([]);
 const showScrollBottom = ref(false);
 const assistantSheetOpen = ref(false);
+const noticeOpen = ref(false);
+const personalizationOpen = ref(false);
+const languageSheetOpen = ref(false);
 const { previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError } =
   useImagePreview();
 let removeMobileMediaQueryListener = null;
@@ -134,23 +175,23 @@ const activeConversationTitle = computed(() => {
   return activeHistory.value?.title || "";
 });
 
-const suggestions = [
+const suggestions = computed(() => [
   {
     icon: "▧",
-    text: "이미지 만들기",
+    text: t("chat.suggestions.image"),
     prompt: "이미지 생성 화면의 UI 구조를 제안해줘"
   },
   {
     icon: "✎",
-    text: "글쓰기 또는 편집",
+    text: t("chat.suggestions.writing"),
     prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘"
   },
   {
     icon: "◎",
-    text: "필요한 항목 찾기",
+    text: t("chat.suggestions.search"),
     prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘"
   }
-];
+]);
 
 /**
  * getMessageListRef 처리 함수입니다.
@@ -369,7 +410,42 @@ function openSwagger() {
  * @returns {void}
  */
 function openSettings() {
-  window.dispatchEvent(new CustomEvent("chat:settings-open"));
+  openPersonalization();
+}
+
+/**
+ * Opens the guide page from desktop header or mobile service menu.
+ * @returns {void}
+ */
+function openGuide() {
+  drawerOpen.value = false;
+  router.push({ name: "guide" });
+}
+
+/**
+ * Opens the responsive notice panel.
+ * @returns {void}
+ */
+function openNotice() {
+  drawerOpen.value = false;
+  noticeOpen.value = true;
+}
+
+/**
+ * Opens the responsive personalization panel.
+ * @returns {void}
+ */
+function openPersonalization() {
+  drawerOpen.value = false;
+  personalizationOpen.value = true;
+}
+
+/**
+ * Opens the language selector bottom sheet.
+ * @returns {void}
+ */
+function openLanguage() {
+  languageSheetOpen.value = true;
 }
 
 /**

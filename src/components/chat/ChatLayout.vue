@@ -27,6 +27,12 @@
       @new-chat="$emit('new-chat')"
       @select-history="$emit('select-history', $event)"
       @select-history-collapsed="$emit('select-history', $event)"
+      @open-guide="$emit('open-guide')"
+      @open-notice="$emit('open-notice')"
+      @open-personalization="$emit('open-personalization')"
+      @open-language="$emit('open-language')"
+      @toggle-theme="$emit('toggle-theme')"
+      @open-swagger="$emit('open-swagger')"
     />
 
     <main class="chat-workspace">
@@ -55,6 +61,12 @@ defineEmits([
   "update:drawerOpen",
   "update:collapsedRecentOpen",
   "new-chat",
-  "select-history"
+  "select-history",
+  "open-guide",
+  "open-notice",
+  "open-personalization",
+  "open-language",
+  "toggle-theme",
+  "open-swagger"
 ]);
 </script>

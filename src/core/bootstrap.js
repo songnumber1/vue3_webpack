@@ -19,6 +19,7 @@ import { resolveStorage } from "@/core/resolver/storage";
 import { resolveTheme } from "@/core/resolver/theme";
 import { resolveErrorUI } from "@/core/resolver/errorUi";
 import { resolveUploadStrategy } from "@/core/resolver/upload";
+import { i18n } from "@/i18n";
 
 /**
  * bootstrap 함수입니다.
@@ -57,6 +58,7 @@ export async function bootstrap() {
   const app = createApp(App);
   const pinia = createPinia();
   app.use(pinia);
+  app.use(i18n);
   const platformStore = usePlatformStore();
   platformStore.initialize(appInfo);
 
