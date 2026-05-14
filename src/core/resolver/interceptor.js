@@ -1,4 +1,10 @@
-import { isNativeApp } from '@/core/config'
+/**
+ * @file interceptor.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
+import {isNativeApp} from "@/core/config";
 
 function applyWebRequestInterceptor(instance) {
   instance.interceptors.request.use((config) => {
@@ -20,9 +26,9 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    config.headers['X-App-Version'] = appInfo?.appVersion || '';
-    config.headers['X-App-Build-Version'] = appInfo?.appBuildVersion || '';
-    config.headers['X-Bridge-Version'] = appInfo?.bridgeVersion || '';
+    config.headers["X-App-Version"] = appInfo?.appVersion || "";
+    config.headers["X-App-Build-Version"] = appInfo?.appBuildVersion || "";
+    config.headers["X-Bridge-Version"] = appInfo?.bridgeVersion || "";
 
     return config;
   });

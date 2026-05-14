@@ -1,3 +1,9 @@
+/**
+ * @file swaggerRuntime.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
@@ -51,7 +57,11 @@ async function parsePayload(input, init = {}) {
     return parseTextBody(await input.clone().text());
   }
 
-  if (body && typeof URLSearchParams !== "undefined" && body instanceof URLSearchParams) {
+  if (
+    body &&
+    typeof URLSearchParams !== "undefined" &&
+    body instanceof URLSearchParams
+  ) {
     return Object.fromEntries(body.entries());
   }
 
@@ -59,13 +69,19 @@ async function parsePayload(input, init = {}) {
 }
 
 function toContractType(pathname) {
-  const lastSegment = String(pathname || "").split("/").filter(Boolean).pop() || "";
+  const lastSegment =
+    String(pathname || "")
+      .split("/")
+      .filter(Boolean)
+      .pop() || "";
   return decodeURIComponent(lastSegment).toUpperCase();
 }
 
 function resolveCategoryFromUrl(pathname) {
-  if (pathname.includes(JS_TO_ANDROID_PATH)) return BRIDGE_CATEGORY.JS_TO_ANDROID;
-  if (pathname.includes(ANDROID_TO_JS_PATH)) return BRIDGE_CATEGORY.ANDROID_TO_JS;
+  if (pathname.includes(JS_TO_ANDROID_PATH))
+    return BRIDGE_CATEGORY.JS_TO_ANDROID;
+  if (pathname.includes(ANDROID_TO_JS_PATH))
+    return BRIDGE_CATEGORY.ANDROID_TO_JS;
   if (pathname.includes(WEB_API_PATH)) return BRIDGE_CATEGORY.WEB_API;
   return null;
 }
@@ -98,7 +114,12 @@ function createFallbackError(error) {
 }
 
 export function installSwaggerRuntime() {
-  if (originalFetch || typeof window === "undefined" || typeof window.fetch !== "function") return;
+  if (
+    originalFetch ||
+    typeof window === "undefined" ||
+    typeof window.fetch !== "function"
+  )
+    return;
 
   originalFetch = window.fetch.bind(window);
 

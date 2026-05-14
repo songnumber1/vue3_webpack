@@ -1,14 +1,23 @@
-import { nextTick } from 'vue'
+/**
+ * @file useAutoScroll.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
+import {nextTick} from "vue";
 
 function afterFrame(callback) {
-  if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
-    setTimeout(callback, 0)
-    return
+  if (
+    typeof window === "undefined" ||
+    typeof window.requestAnimationFrame !== "function"
+  ) {
+    setTimeout(callback, 0);
+    return;
   }
 
   window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(callback)
-  })
+    window.requestAnimationFrame(callback);
+  });
 }
 
 /**
@@ -20,17 +29,17 @@ function afterFrame(callback) {
  */
 export function useAutoScroll(targetRef) {
   async function scrollToBottom(options = {}) {
-    await nextTick()
+    await nextTick();
 
     afterFrame(() => {
-      const target = targetRef.value
-      if (!target) return
+      const target = targetRef.value;
+      if (!target) return;
 
-      if (typeof target.scrollToBottom === 'function') {
-        target.scrollToBottom(options)
+      if (typeof target.scrollToBottom === "function") {
+        target.scrollToBottom(options);
       }
-    })
+    });
   }
 
-  return { scrollToBottom }
+  return {scrollToBottom};
 }

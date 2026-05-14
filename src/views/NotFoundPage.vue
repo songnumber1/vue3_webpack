@@ -1,14 +1,12 @@
+/** * @file NotFoundPage.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI */
+
 <template>
   <main class="exception-page">
     <section class="exception-card">
+      <p class="exception-code">404 NOT FOUND</p>
 
-      <p class="exception-code">
-        404 NOT FOUND
-      </p>
-
-      <h1 class="exception-title">
-        페이지를 찾을 수 없습니다.
-      </h1>
+      <h1 class="exception-title">페이지를 찾을 수 없습니다.</h1>
 
       <p class="exception-description">
         요청한 페이지가 존재하지 않거나<br />
@@ -16,17 +14,16 @@
       </p>
 
       <div class="exception-actions">
+        <RouterLink to="/" class="exception-button"> 홈으로 이동 </RouterLink>
 
-        <RouterLink to="/" class="exception-button">
-          홈으로 이동
-        </RouterLink>
-
-        <button type="button" class="exception-button exception-button--secondary" @click="goBack">
+        <button
+          type="button"
+          class="exception-button exception-button--secondary"
+          @click="goBack"
+        >
           이전 페이지
         </button>
-
       </div>
-
     </section>
   </main>
 </template>
@@ -34,10 +31,10 @@
 <script setup>
 function goBack() {
   if (window.history.length > 1) {
-    window.history.back()
-    return
+    window.history.back();
+    return;
   }
 
-  window.location.assign('/')
+  window.location.assign("/");
 }
 </script>

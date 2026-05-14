@@ -1,3 +1,9 @@
+/**
+ * @file android.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {RUN_ENV, PLATFORM} from "./constants";
 import {createId} from "@/utils/id";
 
@@ -17,8 +23,8 @@ export const LAST_VERSION_INFO = Object.freeze({
 function readAndroidValue(bridge, methodName, fallback = null) {
   try {
     const member = bridge?.[methodName];
-    const value = typeof member === 'function' ? member.call(bridge) : member;
-    return value == null || value === '' ? fallback : String(value);
+    const value = typeof member === "function" ? member.call(bridge) : member;
+    return value == null || value === "" ? fallback : String(value);
   } catch {
     return fallback;
   }

@@ -51,3 +51,25 @@ Mermaid는 번들 크기와 인증 이슈를 피하기 위해 npm 패키지로 �
 - 해당 채팅방을 선택하면 `public/samples/markdown-showcase.md`가 assistant 메시지로 렌더링됩니다.
 - Mermaid는 현재 테마 기준으로 초기화되며, 다크 테마에서 노드/텍스트/선/화살표가 보이도록 CSS와 themeVariables를 함께 보정했습니다.
 - 테마 전환 시 이미 렌더링된 Mermaid SVG를 원본 source 기준으로 다시 렌더링합니다.
+
+
+
+## Development Quality Tools
+
+### Install
+```bash
+npm install
+```
+
+### ESLint
+```bash
+npm run lint
+npm run lint:fix
+```
+
+### Prettier
+```bash
+npm run format
+```
+
+Node.js 16 compatible ESLint and Prettier packages have been added.

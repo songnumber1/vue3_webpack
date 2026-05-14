@@ -1,3 +1,9 @@
+/**
+ * @file bridgeConstants.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 export const BRIDGE_PATH = "/bridge/";
 export const WEB_API_PATH = "/web-api/";
 export const JS_TO_ANDROID_PATH = "/bridge/js-to-android/";

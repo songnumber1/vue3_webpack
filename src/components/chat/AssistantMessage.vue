@@ -1,28 +1,37 @@
+/** * @file AssistantMessage.vue * @description Vue component used in the chat
+web application runtime. * @author OpenAI */
+
 <template>
   <article class="message message--assistant">
     <div class="avatar">AI</div>
     <div class="bubble bubble--assistant">
       <div class="bubble-meta">Assistant</div>
-      <div v-if="message.content" ref="contentRef" class="bubble-content markdown-body" v-html="html" @click.capture="handleMarkdownClick"></div>
+      <div
+        v-if="message.content"
+        ref="contentRef"
+        class="bubble-content markdown-body"
+        v-html="html"
+        @click.capture="handleMarkdownClick"
+      ></div>
       <MessageActions role="assistant" :content="message.content" />
     </div>
   </article>
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref, watch } from 'vue'
-import { renderMarkdown } from '@/utils/markdown'
-import { openExternalBrowser } from '@/services/platformBridge'
-import { usePlatformStore } from '@/stores/platformStore'
-import { renderMermaidInElement } from '@/utils/mermaidRenderer'
-import MessageActions from './MessageActions.vue'
+import {nextTick, onMounted, ref, watch} from "vue";
+import {renderMarkdown} from "@/utils/markdown";
+import {openExternalBrowser} from "@/services/platformBridge";
+import {usePlatformStore} from "@/stores/platformStore";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import MessageActions from "./MessageActions.vue";
 
-const props = defineProps({ message: { type: Object, required: true } })
-const platformStore = usePlatformStore()
-const emit = defineEmits(['rendered'])
-const html = ref('<p></p>')
-const contentRef = ref(null)
-let renderVersion = 0
+const props = defineProps({message: {type: Object, required: true}});
+const platformStore = usePlatformStore();
+const emit = defineEmits(["rendered"]);
+const html = ref("<p></p>");
+const contentRef = ref(null);
+let renderVersion = 0;
 /**
  * Android WebView에서는 target="_blank" 링크가 현재 WebView 안에서 열릴 수 있어
  * Markdown 내부 anchor 클릭을 Native Bridge의 외부 브라우저 열기로 명시적으로 위임합니다.
@@ -31,28 +40,30 @@ let renderVersion = 0
  * @returns {Promise<void>} 외부 링크 처리 완료 Promise
  */
 async function handleMarkdownClick(event) {
-  const anchor = event.target?.closest?.('a[href]')
-  if (!anchor || !contentRef.value?.contains(anchor)) return
+  const anchor = event.target?.closest?.("a[href]");
+  if (!anchor || !contentRef.value?.contains(anchor)) return;
 
-  const href = anchor.getAttribute('href')
-  if (!href || href.startsWith('#')) return
+  const href = anchor.getAttribute("href");
+  if (!href || href.startsWith("#")) return;
 
-  if (!platformStore.info.isAndroidApp) return
+  if (!platformStore.info.isAndroidApp) return;
 
-  event.preventDefault()
-  event.stopPropagation()
-  await openExternalBrowser(anchor.href)
+  event.preventDefault();
+  event.stopPropagation();
+  await openExternalBrowser(anchor.href);
 }
 
 async function renderContent() {
-  const currentVersion = ++renderVersion
-  const rendered = props.message.content ? await renderMarkdown(props.message.content) : ''
-  if (currentVersion !== renderVersion) return
-  html.value = rendered
-  await nextTick()
-  await renderMermaidInElement(contentRef.value)
-  emit('rendered')
+  const currentVersion = ++renderVersion;
+  const rendered = props.message.content
+    ? await renderMarkdown(props.message.content)
+    : "";
+  if (currentVersion !== renderVersion) return;
+  html.value = rendered;
+  await nextTick();
+  await renderMermaidInElement(contentRef.value);
+  emit("rendered");
 }
-watch(() => props.message.content, renderContent, { immediate: true })
-onMounted(renderContent)
+watch(() => props.message.content, renderContent, {immediate: true});
+onMounted(renderContent);
 </script>

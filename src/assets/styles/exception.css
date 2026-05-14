@@ -137,7 +137,9 @@
 
   cursor: pointer;
 
-  transition: background 0.2s ease, opacity 0.2s ease;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .exception-button:hover {
@@ -171,4 +173,45 @@
   }
 }
 
-.access-denied-page{min-height:100dvh;display:grid;place-items:center;background:var(--app-bg,#fff);padding:24px}.access-denied-card{width:min(520px,100%);border:1px solid var(--border-color,#ddd);border-radius:24px;padding:28px;background:var(--panel-bg,#fff);box-shadow:0 20px 50px rgba(0,0,0,.08)}.access-denied-card h1{margin:0 0 12px;font-size:24px}.access-denied-card p{margin:0 0 18px;color:#6b7280}.access-denied-card dl{margin:0;display:grid;gap:8px}.access-denied-card div{display:flex;justify-content:space-between;gap:12px}.access-denied-card dt{font-weight:700}.access-denied-card dd{margin:0;color:#6b7280;text-align:right;word-break:break-all}
+.access-denied-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  background: var(--app-bg, #fff);
+  padding: 24px;
+}
+.access-denied-card {
+  width: min(520px, 100%);
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 24px;
+  padding: 28px;
+  background: var(--panel-bg, #fff);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+}
+.access-denied-card h1 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+.access-denied-card p {
+  margin: 0 0 18px;
+  color: #6b7280;
+}
+.access-denied-card dl {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.access-denied-card div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.access-denied-card dt {
+  font-weight: 700;
+}
+.access-denied-card dd {
+  margin: 0;
+  color: #6b7280;
+  text-align: right;
+  word-break: break-all;
+}

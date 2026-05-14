@@ -1,3 +1,9 @@
+/**
+ * @file bootstrap.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {createApp} from "vue";
 import {createPinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
@@ -50,7 +56,10 @@ export async function bootstrap() {
   const platformStore = usePlatformStore();
   platformStore.initialize(appInfo);
 
-  if (typeof window !== 'undefined' && Array.isArray(window.__pendingNativeEvents)) {
+  if (
+    typeof window !== "undefined" &&
+    Array.isArray(window.__pendingNativeEvents)
+  ) {
     window.__pendingNativeEvents.splice(0).forEach((event) => {
       platformStore.recordNativeEvent(event.type, event.payload);
     });

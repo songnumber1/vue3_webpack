@@ -1,3 +1,9 @@
+/**
+ * @file openapi.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
@@ -21,7 +27,8 @@ const CATEGORY_OPTIONS = [
   {
     value: BRIDGE_CATEGORY.WEB_API,
     label: "REST / Web API",
-    description: "JS에서 실제 backend API를 호출하고 표준 응답으로 정규화하는 contract",
+    description:
+      "JS에서 실제 backend API를 호출하고 표준 응답으로 정규화하는 contract",
   },
   {
     value: BRIDGE_CATEGORY.JS_TO_ANDROID,
@@ -53,11 +60,17 @@ function getCategoryPath(category) {
 }
 
 function getCategoryDescription(category) {
-  return CATEGORY_OPTIONS.find((option) => option.value === category)?.description || "Bridge contract";
+  return (
+    CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
+    "Bridge contract"
+  );
 }
 
 function shouldIncludeContract(selectedCategory, contract) {
-  return selectedCategory === BRIDGE_CATEGORY.ALL || contract.category === selectedCategory;
+  return (
+    selectedCategory === BRIDGE_CATEGORY.ALL ||
+    contract.category === selectedCategory
+  );
 }
 
 export function getOpenApiCategoryOptions() {
@@ -76,7 +89,9 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
     .filter(([, contract]) => shouldIncludeContract(selectedCategory, contract))
     .forEach(([type, contract]) => {
       const basePath = getCategoryPath(contract.category);
-      const schemaPrefix = `${contract.category}_${type}`.replace(/-/g, "_").toUpperCase();
+      const schemaPrefix = `${contract.category}_${type}`
+        .replace(/-/g, "_")
+        .toUpperCase();
 
       registry.register(`${schemaPrefix}_Request`, contract.request);
       registry.register(`${schemaPrefix}_Response`, contract.response);
@@ -136,8 +151,14 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
     },
     tags: [
       {name: "REST / Web API", description: "JS 실제 backend API contract"},
-      {name: "JS → Android", description: "JS에서 Android Native Bridge로 요청하는 contract"},
-      {name: "Android → JS", description: "Android에서 WebView JS로 전달하는 이벤트 contract"},
+      {
+        name: "JS → Android",
+        description: "JS에서 Android Native Bridge로 요청하는 contract",
+      },
+      {
+        name: "Android → JS",
+        description: "Android에서 WebView JS로 전달하는 이벤트 contract",
+      },
     ],
   });
 }

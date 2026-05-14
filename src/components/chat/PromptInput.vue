@@ -1,3 +1,6 @@
+/** * @file PromptInput.vue * @description Vue component used in the chat web
+application runtime. * @author OpenAI */
+
 <template>
   <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
@@ -13,15 +16,27 @@
           :class="{'attachment-preview-card--image': file.kind === 'image'}"
           :role="file.kind === 'image' ? 'button' : undefined"
           :tabindex="file.kind === 'image' ? 0 : undefined"
-          :aria-label="file.kind === 'image' ? `${file.name} 미리보기` : undefined"
+          :aria-label="
+            file.kind === 'image' ? `${file.name} 미리보기` : undefined
+          "
           @click="handleAttachmentPreview(file)"
           @keydown.enter.prevent="handleAttachmentPreview(file)"
           @keydown.space.prevent="handleAttachmentPreview(file)"
         >
-          <div v-if="file.kind === 'image'" class="attachment-preview-thumb" aria-hidden="true">
-            <img :src="getPreviewUrl(file)" :alt="file.name" @error="markPreviewError(file)" />
+          <div
+            v-if="file.kind === 'image'"
+            class="attachment-preview-thumb"
+            aria-hidden="true"
+          >
+            <img
+              :src="getPreviewUrl(file)"
+              :alt="file.name"
+              @error="markPreviewError(file)"
+            />
           </div>
-          <div v-else class="attachment-preview-file" aria-hidden="true">📄</div>
+          <div v-else class="attachment-preview-file" aria-hidden="true">
+            📄
+          </div>
           <div class="attachment-preview-info">
             <strong :title="file.name">{{ file.name }}</strong>
             <span>{{ formatFileSize(file.size) }}</span>
@@ -34,7 +49,9 @@
             @mousedown.stop
             @touchstart.stop
             @click.stop.prevent="removeAttachment(file.id)"
-          >×</button>
+          >
+            ×
+          </button>
         </div>
       </div>
 
@@ -62,9 +79,21 @@
               @click="openModelSelector"
             >
               <span>{{ currentModel.label }}</span>
-              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 7.5 10 12l4.5-4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <svg viewBox="0 0 20 20" aria-hidden="true">
+                <path
+                  d="M5.5 7.5 10 12l4.5-4.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
             </button>
-            <div v-if="modelMenuOpen && !isMobileSheet" class="prompt-popover model-menu prompt-model-menu">
+            <div
+              v-if="modelMenuOpen && !isMobileSheet"
+              class="prompt-popover model-menu prompt-model-menu"
+            >
               <button
                 v-for="model in models"
                 :key="model.id"
@@ -87,16 +116,29 @@
               :disabled="disabled"
               aria-label="도구"
               @click="openToolSelector"
-            >＋</button>
-            <div v-if="toolMenuOpen && !isMobileSheet" class="prompt-popover prompt-tool-menu">
-              <button v-for="tool in tools" :key="tool.id" type="button" @click="applyTool(tool)">
+            >
+              ＋
+            </button>
+            <div
+              v-if="toolMenuOpen && !isMobileSheet"
+              class="prompt-popover prompt-tool-menu"
+            >
+              <button
+                v-for="tool in tools"
+                :key="tool.id"
+                type="button"
+                @click="applyTool(tool)"
+              >
                 <span aria-hidden="true">{{ tool.icon }}</span>
                 <p>{{ tool.label }}</p>
               </button>
             </div>
           </div>
 
-          <div class="prompt-selector-wrap attach-menu-wrap" ref="attachButtonRef">
+          <div
+            class="prompt-selector-wrap attach-menu-wrap"
+            ref="attachButtonRef"
+          >
             <button
               class="prompt-icon-action attach-button"
               :class="{'prompt-icon-action--active': attachMenuOpen}"
@@ -107,24 +149,59 @@
               @click="openAttachSelector"
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M21.4 11.6 12.1 20.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4.1 4.1 0 0 1 5.8 5.8l-9.4 9.4a2.2 2.2 0 1 1-3.1-3.1l8.6-8.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path
+                  d="M21.4 11.6 12.1 20.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4.1 4.1 0 0 1 5.8 5.8l-9.4 9.4a2.2 2.2 0 1 1-3.1-3.1l8.6-8.6"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </button>
-            <div v-if="attachMenuOpen && !isMobileSheet" class="prompt-popover attach-menu" role="menu">
-              <button v-if="showCameraMenu" type="button" role="menuitem" @click="openFilePicker('camera')">
-                <span aria-hidden="true">📷</span><p>카메라로 촬영</p>
+            <div
+              v-if="attachMenuOpen && !isMobileSheet"
+              class="prompt-popover attach-menu"
+              role="menu"
+            >
+              <button
+                v-if="showCameraMenu"
+                type="button"
+                role="menuitem"
+                @click="openFilePicker('camera')"
+              >
+                <span aria-hidden="true">📷</span>
+                <p>카메라로 촬영</p>
               </button>
-              <button type="button" role="menuitem" @click="openFilePicker('image')">
-                <span aria-hidden="true">🖼️</span><p>이미지 추가</p>
+              <button
+                type="button"
+                role="menuitem"
+                @click="openFilePicker('image')"
+              >
+                <span aria-hidden="true">🖼️</span>
+                <p>이미지 추가</p>
               </button>
-              <button type="button" role="menuitem" @click="openFilePicker('all')">
-                <span aria-hidden="true">📎</span><p>파일 추가</p>
+              <button
+                type="button"
+                role="menuitem"
+                @click="openFilePicker('all')"
+              >
+                <span aria-hidden="true">📎</span>
+                <p>파일 추가</p>
               </button>
             </div>
           </div>
         </div>
 
-        <button class="send-button" type="submit" :disabled="disabled || !canSubmit" title="전송" aria-label="전송">↗</button>
+        <button
+          class="send-button"
+          type="submit"
+          :disabled="disabled || !canSubmit"
+          title="전송"
+          aria-label="전송"
+        >
+          ↗
+        </button>
       </div>
 
       <input
@@ -137,9 +214,16 @@
         @change="handleFileChange"
       />
     </form>
-    <p v-if="showHelp" class="prompt-help">API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서 확장하세요.</p>
+    <p v-if="showHelp" class="prompt-help">
+      API 없이 동작하는 UI 데모입니다. 실제 연동은 resolver/api.js에서
+      확장하세요.
+    </p>
 
-    <BaseBottomSheet :open="modelMenuOpen && isMobileSheet" title="모델 선택" @close="modelMenuOpen = false">
+    <BaseBottomSheet
+      :open="modelMenuOpen && isMobileSheet"
+      title="모델 선택"
+      @close="modelMenuOpen = false"
+    >
       <button
         v-for="model in models"
         :key="model.id"
@@ -153,21 +237,48 @@
       </button>
     </BaseBottomSheet>
 
-    <BaseBottomSheet :open="toolMenuOpen && isMobileSheet" title="도구" @close="toolMenuOpen = false">
-      <button v-for="tool in tools" :key="tool.id" class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="applyTool(tool)">
+    <BaseBottomSheet
+      :open="toolMenuOpen && isMobileSheet"
+      title="도구"
+      @close="toolMenuOpen = false"
+    >
+      <button
+        v-for="tool in tools"
+        :key="tool.id"
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="applyTool(tool)"
+      >
         <span aria-hidden="true">{{ tool.icon }}</span>
         <strong>{{ tool.label }}</strong>
       </button>
     </BaseBottomSheet>
 
-    <BaseBottomSheet :open="attachMenuOpen && isMobileSheet" title="첨부" @close="attachMenuOpen = false">
-      <button v-if="showCameraMenu" class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('camera')">
+    <BaseBottomSheet
+      :open="attachMenuOpen && isMobileSheet"
+      title="첨부"
+      @close="attachMenuOpen = false"
+    >
+      <button
+        v-if="showCameraMenu"
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="openFilePicker('camera')"
+      >
         <span aria-hidden="true">📷</span><strong>카메라로 촬영</strong>
       </button>
-      <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('image')">
+      <button
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="openFilePicker('image')"
+      >
         <span aria-hidden="true">🖼️</span><strong>이미지 추가</strong>
       </button>
-      <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="openFilePicker('all')">
+      <button
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="openFilePicker('all')"
+      >
         <span aria-hidden="true">📎</span><strong>파일 추가</strong>
       </button>
     </BaseBottomSheet>
@@ -190,7 +301,13 @@ const props = defineProps({
   models: {type: Array, default: () => []},
 });
 
-const emit = defineEmits(["submit", "focus", "blur", "height-change", "update:modelValue"]);
+const emit = defineEmits([
+  "submit",
+  "focus",
+  "blur",
+  "height-change",
+  "update:modelValue",
+]);
 const platformStore = usePlatformStore();
 const text = ref("");
 const textareaRef = ref(null);
@@ -208,13 +325,36 @@ const isMobileSheet = ref(false);
 let lastHeight = 0;
 let removeViewportListener = null;
 
-const fallbackModels = [{id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델"}];
-const currentModels = computed(() => (props.models.length ? props.models : fallbackModels));
-const currentModel = computed(() => currentModels.value.find((model) => model.id === props.modelValue) || currentModels.value[0]);
+const fallbackModels = [
+  {id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델"},
+];
+const currentModels = computed(() =>
+  props.models.length ? props.models : fallbackModels
+);
+const currentModel = computed(
+  () =>
+    currentModels.value.find((model) => model.id === props.modelValue) ||
+    currentModels.value[0]
+);
 const tools = [
-  {id: "image", icon: "▧", label: "이미지 만들기", prompt: "이미지 생성 프롬프트를 만들어줘"},
-  {id: "write", icon: "✎", label: "글쓰기 또는 편집", prompt: "아래 내용을 더 자연스럽게 다듬어줘"},
-  {id: "find", icon: "◎", label: "필요한 항목 찾기", prompt: "프로젝트에서 빠진 항목을 찾아줘"},
+  {
+    id: "image",
+    icon: "▧",
+    label: "이미지 만들기",
+    prompt: "이미지 생성 프롬프트를 만들어줘",
+  },
+  {
+    id: "write",
+    icon: "✎",
+    label: "글쓰기 또는 편집",
+    prompt: "아래 내용을 더 자연스럽게 다듬어줘",
+  },
+  {
+    id: "find",
+    icon: "◎",
+    label: "필요한 항목 찾기",
+    prompt: "프로젝트에서 빠진 항목을 찾아줘",
+  },
 ];
 
 function getPreviewUrl(file) {
@@ -226,18 +366,25 @@ function markPreviewError(file) {
   file.previewError = true;
 }
 
-const canSubmit = computed(() => text.value.trim().length > 0 || attachments.value.length > 0);
+const canSubmit = computed(
+  () => text.value.trim().length > 0 || attachments.value.length > 0
+);
 const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 
 function syncViewportMode() {
-  isMobileSheet.value = Boolean(window.matchMedia?.("(max-width: 900px)")?.matches || document.querySelector(".app-shell--mobile"));
+  isMobileSheet.value = Boolean(
+    window.matchMedia?.("(max-width: 900px)")?.matches ||
+    document.querySelector(".app-shell--mobile")
+  );
 }
 
 function resize() {
   const el = textareaRef.value;
   if (!el) return;
   el.style.height = "auto";
-  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches ? 136 : 160;
+  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches
+    ? 136
+    : 160;
   const nextHeight = Math.min(Math.max(el.scrollHeight, 38), maxHeight);
   el.style.height = `${nextHeight}px`;
   el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
@@ -315,13 +462,17 @@ async function openFilePicker(type) {
   if (platformStore.info.isAndroidApp) {
     try {
       await openNativeFilePicker({
-        source: type === "camera" ? "camera" : type === "image" ? "image" : "all",
+        source:
+          type === "camera" ? "camera" : type === "image" ? "image" : "all",
         multiple: type !== "camera",
         accept: type === "image" || type === "camera" ? "image/*" : "",
       });
       return;
     } catch (error) {
-      console.warn("Android file picker failed. Falling back to web input.", error);
+      console.warn(
+        "Android file picker failed. Falling back to web input.",
+        error
+      );
     }
   }
 
@@ -389,7 +540,9 @@ function addFiles(fileList) {
     };
   });
   attachments.value = [...attachments.value, ...mapped];
-  mapped.filter((file) => file.kind === "image").forEach((file) => hydrateImagePreviewUrl(file));
+  mapped
+    .filter((file) => file.kind === "image")
+    .forEach((file) => hydrateImagePreviewUrl(file));
   nextTick(() => {
     resize();
     emit("height-change", lastHeight);
@@ -397,7 +550,10 @@ function addFiles(fileList) {
 }
 
 function isImageFile(file) {
-  return Boolean(file?.type?.startsWith("image/") || /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || ""));
+  return Boolean(
+    file?.type?.startsWith("image/") ||
+    /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
+  );
 }
 
 function inferMimeType(name = "") {
@@ -448,7 +604,11 @@ function removeAttachment(id) {
 function previewImage(file) {
   if (!file) return;
   file.url = file.url || file.previewUrl || file.dataUrl || "";
-  window.dispatchEvent(new CustomEvent("chat:image-preview", {detail: {...file, previewUrl: getPreviewUrl(file)}}));
+  window.dispatchEvent(
+    new CustomEvent("chat:image-preview", {
+      detail: {...file, previewUrl: getPreviewUrl(file)},
+    })
+  );
 }
 
 function formatFileSize(size) {
@@ -460,7 +620,11 @@ function formatFileSize(size) {
 
 function handleDocumentClick(event) {
   if (isMobileSheet.value) return;
-  const roots = [attachButtonRef.value, modelSelectorRef.value, plusSelectorRef.value];
+  const roots = [
+    attachButtonRef.value,
+    modelSelectorRef.value,
+    plusSelectorRef.value,
+  ];
   if (roots.some((root) => root?.contains(event.target))) return;
   closeMenus();
 }
@@ -471,7 +635,8 @@ onMounted(() => {
   resize();
   document.addEventListener("click", handleDocumentClick);
   window.addEventListener("resize", syncViewportMode, {passive: true});
-  removeViewportListener = () => window.removeEventListener("resize", syncViewportMode);
+  removeViewportListener = () =>
+    window.removeEventListener("resize", syncViewportMode);
 });
 
 onBeforeUnmount(() => {

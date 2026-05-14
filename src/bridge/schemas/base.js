@@ -1,3 +1,9 @@
+/**
+ * @file base.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {z} from "../zod";
 
 export const BaseRequest = z.object({

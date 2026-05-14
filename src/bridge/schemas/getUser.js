@@ -1,3 +1,9 @@
+/**
+ * @file getUser.js
+ * @description JavaScript module used by the Vue application runtime.
+ * @author OpenAI
+ */
+
 import {z} from "../zod";
 import {BaseRequest, createResponseSchema} from "./base";
 

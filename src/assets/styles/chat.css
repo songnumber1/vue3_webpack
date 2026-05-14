@@ -45,7 +45,9 @@
   place-items: center;
   font-size: 18px;
   font-weight: 900;
-  transition: background var(--duration-fast), transform var(--duration-fast),
+  transition:
+    background var(--duration-fast),
+    transform var(--duration-fast),
     border-color var(--duration-fast);
 }
 
@@ -109,7 +111,9 @@
   display: grid;
   place-items: center;
   font-size: 20px;
-  transition: background var(--duration-fast), transform var(--duration-fast),
+  transition:
+    background var(--duration-fast),
+    transform var(--duration-fast),
     border-color var(--duration-fast);
 }
 .sidebar-round:hover,
@@ -853,7 +857,9 @@
   height: 16px;
   color: var(--text-muted);
   flex: 0 0 auto;
-  transition: transform var(--duration-fast), color var(--duration-fast);
+  transition:
+    transform var(--duration-fast),
+    color var(--duration-fast);
 }
 .model-trigger:hover .chevron {
   color: var(--text);
@@ -2366,7 +2372,9 @@ body,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--duration-fast), color var(--duration-fast),
+  transition:
+    background var(--duration-fast),
+    color var(--duration-fast),
     transform var(--duration-fast);
 }
 
@@ -2438,7 +2446,9 @@ body,
 
 .collapsed-popover-fade-enter-active,
 .collapsed-popover-fade-leave-active {
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 
 .collapsed-popover-fade-enter-from,
@@ -2793,7 +2803,11 @@ body,
     linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.14) 75%),
     var(--surface);
   background-size: 18px 18px;
-  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+  background-position:
+    0 0,
+    0 9px,
+    9px -9px,
+    -9px 0;
 }
 
 .attachment-preview-thumb img {
@@ -2823,7 +2837,11 @@ body,
     linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%),
     var(--surface);
   background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
 }
 
 .message-image-card img {
@@ -2850,7 +2868,11 @@ body,
     linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.16) 75%),
     #ffffff;
   background-size: 24px 24px;
-  background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+  background-position:
+    0 0,
+    0 12px,
+    12px -12px,
+    -12px 0;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
 }
 
@@ -2893,7 +2915,11 @@ body,
   width: 100%;
   flex: 0 0 auto;
   padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
-  background: linear-gradient(to top, var(--mobile-bg, var(--chat-bg)) 78%, transparent);
+  background: linear-gradient(
+    to top,
+    var(--mobile-bg, var(--chat-bg)) 78%,
+    transparent
+  );
 }
 
 .prompt-wrap--floating,
@@ -3029,7 +3055,6 @@ body,
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
-
 
 /* Touch-safe attachment preview patch for Web, Android Chrome and Android WebView. */
 .attachment-preview-row {
@@ -3179,7 +3204,10 @@ body,
   }
 
   .image-preview-backdrop {
-    padding: calc(10px + env(safe-area-inset-top)) calc(10px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(10px + env(safe-area-inset-left));
+    padding: calc(10px + env(safe-area-inset-top))
+      calc(10px + env(safe-area-inset-right))
+      calc(10px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left));
   }
 
   .image-preview-stage {
@@ -3261,7 +3289,11 @@ body,
     linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%),
     var(--surface, #f8fafc);
   background-size: 18px 18px;
-  background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+  background-position:
+    0 0,
+    0 9px,
+    9px -9px,
+    -9px 0;
 }
 
 .attachment-preview-thumb img,
@@ -3388,7 +3420,9 @@ body,
   .attachment-preview-remove,
   .app-shell--mobile .attachment-preview-remove,
   .attachment-preview-card--image .attachment-preview-remove,
-  .app-shell--mobile .attachment-preview-card--image .attachment-preview-remove {
+  .app-shell--mobile
+    .attachment-preview-card--image
+    .attachment-preview-remove {
     top: -16px;
     right: -16px;
   }
@@ -3436,7 +3470,8 @@ body,
   height: 100% !important;
   max-height: 100% !important;
   min-height: 0 !important;
-  padding: calc(12px + env(safe-area-inset-top)) 0 calc(12px + env(safe-area-inset-bottom)) !important;
+  padding: calc(12px + env(safe-area-inset-top)) 0
+    calc(12px + env(safe-area-inset-bottom)) !important;
   gap: 6px !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
@@ -3597,7 +3632,10 @@ body,
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: calc(18px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left)) !important;
+  padding: calc(18px + env(safe-area-inset-top))
+    calc(14px + env(safe-area-inset-right))
+    calc(18px + env(safe-area-inset-bottom))
+    calc(14px + env(safe-area-inset-left)) !important;
   background: rgba(0, 0, 0, 0.82) !important;
 }
 
@@ -3663,7 +3701,9 @@ body,
 }
 
 @keyframes imagePreviewSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .image-preview-close {

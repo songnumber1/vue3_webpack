@@ -61,9 +61,10 @@ function installCryptoRandomUuidFallback() {
 
 function installIdleCallbackFallback() {
   if (typeof window.requestIdleCallback !== "function") {
-    window.requestIdleCallback = (callback) => window.setTimeout(() => {
-      callback({didTimeout: false, timeRemaining: () => 0});
-    }, 1);
+    window.requestIdleCallback = (callback) =>
+      window.setTimeout(() => {
+        callback({didTimeout: false, timeRemaining: () => 0});
+      }, 1);
   }
 
   if (typeof window.cancelIdleCallback !== "function") {
@@ -78,7 +79,7 @@ function installResizeObserverFallback() {
     constructor(callback) {
       this.callback = callback;
       this.targets = new Set();
-      this.id = `resize-observer-${resizeObserverId += 1}`;
+      this.id = `resize-observer-${(resizeObserverId += 1)}`;
       this.handleResize = () => this.flush();
       window.addEventListener("resize", this.handleResize, {passive: true});
     }
@@ -111,8 +112,14 @@ function installResizeObserverFallback() {
 function updateViewportCssVars() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   const viewport = window.visualViewport;
-  const height = Math.max(Math.round(viewport?.height || window.innerHeight || 0), 320);
-  const width = Math.max(Math.round(viewport?.width || window.innerWidth || 0), 320);
+  const height = Math.max(
+    Math.round(viewport?.height || window.innerHeight || 0),
+    320
+  );
+  const width = Math.max(
+    Math.round(viewport?.width || window.innerWidth || 0),
+    320
+  );
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
@@ -121,9 +128,15 @@ function updateViewportCssVars() {
 function installViewportCssVars() {
   updateViewportCssVars();
   window.addEventListener("resize", updateViewportCssVars, {passive: true});
-  window.addEventListener("orientationchange", updateViewportCssVars, {passive: true});
-  window.visualViewport?.addEventListener("resize", updateViewportCssVars, {passive: true});
-  window.visualViewport?.addEventListener("scroll", updateViewportCssVars, {passive: true});
+  window.addEventListener("orientationchange", updateViewportCssVars, {
+    passive: true,
+  });
+  window.visualViewport?.addEventListener("resize", updateViewportCssVars, {
+    passive: true,
+  });
+  window.visualViewport?.addEventListener("scroll", updateViewportCssVars, {
+    passive: true,
+  });
 }
 
 export function installWebViewCompat() {
