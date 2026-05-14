@@ -9,7 +9,7 @@ import {
   PLATFORM,
   hasAndroidBridge,
   hasIosBridge,
-  hasExtensionRuntime,
+  hasExtensionRuntime
 } from "@/core/config";
 
 /**
@@ -58,13 +58,10 @@ function getBrowserName(ua) {
  */
 function getBrowserVersion(ua, browserName) {
   if (browserName === "edge") return parseVersion(ua, /Edg\/([\d.]+)/i);
-  if (browserName === "chrome")
-    return parseVersion(ua, /(?:Chrome|CriOS)\/([\d.]+)/i);
+  if (browserName === "chrome") return parseVersion(ua, /(?:Chrome|CriOS)\/([\d.]+)/i);
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
-  if (browserName === "firefox")
-    return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
-  if (browserName === "samsung-internet")
-    return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
+  if (browserName === "firefox") return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
+  if (browserName === "samsung-internet") return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
   return "";
 }
 /**
@@ -88,13 +85,9 @@ function detectEnv(ua, platform) {
  * @param {*} browserName 함수 실행에 필요한 입력값입니다.
  * @returns {void}
  */
-function detectDevice({env, browserName}) {
+function detectDevice({ env, browserName }) {
   if (hasAndroidBridge() || hasIosBridge()) return "app";
-  if (
-    env === PLATFORM.WINDOWS ||
-    env === PLATFORM.MAC ||
-    env === PLATFORM.LINUX
-  )
+  if (env === PLATFORM.WINDOWS || env === PLATFORM.MAC || env === PLATFORM.LINUX)
     return browserName === "unknown" ? "pc" : browserName;
   if (env === PLATFORM.ANDROID) return browserName || "android-browser";
   if (env === PLATFORM.IOS) return browserName || "ios-browser";
@@ -116,6 +109,11 @@ function getBridgeVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
   return bridge?.bridgeVersion || "";
 }
+/**
+ * resolveDetailedPlatform 함수입니다.
+ * @param {*} baseAppInfo 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function resolveDetailedPlatform(baseAppInfo = {}) {
   const nav = getNavigator();
   const screen = getScreen();
@@ -130,7 +128,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       : hasExtensionRuntime()
         ? RUN_ENV.EXTENSION
         : RUN_ENV.BROWSER;
-  const device = detectDevice({ua, env, browserName});
+  const device = detectDevice({ ua, env, browserName });
   const isAndroid = env === PLATFORM.ANDROID;
   const isIos = env === PLATFORM.IOS;
   const isWindows = env === PLATFORM.WINDOWS;
@@ -164,17 +162,15 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",
     appBuildVersion: baseAppInfo.appBuildVersion || "",
-    bridgeVersion:
-      getBridgeVersionFromBridge() || baseAppInfo.bridgeVersion || "",
+    bridgeVersion: getBridgeVersionFromBridge() || baseAppInfo.bridgeVersion || "",
     deviceId: baseAppInfo.deviceId || null,
     token: baseAppInfo.token || "",
     screen: {
       width: screen.width || 0,
       height: screen.height || 0,
-      pixelRatio:
-        typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
+      pixelRatio: typeof window === "undefined" ? 1 : window.devicePixelRatio || 1
     },
-    viewport: {width, height},
-    updatedAt: new Date().toISOString(),
+    viewport: { width, height },
+    updatedAt: new Date().toISOString()
   };
 }

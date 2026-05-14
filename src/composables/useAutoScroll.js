@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import {nextTick} from "vue";
+import { nextTick } from "vue";
 
 /**
  * afterFrame 처리 함수입니다.
@@ -12,10 +12,7 @@ import {nextTick} from "vue";
  * @returns {void}
  */
 function afterFrame(callback) {
-  if (
-    typeof window === "undefined" ||
-    typeof window.requestAnimationFrame !== "function"
-  ) {
+  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
     setTimeout(callback, 0);
     return;
   }
@@ -51,5 +48,5 @@ export function useAutoScroll(targetRef) {
     });
   }
 
-  return {scrollToBottom};
+  return { scrollToBottom };
 }

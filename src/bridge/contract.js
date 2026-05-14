@@ -4,9 +4,9 @@
  * @author OpenAI
  */
 
-import {GetUserRequest, GetUserResponse} from "./schemas/getUser";
-import {LoginRequest, LoginResponse} from "./schemas/login";
-import {UploadFileRequest, UploadFileResponse} from "./schemas/uploadFile";
+import { GetUserRequest, GetUserResponse } from "./schemas/getUser";
+import { LoginRequest, LoginResponse } from "./schemas/login";
+import { UploadFileRequest, UploadFileResponse } from "./schemas/uploadFile";
 import {
   CancelRequestRequest,
   CancelRequestResponse,
@@ -35,7 +35,7 @@ import {
   StorageRemoveRequest,
   StorageRemoveResponse,
   WriteLogRequest,
-  WriteLogResponse,
+  WriteLogResponse
 } from "./schemas/native";
 import {
   NativeEventAckResponse,
@@ -48,22 +48,21 @@ import {
   OnPushClickRequest,
   OnRequestCancelRequest,
   OnSessionExpiredRequest,
-  OnWebViewCloseRequest,
+  OnWebViewCloseRequest
 } from "./schemas/nativeEvents";
-import {BaseResponseError} from "./schemas/base";
-import {BRIDGE_CATEGORY} from "./bridgeConstants";
+import { BaseResponseError } from "./schemas/base";
+import { BRIDGE_CATEGORY } from "./bridgeConstants";
 
 export const WebApiContract = {
   GET_USER: {
     request: GetUserRequest,
     response: GetUserResponse,
     error: BaseResponseError,
-    description:
-      "JS에서 실제 backend 유저 조회 API를 호출한 뒤 표준 응답으로 정규화합니다.",
+    description: "JS에서 실제 backend 유저 조회 API를 호출한 뒤 표준 응답으로 정규화합니다.",
     httpMethod: "GET",
     httpPath: "/users/:id",
     tag: "REST / Web API",
-    category: BRIDGE_CATEGORY.WEB_API,
+    category: BRIDGE_CATEGORY.WEB_API
   },
   LOGIN: {
     request: LoginRequest,
@@ -73,7 +72,7 @@ export const WebApiContract = {
     httpMethod: "POST",
     httpPath: "/login",
     tag: "REST / Web API",
-    category: BRIDGE_CATEGORY.WEB_API,
+    category: BRIDGE_CATEGORY.WEB_API
   },
   UPLOAD_FILE: {
     request: UploadFileRequest,
@@ -83,23 +82,26 @@ export const WebApiContract = {
     httpMethod: "POST",
     httpPath: "/files/upload",
     tag: "REST / Web API",
-    category: BRIDGE_CATEGORY.WEB_API,
-  },
+    category: BRIDGE_CATEGORY.WEB_API
+  }
 };
 
-const jsToAndroid = (
-  request,
-  response,
-  description,
-  required = "required"
-) => ({
+/**
+ * JS에서 Android 네이티브로 호출하는 브릿지 계약 객체를 생성합니다.
+ * @param {*} request 요청 스키마입니다.
+ * @param {*} response 응답 스키마입니다.
+ * @param {string} description Swagger와 문서에 표시할 설명입니다.
+ * @param {string} required 필수 여부 표시 값입니다.
+ * @returns {*} JS → Android 브릿지 계약 객체를 반환합니다.
+ */
+const jsToAndroid = (request, response, description, required = "required") => ({
   request,
   response,
   error: BaseResponseError,
   description,
   tag: "JS → Android",
   category: BRIDGE_CATEGORY.JS_TO_ANDROID,
-  required,
+  required
 });
 export const JsToAndroidContract = {
   OPEN_EXTERNAL_BROWSER: jsToAndroid(
@@ -127,11 +129,7 @@ export const JsToAndroidContract = {
     CopyClipboardResponse,
     "클립보드에 텍스트를 복사합니다."
   ),
-  SHARE: jsToAndroid(
-    ShareRequest,
-    ShareResponse,
-    "Android 시스템 공유창을 실행합니다."
-  ),
+  SHARE: jsToAndroid(ShareRequest, ShareResponse, "Android 시스템 공유창을 실행합니다."),
   CHECK_NETWORK: jsToAndroid(
     EmptyNativeRequest,
     CheckNetworkResponse,
@@ -190,9 +188,16 @@ export const JsToAndroidContract = {
     CloseAppResponse,
     "Android 앱 종료를 요청합니다.",
     "optional"
-  ),
+  )
 };
 
+/**
+ * androidToJs 함수입니다.
+ * @param {*} request 함수 실행에 필요한 값입니다.
+ * @param {*} description 함수 실행에 필요한 값입니다.
+ * @param {*} required 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 const androidToJs = (request, description, required = "required") => ({
   request,
   response: NativeEventAckResponse,
@@ -200,33 +205,15 @@ const androidToJs = (request, description, required = "required") => ({
   description,
   tag: "Android → JS",
   category: BRIDGE_CATEGORY.ANDROID_TO_JS,
-  required,
+  required
 });
 export const AndroidToJsContract = {
-  ON_APP_RESUME: androidToJs(
-    OnAppResumeRequest,
-    "포그라운드 복귀 이벤트를 JS로 전달합니다."
-  ),
-  ON_BACK_PRESSED: androidToJs(
-    OnBackPressedRequest,
-    "Android 뒤로가기 입력을 JS로 전달합니다."
-  ),
-  ON_FILE_SELECTED: androidToJs(
-    OnFileSelectedRequest,
-    "파일/카메라 선택 결과를 JS로 전달합니다."
-  ),
-  ON_NETWORK_CHANGE: androidToJs(
-    OnNetworkChangeRequest,
-    "네트워크 상태 변경을 JS로 전달합니다."
-  ),
-  ON_PUSH_CLICK: androidToJs(
-    OnPushClickRequest,
-    "푸시 클릭 payload를 JS로 전달합니다."
-  ),
-  ON_SESSION_EXPIRED: androidToJs(
-    OnSessionExpiredRequest,
-    "세션 만료를 JS로 통보합니다."
-  ),
+  ON_APP_RESUME: androidToJs(OnAppResumeRequest, "포그라운드 복귀 이벤트를 JS로 전달합니다."),
+  ON_BACK_PRESSED: androidToJs(OnBackPressedRequest, "Android 뒤로가기 입력을 JS로 전달합니다."),
+  ON_FILE_SELECTED: androidToJs(OnFileSelectedRequest, "파일/카메라 선택 결과를 JS로 전달합니다."),
+  ON_NETWORK_CHANGE: androidToJs(OnNetworkChangeRequest, "네트워크 상태 변경을 JS로 전달합니다."),
+  ON_PUSH_CLICK: androidToJs(OnPushClickRequest, "푸시 클릭 payload를 JS로 전달합니다."),
+  ON_SESSION_EXPIRED: androidToJs(OnSessionExpiredRequest, "세션 만료를 JS로 통보합니다."),
   ON_APP_PAUSE: androidToJs(
     OnAppPauseRequest,
     "백그라운드 진입 이벤트를 JS로 전달합니다.",
@@ -242,22 +229,23 @@ export const AndroidToJsContract = {
     "요청 강제 종료 이벤트를 JS로 전달합니다.",
     "recommended"
   ),
-  ON_NATIVE_ERROR: androidToJs(
-    OnNativeErrorRequest,
-    "네이티브 오류를 JS로 전달합니다.",
-    "optional"
-  ),
+  ON_NATIVE_ERROR: androidToJs(OnNativeErrorRequest, "네이티브 오류를 JS로 전달합니다.", "optional")
 };
 export const BridgeContract = {
   ...WebApiContract,
   ...JsToAndroidContract,
-  ...AndroidToJsContract,
+  ...AndroidToJsContract
 };
 export const BridgeContractGroups = {
   [BRIDGE_CATEGORY.WEB_API]: WebApiContract,
   [BRIDGE_CATEGORY.JS_TO_ANDROID]: JsToAndroidContract,
-  [BRIDGE_CATEGORY.ANDROID_TO_JS]: AndroidToJsContract,
+  [BRIDGE_CATEGORY.ANDROID_TO_JS]: AndroidToJsContract
 };
+/**
+ * getContractsByCategory 함수입니다.
+ * @param {*} category 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function getContractsByCategory(category = BRIDGE_CATEGORY.ALL) {
   if (category === BRIDGE_CATEGORY.ALL) return BridgeContract;
   return BridgeContractGroups[category] || BridgeContract;

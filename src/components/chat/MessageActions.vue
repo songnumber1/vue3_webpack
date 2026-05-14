@@ -8,7 +8,7 @@ application runtime. * @author OpenAI
     <button
       v-if="role === 'assistant'"
       type="button"
-      :class="{active: feedback === 'like'}"
+      :class="{ active: feedback === 'like' }"
       aria-label="좋아요"
       @click="setFeedback('like')"
     >
@@ -17,7 +17,7 @@ application runtime. * @author OpenAI
     <button
       v-if="role === 'assistant'"
       type="button"
-      :class="{active: feedback === 'dislike'}"
+      :class="{ active: feedback === 'dislike' }"
       aria-label="싫어요"
       @click="setFeedback('dislike')"
     >
@@ -28,12 +28,12 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import {ref} from "vue";
-import {copyClipboardByPlatform} from "@/services/platformBridge";
+import { ref } from "vue";
+import { copyClipboardByPlatform } from "@/services/platformBridge";
 
 const props = defineProps({
-  role: {type: String, required: true},
-  content: {type: String, default: ""},
+  role: { type: String, required: true },
+  content: { type: String, default: "" }
 });
 const feedback = ref("");
 /**

@@ -35,19 +35,17 @@ application runtime. * @author OpenAI
       </div>
 
       <div class="exception-actions">
-        <button type="button" class="exception-button" @click="requestUpdate">
-          업데이트 진행
-        </button>
+        <button type="button" class="exception-button" @click="requestUpdate">업데이트 진행</button>
       </div>
     </section>
   </main>
 </template>
 
 <script setup>
-import {computed} from "vue";
-import {useAppContext} from "@/composables/useAppContext";
+import { computed } from "vue";
+import { useAppContext } from "@/composables/useAppContext";
 
-const {appInfo, bridge} = useAppContext();
+const { appInfo, bridge } = useAppContext();
 
 const versionInfo = computed(() => appInfo.lastVersionInfo || {});
 
@@ -55,13 +53,10 @@ const currentVersion = computed(() => appInfo.appVersion || "unknown");
 
 const latestVersion = computed(() => versionInfo.value.version || "unknown");
 
-const title = computed(
-  () => versionInfo.value.title || "앱 업데이트가 필요합니다."
-);
+const title = computed(() => versionInfo.value.title || "앱 업데이트가 필요합니다.");
 
 const message = computed(
-  () =>
-    versionInfo.value.message || "최신 버전으로 업데이트 후 다시 실행해 주세요."
+  () => versionInfo.value.message || "최신 버전으로 업데이트 후 다시 실행해 주세요."
 );
 
 /**

@@ -4,11 +4,7 @@
  * @author OpenAI
  */
 
-import {
-  detectBrowserPlatform,
-  resolveAppConfig,
-  isNativeApp,
-} from "@/core/config";
+import { detectBrowserPlatform, resolveAppConfig, isNativeApp } from "@/core/config";
 
 /**
  * @deprecated appInfo 기준의 resolveAppConfig()를 사용하세요.

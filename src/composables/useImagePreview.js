@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 /**
  * Returns unique preview source URLs from an attachment detail object.
@@ -36,8 +36,7 @@ function readPreviewDataUrl(file) {
   return new Promise((resolve) => {
     if (!file || typeof FileReader === "undefined") return resolve("");
     const reader = new FileReader();
-    reader.onload = () =>
-      resolve(typeof reader.result === "string" ? reader.result : "");
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
     reader.onerror = () => resolve("");
     reader.readAsDataURL(file);
   });
@@ -66,7 +65,7 @@ export function useImagePreview() {
         (url, index, array) => url && array.indexOf(url) === index
       ),
       loading: true,
-      error: false,
+      error: false
     };
   }
 
@@ -85,10 +84,10 @@ export function useImagePreview() {
       sources,
       sourceIndex: 0,
       loading: Boolean(firstUrl || detail.file),
-      error: !firstUrl && !detail.file,
+      error: !firstUrl && !detail.file
     };
     if (detail.file && !detail.dataUrl)
-      hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
+      hydrateOpenPreviewFromFile({ ...detail, id: previewImage.value.id });
   }
 
   /**
@@ -116,7 +115,7 @@ export function useImagePreview() {
         url: nextUrl,
         sourceIndex: nextIndex,
         loading: true,
-        error: false,
+        error: false
       };
       return;
     }
@@ -129,7 +128,7 @@ export function useImagePreview() {
         sources: [dataUrl],
         sourceIndex: 0,
         loading: true,
-        error: false,
+        error: false
       };
       return;
     }
@@ -147,17 +146,13 @@ export function useImagePreview() {
     previewImage.value = null;
   }
 
-  onMounted(() =>
-    window.addEventListener("chat:image-preview", openImagePreview)
-  );
-  onBeforeUnmount(() =>
-    window.removeEventListener("chat:image-preview", openImagePreview)
-  );
+  onMounted(() => window.addEventListener("chat:image-preview", openImagePreview));
+  onBeforeUnmount(() => window.removeEventListener("chat:image-preview", openImagePreview));
 
   return {
     previewImage,
     closeImagePreview,
     handlePreviewLoad,
-    handlePreviewError,
+    handlePreviewError
   };
 }

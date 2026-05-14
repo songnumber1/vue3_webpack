@@ -4,21 +4,15 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <aside
-    class="desktop-sidebar"
-    :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
-  >
-    <div
-      v-if="!sidebarCollapsed"
-      class="sidebar-content sidebar-content--assistant"
-    >
+  <aside class="desktop-sidebar" :class="{ 'desktop-sidebar--collapsed': sidebarCollapsed }">
+    <div v-if="!sidebarCollapsed" class="sidebar-content sidebar-content--assistant">
       <div class="sidebar-top">
-        <div class="assistant-selector" ref="assistantSelectorRef">
+        <div ref="assistantSelectorRef" class="assistant-selector">
           <button
             class="assistant-trigger"
             type="button"
-            @click="openAssistantSelector"
             aria-label="Assistant 선택"
+            @click="openAssistantSelector"
           >
             <span>{{ currentAssistant.label }}</span>
             <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -32,15 +26,12 @@ application runtime. * @author OpenAI
               />
             </svg>
           </button>
-          <div
-            v-if="assistantMenuOpen && !isMobileSheet"
-            class="assistant-menu"
-          >
+          <div v-if="assistantMenuOpen && !isMobileSheet" class="assistant-menu">
             <button
               v-for="assistant in assistants"
               :key="assistant.id"
               class="assistant-option"
-              :class="{active: assistant.id === selectedAssistantId}"
+              :class="{ active: assistant.id === selectedAssistantId }"
               type="button"
               @click="selectAssistant(assistant.id)"
             >
@@ -66,9 +57,7 @@ application runtime. * @author OpenAI
         <button class="quick-item active" type="button" @click="handleNewChat">
           <Icon name="pencil" />새 채팅
         </button>
-        <button class="quick-item" type="button">
-          <Icon name="search" />채팅 검색
-        </button>
+        <button class="quick-item" type="button"><Icon name="search" />채팅 검색</button>
       </nav>
 
       <div class="section-label">대화</div>
@@ -77,7 +66,7 @@ application runtime. * @author OpenAI
           v-for="item in histories"
           :key="item.id"
           class="sidebar-history-item"
-          :class="{selected: Number(item.id) === Number(activeHistoryId)}"
+          :class="{ selected: Number(item.id) === Number(activeHistoryId) }"
           type="button"
           :title="item.title"
           @click="handleSelectHistory(item)"
@@ -165,25 +154,19 @@ application runtime. * @author OpenAI
   </aside>
 
   <transition name="drawer-fade">
-    <div
-      v-if="drawerOpen"
-      class="mobile-drawer-backdrop"
-      @click="emitDrawerOpen(false)"
-    ></div>
+    <div v-if="drawerOpen" class="mobile-drawer-backdrop" @click="emitDrawerOpen(false)"></div>
   </transition>
 
   <transition name="drawer-slide">
     <aside v-if="drawerOpen" class="mobile-drawer">
-      <div
-        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
-      >
+      <div class="sidebar-content sidebar-content--mobile sidebar-content--assistant">
         <div class="sidebar-top">
           <div class="assistant-selector">
             <button
               class="assistant-trigger"
               type="button"
-              @click="openAssistantSelector"
               aria-label="Assistant 선택"
+              @click="openAssistantSelector"
             >
               <span>{{ currentAssistant.label }}</span>
               <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -212,16 +195,10 @@ application runtime. * @author OpenAI
         </div>
 
         <nav class="quick-menu quick-menu--assistant">
-          <button
-            class="quick-item active"
-            type="button"
-            @click="handleNewChat"
-          >
+          <button class="quick-item active" type="button" @click="handleNewChat">
             <Icon name="pencil" />새 채팅
           </button>
-          <button class="quick-item" type="button">
-            <Icon name="search" />채팅 검색
-          </button>
+          <button class="quick-item" type="button"><Icon name="search" />채팅 검색</button>
         </nav>
 
         <div class="section-label">대화</div>
@@ -230,7 +207,7 @@ application runtime. * @author OpenAI
             v-for="item in histories"
             :key="item.id"
             class="sidebar-history-item"
-            :class="{selected: Number(item.id) === Number(activeHistoryId)}"
+            :class="{ selected: Number(item.id) === Number(activeHistoryId) }"
             type="button"
             :title="item.title"
             @click="handleSelectHistory(item)"
@@ -239,11 +216,7 @@ application runtime. * @author OpenAI
           </button>
         </div>
 
-        <button
-          class="mobile-new-chat-fab"
-          type="button"
-          @click="handleNewChat"
-        >
+        <button class="mobile-new-chat-fab" type="button" @click="handleNewChat">
           <Icon name="pencil" />채팅
         </button>
 
@@ -264,7 +237,7 @@ application runtime. * @author OpenAI
       v-for="assistant in assistants"
       :key="assistant.id"
       class="bottom-sheet-option"
-      :class="{active: assistant.id === selectedAssistantId}"
+      :class="{ active: assistant.id === selectedAssistantId }"
       type="button"
       @click="selectAssistant(assistant.id)"
     >
@@ -275,18 +248,18 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
 
 const props = defineProps({
-  histories: {type: Array, required: true},
-  assistants: {type: Array, required: true},
-  selectedAssistantId: {type: String, required: true},
-  activeHistoryId: {type: [String, Number], default: null},
-  sidebarCollapsed: {type: Boolean, required: true},
-  drawerOpen: {type: Boolean, required: true},
-  collapsedRecentOpen: {type: Boolean, required: true},
+  histories: { type: Array, required: true },
+  assistants: { type: Array, required: true },
+  selectedAssistantId: { type: String, required: true },
+  activeHistoryId: { type: [String, Number], default: null },
+  sidebarCollapsed: { type: Boolean, required: true },
+  drawerOpen: { type: Boolean, required: true },
+  collapsedRecentOpen: { type: Boolean, required: true }
 });
 
 const emit = defineEmits([
@@ -296,15 +269,14 @@ const emit = defineEmits([
   "update:selectedAssistantId",
   "new-chat",
   "select-history",
-  "select-history-collapsed",
+  "select-history-collapsed"
 ]);
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 const currentAssistant = computed(
   () =>
-    props.assistants.find((item) => item.id === props.selectedAssistantId) ||
-    props.assistants[0]
+    props.assistants.find((item) => item.id === props.selectedAssistantId) || props.assistants[0]
 );
 
 /**
@@ -386,7 +358,7 @@ function handleDocumentClick(event) {
 onMounted(() => {
   syncViewportMode();
   document.addEventListener("click", handleDocumentClick);
-  window.addEventListener("resize", syncViewportMode, {passive: true});
+  window.addEventListener("resize", syncViewportMode, { passive: true });
 });
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleDocumentClick);

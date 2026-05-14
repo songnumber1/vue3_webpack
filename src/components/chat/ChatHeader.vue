@@ -4,10 +4,7 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <header
-    class="mobile-topbar"
-    :class="{'mobile-topbar--desktop-main': isDesktopMain}"
-  >
+  <header class="mobile-topbar" :class="{ 'mobile-topbar--desktop-main': isDesktopMain }">
     <div class="topbar-left">
       <button
         class="round-icon menu-toggle"
@@ -38,10 +35,7 @@ application runtime. * @author OpenAI
         </svg>
       </button>
 
-      <div
-        v-else-if="showDesktopConversationTitle"
-        class="conversation-title-wrap"
-      >
+      <div v-else-if="showDesktopConversationTitle" class="conversation-title-wrap">
         <strong>{{ assistantLabel }}</strong>
         <span>{{ conversationTitle }}</span>
       </div>
@@ -54,10 +48,7 @@ application runtime. * @author OpenAI
         aria-label="테마 전환"
         @click="$emit('toggle-theme')"
       >
-        <span
-          class="theme-glyph"
-          :class="{'theme-glyph--dark': themeName === 'dark'}"
-        ></span>
+        <span class="theme-glyph" :class="{ 'theme-glyph--dark': themeName === 'dark' }"></span>
       </button>
       <button
         class="round-icon document-toggle"
@@ -94,23 +85,17 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import {computed} from "vue";
+import { computed } from "vue";
 
 const props = defineProps({
-  mode: {type: String, default: "main"},
-  isMobile: {type: Boolean, default: false},
-  assistantLabel: {type: String, default: "Assistant"},
-  conversationTitle: {type: String, default: ""},
-  themeName: {type: String, default: "dark"},
+  mode: { type: String, default: "main" },
+  isMobile: { type: Boolean, default: false },
+  assistantLabel: { type: String, default: "Assistant" },
+  conversationTitle: { type: String, default: "" },
+  themeName: { type: String, default: "dark" }
 });
 
-defineEmits([
-  "toggle-theme",
-  "open-drawer",
-  "open-swagger",
-  "open-settings",
-  "open-assistant",
-]);
+defineEmits(["toggle-theme", "open-drawer", "open-swagger", "open-settings", "open-assistant"]);
 
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);

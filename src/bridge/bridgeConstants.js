@@ -14,10 +14,10 @@ export const BRIDGE_CATEGORY = {
   ALL: "all",
   WEB_API: "web-api",
   JS_TO_ANDROID: "js-to-android",
-  ANDROID_TO_JS: "android-to-js",
+  ANDROID_TO_JS: "android-to-js"
 };
 
 export const BRIDGE_STATUS = {
   SUCCESS: "success",
-  ERROR: "error",
+  ERROR: "error"
 };

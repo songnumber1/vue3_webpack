@@ -18,11 +18,7 @@ application runtime. * @author OpenAI
       <div class="exception-actions">
         <RouterLink to="/" class="exception-button"> 홈으로 이동 </RouterLink>
 
-        <button
-          type="button"
-          class="exception-button exception-button--secondary"
-          @click="goBack"
-        >
+        <button type="button" class="exception-button exception-button--secondary" @click="goBack">
           이전 페이지
         </button>
       </div>

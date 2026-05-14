@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import {RUN_ENV, PLATFORM} from "./constants";
-import {createId} from "@/utils/id";
+import { RUN_ENV, PLATFORM } from "./constants";
+import { createId } from "@/utils/id";
 
 /**
  * Android 앱에서 웹 런타임이 요구하는 최소/최신 버전 정보입니다.
@@ -17,7 +17,7 @@ export const LAST_VERSION_INFO = Object.freeze({
   version: "1.0.0",
   title: "앱 업데이트가 필요합니다.",
   message:
-    "현재 앱 버전에서는 최신 웹 기능을 사용할 수 없습니다. 앱을 업데이트한 후 다시 실행해 주세요.",
+    "현재 앱 버전에서는 최신 웹 기능을 사용할 수 없습니다. 앱을 업데이트한 후 다시 실행해 주세요."
 });
 
 /**
@@ -37,6 +37,11 @@ function readAndroidValue(bridge, methodName, fallback = null) {
   }
 }
 
+/**
+ * createAndroidConfig 함수입니다.
+ * @param {*} bridge 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function createAndroidConfig(bridge = window.AndroidBridge) {
   return {
     env: RUN_ENV.NATIVE,
@@ -46,6 +51,6 @@ export function createAndroidConfig(bridge = window.AndroidBridge) {
     bridgeVersion: readAndroidValue(bridge, "getBridgeVersion", "1.0.0"),
     token: readAndroidValue(bridge, "getToken", createId("app")),
     deviceId: readAndroidValue(bridge, "getDeviceId", null),
-    lastVersionInfo: LAST_VERSION_INFO,
+    lastVersionInfo: LAST_VERSION_INFO
   };
 }

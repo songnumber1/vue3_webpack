@@ -4,35 +4,28 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <section
-    ref="scrollRef"
-    class="message-list"
-    aria-live="polite"
-    @scroll.passive="handleScroll"
-  >
+  <section ref="scrollRef" class="message-list" aria-live="polite" @scroll.passive="handleScroll">
     <ChatMessage
       v-for="message in messages"
       :key="message.id"
       :message="message"
       @rendered="handleMessageRendered"
     />
-    <div v-if="loading" class="typing-row">
-      <span></span><span></span><span></span>
-    </div>
+    <div v-if="loading" class="typing-row"><span></span><span></span><span></span></div>
     <div ref="bottomRef" class="message-list-anchor" aria-hidden="true"></div>
   </section>
 </template>
 
 <script setup>
-import {nextTick, onBeforeUnmount, ref} from "vue";
+import { nextTick, onBeforeUnmount, ref } from "vue";
 import ChatMessage from "./ChatMessage.vue";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 
 defineProps({
-  messages: {type: Array, required: true},
-  loading: {type: Boolean, default: false},
+  messages: { type: Array, required: true },
+  loading: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(["content-rendered"]);
@@ -97,7 +90,7 @@ function applyBottomScroll(behavior = "auto") {
   if (!el) return;
 
   if (bottomRef.value?.scrollIntoView) {
-    bottomRef.value.scrollIntoView({block: "end", inline: "nearest", behavior});
+    bottomRef.value.scrollIntoView({ block: "end", inline: "nearest", behavior });
   }
 
   // Direct assignment is kept as a fallback and as an Android Chrome correction.
@@ -144,7 +137,7 @@ async function handleMessageRendered() {
   // If the user is already at the bottom, keep the bottom anchored after late
   // Markdown, code highlight, image, or Mermaid layout changes. If the user has
   // scrolled up, this does nothing and preserves their reading position.
-  scrollToBottom({stable: true});
+  scrollToBottom({ stable: true });
 }
 
 onBeforeUnmount(clearStableTimers);
@@ -161,6 +154,6 @@ function getIsAtBottom() {
 defineExpose({
   scrollToBottom,
   isAtBottom: getIsAtBottom,
-  getScrollElement,
+  getScrollElement
 });
 </script>

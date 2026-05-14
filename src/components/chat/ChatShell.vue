@@ -45,9 +45,7 @@
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
       @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="
-        scrollBottom({force: true, behavior: 'smooth', stable: true})
-      "
+      @scroll-bottom="scrollBottom({ force: true, behavior: 'smooth', stable: true })"
     />
 
     <ChatImagePreview
@@ -68,27 +66,27 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
-import {useAppContext} from "@/composables/useAppContext";
-import {useAutoScroll} from "@/composables/useAutoScroll";
-import {useChatRuntime} from "@/composables/useChatRuntime";
-import {useChatSubmit} from "@/composables/useChatSubmit";
-import {useImagePreview} from "@/composables/useImagePreview";
-import {loadSharedConversation} from "@/composables/useSharedChat";
-import {useViewportGuard} from "@/composables/useViewportGuard";
-import {addMediaQueryListener} from "@/utils/dom";
-import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useAppContext } from "@/composables/useAppContext";
+import { useAutoScroll } from "@/composables/useAutoScroll";
+import { useChatRuntime } from "@/composables/useChatRuntime";
+import { useChatSubmit } from "@/composables/useChatSubmit";
+import { useImagePreview } from "@/composables/useImagePreview";
+import { loadSharedConversation } from "@/composables/useSharedChat";
+import { useViewportGuard } from "@/composables/useViewportGuard";
+import { addMediaQueryListener } from "@/utils/dom";
+import { renderMermaidInElement } from "@/utils/mermaidRenderer";
 import ChatAssistantSheet from "./ChatAssistantSheet.vue";
 import ChatImagePreview from "./ChatImagePreview.vue";
 import ChatLayout from "./ChatLayout.vue";
 import ChatWorkspace from "./ChatWorkspace.vue";
 
-const props = defineProps({mode: {type: String, default: "main"}});
+const props = defineProps({ mode: { type: String, default: "main" } });
 
 const router = useRouter();
 const route = useRoute();
-const {theme} = useAppContext();
+const { theme } = useAppContext();
 const runtime = useChatRuntime();
 const {
   assistants,
@@ -100,15 +98,15 @@ const {
   ensureConversation,
   setConversation,
   getHistory,
-  revokeMessageAttachments,
+  revokeMessageAttachments
 } = runtime;
 
 const workspaceRef = ref(null);
-const {scrollToBottom} = useAutoScroll({value: null});
-const {keyboardOpen, refreshViewport} = useViewportGuard({
-  onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
-    if (isCompact && isKeyboardOpen) scrollBottom({stable: true});
-  },
+const { scrollToBottom } = useAutoScroll({ value: null });
+const { keyboardOpen, refreshViewport } = useViewportGuard({
+  onChange: ({ isCompact, keyboardOpen: isKeyboardOpen }) => {
+    if (isCompact && isKeyboardOpen) scrollBottom({ stable: true });
+  }
 });
 const themeName = ref(theme.current);
 const drawerOpen = ref(false);
@@ -118,7 +116,7 @@ const isMobile = ref(false);
 const messages = ref([]);
 const showScrollBottom = ref(false);
 const assistantSheetOpen = ref(false);
-const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
+const { previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError } =
   useImagePreview();
 let removeMobileMediaQueryListener = null;
 let bottomStateTimer = 0;
@@ -132,8 +130,7 @@ const activeHistoryId = computed(() => {
 });
 const activeHistory = computed(() => getHistory(activeHistoryId.value));
 const activeConversationTitle = computed(() => {
-  if (props.mode === "shared")
-    return `공유 대화 ${activeHistoryId.value || ""}`.trim();
+  if (props.mode === "shared") return `공유 대화 ${activeHistoryId.value || ""}`.trim();
   return activeHistory.value?.title || "";
 });
 
@@ -141,18 +138,18 @@ const suggestions = [
   {
     icon: "▧",
     text: "이미지 만들기",
-    prompt: "이미지 생성 화면의 UI 구조를 제안해줘",
+    prompt: "이미지 생성 화면의 UI 구조를 제안해줘"
   },
   {
     icon: "✎",
     text: "글쓰기 또는 편집",
-    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘",
+    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘"
   },
   {
     icon: "◎",
     text: "필요한 항목 찾기",
-    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘",
-  },
+    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘"
+  }
 ];
 
 /**
@@ -217,8 +214,7 @@ async function scrollBottom(options = {}) {
 function updateScrollBottomButton() {
   const list = getMessageListRef();
   showScrollBottom.value =
-    (props.mode === "chat" || props.mode === "shared") &&
-    Boolean(list && !list.isAtBottom?.());
+    (props.mode === "chat" || props.mode === "shared") && Boolean(list && !list.isAtBottom?.());
 }
 
 /**
@@ -235,7 +231,7 @@ function scheduleBottomStateCheck() {
  * @returns {void}
  */
 function handleMessageContentRendered() {
-  if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
+  if (shouldKeepForceBottom()) scrollBottom({ force: true, stable: true });
   scheduleBottomStateCheck();
 }
 
@@ -246,7 +242,7 @@ function handleMessageContentRendered() {
 function handlePromptFocus() {
   if (isReadOnly.value) return;
   refreshViewport();
-  scrollBottom({stable: true, force: isMobile.value});
+  scrollBottom({ stable: true, force: isMobile.value });
 }
 
 /**
@@ -255,7 +251,7 @@ function handlePromptFocus() {
  */
 function handlePromptResize() {
   if (isReadOnly.value) return;
-  scrollBottom({stable: true, force: isMobile.value});
+  scrollBottom({ stable: true, force: isMobile.value });
 }
 
 /**
@@ -279,7 +275,7 @@ async function startNewChat() {
 async function openHistory(item) {
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
-  await router.push({name: "chat", params: {id: item.id}});
+  await router.push({ name: "chat", params: { id: item.id } });
 }
 
 /**
@@ -296,7 +292,7 @@ async function loadRouteConversation() {
     messages.value = await loadSharedConversation(activeHistoryId.value);
     markForceBottom();
     await nextTick();
-    await scrollBottom({behavior: "auto", force: true, stable: true});
+    await scrollBottom({ behavior: "auto", force: true, stable: true });
     return;
   }
 
@@ -308,7 +304,7 @@ async function loadRouteConversation() {
   messages.value = await ensureConversation(history.id);
   markForceBottom();
   await nextTick();
-  await scrollBottom({behavior: "auto", force: true, stable: true});
+  await scrollBottom({ behavior: "auto", force: true, stable: true });
 }
 
 /**
@@ -318,12 +314,12 @@ async function loadRouteConversation() {
 async function renderAfterStream() {
   markForceBottom(1000);
   await renderMermaidInElement(document.querySelector(".message-list"), {
-    force: true,
+    force: true
   });
-  scrollBottom({force: true, stable: true});
+  scrollBottom({ force: true, stable: true });
 }
 
-const {isGenerating, handleSubmit} = useChatSubmit({
+const { isGenerating, handleSubmit } = useChatSubmit({
   router,
   route,
   histories,
@@ -333,7 +329,7 @@ const {isGenerating, handleSubmit} = useChatSubmit({
     markForceBottom(2500);
     await scrollBottom(options);
   },
-  renderAfterStream,
+  renderAfterStream
 });
 
 /**
@@ -355,9 +351,9 @@ async function toggleTheme() {
   themeName.value = theme.current;
   await nextTick();
   await renderMermaidInElement(document.querySelector(".message-list"), {
-    force: true,
+    force: true
   });
-  scrollBottom({stable: true});
+  scrollBottom({ stable: true });
 }
 
 /**
@@ -394,21 +390,14 @@ function selectAssistantFromSheet(id) {
   assistantSheetOpen.value = false;
 }
 
-watch(
-  () => [route.params.id, route.params.shareId, props.mode],
-  loadRouteConversation,
-  {
-    immediate: true,
-  }
-);
+watch(() => [route.params.id, route.params.shareId, props.mode], loadRouteConversation, {
+  immediate: true
+});
 
 onMounted(() => {
   updateMobileState();
-  removeMobileMediaQueryListener = addMediaQueryListener(
-    "(max-width: 900px)",
-    updateMobileState
-  );
-  window.addEventListener("resize", updateMobileState, {passive: true});
+  removeMobileMediaQueryListener = addMediaQueryListener("(max-width: 900px)", updateMobileState);
+  window.addEventListener("resize", updateMobileState, { passive: true });
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
 });
 

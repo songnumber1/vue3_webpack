@@ -8,9 +8,9 @@ import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
   JS_TO_ANDROID_PATH,
-  WEB_API_PATH,
+  WEB_API_PATH
 } from "./bridgeConstants";
-import {executeContract} from "./bridgeClient";
+import { executeContract } from "./bridgeClient";
 
 let originalFetch = null;
 
@@ -58,7 +58,7 @@ async function parseTextBody(text) {
   try {
     return JSON.parse(text);
   } catch {
-    return {rawBody: text};
+    return { rawBody: text };
   }
 }
 
@@ -83,11 +83,7 @@ async function parsePayload(input, init = {}) {
     return parseTextBody(await input.clone().text());
   }
 
-  if (
-    body &&
-    typeof URLSearchParams !== "undefined" &&
-    body instanceof URLSearchParams
-  ) {
+  if (body && typeof URLSearchParams !== "undefined" && body instanceof URLSearchParams) {
     return Object.fromEntries(body.entries());
   }
 
@@ -114,10 +110,8 @@ function toContractType(pathname) {
  * @returns {void}
  */
 function resolveCategoryFromUrl(pathname) {
-  if (pathname.includes(JS_TO_ANDROID_PATH))
-    return BRIDGE_CATEGORY.JS_TO_ANDROID;
-  if (pathname.includes(ANDROID_TO_JS_PATH))
-    return BRIDGE_CATEGORY.ANDROID_TO_JS;
+  if (pathname.includes(JS_TO_ANDROID_PATH)) return BRIDGE_CATEGORY.JS_TO_ANDROID;
+  if (pathname.includes(ANDROID_TO_JS_PATH)) return BRIDGE_CATEGORY.ANDROID_TO_JS;
   if (pathname.includes(WEB_API_PATH)) return BRIDGE_CATEGORY.WEB_API;
   return null;
 }
@@ -132,7 +126,7 @@ function createJsonResponse(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     statusText: status >= 200 && status < 300 ? "OK" : "Contract Error",
-    headers: {"Content-Type": "application/json; charset=utf-8"},
+    headers: { "Content-Type": "application/json; charset=utf-8" }
   });
 }
 
@@ -155,18 +149,17 @@ function createFallbackError(error) {
     meta: {},
     error: {
       type: "CONTRACT_ERROR",
-      detail: error?.message || "Contract execution failed",
-    },
+      detail: error?.message || "Contract execution failed"
+    }
   };
 }
 
+/**
+ * installSwaggerRuntime 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function installSwaggerRuntime() {
-  if (
-    originalFetch ||
-    typeof window === "undefined" ||
-    typeof window.fetch !== "function"
-  )
-    return;
+  if (originalFetch || typeof window === "undefined" || typeof window.fetch !== "function") return;
 
   originalFetch = window.fetch.bind(window);
 
@@ -193,6 +186,10 @@ export function installSwaggerRuntime() {
   };
 }
 
+/**
+ * uninstallSwaggerRuntime 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function uninstallSwaggerRuntime() {
   if (!originalFetch) return;
 

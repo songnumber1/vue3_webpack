@@ -47,7 +47,7 @@ function installGlobalThisFallback() {
     get() {
       return this;
     },
-    configurable: true,
+    configurable: true
   });
 
   // eslint-disable-next-line no-undef
@@ -67,7 +67,7 @@ function installCryptoRandomUuidFallback() {
   try {
     Object.defineProperty(cryptoObj, "randomUUID", {
       value: createUuidV4Fallback,
-      configurable: true,
+      configurable: true
     });
   } catch {
     // 일부 WebView는 crypto 객체 확장이 막혀 있을 수 있다. 이 경우 createId fallback이 별도로 동작한다.
@@ -82,7 +82,7 @@ function installIdleCallbackFallback() {
   if (typeof window.requestIdleCallback !== "function") {
     window.requestIdleCallback = (callback) =>
       window.setTimeout(() => {
-        callback({didTimeout: false, timeRemaining: () => 0});
+        callback({ didTimeout: false, timeRemaining: () => 0 });
       }, 1);
   }
 
@@ -104,7 +104,7 @@ function installResizeObserverFallback() {
       this.targets = new Set();
       this.id = `resize-observer-${(resizeObserverId += 1)}`;
       this.handleResize = () => this.flush();
-      window.addEventListener("resize", this.handleResize, {passive: true});
+      window.addEventListener("resize", this.handleResize, { passive: true });
     }
 
     observe(target) {
@@ -125,7 +125,7 @@ function installResizeObserverFallback() {
     flush() {
       const entries = Array.from(this.targets).map((target) => ({
         target,
-        contentRect: target.getBoundingClientRect(),
+        contentRect: target.getBoundingClientRect()
       }));
       if (entries.length) this.callback(entries, this);
     }
@@ -139,14 +139,8 @@ function installResizeObserverFallback() {
 function updateViewportCssVars() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   const viewport = window.visualViewport;
-  const height = Math.max(
-    Math.round(viewport?.height || window.innerHeight || 0),
-    320
-  );
-  const width = Math.max(
-    Math.round(viewport?.width || window.innerWidth || 0),
-    320
-  );
+  const height = Math.max(Math.round(viewport?.height || window.innerHeight || 0), 320);
+  const width = Math.max(Math.round(viewport?.width || window.innerWidth || 0), 320);
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
@@ -158,18 +152,22 @@ function updateViewportCssVars() {
  */
 function installViewportCssVars() {
   updateViewportCssVars();
-  window.addEventListener("resize", updateViewportCssVars, {passive: true});
+  window.addEventListener("resize", updateViewportCssVars, { passive: true });
   window.addEventListener("orientationchange", updateViewportCssVars, {
-    passive: true,
+    passive: true
   });
   window.visualViewport?.addEventListener("resize", updateViewportCssVars, {
-    passive: true,
+    passive: true
   });
   window.visualViewport?.addEventListener("scroll", updateViewportCssVars, {
-    passive: true,
+    passive: true
   });
 }
 
+/**
+ * installWebViewCompat 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function installWebViewCompat() {
   if (typeof window === "undefined") return;
 

@@ -13,8 +13,7 @@ body {
   color: var(--text);
   background:
     radial-gradient(circle at top left, var(--bg-gradient-a), transparent 34%),
-    radial-gradient(circle at top right, var(--bg-gradient-b), transparent 30%),
-    var(--bg);
+    radial-gradient(circle at top right, var(--bg-gradient-b), transparent 30%), var(--bg);
   overflow: hidden;
 }
 button,

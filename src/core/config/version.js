@@ -18,6 +18,12 @@ function normalizeVersion(version) {
     });
 }
 
+/**
+ * compareVersion 함수입니다.
+ * @param {*} currentVersion 함수 실행에 필요한 값입니다.
+ * @param {*} targetVersion 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function compareVersion(currentVersion, targetVersion) {
   const current = normalizeVersion(currentVersion);
   const target = normalizeVersion(targetVersion);
@@ -34,6 +40,12 @@ export function compareVersion(currentVersion, targetVersion) {
   return 0;
 }
 
+/**
+ * isVersionLowerThan 함수입니다.
+ * @param {*} currentVersion 함수 실행에 필요한 값입니다.
+ * @param {*} targetVersion 함수 실행에 필요한 값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 export function isVersionLowerThan(currentVersion, targetVersion) {
   return compareVersion(currentVersion, targetVersion) < 0;
 }
