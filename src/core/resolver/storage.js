@@ -63,7 +63,7 @@ function createRequest(payload = {}) {
   return {
     requestId: `storage_${Date.now()}_${Math.random().toString(36).slice(2)}`,
     requestDate: new Date().toISOString(),
-    ...payload
+    ...payload,
   };
 }
 
@@ -94,7 +94,9 @@ function callDirectStorage(bridge, methodName, payload) {
   const method = bridge?.[methodName];
   if (typeof method !== "function") return null;
   try {
-    return parseEnvelope(method.call(bridge, JSON.stringify(createRequest(payload))));
+    return parseEnvelope(
+      method.call(bridge, JSON.stringify(createRequest(payload))),
+    );
   } catch (error) {
     console.warn(`[storage] AndroidBridge.${methodName} failed`, error);
     return null;
@@ -116,7 +118,7 @@ function createLocalStorageAdapter() {
     remove: (key) => {
       local?.removeItem(key);
       removeFallback(key);
-    }
+    },
   };
 }
 
@@ -133,22 +135,29 @@ export function resolveStorage(appInfo, bridge) {
     return {
       get(key) {
         const response = callDirectStorage(bridge, "getStorage", { key });
-        if (response?.isSuccess) return response.data?.value ?? localStorageAdapter.get(key);
+        if (response?.isSuccess)
+          return response.data?.value ?? localStorageAdapter.get(key);
         return localStorageAdapter.get(key);
       },
       set(key, value) {
         const response = callDirectStorage(bridge, "setStorage", {
           key,
-          value: String(value)
+          value: String(value),
         });
         if (!response?.isSuccess)
-          console.warn("[storage] native setStorage fallback used", response?.message);
+          console.warn(
+            "[storage] native setStorage fallback used",
+            response?.message,
+          );
         localStorageAdapter.set(key, value);
       },
       remove(key) {
         const response = callDirectStorage(bridge, "removeStorage", { key });
         if (!response?.isSuccess && response)
-          console.warn("[storage] native removeStorage fallback used", response?.message);
+          console.warn(
+            "[storage] native removeStorage fallback used",
+            response?.message,
+          );
         localStorageAdapter.remove(key);
       },
       async getAsync(key) {
@@ -175,7 +184,7 @@ export function resolveStorage(appInfo, bridge) {
           console.warn("[storage] native removeAsync fallback used", error);
         }
         localStorageAdapter.remove(key);
-      }
+      },
     };
   }
 
@@ -189,6 +198,6 @@ export function resolveStorage(appInfo, bridge) {
     removeAsync: (key) => {
       localStorageAdapter.remove(key);
       return Promise.resolve();
-    }
+    },
   };
 }

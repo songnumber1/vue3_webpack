@@ -6,7 +6,11 @@ web application runtime. * @author OpenAI
 <template>
   <teleport to="body">
     <transition name="sheet-fade">
-      <div v-if="open" class="bottom-sheet-backdrop" @click="emit('close')"></div>
+      <div
+        v-if="open"
+        class="bottom-sheet-backdrop"
+        @click="emit('close')"
+      ></div>
     </transition>
 
     <transition name="sheet-slide">
@@ -16,7 +20,7 @@ web application runtime. * @author OpenAI
         class="bottom-sheet"
         :class="{
           'bottom-sheet--dragging': dragging,
-          'bottom-sheet--fullscreen': currentSnap === 'full'
+          'bottom-sheet--fullscreen': currentSnap === 'full',
         }"
         role="dialog"
         aria-modal="true"
@@ -38,7 +42,12 @@ web application runtime. * @author OpenAI
 
         <header class="bottom-sheet-header">
           <h2>{{ title }}</h2>
-          <button type="button" class="bottom-sheet-close" aria-label="닫기" @click="emit('close')">
+          <button
+            type="button"
+            class="bottom-sheet-close"
+            aria-label="닫기"
+            @click="emit('close')"
+          >
             ×
           </button>
         </header>
@@ -59,7 +68,7 @@ const props = defineProps({
   title: { type: String, default: "선택" },
   initialSnap: { type: String, default: "content" },
   minHeight: { type: Number, default: 260 },
-  maxRatio: { type: Number, default: 0.92 }
+  maxRatio: { type: Number, default: 0.92 },
 });
 
 const emit = defineEmits(["close"]);
@@ -76,7 +85,7 @@ let previousBodyOverflow = "";
 let viewportTimer = null;
 
 const sheetStyle = computed(() => ({
-  "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`
+  "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
 }));
 
 /**
@@ -88,7 +97,7 @@ function getViewportHeight() {
   return Math.max(
     Math.round(window.visualViewport?.height || 0),
     Math.round(window.innerHeight || 0),
-    320
+    320,
   );
 }
 
@@ -102,7 +111,10 @@ function getSafeBottom() {
   probe.style.cssText =
     "position:fixed;bottom:env(safe-area-inset-bottom);height:0;visibility:hidden;";
   document.body.appendChild(probe);
-  const value = Math.max(0, Math.round(window.innerHeight - probe.getBoundingClientRect().bottom));
+  const value = Math.max(
+    0,
+    Math.round(window.innerHeight - probe.getBoundingClientRect().bottom),
+  );
   probe.remove();
   return Number.isFinite(value) ? value : 0;
 }
@@ -116,7 +128,7 @@ function clampHeight(height) {
   const viewportHeight = getViewportHeight();
   const maxHeight = Math.max(
     props.minHeight,
-    Math.floor(viewportHeight * props.maxRatio) - getSafeBottom()
+    Math.floor(viewportHeight * props.maxRatio) - getSafeBottom(),
   );
   const minHeight = Math.min(props.minHeight, maxHeight);
   return Math.min(Math.max(height, minHeight), maxHeight);
@@ -141,7 +153,10 @@ function getInitialHeight() {
   const viewportHeight = getViewportHeight();
   if (props.initialSnap === "full") return viewportHeight * props.maxRatio;
   if (props.initialSnap === "half") return viewportHeight * 0.58;
-  return Math.max(props.minHeight, Math.min(getContentHeight(), viewportHeight * 0.72));
+  return Math.max(
+    props.minHeight,
+    Math.min(getContentHeight(), viewportHeight * 0.72),
+  );
 }
 
 /**
@@ -153,7 +168,8 @@ function getInitialHeight() {
 function setHeight(height, snap = "custom") {
   currentHeight.value = clampHeight(height);
   const viewportHeight = getViewportHeight();
-  currentSnap.value = currentHeight.value >= viewportHeight * 0.82 ? "full" : snap;
+  currentSnap.value =
+    currentHeight.value >= viewportHeight * 0.82 ? "full" : snap;
 }
 
 /**
@@ -264,18 +280,32 @@ watch(
       lockBodyScroll();
       resetHeight();
       window.addEventListener("resize", scheduleViewportRefresh, {
-        passive: true
+        passive: true,
       });
-      window.visualViewport?.addEventListener("resize", scheduleViewportRefresh, { passive: true });
-      window.visualViewport?.addEventListener("scroll", scheduleViewportRefresh, { passive: true });
+      window.visualViewport?.addEventListener(
+        "resize",
+        scheduleViewportRefresh,
+        { passive: true },
+      );
+      window.visualViewport?.addEventListener(
+        "scroll",
+        scheduleViewportRefresh,
+        { passive: true },
+      );
     } else {
       unlockBodyScroll();
       window.removeEventListener("resize", scheduleViewportRefresh);
-      window.visualViewport?.removeEventListener("resize", scheduleViewportRefresh);
-      window.visualViewport?.removeEventListener("scroll", scheduleViewportRefresh);
+      window.visualViewport?.removeEventListener(
+        "resize",
+        scheduleViewportRefresh,
+      );
+      window.visualViewport?.removeEventListener(
+        "scroll",
+        scheduleViewportRefresh,
+      );
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 
 onBeforeUnmount(() => {

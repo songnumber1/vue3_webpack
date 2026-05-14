@@ -37,7 +37,9 @@
     <section class="personal-card">
       <h3>{{ t("personalization.dataTitle") }}</h3>
       <p>{{ t("personalization.dataBody") }}</p>
-      <button class="secondary-action" type="button">{{ t("common.settings") }}</button>
+      <button class="secondary-action" type="button">
+        {{ t("common.settings") }}
+      </button>
     </section>
   </div>
 </template>
@@ -52,6 +54,6 @@ const selectedStyle = ref("detailed");
 const styleOptions = computed(() => [
   { value: "compact", label: t("personalization.compact") },
   { value: "detailed", label: t("personalization.detailed") },
-  { value: "technical", label: t("personalization.technical") }
+  { value: "technical", label: t("personalization.technical") },
 ]);
 </script>

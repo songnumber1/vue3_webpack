@@ -8,7 +8,7 @@ import {
   AndroidToJsContract,
   BridgeContract,
   JsToAndroidContract,
-  WebApiContract
+  WebApiContract,
 } from "./contract";
 import { BRIDGE_CATEGORY, BRIDGE_TIMEOUT } from "./bridgeConstants";
 import { getActivePinia } from "pinia";
@@ -75,7 +75,7 @@ function createContractError(request, message, code, status = 400, meta = {}) {
   errorResponse.meta = {
     ...errorResponse.meta,
     ...meta,
-    status
+    status,
   };
 
   const error = new Error(message);
@@ -102,7 +102,7 @@ function safeParseBySchema(schema, value, request, options) {
       `${options.message}: ${detail}`,
       options.code,
       options.status,
-      options.meta
+      options.meta,
     );
   }
 
@@ -118,7 +118,7 @@ function createBridgeRequest(payload = {}) {
   return {
     requestId: payload.requestId || createRequestId(),
     requestDate: payload.requestDate || createIsoDate(),
-    ...payload
+    ...payload,
   };
 }
 
@@ -137,7 +137,7 @@ function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
     code: "INVALID_BRIDGE_REQUEST",
     status: 400,
     message: `Invalid bridge request payload: ${type}`,
-    meta: { type, phase: "request" }
+    meta: { type, phase: "request" },
   });
 }
 
@@ -149,18 +149,23 @@ function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
  * @param {*} fallbackRequest 응답에 요청 식별자가 없을 때 사용할 요청 정보입니다.
  * @returns {*} 검증된 브릿지 응답을 반환합니다.
  */
-function validateBridgeResponse(type, data, contractMap = BridgeContract, fallbackRequest = {}) {
+function validateBridgeResponse(
+  type,
+  data,
+  contractMap = BridgeContract,
+  fallbackRequest = {},
+) {
   const contract = getContract(type, contractMap);
   const request = {
     requestId: data?.requestId || fallbackRequest?.requestId,
-    requestDate: data?.requestDate || fallbackRequest?.requestDate
+    requestDate: data?.requestDate || fallbackRequest?.requestDate,
   };
 
   return safeParseBySchema(contract.response, data, request, {
     code: "INVALID_BRIDGE_RESPONSE",
     status: 500,
     message: `Invalid bridge response payload: ${type}`,
-    meta: { type, phase: "response" }
+    meta: { type, phase: "response" },
   });
 }
 
@@ -176,19 +181,19 @@ function validateBridgeErrorResponse(
   type,
   data,
   contractMap = BridgeContract,
-  fallbackRequest = {}
+  fallbackRequest = {},
 ) {
   const contract = getContract(type, contractMap);
   const request = {
     requestId: data?.requestId || fallbackRequest?.requestId,
-    requestDate: data?.requestDate || fallbackRequest?.requestDate
+    requestDate: data?.requestDate || fallbackRequest?.requestDate,
   };
 
   return safeParseBySchema(contract.error, data, request, {
     code: "INVALID_BRIDGE_ERROR_RESPONSE",
     status: 500,
     message: `Invalid bridge error response payload: ${type}`,
-    meta: { type, phase: "error-response" }
+    meta: { type, phase: "error-response" },
   });
 }
 
@@ -214,7 +219,7 @@ function getAndroidBridgeMethodName(type) {
     SHOW_TOAST: "showToast",
     GET_DEVICE_INFO: "getDeviceInfo",
     WRITE_LOG: "writeLog",
-    CLOSE_APP: "closeApp"
+    CLOSE_APP: "closeApp",
   };
 
   return methodMap[type];
@@ -245,7 +250,9 @@ function hasDirectAndroidBridge(type) {
   const methodName = getAndroidBridgeMethodName(type);
   const bridge = getAndroidBridge();
 
-  return Boolean(bridge && methodName && typeof bridge[methodName] === "function");
+  return Boolean(
+    bridge && methodName && typeof bridge[methodName] === "function",
+  );
 }
 
 /**
@@ -276,13 +283,13 @@ function createBridgeUnavailableResponse(request, type) {
   const response = createErrorResponse(
     request,
     `AndroidBridge가 없어 ${type} 요청을 실제 Native로 전달할 수 없습니다. Windows/Web 브라우저에서는 성공 mock을 반환하지 않습니다.`,
-    "ANDROID_BRIDGE_UNAVAILABLE"
+    "ANDROID_BRIDGE_UNAVAILABLE",
   );
   response.meta = {
     ...response.meta,
     type,
     phase: "native-bridge",
-    status: 503
+    status: 503,
   };
   return response;
 }
@@ -310,7 +317,12 @@ function parseNativePayload(payload) {
  * @param {*} meta 부가 메타 데이터입니다.
  * @returns {*} 표준 성공 응답 객체를 반환합니다.
  */
-function createSuccessResponse(request, data, message = "정상 처리되었습니다.", meta = {}) {
+function createSuccessResponse(
+  request,
+  data,
+  message = "정상 처리되었습니다.",
+  meta = {},
+) {
   return {
     requestId: request.requestId,
     requestDate: request.requestDate,
@@ -319,7 +331,7 @@ function createSuccessResponse(request, data, message = "정상 처리되었습�
     code: "SUCCESS",
     data,
     message,
-    meta
+    meta,
   };
 }
 
@@ -331,7 +343,10 @@ function createSuccessResponse(request, data, message = "정상 처리되었습�
  * @returns {void}
  */
 function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
-  const message = error instanceof Error ? error.message : String(error || "Bridge response error");
+  const message =
+    error instanceof Error
+      ? error.message
+      : String(error || "Bridge response error");
 
   return {
     requestId: request?.requestId || createRequestId(),
@@ -344,8 +359,8 @@ function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
     meta: {},
     error: {
       type: code,
-      detail: message
-    }
+      detail: message,
+    },
   };
 }
 
@@ -360,12 +375,20 @@ function normalizeBridgeResponse(response, request) {
     try {
       return JSON.parse(response);
     } catch (error) {
-      return createErrorResponse(request, "Invalid bridge response JSON", "INVALID_JSON");
+      return createErrorResponse(
+        request,
+        "Invalid bridge response JSON",
+        "INVALID_JSON",
+      );
     }
   }
 
   if (!response) {
-    return createErrorResponse(request, "Empty bridge response", "EMPTY_RESPONSE");
+    return createErrorResponse(
+      request,
+      "Empty bridge response",
+      "EMPTY_RESPONSE",
+    );
   }
 
   if (typeof response.isSuccess === "boolean") {
@@ -376,19 +399,19 @@ function normalizeBridgeResponse(response, request) {
     return createErrorResponse(
       {
         requestId: response.requestId || request?.requestId,
-        requestDate: response.requestDate || request?.requestDate
+        requestDate: response.requestDate || request?.requestDate,
       },
       response.error,
-      "BRIDGE_ERROR"
+      "BRIDGE_ERROR",
     );
   }
 
   return createSuccessResponse(
     {
       requestId: response.requestId || request?.requestId,
-      requestDate: response.requestDate || request?.requestDate
+      requestDate: response.requestDate || request?.requestDate,
     },
-    response.data ?? response
+    response.data ?? response,
   );
 }
 
@@ -428,9 +451,16 @@ function completeBridgeResponse(rawResponse) {
 function throwIfErrorResponse(type, response, contractMap) {
   if (response.isSuccess) return;
 
-  const errorResponse = validateBridgeErrorResponse(type, response, contractMap, response);
+  const errorResponse = validateBridgeErrorResponse(
+    type,
+    response,
+    contractMap,
+    response,
+  );
   const error = new Error(
-    errorResponse.message || errorResponse.error?.detail || "Bridge response error"
+    errorResponse.message ||
+      errorResponse.error?.detail ||
+      "Bridge response error",
   );
   error.response = errorResponse;
   error.status = errorResponse.meta?.status || response.meta?.status || 500;
@@ -453,7 +483,9 @@ function getApiBaseUrl() {
  * @returns {void}
  */
 function interpolatePath(path, payload) {
-  return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) => encodeURIComponent(payload?.[key] ?? ""));
+  return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) =>
+    encodeURIComponent(payload?.[key] ?? ""),
+  );
 }
 
 /**
@@ -463,7 +495,8 @@ function interpolatePath(path, payload) {
  * @returns {void}
  */
 function buildBackendUrl(contract, payload) {
-  const rawPath = contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
+  const rawPath =
+    contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
   const path = interpolatePath(rawPath, payload);
   return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
@@ -522,12 +555,17 @@ function normalizeBackendSuccess(request, backendBody, contract) {
     return backendBody;
   }
 
-  return createSuccessResponse(request, backendBody, "Backend API를 실제 호출한 결과입니다.", {
-    category: BRIDGE_CATEGORY.WEB_API,
-    runtime: "backend",
-    endpoint: contract.httpPath,
-    method: contract.httpMethod
-  });
+  return createSuccessResponse(
+    request,
+    backendBody,
+    "Backend API를 실제 호출한 결과입니다.",
+    {
+      category: BRIDGE_CATEGORY.WEB_API,
+      runtime: "backend",
+      endpoint: contract.httpPath,
+      method: contract.httpMethod,
+    },
+  );
 }
 
 /**
@@ -541,11 +579,12 @@ function normalizeBackendSuccess(request, backendBody, contract) {
 function normalizeBackendError(request, response, backendBody, contract) {
   const status = response?.status || 500;
   const statusText = response?.statusText || "Backend Error";
-  const backendMessage = backendBody?.message || backendBody?.error || backendBody?.detail;
+  const backendMessage =
+    backendBody?.message || backendBody?.error || backendBody?.detail;
   const error = createErrorResponse(
     request,
     backendMessage || `${status} ${statusText}`,
-    `HTTP_${status}`
+    `HTTP_${status}`,
   );
 
   error.meta = {
@@ -555,7 +594,7 @@ function normalizeBackendError(request, response, backendBody, contract) {
     method: contract.httpMethod,
     status,
     statusText,
-    raw: backendBody
+    raw: backendBody,
   };
 
   return error;
@@ -575,9 +614,9 @@ async function requestBackend(type, request, contract) {
     method,
     headers: {
       "Content-Type": "application/json",
-      Accept: "application/json"
+      Accept: "application/json",
     },
-    body: pickRequestBody(method, request)
+    body: pickRequestBody(method, request),
   });
   const backendBody = await parseBackendBody(response);
 
@@ -611,13 +650,17 @@ export async function executeWebApi(type, payload = {}) {
   } catch (error) {
     if (error?.response) throw error;
 
-    const errorResponse = createErrorResponse(request, error, "BACKEND_CALL_ERROR");
+    const errorResponse = createErrorResponse(
+      request,
+      error,
+      "BACKEND_CALL_ERROR",
+    );
     errorResponse.meta = {
       category: BRIDGE_CATEGORY.WEB_API,
       runtime: "backend",
       endpoint: contract.httpPath,
       method: contract.httpMethod,
-      status: 500
+      status: 500,
     };
 
     throwIfErrorResponse(type, errorResponse, WebApiContract);
@@ -666,13 +709,13 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       const errorResponse = createErrorResponse(
         validPayload,
         "AndroidBridge 응답 대기 시간이 초과되었습니다.",
-        "ANDROID_BRIDGE_TIMEOUT"
+        "ANDROID_BRIDGE_TIMEOUT",
       );
       errorResponse.meta = {
         ...errorResponse.meta,
         type,
         phase: "response",
-        status: 504
+        status: 504,
       };
       const error = new Error(errorResponse.message);
       error.response = errorResponse;
@@ -690,7 +733,14 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       try {
         const response = normalizeBridgeResponse(rawResponse, validPayload);
         throwIfErrorResponse(type, response, JsToAndroidContract);
-        resolve(validateBridgeResponse(type, response, JsToAndroidContract, validPayload));
+        resolve(
+          validateBridgeResponse(
+            type,
+            response,
+            JsToAndroidContract,
+            validPayload,
+          ),
+        );
       } catch (error) {
         reject(error);
       }
@@ -702,19 +752,25 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
           JSON.stringify({
             requestId,
             type,
-            payload: validPayload
-          })
+            payload: validPayload,
+          }),
         );
         if (rawResponse) {
-          completeBridgeResponse(normalizeBridgeResponse(rawResponse, validPayload));
+          completeBridgeResponse(
+            normalizeBridgeResponse(rawResponse, validPayload),
+          );
         }
       } catch (error) {
-        const errorResponse = createErrorResponse(validPayload, error, "ANDROID_BRIDGE_ERROR");
+        const errorResponse = createErrorResponse(
+          validPayload,
+          error,
+          "ANDROID_BRIDGE_ERROR",
+        );
         errorResponse.meta = {
           ...errorResponse.meta,
           type,
           phase: "request",
-          status: 500
+          status: 500,
         };
         completeBridgeResponse(errorResponse);
       }
@@ -723,15 +779,21 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 
     callDirectAndroidBridge(type, validPayload)
       .then((rawResponse) => {
-        completeBridgeResponse(normalizeBridgeResponse(rawResponse, validPayload));
+        completeBridgeResponse(
+          normalizeBridgeResponse(rawResponse, validPayload),
+        );
       })
       .catch((error) => {
-        const errorResponse = createErrorResponse(validPayload, error, "ANDROID_BRIDGE_ERROR");
+        const errorResponse = createErrorResponse(
+          validPayload,
+          error,
+          "ANDROID_BRIDGE_ERROR",
+        );
         errorResponse.meta = {
           ...errorResponse.meta,
           type,
           phase: "request",
-          status: 500
+          status: 500,
         };
         completeBridgeResponse(errorResponse);
       });
@@ -756,13 +818,13 @@ export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
   const errorResponse = createErrorResponse(
     request,
     `${type}는 Android Native가 WebView의 JS 함수를 호출해야 하는 이벤트입니다. Swagger/Web 화면에서 성공 mock으로 실행하지 않습니다. Android에서 window.onAppResume/onBackPressed/onPushClick 또는 window.__receiveNativeEvent를 호출해 테스트해야 합니다.`,
-    "ANDROID_TO_JS_REQUIRES_NATIVE_DISPATCH"
+    "ANDROID_TO_JS_REQUIRES_NATIVE_DISPATCH",
   );
   errorResponse.meta = {
     ...errorResponse.meta,
     type,
     phase: "native-dispatch",
-    status: 501
+    status: 501,
   };
 
   const error = new Error(errorResponse.message);
@@ -778,7 +840,11 @@ export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
  * @returns {*} 처리 결과를 반환합니다.
  */
 export function receiveNativeEvent(type, payload = {}) {
-  const request = validateBridgeRequest(type, parseNativePayload(payload), AndroidToJsContract);
+  const request = validateBridgeRequest(
+    type,
+    parseNativePayload(payload),
+    AndroidToJsContract,
+  );
 
   try {
     const activePinia = getActivePinia();
@@ -798,9 +864,9 @@ export function receiveNativeEvent(type, payload = {}) {
     new CustomEvent("android-to-js", {
       detail: {
         type,
-        payload: request
-      }
-    })
+        payload: request,
+      },
+    }),
   );
 
   const globalHandlerName = `__${type}`;
@@ -814,10 +880,10 @@ export function receiveNativeEvent(type, payload = {}) {
     request,
     {
       handled: true,
-      eventName: type
+      eventName: type,
     },
     "Android Native가 호출한 JS 이벤트를 수신했습니다.",
-    { category: "android-to-js", runtime: "native-dispatch" }
+    { category: "android-to-js", runtime: "native-dispatch" },
   );
 
   return validateBridgeResponse(type, response, AndroidToJsContract, request);
@@ -839,8 +905,8 @@ function createNativeEventHandler(type) {
           createErrorResponse(
             createBridgeRequest(parseNativePayload(payload)),
             error,
-            "ANDROID_TO_JS_ERROR"
-          )
+            "ANDROID_TO_JS_ERROR",
+          ),
       );
     }
   };
@@ -856,7 +922,8 @@ function createNativeEventHandler(type) {
 export function executeContract(category, type, payload = {}) {
   if (category === "web-api") return executeWebApi(type, payload);
   if (category === "js-to-android") return callNative(type, payload);
-  if (category === "android-to-js") return rejectAndroidToJsSwaggerExecution(type, payload);
+  if (category === "android-to-js")
+    return rejectAndroidToJsSwaggerExecution(type, payload);
   return executeWebApi(type, payload);
 }
 
@@ -870,8 +937,8 @@ window.__receiveNativeEvent = (type, payload = {}) => {
         createErrorResponse(
           createBridgeRequest(parseNativePayload(payload)),
           error,
-          "ANDROID_TO_JS_ERROR"
-        )
+          "ANDROID_TO_JS_ERROR",
+        ),
     );
   }
 };

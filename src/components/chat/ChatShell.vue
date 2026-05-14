@@ -55,7 +55,9 @@
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
       @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="scrollBottom({ force: true, behavior: 'smooth', stable: true })"
+      @scroll-bottom="
+        scrollBottom({ force: true, behavior: 'smooth', stable: true })
+      "
     />
 
     <ChatImagePreview
@@ -93,12 +95,22 @@
       <PersonalizationView />
     </ResponsiveOverlay>
 
-    <LanguageSheet :open="languageSheetOpen" @close="languageSheetOpen = false" />
+    <LanguageSheet
+      :open="languageSheetOpen"
+      @close="languageSheetOpen = false"
+    />
   </ChatLayout>
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { useAppContext } from "@/composables/useAppContext";
@@ -136,7 +148,7 @@ const {
   ensureConversation,
   setConversation,
   getHistory,
-  revokeMessageAttachments
+  revokeMessageAttachments,
 } = runtime;
 
 const workspaceRef = ref(null);
@@ -144,7 +156,7 @@ const { scrollToBottom } = useAutoScroll({ value: null });
 const { keyboardOpen, refreshViewport } = useViewportGuard({
   onChange: ({ isCompact, keyboardOpen: isKeyboardOpen }) => {
     if (isCompact && isKeyboardOpen) scrollBottom({ stable: true });
-  }
+  },
 });
 const themeName = ref(theme.current);
 const drawerOpen = ref(false);
@@ -157,8 +169,12 @@ const assistantSheetOpen = ref(false);
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const languageSheetOpen = ref(false);
-const { previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError } =
-  useImagePreview();
+const {
+  previewImage,
+  closeImagePreview,
+  handlePreviewLoad,
+  handlePreviewError,
+} = useImagePreview();
 let removeMobileMediaQueryListener = null;
 let bottomStateTimer = 0;
 let forceBottomUntil = 0;
@@ -171,7 +187,8 @@ const activeHistoryId = computed(() => {
 });
 const activeHistory = computed(() => getHistory(activeHistoryId.value));
 const activeConversationTitle = computed(() => {
-  if (props.mode === "shared") return `공유 대화 ${activeHistoryId.value || ""}`.trim();
+  if (props.mode === "shared")
+    return `공유 대화 ${activeHistoryId.value || ""}`.trim();
   return activeHistory.value?.title || "";
 });
 
@@ -179,18 +196,18 @@ const suggestions = computed(() => [
   {
     icon: "▧",
     text: t("chat.suggestions.image"),
-    prompt: "이미지 생성 화면의 UI 구조를 제안해줘"
+    prompt: "이미지 생성 화면의 UI 구조를 제안해줘",
   },
   {
     icon: "✎",
     text: t("chat.suggestions.writing"),
-    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘"
+    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘",
   },
   {
     icon: "◎",
     text: t("chat.suggestions.search"),
-    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘"
-  }
+    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘",
+  },
 ]);
 
 /**
@@ -212,7 +229,7 @@ function updateMobileState() {
   isMobile.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
     window.innerWidth <= 900 ||
-    document.querySelector(".app-shell--mobile")
+    document.querySelector(".app-shell--mobile"),
   );
 }
 
@@ -255,7 +272,8 @@ async function scrollBottom(options = {}) {
 function updateScrollBottomButton() {
   const list = getMessageListRef();
   showScrollBottom.value =
-    (props.mode === "chat" || props.mode === "shared") && Boolean(list && !list.isAtBottom?.());
+    (props.mode === "chat" || props.mode === "shared") &&
+    Boolean(list && !list.isAtBottom?.());
 }
 
 /**
@@ -355,7 +373,7 @@ async function loadRouteConversation() {
 async function renderAfterStream() {
   markForceBottom(1000);
   await renderMermaidInElement(document.querySelector(".message-list"), {
-    force: true
+    force: true,
   });
   scrollBottom({ force: true, stable: true });
 }
@@ -370,7 +388,7 @@ const { isGenerating, handleSubmit } = useChatSubmit({
     markForceBottom(2500);
     await scrollBottom(options);
   },
-  renderAfterStream
+  renderAfterStream,
 });
 
 /**
@@ -392,7 +410,7 @@ async function toggleTheme() {
   themeName.value = theme.current;
   await nextTick();
   await renderMermaidInElement(document.querySelector(".message-list"), {
-    force: true
+    force: true,
   });
   scrollBottom({ stable: true });
 }
@@ -466,13 +484,20 @@ function selectAssistantFromSheet(id) {
   assistantSheetOpen.value = false;
 }
 
-watch(() => [route.params.id, route.params.shareId, props.mode], loadRouteConversation, {
-  immediate: true
-});
+watch(
+  () => [route.params.id, route.params.shareId, props.mode],
+  loadRouteConversation,
+  {
+    immediate: true,
+  },
+);
 
 onMounted(() => {
   updateMobileState();
-  removeMobileMediaQueryListener = addMediaQueryListener("(max-width: 900px)", updateMobileState);
+  removeMobileMediaQueryListener = addMediaQueryListener(
+    "(max-width: 900px)",
+    updateMobileState,
+  );
   window.addEventListener("resize", updateMobileState, { passive: true });
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
 });

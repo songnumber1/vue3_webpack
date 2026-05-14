@@ -18,7 +18,8 @@ const noopBridge = {
     }
   },
   requestPermission: () => Promise.resolve(false),
-  uploadFile: () => Promise.reject(new Error("Native upload is not available."))
+  uploadFile: () =>
+    Promise.reject(new Error("Native upload is not available.")),
 };
 
 /**
@@ -27,7 +28,8 @@ const noopBridge = {
  * @returns {*} 처리 결과를 반환합니다.
  */
 export function resolveBridge(appInfo) {
-  if (isAndroidApp(appInfo) && window.AndroidBridge) return window.AndroidBridge;
+  if (isAndroidApp(appInfo) && window.AndroidBridge)
+    return window.AndroidBridge;
   if (isIosApp(appInfo) && window.webkit?.messageHandlers?.AppBridge) {
     return window.webkit.messageHandlers.AppBridge;
   }

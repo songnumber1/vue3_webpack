@@ -20,6 +20,6 @@ export function createExtensionConfig(platform = PLATFORM.UNKNOWN) {
     appBuildVersion: "extension",
     bridgeVersion: null,
     token: createId("app"),
-    deviceId: null
+    deviceId: null,
   };
 }

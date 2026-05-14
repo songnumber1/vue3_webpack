@@ -9,7 +9,7 @@
     class="chatgpt-shell"
     :class="{
       'chatgpt-shell--keyboard-open': keyboardOpen,
-      'chatgpt-shell--sidebar-collapsed': sidebarCollapsed
+      'chatgpt-shell--sidebar-collapsed': sidebarCollapsed,
     }"
   >
     <ChatSidebar
@@ -20,10 +20,14 @@
       :sidebar-collapsed="sidebarCollapsed"
       :drawer-open="drawerOpen"
       :collapsed-recent-open="collapsedRecentOpen"
-      @update:selected-assistant-id="$emit('update:selectedAssistantId', $event)"
+      @update:selected-assistant-id="
+        $emit('update:selectedAssistantId', $event)
+      "
       @update:sidebar-collapsed="$emit('update:sidebarCollapsed', $event)"
       @update:drawer-open="$emit('update:drawerOpen', $event)"
-      @update:collapsed-recent-open="$emit('update:collapsedRecentOpen', $event)"
+      @update:collapsed-recent-open="
+        $emit('update:collapsedRecentOpen', $event)
+      "
       @new-chat="$emit('new-chat')"
       @select-history="$emit('select-history', $event)"
       @select-history-collapsed="$emit('select-history', $event)"
@@ -52,7 +56,7 @@ defineProps({
   sidebarCollapsed: { type: Boolean, default: false },
   drawerOpen: { type: Boolean, default: false },
   collapsedRecentOpen: { type: Boolean, default: false },
-  keyboardOpen: { type: Boolean, default: false }
+  keyboardOpen: { type: Boolean, default: false },
 });
 
 defineEmits([
@@ -67,6 +71,6 @@ defineEmits([
   "open-personalization",
   "open-language",
   "toggle-theme",
-  "open-swagger"
+  "open-swagger",
 ]);
 </script>

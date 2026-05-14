@@ -17,7 +17,7 @@ export const LAST_VERSION_INFO = Object.freeze({
   version: "1.0.0",
   title: "앱 업데이트가 필요합니다.",
   message:
-    "현재 앱 버전에서는 최신 웹 기능을 사용할 수 없습니다. 앱을 업데이트한 후 다시 실행해 주세요."
+    "현재 앱 버전에서는 최신 웹 기능을 사용할 수 없습니다. 앱을 업데이트한 후 다시 실행해 주세요.",
 });
 
 /**
@@ -51,6 +51,6 @@ export function createAndroidConfig(bridge = window.AndroidBridge) {
     bridgeVersion: readAndroidValue(bridge, "getBridgeVersion", "1.0.0"),
     token: readAndroidValue(bridge, "getToken", createId("app")),
     deviceId: readAndroidValue(bridge, "getDeviceId", null),
-    lastVersionInfo: LAST_VERSION_INFO
+    lastVersionInfo: LAST_VERSION_INFO,
   };
 }

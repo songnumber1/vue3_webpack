@@ -22,6 +22,7 @@ web application runtime. * @author OpenAI
 
 <script setup>
 import { nextTick, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { renderMarkdown } from "@/utils/markdown";
 import { openExternalBrowser } from "@/services/platformBridge";
 import { copyClipboardByPlatform } from "@/services/platformBridge";
@@ -30,6 +31,7 @@ import { renderMermaidInElement } from "@/utils/mermaidRenderer";
 import MessageActions from "./MessageActions.vue";
 
 const props = defineProps({ message: { type: Object, required: true } });
+const { locale } = useI18n();
 const platformStore = usePlatformStore();
 const emit = defineEmits(["rendered"]);
 const html = ref("<p></p>");
@@ -48,7 +50,9 @@ let renderVersion = 0;
  * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
  */
 async function handleMarkdownClick(event) {
-  const tableActionButton = event.target?.closest?.("button[data-md-table-action]");
+  const tableActionButton = event.target?.closest?.(
+    "button[data-md-table-action]",
+  );
   if (tableActionButton && contentRef.value?.contains(tableActionButton)) {
     event.preventDefault();
     event.stopPropagation();
@@ -79,7 +83,7 @@ function tableToText(table) {
     .map((row) =>
       Array.from(row.cells)
         .map((cell) => cell.innerText.replace(/\s+/g, " ").trim())
-        .join("\t")
+        .join("\t"),
     )
     .join("\n");
 }
@@ -93,8 +97,11 @@ function tableToCsv(table) {
   return Array.from(table.rows)
     .map((row) =>
       Array.from(row.cells)
-        .map((cell) => `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`)
-        .join(",")
+        .map(
+          (cell) =>
+            `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`,
+        )
+        .join(","),
     )
     .join("\n");
 }
@@ -142,7 +149,9 @@ async function handleTableAction(button) {
  */
 async function renderContent() {
   const currentVersion = ++renderVersion;
-  const rendered = props.message.content ? await renderMarkdown(props.message.content) : "";
+  const rendered = props.message.content
+    ? await renderMarkdown(props.message.content)
+    : "";
   if (currentVersion !== renderVersion) return;
   html.value = rendered;
   await nextTick();
@@ -150,5 +159,6 @@ async function renderContent() {
   emit("rendered");
 }
 watch(() => props.message.content, renderContent, { immediate: true });
+watch(() => locale.value, renderContent);
 onMounted(renderContent);
 </script>

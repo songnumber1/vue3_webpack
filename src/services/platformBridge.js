@@ -39,7 +39,7 @@ function webSuccess(data = {}, message = "브라우저에서 처리되었습니�
     code: "SUCCESS",
     data,
     message,
-    meta: { runtime: "browser" }
+    meta: { runtime: "browser" },
   };
 }
 
@@ -51,7 +51,10 @@ function webSuccess(data = {}, message = "브라우저에서 처리되었습니�
 export async function copyClipboardByPlatform(text) {
   if (isAndroidApp()) return callNative("COPY_CLIPBOARD", { text });
   const copied = await copyWebText(text);
-  return webSuccess({ copied }, copied ? "브라우저 클립보드에 복사되었습니다." : "복사 실패");
+  return webSuccess(
+    { copied },
+    copied ? "브라우저 클립보드에 복사되었습니다." : "복사 실패",
+  );
 }
 
 /**
@@ -74,7 +77,7 @@ export async function openNativeFilePicker(options = {}) {
   if (isAndroidApp()) return callNative("OPEN_FILE_PICKER", { options });
   return webSuccess(
     { opened: false, reason: "browser-file-input-required" },
-    "브라우저에서는 input[type=file]을 사용해야 합니다."
+    "브라우저에서는 input[type=file]을 사용해야 합니다.",
   );
 }
 
@@ -86,7 +89,7 @@ export async function getPushToken() {
   if (!isAndroidApp())
     return webSuccess(
       { token: "" },
-      "브라우저에서는 FCM 토큰을 Native Bridge에서 조회하지 않습니다."
+      "브라우저에서는 FCM 토큰을 Native Bridge에서 조회하지 않습니다.",
     );
   const res = await callNative("GET_PUSH_TOKEN", {});
   getStore().setPushToken(res.data?.token);
@@ -199,7 +202,9 @@ export async function showNativeToast(message) {
  * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
  */
 export async function getDeviceInfo() {
-  return isAndroidApp() ? callNative("GET_DEVICE_INFO", {}) : webSuccess(getStore().info);
+  return isAndroidApp()
+    ? callNative("GET_DEVICE_INFO", {})
+    : webSuccess(getStore().info);
 }
 
 /**

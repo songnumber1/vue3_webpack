@@ -4,14 +4,17 @@
  * @author OpenAI
  */
 
-import { OpenAPIRegistry, OpenApiGeneratorV3 } from "@asteasolutions/zod-to-openapi";
+import {
+  OpenAPIRegistry,
+  OpenApiGeneratorV3,
+} from "@asteasolutions/zod-to-openapi";
 
 import { getContractsByCategory } from "./contract";
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
   JS_TO_ANDROID_PATH,
-  WEB_API_PATH
+  WEB_API_PATH,
 } from "./bridgeConstants";
 import { BaseRequest, BaseResponse, BaseResponseError } from "./schemas/base";
 
@@ -19,23 +22,24 @@ const CATEGORY_OPTIONS = [
   {
     value: BRIDGE_CATEGORY.ALL,
     label: "전체",
-    description: "REST/Web API, JS → Android, Android → JS contract 전체"
+    description: "REST/Web API, JS → Android, Android → JS contract 전체",
   },
   {
     value: BRIDGE_CATEGORY.WEB_API,
     label: "REST / Web API",
-    description: "JS에서 실제 backend API를 호출하고 표준 응답으로 정규화하는 contract"
+    description:
+      "JS에서 실제 backend API를 호출하고 표준 응답으로 정규화하는 contract",
   },
   {
     value: BRIDGE_CATEGORY.JS_TO_ANDROID,
     label: "JS → Android",
-    description: "JS가 Android Bridge에 네이티브 기능을 요청하는 contract"
+    description: "JS가 Android Bridge에 네이티브 기능을 요청하는 contract",
   },
   {
     value: BRIDGE_CATEGORY.ANDROID_TO_JS,
     label: "Android → JS",
-    description: "Android가 WebView 내부 JS 이벤트 핸들러를 호출하는 contract"
-  }
+    description: "Android가 WebView 내부 JS 이벤트 핸들러를 호출하는 contract",
+  },
 ];
 
 /**
@@ -49,9 +53,9 @@ function createErrorResponse(description, schema) {
     description,
     content: {
       "application/json": {
-        schema
-      }
-    }
+        schema,
+      },
+    },
   };
 }
 
@@ -73,7 +77,8 @@ function getCategoryPath(category) {
  */
 function getCategoryDescription(category) {
   return (
-    CATEGORY_OPTIONS.find((option) => option.value === category)?.description || "Bridge contract"
+    CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
+    "Bridge contract"
   );
 }
 
@@ -84,7 +89,10 @@ function getCategoryDescription(category) {
  * @returns {boolean|*} 처리 결과를 반환합니다.
  */
 function shouldIncludeContract(selectedCategory, contract) {
-  return selectedCategory === BRIDGE_CATEGORY.ALL || contract.category === selectedCategory;
+  return (
+    selectedCategory === BRIDGE_CATEGORY.ALL ||
+    contract.category === selectedCategory
+  );
 }
 
 /**
@@ -112,7 +120,9 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
     .filter(([, contract]) => shouldIncludeContract(selectedCategory, contract))
     .forEach(([type, contract]) => {
       const basePath = getCategoryPath(contract.category);
-      const schemaPrefix = `${contract.category}_${type}`.replace(/-/g, "_").toUpperCase();
+      const schemaPrefix = `${contract.category}_${type}`
+        .replace(/-/g, "_")
+        .toUpperCase();
 
       registry.register(`${schemaPrefix}_Request`, contract.request);
       registry.register(`${schemaPrefix}_Response`, contract.response);
@@ -126,24 +136,24 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
           body: {
             content: {
               "application/json": {
-                schema: contract.request
-              }
-            }
-          }
+                schema: contract.request,
+              },
+            },
+          },
         },
         responses: {
           200: {
             description: "성공",
             content: {
               "application/json": {
-                schema: contract.response
-              }
-            }
+                schema: contract.response,
+              },
+            },
           },
           400: createErrorResponse("요청 검증 오류", contract.error),
           401: createErrorResponse("인증 오류", contract.error),
-          500: createErrorResponse("처리 오류", contract.error)
-        }
+          500: createErrorResponse("처리 오류", contract.error),
+        },
       });
     });
 
@@ -168,18 +178,18 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
 - 모든 오류 응답은 BridgeErrorResponse를 공통으로 사용하고 error 키를 포함합니다.
 
 현재 선택 카테고리: ${getCategoryDescription(selectedCategory)}
-      `
+      `,
     },
     tags: [
       { name: "REST / Web API", description: "JS 실제 backend API contract" },
       {
         name: "JS → Android",
-        description: "JS에서 Android Native Bridge로 요청하는 contract"
+        description: "JS에서 Android Native Bridge로 요청하는 contract",
       },
       {
         name: "Android → JS",
-        description: "Android에서 WebView JS로 전달하는 이벤트 contract"
-      }
-    ]
+        description: "Android에서 WebView JS로 전달하는 이벤트 contract",
+      },
+    ],
   });
 }

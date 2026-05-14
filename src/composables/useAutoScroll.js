@@ -12,7 +12,10 @@ import { nextTick } from "vue";
  * @returns {void}
  */
 function afterFrame(callback) {
-  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+  if (
+    typeof window === "undefined" ||
+    typeof window.requestAnimationFrame !== "function"
+  ) {
     setTimeout(callback, 0);
     return;
   }

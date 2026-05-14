@@ -31,7 +31,10 @@ export function hasAndroidBridge() {
  * @returns {*} 처리 결과를 반환합니다.
  */
 export function hasIosBridge() {
-  return typeof window !== "undefined" && Boolean(window.webkit?.messageHandlers?.AppBridge);
+  return (
+    typeof window !== "undefined" &&
+    Boolean(window.webkit?.messageHandlers?.AppBridge)
+  );
 }
 
 /**
@@ -68,7 +71,8 @@ export function detectBrowserPlatform() {
 export function resolveAppConfig() {
   if (hasAndroidBridge()) return createAndroidConfig(window.AndroidBridge);
   if (hasIosBridge()) return createIosConfig();
-  if (hasExtensionRuntime()) return createExtensionConfig(detectBrowserPlatform());
+  if (hasExtensionRuntime())
+    return createExtensionConfig(detectBrowserPlatform());
 
   return createDefaultConfig(detectBrowserPlatform());
 }

@@ -7,7 +7,10 @@ application runtime. * @author OpenAI
   <article class="message message--user">
     <div class="bubble bubble--user">
       <div class="bubble-meta">You</div>
-      <div v-if="hasAttachments" class="message-attachments message-attachments--user">
+      <div
+        v-if="hasAttachments"
+        class="message-attachments message-attachments--user"
+      >
         <template v-for="file in message.attachments" :key="file.id">
           <button
             v-if="file.kind === 'image'"
@@ -23,7 +26,12 @@ application runtime. * @author OpenAI
               @error="$emit('rendered')"
             />
           </button>
-          <a v-else class="message-file-card" :href="file.url" :download="file.name">
+          <a
+            v-else
+            class="message-file-card"
+            :href="file.url"
+            :download="file.name"
+          >
             <span class="message-file-icon" aria-hidden="true">📄</span>
             <span
               ><strong>{{ file.name }}</strong
@@ -46,7 +54,9 @@ import MessageActions from "./MessageActions.vue";
 const props = defineProps({ message: { type: Object, required: true } });
 defineEmits(["rendered"]);
 const hasAttachments = computed(
-  () => Array.isArray(props.message.attachments) && props.message.attachments.length > 0
+  () =>
+    Array.isArray(props.message.attachments) &&
+    props.message.attachments.length > 0,
 );
 /**
  * getPreviewUrl 처리 함수입니다.
@@ -64,8 +74,8 @@ function getPreviewUrl(file) {
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent("chat:image-preview", {
-      detail: { ...file, url: getPreviewUrl(file) }
-    })
+      detail: { ...file, url: getPreviewUrl(file) },
+    }),
   );
 }
 /**

@@ -5,7 +5,10 @@
  */
 
 export function runAfterPaint(callback) {
-  if (typeof window !== "undefined" && typeof window.requestAnimationFrame === "function") {
+  if (
+    typeof window !== "undefined" &&
+    typeof window.requestAnimationFrame === "function"
+  ) {
     window.requestAnimationFrame(callback);
     return;
   }

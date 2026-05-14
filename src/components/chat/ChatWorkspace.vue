@@ -103,7 +103,10 @@ let composerResizeObserver = null;
  */
 function updateComposerHeight() {
   const height = composerSlotRef.value?.offsetHeight || 0;
-  document.documentElement.style.setProperty("--chat-composer-height", `${Math.max(height, 72)}px`);
+  document.documentElement.style.setProperty(
+    "--chat-composer-height",
+    `${Math.max(height, 72)}px`,
+  );
 }
 
 /**
@@ -149,7 +152,7 @@ const props = defineProps({
   models: { type: Array, default: () => [] },
   isGenerating: { type: Boolean, default: false },
   messages: { type: Array, default: () => [] },
-  showScrollBottom: { type: Boolean, default: false }
+  showScrollBottom: { type: Boolean, default: false },
 });
 
 defineEmits([
@@ -167,7 +170,7 @@ defineEmits([
   "prompt-focus",
   "prompt-resize",
   "message-content-rendered",
-  "scroll-bottom"
+  "scroll-bottom",
 ]);
 
 watch(
@@ -175,10 +178,10 @@ watch(
   async () => {
     await nextTick();
     updateComposerHeight();
-  }
+  },
 );
 
 defineExpose({
-  listRef
+  listRef,
 });
 </script>

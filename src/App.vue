@@ -5,11 +5,17 @@
 
 <template>
   <AppLayout>
-    <section v-if="!platformStore.isAccess" class="access-denied-page" role="alert">
+    <section
+      v-if="!platformStore.isAccess"
+      class="access-denied-page"
+      role="alert"
+    >
       <div class="access-denied-card">
         <h1>
           {{
-            locale === "ko" ? "지원하지 않는 접속 환경입니다." : "Unsupported access environment."
+            locale === "ko"
+              ? "지원하지 않는 접속 환경입니다."
+              : "Unsupported access environment."
           }}
         </h1>
         <p>

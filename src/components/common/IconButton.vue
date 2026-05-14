@@ -4,7 +4,12 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <button class="icon-button" :title="title" type="button" @click="$emit('click')">
+  <button
+    class="icon-button"
+    :title="title"
+    type="button"
+    @click="$emit('click')"
+  >
     <span>{{ icon }}</span>
   </button>
 </template>
@@ -12,7 +17,7 @@ application runtime. * @author OpenAI
 <script setup>
 defineProps({
   icon: { type: String, required: true },
-  title: { type: String, default: "" }
+  title: { type: String, default: "" },
 });
 defineEmits(["click"]);
 </script>

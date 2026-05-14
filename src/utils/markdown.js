@@ -14,6 +14,7 @@ import rehypeStringify from "rehype-stringify";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
 import { visit } from "unist-util-visit";
+import { i18n } from "@/i18n";
 
 /**
  * textContent 처리 함수입니다.
@@ -25,6 +26,54 @@ function textContent(node) {
   if (typeof node.value === "string") return node.value;
   if (!Array.isArray(node.children)) return "";
   return node.children.map(textContent).join("");
+}
+
+/**
+ * Resolves a markdown toolbar label from the active i18n locale.
+ * @param {string} key Translation key.
+ * @returns {string} Resolved translated label.
+ */
+function mdLabel(key) {
+  return i18n.global.t(key);
+}
+
+/**
+ * Creates an icon-only markdown table toolbar button.
+ * @param {'copy'|'csv'} action Table action key.
+ * @param {string} label Accessible button label.
+ * @returns {object} HAST button node.
+ */
+function tableActionButton(action, label) {
+  return {
+    type: "element",
+    tagName: "button",
+    properties: {
+      type: "button",
+      className: ["md-table-action", `md-table-action--${action}`],
+      dataMdTableAction: action,
+      ariaLabel: label,
+      title: label,
+    },
+    children: [
+      {
+        type: "element",
+        tagName: "span",
+        properties: {
+          className: [
+            "md-table-action-icon",
+            `md-table-action-icon--${action}`,
+          ],
+        },
+        children: [],
+      },
+      {
+        type: "element",
+        tagName: "span",
+        properties: { className: ["sr-only"] },
+        children: [{ type: "text", value: label }],
+      },
+    ],
+  };
 }
 
 /**
@@ -51,44 +100,26 @@ function rehypeTableWrapper() {
                 type: "element",
                 tagName: "strong",
                 properties: { className: ["md-table-title"] },
-                children: [{ type: "text", value: "테이블" }]
+                children: [{ type: "text", value: mdLabel("markdown.table") }],
               },
               {
                 type: "element",
                 tagName: "div",
                 properties: { className: ["md-table-actions"] },
                 children: [
-                  {
-                    type: "element",
-                    tagName: "button",
-                    properties: {
-                      type: "button",
-                      className: ["md-table-action"],
-                      dataMdTableAction: "copy"
-                    },
-                    children: [{ type: "text", value: "테이블 복사" }]
-                  },
-                  {
-                    type: "element",
-                    tagName: "button",
-                    properties: {
-                      type: "button",
-                      className: ["md-table-action"],
-                      dataMdTableAction: "csv"
-                    },
-                    children: [{ type: "text", value: "CSV 다운로드" }]
-                  }
-                ]
-              }
-            ]
+                  tableActionButton("copy", mdLabel("markdown.copyTable")),
+                  tableActionButton("csv", mdLabel("markdown.downloadCsv")),
+                ],
+              },
+            ],
           },
           {
             type: "element",
             tagName: "div",
             properties: { className: ["md-table-wrapper"] },
-            children: [node]
-          }
-        ]
+            children: [node],
+          },
+        ],
       };
     });
   };
@@ -106,7 +137,8 @@ function rehypeMermaidBlock() {
 
       const codeNode = node.children?.[0];
       const classNames = codeNode?.properties?.className || [];
-      const isMermaid = codeNode?.tagName === "code" && classNames.includes("language-mermaid");
+      const isMermaid =
+        codeNode?.tagName === "code" && classNames.includes("language-mermaid");
       if (!isMermaid) return;
 
       parent.children[index] = {
@@ -114,9 +146,9 @@ function rehypeMermaidBlock() {
         tagName: "div",
         properties: {
           className: ["mermaid", "md-mermaid"],
-          "data-mermaid-pending": "true"
+          "data-mermaid-pending": "true",
         },
-        children: [{ type: "text", value: textContent(codeNode) }]
+        children: [{ type: "text", value: textContent(codeNode) }],
       };
     });
   };
@@ -133,7 +165,7 @@ const processor = unified()
   .use(rehypeMermaidBlock)
   .use(rehypeExternalLinks, {
     target: "_blank",
-    rel: ["nofollow", "noopener", "noreferrer"]
+    rel: ["nofollow", "noopener", "noreferrer"],
   })
   .use(rehypeStringify);
 

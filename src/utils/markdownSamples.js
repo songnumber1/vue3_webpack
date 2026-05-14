@@ -7,7 +7,7 @@
 export async function loadMarkdownShowcase() {
   try {
     const response = await fetch("/samples/markdown-showcase.md", {
-      cache: "no-store"
+      cache: "no-store",
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return await response.text();

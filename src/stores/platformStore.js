@@ -13,21 +13,22 @@ export const usePlatformStore = defineStore("platform", {
     nativeEvents: [],
     lastNativeEvent: null,
     network: {
-      online: typeof navigator === "undefined" ? true : navigator.onLine
+      online: typeof navigator === "undefined" ? true : navigator.onLine,
     },
     pushToken: "",
-    appVersionInfo: null
+    appVersionInfo: null,
   }),
   getters: {
     isAccess: (state) => state.info.isAccess,
     isAndroidApp: (state) => state.info.isAndroidApp,
     isIos: (state) => state.info.isIos,
-    isWindowsWeb: (state) => state.info.isWindows && !state.info.isNativeApp
+    isWindowsWeb: (state) => state.info.isWindows && !state.info.isNativeApp,
   },
   actions: {
     initialize(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform(baseAppInfo);
-      this.network.online = typeof navigator === "undefined" ? true : navigator.onLine;
+      this.network.online =
+        typeof navigator === "undefined" ? true : navigator.onLine;
     },
     refresh(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform({ ...this.info, ...baseAppInfo });
@@ -46,7 +47,8 @@ export const usePlatformStore = defineStore("platform", {
       const item = { type, payload, receivedAt: new Date().toISOString() };
       this.lastNativeEvent = item;
       this.nativeEvents = [item, ...this.nativeEvents].slice(0, 50);
-      if (type === "ON_NETWORK_CHANGE") this.setNetwork(payload.status || payload);
-    }
-  }
+      if (type === "ON_NETWORK_CHANGE")
+        this.setNetwork(payload.status || payload);
+    },
+  },
 });

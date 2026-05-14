@@ -19,10 +19,11 @@ import { createId } from "@/utils/id";
  * @returns {void}
  */
 function normalizePromptPayload(payload) {
-  if (typeof payload === "string") return { text: payload.trim(), attachments: [] };
+  if (typeof payload === "string")
+    return { text: payload.trim(), attachments: [] };
   return {
     text: String(payload?.text || "").trim(),
-    attachments: Array.isArray(payload?.attachments) ? payload.attachments : []
+    attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
   };
 }
 
@@ -60,7 +61,11 @@ export function useChatSubmit(options) {
    */
   async function handleSubmit(payload) {
     const normalized = normalizePromptPayload(payload);
-    if ((!normalized.text && normalized.attachments.length === 0) || isGenerating.value) return;
+    if (
+      (!normalized.text && normalized.attachments.length === 0) ||
+      isGenerating.value
+    )
+      return;
 
     let targetHistoryId = Number(options.route.params.id);
     if (options.route.name === "main") {
@@ -68,10 +73,13 @@ export function useChatSubmit(options) {
       options.histories.value.unshift({
         id: targetHistoryId,
         title: normalized.text || "새 채팅",
-        preview: normalized.text || "첨부 파일 기반 새 대화"
+        preview: normalized.text || "첨부 파일 기반 새 대화",
       });
       options.setConversation(targetHistoryId, []);
-      await options.router.push({ name: "chat", params: { id: targetHistoryId } });
+      await options.router.push({
+        name: "chat",
+        params: { id: targetHistoryId },
+      });
       await nextTick();
     }
 
@@ -80,13 +88,13 @@ export function useChatSubmit(options) {
       id: createId("message"),
       role: "user",
       content: normalized.text,
-      attachments: normalized.attachments
+      attachments: normalized.attachments,
     });
 
     const assistantMessage = {
       id: createId("message"),
       role: "assistant",
-      content: ""
+      content: "",
     };
     currentMessages.push(assistantMessage);
     options.setConversation(targetHistoryId, currentMessages);
@@ -99,7 +107,7 @@ export function useChatSubmit(options) {
       (chunk) => {
         assistantMessage.content = chunk;
       },
-      { delay: 9 }
+      { delay: 9 },
     );
     isGenerating.value = false;
     options.setConversation(targetHistoryId, currentMessages);

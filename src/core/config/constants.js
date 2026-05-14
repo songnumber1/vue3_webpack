@@ -7,7 +7,7 @@
 export const RUN_ENV = Object.freeze({
   BROWSER: "browser",
   NATIVE: "native",
-  EXTENSION: "extension"
+  EXTENSION: "extension",
 });
 
 export const PLATFORM = Object.freeze({
@@ -16,5 +16,5 @@ export const PLATFORM = Object.freeze({
   LINUX: "linux",
   ANDROID: "android",
   IOS: "ios",
-  UNKNOWN: "unknown"
+  UNKNOWN: "unknown",
 });

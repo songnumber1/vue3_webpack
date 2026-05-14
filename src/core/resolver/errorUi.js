@@ -17,13 +17,13 @@ export function resolveErrorUI(appInfo, bridge) {
     return {
       notify(message) {
         bridge?.toast?.(message);
-      }
+      },
     };
   }
 
   return {
     notify(message) {
       console.warn(message);
-    }
+    },
   };
 }

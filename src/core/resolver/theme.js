@@ -27,6 +27,6 @@ export function resolveTheme(storage) {
     },
     toggle() {
       this.set(this.current === "dark" ? "light" : "dark");
-    }
+    },
   };
 }

@@ -67,7 +67,7 @@ function applyResponseInterceptor(instance, errorUI) {
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 }
 

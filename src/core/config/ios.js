@@ -19,6 +19,6 @@ export function createIosConfig() {
     appBuildVersion: "1",
     bridgeVersion: "1.0.0",
     token: createId("app"),
-    deviceId: null
+    deviceId: null,
   };
 }

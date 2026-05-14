@@ -20,6 +20,6 @@ export function createDefaultConfig(platform = PLATFORM.UNKNOWN) {
     appBuildVersion: "1.0.0",
     bridgeVersion: "1.0.0",
     token: createId("app"),
-    deviceId: null
+    deviceId: null,
   };
 }

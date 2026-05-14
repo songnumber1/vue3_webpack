@@ -6,7 +6,11 @@ application runtime. * @author OpenAI
 <template>
   <footer class="prompt-wrap" :class="{ 'prompt-wrap--floating': floating }">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
-      <div v-if="attachments.length" class="attachment-preview-row" aria-label="첨부 파일 목록">
+      <div
+        v-if="attachments.length"
+        class="attachment-preview-row"
+        aria-label="첨부 파일 목록"
+      >
         <div
           v-for="file in attachments"
           :key="file.id"
@@ -14,15 +18,27 @@ application runtime. * @author OpenAI
           :class="{ 'attachment-preview-card--image': file.kind === 'image' }"
           :role="file.kind === 'image' ? 'button' : undefined"
           :tabindex="file.kind === 'image' ? 0 : undefined"
-          :aria-label="file.kind === 'image' ? `${file.name} 미리보기` : undefined"
+          :aria-label="
+            file.kind === 'image' ? `${file.name} 미리보기` : undefined
+          "
           @click="handleAttachmentPreview(file)"
           @keydown.enter.prevent="handleAttachmentPreview(file)"
           @keydown.space.prevent="handleAttachmentPreview(file)"
         >
-          <div v-if="file.kind === 'image'" class="attachment-preview-thumb" aria-hidden="true">
-            <img :src="getPreviewUrl(file)" :alt="file.name" @error="markPreviewError(file)" />
+          <div
+            v-if="file.kind === 'image'"
+            class="attachment-preview-thumb"
+            aria-hidden="true"
+          >
+            <img
+              :src="getPreviewUrl(file)"
+              :alt="file.name"
+              @error="markPreviewError(file)"
+            />
           </div>
-          <div v-else class="attachment-preview-file" aria-hidden="true">📄</div>
+          <div v-else class="attachment-preview-file" aria-hidden="true">
+            📄
+          </div>
           <div class="attachment-preview-info">
             <strong :title="file.name">{{ file.name }}</strong>
             <span>{{ formatFileSize(file.size) }}</span>
@@ -105,15 +121,26 @@ application runtime. * @author OpenAI
             >
               ＋
             </button>
-            <div v-if="toolMenuOpen && !isMobileSheet" class="prompt-popover prompt-tool-menu">
-              <button v-for="tool in tools" :key="tool.id" type="button" @click="applyTool(tool)">
+            <div
+              v-if="toolMenuOpen && !isMobileSheet"
+              class="prompt-popover prompt-tool-menu"
+            >
+              <button
+                v-for="tool in tools"
+                :key="tool.id"
+                type="button"
+                @click="applyTool(tool)"
+              >
                 <span aria-hidden="true">{{ tool.icon }}</span>
                 <p>{{ tool.label }}</p>
               </button>
             </div>
           </div>
 
-          <div ref="attachButtonRef" class="prompt-selector-wrap attach-menu-wrap">
+          <div
+            ref="attachButtonRef"
+            class="prompt-selector-wrap attach-menu-wrap"
+          >
             <button
               class="prompt-icon-action attach-button"
               :class="{ 'prompt-icon-action--active': attachMenuOpen }"
@@ -148,11 +175,19 @@ application runtime. * @author OpenAI
                 <span aria-hidden="true">📷</span>
                 <p>Camera</p>
               </button>
-              <button type="button" role="menuitem" @click="openFilePicker('image')">
+              <button
+                type="button"
+                role="menuitem"
+                @click="openFilePicker('image')"
+              >
                 <span aria-hidden="true">🖼️</span>
                 <p>Image</p>
               </button>
-              <button type="button" role="menuitem" @click="openFilePicker('all')">
+              <button
+                type="button"
+                role="menuitem"
+                @click="openFilePicker('all')"
+              >
                 <span aria-hidden="true">📎</span>
                 <p>File</p>
               </button>
@@ -267,10 +302,16 @@ const props = defineProps({
   showHelp: { type: Boolean, default: true },
   placeholder: { type: String, default: "" },
   modelValue: { type: String, default: "gpt-5-thinking" },
-  models: { type: Array, default: () => [] }
+  models: { type: Array, default: () => [] },
 });
 
-const emit = defineEmits(["submit", "focus", "blur", "height-change", "update:modelValue"]);
+const emit = defineEmits([
+  "submit",
+  "focus",
+  "blur",
+  "height-change",
+  "update:modelValue",
+]);
 const platformStore = usePlatformStore();
 const text = ref("");
 const textareaRef = ref(null);
@@ -289,31 +330,35 @@ let lastHeight = 0;
 let removeViewportListener = null;
 
 const fallbackModels = [
-  { id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델" }
+  { id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델" },
 ];
-const currentModels = computed(() => (props.models.length ? props.models : fallbackModels));
+const currentModels = computed(() =>
+  props.models.length ? props.models : fallbackModels,
+);
 const currentModel = computed(
-  () => currentModels.value.find((model) => model.id === props.modelValue) || currentModels.value[0]
+  () =>
+    currentModels.value.find((model) => model.id === props.modelValue) ||
+    currentModels.value[0],
 );
 const tools = computed(() => [
   {
     id: "image",
     icon: "▧",
     label: t("chat.suggestions.image"),
-    prompt: "이미지 생성 프롬프트를 만들어줘"
+    prompt: "이미지 생성 프롬프트를 만들어줘",
   },
   {
     id: "write",
     icon: "✎",
     label: t("chat.suggestions.writing"),
-    prompt: "아래 내용을 더 자연스럽게 다듬어줘"
+    prompt: "아래 내용을 더 자연스럽게 다듬어줘",
   },
   {
     id: "find",
     icon: "◎",
     label: t("chat.suggestions.search"),
-    prompt: "프로젝트에서 빠진 항목을 찾아줘"
-  }
+    prompt: "프로젝트에서 빠진 항목을 찾아줘",
+  },
 ]);
 
 /**
@@ -335,7 +380,9 @@ function markPreviewError(file) {
   file.previewError = true;
 }
 
-const canSubmit = computed(() => text.value.trim().length > 0 || attachments.value.length > 0);
+const canSubmit = computed(
+  () => text.value.trim().length > 0 || attachments.value.length > 0,
+);
 const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 
 /**
@@ -345,7 +392,7 @@ const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-shell--mobile")
+    document.querySelector(".app-shell--mobile"),
   );
 }
 
@@ -357,7 +404,9 @@ function resize() {
   const el = textareaRef.value;
   if (!el) return;
   el.style.height = "auto";
-  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches ? 136 : 160;
+  const maxHeight = window.matchMedia?.("(max-width: 900px)")?.matches
+    ? 136
+    : 160;
   const nextHeight = Math.min(Math.max(el.scrollHeight, 38), maxHeight);
   el.style.height = `${nextHeight}px`;
   el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
@@ -475,13 +524,17 @@ async function openFilePicker(type) {
   if (platformStore.info.isAndroidApp) {
     try {
       await openNativeFilePicker({
-        source: type === "camera" ? "camera" : type === "image" ? "image" : "all",
+        source:
+          type === "camera" ? "camera" : type === "image" ? "image" : "all",
         multiple: type !== "camera",
-        accept: type === "image" || type === "camera" ? "image/*" : ""
+        accept: type === "image" || type === "camera" ? "image/*" : "",
       });
       return;
     } catch (error) {
-      console.warn("Android file picker failed. Falling back to web input.", error);
+      console.warn(
+        "Android file picker failed. Falling back to web input.",
+        error,
+      );
     }
   }
 
@@ -518,7 +571,7 @@ function handleNativeFileSelected(event) {
     previewUrl: file.uri || "",
     dataUrl: "",
     previewError: false,
-    nativeFile: file
+    nativeFile: file,
   }));
   if (mapped.length) attachments.value = [...attachments.value, ...mapped];
 }
@@ -565,11 +618,13 @@ function addFiles(fileList) {
       previewUrl: objectUrl,
       dataUrl: "",
       previewError: false,
-      file
+      file,
     };
   });
   attachments.value = [...attachments.value, ...mapped];
-  mapped.filter((file) => file.kind === "image").forEach((file) => hydrateImagePreviewUrl(file));
+  mapped
+    .filter((file) => file.kind === "image")
+    .forEach((file) => hydrateImagePreviewUrl(file));
   nextTick(() => {
     resize();
     emit("height-change", lastHeight);
@@ -584,7 +639,7 @@ function addFiles(fileList) {
 function isImageFile(file) {
   return Boolean(
     file?.type?.startsWith("image/") ||
-    /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
+    /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || ""),
   );
 }
 
@@ -663,8 +718,8 @@ function previewImage(file) {
   file.url = file.url || file.previewUrl || file.dataUrl || "";
   window.dispatchEvent(
     new CustomEvent("chat:image-preview", {
-      detail: { ...file, previewUrl: getPreviewUrl(file) }
-    })
+      detail: { ...file, previewUrl: getPreviewUrl(file) },
+    }),
   );
 }
 
@@ -687,7 +742,11 @@ function formatFileSize(size) {
  */
 function handleDocumentClick(event) {
   if (isMobileSheet.value) return;
-  const roots = [attachButtonRef.value, modelSelectorRef.value, plusSelectorRef.value];
+  const roots = [
+    attachButtonRef.value,
+    modelSelectorRef.value,
+    plusSelectorRef.value,
+  ];
   if (roots.some((root) => root?.contains(event.target))) return;
   closeMenus();
 }
@@ -698,7 +757,8 @@ onMounted(() => {
   resize();
   document.addEventListener("click", handleDocumentClick);
   window.addEventListener("resize", syncViewportMode, { passive: true });
-  removeViewportListener = () => window.removeEventListener("resize", syncViewportMode);
+  removeViewportListener = () =>
+    window.removeEventListener("resize", syncViewportMode);
 });
 
 onBeforeUnmount(() => {

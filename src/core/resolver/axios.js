@@ -11,28 +11,28 @@ const baseConfig = {
   baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
   timeout: 15000,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 };
 
 const androidOverride = {
   timeout: 20000,
   headers: {
-    "X-Client-Platform": "android-webview"
-  }
+    "X-Client-Platform": "android-webview",
+  },
 };
 
 const iosOverride = {
   timeout: 20000,
   headers: {
-    "X-Client-Platform": "ios-webview"
-  }
+    "X-Client-Platform": "ios-webview",
+  },
 };
 
 const webOverride = {
   headers: {
-    "X-Client-Platform": "web"
-  }
+    "X-Client-Platform": "web",
+  },
 };
 
 /**
@@ -47,8 +47,8 @@ function mergeConfig(base, override) {
     ...override,
     headers: {
       ...(base.headers || {}),
-      ...(override.headers || {})
-    }
+      ...(override.headers || {}),
+    },
   };
 }
 

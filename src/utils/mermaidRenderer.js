@@ -6,7 +6,8 @@
 
 let mermaidLoader = null;
 
-const MERMAID_CDN = "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
+const MERMAID_CDN =
+  "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
 
 /**
  * isDarkTheme 처리 함수입니다.
@@ -50,7 +51,7 @@ function getMermaidConfig() {
           nodeBorder: "#9ca3af",
           titleColor: "#f4f4f4",
           textColor: "#f4f4f4",
-          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
         }
       : {
           background: "#ffffff",
@@ -74,8 +75,8 @@ function getMermaidConfig() {
           nodeBorder: "#374151",
           titleColor: "#202123",
           textColor: "#202123",
-          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
-        }
+          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+        },
   };
 }
 
@@ -122,7 +123,7 @@ async function ensureMermaid() {
       .catch((error) => {
         console.warn(
           "Mermaid could not be loaded. The source code block will remain visible.",
-          error
+          error,
         );
         return null;
       });
@@ -139,7 +140,9 @@ async function ensureMermaid() {
  * @returns {void}
  */
 function resetRenderedMermaid(root) {
-  const rendered = Array.from(root.querySelectorAll(".md-mermaid[data-processed]"));
+  const rendered = Array.from(
+    root.querySelectorAll(".md-mermaid[data-processed]"),
+  );
 
   rendered.forEach((target) => {
     const source = target.getAttribute("data-mermaid-source");
@@ -164,7 +167,9 @@ export async function renderMermaidInElement(root, options = {}) {
     resetRenderedMermaid(root);
   }
 
-  const targets = Array.from(root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]'));
+  const targets = Array.from(
+    root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]'),
+  );
   if (targets.length === 0) return;
 
   targets.forEach((target) => {
@@ -186,7 +191,8 @@ export async function renderMermaidInElement(root, options = {}) {
   } catch (error) {
     console.warn("Mermaid rendering failed.", error);
     targets.forEach((target) => {
-      const source = target.getAttribute("data-mermaid-source") || target.textContent || "";
+      const source =
+        target.getAttribute("data-mermaid-source") || target.textContent || "";
       target.setAttribute("data-mermaid-error", "true");
       target.textContent = source;
     });

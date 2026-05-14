@@ -4,7 +4,11 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <UserMessage v-if="message.role === 'user'" :message="message" @rendered="$emit('rendered')" />
+  <UserMessage
+    v-if="message.role === 'user'"
+    :message="message"
+    @rendered="$emit('rendered')"
+  />
   <AssistantMessage v-else :message="message" @rendered="$emit('rendered')" />
 </template>
 

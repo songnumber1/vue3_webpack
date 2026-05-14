@@ -8,18 +8,36 @@ application runtime. * @author OpenAI
     <div class="swagger-toolbar">
       <div>
         <strong>Contract Category</strong>
-        <p>Swagger 화면에서 REST/Web API, JS → Android, Android → JS 명세를 전환합니다.</p>
+        <p>
+          Swagger 화면에서 REST/Web API, JS → Android, Android → JS 명세를
+          전환합니다.
+        </p>
       </div>
 
       <div class="toolbar-actions">
-        <RouterLink class="toolbar-link" to="/" title="홈으로 이동" aria-label="홈으로 이동">
+        <RouterLink
+          class="toolbar-link"
+          to="/"
+          title="홈으로 이동"
+          aria-label="홈으로 이동"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 10.5 12 4l8 6.5V20a.5.5 0 0 1-.5.5h-5v-6h-5v6h-5A.5.5 0 0 1 4 20v-9.5Z" />
+            <path
+              d="M4 10.5 12 4l8 6.5V20a.5.5 0 0 1-.5.5h-5v-6h-5v6h-5A.5.5 0 0 1 4 20v-9.5Z"
+            />
           </svg>
           홈
         </RouterLink>
-        <select v-model="selectedCategory" class="category-select" @change="renderSwagger">
-          <option v-for="option in categoryOptions" :key="option.value" :value="option.value">
+        <select
+          v-model="selectedCategory"
+          class="category-select"
+          @change="renderSwagger"
+        >
+          <option
+            v-for="option in categoryOptions"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
           </option>
         </select>
@@ -43,7 +61,10 @@ import "swagger-ui-dist/swagger-ui.css";
 
 import { BRIDGE_CATEGORY } from "@/bridge/bridgeConstants";
 import { generateOpenApi, getOpenApiCategoryOptions } from "@/bridge/openapi";
-import { installSwaggerRuntime, uninstallSwaggerRuntime } from "@/bridge/swaggerRuntime";
+import {
+  installSwaggerRuntime,
+  uninstallSwaggerRuntime,
+} from "@/bridge/swaggerRuntime";
 import { installWebViewCompat } from "@/utils/webviewCompat";
 
 let swaggerInstance = null;
@@ -88,8 +109,16 @@ const renderSwagger = async () => {
       defaultModelsExpandDepth: 2,
       defaultModelExpandDepth: 2,
       validatorUrl: null,
-      supportedSubmitMethods: ["get", "post", "put", "delete", "patch", "head", "options"],
-      tryItOutEnabled: false
+      supportedSubmitMethods: [
+        "get",
+        "post",
+        "put",
+        "delete",
+        "patch",
+        "head",
+        "options",
+      ],
+      tryItOutEnabled: false,
     });
   } catch (error) {
     renderError.value = error?.message || "Swagger UI를 렌더링하지 못했습니다.";

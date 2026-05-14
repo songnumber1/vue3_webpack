@@ -9,11 +9,11 @@ import { isAndroidApp } from "@/core/config";
 const baseApi = {
   getMe: (http) => http.get("/me"),
   sendMessage: (http, payload) => http.post("/chat/messages", payload),
-  getNotices: (http) => http.get("/notices")
+  getNotices: (http) => http.get("/notices"),
 };
 
 const androidApi = {
-  sendMessage: (http, payload) => http.post("/app/chat/messages", payload)
+  sendMessage: (http, payload) => http.post("/app/chat/messages", payload),
 };
 
 /**
@@ -25,10 +25,13 @@ const androidApi = {
 export function resolveApi(appInfo, http) {
   const apiMap = {
     ...baseApi,
-    ...(isAndroidApp(appInfo) ? androidApi : {})
+    ...(isAndroidApp(appInfo) ? androidApi : {}),
   };
 
   return Object.fromEntries(
-    Object.entries(apiMap).map(([name, fn]) => [name, (...args) => fn(http, ...args)])
+    Object.entries(apiMap).map(([name, fn]) => [
+      name,
+      (...args) => fn(http, ...args),
+    ]),
   );
 }

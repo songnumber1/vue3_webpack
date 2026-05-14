@@ -13,10 +13,11 @@ const KEYBOARD_THRESHOLD = 120;
  * @returns {*} 처리 결과를 반환합니다.
  */
 function getViewportSize() {
-  const visualViewport = typeof window !== "undefined" ? window.visualViewport : null;
+  const visualViewport =
+    typeof window !== "undefined" ? window.visualViewport : null;
   return {
     width: Math.round(visualViewport?.width || window.innerWidth || 0),
-    height: Math.round(visualViewport?.height || window.innerHeight || 0)
+    height: Math.round(visualViewport?.height || window.innerHeight || 0),
   };
 }
 
@@ -46,7 +47,9 @@ export function useViewportGuard(options = {}) {
   const baselineHeight = ref(0);
   let resizeTimer = null;
 
-  const isCompact = computed(() => viewportWidth.value > 0 && viewportWidth.value <= 900);
+  const isCompact = computed(
+    () => viewportWidth.value > 0 && viewportWidth.value <= 900,
+  );
 
   /**
    * apply 처리 함수입니다.
@@ -62,11 +65,13 @@ export function useViewportGuard(options = {}) {
       baselineHeight.value = size.height;
     }
 
-    keyboardOpen.value = isCompact.value && baselineHeight.value - size.height > KEYBOARD_THRESHOLD;
+    keyboardOpen.value =
+      isCompact.value &&
+      baselineHeight.value - size.height > KEYBOARD_THRESHOLD;
     onChange({
       ...size,
       keyboardOpen: keyboardOpen.value,
-      isCompact: isCompact.value
+      isCompact: isCompact.value,
     });
   }
 
@@ -84,13 +89,13 @@ export function useViewportGuard(options = {}) {
     apply();
     window.addEventListener("resize", scheduleApply, { passive: true });
     window.addEventListener("orientationchange", scheduleApply, {
-      passive: true
+      passive: true,
     });
     window.visualViewport?.addEventListener("resize", scheduleApply, {
-      passive: true
+      passive: true,
     });
     window.visualViewport?.addEventListener("scroll", scheduleApply, {
-      passive: true
+      passive: true,
     });
   });
 
@@ -107,6 +112,6 @@ export function useViewportGuard(options = {}) {
     viewportWidth,
     keyboardOpen,
     isCompact,
-    refreshViewport: scheduleApply
+    refreshViewport: scheduleApply,
   };
 }

@@ -4,8 +4,14 @@
 -->
 
 <template>
-  <aside class="desktop-sidebar" :class="{ 'desktop-sidebar--collapsed': sidebarCollapsed }">
-    <div v-if="!sidebarCollapsed" class="sidebar-content sidebar-content--assistant">
+  <aside
+    class="desktop-sidebar"
+    :class="{ 'desktop-sidebar--collapsed': sidebarCollapsed }"
+  >
+    <div
+      v-if="!sidebarCollapsed"
+      class="sidebar-content sidebar-content--assistant"
+    >
       <div class="sidebar-top">
         <div ref="assistantSelectorRef" class="assistant-selector">
           <button
@@ -26,7 +32,10 @@
               />
             </svg>
           </button>
-          <div v-if="assistantMenuOpen && !isMobileSheet" class="assistant-menu">
+          <div
+            v-if="assistantMenuOpen && !isMobileSheet"
+            class="assistant-menu"
+          >
             <button
               v-for="assistant in assistants"
               :key="assistant.id"
@@ -141,12 +150,18 @@
   </aside>
 
   <transition name="drawer-fade">
-    <div v-if="drawerOpen" class="mobile-drawer-backdrop" @click="emitDrawerOpen(false)"></div>
+    <div
+      v-if="drawerOpen"
+      class="mobile-drawer-backdrop"
+      @click="emitDrawerOpen(false)"
+    ></div>
   </transition>
 
   <transition name="drawer-slide">
     <aside v-if="drawerOpen" class="mobile-drawer">
-      <div class="sidebar-content sidebar-content--mobile sidebar-content--assistant">
+      <div
+        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
+      >
         <div class="sidebar-top">
           <div class="assistant-selector">
             <button
@@ -181,7 +196,7 @@
           </div>
         </div>
 
-        <nav class="quick-menu quick-menu--assistant">
+        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
           <button class="quick-item active" type="button" @click="handleNewChat">
             <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
@@ -190,25 +205,39 @@
           </button>
         </nav>
 
-        <details class="service-menu" open>
-          <summary>
-            <span>{{ t("menu.serviceMenu") }}</span>
-            <small>{{ t("menu.serviceMenuDescription") }}</small>
+        <details class="service-menu settings-menu">
+          <summary class="settings-menu-summary">
+            <span class="settings-menu-summary-text">
+              <strong>{{ t("common.settings") }}</strong>
+              <small>{{ t("menu.settingsDescription") }}</small>
+            </span>
+            <ChevronDownIcon />
           </summary>
           <div class="service-menu-list">
             <button class="service-menu-item" type="button" @click="openGuide">
-              <strong>{{ t("common.guide") }}</strong>
-              <small>{{ t("guide.subtitle") }}</small>
+              <GuideIcon />
+              <span>
+                <strong>{{ t("common.guide") }}</strong>
+                <small>{{ t("guide.subtitle") }}</small>
+              </span>
             </button>
             <button class="service-menu-item" type="button" @click="openNotice">
               <strong>{{ t("common.notice") }}</strong>
               <small>{{ t("menu.noticeSummary") }}</small>
             </button>
-            <button class="service-menu-item" type="button" @click="openPersonalization">
+            <button
+              class="service-menu-item"
+              type="button"
+              @click="openPersonalization"
+            >
               <strong>{{ t("common.personalization") }}</strong>
               <small>{{ t("menu.personalizationSummary") }}</small>
             </button>
-            <button class="service-menu-item" type="button" @click="openLanguage">
+            <button
+              class="service-menu-item"
+              type="button"
+              @click="openLanguage"
+            >
               <strong>{{ t("common.language") }}</strong>
               <small>{{ t("menu.languageSummary") }}</small>
             </button>
@@ -230,10 +259,6 @@
           </button>
         </div>
 
-        <button class="mobile-new-chat-fab" type="button" @click="handleNewChat">
-          <Icon name="pencil" />{{ t("chat.newChat") }}
-        </button>
-
         <div class="sidebar-user sidebar-user--mobile">
           <div class="user-avatar">민</div>
           <div class="sidebar-user-main">
@@ -254,7 +279,7 @@
               :aria-label="t('common.swagger')"
               @click="openSwagger"
             >
-              <span aria-hidden="true">文</span>
+              <SwaggerDocIcon />
             </button>
           </div>
         </div>
@@ -286,6 +311,9 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
+import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
+import GuideIcon from "@/components/icons/GuideIcon.vue";
 
 const props = defineProps({
   histories: { type: Array, required: true },
@@ -294,7 +322,7 @@ const props = defineProps({
   activeHistoryId: { type: [String, Number], default: null },
   sidebarCollapsed: { type: Boolean, required: true },
   drawerOpen: { type: Boolean, required: true },
-  collapsedRecentOpen: { type: Boolean, required: true }
+  collapsedRecentOpen: { type: Boolean, required: true },
 });
 
 const emit = defineEmits([
@@ -310,7 +338,7 @@ const emit = defineEmits([
   "open-personalization",
   "open-language",
   "toggle-theme",
-  "open-swagger"
+  "open-swagger",
 ]);
 const { t } = useI18n();
 const assistantMenuOpen = ref(false);
@@ -318,7 +346,8 @@ const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 const currentAssistant = computed(
   () =>
-    props.assistants.find((item) => item.id === props.selectedAssistantId) || props.assistants[0]
+    props.assistants.find((item) => item.id === props.selectedAssistantId) ||
+    props.assistants[0],
 );
 
 /**
@@ -328,7 +357,7 @@ const currentAssistant = computed(
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-shell--mobile")
+    document.querySelector(".app-shell--mobile"),
   );
 }
 

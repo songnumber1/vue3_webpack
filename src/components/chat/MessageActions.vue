@@ -23,7 +23,11 @@
     >
       {{ locale === "ko" ? "싫어요" : "Dislike" }}
     </button>
-    <button type="button" :aria-label="locale === 'ko' ? '복사하기' : 'Copy'" @click="copy">
+    <button
+      type="button"
+      :aria-label="locale === 'ko' ? '복사하기' : 'Copy'"
+      @click="copy"
+    >
       {{ locale === "ko" ? "복사하기" : "Copy" }}
     </button>
   </div>
@@ -36,7 +40,7 @@ import { copyClipboardByPlatform } from "@/services/platformBridge";
 
 const props = defineProps({
   role: { type: String, required: true },
-  content: { type: String, default: "" }
+  content: { type: String, default: "" },
 });
 const { locale } = useI18n();
 const feedback = ref("");

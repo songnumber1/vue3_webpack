@@ -4,7 +4,11 @@
 -->
 
 <template>
-  <BaseBottomSheet :open="open" :title="t('common.language')" @close="$emit('close')">
+  <BaseBottomSheet
+    :open="open"
+    :title="t('common.language')"
+    @close="$emit('close')"
+  >
     <button
       class="bottom-sheet-option"
       :class="{ active: locale === 'ko' }"

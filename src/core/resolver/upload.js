@@ -16,7 +16,7 @@ import { isNativeApp } from "@/core/config";
 export function resolveUploadStrategy(appInfo, http, bridge) {
   if (isNativeApp(appInfo)) {
     return {
-      upload: (fileMeta) => bridge?.uploadFile?.(JSON.stringify(fileMeta))
+      upload: (fileMeta) => bridge?.uploadFile?.(JSON.stringify(fileMeta)),
     };
   }
 
@@ -25,8 +25,8 @@ export function resolveUploadStrategy(appInfo, http, bridge) {
       const formData = new FormData();
       formData.append("file", file);
       return http.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" }
+        headers: { "Content-Type": "multipart/form-data" },
       });
-    }
+    },
   };
 }

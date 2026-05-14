@@ -11,8 +11,17 @@
         class="responsive-overlay"
         :class="{ 'responsive-overlay--mobile': isMobile }"
       >
-        <div v-if="!isMobile" class="responsive-overlay-backdrop" @click="$emit('close')"></div>
-        <section class="responsive-panel" role="dialog" aria-modal="true" :aria-label="title">
+        <div
+          v-if="!isMobile"
+          class="responsive-overlay-backdrop"
+          @click="$emit('close')"
+        ></div>
+        <section
+          class="responsive-panel"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="title"
+        >
           <header class="responsive-panel-header">
             <button
               v-if="isMobile"
@@ -54,7 +63,7 @@ defineProps({
   open: { type: Boolean, default: false },
   isMobile: { type: Boolean, default: false },
   title: { type: String, required: true },
-  subtitle: { type: String, default: "" }
+  subtitle: { type: String, default: "" },
 });
 
 defineEmits(["close"]);

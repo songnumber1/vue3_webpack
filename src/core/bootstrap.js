@@ -62,7 +62,10 @@ export async function bootstrap() {
   const platformStore = usePlatformStore();
   platformStore.initialize(appInfo);
 
-  if (typeof window !== "undefined" && Array.isArray(window.__pendingNativeEvents)) {
+  if (
+    typeof window !== "undefined" &&
+    Array.isArray(window.__pendingNativeEvents)
+  ) {
     window.__pendingNativeEvents.splice(0).forEach((event) => {
       platformStore.recordNativeEvent(event.type, event.payload);
     });
@@ -79,7 +82,7 @@ export async function bootstrap() {
     api,
     errorUI,
     upload,
-    platformStore
+    platformStore,
   });
 
   app.component("AppLayout", Layout);
