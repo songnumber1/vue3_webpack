@@ -4520,8 +4520,9 @@ body,
 }
 
 /* Final floating scroll button stabilization.
-   The button is positioned from the measured composer height so it remains
-   above the input on desktop, mobile browser and Android WebView. */
+   The button is centered inside the chat workspace, not the whole viewport.
+   This keeps it aligned with the visible conversation area whether the left
+   sidebar is expanded, collapsed or hidden on mobile. */
 :root {
   --chat-composer-height: 96px;
   --chat-scroll-button-gap: 12px;
@@ -4535,14 +4536,15 @@ body,
 
 .scroll-bottom-button {
   position: absolute !important;
-  right: max(24px, calc((100vw - 760px) / 2 + 12px)) !important;
+  left: 50% !important;
+  right: auto !important;
   bottom: calc(var(--chat-composer-height, 96px) + var(--chat-scroll-button-gap, 12px)) !important;
   z-index: 60 !important;
   display: inline-grid !important;
   place-items: center !important;
   flex: 0 0 auto;
   overflow: visible !important;
-  transform: translateZ(0);
+  transform: translateX(-50%) translateZ(0) !important;
 }
 
 @media (max-width: 900px) {
@@ -4552,10 +4554,12 @@ body,
 
   .scroll-bottom-button,
   .app-shell--mobile .scroll-bottom-button {
-    right: 16px !important;
+    left: 50% !important;
+    right: auto !important;
     bottom: calc(
       var(--chat-composer-height, 84px) + var(--chat-scroll-button-gap, 10px)
     ) !important;
     z-index: 60 !important;
+    transform: translateX(-50%) translateZ(0) !important;
   }
 }
