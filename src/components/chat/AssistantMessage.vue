@@ -41,6 +41,11 @@ let renderVersion = 0;
  * @param {MouseEvent} event Markdown 콘텐츠 영역에서 발생한 클릭 이벤트
  * @returns {Promise<void>} 외부 링크 처리 완료 Promise
  */
+/**
+ * handleMarkdownClick 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function handleMarkdownClick(event) {
   const anchor = event.target?.closest?.("a[href]");
   if (!anchor || !contentRef.value?.contains(anchor)) return;
@@ -55,6 +60,10 @@ async function handleMarkdownClick(event) {
   await openExternalBrowser(anchor.href);
 }
 
+/**
+ * renderContent 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function renderContent() {
   const currentVersion = ++renderVersion;
   const rendered = props.message.content

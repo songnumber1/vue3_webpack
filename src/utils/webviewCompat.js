@@ -5,10 +5,18 @@
  */
 let resizeObserverId = 0;
 
+/**
+ * getCryptoObject 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getCryptoObject() {
   return globalThis.crypto || globalThis.msCrypto || null;
 }
 
+/**
+ * createUuidV4Fallback 처리 함수입니다.
+ * @returns {void}
+ */
 function createUuidV4Fallback() {
   const cryptoObj = getCryptoObject();
   const bytes = new Uint8Array(16);
@@ -23,11 +31,14 @@ function createUuidV4Fallback() {
 
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
 
+/**
+ * installGlobalThisFallback 처리 함수입니다.
+ * @returns {void}
+ */
 function installGlobalThisFallback() {
   if (typeof globalThis !== "undefined") return;
 
@@ -45,6 +56,10 @@ function installGlobalThisFallback() {
   delete Object.prototype.__magic_global_this__;
 }
 
+/**
+ * installCryptoRandomUuidFallback 처리 함수입니다.
+ * @returns {void}
+ */
 function installCryptoRandomUuidFallback() {
   const cryptoObj = getCryptoObject();
   if (!cryptoObj || typeof cryptoObj.randomUUID === "function") return;
@@ -59,6 +74,10 @@ function installCryptoRandomUuidFallback() {
   }
 }
 
+/**
+ * installIdleCallbackFallback 처리 함수입니다.
+ * @returns {void}
+ */
 function installIdleCallbackFallback() {
   if (typeof window.requestIdleCallback !== "function") {
     window.requestIdleCallback = (callback) =>
@@ -72,6 +91,10 @@ function installIdleCallbackFallback() {
   }
 }
 
+/**
+ * installResizeObserverFallback 처리 함수입니다.
+ * @returns {void}
+ */
 function installResizeObserverFallback() {
   if (typeof window.ResizeObserver === "function") return;
 
@@ -109,6 +132,10 @@ function installResizeObserverFallback() {
   };
 }
 
+/**
+ * updateViewportCssVars 처리 함수입니다.
+ * @returns {void}
+ */
 function updateViewportCssVars() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   const viewport = window.visualViewport;
@@ -125,6 +152,10 @@ function updateViewportCssVars() {
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 }
 
+/**
+ * installViewportCssVars 처리 함수입니다.
+ * @returns {void}
+ */
 function installViewportCssVars() {
   updateViewportCssVars();
   window.addEventListener("resize", updateViewportCssVars, {passive: true});

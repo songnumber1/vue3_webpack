@@ -35,6 +35,12 @@ const webOverride = {
   },
 };
 
+/**
+ * mergeConfig 처리 함수입니다.
+ * @param {*} base 함수 실행에 필요한 입력값입니다.
+ * @param {*} override 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function mergeConfig(base, override) {
   return {
     ...base,

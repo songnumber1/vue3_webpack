@@ -14,6 +14,11 @@ import {executeContract} from "./bridgeClient";
 
 let originalFetch = null;
 
+/**
+ * getRequestUrl 처리 함수입니다.
+ * @param {*} input 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getRequestUrl(input) {
   const rawUrl = typeof input === "string" ? input : input?.url || "";
 
@@ -24,14 +29,29 @@ function getRequestUrl(input) {
   }
 }
 
+/**
+ * canUseBlob 처리 함수입니다.
+ * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function canUseBlob(value) {
   return typeof Blob !== "undefined" && value instanceof Blob;
 }
 
+/**
+ * canUseRequest 처리 함수입니다.
+ * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function canUseRequest(value) {
   return typeof Request !== "undefined" && value instanceof Request;
 }
 
+/**
+ * parseTextBody 처리 함수입니다.
+ * @param {*} text 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function parseTextBody(text) {
   if (!text) return {};
 
@@ -42,6 +62,12 @@ async function parseTextBody(text) {
   }
 }
 
+/**
+ * parsePayload 처리 함수입니다.
+ * @param {*} input 함수 실행에 필요한 입력값입니다.
+ * @param {*} init 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function parsePayload(input, init = {}) {
   const body = init?.body;
 
@@ -68,6 +94,11 @@ async function parsePayload(input, init = {}) {
   return {};
 }
 
+/**
+ * toContractType 처리 함수입니다.
+ * @param {*} pathname 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function toContractType(pathname) {
   const lastSegment =
     String(pathname || "")
@@ -77,6 +108,11 @@ function toContractType(pathname) {
   return decodeURIComponent(lastSegment).toUpperCase();
 }
 
+/**
+ * resolveCategoryFromUrl 처리 함수입니다.
+ * @param {*} pathname 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function resolveCategoryFromUrl(pathname) {
   if (pathname.includes(JS_TO_ANDROID_PATH))
     return BRIDGE_CATEGORY.JS_TO_ANDROID;
@@ -86,6 +122,12 @@ function resolveCategoryFromUrl(pathname) {
   return null;
 }
 
+/**
+ * createJsonResponse 처리 함수입니다.
+ * @param {*} body 함수 실행에 필요한 입력값입니다.
+ * @param {*} status 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createJsonResponse(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -94,6 +136,11 @@ function createJsonResponse(body, status = 200) {
   });
 }
 
+/**
+ * createFallbackError 처리 함수입니다.
+ * @param {*} error 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createFallbackError(error) {
   const now = new Date().toISOString();
 

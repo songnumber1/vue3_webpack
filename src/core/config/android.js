@@ -20,6 +20,13 @@ export const LAST_VERSION_INFO = Object.freeze({
     "현재 앱 버전에서는 최신 웹 기능을 사용할 수 없습니다. 앱을 업데이트한 후 다시 실행해 주세요.",
 });
 
+/**
+ * readAndroidValue 처리 함수입니다.
+ * @param {*} bridge 함수 실행에 필요한 입력값입니다.
+ * @param {*} methodName 함수 실행에 필요한 입력값입니다.
+ * @param {*} fallback 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function readAndroidValue(bridge, methodName, fallback = null) {
   try {
     const member = bridge?.[methodName];

@@ -7,6 +7,10 @@
 import {isNativeApp} from "@/core/config";
 import {callNative} from "@/bridge/bridgeClient";
 
+/**
+ * getLocalStorage 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getLocalStorage() {
   try {
     if (typeof window === "undefined") return null;
@@ -22,18 +26,39 @@ function getLocalStorage() {
 
 const memoryStorage = new Map();
 
+/**
+ * getFallback 처리 함수입니다.
+ * @param {*} key 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getFallback(key) {
   return memoryStorage.has(key) ? memoryStorage.get(key) : null;
 }
 
+/**
+ * setFallback 처리 함수입니다.
+ * @param {*} key 함수 실행에 필요한 입력값입니다.
+ * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function setFallback(key, value) {
   memoryStorage.set(key, String(value));
 }
 
+/**
+ * removeFallback 처리 함수입니다.
+ * @param {*} key 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function removeFallback(key) {
   memoryStorage.delete(key);
 }
 
+/**
+ * createRequest 처리 함수입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createRequest(payload = {}) {
   return {
     requestId: `storage_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -42,6 +67,11 @@ function createRequest(payload = {}) {
   };
 }
 
+/**
+ * parseEnvelope 처리 함수입니다.
+ * @param {*} raw 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function parseEnvelope(raw) {
   if (!raw) return null;
   if (typeof raw === "object") return raw;
@@ -53,6 +83,13 @@ function parseEnvelope(raw) {
   }
 }
 
+/**
+ * callDirectStorage 처리 함수입니다.
+ * @param {*} bridge 함수 실행에 필요한 입력값입니다.
+ * @param {*} methodName 함수 실행에 필요한 입력값입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function callDirectStorage(bridge, methodName, payload) {
   const method = bridge?.[methodName];
   if (typeof method !== "function") return null;
@@ -66,6 +103,10 @@ function callDirectStorage(bridge, methodName, payload) {
   }
 }
 
+/**
+ * createLocalStorageAdapter 처리 함수입니다.
+ * @returns {void}
+ */
 function createLocalStorageAdapter() {
   const local = getLocalStorage();
   return {

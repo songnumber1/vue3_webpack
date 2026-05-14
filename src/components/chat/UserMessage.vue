@@ -58,9 +58,19 @@ const hasAttachments = computed(
     Array.isArray(props.message.attachments) &&
     props.message.attachments.length > 0
 );
+/**
+ * getPreviewUrl 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getPreviewUrl(file) {
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
+/**
+ * openImage 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent("chat:image-preview", {
@@ -68,6 +78,11 @@ function openImage(file) {
     })
   );
 }
+/**
+ * formatFileSize 처리 함수입니다.
+ * @param {*} size 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function formatFileSize(size) {
   if (!size) return "0 B";
   if (size < 1024) return `${size} B`;

@@ -9,10 +9,18 @@ let mermaidLoader = null;
 const MERMAID_CDN =
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
 
+/**
+ * isDarkTheme 처리 함수입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function isDarkTheme() {
   return document.documentElement.getAttribute("data-theme") === "dark";
 }
 
+/**
+ * getMermaidConfig 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getMermaidConfig() {
   const dark = isDarkTheme();
 
@@ -72,6 +80,11 @@ function getMermaidConfig() {
   };
 }
 
+/**
+ * loadScript 처리 함수입니다.
+ * @param {*} src 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
@@ -94,6 +107,10 @@ function loadScript(src) {
   });
 }
 
+/**
+ * ensureMermaid 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function ensureMermaid() {
   if (window.mermaid) {
     window.mermaid.initialize(getMermaidConfig());
@@ -117,6 +134,11 @@ async function ensureMermaid() {
   return mermaid;
 }
 
+/**
+ * resetRenderedMermaid 처리 함수입니다.
+ * @param {*} root 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
     root.querySelectorAll(".md-mermaid[data-processed]")

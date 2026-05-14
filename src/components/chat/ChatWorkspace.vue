@@ -29,7 +29,8 @@
           type="button"
           @click="$emit('submit', item.prompt)"
         >
-          <span>{{ item.icon }}</span>{{ item.text }}
+          <span>{{ item.icon }}</span
+          >{{ item.text }}
         </button>
       </div>
       <PromptInput
@@ -98,7 +99,7 @@ defineProps({
   models: {type: Array, default: () => []},
   isGenerating: {type: Boolean, default: false},
   messages: {type: Array, default: () => []},
-  showScrollBottom: {type: Boolean, default: false}
+  showScrollBottom: {type: Boolean, default: false},
 });
 
 defineEmits([
@@ -112,10 +113,10 @@ defineEmits([
   "prompt-focus",
   "prompt-resize",
   "message-content-rendered",
-  "scroll-bottom"
+  "scroll-bottom",
 ]);
 
 defineExpose({
-  listRef
+  listRef,
 });
 </script>

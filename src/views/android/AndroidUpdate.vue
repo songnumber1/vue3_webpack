@@ -64,6 +64,10 @@ const message = computed(
     versionInfo.value.message || "최신 버전으로 업데이트 후 다시 실행해 주세요."
 );
 
+/**
+ * requestUpdate 처리 함수입니다.
+ * @returns {void}
+ */
 function requestUpdate() {
   if (typeof bridge?.openMarket === "function") {
     bridge.openMarket();

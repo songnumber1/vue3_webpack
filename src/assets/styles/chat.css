@@ -4439,7 +4439,6 @@ body,
   }
 }
 
-
 /* Shared read-only composer */
 .shared-readonly-wrap {
   padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
@@ -4486,5 +4485,55 @@ body,
   }
   .shared-readonly-box span {
     font-size: 12px;
+  }
+}
+
+/* Final chat scroll/composer spacing stabilization.
+   The composer is already rendered as the last grid row, so the message list
+   must not reserve a second large virtual composer space. This keeps the last
+   message close to the input on both desktop and mobile and prevents the
+   scroll-to-bottom button from being clipped by the lower edge. */
+:root {
+  --chat-message-bottom-gap: 18px;
+  --chat-scroll-button-bottom: calc(92px + env(safe-area-inset-bottom));
+}
+
+.message-list,
+.app-shell--mobile .message-list {
+  padding-bottom: var(--chat-message-bottom-gap) !important;
+  scroll-padding-bottom: var(--chat-message-bottom-gap);
+}
+
+.message-list-anchor {
+  height: 1px !important;
+  margin: 0 !important;
+}
+
+.scroll-bottom-button {
+  bottom: var(--chat-scroll-button-bottom) !important;
+  display: inline-grid;
+  place-items: center;
+  box-sizing: border-box;
+  line-height: 1;
+  padding: 0 0 2px;
+  overflow: visible;
+}
+
+@media (max-width: 900px) {
+  :root {
+    --chat-message-bottom-gap: 14px;
+    --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
+  }
+
+  .chatgpt-shell--keyboard-open .message-list,
+  .app-shell--mobile .chatgpt-shell--keyboard-open .message-list {
+    padding-bottom: 12px !important;
+    scroll-padding-bottom: 12px;
+  }
+
+  .scroll-bottom-button {
+    right: 16px !important;
+    width: 44px;
+    height: 44px;
   }
 }

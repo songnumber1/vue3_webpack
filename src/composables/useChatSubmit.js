@@ -13,11 +13,17 @@ import {createId} from "@/utils/id";
  * @param {string|{text?: string, attachments?: Array}} payload Prompt input payload
  * @returns {{text: string, attachments: Array}} Normalized prompt data
  */
+/**
+ * normalizePromptPayload 처리 함수입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function normalizePromptPayload(payload) {
-  if (typeof payload === "string") return {text: payload.trim(), attachments: []};
+  if (typeof payload === "string")
+    return {text: payload.trim(), attachments: []};
   return {
     text: String(payload?.text || "").trim(),
-    attachments: Array.isArray(payload?.attachments) ? payload.attachments : []
+    attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
   };
 }
 
@@ -25,6 +31,11 @@ function normalizePromptPayload(payload) {
  * Builds the demo assistant response used by the local UI sample.
  * @param {{text: string, attachments: Array}} normalized Normalized prompt payload
  * @returns {string} Assistant response text
+ */
+/**
+ * buildAssistantResponse 처리 함수입니다.
+ * @param {*} normalized 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
  */
 function buildAssistantResponse(normalized) {
   const fileSummary = normalized.attachments.length
@@ -43,9 +54,18 @@ function buildAssistantResponse(normalized) {
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
 
+  /**
+   * handleSubmit 처리 함수입니다.
+   * @param {*} payload 함수 실행에 필요한 입력값입니다.
+   * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+   */
   async function handleSubmit(payload) {
     const normalized = normalizePromptPayload(payload);
-    if ((!normalized.text && normalized.attachments.length === 0) || isGenerating.value) return;
+    if (
+      (!normalized.text && normalized.attachments.length === 0) ||
+      isGenerating.value
+    )
+      return;
 
     let targetHistoryId = Number(options.route.params.id);
     if (options.route.name === "main") {
@@ -53,7 +73,7 @@ export function useChatSubmit(options) {
       options.histories.value.unshift({
         id: targetHistoryId,
         title: normalized.text || "새 채팅",
-        preview: normalized.text || "첨부 파일 기반 새 대화"
+        preview: normalized.text || "첨부 파일 기반 새 대화",
       });
       options.setConversation(targetHistoryId, []);
       await options.router.push({name: "chat", params: {id: targetHistoryId}});
@@ -65,10 +85,14 @@ export function useChatSubmit(options) {
       id: createId("message"),
       role: "user",
       content: normalized.text,
-      attachments: normalized.attachments
+      attachments: normalized.attachments,
     });
 
-    const assistantMessage = {id: createId("message"), role: "assistant", content: ""};
+    const assistantMessage = {
+      id: createId("message"),
+      role: "assistant",
+      content: "",
+    };
     currentMessages.push(assistantMessage);
     options.setConversation(targetHistoryId, currentMessages);
     await nextTick();

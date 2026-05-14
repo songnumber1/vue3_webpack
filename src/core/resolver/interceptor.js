@@ -6,6 +6,11 @@
 
 import {isNativeApp} from "@/core/config";
 
+/**
+ * applyWebRequestInterceptor 처리 함수입니다.
+ * @param {*} instance 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function applyWebRequestInterceptor(instance) {
   instance.interceptors.request.use((config) => {
     const token = localStorage.getItem("access_token");
@@ -18,6 +23,13 @@ function applyWebRequestInterceptor(instance) {
   });
 }
 
+/**
+ * applyNativeRequestInterceptor 처리 함수입니다.
+ * @param {*} instance 함수 실행에 필요한 입력값입니다.
+ * @param {*} bridge 함수 실행에 필요한 입력값입니다.
+ * @param {*} appInfo 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   instance.interceptors.request.use((config) => {
     const token = bridge?.getToken?.() || appInfo?.token;
@@ -34,6 +46,12 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   });
 }
 
+/**
+ * applyResponseInterceptor 처리 함수입니다.
+ * @param {*} instance 함수 실행에 필요한 입력값입니다.
+ * @param {*} errorUI 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function applyResponseInterceptor(instance, errorUI) {
   instance.interceptors.response.use(
     (response) => response,

@@ -8,6 +8,10 @@ import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 
 const KEYBOARD_THRESHOLD = 120;
 
+/**
+ * getViewportSize 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getViewportSize() {
   const visualViewport =
     typeof window !== "undefined" ? window.visualViewport : null;
@@ -17,6 +21,11 @@ function getViewportSize() {
   };
 }
 
+/**
+ * setCssViewportVars 처리 함수입니다.
+ * @param {*} size 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function setCssViewportVars(size) {
   const height = Math.max(size.height || 0, 320);
   const width = Math.max(size.width || 0, 320);
@@ -42,6 +51,10 @@ export function useViewportGuard(options = {}) {
     () => viewportWidth.value > 0 && viewportWidth.value <= 900
   );
 
+  /**
+   * apply 처리 함수입니다.
+   * @returns {void}
+   */
   function apply() {
     const size = getViewportSize();
     viewportHeight.value = size.height;
@@ -62,6 +75,10 @@ export function useViewportGuard(options = {}) {
     });
   }
 
+  /**
+   * scheduleApply 처리 함수입니다.
+   * @returns {void}
+   */
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
     apply();

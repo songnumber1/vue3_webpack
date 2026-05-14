@@ -8,14 +8,28 @@ import {callNative} from "@/bridge/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {copyText as copyWebText} from "@/utils/clipboard";
 
+/**
+ * getStore 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getStore() {
   return usePlatformStore();
 }
 
+/**
+ * isAndroidApp 처리 함수입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function isAndroidApp() {
   return getStore().info.isAndroidApp;
 }
 
+/**
+ * webSuccess 처리 함수입니다.
+ * @param {*} data 함수 실행에 필요한 입력값입니다.
+ * @param {*} message 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function webSuccess(data = {}, message = "브라우저에서 처리되었습니다.") {
   return {
     requestId: `web_${Date.now()}_${Math.random().toString(36).slice(2)}`,

@@ -16,14 +16,28 @@ import {usePlatformStore} from "@/stores/platformStore";
 
 const callbacks = {};
 
+/**
+ * createRequestId 처리 함수입니다.
+ * @returns {void}
+ */
 function createRequestId() {
   return `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
 
+/**
+ * createIsoDate 처리 함수입니다.
+ * @returns {void}
+ */
 function createIsoDate() {
   return new Date().toISOString();
 }
 
+/**
+ * getContract 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getContract(type, contractMap = BridgeContract) {
   const contract = contractMap[type];
 
@@ -34,6 +48,11 @@ function getContract(type, contractMap = BridgeContract) {
   return contract;
 }
 
+/**
+ * formatZodIssues 처리 함수입니다.
+ * @param {*} error 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function formatZodIssues(error) {
   return (
     error?.errors
@@ -42,6 +61,15 @@ function formatZodIssues(error) {
   );
 }
 
+/**
+ * createContractError 처리 함수입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} message 함수 실행에 필요한 입력값입니다.
+ * @param {*} code 함수 실행에 필요한 입력값입니다.
+ * @param {*} status 함수 실행에 필요한 입력값입니다.
+ * @param {*} meta 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createContractError(request, message, code, status = 400, meta = {}) {
   const errorResponse = createErrorResponse(request, message, code);
   errorResponse.meta = {
@@ -56,6 +84,14 @@ function createContractError(request, message, code, status = 400, meta = {}) {
   return error;
 }
 
+/**
+ * safeParseBySchema 처리 함수입니다.
+ * @param {*} schema 함수 실행에 필요한 입력값입니다.
+ * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} options 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function safeParseBySchema(schema, value, request, options) {
   const parsed = schema.safeParse(value || {});
 
@@ -73,6 +109,11 @@ function safeParseBySchema(schema, value, request, options) {
   return parsed.data;
 }
 
+/**
+ * createBridgeRequest 처리 함수입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createBridgeRequest(payload = {}) {
   return {
     requestId: payload.requestId || createRequestId(),
@@ -81,6 +122,13 @@ function createBridgeRequest(payload = {}) {
   };
 }
 
+/**
+ * validateBridgeRequest 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
   const contract = getContract(type, contractMap);
   const request = createBridgeRequest(payload);
@@ -133,6 +181,11 @@ function validateBridgeErrorResponse(
   });
 }
 
+/**
+ * getAndroidBridgeMethodName 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getAndroidBridgeMethodName(type) {
   const methodMap = {
     OPEN_EXTERNAL_BROWSER: "openExternalBrowser",
@@ -156,14 +209,27 @@ function getAndroidBridgeMethodName(type) {
   return methodMap[type];
 }
 
+/**
+ * getAndroidBridge 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getAndroidBridge() {
   return window.AndroidBridge || null;
 }
 
+/**
+ * hasPostMessageBridge 처리 함수입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function hasPostMessageBridge() {
   return typeof getAndroidBridge()?.postMessage === "function";
 }
 
+/**
+ * hasDirectAndroidBridge 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function hasDirectAndroidBridge(type) {
   const methodName = getAndroidBridgeMethodName(type);
   const bridge = getAndroidBridge();
@@ -173,6 +239,12 @@ function hasDirectAndroidBridge(type) {
   );
 }
 
+/**
+ * callDirectAndroidBridge 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function callDirectAndroidBridge(type, payload) {
   const methodName = getAndroidBridgeMethodName(type);
   const bridge = getAndroidBridge();
@@ -185,6 +257,12 @@ function callDirectAndroidBridge(type, payload) {
   return Promise.resolve(raw);
 }
 
+/**
+ * createBridgeUnavailableResponse 처리 함수입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createBridgeUnavailableResponse(request, type) {
   const response = createErrorResponse(
     request,
@@ -200,6 +278,11 @@ function createBridgeUnavailableResponse(request, type) {
   return response;
 }
 
+/**
+ * parseNativePayload 처리 함수입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function parseNativePayload(payload) {
   if (typeof payload !== "string") return payload || {};
 
@@ -228,6 +311,13 @@ function createSuccessResponse(
   };
 }
 
+/**
+ * createErrorResponse 처리 함수입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} error 함수 실행에 필요한 입력값입니다.
+ * @param {*} code 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
   const message =
     error instanceof Error
@@ -250,6 +340,12 @@ function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
   };
 }
 
+/**
+ * normalizeBridgeResponse 처리 함수입니다.
+ * @param {*} response 함수 실행에 필요한 입력값입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function normalizeBridgeResponse(response, request) {
   if (typeof response === "string") {
     try {
@@ -295,6 +391,11 @@ function normalizeBridgeResponse(response, request) {
   );
 }
 
+/**
+ * completeBridgeResponse 처리 함수입니다.
+ * @param {*} rawResponse 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function completeBridgeResponse(rawResponse) {
   const requestId =
     typeof rawResponse === "string"
@@ -316,6 +417,13 @@ function completeBridgeResponse(rawResponse) {
   callback(rawResponse);
 }
 
+/**
+ * throwIfErrorResponse 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @param {*} response 함수 실행에 필요한 입력값입니다.
+ * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function throwIfErrorResponse(type, response, contractMap) {
   if (response.isSuccess) return;
 
@@ -335,17 +443,33 @@ function throwIfErrorResponse(type, response, contractMap) {
   throw error;
 }
 
+/**
+ * getApiBaseUrl 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getApiBaseUrl() {
   const configured = process.env.VUE_APP_API_BASE_URL || "/api";
   return configured.replace(/\/$/, "");
 }
 
+/**
+ * interpolatePath 처리 함수입니다.
+ * @param {*} path 함수 실행에 필요한 입력값입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function interpolatePath(path, payload) {
   return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) =>
     encodeURIComponent(payload?.[key] ?? "")
   );
 }
 
+/**
+ * buildBackendUrl 처리 함수입니다.
+ * @param {*} contract 함수 실행에 필요한 입력값입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function buildBackendUrl(contract, payload) {
   const rawPath =
     contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
@@ -353,6 +477,12 @@ function buildBackendUrl(contract, payload) {
   return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/**
+ * pickRequestBody 처리 함수입니다.
+ * @param {*} method 함수 실행에 필요한 입력값입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function pickRequestBody(method, request) {
   const normalizedMethod = method.toUpperCase();
 
@@ -363,6 +493,11 @@ function pickRequestBody(method, request) {
   return JSON.stringify(request);
 }
 
+/**
+ * parseBackendBody 처리 함수입니다.
+ * @param {*} response 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function parseBackendBody(response) {
   const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
@@ -380,6 +515,13 @@ async function parseBackendBody(response) {
   }
 }
 
+/**
+ * normalizeBackendSuccess 처리 함수입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} backendBody 함수 실행에 필요한 입력값입니다.
+ * @param {*} contract 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function normalizeBackendSuccess(request, backendBody, contract) {
   if (
     backendBody &&
@@ -402,6 +544,14 @@ function normalizeBackendSuccess(request, backendBody, contract) {
   );
 }
 
+/**
+ * normalizeBackendError 처리 함수입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} response 함수 실행에 필요한 입력값입니다.
+ * @param {*} backendBody 함수 실행에 필요한 입력값입니다.
+ * @param {*} contract 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function normalizeBackendError(request, response, backendBody, contract) {
   const status = response?.status || 500;
   const statusText = response?.statusText || "Backend Error";
@@ -426,6 +576,13 @@ function normalizeBackendError(request, response, backendBody, contract) {
   return error;
 }
 
+/**
+ * requestBackend 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @param {*} request 함수 실행에 필요한 입력값입니다.
+ * @param {*} contract 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function requestBackend(type, request, contract) {
   const method = (contract.httpMethod || "POST").toUpperCase();
   const url = buildBackendUrl(contract, request);
@@ -506,7 +663,6 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
     }
 
     let settled = false;
-
     const timer = window.setTimeout(() => {
       if (settled) return;
 
@@ -684,6 +840,11 @@ export function receiveNativeEvent(type, payload = {}) {
   return validateBridgeResponse(type, response, AndroidToJsContract, request);
 }
 
+/**
+ * createNativeEventHandler 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createNativeEventHandler(type) {
   return (payload = {}) => {
     try {

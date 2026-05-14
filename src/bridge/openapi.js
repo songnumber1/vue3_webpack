@@ -42,6 +42,12 @@ const CATEGORY_OPTIONS = [
   },
 ];
 
+/**
+ * createErrorResponse 처리 함수입니다.
+ * @param {*} description 함수 실행에 필요한 입력값입니다.
+ * @param {*} schema 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function createErrorResponse(description, schema) {
   return {
     description,
@@ -53,12 +59,22 @@ function createErrorResponse(description, schema) {
   };
 }
 
+/**
+ * getCategoryPath 처리 함수입니다.
+ * @param {*} category 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getCategoryPath(category) {
   if (category === BRIDGE_CATEGORY.JS_TO_ANDROID) return JS_TO_ANDROID_PATH;
   if (category === BRIDGE_CATEGORY.ANDROID_TO_JS) return ANDROID_TO_JS_PATH;
   return WEB_API_PATH;
 }
 
+/**
+ * getCategoryDescription 처리 함수입니다.
+ * @param {*} category 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getCategoryDescription(category) {
   return (
     CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
@@ -66,6 +82,12 @@ function getCategoryDescription(category) {
   );
 }
 
+/**
+ * shouldIncludeContract 처리 함수입니다.
+ * @param {*} selectedCategory 함수 실행에 필요한 입력값입니다.
+ * @param {*} contract 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function shouldIncludeContract(selectedCategory, contract) {
   return (
     selectedCategory === BRIDGE_CATEGORY.ALL ||

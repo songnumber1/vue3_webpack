@@ -74,6 +74,10 @@ const renderError = ref("");
 const categoryOptions = getOpenApiCategoryOptions();
 const selectedCategory = ref(BRIDGE_CATEGORY.ALL);
 
+/**
+ * clearSwaggerRoot 처리 함수입니다.
+ * @returns {void}
+ */
 function clearSwaggerRoot() {
   if (swaggerRoot.value) {
     swaggerRoot.value.innerHTML = "";

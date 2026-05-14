@@ -15,6 +15,11 @@ import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 
+/**
+ * textContent 처리 함수입니다.
+ * @param {*} node 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function textContent(node) {
   if (!node) return "";
   if (typeof node.value === "string") return node.value;
@@ -22,6 +27,10 @@ function textContent(node) {
   return node.children.map(textContent).join("");
 }
 
+/**
+ * rehypeTableWrapper 처리 함수입니다.
+ * @returns {void}
+ */
 function rehypeTableWrapper() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -38,6 +47,10 @@ function rehypeTableWrapper() {
   };
 }
 
+/**
+ * rehypeMermaidBlock 처리 함수입니다.
+ * @returns {void}
+ */
 function rehypeMermaidBlock() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {

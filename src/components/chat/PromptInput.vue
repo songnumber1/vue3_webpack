@@ -359,10 +359,20 @@ const tools = [
   },
 ];
 
+/**
+ * getPreviewUrl 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getPreviewUrl(file) {
   return file?.dataUrl || file?.previewUrl || file?.url || "";
 }
 
+/**
+ * markPreviewError 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function markPreviewError(file) {
   if (!file) return;
   file.previewError = true;
@@ -373,6 +383,10 @@ const canSubmit = computed(
 );
 const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 
+/**
+ * syncViewportMode 처리 함수입니다.
+ * @returns {void}
+ */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
@@ -380,6 +394,10 @@ function syncViewportMode() {
   );
 }
 
+/**
+ * resize 처리 함수입니다.
+ * @returns {void}
+ */
 function resize() {
   const el = textareaRef.value;
   if (!el) return;
@@ -396,11 +414,19 @@ function resize() {
   }
 }
 
+/**
+ * handleFocus 처리 함수입니다.
+ * @returns {void}
+ */
 function handleFocus() {
   emit("focus");
   nextTick(resize);
 }
 
+/**
+ * submit 처리 함수입니다.
+ * @returns {void}
+ */
 function submit() {
   const value = text.value.trim();
   if ((!value && attachments.value.length === 0) || props.disabled) return;
@@ -413,12 +439,21 @@ function submit() {
   nextTick(resize);
 }
 
+/**
+ * closeMenus 처리 함수입니다.
+ * @param {*} except 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function closeMenus(except = "") {
   if (except !== "model") modelMenuOpen.value = false;
   if (except !== "tool") toolMenuOpen.value = false;
   if (except !== "attach") attachMenuOpen.value = false;
 }
 
+/**
+ * openModelSelector 처리 함수입니다.
+ * @returns {void}
+ */
 function openModelSelector() {
   if (props.disabled) return;
   syncViewportMode();
@@ -427,6 +462,10 @@ function openModelSelector() {
   modelMenuOpen.value = next;
 }
 
+/**
+ * openToolSelector 처리 함수입니다.
+ * @returns {void}
+ */
 function openToolSelector() {
   if (props.disabled) return;
   syncViewportMode();
@@ -435,6 +474,10 @@ function openToolSelector() {
   toolMenuOpen.value = next;
 }
 
+/**
+ * openAttachSelector 처리 함수입니다.
+ * @returns {void}
+ */
 function openAttachSelector() {
   if (props.disabled) return;
   syncViewportMode();
@@ -443,11 +486,21 @@ function openAttachSelector() {
   attachMenuOpen.value = next;
 }
 
+/**
+ * selectModel 처리 함수입니다.
+ * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function selectModel(id) {
   emit("update:modelValue", id);
   modelMenuOpen.value = false;
 }
 
+/**
+ * applyTool 처리 함수입니다.
+ * @param {*} tool 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function applyTool(tool) {
   text.value = text.value ? `${text.value}\n${tool.prompt}` : tool.prompt;
   toolMenuOpen.value = false;
@@ -457,6 +510,11 @@ function applyTool(tool) {
   });
 }
 
+/**
+ * openFilePicker 처리 함수입니다.
+ * @param {*} type 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function openFilePicker(type) {
   if (props.disabled) return;
   attachMenuOpen.value = false;
@@ -492,6 +550,11 @@ async function openFilePicker(type) {
   input.click();
 }
 
+/**
+ * handleNativeFileSelected 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handleNativeFileSelected(event) {
   const detail = event?.detail || {};
   if (detail.type !== "ON_FILE_SELECTED") return;
@@ -511,17 +574,32 @@ function handleNativeFileSelected(event) {
   if (mapped.length) attachments.value = [...attachments.value, ...mapped];
 }
 
+/**
+ * handleFileChange 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handleFileChange(event) {
   addFiles(event.target.files);
   event.target.value = "";
 }
 
+/**
+ * handlePaste 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handlePaste(event) {
   const files = Array.from(event.clipboardData?.files || []);
   if (!files.length) return;
   addFiles(files);
 }
 
+/**
+ * addFiles 처리 함수입니다.
+ * @param {*} fileList 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function addFiles(fileList) {
   const nextFiles = Array.from(fileList || []);
   if (!nextFiles.length) return;
@@ -551,6 +629,11 @@ function addFiles(fileList) {
   });
 }
 
+/**
+ * isImageFile 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function isImageFile(file) {
   return Boolean(
     file?.type?.startsWith("image/") ||
@@ -558,6 +641,11 @@ function isImageFile(file) {
   );
 }
 
+/**
+ * inferMimeType 처리 함수입니다.
+ * @param {*} name 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function inferMimeType(name = "") {
   const normalized = name.toLowerCase();
   if (/\.png$/.test(normalized)) return "image/png";
@@ -569,6 +657,11 @@ function inferMimeType(name = "") {
   return "";
 }
 
+/**
+ * hydrateImagePreviewUrl 처리 함수입니다.
+ * @param {*} attachment 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function hydrateImagePreviewUrl(attachment) {
   const sourceFile = attachment?.file;
   if (!sourceFile || typeof FileReader === "undefined") return;
@@ -591,11 +684,21 @@ function hydrateImagePreviewUrl(attachment) {
   reader.readAsDataURL(sourceFile);
 }
 
+/**
+ * handleAttachmentPreview 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handleAttachmentPreview(file) {
   if (file?.kind !== "image") return;
   previewImage(file);
 }
 
+/**
+ * removeAttachment 처리 함수입니다.
+ * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function removeAttachment(id) {
   const target = attachments.value.find((file) => file.id === id);
   if (target?.url) URL.revokeObjectURL(target.url);
@@ -603,6 +706,11 @@ function removeAttachment(id) {
   nextTick(resize);
 }
 
+/**
+ * previewImage 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function previewImage(file) {
   if (!file) return;
   file.url = file.url || file.previewUrl || file.dataUrl || "";
@@ -613,6 +721,11 @@ function previewImage(file) {
   );
 }
 
+/**
+ * formatFileSize 처리 함수입니다.
+ * @param {*} size 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function formatFileSize(size) {
   if (!size) return "0 B";
   if (size < 1024) return `${size} B`;
@@ -620,6 +733,11 @@ function formatFileSize(size) {
   return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 
+/**
+ * handleDocumentClick 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handleDocumentClick(event) {
   if (isMobileSheet.value) return;
   const roots = [

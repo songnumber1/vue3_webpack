@@ -88,6 +88,10 @@ const sheetStyle = computed(() => ({
   "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
 }));
 
+/**
+ * getViewportHeight 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getViewportHeight() {
   if (typeof window === "undefined") return 720;
   return Math.max(
@@ -97,6 +101,10 @@ function getViewportHeight() {
   );
 }
 
+/**
+ * getSafeBottom 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getSafeBottom() {
   if (typeof window === "undefined") return 0;
   const probe = document.createElement("div");
@@ -111,6 +119,11 @@ function getSafeBottom() {
   return Number.isFinite(value) ? value : 0;
 }
 
+/**
+ * clampHeight 처리 함수입니다.
+ * @param {*} height 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function clampHeight(height) {
   const viewportHeight = getViewportHeight();
   const maxHeight = Math.max(
@@ -121,6 +134,10 @@ function clampHeight(height) {
   return Math.min(Math.max(height, minHeight), maxHeight);
 }
 
+/**
+ * getContentHeight 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getContentHeight() {
   const headerHeight = 62;
   const bodyHeight = bodyRef.value?.scrollHeight || 0;
@@ -128,6 +145,10 @@ function getContentHeight() {
   return headerHeight + bodyHeight + padding;
 }
 
+/**
+ * getInitialHeight 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getInitialHeight() {
   const viewportHeight = getViewportHeight();
   if (props.initialSnap === "full") return viewportHeight * props.maxRatio;
@@ -138,6 +159,12 @@ function getInitialHeight() {
   );
 }
 
+/**
+ * setHeight 처리 함수입니다.
+ * @param {*} height 함수 실행에 필요한 입력값입니다.
+ * @param {*} snap 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function setHeight(height, snap = "custom") {
   currentHeight.value = clampHeight(height);
   const viewportHeight = getViewportHeight();
@@ -145,31 +172,56 @@ function setHeight(height, snap = "custom") {
     currentHeight.value >= viewportHeight * 0.82 ? "full" : snap;
 }
 
+/**
+ * expand 처리 함수입니다.
+ * @returns {void}
+ */
 function expand() {
   setHeight(getViewportHeight() * props.maxRatio, "full");
 }
 
+/**
+ * collapse 처리 함수입니다.
+ * @returns {void}
+ */
 function collapse() {
   setHeight(props.minHeight, "min");
 }
 
+/**
+ * resetHeight 처리 함수입니다.
+ * @returns {void}
+ */
 function resetHeight() {
   nextTick(() => {
     setHeight(getInitialHeight(), props.initialSnap);
   });
 }
 
+/**
+ * lockBodyScroll 처리 함수입니다.
+ * @returns {void}
+ */
 function lockBodyScroll() {
   if (typeof document === "undefined") return;
   previousBodyOverflow = document.body.style.overflow;
   document.body.style.overflow = "hidden";
 }
 
+/**
+ * unlockBodyScroll 처리 함수입니다.
+ * @returns {void}
+ */
 function unlockBodyScroll() {
   if (typeof document === "undefined") return;
   document.body.style.overflow = previousBodyOverflow;
 }
 
+/**
+ * startDrag 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function startDrag(event) {
   if (!event.isPrimary && event.pointerType !== "mouse") return;
   dragging.value = true;
@@ -181,6 +233,11 @@ function startDrag(event) {
   window.addEventListener("pointercancel", stopDrag, {passive: true});
 }
 
+/**
+ * handleDrag 처리 함수입니다.
+ * @param {*} event 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function handleDrag(event) {
   if (!dragging.value) return;
   event.preventDefault();
@@ -188,6 +245,10 @@ function handleDrag(event) {
   setHeight(dragStartHeight + delta);
 }
 
+/**
+ * stopDrag 처리 함수입니다.
+ * @returns {void}
+ */
 function stopDrag() {
   if (!dragging.value) return;
   dragging.value = false;
@@ -200,6 +261,10 @@ function stopDrag() {
   else if (currentHeight.value < props.minHeight * 0.82) emit("close");
 }
 
+/**
+ * scheduleViewportRefresh 처리 함수입니다.
+ * @returns {void}
+ */
 function scheduleViewportRefresh() {
   window.clearTimeout(viewportTimer);
   viewportTimer = window.setTimeout(() => {

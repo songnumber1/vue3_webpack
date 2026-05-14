@@ -36,11 +36,6 @@ web application runtime. * @author OpenAI
 <script setup>
 import {computed} from "vue";
 
-/**
- * Sidebar에서 사용하는 최소 SVG 아이콘 정의입니다.
- * 문자열 기반 v-html은 일반 상태에서만 사용하고, bare 상태는 SVG 루트에 직접 path를 그립니다.
- * @type {Record<string, {markup: string, paths?: Array<Record<string, string>>, circles?: Array<Record<string, string>>, rects?: Array<Record<string, string>>}>}
- */
 const ICONS = {
   pencil: {
     markup:

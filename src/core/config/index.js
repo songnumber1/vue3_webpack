@@ -10,6 +10,10 @@ import {createAndroidConfig} from "./android";
 import {createIosConfig} from "./ios";
 import {createExtensionConfig} from "./extension";
 
+/**
+ * getNavigator 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getNavigator() {
   return typeof window === "undefined" ? null : window.navigator;
 }

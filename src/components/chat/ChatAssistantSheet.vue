@@ -26,7 +26,7 @@ import BaseBottomSheet from "./BaseBottomSheet.vue";
 defineProps({
   open: {type: Boolean, default: false},
   assistants: {type: Array, default: () => []},
-  selectedAssistantId: {type: String, default: ""}
+  selectedAssistantId: {type: String, default: ""},
 });
 
 defineEmits(["close", "select"]);

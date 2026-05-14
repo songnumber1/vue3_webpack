@@ -45,7 +45,9 @@
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
       @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="scrollBottom({force: true, behavior: 'smooth', stable: true})"
+      @scroll-bottom="
+        scrollBottom({force: true, behavior: 'smooth', stable: true})
+      "
     />
 
     <ChatImagePreview
@@ -98,7 +100,7 @@ const {
   ensureConversation,
   setConversation,
   getHistory,
-  revokeMessageAttachments
+  revokeMessageAttachments,
 } = runtime;
 
 const workspaceRef = ref(null);
@@ -106,7 +108,7 @@ const {scrollToBottom} = useAutoScroll({value: null});
 const {keyboardOpen, refreshViewport} = useViewportGuard({
   onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
     if (isCompact && isKeyboardOpen) scrollBottom({stable: true});
-  }
+  },
 });
 const themeName = ref(theme.current);
 const drawerOpen = ref(false);
@@ -116,7 +118,8 @@ const isMobile = ref(false);
 const messages = ref([]);
 const showScrollBottom = ref(false);
 const assistantSheetOpen = ref(false);
-const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} = useImagePreview();
+const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
+  useImagePreview();
 let removeMobileMediaQueryListener = null;
 let bottomStateTimer = 0;
 let forceBottomUntil = 0;
@@ -129,16 +132,33 @@ const activeHistoryId = computed(() => {
 });
 const activeHistory = computed(() => getHistory(activeHistoryId.value));
 const activeConversationTitle = computed(() => {
-  if (props.mode === "shared") return `공유 대화 ${activeHistoryId.value || ""}`.trim();
+  if (props.mode === "shared")
+    return `공유 대화 ${activeHistoryId.value || ""}`.trim();
   return activeHistory.value?.title || "";
 });
 
 const suggestions = [
-  {icon: "▧", text: "이미지 만들기", prompt: "이미지 생성 화면의 UI 구조를 제안해줘"},
-  {icon: "✎", text: "글쓰기 또는 편집", prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘"},
-  {icon: "◎", text: "필요한 항목 찾기", prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘"}
+  {
+    icon: "▧",
+    text: "이미지 만들기",
+    prompt: "이미지 생성 화면의 UI 구조를 제안해줘",
+  },
+  {
+    icon: "✎",
+    text: "글쓰기 또는 편집",
+    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘",
+  },
+  {
+    icon: "◎",
+    text: "필요한 항목 찾기",
+    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘",
+  },
 ];
 
+/**
+ * getMessageListRef 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getMessageListRef() {
   const exposed = workspaceRef.value?.listRef;
   if (exposed?.scrollToBottom) return exposed;
@@ -146,22 +166,40 @@ function getMessageListRef() {
   return null;
 }
 
+/**
+ * updateMobileState 처리 함수입니다.
+ * @returns {void}
+ */
 function updateMobileState() {
   isMobile.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-      window.innerWidth <= 900 ||
-      document.querySelector(".app-shell--mobile")
+    window.innerWidth <= 900 ||
+    document.querySelector(".app-shell--mobile")
   );
 }
 
+/**
+ * markForceBottom 처리 함수입니다.
+ * @param {*} duration 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function markForceBottom(duration = 1800) {
   forceBottomUntil = Date.now() + duration;
 }
 
+/**
+ * shouldKeepForceBottom 처리 함수입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function shouldKeepForceBottom() {
   return Date.now() <= forceBottomUntil;
 }
 
+/**
+ * scrollBottom 처리 함수입니다.
+ * @param {*} options 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function scrollBottom(options = {}) {
   const list = getMessageListRef();
   if (list?.scrollToBottom) {
@@ -172,33 +210,58 @@ async function scrollBottom(options = {}) {
   updateScrollBottomButton();
 }
 
+/**
+ * updateScrollBottomButton 처리 함수입니다.
+ * @returns {void}
+ */
 function updateScrollBottomButton() {
   const list = getMessageListRef();
   showScrollBottom.value =
-    (props.mode === "chat" || props.mode === "shared") && Boolean(list && !list.isAtBottom?.());
+    (props.mode === "chat" || props.mode === "shared") &&
+    Boolean(list && !list.isAtBottom?.());
 }
 
+/**
+ * scheduleBottomStateCheck 처리 함수입니다.
+ * @returns {void}
+ */
 function scheduleBottomStateCheck() {
   window.clearTimeout(bottomStateTimer);
   bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
 }
 
+/**
+ * handleMessageContentRendered 처리 함수입니다.
+ * @returns {void}
+ */
 function handleMessageContentRendered() {
   if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
   scheduleBottomStateCheck();
 }
 
+/**
+ * handlePromptFocus 처리 함수입니다.
+ * @returns {void}
+ */
 function handlePromptFocus() {
   if (isReadOnly.value) return;
   refreshViewport();
   scrollBottom({stable: true, force: isMobile.value});
 }
 
+/**
+ * handlePromptResize 처리 함수입니다.
+ * @returns {void}
+ */
 function handlePromptResize() {
   if (isReadOnly.value) return;
   scrollBottom({stable: true, force: isMobile.value});
 }
 
+/**
+ * startNewChat 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function startNewChat() {
   revokeMessageAttachments(messages.value);
   messages.value = [];
@@ -208,12 +271,21 @@ async function startNewChat() {
   await router.push("/");
 }
 
+/**
+ * openHistory 처리 함수입니다.
+ * @param {*} item 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function openHistory(item) {
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
   await router.push({name: "chat", params: {id: item.id}});
 }
 
+/**
+ * loadRouteConversation 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function loadRouteConversation() {
   if (props.mode === "main") {
     messages.value = [];
@@ -239,9 +311,15 @@ async function loadRouteConversation() {
   await scrollBottom({behavior: "auto", force: true, stable: true});
 }
 
+/**
+ * renderAfterStream 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function renderAfterStream() {
   markForceBottom(1000);
-  await renderMermaidInElement(document.querySelector(".message-list"), {force: true});
+  await renderMermaidInElement(document.querySelector(".message-list"), {
+    force: true,
+  });
   scrollBottom({force: true, stable: true});
 }
 
@@ -255,44 +333,81 @@ const {isGenerating, handleSubmit} = useChatSubmit({
     markForceBottom(2500);
     await scrollBottom(options);
   },
-  renderAfterStream
+  renderAfterStream,
 });
 
+/**
+ * submitIfWritable 처리 함수입니다.
+ * @param {*} payload 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function submitIfWritable(payload) {
   if (isReadOnly.value) return;
   handleSubmit(payload);
 }
 
+/**
+ * toggleTheme 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function toggleTheme() {
   theme.toggle();
   themeName.value = theme.current;
   await nextTick();
-  await renderMermaidInElement(document.querySelector(".message-list"), {force: true});
+  await renderMermaidInElement(document.querySelector(".message-list"), {
+    force: true,
+  });
   scrollBottom({stable: true});
 }
 
+/**
+ * openSwagger 처리 함수입니다.
+ * @returns {void}
+ */
 function openSwagger() {
   router.push("/swagger");
 }
 
+/**
+ * openSettings 처리 함수입니다.
+ * @returns {void}
+ */
 function openSettings() {
   window.dispatchEvent(new CustomEvent("chat:settings-open"));
 }
 
+/**
+ * openAssistantFromHeader 처리 함수입니다.
+ * @returns {void}
+ */
 function openAssistantFromHeader() {
   assistantSheetOpen.value = true;
 }
 
+/**
+ * selectAssistantFromSheet 처리 함수입니다.
+ * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function selectAssistantFromSheet(id) {
   selectedAssistantId.value = id;
   assistantSheetOpen.value = false;
 }
 
-watch(() => [route.params.id, route.params.shareId, props.mode], loadRouteConversation, {immediate: true});
+watch(
+  () => [route.params.id, route.params.shareId, props.mode],
+  loadRouteConversation,
+  {
+    immediate: true,
+  }
+);
 
 onMounted(() => {
   updateMobileState();
-  removeMobileMediaQueryListener = addMediaQueryListener("(max-width: 900px)", updateMobileState);
+  removeMobileMediaQueryListener = addMediaQueryListener(
+    "(max-width: 900px)",
+    updateMobileState
+  );
   window.addEventListener("resize", updateMobileState, {passive: true});
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
 });

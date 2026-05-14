@@ -330,6 +330,11 @@ function openAssistantSelector() {
  * @param {string} id 선택된 Assistant id
  * @returns {void}
  */
+/**
+ * selectAssistant 처리 함수입니다.
+ * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function selectAssistant(id) {
   emit("update:selectedAssistantId", id);
   assistantMenuOpen.value = false;

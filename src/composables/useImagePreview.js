@@ -11,6 +11,11 @@ import {onBeforeUnmount, onMounted, ref} from "vue";
  * @param {{dataUrl?: string, previewUrl?: string, url?: string}} detail Attachment preview event detail
  * @returns {string[]} Unique source URLs ordered by priority
  */
+/**
+ * getPreviewSources 처리 함수입니다.
+ * @param {*} detail 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getPreviewSources(detail = {}) {
   return [detail.dataUrl, detail.previewUrl, detail.url]
     .filter((url) => typeof url === "string" && url.length > 0)
@@ -22,11 +27,17 @@ function getPreviewSources(detail = {}) {
  * @param {File|null|undefined} file Browser file object
  * @returns {Promise<string>} Data URL or empty string
  */
+/**
+ * readPreviewDataUrl 처리 함수입니다.
+ * @param {*} file 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function readPreviewDataUrl(file) {
   return new Promise((resolve) => {
     if (!file || typeof FileReader === "undefined") return resolve("");
     const reader = new FileReader();
-    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "");
+    reader.onload = () =>
+      resolve(typeof reader.result === "string" ? reader.result : "");
     reader.onerror = () => resolve("");
     reader.readAsDataURL(file);
   });
@@ -39,6 +50,11 @@ function readPreviewDataUrl(file) {
 export function useImagePreview() {
   const previewImage = ref(null);
 
+  /**
+   * hydrateOpenPreviewFromFile 처리 함수입니다.
+   * @param {*} targetPreview 함수 실행에 필요한 입력값입니다.
+   * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+   */
   async function hydrateOpenPreviewFromFile(targetPreview) {
     const dataUrl = await readPreviewDataUrl(targetPreview?.file);
     if (!dataUrl || previewImage.value?.id !== targetPreview.id) return;
@@ -50,10 +66,15 @@ export function useImagePreview() {
         (url, index, array) => url && array.indexOf(url) === index
       ),
       loading: true,
-      error: false
+      error: false,
     };
   }
 
+  /**
+   * openImagePreview 처리 함수입니다.
+   * @param {*} event 함수 실행에 필요한 입력값입니다.
+   * @returns {void}
+   */
   function openImagePreview(event) {
     const detail = event?.detail || {};
     const sources = getPreviewSources(detail);
@@ -64,17 +85,26 @@ export function useImagePreview() {
       sources,
       sourceIndex: 0,
       loading: Boolean(firstUrl || detail.file),
-      error: !firstUrl && !detail.file
+      error: !firstUrl && !detail.file,
     };
-    if (detail.file && !detail.dataUrl) hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
+    if (detail.file && !detail.dataUrl)
+      hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
   }
 
+  /**
+   * handlePreviewLoad 처리 함수입니다.
+   * @returns {void}
+   */
   function handlePreviewLoad() {
     if (!previewImage.value) return;
     previewImage.value.loading = false;
     previewImage.value.error = false;
   }
 
+  /**
+   * handlePreviewError 처리 함수입니다.
+   * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+   */
   async function handlePreviewError() {
     const current = previewImage.value;
     if (!current) return;
@@ -86,7 +116,7 @@ export function useImagePreview() {
         url: nextUrl,
         sourceIndex: nextIndex,
         loading: true,
-        error: false
+        error: false,
       };
       return;
     }
@@ -99,7 +129,7 @@ export function useImagePreview() {
         sources: [dataUrl],
         sourceIndex: 0,
         loading: true,
-        error: false
+        error: false,
       };
       return;
     }
@@ -109,12 +139,25 @@ export function useImagePreview() {
     }
   }
 
+  /**
+   * closeImagePreview 처리 함수입니다.
+   * @returns {void}
+   */
   function closeImagePreview() {
     previewImage.value = null;
   }
 
-  onMounted(() => window.addEventListener("chat:image-preview", openImagePreview));
-  onBeforeUnmount(() => window.removeEventListener("chat:image-preview", openImagePreview));
+  onMounted(() =>
+    window.addEventListener("chat:image-preview", openImagePreview)
+  );
+  onBeforeUnmount(() =>
+    window.removeEventListener("chat:image-preview", openImagePreview)
+  );
 
-  return {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError};
+  return {
+    previewImage,
+    closeImagePreview,
+    handlePreviewLoad,
+    handlePreviewError,
+  };
 }

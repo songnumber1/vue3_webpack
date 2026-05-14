@@ -47,13 +47,10 @@ export const NativeSelectedFile = z.object({
 });
 export const OnFileSelectedRequest = BaseRequest.extend({
   files: z.array(NativeSelectedFile).openapi({description: "선택된 파일 목록"}),
-  pickerRequestId: z
-    .string()
-    .optional()
-    .openapi({
-      description: "openFilePicker 요청 ID",
-      example: "req_20260507_001",
-    }),
+  pickerRequestId: z.string().optional().openapi({
+    description: "openFilePicker 요청 ID",
+    example: "req_20260507_001",
+  }),
 });
 export const OnNetworkChangeRequest = BaseRequest.extend({
   status: z

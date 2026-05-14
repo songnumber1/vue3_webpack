@@ -31,6 +31,10 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
+/**
+ * goBack 처리 함수입니다.
+ * @returns {void}
+ */
 function goBack() {
   if (window.history.length > 1) {
     window.history.back();

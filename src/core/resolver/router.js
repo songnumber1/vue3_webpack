@@ -35,14 +35,14 @@ const baseRoutes = [
         name: "chat",
         component: ChatPage,
         props: true,
-        meta: {title: "Chat"}
+        meta: {title: "Chat"},
       },
       {
         path: "shared/:shareId",
         name: "shared",
         component: SharedPage,
         props: true,
-        meta: {title: "Shared Chat"}
+        meta: {title: "Shared Chat"},
       },
       {
         path: "swagger",
@@ -68,6 +68,11 @@ const notFoundRoute = {
   component: NotFoundPage,
   meta: {title: "Not Found", skipVersionCheck: true},
 };
+/**
+ * shouldRequireAndroidUpdate 처리 함수입니다.
+ * @param {*} appInfo 함수 실행에 필요한 입력값입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function shouldRequireAndroidUpdate(appInfo) {
   if (!isAndroidApp(appInfo)) return false;
   const currentVersion = appInfo?.appVersion;
@@ -75,6 +80,12 @@ function shouldRequireAndroidUpdate(appInfo) {
   if (!currentVersion || !latestVersion) return false;
   return isVersionLowerThan(currentVersion, latestVersion);
 }
+/**
+ * registerRouteGuard 처리 함수입니다.
+ * @param {*} router 함수 실행에 필요한 입력값입니다.
+ * @param {*} appInfo 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function registerRouteGuard(router, appInfo) {
   router.beforeEach((to) => {
     const platformStore = usePlatformStore();

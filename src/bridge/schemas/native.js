@@ -14,13 +14,10 @@ export const BooleanAckData = z.object({
 export const BooleanAckResponse = createResponseSchema(BooleanAckData);
 
 export const OpenExternalBrowserRequest = BaseRequest.extend({
-  url: z
-    .string()
-    .url()
-    .openapi({
-      description: "외부 브라우저로 열 URL",
-      example: "https://example.com",
-    }),
+  url: z.string().url().openapi({
+    description: "외부 브라우저로 열 URL",
+    example: "https://example.com",
+  }),
 });
 export const OpenExternalBrowserResponse = createResponseSchema(
   z.object({
@@ -52,13 +49,10 @@ export const OpenFilePickerResponse = createResponseSchema(
     opened: z
       .boolean()
       .openapi({description: "파일 선택 UI 실행 여부", example: true}),
-    requestId: z
-      .string()
-      .optional()
-      .openapi({
-        description: "결과 매칭용 요청 ID",
-        example: "req_20260507_001",
-      }),
+    requestId: z.string().optional().openapi({
+      description: "결과 매칭용 요청 ID",
+      example: "req_20260507_001",
+    }),
   })
 );
 
@@ -154,13 +148,10 @@ export const StorageSetResponse = createResponseSchema(
   })
 );
 export const StorageRemoveRequest = BaseRequest.extend({
-  key: z
-    .string()
-    .min(1)
-    .openapi({
-      description: "삭제할 secure storage key",
-      example: "accessToken",
-    }),
+  key: z.string().min(1).openapi({
+    description: "삭제할 secure storage key",
+    example: "accessToken",
+  }),
 });
 export const StorageRemoveResponse = createResponseSchema(
   z.object({
@@ -229,12 +220,10 @@ export const GetDeviceInfoResponse = createResponseSchema(
   })
 );
 export const WriteLogRequest = BaseRequest.extend({
-  data: z
-    .record(z.any())
-    .openapi({
-      description: "네이티브 로그 데이터",
-      example: {level: "info", message: "upload started"},
-    }),
+  data: z.record(z.any()).openapi({
+    description: "네이티브 로그 데이터",
+    example: {level: "info", message: "upload started"},
+  }),
 });
 export const WriteLogResponse = createResponseSchema(
   z.object({

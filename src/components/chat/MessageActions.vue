@@ -36,9 +36,18 @@ const props = defineProps({
   content: {type: String, default: ""},
 });
 const feedback = ref("");
+/**
+ * setFeedback 처리 함수입니다.
+ * @param {*} value 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function setFeedback(value) {
   feedback.value = feedback.value === value ? "" : value;
 }
+/**
+ * copy 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function copy() {
   try {
     await copyClipboardByPlatform(props.content || "");

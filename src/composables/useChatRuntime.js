@@ -106,6 +106,11 @@ const currentAssistant = computed(
  * @param {string|number} id 조회할 history id
  * @returns {{id: string|number, title: string, preview?: string, type?: string}|null}
  */
+/**
+ * getHistory 처리 함수입니다.
+ * @param {*} id 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getHistory(id) {
   const normalizedId = Number(id);
   return (
@@ -116,6 +121,11 @@ function getHistory(id) {
 /**
  * 메시지 첨부파일 중 blob URL을 해제하여 메모리 누수를 방지합니다.
  * @param {Array<{attachments?: Array<{url?: string}>}>} items 정리할 메시지 목록
+ * @returns {void}
+ */
+/**
+ * revokeMessageAttachments 처리 함수입니다.
+ * @param {*} items 함수 실행에 필요한 입력값입니다.
  * @returns {void}
  */
 function revokeMessageAttachments(items = []) {
@@ -131,6 +141,11 @@ function revokeMessageAttachments(items = []) {
  * 저장된 history 정보를 화면 표시용 메시지 목록으로 변환합니다.
  * @param {{id: string|number, title: string, preview?: string, type?: string}|null} history 대화 이력
  * @returns {Promise<Array<{id: string, role: string, content: string}>>}
+ */
+/**
+ * buildMessagesFromHistory 처리 함수입니다.
+ * @param {*} history 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
  */
 async function buildMessagesFromHistory(history) {
   if (!history) return [];
@@ -161,6 +176,11 @@ async function buildMessagesFromHistory(history) {
  * @param {string|number} historyId 대화 이력 id
  * @returns {Promise<Array>} 대화 메시지 목록
  */
+/**
+ * ensureConversation 처리 함수입니다.
+ * @param {*} historyId 함수 실행에 필요한 입력값입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function ensureConversation(historyId) {
   const history = getHistory(historyId);
   if (!history) return [];
@@ -174,6 +194,12 @@ async function ensureConversation(historyId) {
  * 대화방 메시지 목록을 교체합니다.
  * @param {string|number} historyId 대화 이력 id
  * @param {Array} messages 저장할 메시지 목록
+ */
+/**
+ * setConversation 처리 함수입니다.
+ * @param {*} historyId 함수 실행에 필요한 입력값입니다.
+ * @param {*} messages 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
  */
 function setConversation(historyId, messages) {
   conversations.value[historyId] = messages;

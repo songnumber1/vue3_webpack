@@ -12,16 +12,35 @@ import {
   hasExtensionRuntime,
 } from "@/core/config";
 
+/**
+ * getNavigator 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getNavigator() {
   return typeof window === "undefined" ? {} : window.navigator || {};
 }
+/**
+ * getScreen 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getScreen() {
   return typeof window === "undefined" ? {} : window.screen || {};
 }
+/**
+ * parseVersion 처리 함수입니다.
+ * @param {*} ua 함수 실행에 필요한 입력값입니다.
+ * @param {*} pattern 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function parseVersion(ua, pattern) {
   const match = ua.match(pattern);
   return match?.[1] || "";
 }
+/**
+ * getBrowserName 처리 함수입니다.
+ * @param {*} ua 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getBrowserName(ua) {
   if (/Edg\//i.test(ua)) return "edge";
   if (/OPR\//i.test(ua)) return "opera";
@@ -31,6 +50,12 @@ function getBrowserName(ua) {
   if (/Safari\//i.test(ua)) return "safari";
   return "unknown";
 }
+/**
+ * getBrowserVersion 처리 함수입니다.
+ * @param {*} ua 함수 실행에 필요한 입력값입니다.
+ * @param {*} browserName 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getBrowserVersion(ua, browserName) {
   if (browserName === "edge") return parseVersion(ua, /Edg\/([\d.]+)/i);
   if (browserName === "chrome")
@@ -42,6 +67,12 @@ function getBrowserVersion(ua, browserName) {
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
   return "";
 }
+/**
+ * detectEnv 처리 함수입니다.
+ * @param {*} ua 함수 실행에 필요한 입력값입니다.
+ * @param {*} platform 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function detectEnv(ua, platform) {
   if (/Android/i.test(ua)) return PLATFORM.ANDROID;
   if (/iPhone|iPad|iPod/i.test(ua)) return PLATFORM.IOS;
@@ -50,8 +81,14 @@ function detectEnv(ua, platform) {
   if (/Linux/i.test(platform)) return PLATFORM.LINUX;
   return PLATFORM.UNKNOWN;
 }
-// eslint-disable-next-line no-unused-vars
-function detectDevice({ua, env, browserName}) {
+/**
+ * detectDevice 처리 함수입니다.
+ * @param {*} options 함수 실행에 필요한 입력값입니다.
+ * @param {*} env 함수 실행에 필요한 입력값입니다.
+ * @param {*} browserName 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
+function detectDevice({env, browserName}) {
   if (hasAndroidBridge() || hasIosBridge()) return "app";
   if (
     env === PLATFORM.WINDOWS ||
@@ -63,10 +100,18 @@ function detectDevice({ua, env, browserName}) {
   if (env === PLATFORM.IOS) return browserName || "ios-browser";
   return "unknown";
 }
+/**
+ * getAppVersionFromBridge 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
   return bridge?.appVersion || bridge?.version || "";
 }
+/**
+ * getBridgeVersionFromBridge 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getBridgeVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
   return bridge?.bridgeVersion || "";
@@ -93,7 +138,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAndroidApp = isAndroid && hasAndroidBridge();
   const isIosApp = isIos && hasIosBridge();
   const isMobileBrowser = (isAndroid || isIos) && !isNativeApp;
-  const isAccess = !isIos;
+  const isAccess = true; // 플랫폼 접근 허용 여부 (추후 앱 버전, 브리지 버전 등으로 세분화 가능)
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
   return {

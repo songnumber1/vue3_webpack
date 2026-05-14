@@ -30,7 +30,7 @@ import ChatMessage from "./ChatMessage.vue";
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 
-const props = defineProps({
+defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
 });
@@ -42,10 +42,18 @@ const bottomRef = ref(null);
 const userIsAtBottom = ref(true);
 let stableScrollTimerIds = [];
 
+/**
+ * getScrollElement 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getScrollElement() {
   return scrollRef.value;
 }
 
+/**
+ * isNearBottom 처리 함수입니다.
+ * @returns {boolean|*} 처리 결과를 반환합니다.
+ */
 function isNearBottom() {
   const el = getScrollElement();
   if (!el) return true;
@@ -54,19 +62,36 @@ function isNearBottom() {
   return remaining <= BOTTOM_THRESHOLD;
 }
 
+/**
+ * updateBottomState 처리 함수입니다.
+ * @returns {void}
+ */
 function updateBottomState() {
   userIsAtBottom.value = isNearBottom();
 }
 
+/**
+ * handleScroll 처리 함수입니다.
+ * @returns {void}
+ */
 function handleScroll() {
   updateBottomState();
 }
 
+/**
+ * clearStableTimers 처리 함수입니다.
+ * @returns {void}
+ */
 function clearStableTimers() {
   stableScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
   stableScrollTimerIds = [];
 }
 
+/**
+ * applyBottomScroll 처리 함수입니다.
+ * @param {*} behavior 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function applyBottomScroll(behavior = "auto") {
   const el = getScrollElement();
   if (!el) return;
@@ -81,6 +106,11 @@ function applyBottomScroll(behavior = "auto") {
   userIsAtBottom.value = true;
 }
 
+/**
+ * scrollToBottom 처리 함수입니다.
+ * @param {*} options 함수 실행에 필요한 입력값입니다.
+ * @returns {void}
+ */
 function scrollToBottom(options = {}) {
   const force = options.force === true;
   const stable = options.stable === true;
@@ -103,6 +133,10 @@ function scrollToBottom(options = {}) {
   });
 }
 
+/**
+ * handleMessageRendered 처리 함수입니다.
+ * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ */
 async function handleMessageRendered() {
   emit("content-rendered");
 
@@ -115,6 +149,10 @@ async function handleMessageRendered() {
 
 onBeforeUnmount(clearStableTimers);
 
+/**
+ * getIsAtBottom 처리 함수입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getIsAtBottom() {
   updateBottomState();
   return userIsAtBottom.value;

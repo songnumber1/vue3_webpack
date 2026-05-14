@@ -11,6 +11,11 @@ let fallbackCounter = 0;
  * @param {Uint8Array} bytes 난수를 채울 바이트 배열
  * @returns {Uint8Array} 난수가 채워진 배열
  */
+/**
+ * getRandomValuesSafe 처리 함수입니다.
+ * @param {*} bytes 함수 실행에 필요한 입력값입니다.
+ * @returns {*} 처리 결과를 반환합니다.
+ */
 function getRandomValuesSafe(bytes) {
   const cryptoObj = globalThis.crypto || globalThis.msCrypto;
   if (cryptoObj?.getRandomValues) {
@@ -32,7 +37,6 @@ function createUuidV4Fallback() {
   const bytes = getRandomValuesSafe(new Uint8Array(16));
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
-
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }

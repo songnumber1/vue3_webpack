@@ -8,7 +8,6 @@ import {GetUserRequest, GetUserResponse} from "./schemas/getUser";
 import {LoginRequest, LoginResponse} from "./schemas/login";
 import {UploadFileRequest, UploadFileResponse} from "./schemas/uploadFile";
 import {
-  BooleanAckResponse,
   CancelRequestRequest,
   CancelRequestResponse,
   CheckNetworkResponse,

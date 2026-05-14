@@ -44,7 +44,7 @@
 
 <script setup>
 defineProps({
-  image: {type: Object, default: null}
+  image: {type: Object, default: null},
 });
 
 defineEmits(["close", "load", "error"]);
