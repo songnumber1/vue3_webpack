@@ -77,6 +77,10 @@
     </button>
     <div ref="composerSlotRef" class="chat-composer-slot">
       <ChatReadonlyInput v-if="readonly" />
+      <ChatReadonlyInput
+        v-else-if="isActiveModelDeleted"
+        variant="deleted-model"
+      />
       <PromptInput
         v-else
         :model-value="selectedModel"
@@ -160,6 +164,7 @@ const props = defineProps({
   selectedModel: { type: String, default: "" },
   models: { type: Array, default: () => [] },
   modelReadonly: { type: Boolean, default: false },
+  isActiveModelDeleted: { type: Boolean, default: false },
   isGenerating: { type: Boolean, default: false },
   messages: { type: Array, default: () => [] },
   showScrollBottom: { type: Boolean, default: false },
@@ -185,7 +190,7 @@ defineEmits([
 ]);
 
 watch(
-  () => [props.readonly, props.mode, props.showScrollBottom],
+  () => [props.readonly, props.mode, props.showScrollBottom, props.isActiveModelDeleted],
   async () => {
     await nextTick();
     updateComposerHeight();

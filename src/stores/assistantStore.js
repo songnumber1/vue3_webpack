@@ -5,6 +5,7 @@ export const useAssistantStore = defineStore('assistant', {
     assistants: [],
     assistantMap: {},
     models: [],
+    allModels: [],
     modelMap: {},
     modelMapByAssistant: {},
     selectedAssistantId: '',
@@ -21,6 +22,7 @@ export const useAssistantStore = defineStore('assistant', {
       this.assistants = payload.assistants || []
       this.assistantMap = payload.assistantMap || {}
       this.models = payload.models || []
+      this.allModels = payload.allModels || payload.models || []
       this.modelMap = payload.modelMap || {}
       this.modelMapByAssistant = payload.modelMapByAssistant || {}
       this.selectedAssistantId = payload.initialAssistantId || this.assistants[0]?.id || ''

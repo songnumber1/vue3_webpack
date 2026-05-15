@@ -25,6 +25,19 @@ export function adaptModel(raw = {}) {
   }
 }
 
-export function adaptModelList(rawItems = []) {
-  return rawItems.map(adaptModel).filter((item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted)
+export function adaptModelList(rawItems = [], options = {}) {
+  const { includeDeleted = false, includeUnauthorized = false } = options
+
+  return rawItems
+    .map(adaptModel)
+    .filter((item) => {
+      if (!item.id || !item.assistId) return false
+      if (!includeUnauthorized && !item.isAuthorized) return false
+      if (!includeDeleted && item.isDeleted) return false
+      return true
+    })
+}
+
+export function filterAvailableModels(models = []) {
+  return models.filter((item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted)
 }

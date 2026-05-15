@@ -41,6 +41,7 @@
       :selected-model="selectedModel"
       :models="models"
       :model-readonly="isModelLocked"
+      :is-active-model-deleted="isActiveModelDeleted"
       :is-generating="isGenerating"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
@@ -156,6 +157,7 @@ const {
   selectedAssistantId,
   selectedModel,
   isModelLocked,
+  isActiveModelDeleted,
   activeSession,
   ensureConversation,
   setConversation,
@@ -332,7 +334,7 @@ function handleMessageContentRendered() {
  * @returns {void}
  */
 function handlePromptFocus() {
-  if (isReadOnly.value) return;
+  if (isReadOnly.value || isActiveModelDeleted.value) return;
   refreshViewport();
   scrollBottom({ stable: true, force: isMobile.value });
 }
@@ -342,7 +344,7 @@ function handlePromptFocus() {
  * @returns {void}
  */
 function handlePromptResize() {
-  if (isReadOnly.value) return;
+  if (isReadOnly.value || isActiveModelDeleted.value) return;
   scrollBottom({ stable: true, force: isMobile.value });
 }
 
@@ -451,7 +453,7 @@ const { isGenerating, handleSubmit } = useChatSubmit({
  * @returns {void}
  */
 function submitIfWritable(payload) {
-  if (isReadOnly.value) return;
+  if (isReadOnly.value || isActiveModelDeleted.value) return;
   handleSubmit(payload);
 }
 

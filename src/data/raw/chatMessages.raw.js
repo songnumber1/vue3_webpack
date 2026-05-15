@@ -25,6 +25,20 @@ const assistant = (id, content, sendTime, references = []) => ({
 })
 
 export const CHAT_MESSAGES_RAW = {
+  'chat-deleted-model': [
+    user('msg-deleted-1', '이전 모델로 작성했던 답변을 다시 확인하고 싶어', '2026-05-15T08:20:00Z'),
+    assistant('msg-deleted-2', `이 대화는 현재 삭제된 모델로 생성된 이전 대화입니다.
+
+기존 메시지는 계속 확인할 수 있지만, 동일한 모델로 새 질의를 이어서 보낼 수는 없습니다.
+
+| 상태 | 설명 |
+|---|---|
+| 대화방 입장 | 가능 |
+| 이전 메시지 조회 | 가능 |
+| 새 질의 입력 | 불가 |
+
+새 질문을 하려면 좌측 상단에서 사용 가능한 Assistant 또는 모델을 선택해 새 대화를 시작하세요.`, '2026-05-15T08:20:05Z'),
+  ],
   'chat-md-showcase': [
     user('msg-md-1', 'Markdown으로 표, mermaid, 코드, 외부 링크, 이미지, 수식까지 한 번에 렌더링되는지 확인해줘', '2026-05-15T09:00:00Z'),
     assistant(

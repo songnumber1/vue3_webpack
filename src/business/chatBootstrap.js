@@ -1,6 +1,6 @@
 import { resolveChatApis } from '@/api/runtime/chatApis'
 import { adaptAssistantList } from '@/adapters/assistantAdapter'
-import { adaptModelList } from '@/adapters/modelAdapter'
+import { adaptModelList, filterAvailableModels } from '@/adapters/modelAdapter'
 import { adaptChatHistoryList, adaptMessageList } from '@/adapters/chatAdapter'
 import { adaptExamplePromptList } from '@/adapters/promptAdapter'
 
@@ -44,9 +44,13 @@ export async function bootstrapChatRuntime() {
   ])
 
   const assistants = [...adaptAssistantList(assistantRaw), ...adaptAssistantList(studioRaw)].sort((a, b) => a.order - b.order)
-  const models = [...adaptModelList(modelRaw), ...adaptModelList(studioModelRaw)]
+  const allModels = [
+    ...adaptModelList(modelRaw, { includeDeleted: true }),
+    ...adaptModelList(studioModelRaw, { includeDeleted: true }),
+  ]
+  const models = filterAvailableModels(allModels)
   const assistantMap = toMap(assistants)
-  const modelMap = toMap(models)
+  const modelMap = toMap(allModels)
   const modelMapByAssistant = groupModelsByAssistant(models)
   const chatHistories = adaptChatHistoryList(await chatHistoryApi.getChatHistoryList(), { assistantMap, modelMap })
   const initialAssistant = pickInitialAssistant(assistants, accessInfo)
@@ -56,6 +60,7 @@ export async function bootstrapChatRuntime() {
     accessInfo,
     assistants,
     models,
+    allModels,
     assistantMap,
     modelMap,
     modelMapByAssistant,

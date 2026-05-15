@@ -6450,3 +6450,71 @@ body,
     border-radius: 22px;
   }
 }
+
+/* Deleted model composer state.
+   Old chat rooms linked to a deleted model remain readable, but message input is blocked. */
+.shared-readonly-box--deleted-model {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  border-color: color-mix(in srgb, #f59e0b 36%, var(--prompt-border));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, #f59e0b 10%, var(--surface-muted)),
+    var(--surface-muted)
+  );
+}
+
+.shared-readonly-icon {
+  width: 34px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  color: #b45309;
+  background: color-mix(in srgb, #f59e0b 14%, transparent);
+}
+
+.shared-readonly-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.shared-readonly-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.shared-readonly-box--deleted-model .shared-readonly-text strong {
+  color: var(--text);
+}
+
+.shared-readonly-box--deleted-model .shared-readonly-text span {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .shared-readonly-box--deleted-model,
+  .app-shell--mobile .shared-readonly-box--deleted-model,
+  .app-container--mobile .shared-readonly-box--deleted-model {
+    gap: 10px;
+    align-items: flex-start;
+    border-radius: 18px;
+  }
+
+  .shared-readonly-icon {
+    width: 30px;
+    height: 30px;
+    margin-top: 1px;
+  }
+
+  .shared-readonly-icon svg {
+    width: 19px;
+    height: 19px;
+  }
+}

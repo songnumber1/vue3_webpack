@@ -30,6 +30,14 @@ function createLocalHistory({ text, assistant, model }) {
   }
 }
 
+/**
+ * Creates a readonly chat session from a chat history row.
+ * Deleted models are intentionally preserved so old chats can be opened while composer input is blocked.
+ * @param {object} history Adapted chat history item.
+ * @param {Record<string, object>} modelMap All models including deleted models.
+ * @param {Record<string, object>} assistantMap Assistant lookup map.
+ * @returns {object|null} Active chat session context.
+ */
 function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
   if (!history) return null
   const model = modelMap[history.modelId] || null
@@ -43,6 +51,8 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
     modelId: model?.id || history.modelId || '',
     modelName: model?.label || history.modelLabel || '',
     modelType: model?.type || '',
+    isModelDeleted: Boolean(model?.isDeleted),
+    modelUnavailableReason: model?.isDeleted ? 'deleted' : '',
     readonlyModel: true,
   }
 }
@@ -58,6 +68,7 @@ export function useChatRuntime() {
   const currentAssistant = computed(() => assistantStore.currentAssistant || assistants.value[0] || { id: '', label: 'Assistant', description: '' })
   const currentExamplePrompts = computed(() => examplePromptMap.value[selectedAssistantId.value] || [])
   const activeSession = computed(() => chatStore.activeSession)
+  const isActiveModelDeleted = computed(() => Boolean(chatStore.activeSession?.isModelDeleted))
   const models = computed(() => {
     if (!chatStore.isModelLocked) return assistantStore.currentModels
     return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(Boolean)
@@ -190,6 +201,7 @@ export function useChatRuntime() {
     selectedAssistantId,
     selectedModel,
     isModelLocked,
+    isActiveModelDeleted,
     conversations,
     selectAssistant,
     selectAssistantForNewChat,
