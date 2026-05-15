@@ -5805,3 +5805,90 @@ body,
     word-break: keep-all;
   }
 }
+
+/* Assistant/model selection and markdown overflow safety patch. */
+.assistant-option,
+.model-option,
+.bottom-sheet-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.assistant-option-main,
+.model-option-main,
+.bottom-sheet-option-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.option-check,
+.bottom-sheet-check {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  color: var(--primary-strong);
+}
+
+.bottom-sheet-option.active .bottom-sheet-check,
+.assistant-option.active .option-check,
+.model-option.active .option-check {
+  color: var(--primary-strong);
+}
+
+.suggestion-chip {
+  max-width: min(100%, 240px);
+  white-space: nowrap;
+}
+
+.suggestion-chip span + * {
+  min-width: 0;
+}
+
+.markdown-body img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  margin: 12px auto;
+  border-radius: 12px;
+  object-fit: contain;
+}
+
+.markdown-body p:has(> img:only-child) {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.bubble-content.markdown-body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 900px) {
+  .suggestion-row--between {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .suggestion-chip,
+  .app-shell--mobile .suggestion-chip {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .markdown-body img {
+    width: auto;
+    max-width: 100%;
+  }
+}
+.suggestion-chip-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

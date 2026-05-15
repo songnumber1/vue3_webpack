@@ -14,14 +14,21 @@
       type="button"
       @click="$emit('select', assistant.id)"
     >
-      <strong>{{ assistant.label }}</strong>
-      <small>{{ assistant.description }}</small>
+      <span class="bottom-sheet-option-main">
+        <strong>{{ assistant.label }}</strong>
+        <small>{{ assistant.description }}</small>
+      </span>
+      <CheckIcon
+        v-if="assistant.id === selectedAssistantId"
+        class="bottom-sheet-check"
+      />
     </button>
   </BaseBottomSheet>
 </template>
 
 <script setup>
 import BaseBottomSheet from "./BaseBottomSheet.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 defineProps({
   open: { type: Boolean, default: false },

@@ -14,7 +14,7 @@
     :drawer-open="drawerOpen"
     :collapsed-recent-open="collapsedRecentOpen"
     :keyboard-open="keyboardOpen"
-    @update:selected-assistant-id="selectAssistant"
+    @update:selected-assistant-id="startNewChatWithAssistant"
     @update:sidebar-collapsed="sidebarCollapsed = $event"
     @update:drawer-open="drawerOpen = $event"
     @update:collapsed-recent-open="collapsedRecentOpen = $event"
@@ -124,6 +124,7 @@ import { loadSharedConversation } from "@/composables/useSharedChat";
 import { useViewportGuard } from "@/composables/useViewportGuard";
 import { addMediaQueryListener } from "@/utils/dom";
 import { renderMermaidInElement } from "@/utils/mermaidRenderer";
+import { PROMPT_SUGGESTION_DEFINITIONS } from "@/constants/promptSuggestions";
 import ChatAssistantSheet from "@/components/chat/ChatAssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -154,7 +155,8 @@ const {
   createLocalConversation,
   clearCurrentChatSelection,
   appendUserAndAssistantMessages,
-  selectAssistant,
+  selectAssistantForNewChat,
+  currentExamplePrompts,
   getHistory,
   revokeMessageAttachments,
 } = runtime;
@@ -205,23 +207,20 @@ const workspaceAssistantLabel = computed(() => {
   return currentAssistant.value?.label || "Assistant";
 });
 
-const suggestions = computed(() => [
-  {
-    icon: "▧",
-    text: t("chat.suggestions.image"),
-    prompt: "Markdown 이미지와 첨부 파일 미리보기 UI를 점검해줘",
-  },
-  {
-    icon: "✎",
-    text: t("chat.suggestions.writing"),
-    prompt: "운영 API를 유지하면서 adapter/business layer로 분리하는 기준을 정리해줘",
-  },
-  {
-    icon: "◎",
-    text: t("chat.suggestions.search"),
-    prompt: "Promise.all 기반 초기 데이터 로딩 구조에서 빠진 항목을 찾아줘",
-  },
-]);
+const suggestions = computed(() => {
+  const assistantPrompts = currentExamplePrompts.value || [];
+
+  return PROMPT_SUGGESTION_DEFINITIONS.map((definition, index) => {
+    const prompt = assistantPrompts[index];
+    return {
+      id: definition.id,
+      icon: definition.icon,
+      text: t(definition.labelKey),
+      title: prompt?.titleKo || prompt?.titleEn || t(definition.labelKey),
+      prompt: prompt?.contentKo || prompt?.titleKo || definition.fallbackPrompt,
+    };
+  });
+});
 
 /**
  * getMessageListRef 처리 함수입니다.
@@ -336,6 +335,23 @@ async function startNewChat() {
   clearCurrentChatSelection();
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
+  forceBottomUntil = 0;
+  await router.push("/");
+}
+
+/**
+ * Starts a new chat context with the selected assistant.
+ * Existing chat sessions lock their model, so assistant changes always reset to main.
+ * @param {string} id Selected assistant id.
+ * @returns {Promise<void>} Navigation completion promise.
+ */
+async function startNewChatWithAssistant(id) {
+  revokeMessageAttachments(messages.value);
+  messages.value = [];
+  selectAssistantForNewChat(id);
+  drawerOpen.value = false;
+  collapsedRecentOpen.value = false;
+  assistantSheetOpen.value = false;
   forceBottomUntil = 0;
   await router.push("/");
 }
@@ -506,8 +522,7 @@ function openAssistantFromHeader() {
  * @returns {void}
  */
 function selectAssistantFromSheet(id) {
-  selectAssistant(id);
-  assistantSheetOpen.value = false;
+  startNewChatWithAssistant(id);
 }
 
 watch(

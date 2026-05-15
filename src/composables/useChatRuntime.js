@@ -52,10 +52,11 @@ export function useChatRuntime() {
   const authStore = useAuthStore()
   const assistantStore = useAssistantStore()
   const chatStore = useChatStore()
-  const { assistants, selectedAssistantId, selectedModelId } = storeToRefs(assistantStore)
+  const { assistants, selectedAssistantId, selectedModelId, examplePromptMap } = storeToRefs(assistantStore)
   const { histories } = storeToRefs(chatStore)
 
   const currentAssistant = computed(() => assistantStore.currentAssistant || assistants.value[0] || { id: '', label: 'Assistant', description: '' })
+  const currentExamplePrompts = computed(() => examplePromptMap.value[selectedAssistantId.value] || [])
   const activeSession = computed(() => chatStore.activeSession)
   const models = computed(() => {
     if (!chatStore.isModelLocked) return assistantStore.currentModels
@@ -96,6 +97,12 @@ export function useChatRuntime() {
   function selectAssistant(id) {
     if (chatStore.isModelLocked) return
     assistantStore.selectAssistant(id)
+    preloadExamplePrompts(id)
+  }
+
+  function selectAssistantForNewChat(id) {
+    assistantStore.selectAssistant(id)
+    chatStore.clearActiveSession()
     preloadExamplePrompts(id)
   }
 
@@ -176,6 +183,7 @@ export function useChatRuntime() {
     initialize,
     assistants,
     currentAssistant,
+    currentExamplePrompts,
     histories,
     models,
     activeSession,
@@ -184,6 +192,7 @@ export function useChatRuntime() {
     isModelLocked,
     conversations,
     selectAssistant,
+    selectAssistantForNewChat,
     getHistory,
     ensureConversation,
     setConversation,

@@ -105,8 +105,11 @@ application runtime. * @author OpenAI
                 type="button"
                 @click="selectModel(model.id)"
               >
-                <strong>{{ model.label }}</strong>
-                <small>{{ model.description }}</small>
+                <span class="model-option-main">
+                  <strong>{{ model.label }}</strong>
+                  <small>{{ model.description }}</small>
+                </span>
+                <CheckIcon v-if="model.id === modelValue" class="option-check" />
               </button>
             </div>
           </div>
@@ -234,8 +237,11 @@ application runtime. * @author OpenAI
         type="button"
         @click="selectModel(model.id)"
       >
-        <strong>{{ model.label }}</strong>
-        <small>{{ model.description }}</small>
+        <span class="bottom-sheet-option-main">
+          <strong>{{ model.label }}</strong>
+          <small>{{ model.description }}</small>
+        </span>
+        <CheckIcon v-if="model.id === modelValue" class="bottom-sheet-check" />
       </button>
     </BaseBottomSheet>
 
@@ -294,6 +300,7 @@ import { usePlatformStore } from "@/stores/platformStore";
 import { openNativeFilePicker } from "@/services/platformBridge";
 import { createId } from "@/utils/id";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const { t } = useI18n();
 

@@ -29,13 +29,14 @@
       <div class="suggestion-row suggestion-row--between">
         <button
           v-for="item in suggestions"
-          :key="item.text"
+          :key="item.id || item.text"
           class="suggestion-chip"
           type="button"
+          :title="item.title || item.prompt"
           @click="$emit('submit', item.prompt)"
         >
-          <span>{{ item.icon }}</span
-          >{{ item.text }}
+          <span aria-hidden="true">{{ item.icon }}</span>
+          <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
       <PromptInput

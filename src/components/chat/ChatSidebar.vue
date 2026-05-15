@@ -44,8 +44,14 @@
               type="button"
               @click="selectAssistant(assistant.id)"
             >
-              <strong>{{ assistant.label }}</strong>
-              <small>{{ assistant.description }}</small>
+              <span class="assistant-option-main">
+                <strong>{{ assistant.label }}</strong>
+                <small>{{ assistant.description }}</small>
+              </span>
+              <CheckIcon
+                v-if="assistant.id === selectedAssistantId"
+                class="option-check"
+              />
             </button>
           </div>
         </div>
@@ -309,8 +315,14 @@
       type="button"
       @click="selectAssistant(assistant.id)"
     >
-      <strong>{{ assistant.label }}</strong>
-      <small>{{ assistant.description }}</small>
+      <span class="bottom-sheet-option-main">
+        <strong>{{ assistant.label }}</strong>
+        <small>{{ assistant.description }}</small>
+      </span>
+      <CheckIcon
+        v-if="assistant.id === selectedAssistantId"
+        class="bottom-sheet-check"
+      />
     </button>
   </BaseBottomSheet>
 </template>
@@ -323,6 +335,7 @@ import Icon from "./ChatSidebarIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const props = defineProps({
   histories: { type: Array, required: true },
