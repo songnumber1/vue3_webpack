@@ -14,7 +14,7 @@
     :drawer-open="drawerOpen"
     :collapsed-recent-open="collapsedRecentOpen"
     :keyboard-open="keyboardOpen"
-    @update:selected-assistant-id="selectedAssistantId = $event"
+    @update:selected-assistant-id="selectAssistant"
     @update:sidebar-collapsed="sidebarCollapsed = $event"
     @update:drawer-open="drawerOpen = $event"
     @update:collapsed-recent-open="collapsedRecentOpen = $event"
@@ -33,12 +33,13 @@
       :mode="mode"
       :readonly="isReadOnly"
       :is-mobile="isMobile"
-      :assistant-label="currentAssistant.label"
+      :assistant-label="workspaceAssistantLabel"
       :conversation-title="activeConversationTitle"
       :theme-name="themeName"
       :suggestions="suggestions"
       :selected-model="selectedModel"
       :models="models"
+      :model-readonly="isModelLocked"
       :is-generating="isGenerating"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
@@ -146,8 +147,14 @@ const {
   models,
   selectedAssistantId,
   selectedModel,
+  isModelLocked,
+  activeSession,
   ensureConversation,
   setConversation,
+  createLocalConversation,
+  clearCurrentChatSelection,
+  appendUserAndAssistantMessages,
+  selectAssistant,
   getHistory,
   revokeMessageAttachments,
 } = runtime;
@@ -193,21 +200,26 @@ const activeConversationTitle = computed(() => {
   return activeHistory.value?.title || "";
 });
 
+const workspaceAssistantLabel = computed(() => {
+  if (activeSession.value?.assistantLabel) return activeSession.value.assistantLabel;
+  return currentAssistant.value?.label || "Assistant";
+});
+
 const suggestions = computed(() => [
   {
     icon: "▧",
     text: t("chat.suggestions.image"),
-    prompt: "이미지 생성 화면의 UI 구조를 제안해줘",
+    prompt: "Markdown 이미지와 첨부 파일 미리보기 UI를 점검해줘",
   },
   {
     icon: "✎",
     text: t("chat.suggestions.writing"),
-    prompt: "Vue Composition API 코드 리팩토링 기준을 정리해줘",
+    prompt: "운영 API를 유지하면서 adapter/business layer로 분리하는 기준을 정리해줘",
   },
   {
     icon: "◎",
     text: t("chat.suggestions.search"),
-    prompt: "프로젝트에서 resolver에 추가할 항목을 알려줘",
+    prompt: "Promise.all 기반 초기 데이터 로딩 구조에서 빠진 항목을 찾아줘",
   },
 ]);
 
@@ -321,6 +333,7 @@ function handlePromptResize() {
 async function startNewChat() {
   revokeMessageAttachments(messages.value);
   messages.value = [];
+  clearCurrentChatSelection();
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
   forceBottomUntil = 0;
@@ -345,6 +358,7 @@ async function openHistory(item) {
 async function loadRouteConversation() {
   if (props.mode === "main") {
     messages.value = [];
+    clearCurrentChatSelection();
     return;
   }
 
@@ -384,6 +398,8 @@ const { isGenerating, handleSubmit } = useChatSubmit({
   route,
   histories,
   messages,
+  createLocalConversation,
+  appendUserAndAssistantMessages,
   setConversation,
   scrollBottom: async (options) => {
     markForceBottom(2500);
@@ -490,19 +506,20 @@ function openAssistantFromHeader() {
  * @returns {void}
  */
 function selectAssistantFromSheet(id) {
-  selectedAssistantId.value = id;
+  selectAssistant(id);
   assistantSheetOpen.value = false;
 }
 
 watch(
   () => [route.params.id, route.params.shareId, props.mode],
-  loadRouteConversation,
-  {
-    immediate: true,
+  () => {
+    if (runtimeReady.value) loadRouteConversation();
   },
 );
 
-onMounted(() => {
+const runtimeReady = ref(false);
+
+onMounted(async () => {
   updateMobileState();
   removeMobileMediaQueryListener = addMediaQueryListener(
     "(max-width: 900px)",
@@ -510,6 +527,9 @@ onMounted(() => {
   );
   window.addEventListener("resize", updateMobileState, { passive: true });
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
+  await runtime.initialize();
+  runtimeReady.value = true;
+  await loadRouteConversation();
 });
 
 onBeforeUnmount(() => {

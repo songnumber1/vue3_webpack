@@ -76,7 +76,8 @@ application runtime. * @author OpenAI
             <button
               class="prompt-model-trigger"
               type="button"
-              :disabled="disabled"
+              :disabled="disabled || modelReadonly"
+              :title="modelReadonly ? '대화방 모델은 변경할 수 없습니다.' : undefined"
               :aria-label="t('chat.assistantSelect')"
               @click="openModelSelector"
             >
@@ -303,6 +304,7 @@ const props = defineProps({
   placeholder: { type: String, default: "" },
   modelValue: { type: String, default: "gpt-5-thinking" },
   models: { type: Array, default: () => [] },
+  modelReadonly: { type: Boolean, default: false },
 });
 
 const emit = defineEmits([
@@ -457,7 +459,7 @@ function closeMenus(except = "") {
  * @returns {void}
  */
 function openModelSelector() {
-  if (props.disabled) return;
+  if (props.disabled || props.modelReadonly) return;
   syncViewportMode();
   const next = !modelMenuOpen.value;
   closeMenus("model");

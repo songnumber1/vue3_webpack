@@ -1,0 +1,30 @@
+import { MODEL_KEYS } from '@/constants/apiKeys'
+import { toBoolean } from './booleanAdapter'
+
+export function adaptModel(raw = {}) {
+  const id = raw[MODEL_KEYS.ID]
+  const label = raw[MODEL_KEYS.NAME] || 'Model'
+
+  return {
+    id,
+    sourceId: id,
+    assistId: raw[MODEL_KEYS.ASSISTANT_ID],
+    label,
+    name: label,
+    description: raw.modelDesc || `${raw[MODEL_KEYS.TYPE] || 'instance'} 모델`,
+    type: raw[MODEL_KEYS.TYPE] || 'instance',
+    order: Number(raw[MODEL_KEYS.ORDER] ?? 999),
+    isAuthorized: toBoolean(raw[MODEL_KEYS.AUTH_YN]),
+    isDeleted: toBoolean(raw[MODEL_KEYS.DELETE_YN]),
+    isRecommended: toBoolean(raw.recommandYN),
+    isNew: toBoolean(raw.newYN),
+    isStudioModel: toBoolean(raw.studioYN),
+    hasImage: toBoolean(raw.imageYN),
+    hasRag: toBoolean(raw.ragYN),
+    raw,
+  }
+}
+
+export function adaptModelList(rawItems = []) {
+  return rawItems.map(adaptModel).filter((item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted)
+}

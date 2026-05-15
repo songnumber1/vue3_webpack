@@ -77,7 +77,7 @@
           v-for="item in histories"
           :key="item.id"
           class="sidebar-history-item"
-          :class="{ selected: Number(item.id) === Number(activeHistoryId) }"
+          :class="{ selected: String(item.id) === String(activeHistoryId) }"
           type="button"
           :title="item.title"
           @click="handleSelectHistory(item)"
@@ -250,7 +250,7 @@
             v-for="item in histories"
             :key="item.id"
             class="sidebar-history-item"
-            :class="{ selected: Number(item.id) === Number(activeHistoryId) }"
+            :class="{ selected: String(item.id) === String(activeHistoryId) }"
             type="button"
             :title="item.title"
             @click="handleSelectHistory(item)"
@@ -357,7 +357,7 @@ const assistantSelectorRef = ref(null);
 const currentAssistant = computed(
   () =>
     props.assistants.find((item) => item.id === props.selectedAssistantId) ||
-    props.assistants[0],
+    props.assistants[0] || { id: '', label: 'Assistant', description: '' },
 );
 
 /**

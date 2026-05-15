@@ -43,6 +43,7 @@
         :model-value="selectedModel"
         :models="models"
         :disabled="isGenerating"
+        :model-readonly="modelReadonly"
         :show-help="false"
         @update:model-value="$emit('update:selectedModel', $event)"
         @submit="$emit('submit', $event)"
@@ -75,6 +76,7 @@
         :model-value="selectedModel"
         :models="models"
         :disabled="isGenerating"
+        :model-readonly="modelReadonly"
         :show-help="false"
         @update:model-value="$emit('update:selectedModel', $event)"
         @submit="$emit('submit', $event)"
@@ -151,6 +153,7 @@ const props = defineProps({
   suggestions: { type: Array, default: () => [] },
   selectedModel: { type: String, default: "" },
   models: { type: Array, default: () => [] },
+  modelReadonly: { type: Boolean, default: false },
   isGenerating: { type: Boolean, default: false },
   messages: { type: Array, default: () => [] },
   showScrollBottom: { type: Boolean, default: false },
