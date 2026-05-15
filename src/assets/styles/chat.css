@@ -7339,8 +7339,7 @@ body,
   .app-container--mobile
     .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,
-  .chat-container-root--mode-main
-    .desktop-center-prompt.prompt-wrap--floating {
+  .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
     position: fixed !important;
     left: 0 !important;
     right: 0 !important;
@@ -7521,8 +7520,7 @@ body,
   .app-container--mobile
     .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,
-  .chat-container-root--mode-main
-    .desktop-center-prompt.prompt-wrap--floating {
+  .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
     position: static !important;
     bottom: auto !important;
     transform: none !important;

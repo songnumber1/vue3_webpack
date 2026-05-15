@@ -93,7 +93,8 @@ function pickInitialModel(
  */
 export async function bootstrapChatRuntime(options = {}) {
   const {accessInfoOverride = null} = options;
-  const {accessApi, assistantApi, modelApi, chatHistoryApi, examplePromptApi} = resolveChatApis();
+  const {accessApi, assistantApi, modelApi, chatHistoryApi, examplePromptApi} =
+    resolveChatApis();
 
   const accessInfoPromise = accessInfoOverride
     ? Promise.resolve(accessInfoOverride)

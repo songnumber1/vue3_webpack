@@ -104,7 +104,9 @@
   }
 
   .app-container--mobile .empty-stage--mobile-main .suggestion-row--between,
-  .chat-container-root--mode-main .empty-stage--mobile-main .suggestion-row--between {
+  .chat-container-root--mode-main
+    .empty-stage--mobile-main
+    .suggestion-row--between {
     flex: 0 0 auto !important;
   }
 
