@@ -14,7 +14,7 @@
     :sidebar-collapsed="sidebarCollapsed"
     :drawer-open="drawerOpen"
     :collapsed-recent-open="collapsedRecentOpen"
-    :keyboard-open="keyboardOpen"
+    :keyboard-open="layoutKeyboardOpen"
     :mode="mode"
     @update:selected-assistant-id="startNewChatWithAssistant"
     @update:sidebar-collapsed="sidebarCollapsed = $event"
@@ -203,6 +203,8 @@ const {
 let removeMobileMediaQueryListener = null;
 let bottomStateTimer = 0;
 let forceBottomUntil = 0;
+
+const layoutKeyboardOpen = computed(() => props.mode !== "main" && keyboardOpen.value);
 
 const isReadOnly = computed(() => props.mode === "shared");
 const activeHistoryId = computed(() => {

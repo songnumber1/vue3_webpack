@@ -88,7 +88,7 @@ function detectEnv(ua, platform) {
  * @param {*} browserName 함수 실행에 필요한 입력값입니다.
  * @returns {void}
  */
-function detectDevice({ env, browserName }) {
+function detectDevice({env, browserName}) {
   if (hasAndroidBridge() || hasIosBridge()) return "app";
   if (
     env === PLATFORM.WINDOWS ||
@@ -135,7 +135,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       : hasExtensionRuntime()
         ? RUN_ENV.EXTENSION
         : RUN_ENV.BROWSER;
-  const device = detectDevice({ ua, env, browserName });
+  const device = detectDevice({ua, env, browserName});
   const isAndroid = env === PLATFORM.ANDROID;
   const isIos = env === PLATFORM.IOS;
   const isWindows = env === PLATFORM.WINDOWS;
@@ -143,7 +143,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAndroidApp = isAndroid && hasAndroidBridge();
   const isIosApp = isIos && hasIosBridge();
   const isMobileBrowser = (isAndroid || isIos) && !isNativeApp;
-  const isAccess = true; // 플랫폼 접근 허용 여부 (추후 앱 버전, 브리지 버전 등으로 세분화 가능)
+  // TODO : iOS 앱은 지원 불가
+  const isAccess = !isIos; // 플랫폼 접근 허용 여부 (추후 앱 버전, 브리지 버전 등으로 세분화 가능)
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
   return {
@@ -179,7 +180,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       pixelRatio:
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
     },
-    viewport: { width, height },
+    viewport: {width, height},
     updatedAt: new Date().toISOString(),
   };
 }
