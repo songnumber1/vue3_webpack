@@ -26,6 +26,7 @@
     @open-language="openLanguage"
     @toggle-theme="toggleTheme"
     @open-swagger="openSwagger"
+    @open-playground="openPlayground"
   >
     <ChatWorkspace
       ref="workspaceRef"
@@ -51,6 +52,7 @@
       @open-notice="openNotice"
       @open-personalization="openPersonalization"
       @open-language="openLanguage"
+      @open-playground="openPlayground"
       @submit="submitIfWritable"
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
@@ -75,25 +77,24 @@
       @select="selectAssistantFromSheet"
     />
 
-    <ResponsiveOverlay
-      :open="noticeOpen"
+    <AppOverlayProvider
+      :notice-open="noticeOpen"
+      :personalization-open="personalizationOpen"
       :is-mobile="isMobile"
-      :title="t('notice.title')"
-      :subtitle="t('notice.subtitle')"
-      @close="noticeOpen = false"
+      :notice-title="t('notice.title')"
+      :notice-subtitle="t('notice.subtitle')"
+      :personalization-title="t('personalization.title')"
+      :personalization-subtitle="t('personalization.subtitle')"
+      @close-notice="noticeOpen = false"
+      @close-personalization="personalizationOpen = false"
     >
-      <NoticeView />
-    </ResponsiveOverlay>
-
-    <ResponsiveOverlay
-      :open="personalizationOpen"
-      :is-mobile="isMobile"
-      :title="t('personalization.title')"
-      :subtitle="t('personalization.subtitle')"
-      @close="personalizationOpen = false"
-    >
-      <PersonalizationView />
-    </ResponsiveOverlay>
+      <template #notice>
+        <NoticeView />
+      </template>
+      <template #personalization>
+        <PersonalizationView />
+      </template>
+    </AppOverlayProvider>
 
     <LanguageSheet
       :open="languageSheetOpen"
@@ -127,7 +128,7 @@ import ChatImagePreview from "./ChatImagePreview.vue";
 import ChatLayout from "./ChatLayout.vue";
 import ChatWorkspace from "./ChatWorkspace.vue";
 import LanguageSheet from "@/components/menu/LanguageSheet.vue";
-import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
+import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 
@@ -421,6 +422,15 @@ async function toggleTheme() {
  */
 function openSwagger() {
   router.push("/swagger");
+}
+
+/**
+ * Opens the UI playground route.
+ * @returns {void}
+ */
+function openPlayground() {
+  drawerOpen.value = false;
+  router.push({ name: "playground" });
 }
 
 /**

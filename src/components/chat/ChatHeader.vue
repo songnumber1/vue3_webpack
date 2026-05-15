@@ -86,6 +86,7 @@
         @notice="$emit('open-notice')"
         @personalization="$emit('open-personalization')"
         @language="$emit('open-language')"
+        @playground="$emit('open-playground')"
       />
     </div>
   </header>
@@ -116,6 +117,7 @@ defineEmits([
   "open-notice",
   "open-personalization",
   "open-language",
+  "open-playground",
 ]);
 
 const { t } = useI18n();

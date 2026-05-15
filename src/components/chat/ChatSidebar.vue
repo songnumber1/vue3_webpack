@@ -276,6 +276,15 @@
             <button
               class="sidebar-user-action"
               type="button"
+              :aria-label="t('common.playground')"
+              :title="t('common.playground')"
+              @click="openPlayground"
+            >
+              <span class="playground-glyph">▦</span>
+            </button>
+            <button
+              class="sidebar-user-action"
+              type="button"
               :aria-label="t('common.swagger')"
               @click="openSwagger"
             >
@@ -339,6 +348,7 @@ const emit = defineEmits([
   "open-language",
   "toggle-theme",
   "open-swagger",
+  "open-playground",
 ]);
 const { t } = useI18n();
 const assistantMenuOpen = ref(false);
@@ -487,6 +497,15 @@ function toggleTheme() {
 function openSwagger() {
   emitDrawerOpen(false);
   emit("open-swagger");
+}
+
+/**
+ * Opens the playground route from the mobile user area.
+ * @returns {void}
+ */
+function openPlayground() {
+  emitDrawerOpen(false);
+  emit("open-playground");
 }
 
 /**

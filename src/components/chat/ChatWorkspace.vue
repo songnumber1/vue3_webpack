@@ -20,6 +20,7 @@
     @open-notice="$emit('open-notice')"
     @open-personalization="$emit('open-personalization')"
     @open-language="$emit('open-language')"
+    @open-playground="$emit('open-playground')"
   />
 
   <section v-if="mode === 'main'" class="empty-stage empty-stage--main">
@@ -166,6 +167,7 @@ defineEmits([
   "open-notice",
   "open-personalization",
   "open-language",
+  "open-playground",
   "submit",
   "prompt-focus",
   "prompt-resize",

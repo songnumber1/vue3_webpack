@@ -25,6 +25,7 @@ export const messages = {
       theme: "테마",
       swagger: "Swagger 문서",
       settings: "설정",
+      playground: "Playground",
     },
     chat: {
       assistantSelect: "Assistant 선택",
@@ -57,6 +58,7 @@ export const messages = {
       noticeSummary: "서비스 업데이트와 운영 안내를 확인하세요.",
       personalizationSummary: "응답 방식과 화면 취향을 조정하세요.",
       languageSummary: "한국어 또는 영어로 화면 언어를 변경합니다.",
+      playgroundSummary: "공통 UI와 플랫폼별 화면을 독립적으로 테스트합니다.",
     },
     notice: {
       title: "공지 사항",
@@ -138,6 +140,7 @@ export const messages = {
       theme: "Theme",
       swagger: "Swagger Docs",
       settings: "Settings",
+      playground: "Playground",
     },
     chat: {
       assistantSelect: "Select assistant",
@@ -170,6 +173,7 @@ export const messages = {
       noticeSummary: "Check service updates and announcements.",
       personalizationSummary: "Adjust response style and preferences.",
       languageSummary: "Switch the UI between Korean and English.",
+      playgroundSummary: "Test shared UI and platform-specific screens independently.",
     },
     notice: {
       title: "Notices",

@@ -36,6 +36,15 @@
           <strong>{{ t("common.personalization") }}</strong>
           <small>{{ t("menu.personalizationSummary") }}</small>
         </button>
+        <button
+          class="user-menu-item"
+          type="button"
+          role="menuitem"
+          @click="select('playground')"
+        >
+          <strong>{{ t("common.playground") }}</strong>
+          <small>{{ t("menu.playgroundSummary") }}</small>
+        </button>
 
         <div
           class="user-menu-language"
@@ -83,7 +92,7 @@ import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import { setAppLocale } from "@/i18n";
 
-const emit = defineEmits(["notice", "personalization"]);
+const emit = defineEmits(["notice", "personalization", "playground"]);
 const { t, locale } = useI18n();
 const open = ref(false);
 const languageOpen = ref(false);
@@ -113,7 +122,7 @@ function toggleLanguageOpen() {
 
 /**
  * Emits a selected user-menu action and closes the menu.
- * @param {'notice'|'personalization'} action Selected action key.
+ * @param {'notice'|'personalization'|'playground'} action Selected action key.
  * @returns {void}
  */
 function select(action) {
