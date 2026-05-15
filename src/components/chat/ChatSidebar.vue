@@ -215,45 +215,6 @@
           </button>
         </nav>
 
-        <details class="service-menu settings-menu">
-          <summary class="settings-menu-summary">
-            <span class="settings-menu-summary-text">
-              <strong>{{ t("common.settings") }}</strong>
-              <small>{{ t("menu.settingsDescription") }}</small>
-            </span>
-            <ChevronDownIcon />
-          </summary>
-          <div class="service-menu-list">
-            <button class="service-menu-item" type="button" @click="openGuide">
-              <GuideIcon />
-              <span>
-                <strong>{{ t("common.guide") }}</strong>
-                <small>{{ t("guide.subtitle") }}</small>
-              </span>
-            </button>
-            <button class="service-menu-item" type="button" @click="openNotice">
-              <strong>{{ t("common.notice") }}</strong>
-              <small>{{ t("menu.noticeSummary") }}</small>
-            </button>
-            <button
-              class="service-menu-item"
-              type="button"
-              @click="openPersonalization"
-            >
-              <strong>{{ t("common.personalization") }}</strong>
-              <small>{{ t("menu.personalizationSummary") }}</small>
-            </button>
-            <button
-              class="service-menu-item"
-              type="button"
-              @click="openLanguage"
-            >
-              <strong>{{ t("common.language") }}</strong>
-              <small>{{ t("menu.languageSummary") }}</small>
-            </button>
-          </div>
-        </details>
-
         <div class="section-label">{{ t("chat.conversations") }}</div>
         <div class="sidebar-history sidebar-history--main">
           <button
@@ -270,10 +231,17 @@
         </div>
 
         <div class="sidebar-user sidebar-user--mobile">
-          <div class="user-avatar">민</div>
-          <div class="sidebar-user-main">
-            <strong>민우 송</strong><small>{{ t("common.plus") }}</small>
-          </div>
+          <button
+            class="sidebar-user-profile"
+            type="button"
+            :aria-label="t('common.settings')"
+            @click="openSettings"
+          >
+            <div class="user-avatar">민</div>
+            <div class="sidebar-user-main">
+              <strong>민우 송</strong><small>{{ t("common.plus") }}</small>
+            </div>
+          </button>
           <div class="sidebar-user-actions">
             <button
               class="sidebar-user-action"
@@ -340,9 +308,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
-import GuideIcon from "@/components/icons/GuideIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const props = defineProps({
@@ -370,6 +336,7 @@ const emit = defineEmits([
   "toggle-theme",
   "open-swagger",
   "open-playground",
+  "open-settings",
 ]);
 const { t } = useI18n();
 const assistantMenuOpen = ref(false);
@@ -469,38 +436,11 @@ function handleSelectHistoryCollapsed(item) {
 }
 
 /**
- * Opens the guide page from mobile service menu.
+ * Opens the full-screen mobile settings navigator from the drawer user profile row.
  * @returns {void}
  */
-function openGuide() {
-  emitDrawerOpen(false);
-  emit("open-guide");
-}
-
-/**
- * Opens notices from mobile service menu.
- * @returns {void}
- */
-function openNotice() {
-  emitDrawerOpen(false);
-  emit("open-notice");
-}
-
-/**
- * Opens personalization from mobile service menu.
- * @returns {void}
- */
-function openPersonalization() {
-  emitDrawerOpen(false);
-  emit("open-personalization");
-}
-
-/**
- * Opens language selector from mobile service menu.
- * @returns {void}
- */
-function openLanguage() {
-  emit("open-language");
+function openSettings() {
+  emit("open-settings");
 }
 
 /**

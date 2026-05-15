@@ -38,6 +38,7 @@
       @toggle-theme="$emit('toggle-theme')"
       @open-swagger="$emit('open-swagger')"
       @open-playground="$emit('open-playground')"
+      @open-settings="$emit('open-settings')"
     />
 
     <main class="chat-workspace">
@@ -74,5 +75,6 @@ defineEmits([
   "toggle-theme",
   "open-swagger",
   "open-playground",
+  "open-settings",
 ]);
 </script>

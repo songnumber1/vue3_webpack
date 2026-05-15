@@ -27,6 +27,7 @@
     @toggle-theme="toggleTheme"
     @open-swagger="openSwagger"
     @open-playground="openPlayground"
+    @open-settings="openSettings"
   >
     <ChatWorkspace
       ref="workspaceRef"
@@ -101,6 +102,11 @@
       :open="languageSheetOpen"
       @close="languageSheetOpen = false"
     />
+
+    <MobileSettingsPanel
+      :open="mobileSettingsOpen"
+      @close="mobileSettingsOpen = false"
+    />
   </ChatLayout>
 </template>
 
@@ -133,6 +139,7 @@ import LanguageSheet from "@/components/menu/LanguageSheet.vue";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 
 const props = defineProps({ mode: { type: String, default: "main" } });
 
@@ -179,6 +186,7 @@ const assistantSheetOpen = ref(false);
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const languageSheetOpen = ref(false);
+const mobileSettingsOpen = ref(false);
 const {
   previewImage,
   closeImagePreview,
@@ -481,6 +489,11 @@ function openPlayground() {
  * @returns {void}
  */
 function openSettings() {
+  if (isMobile.value) {
+    drawerOpen.value = false;
+    mobileSettingsOpen.value = true;
+    return;
+  }
   openPersonalization();
 }
 
