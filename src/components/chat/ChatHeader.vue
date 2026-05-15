@@ -6,7 +6,7 @@
 <template>
   <header
     class="mobile-topbar"
-    :class="{ 'mobile-topbar--desktop-main': isDesktopMain }"
+    :class="{'mobile-topbar--desktop-main': isDesktopMain}"
   >
     <div class="topbar-left">
       <button
@@ -26,7 +26,7 @@
         @click="$emit('open-assistant')"
       >
         <span>{{ assistantLabel }}</span>
-<ChevronDownIcon class="chevron chevron--selector" />
+        <ChevronDownIcon class="chevron chevron--selector" />
       </button>
 
       <div
@@ -61,7 +61,7 @@
       >
         <span
           class="theme-glyph"
-          :class="{ 'theme-glyph--dark': themeName === 'dark' }"
+          :class="{'theme-glyph--dark': themeName === 'dark'}"
         ></span>
       </button>
       <button
@@ -84,19 +84,19 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
 const props = defineProps({
-  mode: { type: String, default: "main" },
-  isMobile: { type: Boolean, default: false },
-  assistantLabel: { type: String, default: "Assistant" },
-  conversationTitle: { type: String, default: "" },
-  themeName: { type: String, default: "dark" },
+  mode: {type: String, default: "main"},
+  isMobile: {type: Boolean, default: false},
+  assistantLabel: {type: String, default: "Assistant"},
+  conversationTitle: {type: String, default: ""},
+  themeName: {type: String, default: "dark"},
 });
 
 defineEmits([
@@ -112,10 +112,10 @@ defineEmits([
   "open-playground",
 ]);
 
-const { t } = useI18n();
+const {t} = useI18n();
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(
-  () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile,
+  () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile
 );
 </script>

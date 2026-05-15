@@ -3,39 +3,45 @@
  * @description JavaScript module for studios.raw.
  */
 
-const defaultImage = { name: '', path: null, size: null, type: '', default: true }
+const defaultImage = {
+  name: "",
+  path: null,
+  size: null,
+  type: "",
+  default: true,
+};
 
 export const STUDIOS_RAW = [
   {
     Image48Src: defaultImage,
-    studioCatCode: ['MKT'],
+    studioCatCode: ["MKT"],
     fixYN: false,
     image20Src: defaultImage,
     delYN: false,
     authYN: true,
     likeCnt: 12,
     shardStudioYN: false,
-    assistName: '마케팅 스튜디오',
+    assistName: "마케팅 스튜디오",
     image16Src: defaultImage,
     studioYN: true,
-    regUserId: 'user-1234',
+    regUserId: "user-1234",
     fileYN: false,
-    assistId: 'studio-marketing',
+    assistId: "studio-marketing",
   },
   {
     Image48Src: defaultImage,
-    studioCatCode: ['DEV', 'OPS'],
+    studioCatCode: ["DEV", "OPS"],
     fixYN: false,
     image20Src: defaultImage,
     delYN: false,
     authYN: true,
     likeCnt: 8,
     shardStudioYN: true,
-    assistName: '운영 장애 분석 스튜디오',
+    assistName: "운영 장애 분석 스튜디오",
     image16Src: defaultImage,
     studioYN: true,
-    regUserId: 'user-1234',
+    regUserId: "user-1234",
     fileYN: true,
-    assistId: 'studio-ops',
+    assistId: "studio-ops",
   },
-]
+];

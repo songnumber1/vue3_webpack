@@ -52,15 +52,15 @@
 import ChatSidebar from "./ChatSidebar.vue";
 
 defineProps({
-  histories: { type: Array, required: true },
-  assistants: { type: Array, required: true },
-  selectedAssistantId: { type: String, required: true },
-  activeHistoryId: { type: [String, Number], default: null },
-  sidebarCollapsed: { type: Boolean, default: false },
-  drawerOpen: { type: Boolean, default: false },
-  collapsedRecentOpen: { type: Boolean, default: false },
-  keyboardOpen: { type: Boolean, default: false },
-  mode: { type: String, default: 'main' },
+  histories: {type: Array, required: true},
+  assistants: {type: Array, required: true},
+  selectedAssistantId: {type: String, required: true},
+  activeHistoryId: {type: [String, Number], default: null},
+  sidebarCollapsed: {type: Boolean, default: false},
+  drawerOpen: {type: Boolean, default: false},
+  collapsedRecentOpen: {type: Boolean, default: false},
+  keyboardOpen: {type: Boolean, default: false},
+  mode: {type: String, default: "main"},
 });
 
 defineEmits([

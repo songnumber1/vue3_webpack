@@ -3,7 +3,7 @@
  * @description Mock API와 Live API 전환 시 공통으로 사용하는 axios 기반 HTTP client factory입니다.
  */
 
-import axios from 'axios'
+import axios from "axios";
 
 /**
  * 서비스 API 호출용 axios instance를 생성합니다.
@@ -17,13 +17,13 @@ import axios from 'axios'
  */
 export function createHttpClient() {
   return axios.create({
-    baseURL: process.env.VUE_APP_API_BASE_URL || '/api',
+    baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
     timeout: Number(process.env.VUE_APP_API_TIMEOUT || 15000),
     withCredentials: true,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
-  })
+  });
 }
 
-export const httpClient = createHttpClient()
+export const httpClient = createHttpClient();

@@ -49,9 +49,9 @@
 </template>
 
 <script setup>
-import { useI18n } from "vue-i18n";
-import { usePlatformStore } from "@/stores/platformStore";
+import {useI18n} from "vue-i18n";
+import {usePlatformStore} from "@/stores/platformStore";
 
-const { locale } = useI18n();
+const {locale} = useI18n();
 const platformStore = usePlatformStore();
 </script>

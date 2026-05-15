@@ -3,7 +3,7 @@
  * @description vue-router 전역 가드에서 사용하는 로그인/접근권한 확인 로직입니다.
  */
 
-import { API_ENDPOINTS } from '@/constants/apiEndpoints'
+import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
   AUTH_FAILURE_REASONS,
   AUTH_MOCK_SCENARIOS,
@@ -12,9 +12,9 @@ import {
   ALLOW_LOCAL_STORAGE_MOCK_AUTH,
   ENABLE_AUTH_GUARD_DEBUG,
   ENABLE_AUTH_GUARD_CACHE,
-} from '@/constants/auth'
-import { accessApiMock } from '@/api/mock/accessApi.mock'
-import { useAuthStore } from '@/stores/authStore'
+} from "@/constants/auth";
+import {accessApiMock} from "@/api/mock/accessApi.mock";
+import {useAuthStore} from "@/stores/authStore";
 
 /**
  * access/info.do 요청 payload를 생성합니다.
@@ -28,13 +28,13 @@ import { useAuthStore } from '@/stores/authStore'
  */
 function createAccessPayload(to) {
   return {
-    language: 'ko',
-    entryType: to?.name === 'chat' ? 'chat' : 'main',
+    language: "ko",
+    entryType: to?.name === "chat" ? "chat" : "main",
     shareId: to?.params?.shareId || null,
     chatId: to?.params?.id || null,
     msgId: null,
     studioId: to?.query?.studioId || null,
-  }
+  };
 }
 
 /**
@@ -44,11 +44,11 @@ function createAccessPayload(to) {
  * @returns {boolean} true로 해석 가능한 값 여부입니다.
  */
 function isTruthyFlag(value) {
-  if (value === true) return true
-  if (typeof value === 'string') {
-    return ['true', 'y', 'yes', '1'].includes(value.toLowerCase())
+  if (value === true) return true;
+  if (typeof value === "string") {
+    return ["true", "y", "yes", "1"].includes(value.toLowerCase());
   }
-  return value === 1
+  return value === 1;
 }
 
 /**
@@ -61,15 +61,15 @@ function isTruthyFlag(value) {
  * @returns {string} mock 인증 시나리오입니다.
  */
 function getStoredMockScenario() {
-  if (typeof window === 'undefined') {
-    return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null
+  if (typeof window === "undefined") {
+    return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
   }
 
   return (
     window.localStorage.getItem(AUTH_MOCK_SCENARIO_STORAGE_KEY) ||
     process.env.VUE_APP_MOCK_AUTH_SCENARIO ||
     null
-  )
+  );
 }
 
 /**
@@ -82,7 +82,10 @@ function getStoredMockScenario() {
  * @returns {boolean} mock access/info.do 사용 여부입니다.
  */
 function shouldUseMockAuth() {
-  return USE_MOCK_AUTH || (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
+  return (
+    USE_MOCK_AUTH ||
+    (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
+  );
 }
 
 /**
@@ -93,7 +96,7 @@ function shouldUseMockAuth() {
  */
 function debugAuthGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
-    console.info('[auth-guard]', ...args)
+    console.info("[auth-guard]", ...args);
   }
 }
 
@@ -107,17 +110,19 @@ function debugAuthGuard(...args) {
  * @returns {boolean} 로그인 필요 여부입니다.
  */
 function isLoginRequired(accessInfo = {}) {
-  const valid = accessInfo.valid
-  const status = String(accessInfo.status || accessInfo.result || '').toLowerCase()
+  const valid = accessInfo.valid;
+  const status = String(
+    accessInfo.status || accessInfo.result || ""
+  ).toLowerCase();
 
   return (
     valid === false ||
-    status === 'login' ||
-    status === 'login_required' ||
+    status === "login" ||
+    status === "login_required" ||
     isTruthyFlag(accessInfo.loginRequired) ||
     isTruthyFlag(accessInfo.Login) ||
     !accessInfo.user
-  )
+  );
 }
 
 /**
@@ -127,16 +132,18 @@ function isLoginRequired(accessInfo = {}) {
  * @returns {boolean} 접근 거부 여부입니다.
  */
 function isAccessDenied(accessInfo = {}) {
-  const status = String(accessInfo.status || accessInfo.result || '').toLowerCase()
+  const status = String(
+    accessInfo.status || accessInfo.result || ""
+  ).toLowerCase();
 
   return (
-    status === 'accessdeny' ||
-    status === 'access_denied' ||
-    status === 'access-denied' ||
+    status === "accessdeny" ||
+    status === "access_denied" ||
+    status === "access-denied" ||
     isTruthyFlag(accessInfo.accessDeny) ||
     isTruthyFlag(accessInfo.accessDenied) ||
     isTruthyFlag(accessInfo.AccessDeny)
-  )
+  );
 }
 
 /**
@@ -146,16 +153,18 @@ function isAccessDenied(accessInfo = {}) {
  * @returns {boolean} 사용자 동의 필요 여부입니다.
  */
 function isUserAgreementRequired(accessInfo = {}) {
-  const status = String(accessInfo.status || accessInfo.result || '').toLowerCase()
+  const status = String(
+    accessInfo.status || accessInfo.result || ""
+  ).toLowerCase();
 
   return (
-    status === 'useragree' ||
-    status === 'user_agree' ||
-    status === 'user-agree' ||
+    status === "useragree" ||
+    status === "user_agree" ||
+    status === "user-agree" ||
     isTruthyFlag(accessInfo.userAgree) ||
     isTruthyFlag(accessInfo.UserAgree) ||
     isTruthyFlag(accessInfo.userAgreementRequired)
-  )
+  );
 }
 
 /**
@@ -170,26 +179,26 @@ function isUserAgreementRequired(accessInfo = {}) {
  * @returns {Promise<object>} access/info.do 응답 body입니다.
  */
 async function requestAccessInfo(authAxios, payload) {
-  const useMock = shouldUseMockAuth()
-  const scenario = getStoredMockScenario() || AUTH_MOCK_SCENARIOS.AUTHENTICATED
+  const useMock = shouldUseMockAuth();
+  const scenario = getStoredMockScenario() || AUTH_MOCK_SCENARIOS.AUTHENTICATED;
 
-  debugAuthGuard('request access/info.do', {
+  debugAuthGuard("request access/info.do", {
     useMock,
-    scenario: useMock ? scenario : 'live',
+    scenario: useMock ? scenario : "live",
     endpoint: API_ENDPOINTS.ACCESS_INFO,
     payload,
-  })
+  });
 
   if (useMock) {
-    return accessApiMock.getAccessInfo(payload, { scenario })
+    return accessApiMock.getAccessInfo(payload, {scenario});
   }
 
   if (!authAxios) {
-    throw new Error('로그인 확인 전용 axios가 생성되지 않았습니다.')
+    throw new Error("로그인 확인 전용 axios가 생성되지 않았습니다.");
   }
 
-  const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload)
-  return response?.data || {}
+  const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);
+  return response?.data || {};
 }
 
 /**
@@ -204,7 +213,7 @@ function normalizeAccessResult(accessInfo = {}) {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.ACCESS_DENIED,
       accessInfo,
-    }
+    };
   }
 
   if (isUserAgreementRequired(accessInfo)) {
@@ -212,7 +221,7 @@ function normalizeAccessResult(accessInfo = {}) {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.USER_AGREE_REQUIRED,
       accessInfo,
-    }
+    };
   }
 
   if (isLoginRequired(accessInfo)) {
@@ -220,14 +229,14 @@ function normalizeAccessResult(accessInfo = {}) {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.LOGIN_REQUIRED,
       accessInfo,
-    }
+    };
   }
 
   return {
     authenticated: true,
     reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
     accessInfo,
-  }
+  };
 }
 
 /**
@@ -246,39 +255,46 @@ function normalizeAccessResult(accessInfo = {}) {
  * @param {boolean} [params.force=false] - true이면 캐시를 무시하고 다시 확인합니다.
  * @returns {Promise<{authenticated: boolean, reason: string, error?: Error}>} 로그인 확인 결과입니다.
  */
-export async function ensureRouteAuthenticated({ to, authAxios, force = false }) {
-  const authStore = useAuthStore()
+export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
+  const authStore = useAuthStore();
 
-  if (ENABLE_AUTH_GUARD_CACHE && !force && authStore.authChecked && authStore.isAuthenticated) {
-    debugAuthGuard('skip access/info.do because auth store is already authenticated')
+  if (
+    ENABLE_AUTH_GUARD_CACHE &&
+    !force &&
+    authStore.authChecked &&
+    authStore.isAuthenticated
+  ) {
+    debugAuthGuard(
+      "skip access/info.do because auth store is already authenticated"
+    );
     return {
       authenticated: true,
       reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
-    }
+    };
   }
 
-  const payload = createAccessPayload(to)
+  const payload = createAccessPayload(to);
 
   try {
-    const accessInfo = await requestAccessInfo(authAxios, payload)
-    const result = normalizeAccessResult(accessInfo)
+    const accessInfo = await requestAccessInfo(authAxios, payload);
+    const result = normalizeAccessResult(accessInfo);
 
-    debugAuthGuard('access/info.do normalized result', result)
+    debugAuthGuard("access/info.do normalized result", result);
 
     if (result.authenticated) {
-      authStore.setAuthenticatedAccessInfo(result.accessInfo)
+      authStore.setAuthenticatedAccessInfo(result.accessInfo);
     } else {
-      authStore.setAuthFailure(result.reason, result.accessInfo)
+      authStore.setAuthFailure(result.reason, result.accessInfo);
     }
 
-    return result
+    return result;
   } catch (error) {
-    debugAuthGuard('access/info.do error', error)
-    authStore.setAuthError(error)
+    debugAuthGuard("access/info.do error", error);
+    authStore.setAuthError(error);
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.AUTH_ERROR,
       error,
-    }
+    };
   }
 }

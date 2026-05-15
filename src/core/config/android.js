@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import { RUN_ENV, PLATFORM } from "./constants";
-import { createId } from "@/utils/id";
+import {RUN_ENV, PLATFORM} from "./constants";
+import {createId} from "@/utils/id";
 
 /**
  * Android 앱에서 웹 런타임이 요구하는 최소/최신 버전 정보입니다.

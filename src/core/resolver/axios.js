@@ -5,7 +5,7 @@
  */
 
 import axios from "axios";
-import { isAndroidApp, isIosApp } from "@/core/config";
+import {isAndroidApp, isIosApp} from "@/core/config";
 
 const baseConfig = {
   baseURL: process.env.VUE_APP_API_BASE_URL || "/api",

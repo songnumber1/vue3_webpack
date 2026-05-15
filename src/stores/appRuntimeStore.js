@@ -3,9 +3,9 @@
  * @description JavaScript module for appRuntimeStore.
  */
 
-import { defineStore } from 'pinia'
+import {defineStore} from "pinia";
 
-export const useAppRuntimeStore = defineStore('appRuntime', {
+export const useAppRuntimeStore = defineStore("appRuntime", {
   state: () => ({
     initialized: false,
     loading: false,
@@ -13,16 +13,16 @@ export const useAppRuntimeStore = defineStore('appRuntime', {
   }),
   actions: {
     startLoading() {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
     },
     finishLoading() {
-      this.loading = false
-      this.initialized = true
+      this.loading = false;
+      this.initialized = true;
     },
     fail(error) {
-      this.loading = false
-      this.error = error
+      this.loading = false;
+      this.error = error;
     },
   },
-})
+});

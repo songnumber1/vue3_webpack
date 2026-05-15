@@ -3,8 +3,8 @@
  * @description 운영 대화 목록/대화 상세 조회 Live API adapter입니다.
  */
 
-import { httpClient } from '@/api/clients/httpClient'
-import { API_ENDPOINTS } from '@/constants/apiEndpoints'
+import {httpClient} from "@/api/clients/httpClient";
+import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 /**
  * 좌측 대화 목록을 조회합니다.
@@ -16,8 +16,8 @@ import { API_ENDPOINTS } from '@/constants/apiEndpoints'
  * @returns {Promise<Array<object>>} 대화 목록 raw 응답입니다.
  */
 async function getChatHistoryList() {
-  const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST)
-  return response?.data || []
+  const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST);
+  return response?.data || [];
 }
 
 /**
@@ -31,8 +31,11 @@ async function getChatHistoryList() {
  * @returns {Promise<Array<object>>} 메시지 raw 응답입니다.
  */
 async function getChatHistoryDetail(payload = {}) {
-  const response = await httpClient.post(API_ENDPOINTS.CHAT_HISTORY_DETAIL, payload)
-  return response?.data || []
+  const response = await httpClient.post(
+    API_ENDPOINTS.CHAT_HISTORY_DETAIL,
+    payload
+  );
+  return response?.data || [];
 }
 
-export const chatHistoryApiLive = { getChatHistoryList, getChatHistoryDetail }
+export const chatHistoryApiLive = {getChatHistoryList, getChatHistoryDetail};

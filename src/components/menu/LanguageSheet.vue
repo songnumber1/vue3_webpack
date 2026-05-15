@@ -11,7 +11,7 @@
   >
     <button
       class="bottom-sheet-option"
-      :class="{ active: locale === 'ko' }"
+      :class="{active: locale === 'ko'}"
       type="button"
       @click="selectLocale('ko')"
     >
@@ -20,7 +20,7 @@
     </button>
     <button
       class="bottom-sheet-option"
-      :class="{ active: locale === 'en' }"
+      :class="{active: locale === 'en'}"
       type="button"
       @click="selectLocale('en')"
     >
@@ -31,14 +31,14 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/chat/BaseBottomSheet.vue";
-import { setAppLocale } from "@/i18n";
+import {setAppLocale} from "@/i18n";
 
-const props = defineProps({ open: { type: Boolean, default: false } });
+const props = defineProps({open: {type: Boolean, default: false}});
 const emit = defineEmits(["close"]);
-const { t, locale: currentLocale } = useI18n();
+const {t, locale: currentLocale} = useI18n();
 const locale = computed(() => currentLocale.value);
 
 /**

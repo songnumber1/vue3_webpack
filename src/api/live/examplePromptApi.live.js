@@ -3,8 +3,8 @@
  * @description 운영 example prompt 조회 Live API adapter입니다.
  */
 
-import { httpClient } from '@/api/clients/httpClient'
-import { API_ENDPOINTS } from '@/constants/apiEndpoints'
+import {httpClient} from "@/api/clients/httpClient";
+import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 /**
  * Assistant 또는 Studio에 연결된 예시 프롬프트를 조회합니다.
@@ -20,8 +20,10 @@ import { API_ENDPOINTS } from '@/constants/apiEndpoints'
  * @returns {Promise<object>} 예시 프롬프트 raw 응답입니다.
  */
 async function getExamplePrompts(params = {}) {
-  const response = await httpClient.get(API_ENDPOINTS.EXAMPLE_PROMPTS, { params })
-  return response?.data || { list: [] }
+  const response = await httpClient.get(API_ENDPOINTS.EXAMPLE_PROMPTS, {
+    params,
+  });
+  return response?.data || {list: []};
 }
 
-export const examplePromptApiLive = { getExamplePrompts }
+export const examplePromptApiLive = {getExamplePrompts};

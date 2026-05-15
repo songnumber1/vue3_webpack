@@ -25,7 +25,7 @@
           v-for="option in styleOptions"
           :key="option.value"
           class="style-chip"
-          :class="{ active: selectedStyle === option.value }"
+          :class="{active: selectedStyle === option.value}"
           type="button"
           @click="selectedStyle = option.value"
         >
@@ -45,15 +45,15 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed, ref} from "vue";
+import {useI18n} from "vue-i18n";
 
-const { t } = useI18n();
+const {t} = useI18n();
 const memoryEnabled = ref(true);
 const selectedStyle = ref("detailed");
 const styleOptions = computed(() => [
-  { value: "compact", label: t("personalization.compact") },
-  { value: "detailed", label: t("personalization.detailed") },
-  { value: "technical", label: t("personalization.technical") },
+  {value: "compact", label: t("personalization.compact")},
+  {value: "detailed", label: t("personalization.detailed")},
+  {value: "technical", label: t("personalization.technical")},
 ]);
 </script>

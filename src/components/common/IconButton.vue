@@ -16,8 +16,8 @@ application runtime. * @author OpenAI
 
 <script setup>
 defineProps({
-  icon: { type: String, required: true },
-  title: { type: String, default: "" },
+  icon: {type: String, required: true},
+  title: {type: String, default: ""},
 });
 defineEmits(["click"]);
 </script>

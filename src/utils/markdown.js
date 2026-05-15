@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { unified } from "unified";
+import {unified} from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -13,8 +13,8 @@ import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
-import { visit } from "unist-util-visit";
-import { i18n } from "@/i18n";
+import {visit} from "unist-util-visit";
+import {i18n} from "@/i18n";
 
 /**
  * textContent 처리 함수입니다.
@@ -69,8 +69,8 @@ function tableActionButton(action, label) {
       {
         type: "element",
         tagName: "span",
-        properties: { className: ["sr-only"] },
-        children: [{ type: "text", value: label }],
+        properties: {className: ["sr-only"]},
+        children: [{type: "text", value: label}],
       },
     ],
   };
@@ -89,23 +89,23 @@ function rehypeTableWrapper() {
       parent.children[index] = {
         type: "element",
         tagName: "div",
-        properties: { className: ["md-table-card"] },
+        properties: {className: ["md-table-card"]},
         children: [
           {
             type: "element",
             tagName: "div",
-            properties: { className: ["md-table-toolbar"] },
+            properties: {className: ["md-table-toolbar"]},
             children: [
               {
                 type: "element",
                 tagName: "strong",
-                properties: { className: ["md-table-title"] },
-                children: [{ type: "text", value: mdLabel("markdown.table") }],
+                properties: {className: ["md-table-title"]},
+                children: [{type: "text", value: mdLabel("markdown.table")}],
               },
               {
                 type: "element",
                 tagName: "div",
-                properties: { className: ["md-table-actions"] },
+                properties: {className: ["md-table-actions"]},
                 children: [
                   tableActionButton("copy", mdLabel("markdown.copyTable")),
                   tableActionButton("csv", mdLabel("markdown.downloadCsv")),
@@ -116,7 +116,7 @@ function rehypeTableWrapper() {
           {
             type: "element",
             tagName: "div",
-            properties: { className: ["md-table-wrapper"] },
+            properties: {className: ["md-table-wrapper"]},
             children: [node],
           },
         ],
@@ -148,7 +148,7 @@ function rehypeMermaidBlock() {
           className: ["mermaid", "md-mermaid"],
           "data-mermaid-pending": "true",
         },
-        children: [{ type: "text", value: textContent(codeNode) }],
+        children: [{type: "text", value: textContent(codeNode)}],
       };
     });
   };
@@ -159,8 +159,8 @@ const processor = unified()
   .use(remarkGfm)
   .use(remarkMath)
   .use(remarkRehype)
-  .use(rehypeKatex, { throwOnError: false, strict: false })
-  .use(rehypeHighlight, { ignoreMissing: true, detect: false })
+  .use(rehypeKatex, {throwOnError: false, strict: false})
+  .use(rehypeHighlight, {ignoreMissing: true, detect: false})
   .use(rehypeTableWrapper)
   .use(rehypeMermaidBlock)
   .use(rehypeExternalLinks, {

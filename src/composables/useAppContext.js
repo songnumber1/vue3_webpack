@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { inject } from "vue";
+import {inject} from "vue";
 
 /**
  * useAppContext 함수입니다.

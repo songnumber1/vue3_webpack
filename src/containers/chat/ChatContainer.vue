@@ -63,7 +63,7 @@
       @prompt-resize="handlePromptResize"
       @message-content-rendered="handleMessageContentRendered"
       @scroll-bottom="
-        scrollBottom({ force: true, behavior: 'smooth', stable: true })
+        scrollBottom({force: true, behavior: 'smooth', stable: true})
       "
     />
 
@@ -117,26 +117,19 @@
 </template>
 
 <script setup>
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
-import { useI18n } from "vue-i18n";
-import { useRoute, useRouter } from "vue-router";
-import { useAppContext } from "@/composables/useAppContext";
-import { useAutoScroll } from "@/composables/useAutoScroll";
-import { useChatRuntime } from "@/composables/useChatRuntime";
-import { useChatSubmit } from "@/composables/useChatSubmit";
-import { useImagePreview } from "@/composables/useImagePreview";
-import { loadSharedConversation } from "@/composables/useSharedChat";
-import { useViewportGuard } from "@/composables/useViewportGuard";
-import { addMediaQueryListener } from "@/utils/dom";
-import { renderMermaidInElement } from "@/utils/mermaidRenderer";
-import { PROMPT_SUGGESTION_DEFINITIONS } from "@/constants/promptSuggestions";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
+import {useRoute, useRouter} from "vue-router";
+import {useAppContext} from "@/composables/useAppContext";
+import {useAutoScroll} from "@/composables/useAutoScroll";
+import {useChatRuntime} from "@/composables/useChatRuntime";
+import {useChatSubmit} from "@/composables/useChatSubmit";
+import {useImagePreview} from "@/composables/useImagePreview";
+import {loadSharedConversation} from "@/composables/useSharedChat";
+import {useViewportGuard} from "@/composables/useViewportGuard";
+import {addMediaQueryListener} from "@/utils/dom";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {PROMPT_SUGGESTION_DEFINITIONS} from "@/constants/promptSuggestions";
 import ChatAssistantSheet from "@/components/chat/ChatAssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -147,12 +140,12 @@ import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 
-const props = defineProps({ mode: { type: String, default: "main" } });
+const props = defineProps({mode: {type: String, default: "main"}});
 
-const { t, locale } = useI18n();
+const {t, locale} = useI18n();
 const router = useRouter();
 const route = useRoute();
-const { theme } = useAppContext();
+const {theme} = useAppContext();
 const runtime = useChatRuntime();
 const {
   assistants,
@@ -176,10 +169,11 @@ const {
 } = runtime;
 
 const workspaceRef = ref(null);
-const { scrollToBottom } = useAutoScroll({ value: null });
-const { keyboardOpen, refreshViewport } = useViewportGuard({
-  onChange: ({ isCompact, keyboardOpen: isKeyboardOpen }) => {
-    if (props.mode !== "main" && isCompact && isKeyboardOpen) scrollBottom({ stable: true });
+const {scrollToBottom} = useAutoScroll({value: null});
+const {keyboardOpen, refreshViewport} = useViewportGuard({
+  onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
+    if (props.mode !== "main" && isCompact && isKeyboardOpen)
+      scrollBottom({stable: true});
   },
 });
 const themeName = ref(theme.current);
@@ -194,17 +188,15 @@ const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const languageSheetOpen = ref(false);
 const mobileSettingsOpen = ref(false);
-const {
-  previewImage,
-  closeImagePreview,
-  handlePreviewLoad,
-  handlePreviewError,
-} = useImagePreview();
+const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
+  useImagePreview();
 let removeMobileMediaQueryListener = null;
 let bottomStateTimer = 0;
 let forceBottomUntil = 0;
 
-const layoutKeyboardOpen = computed(() => props.mode !== "main" && keyboardOpen.value);
+const layoutKeyboardOpen = computed(
+  () => props.mode !== "main" && keyboardOpen.value
+);
 
 const isReadOnly = computed(() => props.mode === "shared");
 const activeHistoryId = computed(() => {
@@ -251,7 +243,9 @@ const suggestions = computed(() => {
     const content = localizedContent || definition.fallbackPrompt;
 
     return {
-      id: prompt?.id || `${definition.id}-${selectedAssistantId.value || "default"}`,
+      id:
+        prompt?.id ||
+        `${definition.id}-${selectedAssistantId.value || "default"}`,
       type: definition.id,
       icon: definition.icon,
       text: label,
@@ -281,7 +275,7 @@ function updateMobileState() {
   isMobile.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
     window.innerWidth <= 900 ||
-    document.querySelector(".app-container--mobile"),
+    document.querySelector(".app-container--mobile")
   );
 }
 
@@ -342,7 +336,7 @@ function scheduleBottomStateCheck() {
  * @returns {void}
  */
 function handleMessageContentRendered() {
-  if (shouldKeepForceBottom()) scrollBottom({ force: true, stable: true });
+  if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
   scheduleBottomStateCheck();
 }
 
@@ -354,7 +348,7 @@ function handlePromptFocus() {
   if (isReadOnly.value || isActiveModelUnavailable.value) return;
   refreshViewport();
   if (props.mode === "main") return;
-  scrollBottom({ stable: true, force: isMobile.value });
+  scrollBottom({stable: true, force: isMobile.value});
 }
 
 /**
@@ -364,7 +358,7 @@ function handlePromptFocus() {
 function handlePromptResize() {
   if (isReadOnly.value || isActiveModelUnavailable.value) return;
   if (props.mode === "main") return;
-  scrollBottom({ stable: true, force: isMobile.value });
+  scrollBottom({stable: true, force: isMobile.value});
 }
 
 /**
@@ -406,7 +400,7 @@ async function startNewChatWithAssistant(id) {
 async function openHistory(item) {
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
-  await router.push({ name: "chat", params: { id: item.id } });
+  await router.push({name: "chat", params: {id: item.id}});
 }
 
 /**
@@ -424,7 +418,7 @@ async function loadRouteConversation() {
     messages.value = await loadSharedConversation(activeHistoryId.value);
     markForceBottom();
     await nextTick();
-    await scrollBottom({ behavior: "auto", force: true, stable: true });
+    await scrollBottom({behavior: "auto", force: true, stable: true});
     return;
   }
 
@@ -436,7 +430,7 @@ async function loadRouteConversation() {
   messages.value = await ensureConversation(history.id);
   markForceBottom();
   await nextTick();
-  await scrollBottom({ behavior: "auto", force: true, stable: true });
+  await scrollBottom({behavior: "auto", force: true, stable: true});
 }
 
 /**
@@ -448,10 +442,10 @@ async function renderAfterStream() {
   await renderMermaidInElement(document.querySelector(".message-list"), {
     force: true,
   });
-  scrollBottom({ force: true, stable: true });
+  scrollBottom({force: true, stable: true});
 }
 
-const { isGenerating, handleSubmit } = useChatSubmit({
+const {isGenerating, handleSubmit} = useChatSubmit({
   router,
   route,
   histories,
@@ -487,7 +481,7 @@ async function toggleTheme() {
   await renderMermaidInElement(document.querySelector(".message-list"), {
     force: true,
   });
-  scrollBottom({ stable: true });
+  scrollBottom({stable: true});
 }
 
 /**
@@ -504,7 +498,7 @@ function openSwagger() {
  */
 function openPlayground() {
   drawerOpen.value = false;
-  router.push({ name: "playground" });
+  router.push({name: "playground"});
 }
 
 /**
@@ -526,7 +520,7 @@ function openSettings() {
  */
 function openGuide() {
   drawerOpen.value = false;
-  router.push({ name: "guide" });
+  router.push({name: "guide"});
 }
 
 /**
@@ -576,7 +570,7 @@ watch(
   () => [route.params.id, route.params.shareId, props.mode],
   () => {
     if (runtimeReady.value) loadRouteConversation();
-  },
+  }
 );
 
 const runtimeReady = ref(false);
@@ -585,9 +579,9 @@ onMounted(async () => {
   updateMobileState();
   removeMobileMediaQueryListener = addMediaQueryListener(
     "(max-width: 900px)",
-    updateMobileState,
+    updateMobileState
   );
-  window.addEventListener("resize", updateMobileState, { passive: true });
+  window.addEventListener("resize", updateMobileState, {passive: true});
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
   await runtime.initialize();
   await loadRouteConversation();

@@ -34,27 +34,27 @@ web application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { computed } from "vue";
+import {computed} from "vue";
 
 const ICONS = {
   pencil: {
     markup:
       '<path d="M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"/><path d="M13.4 7.1 16.9 10.6"/>',
     paths: [
-      { d: "M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z" },
-      { d: "M13.4 7.1 16.9 10.6" },
+      {d: "M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"},
+      {d: "M13.4 7.1 16.9 10.6"},
     ],
   },
   search: {
     markup: '<circle cx="10.5" cy="10.5" r="5.8"/><path d="M15 15 20 20"/>',
-    circles: [{ cx: "10.5", cy: "10.5", r: "5.8" }],
-    paths: [{ d: "M15 15 20 20" }],
+    circles: [{cx: "10.5", cy: "10.5", r: "5.8"}],
+    paths: [{d: "M15 15 20 20"}],
   },
   panel: {
     markup:
       '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v16"/>',
-    rects: [{ x: "4", y: "4", width: "16", height: "16", rx: "3" }],
-    paths: [{ d: "M9 4v16" }],
+    rects: [{x: "4", y: "4", width: "16", height: "16", rx: "3"}],
+    paths: [{d: "M9 4v16"}],
   },
   chat: {
     markup:
@@ -69,9 +69,9 @@ const ICONS = {
 
 const props = defineProps({
   /** @type {'pencil' | 'search' | 'panel' | 'chat'} */
-  name: { type: String, required: true },
+  name: {type: String, required: true},
   /** true이면 wrapper 없이 svg 자체를 버튼 내부 아이콘으로 렌더링합니다. */
-  bare: { type: Boolean, default: false },
+  bare: {type: Boolean, default: false},
 });
 
 const icon = computed(() => ICONS[props.name] || ICONS.chat);
@@ -91,6 +91,6 @@ const rootAttrs = computed(() =>
         "stroke-linejoin": "round",
         "aria-hidden": "true",
       }
-    : { class: "icon-wrap" },
+    : {class: "icon-wrap"}
 );
 </script>

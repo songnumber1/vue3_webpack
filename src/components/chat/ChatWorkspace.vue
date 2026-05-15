@@ -26,7 +26,7 @@
   <section
     v-if="mode === 'main'"
     class="empty-stage empty-stage--main"
-    :class="{ 'empty-stage--mobile-main': isMobile }"
+    :class="{'empty-stage--mobile-main': isMobile}"
   >
     <div class="empty-center">
       <h1>{{ t("chat.startQuestion") }}</h1>
@@ -113,14 +113,14 @@
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "./PromptInput.vue";
 
-const { t } = useI18n();
+const {t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
 let composerResizeObserver = null;
@@ -133,7 +133,7 @@ function updateComposerHeight() {
   const height = composerSlotRef.value?.offsetHeight || 0;
   document.documentElement.style.setProperty(
     "--chat-composer-height",
-    `${Math.max(height, 72)}px`,
+    `${Math.max(height, 72)}px`
   );
 }
 
@@ -169,21 +169,21 @@ onMounted(async () => {
 onBeforeUnmount(cleanupComposerHeightObserver);
 
 const props = defineProps({
-  mode: { type: String, default: "main" },
-  readonly: { type: Boolean, default: false },
-  isMobile: { type: Boolean, default: false },
-  assistantLabel: { type: String, default: "Assistant" },
-  conversationTitle: { type: String, default: "" },
-  themeName: { type: String, default: "light" },
-  suggestions: { type: Array, default: () => [] },
-  selectedModel: { type: String, default: "" },
-  models: { type: Array, default: () => [] },
-  modelReadonly: { type: Boolean, default: false },
-  isActiveModelDeleted: { type: Boolean, default: false },
-  isActiveModelUnavailable: { type: Boolean, default: false },
-  isGenerating: { type: Boolean, default: false },
-  messages: { type: Array, default: () => [] },
-  showScrollBottom: { type: Boolean, default: false },
+  mode: {type: String, default: "main"},
+  readonly: {type: Boolean, default: false},
+  isMobile: {type: Boolean, default: false},
+  assistantLabel: {type: String, default: "Assistant"},
+  conversationTitle: {type: String, default: ""},
+  themeName: {type: String, default: "light"},
+  suggestions: {type: Array, default: () => []},
+  selectedModel: {type: String, default: ""},
+  models: {type: Array, default: () => []},
+  modelReadonly: {type: Boolean, default: false},
+  isActiveModelDeleted: {type: Boolean, default: false},
+  isActiveModelUnavailable: {type: Boolean, default: false},
+  isGenerating: {type: Boolean, default: false},
+  messages: {type: Array, default: () => []},
+  showScrollBottom: {type: Boolean, default: false},
 });
 
 defineEmits([
@@ -206,11 +206,16 @@ defineEmits([
 ]);
 
 watch(
-  () => [props.readonly, props.mode, props.showScrollBottom, props.isActiveModelUnavailable],
+  () => [
+    props.readonly,
+    props.mode,
+    props.showScrollBottom,
+    props.isActiveModelUnavailable,
+  ],
   async () => {
     await nextTick();
     updateComposerHeight();
-  },
+  }
 );
 
 defineExpose({

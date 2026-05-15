@@ -15,6 +15,6 @@ application runtime. * @author OpenAI
 <script setup>
 import UserMessage from "./UserMessage.vue";
 import AssistantMessage from "./AssistantMessage.vue";
-defineProps({ message: { type: Object, required: true } });
+defineProps({message: {type: Object, required: true}});
 defineEmits(["rendered"]);
 </script>

@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
@@ -32,15 +32,28 @@ function getViewportSize() {
 function setCssViewportVars(size, baselineHeight = 0) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
-  const layoutHeight = Math.max(baselineHeight || height, height, MIN_VIEWPORT_HEIGHT_PX);
+  const layoutHeight = Math.max(
+    baselineHeight || height,
+    height,
+    MIN_VIEWPORT_HEIGHT_PX
+  );
   const keyboardHeight = Math.max(layoutHeight - height, 0);
   const offsetTop = Math.max(window.visualViewport?.offsetTop || 0, 0);
 
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
-  document.documentElement.style.setProperty("--layout-viewport-height", `${layoutHeight}px`);
-  document.documentElement.style.setProperty("--keyboard-height", `${keyboardHeight}px`);
-  document.documentElement.style.setProperty("--visual-viewport-offset-top", `${offsetTop}px`);
+  document.documentElement.style.setProperty(
+    "--layout-viewport-height",
+    `${layoutHeight}px`
+  );
+  document.documentElement.style.setProperty(
+    "--keyboard-height",
+    `${keyboardHeight}px`
+  );
+  document.documentElement.style.setProperty(
+    "--visual-viewport-offset-top",
+    `${offsetTop}px`
+  );
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 }
 
@@ -58,7 +71,7 @@ export function useViewportGuard(options = {}) {
   let resizeTimer = null;
 
   const isCompact = computed(
-    () => viewportWidth.value > 0 && viewportWidth.value <= MOBILE_BREAKPOINT_PX,
+    () => viewportWidth.value > 0 && viewportWidth.value <= MOBILE_BREAKPOINT_PX
   );
 
   /**
@@ -97,7 +110,7 @@ export function useViewportGuard(options = {}) {
 
   onMounted(() => {
     apply();
-    window.addEventListener("resize", scheduleApply, { passive: true });
+    window.addEventListener("resize", scheduleApply, {passive: true});
     window.addEventListener("orientationchange", scheduleApply, {
       passive: true,
     });

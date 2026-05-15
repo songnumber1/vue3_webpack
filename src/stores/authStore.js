@@ -3,7 +3,7 @@
  * @description access/info.do 인증 결과와 사용자 접근 권한을 관리하는 Pinia store입니다.
  */
 
-import { defineStore } from 'pinia'
+import {defineStore} from "pinia";
 
 /**
  * 인증/접근 권한 전역 상태 store입니다.
@@ -11,7 +11,7 @@ import { defineStore } from 'pinia'
  * state: accessInfo, user, isAuthenticated, authFailureReason
  * 특징: 라우터 가드와 chat runtime bootstrap이 동일한 accessInfo를 공유하도록 원본 응답도 함께 보관합니다.
  */
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
   state: () => ({
     accessInfo: null,
     user: null,
@@ -21,13 +21,13 @@ export const useAuthStore = defineStore('auth', {
     authChecked: false,
     isAuthenticated: false,
     authFailureReason: null,
-    authErrorMessage: '',
+    authErrorMessage: "",
   }),
   getters: {
     /** @returns {string} 현재 로그인 사용자 이름입니다. */
-    userName: (state) => state.user?.userName || '',
+    userName: (state) => state.user?.userName || "",
     /** @returns {string} 현재 로그인 사용자 ID입니다. */
-    userId: (state) => state.user?.userId || '',
+    userId: (state) => state.user?.userId || "",
   },
   actions: {
     /**
@@ -42,11 +42,11 @@ export const useAuthStore = defineStore('auth', {
      * @returns {void}
      */
     setAccessInfo(accessInfo = {}) {
-      this.accessInfo = accessInfo || null
-      this.user = accessInfo?.user || null
-      this.isRagAuth = Boolean(accessInfo?.isRagAuth)
-      this.sourceOptions = accessInfo?.sourceOptions || []
-      this.externalOptions = accessInfo?.externalOptions || []
+      this.accessInfo = accessInfo || null;
+      this.user = accessInfo?.user || null;
+      this.isRagAuth = Boolean(accessInfo?.isRagAuth);
+      this.sourceOptions = accessInfo?.sourceOptions || [];
+      this.externalOptions = accessInfo?.externalOptions || [];
     },
 
     /**
@@ -56,11 +56,11 @@ export const useAuthStore = defineStore('auth', {
      * @returns {void}
      */
     setAuthenticatedAccessInfo(accessInfo = {}) {
-      this.setAccessInfo(accessInfo)
-      this.authChecked = true
-      this.isAuthenticated = true
-      this.authFailureReason = null
-      this.authErrorMessage = ''
+      this.setAccessInfo(accessInfo);
+      this.authChecked = true;
+      this.isAuthenticated = true;
+      this.authFailureReason = null;
+      this.authErrorMessage = "";
     },
 
     /**
@@ -71,11 +71,11 @@ export const useAuthStore = defineStore('auth', {
      * @returns {void}
      */
     setAuthFailure(reason, accessInfo = {}) {
-      this.setAccessInfo(accessInfo)
-      this.authChecked = true
-      this.isAuthenticated = false
-      this.authFailureReason = reason
-      this.authErrorMessage = ''
+      this.setAccessInfo(accessInfo);
+      this.authChecked = true;
+      this.isAuthenticated = false;
+      this.authFailureReason = reason;
+      this.authErrorMessage = "";
     },
 
     /**
@@ -85,15 +85,16 @@ export const useAuthStore = defineStore('auth', {
      * @returns {void}
      */
     setAuthError(error) {
-      this.accessInfo = null
-      this.user = null
-      this.isRagAuth = false
-      this.sourceOptions = []
-      this.externalOptions = []
-      this.authChecked = true
-      this.isAuthenticated = false
-      this.authFailureReason = 'AUTH_ERROR'
-      this.authErrorMessage = error?.message || '로그인 확인 중 오류가 발생했습니다.'
+      this.accessInfo = null;
+      this.user = null;
+      this.isRagAuth = false;
+      this.sourceOptions = [];
+      this.externalOptions = [];
+      this.authChecked = true;
+      this.isAuthenticated = false;
+      this.authFailureReason = "AUTH_ERROR";
+      this.authErrorMessage =
+        error?.message || "로그인 확인 중 오류가 발생했습니다.";
     },
 
     /**
@@ -107,15 +108,15 @@ export const useAuthStore = defineStore('auth', {
      * @returns {void}
      */
     resetAuth() {
-      this.accessInfo = null
-      this.user = null
-      this.isRagAuth = false
-      this.sourceOptions = []
-      this.externalOptions = []
-      this.authChecked = false
-      this.isAuthenticated = false
-      this.authFailureReason = null
-      this.authErrorMessage = ''
+      this.accessInfo = null;
+      this.user = null;
+      this.isRagAuth = false;
+      this.sourceOptions = [];
+      this.externalOptions = [];
+      this.authChecked = false;
+      this.isAuthenticated = false;
+      this.authFailureReason = null;
+      this.authErrorMessage = "";
     },
   },
-})
+});

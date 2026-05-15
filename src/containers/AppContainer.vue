@@ -4,17 +4,21 @@
 -->
 
 <template>
-  <div class="app-container" :class="containerClasses" :data-platform="platformName">
+  <div
+    class="app-container"
+    :class="containerClasses"
+    :data-platform="platformName"
+  >
     <slot />
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useAppContext } from "@/composables/useAppContext";
-import { isAndroidApp } from "@/core/config";
+import {computed} from "vue";
+import {useAppContext} from "@/composables/useAppContext";
+import {isAndroidApp} from "@/core/config";
 
-const { appInfo } = useAppContext();
+const {appInfo} = useAppContext();
 
 const platformName = computed(() => appInfo?.platform || "web");
 const isMobileContainer = computed(() => isAndroidApp(appInfo));

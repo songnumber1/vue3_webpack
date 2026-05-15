@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import { RUN_ENV, PLATFORM } from "./constants";
-import { createId } from "@/utils/id";
+import {RUN_ENV, PLATFORM} from "./constants";
+import {createId} from "@/utils/id";
 
 /**
  * createDefaultConfig 함수입니다.

@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { isNativeApp } from "@/core/config";
+import {isNativeApp} from "@/core/config";
 
 /**
  * resolveUploadStrategy 함수입니다.
@@ -25,7 +25,7 @@ export function resolveUploadStrategy(appInfo, http, bridge) {
       const formData = new FormData();
       formData.append("file", file);
       return http.post("/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {"Content-Type": "multipart/form-data"},
       });
     },
   };

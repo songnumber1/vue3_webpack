@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { createId } from "@/utils/id";
+import {createId} from "@/utils/id";
 
 /**
  * Builds read-only messages for a shared conversation URL.

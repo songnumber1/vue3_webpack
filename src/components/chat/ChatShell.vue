@@ -10,5 +10,5 @@
 <script setup>
 import ChatContainer from "@/containers/chat/ChatContainer.vue";
 
-defineProps({ mode: { type: String, default: "main" } });
+defineProps({mode: {type: String, default: "main"}});
 </script>

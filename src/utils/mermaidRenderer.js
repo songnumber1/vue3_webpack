@@ -93,8 +93,8 @@ function loadScript(src) {
         resolve();
         return;
       }
-      existing.addEventListener("load", resolve, { once: true });
-      existing.addEventListener("error", reject, { once: true });
+      existing.addEventListener("load", resolve, {once: true});
+      existing.addEventListener("error", reject, {once: true});
       return;
     }
 
@@ -123,7 +123,7 @@ async function ensureMermaid() {
       .catch((error) => {
         console.warn(
           "Mermaid could not be loaded. The source code block will remain visible.",
-          error,
+          error
         );
         return null;
       });
@@ -141,7 +141,7 @@ async function ensureMermaid() {
  */
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
-    root.querySelectorAll(".md-mermaid[data-processed]"),
+    root.querySelectorAll(".md-mermaid[data-processed]")
   );
 
   rendered.forEach((target) => {
@@ -168,7 +168,7 @@ export async function renderMermaidInElement(root, options = {}) {
   }
 
   const targets = Array.from(
-    root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]'),
+    root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
   );
   if (targets.length === 0) return;
 
@@ -187,7 +187,7 @@ export async function renderMermaidInElement(root, options = {}) {
   });
 
   try {
-    await mermaid.run({ nodes: targets });
+    await mermaid.run({nodes: targets});
   } catch (error) {
     console.warn("Mermaid rendering failed.", error);
     targets.forEach((target) => {

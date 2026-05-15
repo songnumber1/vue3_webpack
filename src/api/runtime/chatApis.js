@@ -3,16 +3,16 @@
  * @description Chat runtime에서 사용할 API 구현체(mock/live)를 선택합니다.
  */
 
-import { accessApiMock } from '@/api/mock/accessApi.mock'
-import { assistantApiMock } from '@/api/mock/assistantApi.mock'
-import { modelApiMock } from '@/api/mock/modelApi.mock'
-import { examplePromptApiMock } from '@/api/mock/examplePromptApi.mock'
-import { chatHistoryApiMock } from '@/api/mock/chatHistoryApi.mock'
-import { accessApiLive } from '@/api/live/accessApi.live'
-import { assistantApiLive } from '@/api/live/assistantApi.live'
-import { modelApiLive } from '@/api/live/modelApi.live'
-import { examplePromptApiLive } from '@/api/live/examplePromptApi.live'
-import { chatHistoryApiLive } from '@/api/live/chatHistoryApi.live'
+import {accessApiMock} from "@/api/mock/accessApi.mock";
+import {assistantApiMock} from "@/api/mock/assistantApi.mock";
+import {modelApiMock} from "@/api/mock/modelApi.mock";
+import {examplePromptApiMock} from "@/api/mock/examplePromptApi.mock";
+import {chatHistoryApiMock} from "@/api/mock/chatHistoryApi.mock";
+import {accessApiLive} from "@/api/live/accessApi.live";
+import {assistantApiLive} from "@/api/live/assistantApi.live";
+import {modelApiLive} from "@/api/live/modelApi.live";
+import {examplePromptApiLive} from "@/api/live/examplePromptApi.live";
+import {chatHistoryApiLive} from "@/api/live/chatHistoryApi.live";
 
 /**
  * Chat runtime API가 mock을 사용할지 판단합니다.
@@ -25,7 +25,7 @@ import { chatHistoryApiLive } from '@/api/live/chatHistoryApi.live'
  * @returns {boolean} mock API 사용 여부입니다.
  */
 export function shouldUseMockChatApi() {
-  return process.env.VUE_APP_USE_MOCK_API !== 'false'
+  return process.env.VUE_APP_USE_MOCK_API !== "false";
 }
 
 /**
@@ -46,7 +46,7 @@ export function resolveChatApis() {
       modelApi: modelApiMock,
       examplePromptApi: examplePromptApiMock,
       chatHistoryApi: chatHistoryApiMock,
-    }
+    };
   }
 
   return {
@@ -55,5 +55,5 @@ export function resolveChatApis() {
     modelApi: modelApiLive,
     examplePromptApi: examplePromptApiLive,
     chatHistoryApi: chatHistoryApiLive,
-  }
+  };
 }

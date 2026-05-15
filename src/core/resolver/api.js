@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { isAndroidApp } from "@/core/config";
+import {isAndroidApp} from "@/core/config";
 
 const baseApi = {
   getMe: (http) => http.get("/me"),
@@ -32,6 +32,6 @@ export function resolveApi(appInfo, http) {
     Object.entries(apiMap).map(([name, fn]) => [
       name,
       (...args) => fn(http, ...args),
-    ]),
+    ])
   );
 }

@@ -4,14 +4,14 @@
  * @author OpenAI
  */
 
-import { z } from "../zod";
+import {z} from "../zod";
 
 export const BaseRequest = z.object({
   requestId: z.string().min(1).openapi({
     description: "요청 추적 ID",
     example: "req_20260507_001",
   }),
-  requestDate: z.string().datetime({ offset: true }).openapi({
+  requestDate: z.string().datetime({offset: true}).openapi({
     description: "요청 생성 일시(ISO-8601)",
     example: "2026-05-07T07:00:00.000Z",
   }),
@@ -25,7 +25,7 @@ export const BaseResponseMeta = z.record(z.any()).openapi({
 });
 
 export const BaseResponse = BaseRequest.extend({
-  responseDate: z.string().datetime({ offset: true }).openapi({
+  responseDate: z.string().datetime({offset: true}).openapi({
     description: "응답 생성 일시(ISO-8601)",
     example: "2026-05-07T07:00:01.000Z",
   }),

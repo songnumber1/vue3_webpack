@@ -54,18 +54,18 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
+import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
+import {RouterLink} from "vue-router";
 import SwaggerUI from "swagger-ui-dist/swagger-ui-es-bundle";
 import "swagger-ui-dist/swagger-ui.css";
 
-import { BRIDGE_CATEGORY } from "@/bridge/bridgeConstants";
-import { generateOpenApi, getOpenApiCategoryOptions } from "@/bridge/openapi";
+import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
+import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
 import {
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
 } from "@/bridge/swaggerRuntime";
-import { installWebViewCompat } from "@/utils/webviewCompat";
+import {installWebViewCompat} from "@/utils/webviewCompat";
 
 let swaggerInstance = null;
 

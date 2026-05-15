@@ -32,7 +32,7 @@
         v-if="image.url && !image.error"
         :key="image.url"
         class="image-preview-large"
-        :class="{ 'image-preview-large--hidden': image.loading }"
+        :class="{'image-preview-large--hidden': image.loading}"
         :src="image.url"
         :alt="image.name"
         @load="$emit('load')"
@@ -44,7 +44,7 @@
 
 <script setup>
 defineProps({
-  image: { type: Object, default: null },
+  image: {type: Object, default: null},
 });
 
 defineEmits(["close", "load", "error"]);

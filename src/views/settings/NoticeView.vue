@@ -18,9 +18,9 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 
-const { tm } = useI18n();
+const {tm} = useI18n();
 const items = computed(() => tm("notice.items"));
 </script>

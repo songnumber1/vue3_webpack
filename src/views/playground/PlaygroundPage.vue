@@ -48,11 +48,15 @@
         <span class="playground-card-label">Overlay</span>
         <h2>Modal / Full Screen</h2>
         <p>
-          공통 Overlay Provider를 통해 데스크톱에서는 모달, 모바일에서는 전체 화면
-          패널로 전환되는지 확인합니다.
+          공통 Overlay Provider를 통해 데스크톱에서는 모달, 모바일에서는 전체
+          화면 패널로 전환되는지 확인합니다.
         </p>
         <div class="playground-actions">
-          <button class="playground-button" type="button" @click="noticeOpen = true">
+          <button
+            class="playground-button"
+            type="button"
+            @click="noticeOpen = true"
+          >
             공지 Overlay 열기
           </button>
           <button
@@ -73,7 +77,11 @@
           내용은 slot으로 교체하고, 버튼 액션은 부모에서 제어합니다.
         </p>
         <div class="playground-actions">
-          <button class="playground-button" type="button" @click="openPopup('alert')">
+          <button
+            class="playground-button"
+            type="button"
+            @click="openPopup('alert')"
+          >
             알림 팝업
           </button>
           <button
@@ -101,10 +109,14 @@
         <span class="playground-card-label">Bottom Sheet</span>
         <h2>모바일 Sheet 테스트</h2>
         <p>
-          동적 컨텐츠가 들어가는 UI는 slot 기반을 유지하고, 외부에서 open/close만
-          제어합니다.
+          동적 컨텐츠가 들어가는 UI는 slot 기반을 유지하고, 외부에서
+          open/close만 제어합니다.
         </p>
-        <button class="playground-button" type="button" @click="sheetOpen = true">
+        <button
+          class="playground-button"
+          type="button"
+          @click="sheetOpen = true"
+        >
           Bottom Sheet 열기
         </button>
       </article>
@@ -113,8 +125,8 @@
         <span class="playground-card-label">Navigation</span>
         <h2>진입 경로 확인</h2>
         <p>
-          웹 모드에서는 헤더 사용자 메뉴의 하위 아이템, 모바일 모드에서는 좌측 메뉴
-          사용자 정보 우측 아이콘으로 이 화면에 접근합니다.
+          웹 모드에서는 헤더 사용자 메뉴의 하위 아이템, 모바일 모드에서는 좌측
+          메뉴 사용자 정보 우측 아이콘으로 이 화면에 접근합니다.
         </p>
         <div class="playground-route-row">
           <RouterLink to="/guide">Guide route</RouterLink>
@@ -173,7 +185,9 @@
           <button
             class="playground-button"
             type="button"
-            @click="closePopup(activePopup.type === 'confirm' ? '확인' : '닫기')"
+            @click="
+              closePopup(activePopup.type === 'confirm' ? '확인' : '닫기')
+            "
           >
             {{ activePopup.type === "confirm" ? "확인" : "닫기" }}
           </button>
@@ -203,19 +217,19 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink } from "vue-router";
-import { useI18n } from "vue-i18n";
-import { useAppContext } from "@/composables/useAppContext";
-import { isAndroidApp } from "@/core/config";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {RouterLink} from "vue-router";
+import {useI18n} from "vue-i18n";
+import {useAppContext} from "@/composables/useAppContext";
+import {isAndroidApp} from "@/core/config";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/chat/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 
-const { t } = useI18n();
-const { appInfo } = useAppContext();
+const {t} = useI18n();
+const {appInfo} = useAppContext();
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const sheetOpen = ref(false);
@@ -223,7 +237,9 @@ const popupOpen = ref(false);
 const activePopupType = ref("alert");
 const popupResult = ref("아직 선택된 팝업 액션이 없습니다.");
 const isMobile = ref(false);
-const containerMode = computed(() => (isAndroidApp(appInfo) ? "mobile" : "web"));
+const containerMode = computed(() =>
+  isAndroidApp(appInfo) ? "mobile" : "web"
+);
 const sheetItems = ["옵션 A", "옵션 B", "옵션 C"];
 
 const popupSamples = {
@@ -233,7 +249,8 @@ const popupSamples = {
     title: "알림 팝업",
     subtitle: "일반 안내 메시지",
     message: "저장이 완료되었습니다.",
-    detail: "서비스 공지, 단순 완료 안내, 토스트보다 강조가 필요한 안내에 사용합니다.",
+    detail:
+      "서비스 공지, 단순 완료 안내, 토스트보다 강조가 필요한 안내에 사용합니다.",
   },
   warning: {
     type: "warning",
@@ -241,7 +258,8 @@ const popupSamples = {
     title: "경고 팝업",
     subtitle: "주의가 필요한 작업",
     message: "입력값을 다시 확인해 주세요.",
-    detail: "삭제 전 경고, 세션 만료, 네트워크 오류처럼 사용자의 주의가 필요한 상황에 사용합니다.",
+    detail:
+      "삭제 전 경고, 세션 만료, 네트워크 오류처럼 사용자의 주의가 필요한 상황에 사용합니다.",
   },
   confirm: {
     type: "confirm",
@@ -281,13 +299,13 @@ function closePopup(action) {
  */
 function syncMobile() {
   isMobile.value = Boolean(
-    window.matchMedia?.("(max-width: 900px)")?.matches || isAndroidApp(appInfo),
+    window.matchMedia?.("(max-width: 900px)")?.matches || isAndroidApp(appInfo)
   );
 }
 
 onMounted(() => {
   syncMobile();
-  window.addEventListener("resize", syncMobile, { passive: true });
+  window.addEventListener("resize", syncMobile, {passive: true});
 });
 
 onBeforeUnmount(() => window.removeEventListener("resize", syncMobile));

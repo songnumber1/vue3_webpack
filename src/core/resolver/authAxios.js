@@ -4,7 +4,7 @@
  */
 
 import axios from "axios";
-import { isAndroidApp, isIosApp } from "@/core/config";
+import {isAndroidApp, isIosApp} from "@/core/config";
 
 const AUTH_TIMEOUT = 10000;
 

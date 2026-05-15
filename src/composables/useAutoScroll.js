@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { nextTick } from "vue";
+import {nextTick} from "vue";
 
 /**
  * afterFrame 처리 함수입니다.
@@ -51,5 +51,5 @@ export function useAutoScroll(targetRef) {
     });
   }
 
-  return { scrollToBottom };
+  return {scrollToBottom};
 }

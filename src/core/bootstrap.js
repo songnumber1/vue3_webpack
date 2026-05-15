@@ -4,23 +4,23 @@
  * @author OpenAI
  */
 
-import { createApp } from "vue";
-import { createPinia } from "pinia";
-import { usePlatformStore } from "@/stores/platformStore";
+import {createApp} from "vue";
+import {createPinia} from "pinia";
+import {usePlatformStore} from "@/stores/platformStore";
 import App from "@/App.vue";
-import { resolveAppConfig } from "@/core/config";
-import { resolveLayout } from "@/core/resolver/layout";
-import { resolveAxios } from "@/core/resolver/axios";
-import { resolveAuthAxios } from "@/core/resolver/authAxios";
-import { applyInterceptors } from "@/core/resolver/interceptor";
-import { resolveApi } from "@/core/resolver/api";
-import { resolveRouter } from "@/core/resolver/router";
-import { resolveBridge } from "@/core/resolver/bridge";
-import { resolveStorage } from "@/core/resolver/storage";
-import { resolveTheme } from "@/core/resolver/theme";
-import { resolveErrorUI } from "@/core/resolver/errorUi";
-import { resolveUploadStrategy } from "@/core/resolver/upload";
-import { i18n } from "@/i18n";
+import {resolveAppConfig} from "@/core/config";
+import {resolveLayout} from "@/core/resolver/layout";
+import {resolveAxios} from "@/core/resolver/axios";
+import {resolveAuthAxios} from "@/core/resolver/authAxios";
+import {applyInterceptors} from "@/core/resolver/interceptor";
+import {resolveApi} from "@/core/resolver/api";
+import {resolveRouter} from "@/core/resolver/router";
+import {resolveBridge} from "@/core/resolver/bridge";
+import {resolveStorage} from "@/core/resolver/storage";
+import {resolveTheme} from "@/core/resolver/theme";
+import {resolveErrorUI} from "@/core/resolver/errorUi";
+import {resolveUploadStrategy} from "@/core/resolver/upload";
+import {i18n} from "@/i18n";
 
 /**
  * bootstrap 함수입니다.
@@ -51,10 +51,10 @@ export async function bootstrap() {
   const errorUI = resolveErrorUI(appInfo, bridge);
   const upload = resolveUploadStrategy(appInfo, axios, bridge);
 
-  applyInterceptors(axios, appInfo, { bridge, errorUI });
+  applyInterceptors(axios, appInfo, {bridge, errorUI});
 
   const api = resolveApi(appInfo, axios);
-  const router = resolveRouter(appInfo, { authAxios });
+  const router = resolveRouter(appInfo, {authAxios});
   const Layout = resolveLayout(appInfo);
 
   const app = createApp(App);

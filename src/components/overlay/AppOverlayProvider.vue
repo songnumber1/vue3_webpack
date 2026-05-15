@@ -29,13 +29,13 @@
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
 defineProps({
-  isMobile: { type: Boolean, default: false },
-  noticeOpen: { type: Boolean, default: false },
-  noticeTitle: { type: String, required: true },
-  noticeSubtitle: { type: String, default: "" },
-  personalizationOpen: { type: Boolean, default: false },
-  personalizationTitle: { type: String, required: true },
-  personalizationSubtitle: { type: String, default: "" },
+  isMobile: {type: Boolean, default: false},
+  noticeOpen: {type: Boolean, default: false},
+  noticeTitle: {type: String, required: true},
+  noticeSubtitle: {type: String, default: ""},
+  personalizationOpen: {type: Boolean, default: false},
+  personalizationTitle: {type: String, required: true},
+  personalizationSubtitle: {type: String, default: ""},
 });
 
 defineEmits(["close-notice", "close-personalization"]);

@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { isNativeApp } from "@/core/config";
+import {isNativeApp} from "@/core/config";
 
 /**
  * applyWebRequestInterceptor 처리 함수입니다.
@@ -67,7 +67,7 @@ function applyResponseInterceptor(instance, errorUI) {
       }
 
       return Promise.reject(error);
-    },
+    }
   );
 }
 
@@ -79,7 +79,7 @@ function applyResponseInterceptor(instance, errorUI) {
  * @returns {*} 처리 결과를 반환합니다.
  */
 export function applyInterceptors(instance, appInfo, context = {}) {
-  const { bridge, errorUI } = context;
+  const {bridge, errorUI} = context;
 
   if (isNativeApp(appInfo)) {
     applyNativeRequestInterceptor(instance, bridge, appInfo);

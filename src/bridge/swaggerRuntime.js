@@ -10,7 +10,7 @@ import {
   JS_TO_ANDROID_PATH,
   WEB_API_PATH,
 } from "./bridgeConstants";
-import { executeContract } from "./bridgeClient";
+import {executeContract} from "./bridgeClient";
 
 let originalFetch = null;
 
@@ -58,7 +58,7 @@ async function parseTextBody(text) {
   try {
     return JSON.parse(text);
   } catch {
-    return { rawBody: text };
+    return {rawBody: text};
   }
 }
 
@@ -132,7 +132,7 @@ function createJsonResponse(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     statusText: status >= 200 && status < 300 ? "OK" : "Contract Error",
-    headers: { "Content-Type": "application/json; charset=utf-8" },
+    headers: {"Content-Type": "application/json; charset=utf-8"},
   });
 }
 
@@ -191,7 +191,7 @@ export function installSwaggerRuntime() {
     } catch (error) {
       return createJsonResponse(
         error?.response || createFallbackError(error),
-        error?.status || error?.response?.meta?.status || 400,
+        error?.status || error?.response?.meta?.status || 400
       );
     }
   };

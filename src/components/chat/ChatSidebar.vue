@@ -6,7 +6,7 @@
 <template>
   <aside
     class="desktop-sidebar"
-    :class="{ 'desktop-sidebar--collapsed': sidebarCollapsed }"
+    :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
   >
     <div
       v-if="!sidebarCollapsed"
@@ -31,7 +31,7 @@
               v-for="assistant in assistants"
               :key="assistant.id"
               class="assistant-option"
-              :class="{ active: assistant.id === selectedAssistantId }"
+              :class="{active: assistant.id === selectedAssistantId}"
               type="button"
               @click="selectAssistant(assistant.id)"
             >
@@ -78,7 +78,7 @@
           v-for="item in histories"
           :key="item.id"
           class="sidebar-history-item"
-          :class="{ selected: String(item.id) === String(activeHistoryId) }"
+          :class="{selected: String(item.id) === String(activeHistoryId)}"
           type="button"
           :title="item.title"
           @click="handleSelectHistory(item)"
@@ -189,7 +189,11 @@
         </div>
 
         <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
-          <button class="quick-item active" type="button" @click="handleNewChat">
+          <button
+            class="quick-item active"
+            type="button"
+            @click="handleNewChat"
+          >
             <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
           <button class="quick-item" type="button">
@@ -203,7 +207,7 @@
             v-for="item in histories"
             :key="item.id"
             class="sidebar-history-item"
-            :class="{ selected: String(item.id) === String(activeHistoryId) }"
+            :class="{selected: String(item.id) === String(activeHistoryId)}"
             type="button"
             :title="item.title"
             @click="handleSelectHistory(item)"
@@ -265,7 +269,7 @@
       v-for="assistant in assistants"
       :key="assistant.id"
       class="bottom-sheet-option"
-      :class="{ active: assistant.id === selectedAssistantId }"
+      :class="{active: assistant.id === selectedAssistantId}"
       type="button"
       @click="selectAssistant(assistant.id)"
     >
@@ -286,8 +290,8 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
@@ -295,13 +299,13 @@ import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
 const props = defineProps({
-  histories: { type: Array, required: true },
-  assistants: { type: Array, required: true },
-  selectedAssistantId: { type: String, required: true },
-  activeHistoryId: { type: [String, Number], default: null },
-  sidebarCollapsed: { type: Boolean, required: true },
-  drawerOpen: { type: Boolean, required: true },
-  collapsedRecentOpen: { type: Boolean, required: true },
+  histories: {type: Array, required: true},
+  assistants: {type: Array, required: true},
+  selectedAssistantId: {type: String, required: true},
+  activeHistoryId: {type: [String, Number], default: null},
+  sidebarCollapsed: {type: Boolean, required: true},
+  drawerOpen: {type: Boolean, required: true},
+  collapsedRecentOpen: {type: Boolean, required: true},
 });
 
 const emit = defineEmits([
@@ -321,14 +325,14 @@ const emit = defineEmits([
   "open-playground",
   "open-settings",
 ]);
-const { t } = useI18n();
+const {t} = useI18n();
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 const currentAssistant = computed(
   () =>
     props.assistants.find((item) => item.id === props.selectedAssistantId) ||
-    props.assistants[0] || { id: '', label: 'Assistant', description: '' },
+    props.assistants[0] || {id: "", label: "Assistant", description: ""}
 );
 
 /**
@@ -338,7 +342,7 @@ const currentAssistant = computed(
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-container--mobile"),
+    document.querySelector(".app-container--mobile")
   );
 }
 
@@ -466,7 +470,7 @@ function handleDocumentClick(event) {
 onMounted(() => {
   syncViewportMode();
   document.addEventListener("click", handleDocumentClick);
-  window.addEventListener("resize", syncViewportMode, { passive: true });
+  window.addEventListener("resize", syncViewportMode, {passive: true});
 });
 onBeforeUnmount(() => {
   document.removeEventListener("click", handleDocumentClick);

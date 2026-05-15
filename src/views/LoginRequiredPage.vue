@@ -31,8 +31,8 @@
  * response: 로그인 필요 안내 UI와 홈 이동 버튼을 렌더링합니다.
  */
 
-import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import {computed} from "vue";
+import {useRoute, useRouter} from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -45,7 +45,7 @@ const reasonMessages = {
 };
 
 const message = computed(
-  () => reasonMessages[route.query.reason] || reasonMessages.LOGIN_REQUIRED,
+  () => reasonMessages[route.query.reason] || reasonMessages.LOGIN_REQUIRED
 );
 
 /**
@@ -58,7 +58,7 @@ const message = computed(
  * @returns {void}
  */
 function goHome() {
-  router.replace({ path: "/" });
+  router.replace({path: "/"});
 }
 </script>
 
@@ -69,7 +69,8 @@ function goHome() {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+  padding: max(24px, env(safe-area-inset-top)) 20px
+    max(24px, env(safe-area-inset-bottom));
   background: var(--app-bg, #f7f7f8);
   color: var(--text-primary, #111827);
 }

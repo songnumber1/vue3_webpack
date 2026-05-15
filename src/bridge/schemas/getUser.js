@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import { z } from "../zod";
-import { BaseRequest, createResponseSchema } from "./base";
+import {z} from "../zod";
+import {BaseRequest, createResponseSchema} from "./base";
 
 export const GetUserRequest = BaseRequest.extend({
   id: z.number().openapi({

@@ -10,7 +10,7 @@
         <button
           type="button"
           class="message-action-icon message-action-icon--svg"
-          :class="{ active: feedback === FEEDBACK_ACTIONS.LIKE }"
+          :class="{active: feedback === FEEDBACK_ACTIONS.LIKE}"
           :aria-label="t('feedback.like')"
           :title="t('feedback.like')"
           @click="setFeedback(FEEDBACK_ACTIONS.LIKE)"
@@ -29,7 +29,7 @@
         <button
           type="button"
           class="message-action-icon message-action-icon--svg"
-          :class="{ active: feedback === FEEDBACK_ACTIONS.DISLIKE }"
+          :class="{active: feedback === FEEDBACK_ACTIONS.DISLIKE}"
           :aria-label="t('feedback.dislike')"
           :title="t('feedback.dislike')"
           @click="setFeedback(FEEDBACK_ACTIONS.DISLIKE)"
@@ -50,7 +50,7 @@
           class="message-action-text-button"
           @click="openFeedbackDialog"
         >
-          {{ t('feedback.send') }}
+          {{ t("feedback.send") }}
         </button>
       </template>
 
@@ -80,14 +80,14 @@
     </div>
 
     <section v-if="showDislikeReasons" class="feedback-reason-panel">
-      <p>{{ t('feedback.hallucinationTitle') }}</p>
+      <p>{{ t("feedback.hallucinationTitle") }}</p>
       <div class="feedback-reason-list">
         <button
           v-for="reason in visibleReasons"
           :key="reason.id"
           class="feedback-reason-chip"
           type="button"
-          :class="{ active: selectedReasons.includes(reason.id) }"
+          :class="{active: selectedReasons.includes(reason.id)}"
           @click="toggleReason(reason.id)"
         >
           {{ reasonLabel(reason) }}
@@ -99,7 +99,7 @@
         type="button"
         @click="showAllReasons = true"
       >
-        {{ t('feedback.more') }}
+        {{ t("feedback.more") }}
       </button>
     </section>
 
@@ -117,7 +117,7 @@
           :aria-label="t('feedback.send')"
         >
           <header class="feedback-dialog-header">
-            <strong>{{ t('feedback.send') }}</strong>
+            <strong>{{ t("feedback.send") }}</strong>
             <button
               type="button"
               class="feedback-dialog-close"
@@ -128,7 +128,7 @@
             </button>
           </header>
           <div class="feedback-dialog-body">
-            <p>{{ t('feedback.sendDescription') }}</p>
+            <p>{{ t("feedback.sendDescription") }}</p>
             <!-- TODO: 출처, 이미지, DUO 검색 결과 등 추가 기능 feedback payload 확장 시 이 영역에 message extension selector를 연결한다. -->
             <textarea
               v-model="feedbackText"
@@ -137,10 +137,10 @@
           </div>
           <footer class="feedback-dialog-footer">
             <button type="button" @click="submitFeedback">
-              {{ t('common.confirm') }}
+              {{ t("common.confirm") }}
             </button>
             <button type="button" @click="closeFeedbackDialog">
-              {{ t('common.close') }}
+              {{ t("common.close") }}
             </button>
           </footer>
         </section>
@@ -150,16 +150,16 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { FEEDBACK_ACTIONS, HALLUCINATION_REASONS } from "@/constants/feedback";
-import { copyClipboardByPlatform } from "@/services/platformBridge";
+import {computed, ref} from "vue";
+import {useI18n} from "vue-i18n";
+import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
+import {copyClipboardByPlatform} from "@/services/platformBridge";
 
 const props = defineProps({
-  role: { type: String, required: true },
-  content: { type: String, default: "" },
+  role: {type: String, required: true},
+  content: {type: String, default: ""},
 });
-const { t, locale } = useI18n();
+const {t, locale} = useI18n();
 const feedback = ref("");
 const feedbackDialogOpen = ref(false);
 const feedbackText = ref("");
@@ -168,15 +168,17 @@ const selectedReasons = ref([]);
 const defaultReasonCount = 4;
 
 const showDislikeReasons = computed(
-  () => props.role === "assistant" && feedback.value === FEEDBACK_ACTIONS.DISLIKE,
+  () =>
+    props.role === "assistant" && feedback.value === FEEDBACK_ACTIONS.DISLIKE
 );
 const visibleReasons = computed(() =>
   showAllReasons.value
     ? HALLUCINATION_REASONS
-    : HALLUCINATION_REASONS.slice(0, defaultReasonCount),
+    : HALLUCINATION_REASONS.slice(0, defaultReasonCount)
 );
 const hasMoreReasons = computed(
-  () => !showAllReasons.value && HALLUCINATION_REASONS.length > defaultReasonCount,
+  () =>
+    !showAllReasons.value && HALLUCINATION_REASONS.length > defaultReasonCount
 );
 
 /**

@@ -9,14 +9,14 @@ import {
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
-import { getContractsByCategory } from "./contract";
+import {getContractsByCategory} from "./contract";
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
   JS_TO_ANDROID_PATH,
   WEB_API_PATH,
 } from "./bridgeConstants";
-import { BaseRequest, BaseResponse, BaseResponseError } from "./schemas/base";
+import {BaseRequest, BaseResponse, BaseResponseError} from "./schemas/base";
 
 const CATEGORY_OPTIONS = [
   {
@@ -181,7 +181,7 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
       `,
     },
     tags: [
-      { name: "REST / Web API", description: "JS 실제 backend API contract" },
+      {name: "REST / Web API", description: "JS 실제 backend API contract"},
       {
         name: "JS → Android",
         description: "JS에서 Android Native Bridge로 요청하는 contract",

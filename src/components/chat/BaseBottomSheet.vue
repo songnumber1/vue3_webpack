@@ -61,14 +61,14 @@ web application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, watch, ref } from "vue";
+import {computed, nextTick, onBeforeUnmount, watch, ref} from "vue";
 
 const props = defineProps({
-  open: { type: Boolean, default: false },
-  title: { type: String, default: "선택" },
-  initialSnap: { type: String, default: "content" },
-  minHeight: { type: Number, default: 260 },
-  maxRatio: { type: Number, default: 0.92 },
+  open: {type: Boolean, default: false},
+  title: {type: String, default: "선택"},
+  initialSnap: {type: String, default: "content"},
+  minHeight: {type: Number, default: 260},
+  maxRatio: {type: Number, default: 0.92},
 });
 
 const emit = defineEmits(["close"]);
@@ -97,7 +97,7 @@ function getViewportHeight() {
   return Math.max(
     Math.round(window.visualViewport?.height || 0),
     Math.round(window.innerHeight || 0),
-    320,
+    320
   );
 }
 
@@ -113,7 +113,7 @@ function getSafeBottom() {
   document.body.appendChild(probe);
   const value = Math.max(
     0,
-    Math.round(window.innerHeight - probe.getBoundingClientRect().bottom),
+    Math.round(window.innerHeight - probe.getBoundingClientRect().bottom)
   );
   probe.remove();
   return Number.isFinite(value) ? value : 0;
@@ -128,7 +128,7 @@ function clampHeight(height) {
   const viewportHeight = getViewportHeight();
   const maxHeight = Math.max(
     props.minHeight,
-    Math.floor(viewportHeight * props.maxRatio) - getSafeBottom(),
+    Math.floor(viewportHeight * props.maxRatio) - getSafeBottom()
   );
   const minHeight = Math.min(props.minHeight, maxHeight);
   return Math.min(Math.max(height, minHeight), maxHeight);
@@ -155,7 +155,7 @@ function getInitialHeight() {
   if (props.initialSnap === "half") return viewportHeight * 0.58;
   return Math.max(
     props.minHeight,
-    Math.min(getContentHeight(), viewportHeight * 0.72),
+    Math.min(getContentHeight(), viewportHeight * 0.72)
   );
 }
 
@@ -228,9 +228,9 @@ function startDrag(event) {
   dragStartY = event.clientY;
   dragStartHeight = currentHeight.value;
   event.currentTarget?.setPointerCapture?.(event.pointerId);
-  window.addEventListener("pointermove", handleDrag, { passive: false });
-  window.addEventListener("pointerup", stopDrag, { passive: true });
-  window.addEventListener("pointercancel", stopDrag, { passive: true });
+  window.addEventListener("pointermove", handleDrag, {passive: false});
+  window.addEventListener("pointerup", stopDrag, {passive: true});
+  window.addEventListener("pointercancel", stopDrag, {passive: true});
 }
 
 /**
@@ -285,27 +285,27 @@ watch(
       window.visualViewport?.addEventListener(
         "resize",
         scheduleViewportRefresh,
-        { passive: true },
+        {passive: true}
       );
       window.visualViewport?.addEventListener(
         "scroll",
         scheduleViewportRefresh,
-        { passive: true },
+        {passive: true}
       );
     } else {
       unlockBodyScroll();
       window.removeEventListener("resize", scheduleViewportRefresh);
       window.visualViewport?.removeEventListener(
         "resize",
-        scheduleViewportRefresh,
+        scheduleViewportRefresh
       );
       window.visualViewport?.removeEventListener(
         "scroll",
-        scheduleViewportRefresh,
+        scheduleViewportRefresh
       );
     }
   },
-  { immediate: true },
+  {immediate: true}
 );
 
 onBeforeUnmount(() => {

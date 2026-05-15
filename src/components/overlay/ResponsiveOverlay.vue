@@ -6,11 +6,7 @@
 <template>
   <teleport to="body">
     <transition :name="isMobile ? 'mobile-page' : 'modal-fade'">
-      <div
-        v-if="open"
-        class="responsive-overlay"
-        :class="overlayClasses"
-      >
+      <div v-if="open" class="responsive-overlay" :class="overlayClasses">
         <div
           v-if="!isMobile"
           class="responsive-overlay-backdrop"
@@ -55,16 +51,16 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const props = defineProps({
-  open: { type: Boolean, default: false },
-  isMobile: { type: Boolean, default: false },
-  title: { type: String, required: true },
-  subtitle: { type: String, default: "" },
+  open: {type: Boolean, default: false},
+  isMobile: {type: Boolean, default: false},
+  title: {type: String, required: true},
+  subtitle: {type: String, default: ""},
   /**
    * Mobile rendering strategy.
    * - fullscreen: keeps the existing notice/personalization mobile page behavior.
@@ -80,10 +76,10 @@ const props = defineProps({
 defineEmits(["close"]);
 
 const isMobileFullscreen = computed(
-  () => props.isMobile && props.mobileMode === "fullscreen",
+  () => props.isMobile && props.mobileMode === "fullscreen"
 );
 const isMobileDialog = computed(
-  () => props.isMobile && props.mobileMode === "dialog",
+  () => props.isMobile && props.mobileMode === "dialog"
 );
 
 const overlayClasses = computed(() => ({

@@ -4,11 +4,11 @@
  * @author OpenAI
  */
 
-import { RUN_ENV, PLATFORM } from "./constants";
-import { createDefaultConfig } from "./default";
-import { createAndroidConfig } from "./android";
-import { createIosConfig } from "./ios";
-import { createExtensionConfig } from "./extension";
+import {RUN_ENV, PLATFORM} from "./constants";
+import {createDefaultConfig} from "./default";
+import {createAndroidConfig} from "./android";
+import {createIosConfig} from "./ios";
+import {createExtensionConfig} from "./extension";
 
 /**
  * getNavigator 처리 함수입니다.
@@ -122,4 +122,4 @@ export function isIosApp(appInfo) {
   return isNativeApp(appInfo) && appInfo?.platform === PLATFORM.IOS;
 }
 
-export { RUN_ENV, PLATFORM };
+export {RUN_ENV, PLATFORM};

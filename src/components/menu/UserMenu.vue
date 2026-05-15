@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <div ref="menuRef" class="user-menu" :class="{ 'user-menu--open': open }">
+  <div ref="menuRef" class="user-menu" :class="{'user-menu--open': open}">
     <button
       class="user-menu-trigger"
       type="button"
@@ -70,7 +70,7 @@
                 v-for="option in languageOptions"
                 :key="option.value"
                 class="user-menu-language-option"
-                :class="{ active: currentLocale === option.value }"
+                :class="{active: currentLocale === option.value}"
                 type="button"
                 @click="selectLocale(option.value)"
               >
@@ -86,21 +86,21 @@
 </template>
 
 <script setup>
-import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
-import { setAppLocale } from "@/i18n";
+import {setAppLocale} from "@/i18n";
 
 const emit = defineEmits(["notice", "personalization", "playground"]);
-const { t, locale } = useI18n();
+const {t, locale} = useI18n();
 const open = ref(false);
 const languageOpen = ref(false);
 const menuRef = ref(null);
 const currentLocale = computed(() => locale.value);
 const languageOptions = computed(() => [
-  { value: "ko", label: t("common.korean") },
-  { value: "en", label: t("common.english") },
+  {value: "ko", label: t("common.korean")},
+  {value: "en", label: t("common.english")},
 ]);
 
 /**
@@ -155,6 +155,6 @@ function handleDocumentClick(event) {
 
 onMounted(() => document.addEventListener("click", handleDocumentClick));
 onBeforeUnmount(() =>
-  document.removeEventListener("click", handleDocumentClick),
+  document.removeEventListener("click", handleDocumentClick)
 );
 </script>

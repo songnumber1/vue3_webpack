@@ -21,17 +21,17 @@ web application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { nextTick, onMounted, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
-import { renderMarkdown } from "@/utils/markdown";
-import { openExternalBrowser } from "@/services/platformBridge";
-import { copyClipboardByPlatform } from "@/services/platformBridge";
-import { usePlatformStore } from "@/stores/platformStore";
-import { renderMermaidInElement } from "@/utils/mermaidRenderer";
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
+import {renderMarkdown} from "@/utils/markdown";
+import {openExternalBrowser} from "@/services/platformBridge";
+import {copyClipboardByPlatform} from "@/services/platformBridge";
+import {usePlatformStore} from "@/stores/platformStore";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import MessageActions from "./MessageActions.vue";
 
-const props = defineProps({ message: { type: Object, required: true } });
-const { locale } = useI18n();
+const props = defineProps({message: {type: Object, required: true}});
+const {locale} = useI18n();
 const platformStore = usePlatformStore();
 const emit = defineEmits(["rendered"]);
 const html = ref("<p></p>");
@@ -51,7 +51,7 @@ let renderVersion = 0;
  */
 async function handleMarkdownClick(event) {
   const tableActionButton = event.target?.closest?.(
-    "button[data-md-table-action]",
+    "button[data-md-table-action]"
   );
   if (tableActionButton && contentRef.value?.contains(tableActionButton)) {
     event.preventDefault();
@@ -83,7 +83,7 @@ function tableToText(table) {
     .map((row) =>
       Array.from(row.cells)
         .map((cell) => cell.innerText.replace(/\s+/g, " ").trim())
-        .join("\t"),
+        .join("\t")
     )
     .join("\n");
 }
@@ -99,9 +99,9 @@ function tableToCsv(table) {
       Array.from(row.cells)
         .map(
           (cell) =>
-            `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`,
+            `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`
         )
-        .join(","),
+        .join(",")
     )
     .join("\n");
 }
@@ -112,7 +112,7 @@ function tableToCsv(table) {
  * @returns {void}
  */
 function downloadCsv(csv) {
-  const blob = new Blob([`\ufeff${csv}`], { type: "text/csv;charset=utf-8" });
+  const blob = new Blob([`\ufeff${csv}`], {type: "text/csv;charset=utf-8"});
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
@@ -158,7 +158,7 @@ async function renderContent() {
   await renderMermaidInElement(contentRef.value);
   emit("rendered");
 }
-watch(() => props.message.content, renderContent, { immediate: true });
+watch(() => props.message.content, renderContent, {immediate: true});
 watch(() => locale.value, renderContent);
 onMounted(renderContent);
 </script>

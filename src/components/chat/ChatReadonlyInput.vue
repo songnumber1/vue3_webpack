@@ -47,16 +47,16 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 
 const props = defineProps({
-  variant: { type: String, default: "shared" },
-  title: { type: String, default: "" },
-  description: { type: String, default: "" },
+  variant: {type: String, default: "shared"},
+  title: {type: String, default: ""},
+  description: {type: String, default: ""},
 });
 
-const { t, locale } = useI18n();
+const {t, locale} = useI18n();
 
 /**
  * Returns the localized title shown in the composer replacement.
@@ -65,10 +65,14 @@ const { t, locale } = useI18n();
 const titleText = computed(() => {
   if (props.title) return props.title;
   if (props.variant === "deleted-model") {
-    return locale.value === "ko" ? "삭제된 모델입니다." : "This model has been deleted.";
+    return locale.value === "ko"
+      ? "삭제된 모델입니다."
+      : "This model has been deleted.";
   }
   if (props.variant === "unavailable-model") {
-    return locale.value === "ko" ? "사용할 수 없는 모델입니다." : "This model is unavailable.";
+    return locale.value === "ko"
+      ? "사용할 수 없는 모델입니다."
+      : "This model is unavailable.";
   }
   return t("chat.sharedReadonly");
 });

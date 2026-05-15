@@ -4,7 +4,7 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <footer class="prompt-wrap" :class="{ 'prompt-wrap--floating': floating }">
+  <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
       <div
         v-if="attachments.length"
@@ -15,7 +15,7 @@ application runtime. * @author OpenAI
           v-for="file in attachments"
           :key="file.id"
           class="attachment-preview-card"
-          :class="{ 'attachment-preview-card--image': file.kind === 'image' }"
+          :class="{'attachment-preview-card--image': file.kind === 'image'}"
           :role="file.kind === 'image' ? 'button' : undefined"
           :tabindex="file.kind === 'image' ? 0 : undefined"
           :aria-label="
@@ -77,7 +77,9 @@ application runtime. * @author OpenAI
               class="prompt-model-trigger"
               type="button"
               :disabled="disabled || modelReadonly"
-              :title="modelReadonly ? '대화방 모델은 변경할 수 없습니다.' : undefined"
+              :title="
+                modelReadonly ? '대화방 모델은 변경할 수 없습니다.' : undefined
+              "
               :aria-label="t('chat.assistantSelect')"
               @click="openModelSelector"
             >
@@ -101,7 +103,7 @@ application runtime. * @author OpenAI
                 v-for="model in models"
                 :key="model.id"
                 class="model-option"
-                :class="{ active: model.id === modelValue }"
+                :class="{active: model.id === modelValue}"
                 type="button"
                 @click="selectModel(model.id)"
               >
@@ -109,7 +111,10 @@ application runtime. * @author OpenAI
                   <strong>{{ model.label }}</strong>
                   <small>{{ model.description }}</small>
                 </span>
-                <CheckIcon v-if="model.id === modelValue" class="option-check" />
+                <CheckIcon
+                  v-if="model.id === modelValue"
+                  class="option-check"
+                />
               </button>
             </div>
           </div>
@@ -117,7 +122,7 @@ application runtime. * @author OpenAI
           <div ref="plusSelectorRef" class="prompt-selector-wrap">
             <button
               class="prompt-icon-action"
-              :class="{ 'prompt-icon-action--active': toolMenuOpen }"
+              :class="{'prompt-icon-action--active': toolMenuOpen}"
               type="button"
               :disabled="disabled"
               aria-label="Tools"
@@ -147,7 +152,7 @@ application runtime. * @author OpenAI
           >
             <button
               class="prompt-icon-action attach-button"
-              :class="{ 'prompt-icon-action--active': attachMenuOpen }"
+              :class="{'prompt-icon-action--active': attachMenuOpen}"
               type="button"
               :title="t('chat.attach')"
               :aria-label="t('chat.attach')"
@@ -233,7 +238,7 @@ application runtime. * @author OpenAI
         v-for="model in models"
         :key="model.id"
         class="bottom-sheet-option"
-        :class="{ active: model.id === modelValue }"
+        :class="{active: model.id === modelValue}"
         type="button"
         @click="selectModel(model.id)"
       >
@@ -294,24 +299,24 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
-import { usePlatformStore } from "@/stores/platformStore";
-import { openNativeFilePicker } from "@/services/platformBridge";
-import { createId } from "@/utils/id";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
+import {useI18n} from "vue-i18n";
+import {usePlatformStore} from "@/stores/platformStore";
+import {openNativeFilePicker} from "@/services/platformBridge";
+import {createId} from "@/utils/id";
 import BaseBottomSheet from "./BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
-const { t } = useI18n();
+const {t} = useI18n();
 
 const props = defineProps({
-  disabled: { type: Boolean, default: false },
-  floating: { type: Boolean, default: false },
-  showHelp: { type: Boolean, default: true },
-  placeholder: { type: String, default: "" },
-  modelValue: { type: String, default: "gpt-5-thinking" },
-  models: { type: Array, default: () => [] },
-  modelReadonly: { type: Boolean, default: false },
+  disabled: {type: Boolean, default: false},
+  floating: {type: Boolean, default: false},
+  showHelp: {type: Boolean, default: true},
+  placeholder: {type: String, default: ""},
+  modelValue: {type: String, default: "gpt-5-thinking"},
+  models: {type: Array, default: () => []},
+  modelReadonly: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
@@ -339,15 +344,15 @@ let lastHeight = 0;
 let removeViewportListener = null;
 
 const fallbackModels = [
-  { id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델" },
+  {id: props.modelValue, label: "빠른 모델", description: "현재 선택된 모델"},
 ];
 const currentModels = computed(() =>
-  props.models.length ? props.models : fallbackModels,
+  props.models.length ? props.models : fallbackModels
 );
 const currentModel = computed(
   () =>
     currentModels.value.find((model) => model.id === props.modelValue) ||
-    currentModels.value[0],
+    currentModels.value[0]
 );
 const tools = computed(() => [
   {
@@ -390,7 +395,7 @@ function markPreviewError(file) {
 }
 
 const canSubmit = computed(
-  () => text.value.trim().length > 0 || attachments.value.length > 0,
+  () => text.value.trim().length > 0 || attachments.value.length > 0
 );
 const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 
@@ -401,7 +406,7 @@ const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-container--mobile"),
+    document.querySelector(".app-container--mobile")
   );
 }
 
@@ -441,7 +446,7 @@ function handleFocus() {
 function submit() {
   const value = text.value.trim();
   if ((!value && attachments.value.length === 0) || props.disabled) return;
-  emit("submit", { text: value, attachments: attachments.value });
+  emit("submit", {text: value, attachments: attachments.value});
   text.value = "";
   attachments.value = [];
   attachMenuOpen.value = false;
@@ -542,7 +547,7 @@ async function openFilePicker(type) {
     } catch (error) {
       console.warn(
         "Android file picker failed. Falling back to web input.",
-        error,
+        error
       );
     }
   }
@@ -648,7 +653,7 @@ function addFiles(fileList) {
 function isImageFile(file) {
   return Boolean(
     file?.type?.startsWith("image/") ||
-    /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || ""),
+    /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
   );
 }
 
@@ -727,8 +732,8 @@ function previewImage(file) {
   file.url = file.url || file.previewUrl || file.dataUrl || "";
   window.dispatchEvent(
     new CustomEvent("chat:image-preview", {
-      detail: { ...file, previewUrl: getPreviewUrl(file) },
-    }),
+      detail: {...file, previewUrl: getPreviewUrl(file)},
+    })
   );
 }
 
@@ -765,7 +770,7 @@ onMounted(() => {
   window.addEventListener("android-to-js", handleNativeFileSelected);
   resize();
   document.addEventListener("click", handleDocumentClick);
-  window.addEventListener("resize", syncViewportMode, { passive: true });
+  window.addEventListener("resize", syncViewportMode, {passive: true});
   removeViewportListener = () =>
     window.removeEventListener("resize", syncViewportMode);
 });

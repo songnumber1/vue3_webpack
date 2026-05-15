@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { onBeforeUnmount, onMounted, ref } from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 
 /**
  * Returns unique preview source URLs from an attachment detail object.
@@ -63,7 +63,7 @@ export function useImagePreview() {
       dataUrl,
       url: dataUrl,
       sources: [dataUrl, ...(previewImage.value.sources || [])].filter(
-        (url, index, array) => url && array.indexOf(url) === index,
+        (url, index, array) => url && array.indexOf(url) === index
       ),
       loading: true,
       error: false,
@@ -88,7 +88,7 @@ export function useImagePreview() {
       error: !firstUrl && !detail.file,
     };
     if (detail.file && !detail.dataUrl)
-      hydrateOpenPreviewFromFile({ ...detail, id: previewImage.value.id });
+      hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
   }
 
   /**
@@ -148,10 +148,10 @@ export function useImagePreview() {
   }
 
   onMounted(() =>
-    window.addEventListener("chat:image-preview", openImagePreview),
+    window.addEventListener("chat:image-preview", openImagePreview)
   );
   onBeforeUnmount(() =>
-    window.removeEventListener("chat:image-preview", openImagePreview),
+    window.removeEventListener("chat:image-preview", openImagePreview)
   );
 
   return {

@@ -3,11 +3,11 @@
  * @description Chat 화면 초기화에 필요한 분산 API를 병렬 호출하고 UI ViewModel로 정규화하는 business layer입니다.
  */
 
-import { resolveChatApis } from '@/api/runtime/chatApis'
-import { adaptAssistantList } from '@/adapters/assistantAdapter'
-import { adaptModelList, filterAvailableModels } from '@/adapters/modelAdapter'
-import { adaptChatHistoryList, adaptMessageList } from '@/adapters/chatAdapter'
-import { adaptExamplePromptList } from '@/adapters/promptAdapter'
+import {resolveChatApis} from "@/api/runtime/chatApis";
+import {adaptAssistantList} from "@/adapters/assistantAdapter";
+import {adaptModelList, filterAvailableModels} from "@/adapters/modelAdapter";
+import {adaptChatHistoryList, adaptMessageList} from "@/adapters/chatAdapter";
+import {adaptExamplePromptList} from "@/adapters/promptAdapter";
 
 /**
  * 배열을 id 기준 lookup map으로 변환합니다.
@@ -17,9 +17,9 @@ import { adaptExamplePromptList } from '@/adapters/promptAdapter'
  */
 function toMap(items = []) {
   return items.reduce((acc, item) => {
-    if (item?.id) acc[item.id] = item
-    return acc
-  }, {})
+    if (item?.id) acc[item.id] = item;
+    return acc;
+  }, {});
 }
 
 /**
@@ -30,12 +30,12 @@ function toMap(items = []) {
  */
 function groupModelsByAssistant(models = []) {
   return models.reduce((acc, model) => {
-    if (!model?.assistId) return acc
-    if (!acc[model.assistId]) acc[model.assistId] = []
-    acc[model.assistId].push(model)
-    acc[model.assistId].sort((a, b) => a.order - b.order)
-    return acc
-  }, {})
+    if (!model?.assistId) return acc;
+    if (!acc[model.assistId]) acc[model.assistId] = [];
+    acc[model.assistId].push(model);
+    acc[model.assistId].sort((a, b) => a.order - b.order);
+    return acc;
+  }, {});
 }
 
 /**
@@ -46,9 +46,15 @@ function groupModelsByAssistant(models = []) {
  * @returns {object|null} 초기 선택 Assistant입니다.
  */
 function pickInitialAssistant(assistants = [], accessInfo = {}) {
-  const preferredIds = Object.keys(accessInfo?.user?.presetInfo?.assist || {})
-  const latestPreferredAssistantId = preferredIds.find((id) => assistants.some((item) => item.id === id))
-  return assistants.find((item) => item.id === latestPreferredAssistantId) || assistants[0] || null
+  const preferredIds = Object.keys(accessInfo?.user?.presetInfo?.assist || {});
+  const latestPreferredAssistantId = preferredIds.find((id) =>
+    assistants.some((item) => item.id === id)
+  );
+  return (
+    assistants.find((item) => item.id === latestPreferredAssistantId) ||
+    assistants[0] ||
+    null
+  );
 }
 
 /**
@@ -59,11 +65,15 @@ function pickInitialAssistant(assistants = [], accessInfo = {}) {
  * @param {object} accessInfo - access/info.do 응답입니다.
  * @returns {object|null} 초기 선택 모델입니다.
  */
-function pickInitialModel(assistant, modelMapByAssistant = {}, accessInfo = {}) {
-  if (!assistant) return null
-  const presetModelId = accessInfo?.user?.presetInfo?.assist?.[assistant.id]
-  const models = modelMapByAssistant[assistant.id] || []
-  return models.find((item) => item.id === presetModelId) || models[0] || null
+function pickInitialModel(
+  assistant,
+  modelMapByAssistant = {},
+  accessInfo = {}
+) {
+  if (!assistant) return null;
+  const presetModelId = accessInfo?.user?.presetInfo?.assist?.[assistant.id];
+  const models = modelMapByAssistant[assistant.id] || [];
+  return models.find((item) => item.id === presetModelId) || models[0] || null;
 }
 
 /**
@@ -82,37 +92,54 @@ function pickInitialModel(assistant, modelMapByAssistant = {}, accessInfo = {}) 
  * @returns {Promise<object>} Chat runtime 초기화 ViewModel 묶음입니다.
  */
 export async function bootstrapChatRuntime(options = {}) {
-  const { accessInfoOverride = null } = options
-  const { accessApi, assistantApi, modelApi, chatHistoryApi } = resolveChatApis()
+  const {accessInfoOverride = null} = options;
+  const {accessApi, assistantApi, modelApi, chatHistoryApi} = resolveChatApis();
 
   const accessInfoPromise = accessInfoOverride
     ? Promise.resolve(accessInfoOverride)
-    : accessApi.getAccessInfo({ language: 'ko', entryType: 'main' })
+    : accessApi.getAccessInfo({language: "ko", entryType: "main"});
 
-  const [accessInfo, assistantRaw, studioRaw, modelRaw, studioModelRaw, chatHistoryRaw] = await Promise.all([
+  const [
+    accessInfo,
+    assistantRaw,
+    studioRaw,
+    modelRaw,
+    studioModelRaw,
+    chatHistoryRaw,
+  ] = await Promise.all([
     accessInfoPromise,
     assistantApi.getAssistants(),
     assistantApi.getStudios(),
     modelApi.getModels(),
     modelApi.getStudioModels(),
     chatHistoryApi.getChatHistoryList(),
-  ])
+  ]);
 
-  const assistants = [...adaptAssistantList(assistantRaw), ...adaptAssistantList(studioRaw)]
+  const assistants = [
+    ...adaptAssistantList(assistantRaw),
+    ...adaptAssistantList(studioRaw),
+  ]
     .filter((item) => item.isAuthorized && !item.isDeleted)
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => a.order - b.order);
 
   const allModels = [
-    ...adaptModelList(modelRaw, { includeDeleted: true }),
-    ...adaptModelList(studioModelRaw, { includeDeleted: true }),
-  ]
-  const models = filterAvailableModels(allModels)
-  const assistantMap = toMap(assistants)
-  const modelMap = toMap(allModels)
-  const modelMapByAssistant = groupModelsByAssistant(models)
-  const chatHistories = adaptChatHistoryList(chatHistoryRaw, { assistantMap, modelMap })
-  const initialAssistant = pickInitialAssistant(assistants, accessInfo)
-  const initialModel = pickInitialModel(initialAssistant, modelMapByAssistant, accessInfo)
+    ...adaptModelList(modelRaw, {includeDeleted: true}),
+    ...adaptModelList(studioModelRaw, {includeDeleted: true}),
+  ];
+  const models = filterAvailableModels(allModels);
+  const assistantMap = toMap(assistants);
+  const modelMap = toMap(allModels);
+  const modelMapByAssistant = groupModelsByAssistant(models);
+  const chatHistories = adaptChatHistoryList(chatHistoryRaw, {
+    assistantMap,
+    modelMap,
+  });
+  const initialAssistant = pickInitialAssistant(assistants, accessInfo);
+  const initialModel = pickInitialModel(
+    initialAssistant,
+    modelMapByAssistant,
+    accessInfo
+  );
 
   return {
     accessInfo,
@@ -123,9 +150,9 @@ export async function bootstrapChatRuntime(options = {}) {
     modelMap,
     modelMapByAssistant,
     chatHistories,
-    initialAssistantId: initialAssistant?.id || '',
-    initialModelId: initialModel?.id || '',
-  }
+    initialAssistantId: initialAssistant?.id || "",
+    initialModelId: initialModel?.id || "",
+  };
 }
 
 /**
@@ -139,9 +166,9 @@ export async function bootstrapChatRuntime(options = {}) {
  * @returns {Promise<Array<object>>} 정규화된 메시지 목록입니다.
  */
 export async function loadChatMessages(payload = {}) {
-  const { chatHistoryApi } = resolveChatApis()
-  const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload)
-  return adaptMessageList(rawMessages)
+  const {chatHistoryApi} = resolveChatApis();
+  const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);
+  return adaptMessageList(rawMessages);
 }
 
 /**
@@ -156,8 +183,11 @@ export async function loadChatMessages(payload = {}) {
  * @param {boolean} [params.studioYN=false] - Studio 여부입니다.
  * @returns {Promise<Array<object>>} 정규화된 예시 프롬프트 목록입니다.
  */
-export async function loadExamplePrompts({ assistantId, studioYN = false } = {}) {
-  const { examplePromptApi } = resolveChatApis()
-  const response = await examplePromptApi.getExamplePrompts({ assistId: assistantId, studioYN })
-  return adaptExamplePromptList(response)
+export async function loadExamplePrompts({assistantId, studioYN = false} = {}) {
+  const {examplePromptApi} = resolveChatApis();
+  const response = await examplePromptApi.getExamplePrompts({
+    assistId: assistantId,
+    studioYN,
+  });
+  return adaptExamplePromptList(response);
 }

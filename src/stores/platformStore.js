@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import { defineStore } from "pinia";
-import { resolveDetailedPlatform } from "@/platform/platformDetector";
+import {defineStore} from "pinia";
+import {resolveDetailedPlatform} from "@/platform/platformDetector";
 
 export const usePlatformStore = defineStore("platform", {
   state: () => ({
@@ -31,7 +31,7 @@ export const usePlatformStore = defineStore("platform", {
         typeof navigator === "undefined" ? true : navigator.onLine;
     },
     refresh(baseAppInfo = {}) {
-      this.info = resolveDetailedPlatform({ ...this.info, ...baseAppInfo });
+      this.info = resolveDetailedPlatform({...this.info, ...baseAppInfo});
     },
     setPushToken(token) {
       this.pushToken = token || "";
@@ -41,10 +41,10 @@ export const usePlatformStore = defineStore("platform", {
       if (data?.appVersion) this.info.appVersion = data.appVersion;
     },
     setNetwork(status = {}) {
-      this.network = { ...this.network, ...status };
+      this.network = {...this.network, ...status};
     },
     recordNativeEvent(type, payload = {}) {
-      const item = { type, payload, receivedAt: new Date().toISOString() };
+      const item = {type, payload, receivedAt: new Date().toISOString()};
       this.lastNativeEvent = item;
       this.nativeEvents = [item, ...this.nativeEvents].slice(0, 50);
       if (type === "ON_NETWORK_CHANGE")

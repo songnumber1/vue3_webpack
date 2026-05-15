@@ -10,7 +10,7 @@
       v-for="assistant in assistants"
       :key="assistant.id"
       class="bottom-sheet-option"
-      :class="{ active: assistant.id === selectedAssistantId }"
+      :class="{active: assistant.id === selectedAssistantId}"
       type="button"
       @click="$emit('select', assistant.id)"
     >
@@ -35,9 +35,9 @@ import BaseBottomSheet from "./BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 defineProps({
-  open: { type: Boolean, default: false },
-  assistants: { type: Array, default: () => [] },
-  selectedAssistantId: { type: String, default: "" },
+  open: {type: Boolean, default: false},
+  assistants: {type: Array, default: () => []},
+  selectedAssistantId: {type: String, default: ""},
 });
 
 defineEmits(["close", "select"]);

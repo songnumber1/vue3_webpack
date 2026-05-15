@@ -3,8 +3,8 @@
  * @description 운영 model API 응답을 모델 선택/대화 세션에서 사용하는 ViewModel로 변환합니다.
  */
 
-import { MODEL_KEYS } from '@/constants/apiKeys'
-import { toBoolean } from './booleanAdapter'
+import {MODEL_KEYS} from "@/constants/apiKeys";
+import {toBoolean} from "./booleanAdapter";
 
 /**
  * 단일 모델 raw row를 ModelViewModel로 변환합니다.
@@ -18,8 +18,8 @@ import { toBoolean } from './booleanAdapter'
  * @returns {object} ModelViewModel입니다.
  */
 export function adaptModel(raw = {}) {
-  const id = raw[MODEL_KEYS.ID]
-  const label = raw[MODEL_KEYS.NAME] || 'Model'
+  const id = raw[MODEL_KEYS.ID];
+  const label = raw[MODEL_KEYS.NAME] || "Model";
 
   return {
     id,
@@ -27,8 +27,8 @@ export function adaptModel(raw = {}) {
     assistId: raw[MODEL_KEYS.ASSISTANT_ID],
     label,
     name: label,
-    description: raw.modelDesc || `${raw[MODEL_KEYS.TYPE] || 'instance'} 모델`,
-    type: raw[MODEL_KEYS.TYPE] || 'instance',
+    description: raw.modelDesc || `${raw[MODEL_KEYS.TYPE] || "instance"} 모델`,
+    type: raw[MODEL_KEYS.TYPE] || "instance",
     order: Number(raw[MODEL_KEYS.ORDER] ?? 999),
     isAuthorized: toBoolean(raw[MODEL_KEYS.AUTH_YN]),
     isDeleted: toBoolean(raw[MODEL_KEYS.DELETE_YN]),
@@ -38,7 +38,7 @@ export function adaptModel(raw = {}) {
     hasImage: toBoolean(raw.imageYN),
     hasRag: toBoolean(raw.ragYN),
     raw,
-  }
+  };
 }
 
 /**
@@ -51,16 +51,14 @@ export function adaptModel(raw = {}) {
  * @returns {Array<object>} 정규화된 모델 목록입니다.
  */
 export function adaptModelList(rawItems = [], options = {}) {
-  const { includeDeleted = false, includeUnauthorized = false } = options
+  const {includeDeleted = false, includeUnauthorized = false} = options;
 
-  return rawItems
-    .map(adaptModel)
-    .filter((item) => {
-      if (!item.id || !item.assistId) return false
-      if (!includeUnauthorized && !item.isAuthorized) return false
-      if (!includeDeleted && item.isDeleted) return false
-      return true
-    })
+  return rawItems.map(adaptModel).filter((item) => {
+    if (!item.id || !item.assistId) return false;
+    if (!includeUnauthorized && !item.isAuthorized) return false;
+    if (!includeDeleted && item.isDeleted) return false;
+    return true;
+  });
 }
 
 /**
@@ -69,5 +67,7 @@ export function adaptModelList(rawItems = [], options = {}) {
  * @returns {Array<object>} 권한 있고 삭제되지 않은 모델 목록입니다.
  */
 export function filterAvailableModels(models = []) {
-  return models.filter((item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted)
+  return models.filter(
+    (item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted
+  );
 }

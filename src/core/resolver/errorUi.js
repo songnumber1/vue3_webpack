@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { isNativeApp } from "@/core/config";
+import {isNativeApp} from "@/core/config";
 
 /**
  * resolveErrorUI 함수입니다.

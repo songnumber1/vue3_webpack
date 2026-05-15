@@ -4,7 +4,7 @@
  * @author OpenAI
  */
 
-import { isAndroidApp, isIosApp } from "@/core/config";
+import {isAndroidApp, isIosApp} from "@/core/config";
 
 const noopBridge = {
   getToken: () => null,

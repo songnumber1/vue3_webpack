@@ -49,14 +49,14 @@ application runtime. * @author OpenAI
 </template>
 
 <script setup>
-import { computed } from "vue";
+import {computed} from "vue";
 import MessageActions from "./MessageActions.vue";
-const props = defineProps({ message: { type: Object, required: true } });
+const props = defineProps({message: {type: Object, required: true}});
 defineEmits(["rendered"]);
 const hasAttachments = computed(
   () =>
     Array.isArray(props.message.attachments) &&
-    props.message.attachments.length > 0,
+    props.message.attachments.length > 0
 );
 /**
  * getPreviewUrl 처리 함수입니다.
@@ -74,8 +74,8 @@ function getPreviewUrl(file) {
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent("chat:image-preview", {
-      detail: { ...file, url: getPreviewUrl(file) },
-    }),
+      detail: {...file, url: getPreviewUrl(file)},
+    })
   );
 }
 /**

@@ -162,7 +162,6 @@ function createLoginRequiredRedirect(to, reason) {
   };
 }
 
-
 /**
  * 라우터 인증 가드 디버그 로그를 출력합니다.
  *
@@ -199,7 +198,7 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
     if (Array.isArray(route.children)) {
       normalizedRoute.children = applyInheritedRequireAuth(
         route.children,
-        requireAuth,
+        requireAuth
       );
     }
 

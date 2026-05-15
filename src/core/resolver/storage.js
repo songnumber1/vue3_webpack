@@ -4,8 +4,8 @@
  * @author OpenAI
  */
 
-import { isNativeApp } from "@/core/config";
-import { callNative } from "@/bridge/bridgeClient";
+import {isNativeApp} from "@/core/config";
+import {callNative} from "@/bridge/bridgeClient";
 
 /**
  * getLocalStorage 처리 함수입니다.
@@ -95,7 +95,7 @@ function callDirectStorage(bridge, methodName, payload) {
   if (typeof method !== "function") return null;
   try {
     return parseEnvelope(
-      method.call(bridge, JSON.stringify(createRequest(payload))),
+      method.call(bridge, JSON.stringify(createRequest(payload)))
     );
   } catch (error) {
     console.warn(`[storage] AndroidBridge.${methodName} failed`, error);
@@ -134,7 +134,7 @@ export function resolveStorage(appInfo, bridge) {
   if (isNativeApp(appInfo)) {
     return {
       get(key) {
-        const response = callDirectStorage(bridge, "getStorage", { key });
+        const response = callDirectStorage(bridge, "getStorage", {key});
         if (response?.isSuccess)
           return response.data?.value ?? localStorageAdapter.get(key);
         return localStorageAdapter.get(key);
@@ -147,22 +147,22 @@ export function resolveStorage(appInfo, bridge) {
         if (!response?.isSuccess)
           console.warn(
             "[storage] native setStorage fallback used",
-            response?.message,
+            response?.message
           );
         localStorageAdapter.set(key, value);
       },
       remove(key) {
-        const response = callDirectStorage(bridge, "removeStorage", { key });
+        const response = callDirectStorage(bridge, "removeStorage", {key});
         if (!response?.isSuccess && response)
           console.warn(
             "[storage] native removeStorage fallback used",
-            response?.message,
+            response?.message
           );
         localStorageAdapter.remove(key);
       },
       async getAsync(key) {
         try {
-          const response = await callNative("GET_STORAGE", { key });
+          const response = await callNative("GET_STORAGE", {key});
           return response?.data?.value ?? localStorageAdapter.get(key);
         } catch (error) {
           console.warn("[storage] native getAsync fallback used", error);
@@ -171,7 +171,7 @@ export function resolveStorage(appInfo, bridge) {
       },
       async setAsync(key, value) {
         try {
-          await callNative("SET_STORAGE", { key, value: String(value) });
+          await callNative("SET_STORAGE", {key, value: String(value)});
         } catch (error) {
           console.warn("[storage] native setAsync fallback used", error);
         }
@@ -179,7 +179,7 @@ export function resolveStorage(appInfo, bridge) {
       },
       async removeAsync(key) {
         try {
-          await callNative("REMOVE_STORAGE", { key });
+          await callNative("REMOVE_STORAGE", {key});
         } catch (error) {
           console.warn("[storage] native removeAsync fallback used", error);
         }

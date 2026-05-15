@@ -3,7 +3,7 @@
  * @description Vue i18n instance and message catalog for the chat application UI.
  */
 
-import { createI18n } from "vue-i18n";
+import {createI18n} from "vue-i18n";
 
 export const SUPPORT_LOCALES = ["ko", "en"];
 
@@ -42,7 +42,8 @@ export const messages = {
       chatManagement: "대화 관리",
       chatManagementTitle: "대화 관리",
       chatManagementSummary: "대화 보관, 내보내기, 삭제 설정",
-      chatManagementBody: "운영 API 연결 전까지 대화 관리 기능의 UI 구조를 미리 확인하는 영역입니다.",
+      chatManagementBody:
+        "운영 API 연결 전까지 대화 관리 기능의 UI 구조를 미리 확인하는 영역입니다.",
       chatManagementArchive: "중요 대화 고정 및 보관",
       chatManagementExport: "대화 내보내기 및 공유",
       chatManagementDelete: "대화 삭제 및 복구 정책",
@@ -177,7 +178,8 @@ export const messages = {
       chatManagement: "Chat management",
       chatManagementTitle: "Chat management",
       chatManagementSummary: "Archive, export, and delete chat settings",
-      chatManagementBody: "This area previews chat management UI before the production API is connected.",
+      chatManagementBody:
+        "This area previews chat management UI before the production API is connected.",
       chatManagementArchive: "Pin and archive important chats",
       chatManagementExport: "Export and share conversations",
       chatManagementDelete: "Delete and recovery policy",
@@ -213,7 +215,8 @@ export const messages = {
       noticeSummary: "Check service updates and announcements.",
       personalizationSummary: "Adjust response style and preferences.",
       languageSummary: "Switch the UI between Korean and English.",
-      playgroundSummary: "Test shared UI and platform-specific screens independently.",
+      playgroundSummary:
+        "Test shared UI and platform-specific screens independently.",
     },
     notice: {
       title: "Notices",
