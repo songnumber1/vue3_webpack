@@ -9,6 +9,7 @@
     class="chat-container chatgpt-shell"
     :class="{
       'chatgpt-shell--keyboard-open': keyboardOpen,
+      [`chatgpt-shell--mode-${mode}`]: true,
       'chatgpt-shell--sidebar-collapsed': sidebarCollapsed,
     }"
   >
@@ -59,6 +60,7 @@ defineProps({
   drawerOpen: { type: Boolean, default: false },
   collapsedRecentOpen: { type: Boolean, default: false },
   keyboardOpen: { type: Boolean, default: false },
+  mode: { type: String, default: 'main' },
 });
 
 defineEmits([

@@ -6,6 +6,28 @@
   --radius-md: 16px;
   --radius-lg: 24px;
   --duration-fast: 160ms;
+
+  /* Layout / responsive tokens. CSS custom properties cannot be used directly in @media queries,
+     so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
+  --breakpoint-mobile: 900px;
+  --layout-sidebar-width: 260px;
+  --layout-sidebar-collapsed-width: 68px;
+  --layout-message-width: 840px;
+  --layout-message-avatar-width: 38px;
+  --layout-message-gap: 12px;
+  --layout-prompt-width: 820px;
+  --layout-mobile-drawer-width: min(86vw, 360px);
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --z-drawer: 90;
+  --z-bottom-sheet: 1310;
+  --z-modal: 1300;
+  --overlay-backdrop: rgba(15, 23, 42, 0.36);
+  --drawer-backdrop: rgba(0, 0, 0, 0.45);
 }
 
 :root[data-theme="light"] {
@@ -52,6 +74,11 @@
   --message-border: #ececf1;
   --assistant-avatar-bg: #10a37f;
   --assistant-avatar-text: #ffffff;
+  --text-on-primary: #ffffff;
+  --exception-muted: #64748b;
+  --exception-button-bg: #111827;
+  --exception-button-hover: #1f2937;
+  --exception-button-text: #ffffff;
   --code-bg: #0f172a;
   --code-text: #e2e8f0;
   --shadow-card: 0 8px 22px rgba(15, 23, 42, 0.06);
@@ -104,6 +131,11 @@
   --message-border: transparent;
   --assistant-avatar-bg: #10a37f;
   --assistant-avatar-text: #ffffff;
+  --text-on-primary: #ffffff;
+  --exception-muted: #64748b;
+  --exception-button-bg: #111827;
+  --exception-button-hover: #1f2937;
+  --exception-button-text: #ffffff;
   --code-bg: #0d0d0d;
   --code-text: #f1f5f9;
   --shadow-card: none;

@@ -5,8 +5,11 @@
  */
 
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-
-const KEYBOARD_THRESHOLD = 120;
+import {
+  KEYBOARD_THRESHOLD_PX,
+  MIN_VIEWPORT_HEIGHT_PX,
+  MOBILE_BREAKPOINT_PX,
+} from "@/constants/uiTokens";
 
 /**
  * getViewportSize 처리 함수입니다.
@@ -26,11 +29,18 @@ function getViewportSize() {
  * @param {*} size 함수 실행에 필요한 입력값입니다.
  * @returns {void}
  */
-function setCssViewportVars(size) {
-  const height = Math.max(size.height || 0, 320);
-  const width = Math.max(size.width || 0, 320);
+function setCssViewportVars(size, baselineHeight = 0) {
+  const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
+  const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
+  const layoutHeight = Math.max(baselineHeight || height, height, MIN_VIEWPORT_HEIGHT_PX);
+  const keyboardHeight = Math.max(layoutHeight - height, 0);
+  const offsetTop = Math.max(window.visualViewport?.offsetTop || 0, 0);
+
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
+  document.documentElement.style.setProperty("--layout-viewport-height", `${layoutHeight}px`);
+  document.documentElement.style.setProperty("--keyboard-height", `${keyboardHeight}px`);
+  document.documentElement.style.setProperty("--visual-viewport-offset-top", `${offsetTop}px`);
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 }
 
@@ -48,7 +58,7 @@ export function useViewportGuard(options = {}) {
   let resizeTimer = null;
 
   const isCompact = computed(
-    () => viewportWidth.value > 0 && viewportWidth.value <= 900,
+    () => viewportWidth.value > 0 && viewportWidth.value <= MOBILE_BREAKPOINT_PX,
   );
 
   /**
@@ -59,15 +69,15 @@ export function useViewportGuard(options = {}) {
     const size = getViewportSize();
     viewportHeight.value = size.height;
     viewportWidth.value = size.width;
-    setCssViewportVars(size);
-
     if (!baselineHeight.value || size.height > baselineHeight.value) {
       baselineHeight.value = size.height;
     }
 
+    setCssViewportVars(size, baselineHeight.value);
+
     keyboardOpen.value =
       isCompact.value &&
-      baselineHeight.value - size.height > KEYBOARD_THRESHOLD;
+      baselineHeight.value - size.height > KEYBOARD_THRESHOLD_PX;
     onChange({
       ...size,
       keyboardOpen: keyboardOpen.value,

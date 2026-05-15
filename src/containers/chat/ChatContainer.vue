@@ -14,6 +14,7 @@
     :drawer-open="drawerOpen"
     :collapsed-recent-open="collapsedRecentOpen"
     :keyboard-open="keyboardOpen"
+    :mode="mode"
     @update:selected-assistant-id="startNewChatWithAssistant"
     @update:sidebar-collapsed="sidebarCollapsed = $event"
     @update:drawer-open="drawerOpen = $event"

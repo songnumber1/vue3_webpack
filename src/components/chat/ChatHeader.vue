@@ -26,16 +26,7 @@
         @click="$emit('open-assistant')"
       >
         <span>{{ assistantLabel }}</span>
-        <svg class="chevron" viewBox="0 0 20 20" aria-hidden="true">
-          <path
-            d="M5.5 7.5 10 12l4.5-4.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
+<ChevronDownIcon class="chevron chevron--selector" />
       </button>
 
       <div
@@ -98,6 +89,7 @@ import { useI18n } from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
 const props = defineProps({
   mode: { type: String, default: "main" },

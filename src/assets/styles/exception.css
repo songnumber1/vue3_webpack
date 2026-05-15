@@ -26,9 +26,9 @@
 
   background: var(--surface);
 
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border: 1px solid var(--border);
 
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 30px var(--shadow-card);
 
   text-align: center;
 }
@@ -43,7 +43,7 @@
 
   text-transform: uppercase;
 
-  color: #64748b;
+  color: var(--exception-muted);
 }
 
 .exception-title {
@@ -60,7 +60,7 @@
 .exception-description {
   margin: 14px 0 0;
 
-  color: #64748b;
+  color: var(--exception-muted);
 
   line-height: 1.7;
 
@@ -86,11 +86,11 @@
 
   border-radius: 14px;
 
-  background: rgba(148, 163, 184, 0.08);
+  background: var(--surface-muted);
 }
 
 .exception-info-label {
-  color: #64748b;
+  color: var(--exception-muted);
 
   font-size: 14px;
 }
@@ -127,9 +127,9 @@
 
   border-radius: 14px;
 
-  background: #111827;
+  background: var(--exception-button-bg);
 
-  color: #ffffff;
+  color: var(--exception-button-text);
 
   font-weight: 700;
 
@@ -143,7 +143,7 @@
 }
 
 .exception-button:hover {
-  background: #1f2937;
+  background: var(--exception-button-hover);
 }
 
 .exception-button--secondary {
@@ -151,11 +151,11 @@
 
   color: var(--text);
 
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  border: 1px solid var(--control-border);
 }
 
 .exception-button--secondary:hover {
-  background: rgba(148, 163, 184, 0.08);
+  background: var(--surface-muted);
 }
 
 @media (max-width: 480px) {

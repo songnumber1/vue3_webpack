@@ -9,7 +9,7 @@
       <section v-if="open" class="mobile-settings-page" role="dialog" aria-modal="true">
         <header class="mobile-settings-header">
           <button class="mobile-settings-nav" type="button" @click="handleBack">
-            <span aria-hidden="true">‹</span>
+            <ChevronLeftIcon class="mobile-settings-back-icon" />
             <span>{{ headerTitle }}</span>
           </button>
           <button
@@ -89,6 +89,7 @@ import { useI18n } from "vue-i18n";
 import { setAppLocale } from "@/i18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 
 const props = defineProps({ open: { type: Boolean, default: false } });
 const emit = defineEmits(["close"]);
