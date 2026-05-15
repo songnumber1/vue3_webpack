@@ -146,6 +146,7 @@
     <ResponsiveOverlay
       :open="popupOpen"
       :is-mobile="isMobile"
+      mobile-mode="dialog"
       :title="activePopup.title"
       :subtitle="activePopup.subtitle"
       @close="closePopup('닫기 버튼')"

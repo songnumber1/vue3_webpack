@@ -5718,3 +5718,90 @@ body,
 .playground-log-list strong {
   color: var(--text);
 }
+
+/* Playground mobile scroll + mobile popup dialog policy */
+.playground-page {
+  height: var(--app-height, 100vh);
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.responsive-overlay--mobile-dialog {
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  place-items: center;
+}
+
+.responsive-overlay--mobile-dialog .responsive-overlay-backdrop {
+  display: block;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel {
+  width: min(100%, 420px);
+  max-width: calc(100vw - 32px);
+  max-height: calc(var(--app-height, 100vh) - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel-header {
+  min-height: 58px;
+  padding: 14px 14px 12px 16px;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel-header strong {
+  font-size: 17px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel-header small {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel-body {
+  max-height: calc(var(--app-height, 100vh) - 122px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+}
+
+@media (max-width: 900px) {
+  .playground-page {
+    height: var(--app-height, 100vh);
+    padding: calc(18px + env(safe-area-inset-top)) 16px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  .playground-card {
+    padding: 18px;
+  }
+
+  .playground-header-actions,
+  .playground-actions,
+  .playground-route-row,
+  .playground-dialog-actions {
+    align-items: stretch;
+  }
+
+  .playground-button,
+  .playground-link,
+  .playground-route-row a {
+    min-width: 0;
+    white-space: normal;
+  }
+
+  .playground-popup-content {
+    gap: 12px;
+  }
+
+  .playground-popup-message,
+  .playground-popup-detail {
+    overflow-wrap: anywhere;
+    word-break: keep-all;
+  }
+}

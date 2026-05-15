@@ -9,7 +9,7 @@
       <div
         v-if="open"
         class="responsive-overlay"
-        :class="{ 'responsive-overlay--mobile': isMobile }"
+        :class="overlayClasses"
       >
         <div
           v-if="!isMobile"
@@ -24,7 +24,7 @@
         >
           <header class="responsive-panel-header">
             <button
-              v-if="isMobile"
+              v-if="showMobileBackButton"
               class="responsive-back-button"
               type="button"
               @click="$emit('close')"
@@ -37,7 +37,7 @@
               <small v-if="subtitle">{{ subtitle }}</small>
             </div>
             <button
-              v-if="!isMobile"
+              v-if="showCloseButton"
               class="responsive-close-button"
               type="button"
               @click="$emit('close')"
@@ -55,16 +55,42 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-defineProps({
+const props = defineProps({
   open: { type: Boolean, default: false },
   isMobile: { type: Boolean, default: false },
   title: { type: String, required: true },
   subtitle: { type: String, default: "" },
+  /**
+   * Mobile rendering strategy.
+   * - fullscreen: keeps the existing notice/personalization mobile page behavior.
+   * - dialog: keeps alert/warning/confirm as popup dialogs on mobile.
+   */
+  mobileMode: {
+    type: String,
+    default: "fullscreen",
+    validator: (value) => ["fullscreen", "dialog"].includes(value),
+  },
 });
 
 defineEmits(["close"]);
+
+const isMobileFullscreen = computed(
+  () => props.isMobile && props.mobileMode === "fullscreen",
+);
+const isMobileDialog = computed(
+  () => props.isMobile && props.mobileMode === "dialog",
+);
+
+const overlayClasses = computed(() => ({
+  "responsive-overlay--mobile": isMobileFullscreen.value,
+  "responsive-overlay--mobile-dialog": isMobileDialog.value,
+}));
+
+const showMobileBackButton = computed(() => isMobileFullscreen.value);
+const showCloseButton = computed(() => !isMobileFullscreen.value);
 </script>
