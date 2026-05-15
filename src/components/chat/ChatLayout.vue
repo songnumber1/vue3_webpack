@@ -6,7 +6,7 @@
 
 <template>
   <div
-    class="chatgpt-shell"
+    class="chat-container chatgpt-shell"
     :class="{
       'chatgpt-shell--keyboard-open': keyboardOpen,
       'chatgpt-shell--sidebar-collapsed': sidebarCollapsed,

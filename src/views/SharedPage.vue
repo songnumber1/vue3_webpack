@@ -5,9 +5,9 @@
 -->
 
 <template>
-  <ChatShell mode="shared" />
+  <ChatContainer mode="shared" />
 </template>
 
 <script setup>
-import ChatShell from "@/components/chat/ChatShell.vue";
+import ChatContainer from "@/containers/chat/ChatContainer.vue";
 </script>

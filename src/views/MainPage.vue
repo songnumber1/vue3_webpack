@@ -4,9 +4,9 @@ application runtime. * @author OpenAI
 -->
 
 <template>
-  <ChatShell mode="main" />
+  <ChatContainer mode="main" />
 </template>
 
 <script setup>
-import ChatShell from "@/components/chat/ChatShell.vue";
+import ChatContainer from "@/containers/chat/ChatContainer.vue";
 </script>

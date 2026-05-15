@@ -367,7 +367,7 @@ const currentAssistant = computed(
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-shell--mobile"),
+    document.querySelector(".app-container--mobile, .app-shell--mobile"),
   );
 }
 

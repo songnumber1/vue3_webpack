@@ -1,6 +1,6 @@
 <!--
 @file PlaygroundPage.vue
-@description UI playground for validating shared shell, overlay, modal, bottom sheet, alert and confirm behavior.
+@description UI playground for validating shared container, overlay, modal, bottom sheet, alert and confirm behavior.
 -->
 
 <template>
@@ -22,10 +22,10 @@
 
     <section class="playground-grid">
       <article class="playground-card">
-        <span class="playground-card-label">Shell</span>
-        <h2>AppShell 통합 확인</h2>
+        <span class="playground-card-label">Container</span>
+        <h2>AppContainer 통합 확인</h2>
         <p>
-          기존 WebLayout/AndroidLayout의 단순 slot wrapper를 AppShell 하나로
+          기존 WebLayout/AndroidLayout의 단순 slot wrapper를 AppContainer로
           통합하고, platform class로 Web/Android 차이를 분리했습니다.
         </p>
         <dl class="playground-info-list">
@@ -38,8 +38,8 @@
             <dd>{{ appInfo.env || "browser" }}</dd>
           </div>
           <div>
-            <dt>shell</dt>
-            <dd>{{ shellMode }}</dd>
+            <dt>container</dt>
+            <dd>{{ containerMode }}</dd>
           </div>
         </dl>
       </article>
@@ -223,7 +223,7 @@ const popupOpen = ref(false);
 const activePopupType = ref("alert");
 const popupResult = ref("아직 선택된 팝업 액션이 없습니다.");
 const isMobile = ref(false);
-const shellMode = computed(() => (isAndroidApp(appInfo) ? "mobile" : "web"));
+const containerMode = computed(() => (isAndroidApp(appInfo) ? "mobile" : "web"));
 const sheetItems = ["옵션 A", "옵션 B", "옵션 C"];
 
 const popupSamples = {

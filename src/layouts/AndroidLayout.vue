@@ -1,10 +1,14 @@
 <!--
-@file AndroidLayout.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file AndroidLayout.vue
+@description Backward-compatible layout wrapper. New code should use AppContainer via resolveLayout().
 -->
 
 <template>
-  <div class="app-shell app-shell--mobile">
+  <AppContainer>
     <slot />
-  </div>
+  </AppContainer>
 </template>
+
+<script setup>
+import AppContainer from "@/containers/AppContainer.vue";
+</script>

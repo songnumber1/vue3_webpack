@@ -1,14 +1,14 @@
 /**
  * @file layout.js
- * @description Resolves the single application shell component. Platform-specific UI is controlled by AppShell classes and appContext.
+ * @description Resolves the root application container component. Platform-specific UI is controlled by AppContainer classes and appContext.
  */
 
-import AppShell from "@/layouts/AppShell.vue";
+import AppContainer from "@/containers/AppContainer.vue";
 
 /**
- * Returns the unified application shell.
+ * Returns the unified application container.
  * @returns {*} Vue layout component.
  */
 export function resolveLayout() {
-  return AppShell;
+  return AppContainer;
 }
