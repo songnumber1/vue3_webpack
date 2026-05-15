@@ -1,3 +1,8 @@
+/**
+ * @file examplePrompts.raw.js
+ * @description JavaScript module for examplePrompts.raw.
+ */
+
 const prompt = (assistId, index, kr, en, options = {}) => ({
   question_category_name_en: options.categoryEn || 'General',
   example_view_kr: kr,

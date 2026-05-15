@@ -1,3 +1,8 @@
+/**
+ * @file promptSuggestions.js
+ * @description JavaScript module for promptSuggestions.
+ */
+
 export const PROMPT_SUGGESTION_TYPES = {
   IMAGE: 'image',
   WRITING: 'writing',

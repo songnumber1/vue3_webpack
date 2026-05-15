@@ -1,4 +1,9 @@
 /**
+ * @file webviewCompat.js
+ * @description JavaScript module for webviewCompat.
+ */
+
+/**
  * Android 실제 단말 WebView는 시뮬레이터/PC Chrome보다 일부 Web API가 늦게 들어오는 경우가 있다.
  * Swagger UI는 내부적으로 crypto.randomUUID, ResizeObserver, requestIdleCallback 등에 의존할 수 있어
  * 해당 API가 없는 단말에서는 화면이 렌더링되기 전에 JS 오류로 중단될 수 있다.

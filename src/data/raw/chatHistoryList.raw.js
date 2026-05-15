@@ -1,3 +1,8 @@
+/**
+ * @file chatHistoryList.raw.js
+ * @description JavaScript module for chatHistoryList.raw.
+ */
+
 export const CHAT_HISTORY_LIST_RAW = [
   { chatTitle: 'Markdown 렌더링 종합 테스트: 표, Mermaid, 코드, 링크, 이미지, 수식', chatId: 'chat-md-showcase', modeId: 'model-ds-thinking', bookmarkYN: true, dayGroup: 0, chatEndDt: '2026-05-15T09:10:00Z', userId: 'user-1234' },
   { chatTitle: '삭제된 모델로 생성된 이전 대화 확인', chatId: 'chat-deleted-model', modeId: 'model-ds-retired', bookmarkYN: false, dayGroup: 0, chatEndDt: '2026-05-15T08:30:00Z', userId: 'user-1234' },

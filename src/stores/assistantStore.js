@@ -1,3 +1,8 @@
+/**
+ * @file assistantStore.js
+ * @description JavaScript module for assistantStore.
+ */
+
 import { defineStore } from 'pinia'
 
 export const useAssistantStore = defineStore('assistant', {

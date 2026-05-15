@@ -1,3 +1,8 @@
+/**
+ * @file domain.js
+ * @description JavaScript module for domain.
+ */
+
 export const ASSISTANT_TYPES = Object.freeze({
   ASSISTANT: 'assistant',
   STUDIO: 'studio',

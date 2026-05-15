@@ -1,3 +1,8 @@
+/**
+ * @file accessApi.mock.js
+ * @description JavaScript module for accessApi.mock.
+ */
+
 import { AUTH_MOCK_SCENARIOS } from '@/constants/auth'
 import { ACCESS_INFO_RAW } from '@/data/raw/accessInfo.raw'
 import { resolveMock } from './mockUtils'

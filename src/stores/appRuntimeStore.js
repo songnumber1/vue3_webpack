@@ -1,3 +1,8 @@
+/**
+ * @file appRuntimeStore.js
+ * @description JavaScript module for appRuntimeStore.
+ */
+
 import { defineStore } from 'pinia'
 
 export const useAppRuntimeStore = defineStore('appRuntime', {

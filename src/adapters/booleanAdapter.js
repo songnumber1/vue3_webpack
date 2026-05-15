@@ -1,3 +1,8 @@
+/**
+ * @file booleanAdapter.js
+ * @description JavaScript module for booleanAdapter.
+ */
+
 export function toBoolean(value) {
   if (typeof value === 'boolean') return value
   if (typeof value === 'number') return value !== 0

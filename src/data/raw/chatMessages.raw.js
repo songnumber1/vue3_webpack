@@ -1,3 +1,8 @@
+/**
+ * @file chatMessages.raw.js
+ * @description JavaScript module for chatMessages.raw.
+ */
+
 const user = (id, content, sendTime) => ({
   role: 'user',
   content,

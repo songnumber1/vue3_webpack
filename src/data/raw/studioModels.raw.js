@@ -1,3 +1,8 @@
+/**
+ * @file studioModels.raw.js
+ * @description JavaScript module for studioModels.raw.
+ */
+
 export const STUDIO_MODELS_RAW = [
   { shareYN: true, modelId: 'studio-model-marketing-a', recommandYN: true, imageYN: false, newYN: false, ModelType: 'thinking', delYN: false, authYN: true, modelName: 'Marketing GPT-OSS', modelOrder: 0, connModelId: 'conn-marketing-a', regTime: '2026-02-01T09:00:00Z', shareStudioYN: false, studioYN: true, ragYN: true, modelDesc: '마케팅 캠페인 초안과 문구 검토용 모델입니다.', assistId: 'studio-marketing' },
   { shareYN: true, modelId: 'studio-model-marketing-b', recommandYN: false, imageYN: false, newYN: false, ModelType: 'fast', delYN: false, authYN: true, modelName: 'Marketing Fast', modelOrder: 1, connModelId: 'conn-marketing-b', regTime: '2026-02-02T09:00:00Z', shareStudioYN: false, studioYN: true, ragYN: false, modelDesc: '짧은 마케팅 문구 생성용 모델입니다.', assistId: 'studio-marketing' },

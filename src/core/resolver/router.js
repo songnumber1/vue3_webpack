@@ -1,3 +1,8 @@
+/**
+ * @file router.js
+ * @description JavaScript module for router.
+ */
+
 import {createRouter, createWebHistory} from "vue-router";
 import AssistantRoot from "@/views/AssistantRoot.vue";
 import MainPage from "@/views/MainPage.vue";
@@ -222,8 +227,6 @@ function registerRouteGuard(router, appInfo, context = {}) {
     const platformStore = usePlatformStore();
     platformStore.refresh(appInfo);
 
-    if (!platformStore.isAccess) return true;
-
     const requiresAuth = shouldCheckAuth(to);
     debugRouteGuard("navigation", {
       path: to.fullPath,
@@ -234,6 +237,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
       })),
       enableAuthGuard: ENABLE_AUTH_GUARD,
       requiresAuth,
+      platformAccess: platformStore.isAccess,
     });
 
     if (requiresAuth) {
@@ -244,6 +248,8 @@ function registerRouteGuard(router, appInfo, context = {}) {
         return createLoginRequiredRedirect(to, authResult.reason);
       }
     }
+
+    if (!platformStore.isAccess) return true;
 
     if (to.meta?.skipVersionCheck) return true;
     if (to.name === ANDROID_UPDATE_ROUTE_NAME) return true;

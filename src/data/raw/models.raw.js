@@ -1,3 +1,8 @@
+/**
+ * @file models.raw.js
+ * @description JavaScript module for models.raw.
+ */
+
 export const MODELS_RAW = [
   { shareYN: true, modelId: 'model-ds-thinking', imageYN: false, recommandYN: true, newYN: true, ModelType: 'thinking', delYN: false, authYN: true, modelName: 'DS Thinking', regTime: '2026-01-05T09:00:00Z', modelOrder: 0, shareStudioYN: false, studioYN: false, assistId: 'assist-ds' },
   { shareYN: true, modelId: 'model-ds-fast', imageYN: false, recommandYN: false, newYN: false, ModelType: 'fast', delYN: false, authYN: true, modelName: 'DS Fast', regTime: '2026-01-06T09:00:00Z', modelOrder: 1, shareStudioYN: false, studioYN: false, assistId: 'assist-ds' },

@@ -67,6 +67,9 @@ const titleText = computed(() => {
   if (props.variant === "deleted-model") {
     return locale.value === "ko" ? "삭제된 모델입니다." : "This model has been deleted.";
   }
+  if (props.variant === "unavailable-model") {
+    return locale.value === "ko" ? "사용할 수 없는 모델입니다." : "This model is unavailable.";
+  }
   return t("chat.sharedReadonly");
 });
 
@@ -80,6 +83,11 @@ const descriptionText = computed(() => {
     return locale.value === "ko"
       ? "이전 대화 내용은 확인할 수 있지만 새 메시지는 보낼 수 없습니다."
       : "You can view this conversation, but you cannot send new messages.";
+  }
+  if (props.variant === "unavailable-model") {
+    return locale.value === "ko"
+      ? "대화 이력은 열 수 있지만 모델 정보를 찾을 수 없어 새 메시지는 보낼 수 없습니다."
+      : "You can view this conversation, but model metadata is missing so new messages are blocked.";
   }
   return locale.value === "ko"
     ? "이 화면에서는 메시지를 입력하거나 전송할 수 없습니다."

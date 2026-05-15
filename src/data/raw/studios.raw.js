@@ -1,3 +1,8 @@
+/**
+ * @file studios.raw.js
+ * @description JavaScript module for studios.raw.
+ */
+
 const defaultImage = { name: '', path: null, size: null, type: '', default: true }
 
 export const STUDIOS_RAW = [

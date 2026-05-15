@@ -9,7 +9,9 @@ import {
   AUTH_MOCK_SCENARIOS,
   AUTH_MOCK_SCENARIO_STORAGE_KEY,
   USE_MOCK_AUTH,
+  ALLOW_LOCAL_STORAGE_MOCK_AUTH,
   ENABLE_AUTH_GUARD_DEBUG,
+  ENABLE_AUTH_GUARD_CACHE,
 } from '@/constants/auth'
 import { accessApiMock } from '@/api/mock/accessApi.mock'
 import { useAuthStore } from '@/stores/authStore'
@@ -80,7 +82,7 @@ function getStoredMockScenario() {
  * @returns {boolean} mock access/info.do 사용 여부입니다.
  */
 function shouldUseMockAuth() {
-  return USE_MOCK_AUTH || Boolean(getStoredMockScenario())
+  return USE_MOCK_AUTH || (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
 }
 
 /**
@@ -247,7 +249,7 @@ function normalizeAccessResult(accessInfo = {}) {
 export async function ensureRouteAuthenticated({ to, authAxios, force = false }) {
   const authStore = useAuthStore()
 
-  if (!force && authStore.authChecked && authStore.isAuthenticated) {
+  if (ENABLE_AUTH_GUARD_CACHE && !force && authStore.authChecked && authStore.isAuthenticated) {
     debugAuthGuard('skip access/info.do because auth store is already authenticated')
     return {
       authenticated: true,

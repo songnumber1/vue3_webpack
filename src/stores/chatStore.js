@@ -1,3 +1,8 @@
+/**
+ * @file chatStore.js
+ * @description JavaScript module for chatStore.
+ */
+
 import { defineStore } from 'pinia'
 
 export const useChatStore = defineStore('chat', {
