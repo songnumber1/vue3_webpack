@@ -5892,3 +5892,104 @@ body,
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+
+/* Assistant prompt and markdown responsive refinement. */
+.message,
+.bubble,
+.bubble-content,
+.bubble-content.markdown-body {
+  min-width: 0;
+}
+
+.suggestion-row--between {
+  max-width: 100%;
+}
+
+.suggestion-chip {
+  min-width: 0;
+  max-width: min(100%, 260px);
+  padding-inline: 14px;
+}
+
+.suggestion-chip-text {
+  display: inline-block;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option-selected-indicator,
+.bottom-sheet-selected-indicator {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  color: var(--primary-strong);
+}
+
+.markdown-body :where(p, li, div) > img,
+.markdown-body img {
+  display: block;
+  box-sizing: border-box;
+  inline-size: auto;
+  max-inline-size: 100%;
+  width: auto;
+  max-width: 100% !important;
+  height: auto !important;
+  margin-inline: auto;
+  object-fit: contain;
+}
+
+.markdown-body p:has(> img:only-child),
+.markdown-body li:has(> img:only-child) {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+@media (min-width: 901px) {
+  .suggestion-row--between {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .suggestion-chip {
+    width: 100%;
+    max-width: none;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 900px) {
+  .suggestion-row--between,
+  .app-shell--mobile .suggestion-row--between {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    width: 100%;
+  }
+
+  .suggestion-chip,
+  .app-shell--mobile .suggestion-chip {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    justify-content: center;
+    padding-inline: 10px;
+  }
+
+  .markdown-body :where(p, li, div) > img,
+  .markdown-body img {
+    inline-size: auto;
+    max-inline-size: 100%;
+    width: auto;
+    max-width: 100% !important;
+  }
+}

@@ -48,10 +48,14 @@
                 <strong>{{ assistant.label }}</strong>
                 <small>{{ assistant.description }}</small>
               </span>
-              <CheckIcon
+              <span
                 v-if="assistant.id === selectedAssistantId"
-                class="option-check"
-              />
+                class="option-selected-indicator"
+                aria-label="현재 선택된 값"
+              >
+                <CheckIcon class="option-check" />
+                <span class="sr-only">현재 선택된 값</span>
+              </span>
             </button>
           </div>
         </div>
@@ -319,10 +323,14 @@
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
-      <CheckIcon
+      <span
         v-if="assistant.id === selectedAssistantId"
-        class="bottom-sheet-check"
-      />
+        class="bottom-sheet-selected-indicator"
+        aria-label="현재 선택된 값"
+      >
+        <CheckIcon class="bottom-sheet-check" />
+        <span class="sr-only">현재 선택된 값</span>
+      </span>
     </button>
   </BaseBottomSheet>
 </template>

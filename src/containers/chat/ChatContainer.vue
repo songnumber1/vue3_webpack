@@ -212,12 +212,23 @@ const suggestions = computed(() => {
 
   return PROMPT_SUGGESTION_DEFINITIONS.map((definition, index) => {
     const prompt = assistantPrompts[index];
+    const fallbackLabel = t(definition.labelKey);
+    const label = prompt?.titleKo || prompt?.titleEn || fallbackLabel;
+    const content =
+      prompt?.contentKo ||
+      prompt?.contentEn ||
+      prompt?.titleKo ||
+      prompt?.titleEn ||
+      definition.fallbackPrompt;
+
     return {
-      id: definition.id,
+      id: prompt?.id || `${definition.id}-${selectedAssistantId.value || 'default'}`,
+      type: definition.id,
       icon: definition.icon,
-      text: t(definition.labelKey),
-      title: prompt?.titleKo || prompt?.titleEn || t(definition.labelKey),
-      prompt: prompt?.contentKo || prompt?.titleKo || definition.fallbackPrompt,
+      text: label,
+      title: content || label,
+      prompt: content || label,
+      fallbackLabel,
     };
   });
 });
