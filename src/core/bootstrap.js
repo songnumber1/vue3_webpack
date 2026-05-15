@@ -11,6 +11,7 @@ import App from "@/App.vue";
 import { resolveAppConfig } from "@/core/config";
 import { resolveLayout } from "@/core/resolver/layout";
 import { resolveAxios } from "@/core/resolver/axios";
+import { resolveAuthAxios } from "@/core/resolver/authAxios";
 import { applyInterceptors } from "@/core/resolver/interceptor";
 import { resolveApi } from "@/core/resolver/api";
 import { resolveRouter } from "@/core/resolver/router";
@@ -46,13 +47,14 @@ export async function bootstrap() {
   const storage = resolveStorage(appInfo, bridge);
   const theme = resolveTheme(storage);
   const axios = resolveAxios(appInfo);
+  const authAxios = resolveAuthAxios(appInfo);
   const errorUI = resolveErrorUI(appInfo, bridge);
   const upload = resolveUploadStrategy(appInfo, axios, bridge);
 
   applyInterceptors(axios, appInfo, { bridge, errorUI });
 
   const api = resolveApi(appInfo, axios);
-  const router = resolveRouter(appInfo);
+  const router = resolveRouter(appInfo, { authAxios });
   const Layout = resolveLayout(appInfo);
 
   const app = createApp(App);
@@ -79,6 +81,7 @@ export async function bootstrap() {
     storage,
     theme,
     axios,
+    authAxios,
     api,
     errorUI,
     upload,
