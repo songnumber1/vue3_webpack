@@ -156,8 +156,8 @@ export function useChatRuntime() {
       }
       assistantStore.setBootstrapData(data)
       chatStore.setHistories(data.chatHistories)
-      appRuntimeStore.finishLoading()
       await preloadExamplePrompts(assistantStore.selectedAssistantId)
+      appRuntimeStore.finishLoading()
     } catch (error) {
       appRuntimeStore.fail(error)
       throw error
@@ -183,10 +183,10 @@ export function useChatRuntime() {
    * @param {string} id - 선택할 Assistant ID입니다.
    * @returns {void}
    */
-  function selectAssistant(id) {
+  async function selectAssistant(id) {
     if (chatStore.isModelLocked) return
     assistantStore.selectAssistant(id)
-    preloadExamplePrompts(id)
+    await preloadExamplePrompts(id)
   }
 
   /**
@@ -195,10 +195,10 @@ export function useChatRuntime() {
    * @param {string} id - 선택할 Assistant ID입니다.
    * @returns {void}
    */
-  function selectAssistantForNewChat(id) {
+  async function selectAssistantForNewChat(id) {
     assistantStore.selectAssistant(id)
     chatStore.clearActiveSession()
-    preloadExamplePrompts(id)
+    await preloadExamplePrompts(id)
   }
 
   /**

@@ -6,6 +6,7 @@
 
 <template>
   <ChatLayout
+    v-if="runtimeReady"
     :histories="histories"
     :assistants="assistants"
     :selected-assistant-id="selectedAssistantId"
@@ -110,6 +111,9 @@
       @close="mobileSettingsOpen = false"
     />
   </ChatLayout>
+  <div v-else class="chat-bootstrap-loading" aria-live="polite">
+    <span class="chat-bootstrap-loading__dot"></span>
+  </div>
 </template>
 
 <script setup>
@@ -175,7 +179,7 @@ const workspaceRef = ref(null);
 const { scrollToBottom } = useAutoScroll({ value: null });
 const { keyboardOpen, refreshViewport } = useViewportGuard({
   onChange: ({ isCompact, keyboardOpen: isKeyboardOpen }) => {
-    if (isCompact && isKeyboardOpen) scrollBottom({ stable: true });
+    if (props.mode !== "main" && isCompact && isKeyboardOpen) scrollBottom({ stable: true });
   },
 });
 const themeName = ref(theme.current);
@@ -229,6 +233,8 @@ const workspaceAssistantLabel = computed(() => {
 const suggestions = computed(() => {
   const assistantPrompts = currentExamplePrompts.value || [];
   const isEnglish = locale.value === "en";
+
+  if (!assistantPrompts.length) return [];
 
   return PROMPT_SUGGESTION_DEFINITIONS.map((definition, index) => {
     const prompt = assistantPrompts[index];
@@ -345,6 +351,7 @@ function handleMessageContentRendered() {
 function handlePromptFocus() {
   if (isReadOnly.value || isActiveModelUnavailable.value) return;
   refreshViewport();
+  if (props.mode === "main") return;
   scrollBottom({ stable: true, force: isMobile.value });
 }
 
@@ -354,6 +361,7 @@ function handlePromptFocus() {
  */
 function handlePromptResize() {
   if (isReadOnly.value || isActiveModelUnavailable.value) return;
+  if (props.mode === "main") return;
   scrollBottom({ stable: true, force: isMobile.value });
 }
 
@@ -380,7 +388,7 @@ async function startNewChat() {
 async function startNewChatWithAssistant(id) {
   revokeMessageAttachments(messages.value);
   messages.value = [];
-  selectAssistantForNewChat(id);
+  await selectAssistantForNewChat(id);
   drawerOpen.value = false;
   collapsedRecentOpen.value = false;
   assistantSheetOpen.value = false;
@@ -580,8 +588,8 @@ onMounted(async () => {
   window.addEventListener("resize", updateMobileState, { passive: true });
   window.addEventListener("scroll", scheduleBottomStateCheck, true);
   await runtime.initialize();
-  runtimeReady.value = true;
   await loadRouteConversation();
+  runtimeReady.value = true;
 });
 
 onBeforeUnmount(() => {
