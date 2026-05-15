@@ -18,7 +18,7 @@
  * @type {boolean}
  */
 // todo: 인증 시 true로 변경
-export const ENABLE_AUTH_GUARD = true;
+export const ENABLE_AUTH_GUARD = false;
 
 /**
  * 로그인 확인 mock 사용 여부입니다.

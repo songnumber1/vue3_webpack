@@ -213,7 +213,15 @@ const activeConversationTitle = computed(() => {
 });
 
 const workspaceAssistantLabel = computed(() => {
-  if (activeSession.value?.assistantLabel) return activeSession.value.assistantLabel;
+  if (activeSession.value?.displayAssistantLabel) {
+    return activeSession.value.displayAssistantLabel;
+  }
+  if (
+    activeSession.value?.assistantLabel &&
+    !activeSession.value?.isModelUnavailable
+  ) {
+    return activeSession.value.assistantLabel;
+  }
   return currentAssistant.value?.label || "Assistant";
 });
 

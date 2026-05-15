@@ -6518,3 +6518,91 @@ body,
     height: 19px;
   }
 }
+
+/* Chat route/session UI refinement patch.
+   - Chat histories restore their Assistant selector context.
+   - Deleted or missing model sessions keep the room readable but display the first Assistant as fallback.
+   - Header assistant/title controls are presented as plain text without pill borders.
+   - Message rows share the same right content boundary across user/assistant messages.
+   - Mobile bottom sheet menu rows keep icon and text grouped on the left.
+   - Feedback dialog follows the visual viewport when the mobile keyboard is open. */
+.conversation-title-wrap,
+.model-trigger--assistant {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.conversation-title-wrap {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.model-trigger--assistant:hover,
+.model-trigger--assistant:focus-visible {
+  background: var(--control-hover) !important;
+}
+
+@media (min-width: 901px) {
+  .message--user {
+    grid-template-columns: 38px minmax(0, 1fr) !important;
+  }
+
+  .message--user .avatar {
+    display: none !important;
+  }
+
+  .message--user .bubble {
+    grid-column: 2 !important;
+    justify-self: end !important;
+    max-width: min(780px, 100%) !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .message--user .bubble {
+    max-width: 100% !important;
+  }
+
+  .bottom-sheet-option--row {
+    justify-content: flex-start !important;
+  }
+
+  .bottom-sheet-option--row span {
+    flex: 0 0 auto !important;
+    width: 24px !important;
+    text-align: center !important;
+  }
+
+  .bottom-sheet-option--row strong {
+    flex: 0 1 auto !important;
+    display: inline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .feedback-dialog-backdrop {
+    align-items: flex-start !important;
+    padding: calc(12px + env(safe-area-inset-top)) 12px 12px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .feedback-dialog {
+    width: 100% !important;
+    max-height: calc(var(--app-height, 100dvh) - 24px - env(safe-area-inset-top)) !important;
+  }
+
+  .feedback-dialog-body textarea {
+    min-height: 118px !important;
+    max-height: calc(var(--app-height, 100dvh) - 280px) !important;
+  }
+
+  .empty-stage--mobile-main {
+    overscroll-behavior: contain;
+  }
+
+  .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating {
+    transform: translateZ(0);
+  }
+}

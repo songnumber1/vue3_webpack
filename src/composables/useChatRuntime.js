@@ -89,6 +89,8 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
     isAssistantMissing: assistantMissing,
     isModelUnavailable: Boolean(unavailableReason),
     modelUnavailableReason: unavailableReason,
+    displayAssistantId: '',
+    displayAssistantLabel: '',
     readonlyModel: true,
   }
 }
@@ -224,6 +226,23 @@ export function useChatRuntime() {
     if (!history) return []
 
     const session = createSessionFromHistory(history, assistantStore.modelMap, assistantStore.assistantMap)
+    const fallbackAssistant = assistantStore.assistants[0] || null
+    const shouldUseFallbackAssistant = Boolean(
+      session?.isModelDeleted ||
+        session?.isModelMissing ||
+        session?.isAssistantMissing ||
+        !session?.assistantId,
+    )
+    const displayAssistant = shouldUseFallbackAssistant
+      ? fallbackAssistant
+      : assistantStore.assistantMap[session.assistantId] || fallbackAssistant
+
+    if (displayAssistant?.id) {
+      assistantStore.selectAssistant(displayAssistant.id)
+      session.displayAssistantId = displayAssistant.id
+      session.displayAssistantLabel = displayAssistant.label
+    }
+
     chatStore.setActiveSession(session)
 
     if (!chatStore.messageMap[history.id]) {
