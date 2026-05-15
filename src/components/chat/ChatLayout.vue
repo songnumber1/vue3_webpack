@@ -6,11 +6,11 @@
 
 <template>
   <div
-    class="chat-container chat-container-shell"
+    class="chat-container chat-container-root"
     :class="{
-      'chat-container-shell--keyboard-open': keyboardOpen,
-      [`chat-container-shell--mode-${mode}`]: true,
-      'chat-container-shell--sidebar-collapsed': sidebarCollapsed,
+      'chat-container-root--keyboard-open': keyboardOpen,
+      [`chat-container-root--mode-${mode}`]: true,
+      'chat-container-root--sidebar-collapsed': sidebarCollapsed,
     }"
   >
     <ChatSidebar

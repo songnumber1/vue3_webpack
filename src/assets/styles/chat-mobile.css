@@ -1,0 +1,158 @@
+/**
+ * Mobile viewport and keyboard policy.
+ *
+ * Main page policy:
+ * - The composer is always anchored to the bottom edge of the device viewport.
+ * - When the software keyboard opens, only the composer moves above the keyboard.
+ * - Header/title/example prompt content does not get pushed upward by the composer.
+ * - If the composer covers content, only the main content area scrolls.
+ * - Body/app/container scrolling is locked to prevent blank overscroll below the composer.
+ *
+ * Chat page policy:
+ * - Chat/shared rooms keep using chat-container-root--keyboard-open from ChatLayout.
+ */
+@media (max-width: 900px) {
+  :root {
+    --mobile-main-composer-space: 174px;
+    --mobile-main-content-top: var(--mobile-header-height, 76px);
+    --mobile-main-content-inline: var(--space-4, 16px);
+    --mobile-main-content-gap: var(--space-4, 16px);
+    --mobile-main-composer-z: 90;
+  }
+
+  html,
+  body,
+  #app,
+  .app-container--mobile {
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+
+  .app-container--mobile .chat-container-root--mode-main,
+  .chat-container-root--mode-main {
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+  }
+
+  .app-container--mobile .chat-container-root--mode-main .chat-workspace,
+  .chat-container-root--mode-main .chat-workspace {
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: 0 !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    display: block !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+  }
+
+  .app-container--mobile .empty-stage--mobile-main,
+  .chat-container-root--mode-main .empty-stage--mobile-main {
+    position: relative !important;
+    display: block !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: var(--chat-bg) !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
+  }
+
+  .app-container--mobile .empty-stage--mobile-main .empty-center,
+  .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
+    position: absolute !important;
+    top: var(--mobile-main-content-top) !important;
+    right: 0 !important;
+    bottom: calc(
+      var(--mobile-main-composer-space) + var(--keyboard-height, 0px)
+    ) !important;
+    left: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: var(--mobile-main-content-gap) !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: var(--space-6, 24px) var(--mobile-main-content-inline)
+      var(--space-4, 16px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    transform: none !important;
+  }
+
+  .app-container--mobile .empty-stage--mobile-main .empty-center h1,
+  .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1 {
+    flex: 0 0 auto !important;
+    margin: 0 0 var(--space-1, 4px) !important;
+  }
+
+  .app-container--mobile .empty-stage--mobile-main .suggestion-row--between,
+  .chat-container-root--mode-main .empty-stage--mobile-main .suggestion-row--between {
+    flex: 0 0 auto !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt,
+  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: calc(
+      var(--keyboard-height, 0px) + max(0px, env(safe-area-inset-bottom))
+    ) !important;
+    left: 0 !important;
+    z-index: var(--mobile-main-composer-z) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: var(--space-3, 12px) var(--space-4, 16px)
+      max(var(--space-3, 12px), env(safe-area-inset-bottom)) !important;
+    transform: translate3d(0, 0, 0) !important;
+    background: linear-gradient(
+      to top,
+      var(--mobile-bg, var(--chat-bg)) 86%,
+      color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08) !important;
+    will-change: bottom !important;
+    touch-action: manipulation !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
+    width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    margin: 0 auto !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt textarea,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt textarea {
+    overscroll-behavior: contain !important;
+    touch-action: manipulation !important;
+  }
+
+  .app-container--mobile .desktop-center-prompt.prompt-wrap--floating,
+  .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
+    position: static !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+}

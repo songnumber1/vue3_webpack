@@ -1,4 +1,4 @@
-.chat-container-shell {
+.chat-container-root {
   height: 100%;
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -14,7 +14,7 @@
   background: var(--sidebar-bg);
 }
 
-.chat-container-shell--sidebar-collapsed {
+.chat-container-root--sidebar-collapsed {
   grid-template-columns: 68px minmax(0, 1fr);
 }
 
@@ -567,7 +567,7 @@
 }
 
 @media (max-width: 900px) {
-  .chat-container-shell {
+  .chat-container-root {
     grid-template-columns: 1fr;
     background: var(--mobile-bg);
   }
@@ -1123,7 +1123,7 @@
   }
 }
 
-.app-container--mobile .chat-container-shell {
+.app-container--mobile .chat-container-root {
   grid-template-columns: 1fr;
   background: var(--mobile-bg);
 }
@@ -1515,7 +1515,7 @@ body,
 #app,
 .app-container,
 .app-container--mobile,
-.chat-container-shell {
+.chat-container-root {
   width: 100%;
 }
 .app-container--mobile {
@@ -1523,7 +1523,7 @@ body,
   margin: 0 !important;
   border-radius: 0 !important;
 }
-.chat-container-shell {
+.chat-container-root {
   height: 100dvh;
 }
 .icon-wrap {
@@ -1567,8 +1567,8 @@ body,
 
 @media (max-width: 900px) {
   .app-container--mobile,
-  .app-container--mobile .chat-container-shell,
-  .chat-container-shell,
+  .app-container--mobile .chat-container-root,
+  .chat-container-root,
   .chat-workspace,
   .empty-stage {
     width: 100vw !important;
@@ -1862,7 +1862,7 @@ body,
 }
 
 /* Stable chat viewport/keyboard patch for PC Chrome, Android Chrome and Android WebView. */
-.chat-container-shell {
+.chat-container-root {
   height: var(--app-height);
   max-height: var(--app-height);
   overflow: hidden;
@@ -1894,8 +1894,8 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chat-container-shell,
-  .app-container--mobile .chat-container-shell {
+  .chat-container-root,
+  .app-container--mobile .chat-container-root {
     grid-template-columns: 1fr;
     height: var(--app-height);
     max-height: var(--app-height);
@@ -1936,19 +1936,19 @@ body,
   .app-container--mobile .desktop-center-prompt {
     display: none !important;
   }
-  .chat-container-shell--keyboard-open .mobile-topbar,
-  .app-container--mobile .chat-container-shell--keyboard-open .mobile-topbar {
+  .chat-container-root--keyboard-open .mobile-topbar,
+  .app-container--mobile .chat-container-root--keyboard-open .mobile-topbar {
     height: 44px;
     padding-top: 4px;
     padding-bottom: 4px;
   }
-  .chat-container-shell--keyboard-open .round-icon,
-  .app-container--mobile .chat-container-shell--keyboard-open .round-icon {
+  .chat-container-root--keyboard-open .round-icon,
+  .app-container--mobile .chat-container-root--keyboard-open .round-icon {
     width: 34px;
     height: 34px;
   }
-  .chat-container-shell--keyboard-open .model-trigger,
-  .app-container--mobile .chat-container-shell--keyboard-open .model-trigger {
+  .chat-container-root--keyboard-open .model-trigger,
+  .app-container--mobile .chat-container-root--keyboard-open .model-trigger {
     height: 34px;
     min-width: 100px;
     font-size: 15px;
@@ -2327,7 +2327,7 @@ body,
 }
 
 /* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
-.chat-container-shell--sidebar-collapsed {
+.chat-container-root--sidebar-collapsed {
   grid-template-columns: 48px minmax(0, 1fr);
 }
 
@@ -2458,7 +2458,7 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chat-container-shell--sidebar-collapsed {
+  .chat-container-root--sidebar-collapsed {
     grid-template-columns: 1fr;
   }
 
@@ -3048,10 +3048,10 @@ body,
     font-size: 22px;
   }
 
-  .chat-container-shell--keyboard-open .empty-stage,
-  .app-container--mobile .chat-container-shell--keyboard-open .empty-stage,
-  .chat-container-shell--keyboard-open .message-list,
-  .app-container--mobile .chat-container-shell--keyboard-open .message-list {
+  .chat-container-root--keyboard-open .empty-stage,
+  .app-container--mobile .chat-container-root--keyboard-open .empty-stage,
+  .chat-container-root--keyboard-open .message-list,
+  .app-container--mobile .chat-container-root--keyboard-open .message-list {
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
@@ -4375,7 +4375,7 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chat-container-shell {
+  .chat-container-root {
     grid-template-columns: minmax(0, 1fr);
   }
   .desktop-sidebar {
@@ -4529,8 +4529,8 @@ body,
     --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
   }
 
-  .chat-container-shell--keyboard-open .message-list,
-  .app-container--mobile .chat-container-shell--keyboard-open .message-list {
+  .chat-container-root--keyboard-open .message-list,
+  .app-container--mobile .chat-container-root--keyboard-open .message-list {
     padding-bottom: 12px !important;
     scroll-padding-bottom: 12px;
   }
@@ -5659,7 +5659,7 @@ body,
     max-width: calc(100% - 248px);
   }
 
-  .chat-container-shell--sidebar-collapsed
+  .chat-container-root--sidebar-collapsed
     .chat-workspace
     > .mobile-topbar
     .topbar-left {
@@ -6632,21 +6632,21 @@ body,
 /* =========================================================
    FINAL RESPONSIVE / KEYBOARD / TOKEN POLISH
    ========================================================= */
-.chat-container-shell {
+.chat-container-root {
   grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
   height: var(--layout-viewport-height, 100dvh);
 }
 
-.chat-container-shell--sidebar-collapsed {
+.chat-container-root--sidebar-collapsed {
   grid-template-columns: var(--layout-sidebar-collapsed-width) minmax(0, 1fr);
 }
 
-.chat-container-shell--mode-chat,
-.chat-container-shell--mode-shared {
+.chat-container-root--mode-chat,
+.chat-container-root--mode-shared {
   height: var(--app-height, 100dvh);
 }
 
-.chat-container-shell--mode-main.chat-container-shell--keyboard-open {
+.chat-container-root--mode-main.chat-container-root--keyboard-open {
   height: var(--layout-viewport-height, 100dvh);
 }
 
@@ -6684,37 +6684,37 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chat-container-shell,
-  .chat-container-shell--mode-chat,
-  .chat-container-shell--mode-shared {
+  .chat-container-root,
+  .chat-container-root--mode-chat,
+  .chat-container-root--mode-shared {
     height: var(--app-height, 100dvh);
   }
 
-  .chat-container-shell--mode-main,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open {
+  .chat-container-root--mode-main,
+  .chat-container-root--mode-main.chat-container-root--keyboard-open {
     height: var(--layout-viewport-height, 100dvh);
   }
 
-  .chat-container-shell--mode-chat.chat-container-shell--keyboard-open
+  .chat-container-root--mode-chat.chat-container-root--keyboard-open
     .chat-workspace,
-  .chat-container-shell--mode-shared.chat-container-shell--keyboard-open
+  .chat-container-root--mode-shared.chat-container-root--keyboard-open
     .chat-workspace {
     height: var(--app-height, 100dvh);
   }
 
-  .chat-container-shell--mode-chat.chat-container-shell--keyboard-open
+  .chat-container-root--mode-chat.chat-container-root--keyboard-open
     .prompt-wrap,
-  .chat-container-shell--mode-shared.chat-container-shell--keyboard-open
+  .chat-container-root--mode-shared.chat-container-root--keyboard-open
     .prompt-wrap {
     padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main {
     height: var(--layout-viewport-height, 100dvh);
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
     bottom: 0 !important;
   }
@@ -6850,7 +6850,7 @@ body,
 
 /* =========================================================
    DSLLM final mobile/container polish
-   - Keep all legacy shell names replaced with container names.
+   - Keep all legacy container names replaced with container names.
    - Mobile drawer footer spacing is explicit so browser bottom bars do not
      visually collide with the profile area.
    - Mobile assistant selector width is wider than desktop while desktop keeps
@@ -7006,21 +7006,21 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open {
+    .chat-container-root--mode-main.chat-container-root--keyboard-open,
+  .chat-container-root--mode-main.chat-container-root--keyboard-open {
     height: var(--layout-viewport-height, 100dvh) !important;
     overflow: hidden !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .chat-workspace,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .chat-workspace,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main {
     height: var(--layout-viewport-height, 100dvh) !important;
     min-height: var(--layout-viewport-height, 100dvh) !important;
@@ -7028,17 +7028,17 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center {
     transform: none !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating,
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
     bottom: 0 !important;
     transform: translate3d(0, var(--keyboard-height, 0px), 0) !important;
@@ -7142,27 +7142,27 @@ body,
     box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04) !important;
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open,
+  .chat-container-root--mode-main.chat-container-root--keyboard-open,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open {
+    .chat-container-root--mode-main.chat-container-root--keyboard-open {
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .chat-workspace,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .chat-workspace {
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
     overflow: hidden !important;
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main {
     height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
@@ -7173,19 +7173,19 @@ body,
     padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center {
     transform: none !important;
     margin-top: 0 !important;
   }
 
-  .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating,
   .app-container--mobile
-    .chat-container-shell--mode-main.chat-container-shell--keyboard-open
+    .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
     bottom: 0 !important;
     transform: none !important;
@@ -7201,15 +7201,15 @@ body,
    - Chat/shared routes still use the keyboard-open layout class from ChatLayout.
    ========================================================= */
 @media (max-width: 900px) {
-  .app-container--mobile .chat-container-shell--mode-main,
-  .chat-container-shell--mode-main {
+  .app-container--mobile .chat-container-root--mode-main,
+  .chat-container-root--mode-main {
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
     overflow: hidden !important;
   }
 
-  .app-container--mobile .chat-container-shell--mode-main .chat-workspace,
-  .chat-container-shell--mode-main .chat-workspace {
+  .app-container--mobile .chat-container-root--mode-main .chat-workspace,
+  .chat-container-root--mode-main .chat-workspace {
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
     overflow: hidden !important;
@@ -7283,15 +7283,15 @@ body,
      to scroll behind the fixed composer.
    ========================================================= */
 @media (max-width: 900px) {
-  .app-container--mobile .chat-container-shell--mode-main,
-  .chat-container-shell--mode-main {
+  .app-container--mobile .chat-container-root--mode-main,
+  .chat-container-root--mode-main {
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
     overflow: hidden !important;
   }
 
-  .app-container--mobile .chat-container-shell--mode-main .chat-workspace,
-  .chat-container-shell--mode-main .chat-workspace {
+  .app-container--mobile .chat-container-root--mode-main .chat-workspace,
+  .chat-container-root--mode-main .chat-workspace {
     position: relative !important;
     height: var(--layout-viewport-height, 100dvh) !important;
     max-height: var(--layout-viewport-height, 100dvh) !important;
@@ -7299,9 +7299,9 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .empty-stage--mobile-main,
-  .chat-container-shell--mode-main .empty-stage--mobile-main {
+  .chat-container-root--mode-main .empty-stage--mobile-main {
     height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
     ) !important;
@@ -7326,8 +7326,8 @@ body,
     ) !important;
   }
 
-  .app-container--mobile .chat-container-shell--mode-main .empty-center,
-  .chat-container-shell--mode-main .empty-center {
+  .app-container--mobile .chat-container-root--mode-main .empty-center,
+  .chat-container-root--mode-main .empty-center {
     min-height: auto !important;
     width: 100% !important;
     transform: none !important;
@@ -7337,9 +7337,9 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,
-  .chat-container-shell--mode-main
+  .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating {
     position: fixed !important;
     left: 0 !important;
@@ -7361,10 +7361,10 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating
     .prompt-box,
-  .chat-container-shell--mode-main
+  .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating
     .prompt-box {
     max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
@@ -7379,7 +7379,7 @@ body,
    - Only the content area scrolls.
    - The composer stays at the bottom of the visible viewport on every device.
    - Keyboard resize is handled by --app-height from visualViewport.
-   - Body/app/shell do not scroll, preventing blank overscroll below the composer.
+   - Body/app/container do not scroll, preventing blank overscroll below the composer.
    ========================================================= */
 @media (max-width: 900px) {
   html,
@@ -7392,16 +7392,16 @@ body,
     overscroll-behavior: none !important;
   }
 
-  .app-container--mobile .chat-container-shell--mode-main,
-  .chat-container-shell--mode-main {
+  .app-container--mobile .chat-container-root--mode-main,
+  .chat-container-root--mode-main {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
     overflow: hidden !important;
     touch-action: pan-y !important;
   }
 
-  .app-container--mobile .chat-container-shell--mode-main .chat-workspace,
-  .chat-container-shell--mode-main .chat-workspace {
+  .app-container--mobile .chat-container-root--mode-main .chat-workspace,
+  .chat-container-root--mode-main .chat-workspace {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
     min-height: 0 !important;
@@ -7411,9 +7411,9 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .empty-stage--mobile-main,
-  .chat-container-shell--mode-main .empty-stage--mobile-main {
+  .chat-container-root--mode-main .empty-stage--mobile-main {
     height: 100% !important;
     max-height: 100% !important;
     min-height: 0 !important;
@@ -7430,10 +7430,10 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .empty-stage--mobile-main
     .empty-center,
-  .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center {
+  .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     width: 100% !important;
@@ -7455,33 +7455,33 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .empty-stage--mobile-main
     .empty-center
     h1,
-  .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center h1 {
+  .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1 {
     flex: 0 0 auto !important;
     margin: 0 0 4px !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .empty-stage--mobile-main
     .suggestion-row--between,
-  .chat-container-shell--mode-main
+  .chat-container-root--mode-main
     .empty-stage--mobile-main
     .suggestion-row--between {
     flex: 0 0 auto !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .mobile-main-fixed-prompt,
-  .chat-container-shell--mode-main .mobile-main-fixed-prompt,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt,
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .mobile-main-fixed-prompt.prompt-wrap,
-  .chat-container-shell--mode-main .mobile-main-fixed-prompt.prompt-wrap {
+  .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
     flex: 0 0 auto !important;
     position: relative !important;
     left: auto !important;
@@ -7502,26 +7502,26 @@ body,
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .mobile-main-fixed-prompt
     .prompt-box,
-  .chat-container-shell--mode-main .mobile-main-fixed-prompt .prompt-box {
+  .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
     max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
     margin: 0 auto !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .mobile-main-fixed-prompt
     textarea,
-  .chat-container-shell--mode-main .mobile-main-fixed-prompt textarea {
+  .chat-container-root--mode-main .mobile-main-fixed-prompt textarea {
     overscroll-behavior: contain !important;
   }
 
   .app-container--mobile
-    .chat-container-shell--mode-main
+    .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,
-  .chat-container-shell--mode-main
+  .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating {
     position: static !important;
     bottom: auto !important;

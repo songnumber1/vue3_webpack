@@ -1,4 +1,7 @@
 @import "./themes.css";
 @import "./base.css";
 @import "./chat.css";
+@import "./chat-container.css";
+@import "./chat-prompt.css";
+@import "./chat-mobile.css";
 @import "./exception.css";

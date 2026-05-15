@@ -13,4 +13,4 @@
  *
  * @type {number}
  */
-export const PROMPT_SUGGESTION_LIMIT = 3;
+export const PROMPT_SUGGESTION_LIMIT = 5;
