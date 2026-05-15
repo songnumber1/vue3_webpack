@@ -1,6 +1,6 @@
 <!--
 @file PlaygroundPage.vue
-@description UI playground for validating shared shell, overlay, modal, bottom sheet and platform navigation behavior.
+@description UI playground for validating shared shell, overlay, modal, bottom sheet, alert and confirm behavior.
 -->
 
 <template>
@@ -10,8 +10,8 @@
         <p class="playground-eyebrow">UI Playground</p>
         <h1>공통 UI 테스트 공간</h1>
         <p>
-          Web/Android 공통 컴포넌트, Overlay, Bottom Sheet, 라우터 이동을 실제
-          화면과 분리해서 확인합니다.
+          Web/Android 공통 컴포넌트, Overlay, Bottom Sheet, 알림/경고/확인
+          팝업을 실제 화면과 분리해서 확인합니다.
         </p>
       </div>
       <div class="playground-header-actions">
@@ -66,6 +66,38 @@
       </article>
 
       <article class="playground-card">
+        <span class="playground-card-label">Popup</span>
+        <h2>알림 / 경고 / 확인 팝업</h2>
+        <p>
+          실제 서비스에서 공통으로 사용할 알림, 경고, 확인 팝업 샘플입니다.
+          내용은 slot으로 교체하고, 버튼 액션은 부모에서 제어합니다.
+        </p>
+        <div class="playground-actions">
+          <button class="playground-button" type="button" @click="openPopup('alert')">
+            알림 팝업
+          </button>
+          <button
+            class="playground-button playground-button--secondary"
+            type="button"
+            @click="openPopup('warning')"
+          >
+            경고 팝업
+          </button>
+          <button
+            class="playground-button playground-button--secondary"
+            type="button"
+            @click="openPopup('confirm')"
+          >
+            확인 팝업
+          </button>
+        </div>
+        <div class="playground-log-list">
+          <strong>마지막 팝업 결과</strong><br />
+          {{ popupResult }}
+        </div>
+      </article>
+
+      <article class="playground-card">
         <span class="playground-card-label">Bottom Sheet</span>
         <h2>모바일 Sheet 테스트</h2>
         <p>
@@ -111,6 +143,43 @@
       </template>
     </AppOverlayProvider>
 
+    <ResponsiveOverlay
+      :open="popupOpen"
+      :is-mobile="isMobile"
+      :title="activePopup.title"
+      :subtitle="activePopup.subtitle"
+      @close="closePopup('닫기 버튼')"
+    >
+      <div class="playground-popup-content">
+        <div class="playground-popup-icon" aria-hidden="true">
+          {{ activePopup.icon }}
+        </div>
+        <p class="playground-popup-message">
+          {{ activePopup.message }}
+        </p>
+        <p class="playground-popup-detail">
+          {{ activePopup.detail }}
+        </p>
+        <div class="playground-dialog-actions">
+          <button
+            v-if="activePopup.type === 'confirm'"
+            class="playground-button playground-button--secondary"
+            type="button"
+            @click="closePopup('취소')"
+          >
+            취소
+          </button>
+          <button
+            class="playground-button"
+            type="button"
+            @click="closePopup(activePopup.type === 'confirm' ? '확인' : '닫기')"
+          >
+            {{ activePopup.type === "confirm" ? "확인" : "닫기" }}
+          </button>
+        </div>
+      </div>
+    </ResponsiveOverlay>
+
     <BaseBottomSheet
       :open="sheetOpen"
       title="Playground Bottom Sheet"
@@ -139,6 +208,7 @@ import { useI18n } from "vue-i18n";
 import { useAppContext } from "@/composables/useAppContext";
 import { isAndroidApp } from "@/core/config";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
+import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/chat/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
@@ -148,10 +218,66 @@ const { appInfo } = useAppContext();
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const sheetOpen = ref(false);
+const popupOpen = ref(false);
+const activePopupType = ref("alert");
+const popupResult = ref("아직 선택된 팝업 액션이 없습니다.");
 const isMobile = ref(false);
 const shellMode = computed(() => (isAndroidApp(appInfo) ? "mobile" : "web"));
 const sheetItems = ["옵션 A", "옵션 B", "옵션 C"];
 
+const popupSamples = {
+  alert: {
+    type: "alert",
+    icon: "i",
+    title: "알림 팝업",
+    subtitle: "일반 안내 메시지",
+    message: "저장이 완료되었습니다.",
+    detail: "서비스 공지, 단순 완료 안내, 토스트보다 강조가 필요한 안내에 사용합니다.",
+  },
+  warning: {
+    type: "warning",
+    icon: "!",
+    title: "경고 팝업",
+    subtitle: "주의가 필요한 작업",
+    message: "입력값을 다시 확인해 주세요.",
+    detail: "삭제 전 경고, 세션 만료, 네트워크 오류처럼 사용자의 주의가 필요한 상황에 사용합니다.",
+  },
+  confirm: {
+    type: "confirm",
+    icon: "?",
+    title: "확인 팝업",
+    subtitle: "사용자 선택 필요",
+    message: "선택한 대화를 삭제하시겠습니까?",
+    detail: "확인/취소처럼 사용자의 명시적인 선택이 필요한 작업에 사용합니다.",
+  },
+};
+
+const activePopup = computed(() => popupSamples[activePopupType.value]);
+
+/**
+ * Opens a popup sample by type.
+ * @param {'alert'|'warning'|'confirm'} type Popup sample type.
+ * @returns {void}
+ */
+function openPopup(type) {
+  activePopupType.value = type;
+  popupOpen.value = true;
+}
+
+/**
+ * Closes the active popup and records the selected action in the playground log.
+ * @param {string} action Selected popup action label.
+ * @returns {void}
+ */
+function closePopup(action) {
+  popupOpen.value = false;
+  popupResult.value = `${activePopup.value.title} - ${action}`;
+}
+
+/**
+ * Synchronizes responsive playground mode with viewport and app platform.
+ * @returns {void}
+ */
 function syncMobile() {
   isMobile.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches || isAndroidApp(appInfo),

@@ -5596,3 +5596,125 @@ body,
     grid-template-columns: 1fr;
   }
 }
+
+/* Header overflow safety: keep desktop title from pushing action buttons. */
+.chat-workspace > .mobile-topbar {
+  width: 100%;
+  min-width: 0;
+}
+
+.mobile-topbar {
+  min-width: 0;
+}
+
+.mobile-topbar .topbar-left {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.mobile-topbar .topbar-actions,
+.mobile-topbar .topbar-actions--desktop {
+  flex: 0 0 auto;
+  min-width: max-content;
+  margin-left: auto;
+}
+
+.mobile-topbar .menu-toggle,
+.mobile-topbar .round-icon {
+  flex: 0 0 auto;
+}
+
+.mobile-topbar .conversation-title-wrap {
+  flex: 1 1 auto;
+  width: auto;
+  max-width: 100%;
+}
+
+.mobile-topbar .conversation-title-wrap span {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mobile-topbar .conversation-title-wrap strong {
+  max-width: 180px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 901px) {
+  .chat-workspace > .mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .chat-workspace > .mobile-topbar .topbar-left {
+    max-width: calc(100% - 248px);
+  }
+
+  .chatgpt-shell--sidebar-collapsed .chat-workspace > .mobile-topbar .topbar-left {
+    max-width: calc(100% - 248px);
+  }
+}
+
+@media (max-width: 900px) {
+  .mobile-topbar .conversation-title-wrap strong {
+    max-width: 120px;
+  }
+}
+
+/* Playground popup samples */
+.playground-popup-content {
+  display: grid;
+  gap: 16px;
+}
+
+.playground-popup-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: var(--control-bg);
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.playground-popup-message {
+  margin: 0;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.playground-popup-detail {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.playground-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.playground-log-list {
+  margin: 18px 0 0;
+  padding: 14px;
+  border: 1px solid var(--control-border);
+  border-radius: 16px;
+  background: var(--control-bg);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.playground-log-list strong {
+  color: var(--text);
+}
