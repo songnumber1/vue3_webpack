@@ -143,3 +143,20 @@
   --shadow-menu: 0 18px 60px rgba(0, 0, 0, 0.48);
   --shadow-prompt: 0 8px 26px rgba(0, 0, 0, 0.34);
 }
+
+/* DSLLM responsive extension tokens. */
+:root {
+  --layout-mobile-assistant-trigger-min: 190px;
+  --layout-mobile-assistant-trigger-max: min(72vw, 320px);
+  --layout-mobile-drawer-footer-gap: 28px;
+  --layout-mobile-message-gutter: 16px;
+  --layout-desktop-message-gutter: 24px;
+}
+
+:root[data-theme="light"] {
+  --prompt-outer-bg: #ffffff;
+}
+
+:root[data-theme="dark"] {
+  --prompt-outer-bg: var(--chat-bg);
+}

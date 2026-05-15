@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <div class="app-container app-shell" :class="containerClasses" :data-platform="platformName">
+  <div class="app-container" :class="containerClasses" :data-platform="platformName">
     <slot />
   </div>
 </template>
@@ -22,9 +22,6 @@ const isMobileContainer = computed(() => isAndroidApp(appInfo));
 const containerClasses = computed(() => ({
   "app-container--web": !isMobileContainer.value,
   "app-container--mobile": isMobileContainer.value,
-  "app-shell--web": !isMobileContainer.value,
-  "app-shell--mobile": isMobileContainer.value,
   [`app-container--${platformName.value}`]: true,
-  [`app-shell--${platformName.value}`]: true,
 }));
 </script>

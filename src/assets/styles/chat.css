@@ -1,4 +1,4 @@
-.chatgpt-shell {
+.chat-container-shell {
   height: 100%;
   display: grid;
   grid-template-columns: 260px minmax(0, 1fr);
@@ -14,7 +14,7 @@
   background: var(--sidebar-bg);
 }
 
-.chatgpt-shell--sidebar-collapsed {
+.chat-container-shell--sidebar-collapsed {
   grid-template-columns: 68px minmax(0, 1fr);
 }
 
@@ -567,7 +567,7 @@
 }
 
 @media (max-width: 900px) {
-  .chatgpt-shell {
+  .chat-container-shell {
     grid-template-columns: 1fr;
     background: var(--mobile-bg);
   }
@@ -1123,76 +1123,76 @@
   }
 }
 
-.app-shell--mobile .chatgpt-shell {
+.app-container--mobile .chat-container-shell {
   grid-template-columns: 1fr;
   background: var(--mobile-bg);
 }
-.app-shell--mobile .desktop-sidebar {
+.app-container--mobile .desktop-sidebar {
   display: none;
 }
-.app-shell--mobile .chat-workspace {
+.app-container--mobile .chat-workspace {
   background: var(--mobile-bg);
 }
-.app-shell--mobile .mobile-topbar {
+.app-container--mobile .mobile-topbar {
   height: 58px;
   padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
 }
-.app-shell--mobile .round-icon {
+.app-container--mobile .round-icon {
   width: 44px;
   height: 44px;
   font-size: 20px;
 }
-.app-shell--mobile .model-trigger {
+.app-container--mobile .model-trigger {
   height: 44px;
   min-width: 124px;
   padding: 0 16px;
   font-size: 20px;
 }
-.app-shell--mobile .desktop-empty-actions,
-.app-shell--mobile .empty-center {
+.app-container--mobile .desktop-empty-actions,
+.app-container--mobile .empty-center {
   display: none;
 }
-.app-shell--mobile .empty-stage {
+.app-container--mobile .empty-stage {
   display: block;
   overflow: auto;
   padding: 16px 20px 96px;
 }
-.app-shell--mobile .mobile-project-home {
+.app-container--mobile .mobile-project-home {
   display: block;
 }
-.app-shell--mobile .project-title h1 {
+.app-container--mobile .project-title h1 {
   font-size: 28px;
 }
-.app-shell--mobile .folder-icon {
+.app-container--mobile .folder-icon {
   font-size: 26px;
 }
-.app-shell--mobile .source-chip {
+.app-container--mobile .source-chip {
   height: 38px;
   font-size: 15px;
   margin-top: 14px;
 }
-.app-shell--mobile .mobile-recent-list {
+.app-container--mobile .mobile-recent-list {
   margin-top: 28px;
   gap: 20px;
 }
-.app-shell--mobile .mobile-recent-card strong {
+.app-container--mobile .mobile-recent-card strong {
   font-size: 19px;
 }
-.app-shell--mobile .mobile-recent-card span {
+.app-container--mobile .mobile-recent-card span {
   font-size: 15px;
 }
-.app-shell--mobile .message-list {
+.app-container--mobile .message-list {
   padding: 12px 16px 94px;
 }
-.app-shell--mobile .message {
+.app-container--mobile .message {
   display: block;
   margin-bottom: 18px;
 }
-.app-shell--mobile .avatar,
-.app-shell--mobile .bubble-meta {
+.app-container--mobile .avatar,
+.app-container--mobile .bubble-meta {
   display: none;
 }
-.app-shell--mobile .bubble {
+.app-container--mobile .bubble {
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -1200,7 +1200,7 @@
   padding: 0;
   max-width: 100%;
 }
-.app-shell--mobile .message--user .bubble {
+.app-container--mobile .message--user .bubble {
   background: var(--mobile-user-bubble);
   color: var(--text);
   border-radius: 18px;
@@ -1208,16 +1208,16 @@
   max-width: 82%;
   margin-left: auto;
 }
-.app-shell--mobile .bubble-content {
+.app-container--mobile .bubble-content {
   font-size: 15px;
   line-height: 1.62;
 }
-.app-shell--mobile .prompt-wrap {
+.app-container--mobile .prompt-wrap {
   padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
   background: linear-gradient(to top, var(--mobile-bg) 72%, transparent);
 }
-.app-shell--mobile .prompt-wrap--floating,
-.app-shell--mobile .mobile-bottom-prompt {
+.app-container--mobile .prompt-wrap--floating,
+.app-container--mobile .mobile-bottom-prompt {
   display: block;
   position: fixed;
   left: 0;
@@ -1225,38 +1225,38 @@
   bottom: 0;
   z-index: 25;
 }
-.app-shell--mobile .prompt-box {
+.app-container--mobile .prompt-box {
   max-width: none;
   grid-template-columns: 34px minmax(0, 1fr) 42px;
   border-radius: 26px;
   padding: 7px;
   background: var(--mobile-prompt-bg);
 }
-.app-shell--mobile .prompt-box textarea {
+.app-container--mobile .prompt-box textarea {
   min-height: 34px;
   max-height: 140px;
   padding: 7px 4px;
   font-size: 15px;
 }
-.app-shell--mobile .attach-button,
-.app-shell--mobile .send-button {
+.app-container--mobile .attach-button,
+.app-container--mobile .send-button {
   width: 34px;
   height: 34px;
   font-size: 20px;
 }
-.app-shell--mobile .send-button {
+.app-container--mobile .send-button {
   width: 42px;
   height: 42px;
   font-size: 22px;
 }
-.app-shell--mobile .mobile-drawer-backdrop {
+.app-container--mobile .mobile-drawer-backdrop {
   display: block;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   z-index: 80;
 }
-.app-shell--mobile .mobile-drawer {
+.app-container--mobile .mobile-drawer {
   display: block;
   position: fixed;
   inset: 0 auto 0 0;
@@ -1272,24 +1272,24 @@
   font-weight: 800;
   line-height: 1;
 }
-.app-shell--mobile {
+.app-container--mobile {
   max-width: none;
   width: 100%;
 }
 @media (max-width: 900px) {
-  .app-shell--mobile .mobile-topbar,
+  .app-container--mobile .mobile-topbar,
   .mobile-topbar {
     height: 52px;
     padding: calc(6px + env(safe-area-inset-top)) 12px 6px;
   }
-  .app-shell--mobile .round-icon,
+  .app-container--mobile .round-icon,
   .round-icon {
     width: 38px;
     height: 38px;
     font-size: 17px;
     box-shadow: var(--shadow-control);
   }
-  .app-shell--mobile .model-trigger,
+  .app-container--mobile .model-trigger,
   .model-trigger {
     height: 38px;
     min-width: 108px;
@@ -1298,106 +1298,106 @@
     font-size: 17px;
     letter-spacing: -0.035em;
   }
-  .app-shell--mobile .chevron,
+  .app-container--mobile .chevron,
   .chevron {
     width: 13px;
     height: 13px;
   }
-  .app-shell--mobile .model-menu,
+  .app-container--mobile .model-menu,
   .model-menu {
     width: min(270px, calc(100vw - 24px));
     border-radius: 16px;
     padding: 7px;
   }
-  .app-shell--mobile .model-option,
+  .app-container--mobile .model-option,
   .model-option {
     padding: 10px;
     border-radius: 12px;
   }
-  .app-shell--mobile .model-option strong,
+  .app-container--mobile .model-option strong,
   .model-option strong {
     font-size: 13.5px;
   }
-  .app-shell--mobile .model-option small,
+  .app-container--mobile .model-option small,
   .model-option small {
     font-size: 11.5px;
   }
-  .app-shell--mobile .empty-stage,
+  .app-container--mobile .empty-stage,
   .empty-stage {
     padding: 12px 16px 86px;
   }
-  .app-shell--mobile .project-title,
+  .app-container--mobile .project-title,
   .project-title {
     margin-top: 4px;
     gap: 8px;
   }
-  .app-shell--mobile .project-title h1,
+  .app-container--mobile .project-title h1,
   .project-title h1 {
     font-size: 23px;
     line-height: 1.22;
     letter-spacing: -0.04em;
   }
-  .app-shell--mobile .folder-icon,
+  .app-container--mobile .folder-icon,
   .folder-icon {
     font-size: 22px;
   }
-  .app-shell--mobile .source-chip,
+  .app-container--mobile .source-chip,
   .source-chip {
     margin-top: 12px;
     height: 34px;
     padding: 0 14px;
     font-size: 13.5px;
   }
-  .app-shell--mobile .mobile-recent-list,
+  .app-container--mobile .mobile-recent-list,
   .mobile-recent-list {
     margin-top: 22px;
     gap: 15px;
   }
-  .app-shell--mobile .mobile-recent-card strong,
+  .app-container--mobile .mobile-recent-card strong,
   .mobile-recent-card strong {
     font-size: 16.5px;
     margin-bottom: 3px;
   }
-  .app-shell--mobile .mobile-recent-card span,
+  .app-container--mobile .mobile-recent-card span,
   .mobile-recent-card span {
     font-size: 13.5px;
     line-height: 1.35;
   }
-  .app-shell--mobile .message-list,
+  .app-container--mobile .message-list,
   .message-list {
     padding: 10px 14px 84px;
   }
-  .app-shell--mobile .message,
+  .app-container--mobile .message,
   .message {
     margin-bottom: 15px;
   }
-  .app-shell--mobile .message--user .bubble,
+  .app-container--mobile .message--user .bubble,
   .message--user .bubble {
     border-radius: 16px;
     padding: 9px 12px;
     max-width: 82%;
   }
-  .app-shell--mobile .bubble-content,
+  .app-container--mobile .bubble-content,
   .bubble-content {
     font-size: 14px;
     line-height: 1.58;
   }
-  .app-shell--mobile .bubble-tools button,
+  .app-container--mobile .bubble-tools button,
   .bubble-tools button {
     padding: 4px 9px;
     font-size: 12px;
   }
-  .app-shell--mobile .prompt-wrap,
+  .app-container--mobile .prompt-wrap,
   .prompt-wrap {
     padding: 7px 12px calc(8px + env(safe-area-inset-bottom));
   }
-  .app-shell--mobile .prompt-box,
+  .app-container--mobile .prompt-box,
   .prompt-box {
     grid-template-columns: 30px minmax(0, 1fr) 38px;
     border-radius: 24px;
     padding: 6px;
   }
-  .app-shell--mobile .prompt-box textarea,
+  .app-container--mobile .prompt-box textarea,
   .prompt-box textarea {
     min-height: 31px;
     max-height: 120px;
@@ -1405,61 +1405,61 @@
     font-size: 14px;
     line-height: 1.35;
   }
-  .app-shell--mobile .attach-button,
-  .app-shell--mobile .send-button,
+  .app-container--mobile .attach-button,
+  .app-container--mobile .send-button,
   .attach-button,
   .send-button {
     width: 30px;
     height: 30px;
     font-size: 18px;
   }
-  .app-shell--mobile .send-button,
+  .app-container--mobile .send-button,
   .send-button {
     width: 38px;
     height: 38px;
     font-size: 20px;
   }
-  .app-shell--mobile .mobile-drawer,
+  .app-container--mobile .mobile-drawer,
   .mobile-drawer {
     width: min(86vw, 360px);
   }
-  .app-shell--mobile .sidebar-content--mobile,
+  .app-container--mobile .sidebar-content--mobile,
   .sidebar-content--mobile {
     padding: calc(10px + env(safe-area-inset-top)) 0
       calc(8px + env(safe-area-inset-bottom));
     gap: 6px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-top,
+  .app-container--mobile .sidebar-content--mobile .sidebar-top,
   .sidebar-content--mobile .sidebar-top {
     padding: 0 16px 7px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-title,
+  .app-container--mobile .sidebar-content--mobile .sidebar-title,
   .sidebar-content--mobile .sidebar-title {
     font-size: 22px;
     letter-spacing: -0.045em;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-round,
+  .app-container--mobile .sidebar-content--mobile .sidebar-round,
   .sidebar-content--mobile .sidebar-round {
     width: 36px;
     height: 36px;
     font-size: 21px;
   }
-  .app-shell--mobile .sidebar-content--mobile .quick-menu,
+  .app-container--mobile .sidebar-content--mobile .quick-menu,
   .sidebar-content--mobile .quick-menu {
     max-height: 170px;
   }
-  .app-shell--mobile .sidebar-content--mobile .project-list,
+  .app-container--mobile .sidebar-content--mobile .project-list,
   .sidebar-content--mobile .project-list {
     max-height: 220px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-history,
+  .app-container--mobile .sidebar-content--mobile .sidebar-history,
   .sidebar-content--mobile .sidebar-history {
     min-height: 80px;
     padding-bottom: 64px;
   }
-  .app-shell--mobile .sidebar-content--mobile .quick-item,
-  .app-shell--mobile .sidebar-content--mobile .project-item,
-  .app-shell--mobile .sidebar-content--mobile .sidebar-history-item,
+  .app-container--mobile .sidebar-content--mobile .quick-item,
+  .app-container--mobile .sidebar-content--mobile .project-item,
+  .app-container--mobile .sidebar-content--mobile .sidebar-history-item,
   .sidebar-content--mobile .quick-item,
   .sidebar-content--mobile .project-item,
   .sidebar-content--mobile .sidebar-history-item {
@@ -1468,19 +1468,19 @@
     font-size: 16px;
     gap: 11px;
   }
-  .app-shell--mobile .sidebar-content--mobile .quick-item span,
-  .app-shell--mobile .sidebar-content--mobile .project-item span,
+  .app-container--mobile .sidebar-content--mobile .quick-item span,
+  .app-container--mobile .sidebar-content--mobile .project-item span,
   .sidebar-content--mobile .quick-item span,
   .sidebar-content--mobile .project-item span {
     width: 23px;
     font-size: 18px;
   }
-  .app-shell--mobile .sidebar-content--mobile .section-label,
+  .app-container--mobile .sidebar-content--mobile .section-label,
   .sidebar-content--mobile .section-label {
     padding: 10px 17px 2px;
     font-size: 13px;
   }
-  .app-shell--mobile .mobile-new-chat-fab,
+  .app-container--mobile .mobile-new-chat-fab,
   .mobile-new-chat-fab {
     right: 20px;
     bottom: calc(64px + env(safe-area-inset-bottom));
@@ -1489,21 +1489,21 @@
     gap: 8px;
     font-size: 16px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-user,
+  .app-container--mobile .sidebar-content--mobile .sidebar-user,
   .sidebar-content--mobile .sidebar-user {
     padding: 8px 17px calc(7px + env(safe-area-inset-bottom));
   }
-  .app-shell--mobile .sidebar-content--mobile .user-avatar,
+  .app-container--mobile .sidebar-content--mobile .user-avatar,
   .sidebar-content--mobile .user-avatar {
     width: 30px;
     height: 30px;
     font-size: 11px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-user strong,
+  .app-container--mobile .sidebar-content--mobile .sidebar-user strong,
   .sidebar-content--mobile .sidebar-user strong {
     font-size: 14px;
   }
-  .app-shell--mobile .sidebar-content--mobile .sidebar-user small,
+  .app-container--mobile .sidebar-content--mobile .sidebar-user small,
   .sidebar-content--mobile .sidebar-user small {
     font-size: 10.5px;
   }
@@ -1513,17 +1513,17 @@
 html,
 body,
 #app,
-.app-shell,
-.app-shell--mobile,
-.chatgpt-shell {
+.app-container,
+.app-container--mobile,
+.chat-container-shell {
   width: 100%;
 }
-.app-shell--mobile {
+.app-container--mobile {
   max-width: none !important;
   margin: 0 !important;
   border-radius: 0 !important;
 }
-.chatgpt-shell {
+.chat-container-shell {
   height: 100dvh;
 }
 .icon-wrap {
@@ -1566,9 +1566,9 @@ body,
 }
 
 @media (max-width: 900px) {
-  .app-shell--mobile,
-  .app-shell--mobile .chatgpt-shell,
-  .chatgpt-shell,
+  .app-container--mobile,
+  .app-container--mobile .chat-container-shell,
+  .chat-container-shell,
   .chat-workspace,
   .empty-stage {
     width: 100vw !important;
@@ -1653,34 +1653,34 @@ body,
 
 /* When the Android/mobile layout is selected, keep the project home fluid
    even if the browser viewport is wider than the 900px CSS breakpoint. */
-.app-shell--mobile .empty-stage {
+.app-container--mobile .empty-stage {
   width: 100%;
   max-width: none;
 }
 
-.app-shell--mobile .mobile-project-home,
-.app-shell--mobile .mobile-recent-list,
-.app-shell--mobile .mobile-recent-card {
+.app-container--mobile .mobile-project-home,
+.app-container--mobile .mobile-recent-list,
+.app-container--mobile .mobile-recent-card {
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
-.app-shell--mobile .mobile-recent-card strong,
-.app-shell--mobile .mobile-recent-card span {
+.app-container--mobile .mobile-recent-card strong,
+.app-container--mobile .mobile-recent-card span {
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
 /* Desktop-like message cards for mobile layout. */
-.app-shell--mobile .message-list {
+.app-container--mobile .message-list {
   width: 100%;
   max-width: 100%;
   padding: 12px clamp(14px, 4vw, 36px) calc(92px + env(safe-area-inset-bottom));
 }
 
-.app-shell--mobile .message {
+.app-container--mobile .message {
   width: 100%;
   max-width: 980px;
   min-width: 0;
@@ -1692,11 +1692,11 @@ body,
   margin-bottom: 18px;
 }
 
-.app-shell--mobile .message--user {
+.app-container--mobile .message--user {
   grid-template-columns: minmax(0, 1fr) 32px;
 }
 
-.app-shell--mobile .avatar {
+.app-container--mobile .avatar {
   display: grid;
   width: 32px;
   height: 32px;
@@ -1704,13 +1704,13 @@ body,
   font-size: 11px;
 }
 
-.app-shell--mobile .message--user .avatar {
+.app-container--mobile .message--user .avatar {
   grid-column: 2;
   background: var(--primary);
   color: #fff;
 }
 
-.app-shell--mobile .bubble {
+.app-container--mobile .bubble {
   grid-column: 2;
   width: auto;
   max-width: min(100%, 900px);
@@ -1722,7 +1722,7 @@ body,
   box-shadow: var(--shadow-card);
 }
 
-.app-shell--mobile .message--user .bubble {
+.app-container--mobile .message--user .bubble {
   grid-column: 1;
   grid-row: 1;
   justify-self: end;
@@ -1735,7 +1735,7 @@ body,
   margin-left: 0;
 }
 
-.app-shell--mobile .bubble-meta {
+.app-container--mobile .bubble-meta {
   display: block;
   font-size: 11px;
   color: var(--text-muted);
@@ -1743,11 +1743,11 @@ body,
   font-weight: 800;
 }
 
-.app-shell--mobile .message--user .bubble-meta {
+.app-container--mobile .message--user .bubble-meta {
   color: var(--text-muted);
 }
 
-.app-shell--mobile .bubble-content {
+.app-container--mobile .bubble-content {
   font-size: 14.5px;
   line-height: 1.62;
 }
@@ -1778,7 +1778,7 @@ body,
   }
 
   .message-list,
-  .app-shell--mobile .message-list {
+  .app-container--mobile .message-list {
     width: 100%;
     max-width: 100%;
     padding: 12px clamp(14px, 4vw, 28px)
@@ -1786,7 +1786,7 @@ body,
   }
 
   .message,
-  .app-shell--mobile .message {
+  .app-container--mobile .message {
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -1799,12 +1799,12 @@ body,
   }
 
   .message--user,
-  .app-shell--mobile .message--user {
+  .app-container--mobile .message--user {
     grid-template-columns: minmax(0, 1fr) 30px;
   }
 
   .avatar,
-  .app-shell--mobile .avatar {
+  .app-container--mobile .avatar {
     display: grid;
     width: 30px;
     height: 30px;
@@ -1813,7 +1813,7 @@ body,
   }
 
   .bubble,
-  .app-shell--mobile .bubble {
+  .app-container--mobile .bubble {
     grid-column: 2;
     width: auto;
     max-width: 100%;
@@ -1826,14 +1826,14 @@ body,
   }
 
   .message--user .avatar,
-  .app-shell--mobile .message--user .avatar {
+  .app-container--mobile .message--user .avatar {
     grid-column: 2;
     background: var(--primary);
     color: #fff;
   }
 
   .message--user .bubble,
-  .app-shell--mobile .message--user .bubble {
+  .app-container--mobile .message--user .bubble {
     grid-column: 1;
     grid-row: 1;
     justify-self: end;
@@ -1847,7 +1847,7 @@ body,
   }
 
   .bubble-meta,
-  .app-shell--mobile .bubble-meta {
+  .app-container--mobile .bubble-meta {
     display: block;
     font-size: 10.5px;
     margin-bottom: 5px;
@@ -1855,14 +1855,14 @@ body,
   }
 
   .bubble-content,
-  .app-shell--mobile .bubble-content {
+  .app-container--mobile .bubble-content {
     font-size: 14px;
     line-height: 1.58;
   }
 }
 
 /* Stable chat viewport/keyboard patch for PC Chrome, Android Chrome and Android WebView. */
-.chatgpt-shell {
+.chat-container-shell {
   height: var(--app-height);
   max-height: var(--app-height);
   overflow: hidden;
@@ -1894,14 +1894,14 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chatgpt-shell,
-  .app-shell--mobile .chatgpt-shell {
+  .chat-container-shell,
+  .app-container--mobile .chat-container-shell {
     grid-template-columns: 1fr;
     height: var(--app-height);
     max-height: var(--app-height);
   }
   .chat-workspace,
-  .app-shell--mobile .chat-workspace {
+  .app-container--mobile .chat-workspace {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     height: var(--app-height);
@@ -1909,21 +1909,21 @@ body,
     overflow: hidden;
   }
   .message-list,
-  .app-shell--mobile .message-list {
+  .app-container--mobile .message-list {
     padding-bottom: 16px;
     overflow-y: auto;
   }
   .empty-stage,
-  .app-shell--mobile .empty-stage {
+  .app-container--mobile .empty-stage {
     overflow-y: auto;
     padding-bottom: 16px;
   }
   .prompt-wrap,
-  .app-shell--mobile .prompt-wrap,
+  .app-container--mobile .prompt-wrap,
   .prompt-wrap--floating,
-  .app-shell--mobile .prompt-wrap--floating,
+  .app-container--mobile .prompt-wrap--floating,
   .mobile-bottom-prompt,
-  .app-shell--mobile .mobile-bottom-prompt {
+  .app-container--mobile .mobile-bottom-prompt {
     position: relative !important;
     left: auto !important;
     right: auto !important;
@@ -1933,22 +1933,22 @@ body,
     background: var(--mobile-bg);
   }
   .desktop-center-prompt,
-  .app-shell--mobile .desktop-center-prompt {
+  .app-container--mobile .desktop-center-prompt {
     display: none !important;
   }
-  .chatgpt-shell--keyboard-open .mobile-topbar,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .mobile-topbar {
+  .chat-container-shell--keyboard-open .mobile-topbar,
+  .app-container--mobile .chat-container-shell--keyboard-open .mobile-topbar {
     height: 44px;
     padding-top: 4px;
     padding-bottom: 4px;
   }
-  .chatgpt-shell--keyboard-open .round-icon,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .round-icon {
+  .chat-container-shell--keyboard-open .round-icon,
+  .app-container--mobile .chat-container-shell--keyboard-open .round-icon {
     width: 34px;
     height: 34px;
   }
-  .chatgpt-shell--keyboard-open .model-trigger,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .model-trigger {
+  .chat-container-shell--keyboard-open .model-trigger,
+  .app-container--mobile .chat-container-shell--keyboard-open .model-trigger {
     height: 34px;
     min-width: 100px;
     font-size: 15px;
@@ -2222,15 +2222,15 @@ body,
 
 /* Final alignment/full-width patch: keep the file structure unchanged and override older responsive rules. */
 .prompt-box,
-.app-shell--mobile .prompt-box {
+.app-container--mobile .prompt-box {
   grid-template-columns: 38px minmax(0, 1fr) 38px;
   align-items: center;
 }
 
 .attach-button,
 .send-button,
-.app-shell--mobile .attach-button,
-.app-shell--mobile .send-button {
+.app-container--mobile .attach-button,
+.app-container--mobile .send-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -2240,24 +2240,24 @@ body,
 }
 
 .send-button,
-.app-shell--mobile .send-button {
+.app-container--mobile .send-button {
   width: 38px;
   height: 38px;
 }
 
 .prompt-box textarea,
-.app-shell--mobile .prompt-box textarea {
+.app-container--mobile .prompt-box textarea {
   align-self: center;
 }
 
 .message-list,
-.app-shell--mobile .message-list {
+.app-container--mobile .message-list {
   width: 100%;
   max-width: 100%;
 }
 
 .message:not(.message--user),
-.app-shell--mobile .message:not(.message--user) {
+.app-container--mobile .message:not(.message--user) {
   width: 100%;
   max-width: 100%;
   margin-left: 0;
@@ -2266,7 +2266,7 @@ body,
 }
 
 .message:not(.message--user) .bubble,
-.app-shell--mobile .message:not(.message--user) .bubble {
+.app-container--mobile .message:not(.message--user) .bubble {
   width: 100%;
   max-width: 100%;
   justify-self: stretch;
@@ -2274,24 +2274,24 @@ body,
 
 @media (max-width: 900px) {
   .message:not(.message--user),
-  .app-shell--mobile .message:not(.message--user) {
+  .app-container--mobile .message:not(.message--user) {
     grid-template-columns: 30px minmax(0, 1fr);
   }
 
   .prompt-box,
-  .app-shell--mobile .prompt-box {
+  .app-container--mobile .prompt-box {
     grid-template-columns: 34px minmax(0, 1fr) 38px;
     align-items: center;
   }
 
   .attach-button,
-  .app-shell--mobile .attach-button {
+  .app-container--mobile .attach-button {
     width: 34px;
     height: 34px;
   }
 
   .send-button,
-  .app-shell--mobile .send-button {
+  .app-container--mobile .send-button {
     width: 38px;
     height: 38px;
   }
@@ -2326,8 +2326,8 @@ body,
   }
 }
 
-/* Collapsed sidebar patch: ChatGPT-like rail with recent chat flyout. */
-.chatgpt-shell--sidebar-collapsed {
+/* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
+.chat-container-shell--sidebar-collapsed {
   grid-template-columns: 48px minmax(0, 1fr);
 }
 
@@ -2458,7 +2458,7 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chatgpt-shell--sidebar-collapsed {
+  .chat-container-shell--sidebar-collapsed {
     grid-template-columns: 1fr;
   }
 
@@ -2911,7 +2911,7 @@ body,
    Keep the final composer rules simple and platform-neutral so the input does
    not collapse into a narrow/tall column on real Android Chrome/WebView. */
 .prompt-wrap,
-.app-shell--mobile .prompt-wrap {
+.app-container--mobile .prompt-wrap {
   width: 100%;
   flex: 0 0 auto;
   padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
@@ -2923,9 +2923,9 @@ body,
 }
 
 .prompt-wrap--floating,
-.app-shell--mobile .prompt-wrap--floating,
+.app-container--mobile .prompt-wrap--floating,
 .mobile-bottom-prompt,
-.app-shell--mobile .mobile-bottom-prompt {
+.app-container--mobile .mobile-bottom-prompt {
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -2934,7 +2934,7 @@ body,
 }
 
 .prompt-box,
-.app-shell--mobile .prompt-box {
+.app-container--mobile .prompt-box {
   width: min(100%, 760px);
   max-width: 760px;
   min-width: 0;
@@ -2949,7 +2949,7 @@ body,
 }
 
 .prompt-input-row,
-.app-shell--mobile .prompt-input-row {
+.app-container--mobile .prompt-input-row {
   width: 100%;
   min-width: 0;
   display: flex !important;
@@ -2958,7 +2958,7 @@ body,
 }
 
 .attach-menu-wrap,
-.app-shell--mobile .attach-menu-wrap {
+.app-container--mobile .attach-menu-wrap {
   flex: 0 0 auto;
   display: flex;
   align-items: flex-end;
@@ -2966,7 +2966,7 @@ body,
 }
 
 .prompt-box textarea,
-.app-shell--mobile .prompt-box textarea {
+.app-container--mobile .prompt-box textarea {
   flex: 1 1 auto;
   width: auto;
   min-width: 0;
@@ -2988,8 +2988,8 @@ body,
 
 .attach-button,
 .send-button,
-.app-shell--mobile .attach-button,
-.app-shell--mobile .send-button {
+.app-container--mobile .attach-button,
+.app-container--mobile .send-button {
   flex: 0 0 auto;
   width: 38px;
   height: 38px;
@@ -3000,22 +3000,22 @@ body,
 
 @media (max-width: 900px) {
   .empty-stage,
-  .app-shell--mobile .empty-stage {
+  .app-container--mobile .empty-stage {
     padding-bottom: calc(116px + env(safe-area-inset-bottom));
   }
 
   .message-list,
-  .app-shell--mobile .message-list {
+  .app-container--mobile .message-list {
     padding-bottom: calc(116px + env(safe-area-inset-bottom));
   }
 
   .prompt-wrap,
-  .app-shell--mobile .prompt-wrap {
+  .app-container--mobile .prompt-wrap {
     padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
   }
 
   .prompt-box,
-  .app-shell--mobile .prompt-box {
+  .app-container--mobile .prompt-box {
     width: 100%;
     max-width: none;
     border-radius: 26px;
@@ -3023,12 +3023,12 @@ body,
   }
 
   .prompt-input-row,
-  .app-shell--mobile .prompt-input-row {
+  .app-container--mobile .prompt-input-row {
     gap: 7px;
   }
 
   .prompt-box textarea,
-  .app-shell--mobile .prompt-box textarea {
+  .app-container--mobile .prompt-box textarea {
     min-height: 38px;
     height: 38px;
     max-height: 136px;
@@ -3039,8 +3039,8 @@ body,
 
   .attach-button,
   .send-button,
-  .app-shell--mobile .attach-button,
-  .app-shell--mobile .send-button {
+  .app-container--mobile .attach-button,
+  .app-container--mobile .send-button {
     width: 38px;
     height: 38px;
     min-width: 38px;
@@ -3048,10 +3048,10 @@ body,
     font-size: 22px;
   }
 
-  .chatgpt-shell--keyboard-open .empty-stage,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .empty-stage,
-  .chatgpt-shell--keyboard-open .message-list,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .message-list {
+  .chat-container-shell--keyboard-open .empty-stage,
+  .app-container--mobile .chat-container-shell--keyboard-open .empty-stage,
+  .chat-container-shell--keyboard-open .message-list,
+  .app-container--mobile .chat-container-shell--keyboard-open .message-list {
     padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
@@ -3221,12 +3221,12 @@ body,
   }
 }
 
-/* ChatGPT-like attachment card final override.
+/* DSLLM-like attachment card final override.
    The whole image card opens preview except the remove button. The remove
    button is visually outside the thumbnail but has a large touch target, so
    Android WebView/Chrome and desktop browsers behave the same. */
 .attachment-preview-row,
-.app-shell--mobile .attachment-preview-row {
+.app-container--mobile .attachment-preview-row {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -3237,7 +3237,7 @@ body,
 }
 
 .attachment-preview-card,
-.app-shell--mobile .attachment-preview-card {
+.app-container--mobile .attachment-preview-card {
   position: relative;
   box-sizing: border-box;
   width: 136px;
@@ -3256,7 +3256,7 @@ body,
 }
 
 .attachment-preview-card--image,
-.app-shell--mobile .attachment-preview-card--image {
+.app-container--mobile .attachment-preview-card--image {
   width: 136px;
   min-height: 150px;
   padding: 10px;
@@ -3265,13 +3265,13 @@ body,
 }
 
 .attachment-preview-card--image:focus-visible,
-.app-shell--mobile .attachment-preview-card--image:focus-visible {
+.app-container--mobile .attachment-preview-card--image:focus-visible {
   outline: 2px solid var(--accent, #2563eb);
   outline-offset: 3px;
 }
 
 .attachment-preview-thumb,
-.app-shell--mobile .attachment-preview-thumb {
+.app-container--mobile .attachment-preview-thumb {
   width: 100%;
   height: 88px;
   min-height: 88px;
@@ -3297,7 +3297,7 @@ body,
 }
 
 .attachment-preview-thumb img,
-.app-shell--mobile .attachment-preview-thumb img {
+.app-container--mobile .attachment-preview-thumb img {
   width: 100%;
   height: 100%;
   display: block;
@@ -3310,9 +3310,9 @@ body,
 }
 
 .attachment-preview-info,
-.app-shell--mobile .attachment-preview-info,
+.app-container--mobile .attachment-preview-info,
 .attachment-preview-card--image .attachment-preview-info,
-.app-shell--mobile .attachment-preview-card--image .attachment-preview-info {
+.app-container--mobile .attachment-preview-card--image .attachment-preview-info {
   position: static;
   min-width: 0;
   width: 100%;
@@ -3322,7 +3322,7 @@ body,
 }
 
 .attachment-preview-info strong,
-.app-shell--mobile .attachment-preview-info strong {
+.app-container--mobile .attachment-preview-info strong {
   display: block;
   max-width: 100%;
   overflow: hidden;
@@ -3335,7 +3335,7 @@ body,
 }
 
 .attachment-preview-info span,
-.app-shell--mobile .attachment-preview-info span {
+.app-container--mobile .attachment-preview-info span {
   display: block;
   margin-top: 4px;
   color: var(--text-muted);
@@ -3344,9 +3344,9 @@ body,
 }
 
 .attachment-preview-remove,
-.app-shell--mobile .attachment-preview-remove,
+.app-container--mobile .attachment-preview-remove,
 .attachment-preview-card--image .attachment-preview-remove,
-.app-shell--mobile .attachment-preview-card--image .attachment-preview-remove {
+.app-container--mobile .attachment-preview-card--image .attachment-preview-remove {
   position: absolute;
   top: -18px;
   right: -18px;
@@ -3374,7 +3374,7 @@ body,
 }
 
 .attachment-preview-remove::before,
-.app-shell--mobile .attachment-preview-remove::before {
+.app-container--mobile .attachment-preview-remove::before {
   content: "";
   position: absolute;
   inset: -10px;
@@ -3382,13 +3382,13 @@ body,
 }
 
 .attachment-preview-remove:active,
-.app-shell--mobile .attachment-preview-remove:active {
+.app-container--mobile .attachment-preview-remove:active {
   transform: scale(0.96);
 }
 
 @media (max-width: 900px) {
   .attachment-preview-row,
-  .app-shell--mobile .attachment-preview-row {
+  .app-container--mobile .attachment-preview-row {
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: visible;
@@ -3398,29 +3398,29 @@ body,
   }
 
   .attachment-preview-row::-webkit-scrollbar,
-  .app-shell--mobile .attachment-preview-row::-webkit-scrollbar {
+  .app-container--mobile .attachment-preview-row::-webkit-scrollbar {
     display: none;
   }
 
   .attachment-preview-card,
-  .app-shell--mobile .attachment-preview-card,
+  .app-container--mobile .attachment-preview-card,
   .attachment-preview-card--image,
-  .app-shell--mobile .attachment-preview-card--image {
+  .app-container--mobile .attachment-preview-card--image {
     flex: 0 0 132px;
     width: 132px;
     min-height: 148px;
   }
 
   .attachment-preview-thumb,
-  .app-shell--mobile .attachment-preview-thumb {
+  .app-container--mobile .attachment-preview-thumb {
     height: 86px;
     min-height: 86px;
   }
 
   .attachment-preview-remove,
-  .app-shell--mobile .attachment-preview-remove,
+  .app-container--mobile .attachment-preview-remove,
   .attachment-preview-card--image .attachment-preview-remove,
-  .app-shell--mobile
+  .app-container--mobile
     .attachment-preview-card--image
     .attachment-preview-remove {
     top: -16px;
@@ -3430,11 +3430,11 @@ body,
 
 /* =========================================================
    FINAL ANDROID DRAWER + IMAGE PREVIEW FIX
-   - Android WebView can keep desktop breakpoint while using app-shell--mobile.
+   - Android WebView can keep desktop breakpoint while using app-container--mobile.
    - Force mobile drawer content to be visible, scrollable and readable.
    - Image preview no longer depends on browser default image loading UI.
    ========================================================= */
-.app-shell--mobile .mobile-drawer-backdrop,
+.app-container--mobile .mobile-drawer-backdrop,
 .mobile-drawer-backdrop {
   position: fixed !important;
   inset: 0 !important;
@@ -3443,7 +3443,7 @@ body,
   z-index: 800 !important;
 }
 
-.app-shell--mobile .mobile-drawer,
+.app-container--mobile .mobile-drawer,
 .mobile-drawer {
   position: fixed !important;
   top: 0 !important;
@@ -3461,7 +3461,7 @@ body,
   transform: translate3d(0, 0, 0);
 }
 
-.app-shell--mobile .sidebar-content--mobile,
+.app-container--mobile .sidebar-content--mobile,
 .mobile-drawer .sidebar-content--mobile {
   position: relative !important;
   display: flex !important;
@@ -3482,14 +3482,14 @@ body,
   visibility: visible !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile > *,
+.app-container--mobile .sidebar-content--mobile > *,
 .mobile-drawer .sidebar-content--mobile > * {
   opacity: 1 !important;
   visibility: visible !important;
   color: inherit;
 }
 
-.app-shell--mobile .sidebar-content--mobile .sidebar-top,
+.app-container--mobile .sidebar-content--mobile .sidebar-top,
 .mobile-drawer .sidebar-content--mobile .sidebar-top {
   position: sticky !important;
   top: 0 !important;
@@ -3503,7 +3503,7 @@ body,
   background: var(--sidebar-bg, #ffffff) !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .sidebar-title,
+.app-container--mobile .sidebar-content--mobile .sidebar-title,
 .mobile-drawer .sidebar-content--mobile .sidebar-title {
   display: block !important;
   color: var(--sidebar-text, #202123) !important;
@@ -3512,7 +3512,7 @@ body,
   line-height: 1.2 !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .sidebar-round,
+.app-container--mobile .sidebar-content--mobile .sidebar-round,
 .mobile-drawer .sidebar-content--mobile .sidebar-round {
   flex: 0 0 auto !important;
   width: 40px !important;
@@ -3521,9 +3521,9 @@ body,
   background: var(--control-bg, #ffffff) !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .quick-menu,
-.app-shell--mobile .sidebar-content--mobile .project-list,
-.app-shell--mobile .sidebar-content--mobile .sidebar-history,
+.app-container--mobile .sidebar-content--mobile .quick-menu,
+.app-container--mobile .sidebar-content--mobile .project-list,
+.app-container--mobile .sidebar-content--mobile .sidebar-history,
 .mobile-drawer .sidebar-content--mobile .quick-menu,
 .mobile-drawer .sidebar-content--mobile .project-list,
 .mobile-drawer .sidebar-content--mobile .sidebar-history {
@@ -3537,7 +3537,7 @@ body,
   color: var(--sidebar-text, #202123) !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .sidebar-history,
+.app-container--mobile .sidebar-content--mobile .sidebar-history,
 .mobile-drawer .sidebar-content--mobile .sidebar-history {
   flex: 1 1 auto !important;
   min-height: 120px !important;
@@ -3545,9 +3545,9 @@ body,
   padding-bottom: 76px !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .quick-item,
-.app-shell--mobile .sidebar-content--mobile .project-item,
-.app-shell--mobile .sidebar-content--mobile .sidebar-history-item,
+.app-container--mobile .sidebar-content--mobile .quick-item,
+.app-container--mobile .sidebar-content--mobile .project-item,
+.app-container--mobile .sidebar-content--mobile .sidebar-history-item,
 .mobile-drawer .sidebar-content--mobile .quick-item,
 .mobile-drawer .sidebar-content--mobile .project-item,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item {
@@ -3568,11 +3568,11 @@ body,
   text-overflow: ellipsis !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .quick-item:hover,
-.app-shell--mobile .sidebar-content--mobile .project-item:hover,
-.app-shell--mobile .sidebar-content--mobile .sidebar-history-item:hover,
-.app-shell--mobile .sidebar-content--mobile .quick-item.active,
-.app-shell--mobile .sidebar-content--mobile .project-item.selected,
+.app-container--mobile .sidebar-content--mobile .quick-item:hover,
+.app-container--mobile .sidebar-content--mobile .project-item:hover,
+.app-container--mobile .sidebar-content--mobile .sidebar-history-item:hover,
+.app-container--mobile .sidebar-content--mobile .quick-item.active,
+.app-container--mobile .sidebar-content--mobile .project-item.selected,
 .mobile-drawer .sidebar-content--mobile .quick-item:hover,
 .mobile-drawer .sidebar-content--mobile .project-item:hover,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
@@ -3581,8 +3581,8 @@ body,
   background: var(--sidebar-hover, #ececf1) !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .quick-item span,
-.app-shell--mobile .sidebar-content--mobile .project-item span,
+.app-container--mobile .sidebar-content--mobile .quick-item span,
+.app-container--mobile .sidebar-content--mobile .project-item span,
 .mobile-drawer .sidebar-content--mobile .quick-item span,
 .mobile-drawer .sidebar-content--mobile .project-item span {
   flex: 0 0 22px !important;
@@ -3590,7 +3590,7 @@ body,
   color: var(--sidebar-icon, #4b5563) !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .section-label,
+.app-container--mobile .sidebar-content--mobile .section-label,
 .mobile-drawer .sidebar-content--mobile .section-label {
   display: block !important;
   flex: 0 0 auto !important;
@@ -3600,7 +3600,7 @@ body,
   font-weight: 800 !important;
 }
 
-.app-shell--mobile .mobile-new-chat-fab,
+.app-container--mobile .mobile-new-chat-fab,
 .mobile-drawer .mobile-new-chat-fab {
   position: sticky !important;
   align-self: flex-end !important;
@@ -3619,7 +3619,7 @@ body,
   font-weight: 800 !important;
 }
 
-.app-shell--mobile .sidebar-content--mobile .sidebar-user,
+.app-container--mobile .sidebar-content--mobile .sidebar-user,
 .mobile-drawer .sidebar-content--mobile .sidebar-user {
   flex: 0 0 auto !important;
   margin-top: 0 !important;
@@ -3839,7 +3839,7 @@ body,
 }
 
 .prompt-box--gemini,
-.app-shell--mobile .prompt-box--gemini {
+.app-container--mobile .prompt-box--gemini {
   width: min(100%, 820px);
   max-width: 820px;
   display: flex !important;
@@ -3851,7 +3851,7 @@ body,
   background: var(--prompt-bg);
 }
 .prompt-box--gemini textarea,
-.app-shell--mobile .prompt-box--gemini textarea {
+.app-container--mobile .prompt-box--gemini textarea {
   width: 100%;
   min-height: 42px;
   height: 42px;
@@ -3891,7 +3891,7 @@ body,
 }
 .prompt-icon-action,
 .prompt-box--gemini .send-button,
-.app-shell--mobile .prompt-box--gemini .send-button {
+.app-container--mobile .prompt-box--gemini .send-button {
   width: 38px;
   height: 38px;
   min-width: 38px;
@@ -3919,7 +3919,7 @@ body,
   background: var(--control-hover);
 }
 .prompt-box--gemini .send-button,
-.app-shell--mobile .prompt-box--gemini .send-button {
+.app-container--mobile .prompt-box--gemini .send-button {
   flex: 0 0 auto;
   background: var(--send-bg);
   color: var(--send-text);
@@ -3927,7 +3927,7 @@ body,
   font-weight: 900;
 }
 .prompt-box--gemini .send-button:disabled,
-.app-shell--mobile .prompt-box--gemini .send-button:disabled {
+.app-container--mobile .prompt-box--gemini .send-button:disabled {
   opacity: 0.46;
   cursor: not-allowed;
 }
@@ -4091,55 +4091,55 @@ body,
 
 @media (max-width: 900px) {
   .mobile-project-home,
-  .app-shell--mobile .mobile-project-home,
+  .app-container--mobile .mobile-project-home,
   .mobile-bottom-prompt,
-  .app-shell--mobile .mobile-bottom-prompt {
+  .app-container--mobile .mobile-bottom-prompt {
     display: none !important;
   }
   .empty-stage,
-  .app-shell--mobile .empty-stage {
+  .app-container--mobile .empty-stage {
     display: grid !important;
     place-items: center !important;
     padding: 18px 16px calc(18px + env(safe-area-inset-bottom)) !important;
     overflow-y: auto !important;
   }
   .empty-center,
-  .app-shell--mobile .empty-center {
+  .app-container--mobile .empty-center {
     display: flex !important;
     width: min(100%, 760px);
     transform: none !important;
     gap: 16px;
   }
   .empty-center h1,
-  .app-shell--mobile .empty-center h1 {
+  .app-container--mobile .empty-center h1 {
     font-size: 24px;
     text-align: center;
     margin: 0 !important;
   }
   .desktop-center-prompt,
-  .app-shell--mobile .desktop-center-prompt {
+  .app-container--mobile .desktop-center-prompt {
     display: block !important;
     width: 100% !important;
   }
   .suggestion-row,
-  .app-shell--mobile .suggestion-row {
+  .app-container--mobile .suggestion-row {
     width: 100%;
     gap: 8px;
     justify-content: center;
   }
   .suggestion-chip,
-  .app-shell--mobile .suggestion-chip {
+  .app-container--mobile .suggestion-chip {
     min-height: 34px;
     padding: 0 12px;
     font-size: 13px;
   }
   .prompt-wrap,
-  .app-shell--mobile .prompt-wrap {
+  .app-container--mobile .prompt-wrap {
     background: var(--mobile-bg, var(--chat-bg));
     padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
   }
   .prompt-box--gemini,
-  .app-shell--mobile .prompt-box--gemini {
+  .app-container--mobile .prompt-box--gemini {
     width: 100%;
     max-width: none;
     border-radius: 28px;
@@ -4147,22 +4147,22 @@ body,
     gap: 8px;
   }
   .prompt-box--gemini textarea,
-  .app-shell--mobile .prompt-box--gemini textarea {
+  .app-container--mobile .prompt-box--gemini textarea {
     min-height: 40px;
     height: 40px;
     max-height: 136px;
     font-size: 16px;
   }
   .prompt-action-row,
-  .app-shell--mobile .prompt-action-row {
+  .app-container--mobile .prompt-action-row {
     gap: 8px;
   }
   .prompt-left-actions,
-  .app-shell--mobile .prompt-left-actions {
+  .app-container--mobile .prompt-left-actions {
     gap: 5px;
   }
   .prompt-model-trigger,
-  .app-shell--mobile .prompt-model-trigger {
+  .app-container--mobile .prompt-model-trigger {
     height: 36px;
     max-width: 132px;
     padding: 0 10px;
@@ -4170,26 +4170,26 @@ body,
   }
   .prompt-icon-action,
   .prompt-box--gemini .send-button,
-  .app-shell--mobile .prompt-icon-action,
-  .app-shell--mobile .prompt-box--gemini .send-button {
+  .app-container--mobile .prompt-icon-action,
+  .app-container--mobile .prompt-box--gemini .send-button {
     width: 36px;
     height: 36px;
     min-width: 36px;
     min-height: 36px;
   }
   .sidebar-content--mobile .assistant-trigger,
-  .app-shell--mobile .sidebar-content--mobile .assistant-trigger {
+  .app-container--mobile .sidebar-content--mobile .assistant-trigger {
     height: 40px;
     max-width: 210px;
     font-size: 18px;
     box-shadow: none;
   }
   .sidebar-content--mobile .project-list,
-  .app-shell--mobile .sidebar-content--mobile .project-list {
+  .app-container--mobile .sidebar-content--mobile .project-list {
     display: none !important;
   }
   .sidebar-content--mobile .sidebar-history,
-  .app-shell--mobile .sidebar-content--mobile .sidebar-history {
+  .app-container--mobile .sidebar-content--mobile .sidebar-history {
     flex: 1 1 auto !important;
     min-height: 160px !important;
   }
@@ -4197,13 +4197,13 @@ body,
 
 @media (max-width: 420px) {
   .prompt-model-trigger,
-  .app-shell--mobile .prompt-model-trigger {
+  .app-container--mobile .prompt-model-trigger {
     max-width: 112px;
   }
   .prompt-icon-action,
   .prompt-box--gemini .send-button,
-  .app-shell--mobile .prompt-icon-action,
-  .app-shell--mobile .prompt-box--gemini .send-button {
+  .app-container--mobile .prompt-icon-action,
+  .app-container--mobile .prompt-box--gemini .send-button {
     width: 34px;
     height: 34px;
     min-width: 34px;
@@ -4371,7 +4371,7 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chatgpt-shell {
+  .chat-container-shell {
     grid-template-columns: minmax(0, 1fr);
   }
   .desktop-sidebar {
@@ -4469,12 +4469,12 @@ body,
 }
 @media (max-width: 900px) {
   .shared-readonly-wrap,
-  .app-shell--mobile .shared-readonly-wrap {
+  .app-container--mobile .shared-readonly-wrap {
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
     background: var(--mobile-bg);
   }
   .shared-readonly-box,
-  .app-shell--mobile .shared-readonly-box {
+  .app-container--mobile .shared-readonly-box {
     max-width: none;
     min-height: 52px;
     border-radius: 20px;
@@ -4499,7 +4499,7 @@ body,
 }
 
 .message-list,
-.app-shell--mobile .message-list {
+.app-container--mobile .message-list {
   padding-bottom: var(--chat-message-bottom-gap) !important;
   scroll-padding-bottom: var(--chat-message-bottom-gap);
 }
@@ -4525,8 +4525,8 @@ body,
     --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
   }
 
-  .chatgpt-shell--keyboard-open .message-list,
-  .app-shell--mobile .chatgpt-shell--keyboard-open .message-list {
+  .chat-container-shell--keyboard-open .message-list,
+  .app-container--mobile .chat-container-shell--keyboard-open .message-list {
     padding-bottom: 12px !important;
     scroll-padding-bottom: 12px;
   }
@@ -4574,7 +4574,7 @@ body,
   }
 
   .scroll-bottom-button,
-  .app-shell--mobile .scroll-bottom-button {
+  .app-container--mobile .scroll-bottom-button {
     left: 50% !important;
     right: auto !important;
     bottom: calc(
@@ -5064,7 +5064,7 @@ body,
     padding-bottom: 0 !important;
   }
   .sidebar-content--mobile .sidebar-user,
-  .app-shell--mobile .sidebar-content--mobile .sidebar-user {
+  .app-container--mobile .sidebar-content--mobile .sidebar-user {
     position: sticky !important;
     bottom: 0 !important;
     margin-top: auto !important;
@@ -5258,12 +5258,12 @@ body,
 
 @media (max-width: 900px) {
   .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search,
-  .app-shell--mobile .quick-menu--assistant.quick-menu--mobile-search {
+  .app-container--mobile .quick-menu--assistant.quick-menu--mobile-search {
     gap: 0 !important;
     padding: 4px 12px 2px !important;
   }
   .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search .quick-item,
-  .app-shell--mobile
+  .app-container--mobile
     .quick-menu--assistant.quick-menu--mobile-search
     .quick-item {
     font-size: 14px !important;
@@ -5272,16 +5272,16 @@ body,
     justify-content: flex-start !important;
   }
   .mobile-drawer .service-menu.settings-menu,
-  .app-shell--mobile .service-menu.settings-menu {
+  .app-container--mobile .service-menu.settings-menu {
     margin: 0 12px 8px !important;
     border-color: var(--sidebar-border) !important;
   }
   .mobile-drawer .mobile-new-chat-fab,
-  .app-shell--mobile .mobile-new-chat-fab {
+  .app-container--mobile .mobile-new-chat-fab {
     display: none !important;
   }
   .mobile-drawer .sidebar-history--main,
-  .app-shell--mobile .sidebar-history--main {
+  .app-container--mobile .sidebar-history--main {
     flex: 1 1 auto;
   }
   .md-table-toolbar {
@@ -5303,7 +5303,7 @@ body,
 @media (min-width: 901px) {
   .chat-workspace > .mobile-topbar,
   .mobile-topbar,
-  .app-shell--desktop .mobile-topbar {
+  .app-container--desktop .mobile-topbar {
     border-bottom: 1px solid var(--sidebar-border) !important;
   }
 }
@@ -5338,7 +5338,7 @@ body,
 
 /* Mobile drawer setting menu should visually match the chat list, not a card. */
 .mobile-drawer .settings-menu,
-.app-shell--mobile .settings-menu {
+.app-container--mobile .settings-menu {
   margin: 4px 0 10px;
   border: 0;
   border-radius: 0;
@@ -5346,7 +5346,7 @@ body,
 }
 
 .mobile-drawer .settings-menu-summary,
-.app-shell--mobile .settings-menu-summary {
+.app-container--mobile .settings-menu-summary {
   min-height: 42px;
   padding: 8px 10px !important;
   border-radius: 10px;
@@ -5355,50 +5355,50 @@ body,
 }
 
 .mobile-drawer .settings-menu-summary::-webkit-details-marker,
-.app-shell--mobile .settings-menu-summary::-webkit-details-marker {
+.app-container--mobile .settings-menu-summary::-webkit-details-marker {
   display: none;
 }
 
 .mobile-drawer .settings-menu-summary:hover,
-.app-shell--mobile .settings-menu-summary:hover {
+.app-container--mobile .settings-menu-summary:hover {
   background: var(--sidebar-hover);
 }
 
 .mobile-drawer .settings-menu-summary-text,
-.app-shell--mobile .settings-menu-summary-text {
+.app-container--mobile .settings-menu-summary-text {
   display: flex !important;
   align-items: center;
   gap: 8px;
 }
 
 .mobile-drawer .settings-menu-summary-text strong,
-.app-shell--mobile .settings-menu-summary-text strong {
+.app-container--mobile .settings-menu-summary-text strong {
   font-size: 14px !important;
   line-height: 1.35;
   font-weight: 700;
 }
 
 .mobile-drawer .settings-menu-summary-text small,
-.app-shell--mobile .settings-menu-summary-text small {
+.app-container--mobile .settings-menu-summary-text small {
   display: none;
 }
 
 .mobile-drawer .settings-menu .app-icon--chevron,
-.app-shell--mobile .settings-menu .app-icon--chevron {
+.app-container--mobile .settings-menu .app-icon--chevron {
   width: 18px;
   height: 18px;
   color: var(--text-muted);
 }
 
 .mobile-drawer .settings-menu .service-menu-list,
-.app-shell--mobile .settings-menu .service-menu-list {
+.app-container--mobile .settings-menu .service-menu-list {
   padding: 2px 0 2px 12px;
   display: grid;
   gap: 2px;
 }
 
 .mobile-drawer .settings-menu .service-menu-item,
-.app-shell--mobile .settings-menu .service-menu-item {
+.app-container--mobile .settings-menu .service-menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -5413,12 +5413,12 @@ body,
 }
 
 .mobile-drawer .settings-menu .service-menu-item:hover,
-.app-shell--mobile .settings-menu .service-menu-item:hover {
+.app-container--mobile .settings-menu .service-menu-item:hover {
   background: var(--sidebar-hover);
 }
 
 .mobile-drawer .settings-menu .service-menu-item strong,
-.app-shell--mobile .settings-menu .service-menu-item strong {
+.app-container--mobile .settings-menu .service-menu-item strong {
   display: block;
   font-size: 14px !important;
   line-height: 1.35;
@@ -5426,12 +5426,12 @@ body,
 }
 
 .mobile-drawer .settings-menu .service-menu-item small,
-.app-shell--mobile .settings-menu .service-menu-item small {
+.app-container--mobile .settings-menu .service-menu-item small {
   display: none;
 }
 
 .mobile-drawer .settings-menu .service-menu-item .app-icon,
-.app-shell--mobile .settings-menu .service-menu-item .app-icon {
+.app-container--mobile .settings-menu .service-menu-item .app-icon {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
@@ -5439,14 +5439,14 @@ body,
 }
 
 .mobile-drawer .quick-menu--mobile-search,
-.app-shell--mobile .quick-menu--mobile-search {
+.app-container--mobile .quick-menu--mobile-search {
   display: grid;
   gap: 4px;
   margin-bottom: 8px;
 }
 
 .mobile-drawer .quick-menu--mobile-search .quick-item,
-.app-shell--mobile .quick-menu--mobile-search .quick-item {
+.app-container--mobile .quick-menu--mobile-search .quick-item {
   min-height: 42px;
   font-size: 14px;
   border-radius: 10px;
@@ -5655,7 +5655,7 @@ body,
     max-width: calc(100% - 248px);
   }
 
-  .chatgpt-shell--sidebar-collapsed .chat-workspace > .mobile-topbar .topbar-left {
+  .chat-container-shell--sidebar-collapsed .chat-workspace > .mobile-topbar .topbar-left {
     max-width: calc(100% - 248px);
   }
 }
@@ -5874,7 +5874,7 @@ body,
   }
 
   .suggestion-chip,
-  .app-shell--mobile .suggestion-chip {
+  .app-container--mobile .suggestion-chip {
     width: 100%;
     max-width: none;
     justify-content: center;
@@ -5969,7 +5969,7 @@ body,
 
 @media (max-width: 900px) {
   .suggestion-row--between,
-  .app-shell--mobile .suggestion-row--between {
+  .app-container--mobile .suggestion-row--between {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
@@ -5977,7 +5977,7 @@ body,
   }
 
   .suggestion-chip,
-  .app-shell--mobile .suggestion-chip {
+  .app-container--mobile .suggestion-chip {
     width: 100%;
     max-width: none;
     min-width: 0;
@@ -6380,7 +6380,7 @@ body,
 
 @media (max-width: 900px) {
   .empty-stage--mobile-main,
-  .app-shell--mobile .empty-stage--mobile-main {
+  .app-container--mobile .empty-stage--mobile-main {
     place-items: start center !important;
     align-content: start !important;
     padding: 78px 16px calc(150px + env(safe-area-inset-bottom)) !important;
@@ -6388,7 +6388,7 @@ body,
   }
 
   .empty-stage--mobile-main .empty-center,
-  .app-shell--mobile .empty-stage--mobile-main .empty-center {
+  .app-container--mobile .empty-stage--mobile-main .empty-center {
     width: 100% !important;
     min-height: auto;
     align-items: stretch !important;
@@ -6397,14 +6397,14 @@ body,
   }
 
   .empty-stage--mobile-main .empty-center h1,
-  .app-shell--mobile .empty-stage--mobile-main .empty-center h1 {
+  .app-container--mobile .empty-stage--mobile-main .empty-center h1 {
     text-align: left !important;
     font-size: 24px;
     line-height: 1.25;
   }
 
   .empty-stage--mobile-main .suggestion-row--between,
-  .app-shell--mobile .empty-stage--mobile-main .suggestion-row--between {
+  .app-container--mobile .empty-stage--mobile-main .suggestion-row--between {
     display: grid !important;
     grid-template-columns: 1fr !important;
     gap: 10px !important;
@@ -6413,7 +6413,7 @@ body,
   }
 
   .empty-stage--mobile-main .suggestion-chip,
-  .app-shell--mobile .empty-stage--mobile-main .suggestion-chip {
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip {
     width: 100% !important;
     min-height: 46px;
     justify-content: flex-start !important;
@@ -6422,12 +6422,12 @@ body,
   }
 
   .empty-stage--mobile-main .suggestion-chip-text,
-  .app-shell--mobile .empty-stage--mobile-main .suggestion-chip-text {
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip-text {
     white-space: nowrap;
   }
 
   .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating,
-  .app-shell--mobile .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating {
+  .app-container--mobile .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating {
     display: block !important;
     position: fixed !important;
     left: 0 !important;
@@ -6500,7 +6500,7 @@ body,
 
 @media (max-width: 900px) {
   .shared-readonly-box--deleted-model,
-  .app-shell--mobile .shared-readonly-box--deleted-model,
+  .app-container--mobile .shared-readonly-box--deleted-model,
   .app-container--mobile .shared-readonly-box--deleted-model {
     gap: 10px;
     align-items: flex-start;
@@ -6610,21 +6610,21 @@ body,
 /* =========================================================
    FINAL RESPONSIVE / KEYBOARD / TOKEN POLISH
    ========================================================= */
-.chatgpt-shell {
+.chat-container-shell {
   grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
   height: var(--layout-viewport-height, 100dvh);
 }
 
-.chatgpt-shell--sidebar-collapsed {
+.chat-container-shell--sidebar-collapsed {
   grid-template-columns: var(--layout-sidebar-collapsed-width) minmax(0, 1fr);
 }
 
-.chatgpt-shell--mode-chat,
-.chatgpt-shell--mode-shared {
+.chat-container-shell--mode-chat,
+.chat-container-shell--mode-shared {
   height: var(--app-height, 100dvh);
 }
 
-.chatgpt-shell--mode-main.chatgpt-shell--keyboard-open {
+.chat-container-shell--mode-main.chat-container-shell--keyboard-open {
   height: var(--layout-viewport-height, 100dvh);
 }
 
@@ -6662,32 +6662,32 @@ body,
 }
 
 @media (max-width: 900px) {
-  .chatgpt-shell,
-  .chatgpt-shell--mode-chat,
-  .chatgpt-shell--mode-shared {
+  .chat-container-shell,
+  .chat-container-shell--mode-chat,
+  .chat-container-shell--mode-shared {
     height: var(--app-height, 100dvh);
   }
 
-  .chatgpt-shell--mode-main,
-  .chatgpt-shell--mode-main.chatgpt-shell--keyboard-open {
+  .chat-container-shell--mode-main,
+  .chat-container-shell--mode-main.chat-container-shell--keyboard-open {
     height: var(--layout-viewport-height, 100dvh);
   }
 
-  .chatgpt-shell--mode-chat.chatgpt-shell--keyboard-open .chat-workspace,
-  .chatgpt-shell--mode-shared.chatgpt-shell--keyboard-open .chat-workspace {
+  .chat-container-shell--mode-chat.chat-container-shell--keyboard-open .chat-workspace,
+  .chat-container-shell--mode-shared.chat-container-shell--keyboard-open .chat-workspace {
     height: var(--app-height, 100dvh);
   }
 
-  .chatgpt-shell--mode-chat.chatgpt-shell--keyboard-open .prompt-wrap,
-  .chatgpt-shell--mode-shared.chatgpt-shell--keyboard-open .prompt-wrap {
+  .chat-container-shell--mode-chat.chat-container-shell--keyboard-open .prompt-wrap,
+  .chat-container-shell--mode-shared.chat-container-shell--keyboard-open .prompt-wrap {
     padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
-  .chatgpt-shell--mode-main.chatgpt-shell--keyboard-open .empty-stage--mobile-main {
+  .chat-container-shell--mode-main.chat-container-shell--keyboard-open .empty-stage--mobile-main {
     height: var(--layout-viewport-height, 100dvh);
   }
 
-  .chatgpt-shell--mode-main.chatgpt-shell--keyboard-open .desktop-center-prompt.prompt-wrap--floating {
+  .chat-container-shell--mode-main.chat-container-shell--keyboard-open .desktop-center-prompt.prompt-wrap--floating {
     bottom: 0 !important;
   }
 
@@ -6816,4 +6816,118 @@ body,
   .feedback-dialog-body textarea {
     max-height: max(110px, calc(var(--app-height, 100dvh) - 310px)) !important;
   }
+}
+
+/* =========================================================
+   DSLLM final mobile/container polish
+   - Keep all legacy shell names replaced with container names.
+   - Mobile drawer footer spacing is explicit so browser bottom bars do not
+     visually collide with the profile area.
+   - Mobile assistant selector width is wider than desktop while desktop keeps
+     the current compact width.
+   - AI avatar is hidden on mobile only.
+   - Settings arrows use SVG icons instead of text/pseudo arrows.
+   - Main prompt dark-mode outer corners inherit the page surface.
+   ========================================================= */
+.app-container {
+  height: var(--app-height);
+  width: 100%;
+  min-height: 0;
+}
+
+@media (max-width: 900px) {
+  .sidebar-content--mobile {
+    min-height: 100%;
+    padding-bottom: calc(
+      var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
+    ) !important;
+  }
+
+  .sidebar-content--mobile .sidebar-user,
+  .sidebar-user--mobile {
+    margin-top: auto !important;
+    margin-bottom: calc(
+      var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
+    ) !important;
+    padding-bottom: var(--space-4) !important;
+  }
+
+  .mobile-topbar .model-trigger--assistant,
+  .sidebar-content--mobile .assistant-trigger {
+    min-width: var(--layout-mobile-assistant-trigger-min);
+    max-width: var(--layout-mobile-assistant-trigger-max);
+  }
+
+  .mobile-topbar .model-trigger--assistant span,
+  .sidebar-content--mobile .assistant-trigger span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .message--assistant .avatar,
+  .app-container--mobile .message--assistant .avatar {
+    display: none !important;
+  }
+
+  .message--assistant,
+  .app-container--mobile .message--assistant {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .message--assistant .bubble,
+  .app-container--mobile .message--assistant .bubble {
+    grid-column: 1 !important;
+  }
+}
+
+.mobile-settings-item-arrow {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 0 !important;
+  color: var(--text-muted);
+}
+
+.mobile-settings-item-arrow::before {
+  content: none !important;
+}
+
+.mobile-settings-item-arrow .chevron-right-icon {
+  width: 20px;
+  height: 20px;
+  transition:
+    transform var(--duration-fast),
+    color var(--duration-fast);
+}
+
+.mobile-settings-item:hover .mobile-settings-item-arrow .chevron-right-icon,
+.mobile-settings-item:focus-visible .mobile-settings-item-arrow .chevron-right-icon {
+  color: var(--text);
+  transform: translateX(2px);
+}
+
+.prompt-wrap,
+.prompt-wrap--floating,
+.desktop-center-prompt {
+  background: transparent;
+}
+
+.empty-stage,
+.empty-stage--mobile-main,
+.chat-workspace {
+  background: var(--chat-bg);
+}
+
+.prompt-box {
+  background: var(--prompt-bg);
+  background-clip: padding-box;
+}
+
+:root[data-theme="dark"] .desktop-center-prompt .prompt-box,
+:root[data-theme="dark"] .prompt-wrap--floating .prompt-box {
+  box-shadow: var(--shadow-prompt);
 }

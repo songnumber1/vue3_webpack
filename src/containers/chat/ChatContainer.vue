@@ -273,7 +273,7 @@ function updateMobileState() {
   isMobile.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
     window.innerWidth <= 900 ||
-    document.querySelector(".app-container--mobile, .app-shell--mobile"),
+    document.querySelector(".app-container--mobile"),
   );
 }
 

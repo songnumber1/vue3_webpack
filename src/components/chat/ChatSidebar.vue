@@ -21,16 +21,7 @@
             @click="openAssistantSelector"
           >
             <span>{{ currentAssistant.label }}</span>
-            <svg viewBox="0 0 20 20" aria-hidden="true">
-              <path
-                d="M5.5 7.5 10 12l4.5-4.5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+            <ChevronDownIcon class="chevron chevron--selector" />
           </button>
           <div
             v-if="assistantMenuOpen && !isMobileSheet"
@@ -181,16 +172,7 @@
               @click="openAssistantSelector"
             >
               <span>{{ currentAssistant.label }}</span>
-              <svg viewBox="0 0 20 20" aria-hidden="true">
-                <path
-                  d="M5.5 7.5 10 12l4.5-4.5"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <ChevronDownIcon class="chevron chevron--selector" />
             </button>
           </div>
           <div class="sidebar-top-actions">
@@ -310,6 +292,7 @@ import BaseBottomSheet from "./BaseBottomSheet.vue";
 import Icon from "./ChatSidebarIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
 const props = defineProps({
   histories: { type: Array, required: true },
@@ -355,7 +338,7 @@ const currentAssistant = computed(
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-container--mobile, .app-shell--mobile"),
+    document.querySelector(".app-container--mobile"),
   );
 }
 

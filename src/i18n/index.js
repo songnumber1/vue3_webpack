@@ -103,7 +103,7 @@ export const messages = {
     },
     personalization: {
       title: "개인화",
-      subtitle: "ChatGPT 스타일의 개인화 설정 예시입니다.",
+      subtitle: "DSLLM 스타일의 개인화 설정 예시입니다.",
       memoryTitle: "메모리",
       memoryBody:
         "대화 맥락과 선호도를 기억하여 더 자연스러운 응답을 제공합니다.",
@@ -238,7 +238,7 @@ export const messages = {
     },
     personalization: {
       title: "Personalization",
-      subtitle: "ChatGPT-style personalization examples.",
+      subtitle: "DSLLM-style personalization examples.",
       memoryTitle: "Memory",
       memoryBody:
         "Remember conversation context and preferences for more natural responses.",

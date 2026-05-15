@@ -29,12 +29,12 @@ button:disabled {
   opacity: 0.58;
 }
 .app-container,
-.app-shell {
+.app-container {
   height: 100%;
   width: 100%;
 }
 .app-container--mobile,
-.app-shell--mobile {
+.app-container--mobile {
   max-width: none;
   margin: 0;
   background: var(--surface);
@@ -54,7 +54,7 @@ html,
 body,
 #app,
 .app-container,
-.app-shell {
+.app-container {
   min-height: 0;
   height: var(--app-height);
   overscroll-behavior: none;

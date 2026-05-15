@@ -37,7 +37,7 @@
                 <strong>{{ item.label }}</strong>
                 <small>{{ item.description }}</small>
               </span>
-              <span class="mobile-settings-item-arrow" aria-hidden="true">›</span>
+              <span class="mobile-settings-item-arrow" aria-hidden="true"><ChevronRightIcon /></span>
             </button>
           </nav>
 
@@ -90,6 +90,7 @@ import { setAppLocale } from "@/i18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
+import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
 
 const props = defineProps({ open: { type: Boolean, default: false } });
 const emit = defineEmits(["close"]);

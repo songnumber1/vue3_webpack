@@ -1,6 +1,6 @@
 <!--
 @file PersonalizationView.vue
-@description ChatGPT-like personalization settings sample view.
+@description DSLLM-like personalization settings sample view.
 -->
 
 <template>
