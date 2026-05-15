@@ -12,6 +12,7 @@ export const messages = {
     common: {
       back: "뒤로",
       close: "닫기",
+      confirm: "확인",
       cancel: "취소",
       save: "저장",
       guide: "가이드",
@@ -146,6 +147,7 @@ export const messages = {
     common: {
       back: "Back",
       close: "Close",
+      confirm: "Confirm",
       cancel: "Cancel",
       save: "Save",
       guide: "Guide",

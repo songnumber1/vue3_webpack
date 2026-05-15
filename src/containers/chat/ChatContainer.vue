@@ -143,7 +143,7 @@ import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 
 const props = defineProps({ mode: { type: String, default: "main" } });
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const { theme } = useAppContext();
@@ -217,20 +217,22 @@ const workspaceAssistantLabel = computed(() => {
 
 const suggestions = computed(() => {
   const assistantPrompts = currentExamplePrompts.value || [];
+  const isEnglish = locale.value === "en";
 
   return PROMPT_SUGGESTION_DEFINITIONS.map((definition, index) => {
     const prompt = assistantPrompts[index];
     const fallbackLabel = t(definition.labelKey);
-    const label = prompt?.titleKo || prompt?.titleEn || fallbackLabel;
-    const content =
-      prompt?.contentKo ||
-      prompt?.contentEn ||
-      prompt?.titleKo ||
-      prompt?.titleEn ||
-      definition.fallbackPrompt;
+    const localizedTitle = isEnglish
+      ? prompt?.titleEn || prompt?.titleKo
+      : prompt?.titleKo || prompt?.titleEn;
+    const localizedContent = isEnglish
+      ? prompt?.contentEn || prompt?.contentKo || localizedTitle
+      : prompt?.contentKo || prompt?.contentEn || localizedTitle;
+    const label = localizedTitle || fallbackLabel;
+    const content = localizedContent || definition.fallbackPrompt;
 
     return {
-      id: prompt?.id || `${definition.id}-${selectedAssistantId.value || 'default'}`,
+      id: prompt?.id || `${definition.id}-${selectedAssistantId.value || "default"}`,
       type: definition.id,
       icon: definition.icon,
       text: label,

@@ -23,7 +23,11 @@
     @open-playground="$emit('open-playground')"
   />
 
-  <section v-if="mode === 'main'" class="empty-stage empty-stage--main">
+  <section
+    v-if="mode === 'main'"
+    class="empty-stage empty-stage--main"
+    :class="{ 'empty-stage--mobile-main': isMobile }"
+  >
     <div class="empty-center">
       <h1>{{ t("chat.startQuestion") }}</h1>
       <div class="suggestion-row suggestion-row--between">
@@ -41,6 +45,7 @@
       </div>
       <PromptInput
         class="desktop-center-prompt"
+        :floating="isMobile"
         :model-value="selectedModel"
         :models="models"
         :disabled="isGenerating"
