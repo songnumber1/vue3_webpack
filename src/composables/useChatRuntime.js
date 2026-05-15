@@ -176,7 +176,6 @@ export function useChatRuntime() {
       }
       assistantStore.setBootstrapData(data);
       chatStore.setHistories(data.chatHistories);
-      await preloadExamplePrompts(assistantStore.selectedAssistantId);
       appRuntimeStore.finishLoading();
     } catch (error) {
       appRuntimeStore.fail(error);

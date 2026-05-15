@@ -39,7 +39,7 @@
           :title="item.title || item.prompt"
           @click="$emit('submit', item.prompt)"
         >
-          <span aria-hidden="true">{{ item.icon }}</span>
+          <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>

@@ -81,7 +81,7 @@ function pickInitialModel(
  *
  * method: Promise.all
  * payload: { language, entryType } 및 분산 API GET 요청
- * response: accessInfo, assistants, models, history, lookup map, 초기 선택값
+ * response: accessInfo, assistants, models, history, examplePromptMap, lookup map, 초기 선택값
  * 특징:
  * - 운영 API가 분산되어 있으므로 Promise.all로 병렬 호출합니다.
  * - router auth guard가 이미 access/info.do를 호출한 경우 accessInfoOverride를 재사용해 mock/live 불일치를 방지합니다.
@@ -93,7 +93,7 @@ function pickInitialModel(
  */
 export async function bootstrapChatRuntime(options = {}) {
   const {accessInfoOverride = null} = options;
-  const {accessApi, assistantApi, modelApi, chatHistoryApi} = resolveChatApis();
+  const {accessApi, assistantApi, modelApi, chatHistoryApi, examplePromptApi} = resolveChatApis();
 
   const accessInfoPromise = accessInfoOverride
     ? Promise.resolve(accessInfoOverride)
@@ -134,6 +134,16 @@ export async function bootstrapChatRuntime(options = {}) {
     assistantMap,
     modelMap,
   });
+  const examplePromptEntries = await Promise.all(
+    assistants.map(async (assistant) => {
+      const response = await examplePromptApi.getExamplePrompts({
+        assistId: assistant.id,
+        studioYN: assistant.type === "studio",
+      });
+      return [assistant.id, adaptExamplePromptList(response)];
+    })
+  );
+  const examplePromptMap = Object.fromEntries(examplePromptEntries);
   const initialAssistant = pickInitialAssistant(assistants, accessInfo);
   const initialModel = pickInitialModel(
     initialAssistant,
@@ -150,6 +160,7 @@ export async function bootstrapChatRuntime(options = {}) {
     modelMap,
     modelMapByAssistant,
     chatHistories,
+    examplePromptMap,
     initialAssistantId: initialAssistant?.id || "",
     initialModelId: initialModel?.id || "",
   };

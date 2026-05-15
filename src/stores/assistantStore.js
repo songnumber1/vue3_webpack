@@ -38,6 +38,7 @@ export const useAssistantStore = defineStore("assistant", {
         payload.initialAssistantId || this.assistants[0]?.id || "";
       this.selectedModelId =
         payload.initialModelId || this.currentModels[0]?.id || "";
+      this.examplePromptMap = payload.examplePromptMap || {};
     },
     selectAssistant(id) {
       if (!this.assistantMap[id]) return;
@@ -58,6 +59,9 @@ export const useAssistantStore = defineStore("assistant", {
         ...this.examplePromptMap,
         [assistantId]: prompts,
       };
+    },
+    setExamplePromptMap(promptMap = {}) {
+      this.examplePromptMap = {...promptMap};
     },
   },
 });

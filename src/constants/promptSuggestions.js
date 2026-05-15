@@ -1,31 +1,16 @@
 /**
  * @file promptSuggestions.js
- * @description JavaScript module for promptSuggestions.
+ * @description Assistant/Studio별 예시 프롬프트 출력 정책을 정의합니다.
  */
 
-export const PROMPT_SUGGESTION_TYPES = {
-  IMAGE: "image",
-  WRITING: "writing",
-  SEARCH: "search",
-};
-
-export const PROMPT_SUGGESTION_DEFINITIONS = [
-  {
-    id: PROMPT_SUGGESTION_TYPES.IMAGE,
-    icon: "▧",
-    labelKey: "chat.suggestions.image",
-    fallbackPrompt: "이미지 생성 또는 이미지 설명에 필요한 프롬프트를 만들어줘",
-  },
-  {
-    id: PROMPT_SUGGESTION_TYPES.WRITING,
-    icon: "✎",
-    labelKey: "chat.suggestions.writing",
-    fallbackPrompt: "아래 내용을 더 자연스럽고 명확하게 다듬어줘",
-  },
-  {
-    id: PROMPT_SUGGESTION_TYPES.SEARCH,
-    icon: "◎",
-    labelKey: "chat.suggestions.search",
-    fallbackPrompt: "현재 상황에서 빠진 항목과 확인해야 할 항목을 찾아줘",
-  },
-];
+/**
+ * 메인 화면에 출력할 Assistant/Studio 예시 프롬프트 최대 개수입니다.
+ *
+ * 특징:
+ * - 실제 문구는 example-prompts API/mock 데이터에서 가져옵니다.
+ * - 이 값을 3에서 4로 변경하면 Assistant별 프롬프트 중 앞 4개가 출력됩니다.
+ * - 고정 카테고리 라벨/프롬프트를 사용하지 않아 Assistant 변경 시 fallback 문구 깜박임을 방지합니다.
+ *
+ * @type {number}
+ */
+export const PROMPT_SUGGESTION_LIMIT = 3;

@@ -129,7 +129,7 @@ import {loadSharedConversation} from "@/composables/useSharedChat";
 import {useViewportGuard} from "@/composables/useViewportGuard";
 import {addMediaQueryListener} from "@/utils/dom";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {PROMPT_SUGGESTION_DEFINITIONS} from "@/constants/promptSuggestions";
+import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import ChatAssistantSheet from "@/components/chat/ChatAssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -228,32 +228,26 @@ const suggestions = computed(() => {
   const assistantPrompts = currentExamplePrompts.value || [];
   const isEnglish = locale.value === "en";
 
-  if (!assistantPrompts.length) return [];
+  return assistantPrompts
+    .slice(0, PROMPT_SUGGESTION_LIMIT)
+    .map((prompt) => {
+      const localizedTitle = isEnglish
+        ? prompt.titleEn || prompt.titleKo
+        : prompt.titleKo || prompt.titleEn;
+      const localizedContent = isEnglish
+        ? prompt.contentEn || prompt.contentKo || localizedTitle
+        : prompt.contentKo || prompt.contentEn || localizedTitle;
+      const text = localizedTitle || localizedContent;
+      const content = localizedContent || localizedTitle;
 
-  return PROMPT_SUGGESTION_DEFINITIONS.map((definition, index) => {
-    const prompt = assistantPrompts[index];
-    const fallbackLabel = t(definition.labelKey);
-    const localizedTitle = isEnglish
-      ? prompt?.titleEn || prompt?.titleKo
-      : prompt?.titleKo || prompt?.titleEn;
-    const localizedContent = isEnglish
-      ? prompt?.contentEn || prompt?.contentKo || localizedTitle
-      : prompt?.contentKo || prompt?.contentEn || localizedTitle;
-    const label = localizedTitle || fallbackLabel;
-    const content = localizedContent || definition.fallbackPrompt;
-
-    return {
-      id:
-        prompt?.id ||
-        `${definition.id}-${selectedAssistantId.value || "default"}`,
-      type: definition.id,
-      icon: definition.icon,
-      text: label,
-      title: content || label,
-      prompt: content || label,
-      fallbackLabel,
-    };
-  });
+      return {
+        id: prompt.id,
+        text,
+        title: content || text,
+        prompt: content || text,
+      };
+    })
+    .filter((item) => item.text && item.prompt);
 });
 
 /**
