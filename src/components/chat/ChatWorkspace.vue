@@ -44,8 +44,9 @@
         </button>
       </div>
       <PromptInput
+        v-if="!isMobile"
         class="desktop-center-prompt"
-        :floating="isMobile"
+        :floating="false"
         :model-value="selectedModel"
         :models="models"
         :disabled="isGenerating"
@@ -57,6 +58,20 @@
         @height-change="$emit('prompt-resize', $event)"
       />
     </div>
+    <PromptInput
+      v-if="isMobile"
+      class="mobile-main-fixed-prompt"
+      :floating="false"
+      :model-value="selectedModel"
+      :models="models"
+      :disabled="isGenerating"
+      :model-readonly="modelReadonly"
+      :show-help="false"
+      @update:model-value="$emit('update:selectedModel', $event)"
+      @submit="$emit('submit', $event)"
+      @focus="$emit('prompt-focus')"
+      @height-change="$emit('prompt-resize', $event)"
+    />
   </section>
 
   <template v-else>

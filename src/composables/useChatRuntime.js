@@ -3,14 +3,18 @@
  * @description Chat runtime facade입니다. business layer, Pinia store, UI container 사이의 연결을 담당합니다.
  */
 
-import { computed } from 'vue'
-import { storeToRefs } from 'pinia'
-import { createId } from '@/utils/id'
-import { bootstrapChatRuntime, loadChatMessages, loadExamplePrompts } from '@/business/chatBootstrap'
-import { useAppRuntimeStore } from '@/stores/appRuntimeStore'
-import { useAssistantStore } from '@/stores/assistantStore'
-import { useAuthStore } from '@/stores/authStore'
-import { useChatStore } from '@/stores/chatStore'
+import {computed} from "vue";
+import {storeToRefs} from "pinia";
+import {createId} from "@/utils/id";
+import {
+  bootstrapChatRuntime,
+  loadChatMessages,
+  loadExamplePrompts,
+} from "@/business/chatBootstrap";
+import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
+import {useAssistantStore} from "@/stores/assistantStore";
+import {useAuthStore} from "@/stores/authStore";
+import {useChatStore} from "@/stores/chatStore";
 
 /**
  * 서버 저장 전 임시 대화 history ViewModel을 생성합니다.
@@ -26,24 +30,24 @@ import { useChatStore } from '@/stores/chatStore'
  * @param {object|null} params.model - 현재 선택 모델입니다.
  * @returns {object} 임시 대화 목록 ViewModel입니다.
  */
-function createLocalHistory({ text, assistant, model }) {
-  const id = `chat-local-${Date.now()}`
+function createLocalHistory({text, assistant, model}) {
+  const id = `chat-local-${Date.now()}`;
   return {
     id,
     temporary: true,
-    syncStatus: 'local',
-    title: text || '새 채팅',
-    preview: text || '첨부 파일 기반 새 대화',
-    modelId: model?.id || '',
-    assistantId: assistant?.id || model?.assistId || '',
-    assistantType: assistant?.type || '',
-    assistantLabel: assistant?.label || '',
-    modelLabel: model?.label || '',
+    syncStatus: "local",
+    title: text || "새 채팅",
+    preview: text || "첨부 파일 기반 새 대화",
+    modelId: model?.id || "",
+    assistantId: assistant?.id || model?.assistId || "",
+    assistantType: assistant?.type || "",
+    assistantLabel: assistant?.label || "",
+    modelLabel: model?.label || "",
     isPinned: false,
     endedAt: new Date().toISOString(),
-    userId: '',
+    userId: "",
     raw: null,
-  }
+  };
 }
 
 /**
@@ -62,37 +66,40 @@ function createLocalHistory({ text, assistant, model }) {
  * @returns {object|null} 현재 대화방 session context입니다.
  */
 function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
-  if (!history) return null
-  const model = modelMap[history.modelId] || null
-  const assistant = assistantMap[history.assistantId || model?.assistId] || null
-  const modelMissing = Boolean(history.modelId && !model)
-  const assistantMissing = Boolean((history.assistantId || model?.assistId) && !assistant)
-  const modelDeleted = Boolean(model?.isDeleted)
+  if (!history) return null;
+  const model = modelMap[history.modelId] || null;
+  const assistant =
+    assistantMap[history.assistantId || model?.assistId] || null;
+  const modelMissing = Boolean(history.modelId && !model);
+  const assistantMissing = Boolean(
+    (history.assistantId || model?.assistId) && !assistant
+  );
+  const modelDeleted = Boolean(model?.isDeleted);
   const unavailableReason = modelDeleted
-    ? 'deleted'
+    ? "deleted"
     : modelMissing
-      ? 'missing-model'
+      ? "missing-model"
       : assistantMissing
-        ? 'missing-assistant'
-        : ''
+        ? "missing-assistant"
+        : "";
 
   return {
     chatId: history.id,
-    assistantId: assistant?.id || history.assistantId || model?.assistId || '',
-    assistantType: assistant?.type || history.assistantType || '',
-    assistantLabel: assistant?.label || history.assistantLabel || '',
-    modelId: model?.id || history.modelId || '',
-    modelName: model?.label || history.modelLabel || '',
-    modelType: model?.type || '',
+    assistantId: assistant?.id || history.assistantId || model?.assistId || "",
+    assistantType: assistant?.type || history.assistantType || "",
+    assistantLabel: assistant?.label || history.assistantLabel || "",
+    modelId: model?.id || history.modelId || "",
+    modelName: model?.label || history.modelLabel || "",
+    modelType: model?.type || "",
     isModelDeleted: modelDeleted,
     isModelMissing: modelMissing,
     isAssistantMissing: assistantMissing,
     isModelUnavailable: Boolean(unavailableReason),
     modelUnavailableReason: unavailableReason,
-    displayAssistantId: '',
-    displayAssistantLabel: '',
+    displayAssistantId: "",
+    displayAssistantLabel: "",
     readonlyModel: true,
-  }
+  };
 }
 
 /**
@@ -106,31 +113,44 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
  * @returns {object} Chat runtime state/action facade입니다.
  */
 export function useChatRuntime() {
-  const appRuntimeStore = useAppRuntimeStore()
-  const authStore = useAuthStore()
-  const assistantStore = useAssistantStore()
-  const chatStore = useChatStore()
-  const { assistants, selectedAssistantId, selectedModelId, examplePromptMap } = storeToRefs(assistantStore)
-  const { histories } = storeToRefs(chatStore)
+  const appRuntimeStore = useAppRuntimeStore();
+  const authStore = useAuthStore();
+  const assistantStore = useAssistantStore();
+  const chatStore = useChatStore();
+  const {assistants, selectedAssistantId, selectedModelId, examplePromptMap} =
+    storeToRefs(assistantStore);
+  const {histories} = storeToRefs(chatStore);
 
-  const currentAssistant = computed(() => assistantStore.currentAssistant || assistants.value[0] || { id: '', label: 'Assistant', description: '' })
-  const currentExamplePrompts = computed(() => examplePromptMap.value[selectedAssistantId.value] || [])
-  const activeSession = computed(() => chatStore.activeSession)
-  const isActiveModelDeleted = computed(() => Boolean(chatStore.activeSession?.isModelDeleted))
-  const isActiveModelUnavailable = computed(() => Boolean(chatStore.activeSession?.isModelUnavailable))
+  const currentAssistant = computed(
+    () =>
+      assistantStore.currentAssistant ||
+      assistants.value[0] || {id: "", label: "Assistant", description: ""}
+  );
+  const currentExamplePrompts = computed(
+    () => examplePromptMap.value[selectedAssistantId.value] || []
+  );
+  const activeSession = computed(() => chatStore.activeSession);
+  const isActiveModelDeleted = computed(() =>
+    Boolean(chatStore.activeSession?.isModelDeleted)
+  );
+  const isActiveModelUnavailable = computed(() =>
+    Boolean(chatStore.activeSession?.isModelUnavailable)
+  );
   const models = computed(() => {
-    if (!chatStore.isModelLocked) return assistantStore.currentModels
-    return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(Boolean)
-  })
+    if (!chatStore.isModelLocked) return assistantStore.currentModels;
+    return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(
+      Boolean
+    );
+  });
   const selectedModel = computed({
     get: () => chatStore.activeSession?.modelId || selectedModelId.value,
     set: (id) => {
-      if (chatStore.isModelLocked) return
-      assistantStore.selectModel(id)
+      if (chatStore.isModelLocked) return;
+      assistantStore.selectModel(id);
     },
-  })
-  const isModelLocked = computed(() => chatStore.isModelLocked)
-  const conversations = computed(() => chatStore.messageMap)
+  });
+  const isModelLocked = computed(() => chatStore.isModelLocked);
+  const conversations = computed(() => chatStore.messageMap);
 
   /**
    * 앱 최초 진입 시 chat runtime에 필요한 데이터를 초기화합니다.
@@ -143,24 +163,24 @@ export function useChatRuntime() {
    * @returns {Promise<void>} 초기화 완료 Promise입니다.
    */
   async function initialize() {
-    if (appRuntimeStore.initialized || appRuntimeStore.loading) return
-    appRuntimeStore.startLoading()
+    if (appRuntimeStore.initialized || appRuntimeStore.loading) return;
+    appRuntimeStore.startLoading();
     try {
       const data = await bootstrapChatRuntime({
         accessInfoOverride: authStore.accessInfo || null,
-      })
+      });
       if (data.accessInfo?.user) {
-        authStore.setAuthenticatedAccessInfo(data.accessInfo)
+        authStore.setAuthenticatedAccessInfo(data.accessInfo);
       } else {
-        authStore.setAccessInfo(data.accessInfo)
+        authStore.setAccessInfo(data.accessInfo);
       }
-      assistantStore.setBootstrapData(data)
-      chatStore.setHistories(data.chatHistories)
-      await preloadExamplePrompts(assistantStore.selectedAssistantId)
-      appRuntimeStore.finishLoading()
+      assistantStore.setBootstrapData(data);
+      chatStore.setHistories(data.chatHistories);
+      await preloadExamplePrompts(assistantStore.selectedAssistantId);
+      appRuntimeStore.finishLoading();
     } catch (error) {
-      appRuntimeStore.fail(error)
-      throw error
+      appRuntimeStore.fail(error);
+      throw error;
     }
   }
 
@@ -171,10 +191,13 @@ export function useChatRuntime() {
    * @returns {Promise<void>} 프롬프트 로딩 완료 Promise입니다.
    */
   async function preloadExamplePrompts(assistantId) {
-    if (!assistantId || assistantStore.examplePromptMap[assistantId]) return
-    const assistant = assistantStore.assistantMap[assistantId]
-    const prompts = await loadExamplePrompts({ assistantId, studioYN: assistant?.type === 'studio' })
-    assistantStore.setExamplePrompts(assistantId, prompts)
+    if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
+    const assistant = assistantStore.assistantMap[assistantId];
+    const prompts = await loadExamplePrompts({
+      assistantId,
+      studioYN: assistant?.type === "studio",
+    });
+    assistantStore.setExamplePrompts(assistantId, prompts);
   }
 
   /**
@@ -184,9 +207,9 @@ export function useChatRuntime() {
    * @returns {void}
    */
   async function selectAssistant(id) {
-    if (chatStore.isModelLocked) return
-    assistantStore.selectAssistant(id)
-    await preloadExamplePrompts(id)
+    if (chatStore.isModelLocked) return;
+    assistantStore.selectAssistant(id);
+    await preloadExamplePrompts(id);
   }
 
   /**
@@ -196,9 +219,9 @@ export function useChatRuntime() {
    * @returns {void}
    */
   async function selectAssistantForNewChat(id) {
-    assistantStore.selectAssistant(id)
-    chatStore.clearActiveSession()
-    await preloadExamplePrompts(id)
+    assistantStore.selectAssistant(id);
+    chatStore.clearActiveSession();
+    await preloadExamplePrompts(id);
   }
 
   /**
@@ -207,7 +230,7 @@ export function useChatRuntime() {
    * @returns {object|null} 대화 목록 ViewModel입니다.
    */
   function getHistory(id) {
-    return chatStore.getHistory(id)
+    return chatStore.getHistory(id);
   }
 
   /**
@@ -222,40 +245,44 @@ export function useChatRuntime() {
    * @returns {Promise<Array<object>>} 메시지 목록입니다.
    */
   async function ensureConversation(historyId) {
-    const history = getHistory(historyId)
-    if (!history) return []
+    const history = getHistory(historyId);
+    if (!history) return [];
 
-    const session = createSessionFromHistory(history, assistantStore.modelMap, assistantStore.assistantMap)
-    const fallbackAssistant = assistantStore.assistants[0] || null
+    const session = createSessionFromHistory(
+      history,
+      assistantStore.modelMap,
+      assistantStore.assistantMap
+    );
+    const fallbackAssistant = assistantStore.assistants[0] || null;
     const shouldUseFallbackAssistant = Boolean(
       session?.isModelDeleted ||
-        session?.isModelMissing ||
-        session?.isAssistantMissing ||
-        !session?.assistantId,
-    )
+      session?.isModelMissing ||
+      session?.isAssistantMissing ||
+      !session?.assistantId
+    );
     const displayAssistant = shouldUseFallbackAssistant
       ? fallbackAssistant
-      : assistantStore.assistantMap[session.assistantId] || fallbackAssistant
+      : assistantStore.assistantMap[session.assistantId] || fallbackAssistant;
 
     if (displayAssistant?.id) {
-      assistantStore.selectAssistant(displayAssistant.id)
-      session.displayAssistantId = displayAssistant.id
-      session.displayAssistantLabel = displayAssistant.label
+      assistantStore.selectAssistant(displayAssistant.id);
+      session.displayAssistantId = displayAssistant.id;
+      session.displayAssistantLabel = displayAssistant.label;
     }
 
-    chatStore.setActiveSession(session)
+    chatStore.setActiveSession(session);
 
     if (!chatStore.messageMap[history.id]) {
       const messages = await loadChatMessages({
         chatId: history.id,
         assistId: session?.assistantId || history.assistantId,
         modelId: session?.modelId || history.modelId,
-        studio: session?.assistantType === 'studio',
-      })
-      chatStore.setMessages(history.id, messages)
+        studio: session?.assistantType === "studio",
+      });
+      chatStore.setMessages(history.id, messages);
     }
 
-    return chatStore.messageMap[history.id] || []
+    return chatStore.messageMap[history.id] || [];
   }
 
   /**
@@ -265,7 +292,7 @@ export function useChatRuntime() {
    * @returns {void}
    */
   function setConversation(historyId, messages) {
-    chatStore.setMessages(historyId, messages)
+    chatStore.setMessages(historyId, messages);
   }
 
   /**
@@ -274,16 +301,22 @@ export function useChatRuntime() {
    * @param {string} [params.text] - 최초 메시지입니다.
    * @returns {object} 생성된 local history입니다.
    */
-  function createLocalConversation({ text } = {}) {
+  function createLocalConversation({text} = {}) {
     const history = createLocalHistory({
       text,
       assistant: assistantStore.currentAssistant,
       model: assistantStore.currentModel || assistantStore.currentModels[0],
-    })
-    chatStore.addHistory(history)
-    chatStore.setMessages(history.id, [])
-    chatStore.setActiveSession(createSessionFromHistory(history, assistantStore.modelMap, assistantStore.assistantMap))
-    return history
+    });
+    chatStore.addHistory(history);
+    chatStore.setMessages(history.id, []);
+    chatStore.setActiveSession(
+      createSessionFromHistory(
+        history,
+        assistantStore.modelMap,
+        assistantStore.assistantMap
+      )
+    );
+    return history;
   }
 
   /**
@@ -291,7 +324,7 @@ export function useChatRuntime() {
    * @returns {void}
    */
   function clearCurrentChatSelection() {
-    chatStore.clearActiveSession()
+    chatStore.clearActiveSession();
   }
 
   /**
@@ -301,11 +334,11 @@ export function useChatRuntime() {
    */
   function revokeMessageAttachments(items = []) {
     items.forEach((message) => {
-      if (!Array.isArray(message.attachments)) return
+      if (!Array.isArray(message.attachments)) return;
       message.attachments.forEach((file) => {
-        if (file?.url?.startsWith?.('blob:')) URL.revokeObjectURL(file.url)
-      })
-    })
+        if (file?.url?.startsWith?.("blob:")) URL.revokeObjectURL(file.url);
+      });
+    });
   }
 
   /**
@@ -315,23 +348,23 @@ export function useChatRuntime() {
    * @returns {{messages: Array<object>, assistantMessage: object}} 추가 결과입니다.
    */
   function appendUserAndAssistantMessages(chatId, normalized) {
-    const currentMessages = chatStore.messageMap[chatId] || []
+    const currentMessages = chatStore.messageMap[chatId] || [];
     const userMessage = {
-      id: createId('message'),
-      role: 'user',
+      id: createId("message"),
+      role: "user",
       content: normalized.text,
       attachments: normalized.attachments,
       createdAt: new Date().toISOString(),
-    }
+    };
     const assistantMessage = {
-      id: createId('message'),
-      role: 'assistant',
-      content: '',
+      id: createId("message"),
+      role: "assistant",
+      content: "",
       createdAt: new Date().toISOString(),
-    }
-    const nextMessages = [...currentMessages, userMessage, assistantMessage]
-    chatStore.setMessages(chatId, nextMessages)
-    return { messages: nextMessages, assistantMessage }
+    };
+    const nextMessages = [...currentMessages, userMessage, assistantMessage];
+    chatStore.setMessages(chatId, nextMessages);
+    return {messages: nextMessages, assistantMessage};
   }
 
   return {
@@ -357,5 +390,5 @@ export function useChatRuntime() {
     clearCurrentChatSelection,
     appendUserAndAssistantMessages,
     revokeMessageAttachments,
-  }
+  };
 }

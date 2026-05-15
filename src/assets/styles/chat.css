@@ -7180,3 +7180,218 @@ body,
     max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
   }
 }
+
+/* =========================================================
+   MOBILE MAIN FIXED COMPOSER + SCROLLABLE CONTENT OVERRIDE
+   ---------------------------------------------------------
+   Requirement:
+   - On mobile main screen, keep the composer fixed at the bottom.
+   - When the soft keyboard opens, move only the composer above the keyboard.
+   - Do not push the header/title/suggestions out of the viewport.
+   - If the composer overlaps examples or content, allow the main content area
+     to scroll behind the fixed composer.
+   ========================================================= */
+@media (max-width: 900px) {
+  .app-container--mobile .chat-container-shell--mode-main,
+  .chat-container-shell--mode-main {
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .chat-workspace,
+  .chat-container-shell--mode-main .chat-workspace {
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-stage--mobile-main,
+  .chat-container-shell--mode-main .empty-stage--mobile-main {
+    height: calc(var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)) !important;
+    min-height: 0 !important;
+    max-height: calc(var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding-top: 78px !important;
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+    padding-bottom: calc(
+      var(--mobile-main-composer-space, 178px) +
+      var(--keyboard-height, 0px) +
+      env(safe-area-inset-bottom)
+    ) !important;
+    scroll-padding-bottom: calc(
+      var(--mobile-main-composer-space, 178px) +
+      var(--keyboard-height, 0px) +
+      env(safe-area-inset-bottom)
+    ) !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-center,
+  .chat-container-shell--mode-main .empty-center {
+    min-height: auto !important;
+    width: 100% !important;
+    transform: none !important;
+    margin: 0 !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating,
+  .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: max(var(--keyboard-height, 0px), env(safe-area-inset-bottom)) !important;
+    width: 100% !important;
+    z-index: 70 !important;
+    transform: translate3d(0, 0, 0) !important;
+    padding: 10px 14px 12px !important;
+    background: linear-gradient(
+      to top,
+      var(--mobile-bg, var(--chat-bg)) 82%,
+      color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 78%, transparent)
+    ) !important;
+    will-change: bottom !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating .prompt-box,
+  .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating .prompt-box {
+    max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* =========================================================
+   MOBILE MAIN STABLE COMPOSER LAYOUT
+   ---------------------------------------------------------
+   The main landing page uses a different mobile keyboard policy than chat rooms.
+   - Only the content area scrolls.
+   - The composer stays at the bottom of the visible viewport on every device.
+   - Keyboard resize is handled by --app-height from visualViewport.
+   - Body/app/shell do not scroll, preventing blank overscroll below the composer.
+   ========================================================= */
+@media (max-width: 900px) {
+  html,
+  body,
+  #app,
+  .app-container--mobile {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main,
+  .chat-container-shell--mode-main {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    touch-action: pan-y !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .chat-workspace,
+  .chat-container-shell--mode-main .chat-workspace {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-stage--mobile-main,
+  .chat-container-shell--mode-main .empty-stage--mobile-main {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
+    place-items: stretch !important;
+    align-content: stretch !important;
+    padding: 0 !important;
+    background: var(--chat-bg) !important;
+    overscroll-behavior: none !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center,
+  .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    transform: none !important;
+    padding: 24px 16px 16px !important;
+    scroll-padding-bottom: 24px !important;
+    touch-action: pan-y !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center h1,
+  .chat-container-shell--mode-main .empty-stage--mobile-main .empty-center h1 {
+    flex: 0 0 auto !important;
+    margin: 0 0 4px !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .empty-stage--mobile-main .suggestion-row--between,
+  .chat-container-shell--mode-main .empty-stage--mobile-main .suggestion-row--between {
+    flex: 0 0 auto !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .mobile-main-fixed-prompt,
+  .chat-container-shell--mode-main .mobile-main-fixed-prompt,
+  .app-container--mobile .chat-container-shell--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+  .chat-container-shell--mode-main .mobile-main-fixed-prompt.prompt-wrap {
+    flex: 0 0 auto !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    z-index: 30 !important;
+    transform: none !important;
+    padding: 10px 14px max(12px, env(safe-area-inset-bottom)) !important;
+    background: linear-gradient(
+      to top,
+      var(--mobile-bg, var(--chat-bg)) 86%,
+      color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06) !important;
+    will-change: auto !important;
+    touch-action: manipulation !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .mobile-main-fixed-prompt .prompt-box,
+  .chat-container-shell--mode-main .mobile-main-fixed-prompt .prompt-box {
+    max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+    margin: 0 auto !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .mobile-main-fixed-prompt textarea,
+  .chat-container-shell--mode-main .mobile-main-fixed-prompt textarea {
+    overscroll-behavior: contain !important;
+  }
+
+  .app-container--mobile .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating,
+  .chat-container-shell--mode-main .desktop-center-prompt.prompt-wrap--floating {
+    position: static !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+}
