@@ -231,7 +231,7 @@ application runtime. * @author OpenAI
 
     <BaseBottomSheet
       :open="modelMenuOpen && isMobileSheet"
-      :title="t('chat.assistantSelect')"
+      :title="t('chat.modelSelect')"
       @close="modelMenuOpen = false"
     >
       <button

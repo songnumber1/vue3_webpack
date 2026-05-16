@@ -84,9 +84,44 @@ let dragStartHeight = 0;
 let previousBodyOverflow = "";
 let viewportTimer = null;
 
+const MOBILE_BREAKPOINT_PX = 900;
+const MIN_VISIBLE_OPTION_COUNT = 3;
+const DEFAULT_OPTION_HEIGHT_PX = 58;
+const DEFAULT_SHEET_CHROME_HEIGHT_PX = 122;
+
 const sheetStyle = computed(() => ({
   "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
 }));
+
+/**
+ * Returns the current mobile browser family for viewport workarounds.
+ * Firefox Android reports bottom-sheet viewport height differently from
+ * Chromium based browsers, so content-sized sheets use the smallest reliable
+ * visible viewport metric.
+ *
+ * @returns {string} Browser family key.
+ */
+function getMobileBrowserFamily() {
+  if (typeof navigator === "undefined") return "default";
+  const userAgent = navigator.userAgent || "";
+  if (/SamsungBrowser/i.test(userAgent)) return "samsung";
+  if (/Firefox/i.test(userAgent)) return "firefox";
+  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
+  return "default";
+}
+
+/**
+ * Reads a numeric CSS custom property from the root element.
+ *
+ * @param {string} name CSS custom property name.
+ * @returns {number} Parsed pixel value, or 0 when unavailable.
+ */
+function readRootPixelVar(name) {
+  if (typeof document === "undefined") return 0;
+  const value = window.getComputedStyle(document.documentElement).getPropertyValue(name);
+  const parsed = Number.parseFloat(value || "0");
+  return Number.isFinite(parsed) ? parsed : 0;
+}
 
 /**
  * getViewportHeight 처리 함수입니다.
@@ -94,10 +129,129 @@ const sheetStyle = computed(() => ({
  */
 function getViewportHeight() {
   if (typeof window === "undefined") return 720;
+
+  const visualHeight = Math.round(window.visualViewport?.height || 0);
+  const innerHeight = Math.round(window.innerHeight || 0);
+  const clientHeight = Math.round(document.documentElement?.clientHeight || 0);
+  const appHeight = Math.round(readRootPixelVar("--app-height") || 0);
+  const candidates = [visualHeight, innerHeight, clientHeight, appHeight].filter(
+    (height) => Number.isFinite(height) && height >= 320
+  );
+
+  if (!candidates.length) return 720;
+
+  if (isMobileViewport() && getMobileBrowserFamily() === "firefox") {
+    return Math.max(Math.min(...candidates), 320);
+  }
+
+  if (isMobileViewport() && visualHeight > 0) {
+    return Math.max(visualHeight, 320);
+  }
+
+  return Math.max(innerHeight || visualHeight || clientHeight, 320);
+}
+
+/**
+ * Checks whether the current viewport should use mobile bottom-sheet sizing.
+ * Firefox Android can under-report scrollable body height while a sheet is
+ * transitioning, so mobile sheets reserve enough space for at least three
+ * selectable rows.
+ *
+ * @returns {boolean} True when the visible layout width is mobile sized.
+ */
+function isMobileViewport() {
+  if (typeof window === "undefined") return false;
+  const width = Math.min(
+    window.visualViewport?.width || window.innerWidth || 0,
+    window.innerWidth || window.visualViewport?.width || 0
+  );
+  return width > 0 && width <= MOBILE_BREAKPOINT_PX;
+}
+
+/**
+ * Returns the non-scrollable chrome height of the bottom sheet.
+ * This includes drag handle, title header and bottom padding.
+ *
+ * @returns {number} Estimated fixed chrome height in pixels.
+ */
+function getSheetChromeHeight() {
+  const sheet = sheetRef.value;
+  if (!sheet) return DEFAULT_SHEET_CHROME_HEIGHT_PX;
+
+  const dragArea = sheet.querySelector(".bottom-sheet-drag-area");
+  const header = sheet.querySelector(".bottom-sheet-header");
+  const sheetStyle = window.getComputedStyle(sheet);
+  const paddingBottom = Number.parseFloat(sheetStyle.paddingBottom || "0") || 0;
+
+  return Math.ceil(
+    (dragArea?.getBoundingClientRect().height || 28) +
+      (header?.getBoundingClientRect().height || 50) +
+      paddingBottom +
+      18
+  );
+}
+
+/**
+ * Calculates the minimum body height required to show the first three rows.
+ * The value is data-driven when option elements exist and falls back to a
+ * conservative row size for Firefox Android's first render pass.
+ *
+ * @returns {number} Minimum visible body height in pixels.
+ */
+function getMinimumVisibleBodyHeight() {
+  const body = bodyRef.value;
+  const options = Array.from(
+    body?.querySelectorAll?.(".bottom-sheet-option") || []
+  );
+
+  if (!options.length) return DEFAULT_OPTION_HEIGHT_PX * MIN_VISIBLE_OPTION_COUNT;
+
+  const visibleOptions = options.slice(0, MIN_VISIBLE_OPTION_COUNT);
+  const totalOptionHeight = visibleOptions.reduce((sum, option) => {
+    const rectHeight = option.getBoundingClientRect().height;
+    return sum + (rectHeight > 0 ? rectHeight : DEFAULT_OPTION_HEIGHT_PX);
+  }, 0);
+
+  return Math.ceil(totalOptionHeight + 12);
+}
+
+
+/**
+ * Measures only the real slot content height instead of the flex-expanded sheet
+ * body. Firefox Android can report the flex body height as the available sheet
+ * area, which makes content-sized sheets much taller than their item list.
+ *
+ * @returns {number} Actual rendered slot content height in pixels.
+ */
+function getBodyContentHeight() {
+  const body = bodyRef.value;
+  if (!body) return 0;
+
+  const children = Array.from(body.children || []);
+  if (!children.length) return body.scrollHeight || 0;
+
+  const contentHeight = children.reduce((sum, child) => {
+    const rectHeight = child.getBoundingClientRect().height;
+    return sum + (rectHeight > 0 ? rectHeight : child.scrollHeight || 0);
+  }, 0);
+
+  const bodyStyle = window.getComputedStyle(body);
+  const paddingTop = Number.parseFloat(bodyStyle.paddingTop || "0") || 0;
+  const paddingBottom = Number.parseFloat(bodyStyle.paddingBottom || "0") || 0;
+
+  return Math.ceil(contentHeight + paddingTop + paddingBottom);
+}
+
+/**
+ * Returns the minimum sheet height required for mobile usability.
+ *
+ * @returns {number} Minimum sheet height in pixels.
+ */
+function getMinimumSheetHeight() {
+  if (!isMobileViewport()) return props.minHeight;
   return Math.max(
-    Math.round(window.visualViewport?.height || 0),
-    Math.round(window.innerHeight || 0),
-    320
+    props.minHeight,
+    getSheetChromeHeight() + getMinimumVisibleBodyHeight()
   );
 }
 
@@ -126,11 +280,12 @@ function getSafeBottom() {
  */
 function clampHeight(height) {
   const viewportHeight = getViewportHeight();
+  const preferredMinHeight = getMinimumSheetHeight();
   const maxHeight = Math.max(
-    props.minHeight,
+    preferredMinHeight,
     Math.floor(viewportHeight * props.maxRatio) - getSafeBottom()
   );
-  const minHeight = Math.min(props.minHeight, maxHeight);
+  const minHeight = Math.min(preferredMinHeight, maxHeight);
   return Math.min(Math.max(height, minHeight), maxHeight);
 }
 
@@ -139,10 +294,7 @@ function clampHeight(height) {
  * @returns {*} 처리 결과를 반환합니다.
  */
 function getContentHeight() {
-  const headerHeight = 62;
-  const bodyHeight = bodyRef.value?.scrollHeight || 0;
-  const padding = 30;
-  return headerHeight + bodyHeight + padding;
+  return getSheetChromeHeight() + getBodyContentHeight() + 8;
 }
 
 /**
@@ -153,9 +305,15 @@ function getInitialHeight() {
   const viewportHeight = getViewportHeight();
   if (props.initialSnap === "full") return viewportHeight * props.maxRatio;
   if (props.initialSnap === "half") return viewportHeight * 0.58;
+
+  const minimumSheetHeight = getMinimumSheetHeight();
+  const contentHeight = getContentHeight();
+  const contentSnapRatio =
+    isMobileViewport() && getMobileBrowserFamily() === "firefox" ? 0.64 : 0.72;
+
   return Math.max(
-    props.minHeight,
-    Math.min(getContentHeight(), viewportHeight * 0.72)
+    minimumSheetHeight,
+    Math.min(contentHeight, viewportHeight * contentSnapRatio)
   );
 }
 
@@ -195,6 +353,13 @@ function collapse() {
 function resetHeight() {
   nextTick(() => {
     setHeight(getInitialHeight(), props.initialSnap);
+
+    window.requestAnimationFrame?.(() => {
+      setHeight(getInitialHeight(), props.initialSnap);
+      window.requestAnimationFrame?.(() => {
+        setHeight(getInitialHeight(), props.initialSnap);
+      });
+    });
   });
 }
 

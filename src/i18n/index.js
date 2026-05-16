@@ -50,6 +50,7 @@ export const messages = {
     },
     chat: {
       assistantSelect: "Assistant 선택",
+      modelSelect: "모델 선택",
       hideSidebar: "사이드바 숨기기",
       openSidebar: "사이드바 열기",
       newChat: "새 채팅",
@@ -186,6 +187,7 @@ export const messages = {
     },
     chat: {
       assistantSelect: "Select assistant",
+      modelSelect: "Select model",
       hideSidebar: "Hide sidebar",
       openSidebar: "Open sidebar",
       newChat: "New chat",

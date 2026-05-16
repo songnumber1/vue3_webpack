@@ -424,3 +424,34 @@
     transform: none !important;
   }
 }
+
+/* =========================================================
+   Firefox Android bottom sheet visible row stabilization
+   ---------------------------------------------------------
+   Firefox can report a smaller scrollable body during the initial sheet
+   transition. Reserve enough sheet/body height so three action rows are visible
+   like Chrome and Samsung Internet.
+   ========================================================= */
+@media (max-width: 900px) {
+  .mobile-browser-firefox .bottom-sheet,
+  .app-container--mobile.app-container--browser-firefox ~ .bottom-sheet,
+  body.mobile-browser-firefox .bottom-sheet {
+    min-height: 220px !important;
+    max-height: calc(var(--app-height, 100dvh) - 12px) !important;
+  }
+
+  .mobile-browser-firefox .bottom-sheet-body,
+  body.mobile-browser-firefox .bottom-sheet-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding-bottom: var(--space-2, 8px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+  }
+
+  .mobile-browser-firefox .bottom-sheet-option,
+  body.mobile-browser-firefox .bottom-sheet-option {
+    min-height: 56px !important;
+    flex: 0 0 auto !important;
+  }
+}
