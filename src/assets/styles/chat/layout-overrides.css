@@ -2211,3 +2211,92 @@
   }
 }
 
+
+/* =========================================================
+   FINAL MOBILE-ONLY ATTACHMENT PREVIEW COMPACT OVERRIDE
+   - Applies only when AppContainer detects mobile mode.
+   - Keeps desktop/web attachment card UI unchanged.
+   - Mobile previews use one fixed square size for both image and file items.
+   - File name and size are hidden on mobile to prevent the composer from
+     becoming too tall when the software keyboard is open.
+   ========================================================= */
+.app-container--mobile .attachment-preview-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 38px 8px 2px !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.app-container--mobile .attachment-preview-row::-webkit-scrollbar {
+  display: none !important;
+}
+
+.app-container--mobile .attachment-preview-card,
+.app-container--mobile .attachment-preview-card--image {
+  flex: 0 0 72px !important;
+  width: 72px !important;
+  height: 72px !important;
+  min-width: 72px !important;
+  min-height: 72px !important;
+  max-width: 72px !important;
+  max-height: 72px !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 6px !important;
+  border-radius: 14px !important;
+  overflow: visible !important;
+}
+
+.app-container--mobile .attachment-preview-thumb,
+.app-container--mobile .attachment-preview-file {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 10px !important;
+}
+
+.app-container--mobile .attachment-preview-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 10px !important;
+}
+
+.app-container--mobile .attachment-preview-file {
+  font-size: 28px !important;
+  line-height: 1 !important;
+  background: var(--surface, #f8fafc) !important;
+}
+
+.app-container--mobile .attachment-preview-info,
+.app-container--mobile .attachment-preview-info strong,
+.app-container--mobile .attachment-preview-info span,
+.app-container--mobile .attachment-preview-card--image .attachment-preview-info {
+  display: none !important;
+}
+
+.app-container--mobile .attachment-preview-remove,
+.app-container--mobile .attachment-preview-card--image .attachment-preview-remove {
+  top: -10px !important;
+  right: -10px !important;
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  padding: 0 0 2px !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
+}
+
+.app-container--mobile .attachment-preview-remove::before {
+  inset: -8px !important;
+}
