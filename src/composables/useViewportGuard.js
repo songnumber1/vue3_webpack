@@ -202,12 +202,26 @@ export function useViewportGuard(options = {}) {
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
     apply();
-    resizeTimer = window.setTimeout(apply, 80);
+    // Samsung Internet는 visualViewport 업데이트가 150~200ms 지연되므로
+    // 한 번 더 적용하여 키보드 올라올 때 레이아웃 밀림 보정
+    const browserFamily = getMobileBrowserFamily();
+    const delay = browserFamily === 'samsung' ? 200 : 80;
+    resizeTimer = window.setTimeout(apply, delay);
+  }
+
+  // Firefox Android는 visualViewport resize 이벤트가 발생하지 않는 경우가 있어
+  // window resize를 추가로 구독합니다.
+  function handleWindowResize() {
+    const browserFamily = getMobileBrowserFamily();
+    if (browserFamily === 'firefox') {
+      scheduleApply();
+    }
   }
 
   onMounted(() => {
     apply();
     window.addEventListener("resize", scheduleApply, {passive: true});
+    window.addEventListener("resize", handleWindowResize, {passive: true});
     window.addEventListener("orientationchange", scheduleApply, {
       passive: true,
     });
@@ -224,6 +238,7 @@ export function useViewportGuard(options = {}) {
   onBeforeUnmount(() => {
     window.clearTimeout(resizeTimer);
     window.removeEventListener("resize", scheduleApply);
+    window.removeEventListener("resize", handleWindowResize);
     window.removeEventListener("orientationchange", scheduleApply);
     window.visualViewport?.removeEventListener("resize", scheduleApply);
     window.visualViewport?.removeEventListener("scroll", scheduleApply);

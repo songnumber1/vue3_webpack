@@ -51,6 +51,7 @@ export const messages = {
     chat: {
       assistantSelect: "Assistant 선택",
       modelSelect: "모델 선택",
+      modelReadonly: "대화방 모델은 변경할 수 없습니다.",
       hideSidebar: "사이드바 숨기기",
       openSidebar: "사이드바 열기",
       newChat: "새 채팅",
@@ -188,6 +189,7 @@ export const messages = {
     chat: {
       assistantSelect: "Select assistant",
       modelSelect: "Select model",
+      modelReadonly: "The model for this chat cannot be changed.",
       hideSidebar: "Hide sidebar",
       openSidebar: "Open sidebar",
       newChat: "New chat",

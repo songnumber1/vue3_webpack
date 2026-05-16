@@ -41,6 +41,17 @@ export function usePromptMenus(props, emit, textarea) {
       currentModels.value.find((model) => model.id === props.modelValue) ||
       currentModels.value[0]
   );
+  /**
+   * Returns DOM elements exposed from PromptActionToolbar. Vue may unwrap
+   * exposed refs on the parent proxy, so support both HTMLElement and Ref shapes.
+   * @param {'modelRoot'|'toolRoot'|'attachRoot'} key Exposed toolbar root key.
+   * @returns {HTMLElement|null}
+   */
+  function getToolbarRoot(key) {
+    const root = toolbarRef.value?.[key];
+    return root?.value || root || null;
+  }
+
   const tools = computed(() => [
     {
       id: 'image',
@@ -119,9 +130,9 @@ export function usePromptMenus(props, emit, textarea) {
 
   useOutsideClick(
     [
-      () => toolbarRef.value?.modelRoot?.value,
-      () => toolbarRef.value?.toolRoot?.value,
-      () => toolbarRef.value?.attachRoot?.value,
+      () => getToolbarRoot('modelRoot'),
+      () => getToolbarRoot('toolRoot'),
+      () => getToolbarRoot('attachRoot'),
     ],
     closeMenus,
     {shouldIgnore: () => isMobileSheet.value}

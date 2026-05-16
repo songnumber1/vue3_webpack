@@ -1188,15 +1188,15 @@
   .app-container--mobile .attachment-preview-card,
   .attachment-preview-card--image,
   .app-container--mobile .attachment-preview-card--image {
-    flex: 0 0 132px;
-    width: 132px;
-    min-height: 148px;
+    flex: 0 0 96px;
+    width: 96px;
+    min-height: 108px;
   }
 
   .attachment-preview-thumb,
   .app-container--mobile .attachment-preview-thumb {
-    height: 86px;
-    min-height: 86px;
+    height: 60px;
+    min-height: 60px;
   }
 
   .attachment-preview-remove,

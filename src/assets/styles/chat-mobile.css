@@ -188,7 +188,10 @@
       var(--space-3, 12px),
       env(safe-area-inset-bottom, 0px)
     ) !important;
-    max-height: var(--mobile-main-composer-space, 174px) !important;
+    /* Fix: max-height 고정값 제거 - 첨부파일 추가 시 input이 밀리는 버그 방지.
+       attachment-preview-row가 추가되면 자연스럽게 높이가 늘어나도록 auto로 변경 */
+    max-height: none !important;
+    height: auto !important;
     overflow: visible !important;
     overscroll-behavior: none !important;
     touch-action: manipulation !important;

@@ -78,10 +78,27 @@ export function usePromptComposer(props, emit) {
     () => textareaComponentRef.value?.textareaRef || null
   );
 
+  /**
+   * Returns DOM elements exposed from PromptActionToolbar.
+   * Vue unwraps exposed refs on the parent component proxy, but some runtimes
+   * still expose the raw ref object. Supporting both shapes prevents the
+   * document outside-click handler from immediately closing desktop popovers
+   * right after the trigger button is clicked.
+   * @param {'modelRoot'|'toolRoot'|'attachRoot'} key Exposed toolbar root key.
+   * @returns {HTMLElement|null}
+   */
+  function getToolbarRoot(key) {
+    const root = toolbarRef.value?.[key];
+    return root?.value || root || null;
+  }
+
   function syncViewportMode() {
+    // NOTE: `.app-container--mobile` 클래스 체크를 제거합니다.
+    // 웹 PC 모드에서도 해당 클래스가 존재하는 경우 isMobileSheet=true가 되어
+    // 모델/첨부 버튼 클릭 시 popover가 열리지 않고 BottomSheet도 열리지 않는 버그 발생.
+    // viewport 너비 기준으로만 판단합니다.
     isMobileSheet.value = Boolean(
-      window.matchMedia?.('(max-width: 900px)')?.matches ||
-        document.querySelector('.app-container--mobile')
+      window.matchMedia?.('(max-width: 900px)')?.matches
     );
   }
 
@@ -258,9 +275,9 @@ export function usePromptComposer(props, emit) {
 
   useOutsideClick(
     [
-      () => toolbarRef.value?.modelRoot?.value,
-      () => toolbarRef.value?.toolRoot?.value,
-      () => toolbarRef.value?.attachRoot?.value,
+      () => getToolbarRoot('modelRoot'),
+      () => getToolbarRoot('toolRoot'),
+      () => getToolbarRoot('attachRoot'),
     ],
     closeMenus,
     {shouldIgnore: () => isMobileSheet.value}
