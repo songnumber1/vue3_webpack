@@ -204,3 +204,103 @@
     touch-action: manipulation !important;
   }
 }
+
+/*
+ * Firefox/Samsung/Chrome Android final mobile composer fallback.
+ * Keep this block at the end of the mobile stylesheet because legacy chat.css
+ * still contains high-specificity mobile-main-fixed-prompt rules.
+ */
+@media (max-width: 900px) {
+  :root {
+    --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-browser-firefox {
+    --mobile-browser-safe-bottom: 0px;
+    --mobile-main-composer-space: 150px;
+  }
+
+  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt,
+  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt.prompt-wrap,
+  .mobile-browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt,
+  .mobile-browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt.prompt-wrap {
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
+    bottom: calc(
+      var(--composer-keyboard-inset, 0px) + var(--mobile-browser-safe-bottom, 0px)
+    ) !important;
+    left: 0 !important;
+    z-index: var(--mobile-main-composer-z, 90) !important;
+    flex: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: var(--space-3, 12px) var(--space-4, 16px)
+      max(var(--space-3, 12px), var(--mobile-browser-safe-bottom, 0px)) !important;
+    transform: translate3d(0, 0, 0) !important;
+    background: linear-gradient(
+      to top,
+      var(--mobile-bg, var(--chat-bg)) 86%,
+      color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08) !important;
+    overflow: visible !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation !important;
+    will-change: bottom !important;
+  }
+
+  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt
+    .prompt-box,
+  .mobile-browser-firefox
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt
+    .prompt-box {
+    width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    margin: 0 auto !important;
+  }
+
+  .mobile-browser-firefox .mobile-drawer,
+  .app-container--mobile.app-container--browser-firefox .mobile-drawer {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+  }
+
+  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile,
+  .app-container--mobile.app-container--browser-firefox
+    .mobile-drawer
+    .sidebar-content--mobile {
+    padding-bottom: 0 !important;
+  }
+
+  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-history,
+  .app-container--mobile.app-container--browser-firefox
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-history {
+    padding-bottom: 12px !important;
+  }
+
+  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-user,
+  .app-container--mobile.app-container--browser-firefox
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-user {
+    padding-bottom: 12px !important;
+  }
+}

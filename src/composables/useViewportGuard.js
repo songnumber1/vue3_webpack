@@ -32,7 +32,33 @@ function getMobileBrowserFamily() {
   const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
   if (/SamsungBrowser/i.test(userAgent)) return "samsung";
   if (/Firefox/i.test(userAgent)) return "firefox";
+  if (/Chrome/i.test(userAgent)) return "chrome";
   return "default";
+}
+
+/**
+ * Applies browser-specific classes used by CSS fallback rules.
+ * Firefox Android and Samsung Internet report viewport metrics differently,
+ * so the fixed mobile composer uses these classes for small spacing overrides.
+ *
+ * @param {string} browserFamily Normalized mobile browser name.
+ * @returns {void}
+ */
+function applyBrowserViewportClass(browserFamily) {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  const body = document.body;
+  const classes = [
+    "mobile-browser-default",
+    "mobile-browser-chrome",
+    "mobile-browser-firefox",
+    "mobile-browser-samsung",
+  ];
+  root.classList.remove(...classes);
+  body?.classList.remove(...classes);
+  const className = `mobile-browser-${browserFamily || "default"}`;
+  root.classList.add(className);
+  body?.classList.add(className);
 }
 
 function isTextEditingElement(element) {
@@ -96,10 +122,14 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
 function setCssViewportVars(size, baselineHeight = 0) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
+  const browserFamily = getMobileBrowserFamily();
   const {layoutHeight, keyboardHeight, composerInset, offsetTop} = getKeyboardMetrics(
     size,
     baselineHeight
   );
+  const browserSafeBottom = browserFamily === "firefox" ? 0 : null;
+
+  applyBrowserViewportClass(browserFamily);
 
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
@@ -123,6 +153,14 @@ function setCssViewportVars(size, baselineHeight = 0) {
     "--visual-viewport-offset-top",
     `${offsetTop}px`
   );
+  if (browserSafeBottom === null) {
+    document.documentElement.style.removeProperty("--mobile-browser-safe-bottom");
+  } else {
+    document.documentElement.style.setProperty(
+      "--mobile-browser-safe-bottom",
+      `${browserSafeBottom}px`
+    );
+  }
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 
   return {keyboardHeight, layoutHeight};
