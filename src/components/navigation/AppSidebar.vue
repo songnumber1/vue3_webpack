@@ -78,7 +78,7 @@
           v-for="item in histories"
           :key="item.id"
           class="sidebar-history-item"
-          :class="{selected: String(item.id) === String(activeHistoryId)}"
+          :class="{selected: String(item.id) === String(selectedChatId)}"
           type="button"
           :title="item.title"
           @click="handleSelectHistory(item)"
@@ -207,7 +207,7 @@
             v-for="item in histories"
             :key="item.id"
             class="sidebar-history-item"
-            :class="{selected: String(item.id) === String(activeHistoryId)}"
+            :class="{selected: String(item.id) === String(selectedChatId)}"
             type="button"
             :title="item.title"
             @click="handleSelectHistory(item)"
@@ -291,31 +291,21 @@
 
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import Icon from "@/components/navigation/SidebarIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-
-const props = defineProps({
-  histories: {type: Array, required: true},
-  assistants: {type: Array, required: true},
-  selectedAssistantId: {type: String, required: true},
-  activeHistoryId: {type: [String, Number], default: null},
-  sidebarCollapsed: {type: Boolean, required: true},
-  drawerOpen: {type: Boolean, required: true},
-  collapsedRecentOpen: {type: Boolean, required: true},
-});
+import {useAssistantStore} from "@/stores/assistantStore";
+import {useChatStore} from "@/stores/chatStore";
+import {useNavigationStore} from "@/stores/navigationStore";
 
 const emit = defineEmits([
-  "update:sidebarCollapsed",
-  "update:drawerOpen",
-  "update:collapsedRecentOpen",
-  "update:selectedAssistantId",
   "new-chat",
   "select-history",
-  "select-history-collapsed",
+  "select-assistant",
   "open-guide",
   "open-notice",
   "open-personalization",
@@ -326,13 +316,19 @@ const emit = defineEmits([
   "open-settings",
 ]);
 const {t} = useI18n();
+const assistantStore = useAssistantStore();
+const chatStore = useChatStore();
+const navigationStore = useNavigationStore();
+const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
+const {histories, selectedChatId} = storeToRefs(chatStore);
+const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigationStore);
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 const currentAssistant = computed(
   () =>
-    props.assistants.find((item) => item.id === props.selectedAssistantId) ||
-    props.assistants[0] || {id: "", label: "Assistant", description: ""}
+    assistants.value.find((item) => item.id === selectedAssistantId.value) ||
+    assistants.value[0] || {id: "", label: "Assistant", description: ""}
 );
 
 /**
@@ -361,7 +357,7 @@ function openAssistantSelector() {
  * @returns {void}
  */
 function selectAssistant(id) {
-  emit("update:selectedAssistantId", id);
+  emit("select-assistant", id);
   assistantMenuOpen.value = false;
 }
 
@@ -371,7 +367,7 @@ function selectAssistant(id) {
  * @returns {void}
  */
 function emitSidebarCollapsed(value) {
-  emit("update:sidebarCollapsed", value);
+  navigationStore.setSidebarCollapsed(value);
 }
 
 /**
@@ -380,7 +376,7 @@ function emitSidebarCollapsed(value) {
  * @returns {void}
  */
 function emitDrawerOpen(value) {
-  emit("update:drawerOpen", value);
+  navigationStore.setDrawerOpen(value);
 }
 
 /**
@@ -389,7 +385,7 @@ function emitDrawerOpen(value) {
  * @returns {void}
  */
 function emitCollapsedRecentOpen(value) {
-  emit("update:collapsedRecentOpen", value);
+  navigationStore.setCollapsedRecentOpen(value);
 }
 
 /**
@@ -418,7 +414,7 @@ function handleSelectHistory(item) {
  * @returns {void}
  */
 function handleSelectHistoryCollapsed(item) {
-  emit("select-history-collapsed", item);
+  emit("select-history", item);
   emitCollapsedRecentOpen(false);
 }
 

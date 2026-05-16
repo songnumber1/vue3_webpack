@@ -45,6 +45,7 @@
       </div>
       <PromptInput
         v-if="!isMobile"
+        :is-mobile="false"
         class="desktop-center-prompt"
         :floating="false"
         :model-value="selectedModel"
@@ -60,6 +61,7 @@
     </div>
     <PromptInput
       v-if="isMobile"
+      :is-mobile="true"
       class="mobile-main-fixed-prompt"
       :floating="false"
       :model-value="selectedModel"
@@ -98,6 +100,7 @@
       />
       <PromptInput
         v-else
+        :is-mobile="isMobile"
         :model-value="selectedModel"
         :models="models"
         :disabled="isGenerating"

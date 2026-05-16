@@ -7,19 +7,9 @@
 <template>
   <ChatLayout
     v-if="runtimeReady"
-    :histories="histories"
-    :assistants="assistants"
-    :selected-assistant-id="selectedAssistantId"
-    :active-history-id="activeHistoryId"
-    :sidebar-collapsed="sidebarCollapsed"
-    :drawer-open="drawerOpen"
-    :collapsed-recent-open="collapsedRecentOpen"
     :keyboard-open="layoutKeyboardOpen"
     :mode="mode"
-    @update:selected-assistant-id="startNewChatWithAssistant"
-    @update:sidebar-collapsed="sidebarCollapsed = $event"
-    @update:drawer-open="drawerOpen = $event"
-    @update:collapsed-recent-open="collapsedRecentOpen = $event"
+    @select-assistant="startNewChatWithAssistant"
     @new-chat="startNewChat"
     @select-history="openHistory"
     @open-guide="openGuide"
@@ -127,6 +117,7 @@ import {useChatSubmit} from "@/composables/useChatSubmit";
 import {useImagePreview} from "@/composables/useImagePreview";
 import {loadSharedConversation} from "@/composables/useSharedChat";
 import {useViewportGuard} from "@/composables/useViewportGuard";
+import {useNavigationStore} from "@/stores/navigationStore";
 import {addMediaQueryListener} from "@/utils/dom";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
@@ -177,9 +168,7 @@ const {keyboardOpen, refreshViewport} = useViewportGuard({
   },
 });
 const themeName = ref(theme.current);
-const drawerOpen = ref(false);
-const sidebarCollapsed = ref(false);
-const collapsedRecentOpen = ref(false);
+const navigationStore = useNavigationStore();
 const isMobile = ref(false);
 const messages = ref([]);
 const showScrollBottom = ref(false);
@@ -363,8 +352,7 @@ async function startNewChat() {
   revokeMessageAttachments(messages.value);
   messages.value = [];
   clearCurrentChatSelection();
-  drawerOpen.value = false;
-  collapsedRecentOpen.value = false;
+  navigationStore.closeTransientPanels();
   forceBottomUntil = 0;
   await router.push("/");
 }
@@ -379,8 +367,7 @@ async function startNewChatWithAssistant(id) {
   revokeMessageAttachments(messages.value);
   messages.value = [];
   await selectAssistantForNewChat(id);
-  drawerOpen.value = false;
-  collapsedRecentOpen.value = false;
+  navigationStore.closeTransientPanels();
   assistantSheetOpen.value = false;
   forceBottomUntil = 0;
   await router.push("/");
@@ -392,8 +379,7 @@ async function startNewChatWithAssistant(id) {
  * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
  */
 async function openHistory(item) {
-  drawerOpen.value = false;
-  collapsedRecentOpen.value = false;
+  navigationStore.closeTransientPanels();
   await router.push({name: "chat", params: {id: item.id}});
 }
 
@@ -491,7 +477,7 @@ function openSwagger() {
  * @returns {void}
  */
 function openPlayground() {
-  drawerOpen.value = false;
+  navigationStore.setDrawerOpen(false);
   router.push({name: "playground"});
 }
 
@@ -511,14 +497,14 @@ function openMobileDrawer() {
   const activeElement =
     typeof document !== "undefined" ? document.activeElement : null;
   if (activeElement?.blur) activeElement.blur();
-  drawerOpen.value = true;
+  navigationStore.setDrawerOpen(true);
   window.setTimeout(refreshViewport, 50);
   window.setTimeout(refreshViewport, 180);
 }
 
 function openSettings() {
   if (isMobile.value) {
-    drawerOpen.value = false;
+    navigationStore.setDrawerOpen(false);
     mobileSettingsOpen.value = true;
     return;
   }
@@ -530,7 +516,7 @@ function openSettings() {
  * @returns {void}
  */
 function openGuide() {
-  drawerOpen.value = false;
+  navigationStore.setDrawerOpen(false);
   router.push({name: "guide"});
 }
 
@@ -539,7 +525,7 @@ function openGuide() {
  * @returns {void}
  */
 function openNotice() {
-  drawerOpen.value = false;
+  navigationStore.setDrawerOpen(false);
   noticeOpen.value = true;
 }
 
@@ -548,7 +534,7 @@ function openNotice() {
  * @returns {void}
  */
 function openPersonalization() {
-  drawerOpen.value = false;
+  navigationStore.setDrawerOpen(false);
   personalizationOpen.value = true;
 }
 
