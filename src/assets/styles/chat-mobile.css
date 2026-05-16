@@ -304,3 +304,123 @@
     padding-bottom: 12px !important;
   }
 }
+
+/* =========================================================
+   Mobile browser final drawer/chat composer corrections
+   ---------------------------------------------------------
+   Firefox Android reports safe-area and viewport height differently from
+   Chromium-based browsers. Keep chat-room composer close to the visible
+   bottom while preserving Chrome/Samsung behavior. Samsung Internet can keep
+   stale keyboard values when opening the drawer, so the drawer footer is laid
+   out as a flex footer inside the visible drawer instead of relying on sticky
+   bottom offsets.
+   ========================================================= */
+@media (max-width: 900px) {
+  .mobile-browser-firefox .chat-container-root--mode-chat .prompt-wrap,
+  .mobile-browser-firefox .chat-container-root--mode-shared .prompt-wrap,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-chat
+    .prompt-wrap,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-shared
+    .prompt-wrap {
+    padding-top: var(--space-2, 8px) !important;
+    padding-bottom: var(--space-2, 8px) !important;
+    margin-bottom: 0 !important;
+  }
+
+  .mobile-browser-firefox .chat-container-root--mode-chat .chat-composer-slot,
+  .mobile-browser-firefox .chat-container-root--mode-shared .chat-composer-slot,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-chat
+    .chat-composer-slot,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-shared
+    .chat-composer-slot {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    align-self: end !important;
+  }
+
+  .mobile-browser-firefox .chat-container-root--mode-chat .chat-workspace,
+  .mobile-browser-firefox .chat-container-root--mode-shared .chat-workspace,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-chat
+    .chat-workspace,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-shared
+    .chat-workspace {
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    min-height: 0 !important;
+  }
+
+  .mobile-browser-firefox .chat-container-root--mode-chat,
+  .mobile-browser-firefox .chat-container-root--mode-shared,
+  .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-chat,
+  .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-shared {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+  }
+
+  .mobile-browser-firefox .chat-container-root--mode-chat .message-list,
+  .mobile-browser-firefox .chat-container-root--mode-shared .message-list,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-chat
+    .message-list,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-shared
+    .message-list {
+    padding-bottom: var(--space-3, 12px) !important;
+    scroll-padding-bottom: var(--space-3, 12px) !important;
+  }
+
+  .mobile-browser-samsung .mobile-drawer,
+  .app-container--mobile.app-container--browser-samsung-internet .mobile-drawer {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile,
+  .app-container--mobile.app-container--browser-samsung-internet
+    .mobile-drawer
+    .sidebar-content--mobile {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
+  }
+
+  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-history,
+  .app-container--mobile.app-container--browser-samsung-internet
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-history {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: var(--space-4, 16px) !important;
+  }
+
+  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-user,
+  .mobile-browser-samsung .mobile-drawer .sidebar-user--mobile,
+  .app-container--mobile.app-container--browser-samsung-internet
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-user,
+  .app-container--mobile.app-container--browser-samsung-internet
+    .mobile-drawer
+    .sidebar-user--mobile {
+    position: relative !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+    padding-bottom: max(var(--space-4, 16px), env(safe-area-inset-bottom, 0px)) !important;
+    transform: none !important;
+  }
+}

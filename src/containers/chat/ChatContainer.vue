@@ -48,7 +48,7 @@
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
       @update:selected-model="selectedModel = $event"
-      @open-drawer="drawerOpen = true"
+      @open-drawer="openMobileDrawer"
       @toggle-theme="toggleTheme"
       @open-swagger="openSwagger"
       @open-settings="openSettings"
@@ -499,6 +499,22 @@ function openPlayground() {
  * openSettings 처리 함수입니다.
  * @returns {void}
  */
+
+/**
+ * Opens the mobile navigation drawer after releasing any active text input.
+ * This prevents Android browsers, especially Samsung Internet, from keeping
+ * stale keyboard viewport values that can push the drawer footer below the
+ * visible screen.
+ * @returns {void}
+ */
+function openMobileDrawer() {
+  const activeElement = typeof document !== "undefined" ? document.activeElement : null;
+  if (activeElement?.blur) activeElement.blur();
+  drawerOpen.value = true;
+  window.setTimeout(refreshViewport, 50);
+  window.setTimeout(refreshViewport, 180);
+}
+
 function openSettings() {
   if (isMobile.value) {
     drawerOpen.value = false;
