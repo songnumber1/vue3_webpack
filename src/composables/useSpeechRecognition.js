@@ -2,6 +2,7 @@ import {computed, onBeforeUnmount, ref} from 'vue';
 
 const DEFAULT_LANGUAGE = 'ko-KR';
 const AUTO_RESTART_DELAY = 250;
+const DUPLICATE_NORMALIZE_PATTERN = /\s+/g;
 
 function getSpeechRecognitionConstructor() {
   if (typeof window === 'undefined') return null;
@@ -18,6 +19,8 @@ export function useSpeechRecognition(options = {}) {
   let recognition = null;
   let restartTimer = null;
   let shouldAutoRestart = false;
+  let committedTranscript = '';
+  let interimTranscript = '';
 
   const language = computed(() => options.language || DEFAULT_LANGUAGE);
 
@@ -25,6 +28,14 @@ export function useSpeechRecognition(options = {}) {
     if (!restartTimer) return;
     window.clearTimeout(restartTimer);
     restartTimer = null;
+  }
+
+  function normalizeText(value) {
+    return String(value || '').replace(DUPLICATE_NORMALIZE_PATTERN, ' ').trim();
+  }
+
+  function mergeText(...parts) {
+    return parts.map(normalizeText).filter(Boolean).join(' ');
   }
 
   function emitText(nextText) {
@@ -49,21 +60,40 @@ export function useSpeechRecognition(options = {}) {
     };
 
     instance.onresult = (event) => {
-      let finalText = '';
-      let interimText = '';
+      interimTranscript = '';
 
-      for (let index = 0; index < event.results.length; index += 1) {
+      for (
+        let index = event.resultIndex;
+        index < event.results.length;
+        index += 1
+      ) {
         const result = event.results[index];
-        const text = result?.[0]?.transcript || '';
-        if (result.isFinal) finalText += text;
-        else interimText += text;
+        const resultText = normalizeText(result?.[0]?.transcript || '');
+        if (!resultText) continue;
+
+        if (result.isFinal) {
+          const currentFinal = normalizeText(committedTranscript);
+          const alreadyIncluded =
+            currentFinal &&
+            (currentFinal === resultText ||
+              currentFinal.endsWith(` ${resultText}`));
+
+          if (alreadyIncluded) {
+            continue;
+          }
+
+          committedTranscript =
+            currentFinal && resultText.startsWith(currentFinal)
+              ? resultText
+              : mergeText(committedTranscript, resultText);
+        } else {
+          interimTranscript = mergeText(interimTranscript, resultText);
+        }
       }
 
-      const nextText = [baseText.value, finalText, interimText]
-        .map((item) => item.trim())
-        .filter(Boolean)
-        .join(' ');
-      emitText(nextText);
+      emitText(
+        mergeText(baseText.value, committedTranscript, interimTranscript)
+      );
     };
 
     instance.onerror = (event) => {
@@ -92,8 +122,10 @@ export function useSpeechRecognition(options = {}) {
     clearRestartTimer();
     hasManualStop.value = false;
     shouldAutoRestart = true;
-    baseText.value = currentText.trim();
-    transcriptText.value = currentText;
+    baseText.value = normalizeText(currentText);
+    transcriptText.value = baseText.value;
+    committedTranscript = '';
+    interimTranscript = '';
 
     if (recognition) {
       try {
@@ -135,6 +167,8 @@ export function useSpeechRecognition(options = {}) {
   function resetToMic() {
     hasManualStop.value = false;
     errorMessage.value = '';
+    committedTranscript = '';
+    interimTranscript = '';
   }
 
   onBeforeUnmount(() => {

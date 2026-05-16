@@ -194,7 +194,12 @@ defineEmits([
 ]);
 
 const showVoiceStartButton = computed(
-  () => props.isMicEnabled && !props.isVoiceListening && !props.hasVoiceStopped
+  () =>
+    props.isMicEnabled &&
+    props.isSpeechSupported &&
+    !props.canSubmit &&
+    !props.isVoiceListening &&
+    !props.hasVoiceStopped
 );
 const showVoiceStopButton = computed(
   () => props.isMicEnabled && props.isVoiceListening
