@@ -1,11 +1,11 @@
-import {computed, onBeforeUnmount, ref} from 'vue';
+import {computed, onBeforeUnmount, ref} from "vue";
 
-const DEFAULT_LANGUAGE = 'ko-KR';
+const DEFAULT_LANGUAGE = "ko-KR";
 const AUTO_RESTART_DELAY = 250;
 const DUPLICATE_NORMALIZE_PATTERN = /\s+/g;
 
 function getSpeechRecognitionConstructor() {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
@@ -13,14 +13,14 @@ export function useSpeechRecognition(options = {}) {
   const isListening = ref(false);
   const isSupported = ref(Boolean(getSpeechRecognitionConstructor()));
   const hasManualStop = ref(false);
-  const errorMessage = ref('');
-  const baseText = ref('');
-  const transcriptText = ref('');
+  const errorMessage = ref("");
+  const baseText = ref("");
+  const transcriptText = ref("");
   let recognition = null;
   let restartTimer = null;
   let shouldAutoRestart = false;
-  let committedTranscript = '';
-  let interimTranscript = '';
+  let committedTranscript = "";
+  let interimTranscript = "";
 
   const language = computed(() => options.language || DEFAULT_LANGUAGE);
 
@@ -31,11 +31,13 @@ export function useSpeechRecognition(options = {}) {
   }
 
   function normalizeText(value) {
-    return String(value || '').replace(DUPLICATE_NORMALIZE_PATTERN, ' ').trim();
+    return String(value || "")
+      .replace(DUPLICATE_NORMALIZE_PATTERN, " ")
+      .trim();
   }
 
   function mergeText(...parts) {
-    return parts.map(normalizeText).filter(Boolean).join(' ');
+    return parts.map(normalizeText).filter(Boolean).join(" ");
   }
 
   function emitText(nextText) {
@@ -56,11 +58,11 @@ export function useSpeechRecognition(options = {}) {
 
     instance.onstart = () => {
       isListening.value = true;
-      errorMessage.value = '';
+      errorMessage.value = "";
     };
 
     instance.onresult = (event) => {
-      interimTranscript = '';
+      interimTranscript = "";
 
       for (
         let index = event.resultIndex;
@@ -68,7 +70,7 @@ export function useSpeechRecognition(options = {}) {
         index += 1
       ) {
         const result = event.results[index];
-        const resultText = normalizeText(result?.[0]?.transcript || '');
+        const resultText = normalizeText(result?.[0]?.transcript || "");
         if (!resultText) continue;
 
         if (result.isFinal) {
@@ -97,7 +99,7 @@ export function useSpeechRecognition(options = {}) {
     };
 
     instance.onerror = (event) => {
-      errorMessage.value = event?.error || 'speech-recognition-error';
+      errorMessage.value = event?.error || "speech-recognition-error";
     };
 
     instance.onend = () => {
@@ -106,26 +108,30 @@ export function useSpeechRecognition(options = {}) {
       if (!shouldAutoRestart || hasManualStop.value) return;
       clearRestartTimer();
       restartTimer = window.setTimeout(() => {
-        if (shouldAutoRestart && !hasManualStop.value) start(transcriptText.value);
+        if (shouldAutoRestart && !hasManualStop.value)
+          start(transcriptText.value);
       }, AUTO_RESTART_DELAY);
     };
 
     return instance;
   }
 
-  function start(currentText = '') {
+  function start(currentText = "") {
     if (!isSupported.value) {
-      errorMessage.value = 'speech-recognition-not-supported';
+      errorMessage.value = "speech-recognition-not-supported";
       return false;
     }
 
     clearRestartTimer();
     hasManualStop.value = false;
+
+    // TODO : 자동 재생 안되도록 설정하려면 false로 변경
     shouldAutoRestart = true;
+
     baseText.value = normalizeText(currentText);
     transcriptText.value = baseText.value;
-    committedTranscript = '';
-    interimTranscript = '';
+    committedTranscript = "";
+    interimTranscript = "";
 
     if (recognition) {
       try {
@@ -142,7 +148,7 @@ export function useSpeechRecognition(options = {}) {
       recognition.start();
       return true;
     } catch (error) {
-      errorMessage.value = error?.message || 'speech-recognition-start-failed';
+      errorMessage.value = error?.message || "speech-recognition-start-failed";
       recognition = null;
       return false;
     }
@@ -166,9 +172,9 @@ export function useSpeechRecognition(options = {}) {
 
   function resetToMic() {
     hasManualStop.value = false;
-    errorMessage.value = '';
-    committedTranscript = '';
-    interimTranscript = '';
+    errorMessage.value = "";
+    committedTranscript = "";
+    interimTranscript = "";
   }
 
   onBeforeUnmount(() => {
