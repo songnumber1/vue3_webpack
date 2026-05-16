@@ -147,6 +147,22 @@ function getBridgeVersionFromBridge() {
   return bridge?.bridgeVersion || "";
 }
 /**
+ * @description 모바일 웹에서 음성 인식 마이크 버튼을 노출할 수 있는 브라우저인지 확인합니다.
+ * @param {object} value - 플랫폼과 브라우저 판별에 필요한 값입니다.
+ * @param {boolean} value.isAndroid - Android 환경 여부입니다.
+ * @param {boolean} value.isMobileBrowser - 네이티브 앱이 아닌 모바일 브라우저 여부입니다.
+ * @param {string} value.browserName - User-Agent로 판별한 브라우저 이름입니다.
+ * @returns {boolean} Android Chrome 또는 Samsung Internet 모바일 브라우저이면 true를 반환합니다.
+ */
+function isSupportedMobileMicBrowser({isAndroid, isMobileBrowser, browserName}) {
+  // Android 모바일 브라우저가 아니면 PC와 동일하게 전송 버튼 fallback을 사용합니다.
+  if (!isAndroid || !isMobileBrowser) return false;
+
+  // Firefox Android는 SpeechRecognition 런타임 지원이 없어 마이크 버튼 대상에서 제외합니다.
+  return browserName === "chrome" || browserName === "samsung-internet";
+}
+
+/**
  * @description resolveDetailedPlatform 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {*} baseAppInfo - baseAppInfo 입력값입니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
@@ -174,6 +190,11 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isIosApp = isIos && hasIosBridge();
   const isMobile = isAndroid || isIos;
   const isMobileBrowser = isMobile && !isNativeApp;
+  const isMic = isSupportedMobileMicBrowser({
+    isAndroid,
+    isMobileBrowser,
+    browserName,
+  });
   const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
@@ -197,7 +218,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isIosApp,
     isMobile,
     isMobileBrowser,
-    isMic: isMobile,
+    isMic,
     isChrome: browserName === "chrome",
     isSafari: browserName === "safari",
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,

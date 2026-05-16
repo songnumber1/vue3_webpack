@@ -227,7 +227,7 @@ export function usePromptComposer(props, emit) {
    */
   function startVoiceInput() {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled || !isMicEnabled.value) return;
+    if (props.disabled || !isMicEnabled.value || !speech.isSupported.value) return;
     closeMenus();
     speech.start(text.value);
   }

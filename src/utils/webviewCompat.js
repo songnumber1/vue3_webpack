@@ -1,4 +1,5 @@
 let resizeObserverId = 0;
+let viewportCssVarsInstalled = false;
 
 /**
  * @description getCryptoObject 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -171,14 +172,14 @@ function updateViewportCssVars() {
  */
 function installViewportCssVars() {
   updateViewportCssVars();
+
+  // useViewportGuard가 화면별 동적 viewport 보정을 담당하므로 중복 리스너 등록은 1회로 제한합니다.
+  if (viewportCssVarsInstalled) return;
+  viewportCssVarsInstalled = true;
+
+  // 초기 진입/비채팅 화면을 위한 최소 fallback만 유지하고 visualViewport 동적 갱신은 useViewportGuard에 위임합니다.
   window.addEventListener("resize", updateViewportCssVars, {passive: true});
   window.addEventListener("orientationchange", updateViewportCssVars, {
-    passive: true,
-  });
-  window.visualViewport?.addEventListener("resize", updateViewportCssVars, {
-    passive: true,
-  });
-  window.visualViewport?.addEventListener("scroll", updateViewportCssVars, {
     passive: true,
   });
 }
