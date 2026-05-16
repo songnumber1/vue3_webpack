@@ -4,6 +4,8 @@
  * @author OpenAI
  */
 
+import {logWarn} from "@/utils/logger";
+
 let mermaidLoader = null;
 
 const MERMAID_CDN =
@@ -121,7 +123,7 @@ async function ensureMermaid() {
     mermaidLoader = loadScript(MERMAID_CDN)
       .then(() => window.mermaid)
       .catch((error) => {
-        console.warn(
+        logWarn(
           "Mermaid could not be loaded. The source code block will remain visible.",
           error
         );
@@ -189,7 +191,7 @@ export async function renderMermaidInElement(root, options = {}) {
   try {
     await mermaid.run({nodes: targets});
   } catch (error) {
-    console.warn("Mermaid rendering failed.", error);
+    logWarn("Mermaid rendering failed.", error);
     targets.forEach((target) => {
       const source =
         target.getAttribute("data-mermaid-source") || target.textContent || "";

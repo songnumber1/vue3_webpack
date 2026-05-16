@@ -1,13 +1,17 @@
 /**
  * @file zod.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
+ * @description Runtime-safe Zod export. The OpenAPI metadata method is kept as a lightweight no-op so schemas can be shared by runtime validation and Swagger generation without forcing OpenAPI tooling into the main bundle.
  */
 
-import {z} from "zod";
-import {extendZodWithOpenApi} from "@asteasolutions/zod-to-openapi";
+import {z, ZodType} from "zod";
 
-// Zod OpenAPI 확장은 반드시 스키마 생성 전에 1회만 실행한다.
-extendZodWithOpenApi(z);
+if (typeof ZodType?.prototype?.openapi !== "function") {
+  Object.defineProperty(ZodType.prototype, "openapi", {
+    value() {
+      return this;
+    },
+    configurable: true,
+  });
+}
 
 export {z};

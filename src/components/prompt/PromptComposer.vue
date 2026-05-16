@@ -97,6 +97,7 @@ import {
   revokeAttachmentUrl,
 } from '@/utils/attachment';
 import {useOutsideClick} from '@/composables/useOutsideClick';
+import {logWarn} from '@/utils/logger';
 import PromptActionToolbar from '@/components/prompt/parts/PromptActionToolbar.vue';
 import PromptAttachmentPreviewList from '@/components/prompt/parts/PromptAttachmentPreviewList.vue';
 import PromptMobileSheets from '@/components/prompt/parts/PromptMobileSheets.vue';
@@ -308,7 +309,7 @@ async function openFilePicker(type) {
       });
       return;
     } catch (error) {
-      console.warn('Android file picker failed. Falling back to web input.', error);
+      logWarn('Android file picker failed. Falling back to web input.', error);
     }
   }
 

@@ -5,6 +5,7 @@
  */
 
 import {isNativeApp} from "@/core/config";
+import {logWarn} from "@/utils/logger";
 
 /**
  * resolveErrorUI 함수입니다.
@@ -23,7 +24,7 @@ export function resolveErrorUI(appInfo, bridge) {
 
   return {
     notify(message) {
-      console.warn(message);
+      logWarn(message);
     },
   };
 }

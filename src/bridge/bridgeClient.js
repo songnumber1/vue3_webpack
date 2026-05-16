@@ -13,6 +13,7 @@ import {
 import {BRIDGE_CATEGORY, BRIDGE_TIMEOUT} from "./bridgeConstants";
 import {getActivePinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
+import {logWarn} from "@/utils/logger";
 
 const callbacks = {};
 
@@ -857,7 +858,7 @@ export function receiveNativeEvent(type, payload = {}) {
   } catch (error) {
     window.__pendingNativeEvents = window.__pendingNativeEvents || [];
     window.__pendingNativeEvents.push({type, payload: request});
-    console.warn("Failed to record native event.", error);
+    logWarn("Failed to record native event.", error);
   }
 
   window.dispatchEvent(

@@ -6,6 +6,7 @@
 
 import {callNative} from "@/bridge/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
+import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";
 
 /**
@@ -193,7 +194,7 @@ export async function setBackHandler(enable) {
  */
 export async function showNativeToast(message) {
   if (isAndroidApp()) return callNative("SHOW_TOAST", {message});
-  console.info("[toast]", message);
+  logInfo("[toast]", message);
   return webSuccess({shown: true});
 }
 
@@ -214,7 +215,7 @@ export async function getDeviceInfo() {
  */
 export async function writeNativeLog(data) {
   if (isAndroidApp()) return callNative("WRITE_LOG", {data});
-  console.log("[native-log]", data);
+  logInfo("[native-log]", data);
   return webSuccess({written: true});
 }
 

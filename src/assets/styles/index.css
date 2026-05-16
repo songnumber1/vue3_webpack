@@ -1,13 +1,26 @@
+/**
+ * Global stylesheet entry.
+ *
+ * Import order is intentional:
+ * 1. tokens/base: theme variables and resets
+ * 2. chat base: stable shared chat styles
+ * 3. component features: markdown, composer, bottom sheet, feedback
+ * 4. responsive compatibility: mobile keyboard/browser overrides
+ * 5. page-level exceptions: error/exception pages
+ */
 @import "./themes.css";
 @import "./base.css";
+
 @import "./chat/core.css";
-@import "./chat/responsive-keyboard.css";
 @import "./chat/markdown.css";
-@import "./chat/layout-overrides.css";
-@import "./chat/bottom-sheet-composer.css";
-@import "./chat/playground-feedback.css";
-@import "./chat/session-mobile-browser-fixes.css";
 @import "./chat-container.css";
 @import "./chat-prompt.css";
+@import "./chat/bottom-sheet-composer.css";
+@import "./chat/playground-feedback.css";
+
+@import "./chat/responsive-keyboard.css";
+@import "./chat/session-mobile-browser-fixes.css";
 @import "./chat-mobile.css";
+@import "./chat/layout-overrides.css";
+
 @import "./exception.css";

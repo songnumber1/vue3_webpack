@@ -15,6 +15,7 @@ import {
   ENABLE_AUTH_GUARD_DEBUG,
   AUTH_FAILURE_REASONS,
 } from "@/constants/auth";
+import {logInfo} from "@/utils/logger";
 
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
@@ -165,12 +166,12 @@ function createLoginRequiredRedirect(to, reason) {
 /**
  * 라우터 인증 가드 디버그 로그를 출력합니다.
  *
- * @param {...*} args - console.info로 출력할 값입니다.
+ * @param {...*} args - 디버그 로그로 출력할 값입니다.
  * @returns {void}
  */
 function debugRouteGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
-    console.info("[route-guard]", ...args);
+    logInfo("[route-guard]", ...args);
   }
 }
 

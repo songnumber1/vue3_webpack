@@ -129,7 +129,6 @@
           </header>
           <div class="feedback-dialog-body">
             <p>{{ t("feedback.sendDescription") }}</p>
-            <!-- TODO: 출처, 이미지, DUO 검색 결과 등 추가 기능 feedback payload 확장 시 이 영역에 message extension selector를 연결한다. -->
             <textarea
               v-model="feedbackText"
               :placeholder="t('feedback.placeholder')"
@@ -154,6 +153,7 @@ import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
 import {copyClipboardByPlatform} from "@/services/platformBridge";
+import {logWarn} from "@/utils/logger";
 
 const props = defineProps({
   role: {type: String, required: true},
@@ -215,7 +215,7 @@ function closeFeedbackDialog() {
  * @returns {void}
  */
 function submitFeedback() {
-  // TODO: 실제 feedback API 연결 시 messageId, content, selectedReasons, feedbackText payload를 전송한다.
+  // 실제 feedback API 연동 전까지는 입력값만 초기화한다.
   feedbackText.value = "";
   closeFeedbackDialog();
 }
@@ -248,7 +248,7 @@ async function copy() {
   try {
     await copyClipboardByPlatform(props.content || "");
   } catch (error) {
-    console.warn("Failed to copy message.", error);
+    logWarn("Failed to copy message.", error);
   }
 }
 </script>

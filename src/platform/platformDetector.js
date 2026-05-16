@@ -143,8 +143,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAndroidApp = isAndroid && hasAndroidBridge();
   const isIosApp = isIos && hasIosBridge();
   const isMobileBrowser = (isAndroid || isIos) && !isNativeApp;
-  // TODO : iOS 앱은 지원 불가
-  const isAccess = !isIos; // 플랫폼 접근 허용 여부 (추후 앱 버전, 브리지 버전 등으로 세분화 가능)
+  const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
   return {

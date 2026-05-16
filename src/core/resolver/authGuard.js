@@ -15,6 +15,7 @@ import {
 } from "@/constants/auth";
 import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
+import {logInfo} from "@/utils/logger";
 
 /**
  * access/info.do 요청 payload를 생성합니다.
@@ -91,12 +92,12 @@ function shouldUseMockAuth() {
 /**
  * 인증 가드 디버그 로그를 출력합니다.
  *
- * @param {...*} args - console.info로 출력할 값입니다.
+ * @param {...*} args - 디버그 로그로 출력할 값입니다.
  * @returns {void}
  */
 function debugAuthGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
-    console.info("[auth-guard]", ...args);
+    logInfo("[auth-guard]", ...args);
   }
 }
 

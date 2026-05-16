@@ -5,17 +5,14 @@
  */
 
 import {isAndroidApp, isIosApp} from "@/core/config";
+import {logWarn} from "@/utils/logger";
 
 const noopBridge = {
   getToken: () => null,
   getStorage: () => null,
   setStorage: () => {},
   toast: (message) => {
-    if (typeof window !== "undefined" && typeof window.alert === "function") {
-      window.alert(message);
-    } else {
-      console.warn(message);
-    }
+    logWarn("[native-toast:fallback]", message);
   },
   requestPermission: () => Promise.resolve(false),
   uploadFile: () =>

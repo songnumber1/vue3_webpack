@@ -66,6 +66,7 @@ import {
   uninstallSwaggerRuntime,
 } from "@/bridge/swaggerRuntime";
 import {installWebViewCompat} from "@/utils/webviewCompat";
+import {logError} from "@/utils/logger";
 
 let swaggerInstance = null;
 
@@ -122,7 +123,7 @@ const renderSwagger = async () => {
     });
   } catch (error) {
     renderError.value = error?.message || "Swagger UI를 렌더링하지 못했습니다.";
-    console.error("[SwaggerPage] render failed", error);
+    logError("[SwaggerPage] render failed", error);
   }
 };
 
