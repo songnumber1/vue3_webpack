@@ -158,3 +158,49 @@
     transform: none !important;
   }
 }
+
+/*
+ * Cross-browser mobile composer stabilization.
+ * Chrome, Samsung Internet and Firefox Android expose different viewport values
+ * when the software keyboard opens. The JS viewport guard provides two vars:
+ * - --mobile-keyboard-inset: content scroll reserve
+ * - --composer-keyboard-inset: fixed composer bottom offset
+ */
+@media (max-width: 900px) {
+  .app-container--mobile .chat-container-root--mode-main .empty-center,
+  .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
+    bottom: calc(
+      var(--mobile-main-composer-space) + var(--mobile-keyboard-inset, 0px)
+    ) !important;
+    padding-bottom: calc(
+      var(--space-4, 16px) + var(--mobile-keyboard-inset, 0px)
+    ) !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt,
+  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
+    bottom: calc(
+      var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
+    ) !important;
+    padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 0px)) !important;
+    max-height: var(--mobile-main-composer-space, 174px) !important;
+    overflow: visible !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
+    transform: translateZ(0) !important;
+  }
+
+  .app-container--mobile .mobile-main-fixed-prompt textarea,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt textarea,
+  .app-container--mobile .mobile-main-fixed-prompt .prompt-action-row,
+  .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-action-row {
+    overscroll-behavior: contain !important;
+    touch-action: manipulation !important;
+  }
+}
