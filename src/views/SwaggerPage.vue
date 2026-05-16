@@ -56,9 +56,6 @@ application runtime. * @author OpenAI
 <script setup>
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
-import SwaggerUI from "swagger-ui-dist/swagger-ui-es-bundle";
-import "swagger-ui-dist/swagger-ui.css";
-
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
 import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
 import {
@@ -94,6 +91,10 @@ const renderSwagger = async () => {
 
   try {
     installWebViewCompat();
+    const [{default: SwaggerUI}] = await Promise.all([
+      import(/* webpackChunkName: "swagger-ui-runtime" */ "swagger-ui-dist/swagger-ui-es-bundle"),
+      import(/* webpackChunkName: "swagger-ui-style" */ "swagger-ui-dist/swagger-ui.css"),
+    ]);
     const spec = generateOpenApi(selectedCategory.value);
 
     await nextTick();

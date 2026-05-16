@@ -841,3 +841,32 @@
   }
 }
 
+
+/* Stable container/composer contract migrated from legacy wrapper CSS files. */
+.chat-container-root,
+.chat-container-root--mode-main,
+.chat-container-root--mode-chat,
+.chat-container-root--mode-shared,
+.chat-workspace {
+  min-width: 0;
+}
+
+.prompt-wrap {
+  --prompt-safe-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom));
+}
+
+.prompt-box {
+  min-width: 0;
+}
+
+.mobile-main-fixed-prompt .prompt-box,
+.desktop-center-prompt .prompt-box {
+  width: min(100%, var(--layout-prompt-width, 820px));
+}
+
+@media (max-width: 900px) {
+  .mobile-main-fixed-prompt {
+    padding-inline: var(--space-4, 16px);
+    padding-bottom: var(--prompt-safe-bottom);
+  }
+}

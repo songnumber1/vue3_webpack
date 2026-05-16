@@ -13,8 +13,6 @@
 
 @import "./chat/core.css";
 @import "./chat/markdown.css";
-@import "./chat-container.css";
-@import "./chat-prompt.css";
 @import "./chat/bottom-sheet-composer.css";
 @import "./chat/playground-feedback.css";
 
