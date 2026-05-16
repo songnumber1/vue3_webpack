@@ -136,7 +136,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasAndroidBridge();
   const isIosApp = isIos && hasIosBridge();
-  const isMobileBrowser = (isAndroid || isIos) && !isNativeApp;
+  const isMobile = isAndroid || isIos;
+  const isMobileBrowser = isMobile && !isNativeApp;
   const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
@@ -157,7 +158,9 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isNativeApp,
     isAndroidApp,
     isIosApp,
+    isMobile,
     isMobileBrowser,
+    isMic: isMobile,
     isChrome: browserName === "chrome",
     isSafari: browserName === "safari",
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,

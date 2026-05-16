@@ -34,6 +34,12 @@
         :is-mobile-sheet="isMobileSheet"
         :attach-options="attachOptions"
         :can-submit="canSubmit"
+        :is-mic-enabled="isMicEnabled"
+        :is-voice-listening="isVoiceListening"
+        :has-voice-stopped="hasVoiceStopped"
+        :is-speech-supported="isSpeechSupported"
+        :voice-start-label="t('chat.voiceStart')"
+        :voice-stop-label="t('chat.voiceStop')"
         :attach-label="t('chat.attach')"
         :send-label="t('chat.send')"
         :model-select-label="t('chat.modelSelect')"
@@ -44,6 +50,8 @@
         @select-model="selectModel"
         @apply-tool="applyTool"
         @open-file-picker="openFilePicker"
+        @start-voice="startVoiceInput"
+        @stop-voice="stopVoiceInput"
       />
 
       <input
@@ -119,6 +127,10 @@ const {
   fileAccept,
   captureMode,
   isMobileSheet,
+  isMicEnabled,
+  isVoiceListening,
+  hasVoiceStopped,
+  isSpeechSupported,
   currentModels,
   currentModel,
   tools,
@@ -130,6 +142,8 @@ const {
   openModelSelector,
   openToolSelector,
   openAttachSelector,
+  startVoiceInput,
+  stopVoiceInput,
   selectModel,
   applyTool,
   openFilePicker,

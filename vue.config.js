@@ -1,17 +1,50 @@
-const { defineConfig } = require('@vue/cli-service');
+const fs = require("fs");
+const {defineConfig} = require("@vue/cli-service");
+
+const isHttps = process.env.VUE_APP_HTTPS === "true";
+
+const httpsOptions = isHttps
+  ? {
+      key: fs.readFileSync("./cert/localhost+1-key.pem"),
+      cert: fs.readFileSync("./cert/localhost+1.pem"),
+    }
+  : false;
 
 module.exports = defineConfig({
   transpileDependencies: true,
+
   productionSourceMap: false,
+
   configureWebpack: {
     optimization: {
-      // Swagger/vendor 번들이 큰 프로젝트라 Node 16 환경에서 terser 최소화 시간이 과도하게 길어지는 경우를 방지합니다.
-      // 운영에서 최소화가 반드시 필요하면 서버 CI에서 minimize 옵션만 true로 되돌리면 됩니다.
-      minimize: false
-    }
+      /**
+       * Swagger/vendor 번들 최소화 제거
+       * Node16 환경 빌드 속도 개선
+       */
+      minimize: false,
+    },
   },
+
   devServer: {
+    host: "0.0.0.0",
+
     port: 8080,
-    historyApiFallback: true
-  }
+
+    historyApiFallback: true,
+
+    https: httpsOptions,
+
+    allowedHosts: "all",
+
+    client: {
+      overlay: {
+        warnings: false,
+        errors: true,
+      },
+    },
+
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+    },
+  },
 });

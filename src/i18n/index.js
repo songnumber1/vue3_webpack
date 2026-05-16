@@ -65,6 +65,8 @@ export const messages = {
       assistant: "Assistant",
       promptPlaceholder: "무엇이든 물어보세요",
       send: "전송",
+      voiceStart: "음성 입력 시작",
+      voiceStop: "음성 입력 중지",
       attach: "첨부",
       suggestions: {
         image: "이미지 만들기",
@@ -209,6 +211,8 @@ export const messages = {
       assistant: "Assistant",
       promptPlaceholder: "Ask anything",
       send: "Send",
+      voiceStart: "Start voice input",
+      voiceStop: "Stop voice input",
       attach: "Attach",
       suggestions: {
         image: "Create image",

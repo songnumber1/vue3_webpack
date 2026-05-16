@@ -2300,3 +2300,60 @@
 .app-container--mobile .attachment-preview-remove::before {
   inset: -8px !important;
 }
+
+.prompt-box--gemini .voice-button,
+.app-container--mobile .prompt-box--gemini .voice-button {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+}
+
+.prompt-box--gemini .voice-button svg,
+.app-container--mobile .prompt-box--gemini .voice-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.prompt-box--gemini .voice-button--start,
+.app-container--mobile .prompt-box--gemini .voice-button--start {
+  background: var(--send-bg);
+  color: var(--send-text);
+}
+
+.prompt-box--gemini .voice-button--stop,
+.app-container--mobile .prompt-box--gemini .voice-button--stop {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.14);
+}
+
+.prompt-box--gemini .voice-button--stop span,
+.app-container--mobile .prompt-box--gemini .voice-button--stop span {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  background: currentColor;
+}
+
+.prompt-box--gemini .voice-button:hover:not(:disabled),
+.app-container--mobile .prompt-box--gemini .voice-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.prompt-box--gemini .voice-button:disabled,
+.app-container--mobile .prompt-box--gemini .voice-button:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
+  box-shadow: none;
+}

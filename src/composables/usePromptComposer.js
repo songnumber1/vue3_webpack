@@ -9,6 +9,7 @@ import {
   revokeAttachmentUrl,
 } from '@/utils/attachment';
 import {useOutsideClick} from '@/composables/useOutsideClick';
+import {useSpeechRecognition} from '@/composables/useSpeechRecognition';
 import {logWarn} from '@/utils/logger';
 import {
   ANDROID_TO_JS_EVENT,
@@ -42,6 +43,7 @@ export function usePromptComposer(props, emit) {
   const fileAccept = ref('');
   const captureMode = ref(null);
   const isMobileSheet = ref(false);
+  const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
   let lastHeight = 0;
   let removeViewportListener = null;
 
@@ -74,6 +76,13 @@ export function usePromptComposer(props, emit) {
   const canSubmit = computed(
     () => text.value.trim().length > 0 || attachments.value.length > 0
   );
+  const speech = useSpeechRecognition({
+    language: 'ko-KR',
+    onText: (nextText) => {
+      text.value = nextText;
+      nextTick(resize);
+    },
+  });
   const textareaRef = computed(
     () => textareaComponentRef.value?.textareaRef || null
   );
@@ -132,6 +141,7 @@ export function usePromptComposer(props, emit) {
     emit('submit', {text: value, attachments: attachments.value});
     text.value = '';
     attachments.value = [];
+    speech.resetToMic();
     closeMenus();
     nextTick(resize);
   }
@@ -164,6 +174,20 @@ export function usePromptComposer(props, emit) {
     const next = !attachMenuOpen.value;
     closeMenus('attach');
     attachMenuOpen.value = next;
+  }
+
+  function startVoiceInput() {
+    if (props.disabled || !isMicEnabled.value) return;
+    closeMenus();
+    speech.start(text.value);
+  }
+
+  function stopVoiceInput() {
+    speech.stopByUser();
+    nextTick(() => {
+      textareaRef.value?.focus();
+      resize();
+    });
   }
 
   function selectModel(id) {
@@ -318,6 +342,10 @@ export function usePromptComposer(props, emit) {
     fileAccept,
     captureMode,
     isMobileSheet,
+    isMicEnabled,
+    isVoiceListening: speech.isListening,
+    hasVoiceStopped: speech.hasManualStop,
+    isSpeechSupported: speech.isSupported,
     currentModels,
     currentModel,
     tools,
@@ -329,6 +357,8 @@ export function usePromptComposer(props, emit) {
     openModelSelector,
     openToolSelector,
     openAttachSelector,
+    startVoiceInput,
+    stopVoiceInput,
     selectModel,
     applyTool,
     openFilePicker,
