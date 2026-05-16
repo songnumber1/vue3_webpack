@@ -1,8 +1,3 @@
-/**
- * @file authStore.js
- * @description access/info.do 인증 결과와 사용자 접근 권한을 관리하는 Pinia store입니다.
- */
-
 import {defineStore} from "pinia";
 
 /**

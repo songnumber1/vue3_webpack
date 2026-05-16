@@ -1,8 +1,3 @@
-<!--
-@file PersonalizationView.vue
-@description DSLLM-like personalization settings sample view.
--->
-
 <template>
   <div class="personalization-view">
     <section class="personal-card personalization-hero">

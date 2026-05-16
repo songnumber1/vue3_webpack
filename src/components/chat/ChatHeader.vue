@@ -1,8 +1,3 @@
-<!--
-@file ChatHeader.vue
-@description Chat workspace header with mobile navigation and desktop user controls.
--->
-
 <template>
   <header
     class="mobile-topbar"

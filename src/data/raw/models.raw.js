@@ -1,8 +1,3 @@
-/**
- * @file models.raw.js
- * @description JavaScript module for models.raw.
- */
-
 export const MODELS_RAW = [
   {
     shareYN: true,

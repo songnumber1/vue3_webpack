@@ -1,9 +1,3 @@
-/**
- * @file dom.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 export function runAfterPaint(callback) {
   if (
     typeof window !== "undefined" &&

@@ -1,9 +1,3 @@
-/**
- * @file useViewportGuard.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {
   KEYBOARD_THRESHOLD_PX,

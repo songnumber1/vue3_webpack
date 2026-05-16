@@ -1,8 +1,3 @@
-<!--
-@file PromptTextarea.vue
-@description Autosizing textarea used by prompt composer.
--->
-
 <template>
   <textarea
     ref="textareaRef"

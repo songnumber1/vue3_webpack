@@ -1,8 +1,3 @@
-/**
- * @file modelAdapter.js
- * @description 운영 model API 응답을 모델 선택/대화 세션에서 사용하는 ViewModel로 변환합니다.
- */
-
 import {MODEL_KEYS} from "@/constants/apiKeys";
 import {toBoolean} from "./booleanAdapter";
 

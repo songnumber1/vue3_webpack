@@ -1,8 +1,3 @@
-<!--
-@file PromptMobileSheets.vue
-@description Mobile bottom sheets used by the prompt composer for model, tool and attachment actions.
--->
-
 <template>
   <BaseBottomSheet :open="modelOpen" :title="modelTitle" @close="$emit('close-model')">
     <button

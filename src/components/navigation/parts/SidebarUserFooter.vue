@@ -1,8 +1,3 @@
-<!--
-@file SidebarUserFooter.vue
-@description Mobile drawer user footer with settings, theme, playground and swagger actions.
--->
-
 <template>
   <div class="sidebar-user sidebar-user--mobile">
     <button class="sidebar-user-profile" type="button" :aria-label="t('common.settings')" @click="$emit('open-settings')">

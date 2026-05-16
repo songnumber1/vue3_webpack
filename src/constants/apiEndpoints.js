@@ -1,8 +1,3 @@
-/**
- * @file apiEndpoints.js
- * @description JavaScript module for apiEndpoints.
- */
-
 export const API_ENDPOINTS = Object.freeze({
   ACCESS_INFO: "/access/info.do",
   ASSISTANT_INFO: "/assist/info/assist.do",

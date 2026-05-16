@@ -1,8 +1,3 @@
-/**
- * @file index.js
- * @description Vue i18n instance and message catalog for the chat application UI.
- */
-
 import {createI18n} from "vue-i18n";
 
 export const SUPPORT_LOCALES = ["ko", "en"];

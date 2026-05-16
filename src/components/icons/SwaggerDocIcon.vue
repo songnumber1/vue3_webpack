@@ -1,8 +1,3 @@
-<!--
-@file SwaggerDocIcon.vue
-@description Reusable document icon used by Swagger documentation buttons.
--->
-
 <template>
   <svg
     class="app-icon app-icon--swagger"

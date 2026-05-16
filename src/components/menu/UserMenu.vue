@@ -1,8 +1,3 @@
-<!--
-@file UserMenu.vue
-@description Desktop user selector menu with guide, notices, personalization and inline language selector.
--->
-
 <template>
   <div ref="menuRef" class="user-menu" :class="{'user-menu--open': open}">
     <button

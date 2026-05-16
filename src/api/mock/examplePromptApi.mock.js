@@ -1,8 +1,3 @@
-/**
- * @file examplePromptApi.mock.js
- * @description JavaScript module for examplePromptApi.mock.
- */
-
 import {EXAMPLE_PROMPTS_RAW} from "@/data/raw/examplePrompts.raw";
 import {resolveMock} from "./mockUtils";
 

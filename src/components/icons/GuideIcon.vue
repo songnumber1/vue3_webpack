@@ -1,8 +1,3 @@
-<!--
-@file GuideIcon.vue
-@description Reusable guide/help icon for guide documentation buttons.
--->
-
 <template>
   <svg class="app-icon app-icon--guide" viewBox="0 0 24 24" aria-hidden="true">
     <path

@@ -1,9 +1,3 @@
-/**
- * @file default.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {RUN_ENV, PLATFORM} from "./constants";
 import {createId} from "@/utils/id";
 

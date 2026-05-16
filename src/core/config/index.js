@@ -1,9 +1,3 @@
-/**
- * @file index.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {RUN_ENV, PLATFORM} from "./constants";
 import {createDefaultConfig} from "./default";
 import {createAndroidConfig} from "./android";

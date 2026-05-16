@@ -1,8 +1,3 @@
-/**
- * @file useMarkdownMessageInteractions.js
- * @description Markdown click behavior for assistant messages: table actions and Android external link delegation.
- */
-
 import {openExternalBrowser, copyClipboardByPlatform} from '@/services/platformBridge';
 import {usePlatformStore} from '@/stores/platformStore';
 

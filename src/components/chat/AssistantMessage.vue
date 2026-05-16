@@ -1,8 +1,3 @@
-<!--
-@file AssistantMessage.vue
-@description Assistant message view. Markdown rendering and click behavior are lazy/composable to keep this component UI-focused.
--->
-
 <template>
   <article class="message message--assistant">
     <div class="avatar">AI</div>

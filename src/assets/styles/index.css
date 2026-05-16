@@ -1,13 +1,3 @@
-/**
- * Global stylesheet entry.
- *
- * Import order is intentional:
- * 1. tokens/base: theme variables and resets
- * 2. chat base: stable shared chat styles
- * 3. component features: markdown, composer, bottom sheet, feedback
- * 4. responsive compatibility: mobile keyboard/browser overrides
- * 5. page-level exceptions: error/exception pages
- */
 @import "./themes.css";
 @import "./base.css";
 

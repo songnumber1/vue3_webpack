@@ -1,8 +1,3 @@
-/**
- * @file useChatRuntime.js
- * @description Chat runtime facade입니다. business layer, Pinia store, UI container 사이의 연결을 담당합니다.
- */
-
 import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";

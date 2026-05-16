@@ -1,9 +1,3 @@
-/**
- * @file markdown.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {unified} from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";

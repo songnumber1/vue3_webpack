@@ -1,8 +1,3 @@
-<!--
-@file PlaygroundPage.vue
-@description UI playground for validating shared container, overlay, modal, bottom sheet, alert and confirm behavior.
--->
-
 <template>
   <main class="playground-page">
     <header class="playground-header">

@@ -1,8 +1,3 @@
-<!--
-@file LoginRequiredPage.vue
-@description Vue component for LoginRequiredPage.
--->
-
 <template>
   <main class="auth-required-page" role="main">
     <section class="auth-required-card" aria-labelledby="auth-required-title">

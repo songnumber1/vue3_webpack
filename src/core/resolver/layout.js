@@ -1,8 +1,3 @@
-/**
- * @file layout.js
- * @description Resolves the root application container component. Platform-specific UI is controlled by AppContainer classes and appContext.
- */
-
 import AppContainer from "@/containers/AppContainer.vue";
 
 /**

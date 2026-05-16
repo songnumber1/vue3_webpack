@@ -1,8 +1,3 @@
-/**
- * @file useBottomSheetSizing.js
- * @description Bottom sheet height and drag behavior. Uses a single coalesced measurement per frame instead of repeated nested reflows.
- */
-
 import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
 import {
   getMobileBrowserFamily,

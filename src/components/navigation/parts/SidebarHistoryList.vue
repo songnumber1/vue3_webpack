@@ -1,8 +1,3 @@
-<!--
-@file SidebarHistoryList.vue
-@description Renders chat history items for desktop sidebar, mobile drawer, and collapsed popover.
--->
-
 <template>
   <div :class="containerClass">
     <button

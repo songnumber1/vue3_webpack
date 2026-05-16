@@ -1,8 +1,3 @@
-<!--
-@file AppOverlayProvider.vue
-@description Centralized overlay composer for reusable modal/full-screen surfaces. Content remains slot-based while open state and responsive container policy is managed in one component.
--->
-
 <template>
   <ResponsiveOverlay
     :open="noticeOpen"

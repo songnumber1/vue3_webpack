@@ -1,8 +1,3 @@
-/**
- * @file accessInfo.raw.js
- * @description JavaScript module for accessInfo.raw.
- */
-
 export const ACCESS_INFO_RAW = {
   valid: null,
   entryType: "main",

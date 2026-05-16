@@ -1,9 +1,3 @@
-/**
- * @file interceptor.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {isNativeApp} from "@/core/config";
 
 /**

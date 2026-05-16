@@ -1,8 +1,3 @@
-/**
- * @file attachment.js
- * @description File attachment helpers shared by prompt composer and native bridge flows.
- */
-
 import {createId} from '@/utils/id';
 
 export function inferMimeType(name = '') {

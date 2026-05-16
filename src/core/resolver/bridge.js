@@ -1,9 +1,3 @@
-/**
- * @file bridge.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {isAndroidApp, isIosApp} from "@/core/config";
 import {logWarn} from "@/utils/logger";
 

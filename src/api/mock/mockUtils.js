@@ -1,8 +1,3 @@
-/**
- * @file mockUtils.js
- * @description JavaScript module for mockUtils.
- */
-
 export function cloneMockData(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
   return JSON.parse(JSON.stringify(value));

@@ -1,8 +1,3 @@
-/**
- * @file apiKeys.js
- * @description JavaScript module for apiKeys.
- */
-
 export const ASSISTANT_KEYS = Object.freeze({
   ID: "assistId",
   NAME: "assistName",

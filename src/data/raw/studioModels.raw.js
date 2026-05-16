@@ -1,8 +1,3 @@
-/**
- * @file studioModels.raw.js
- * @description JavaScript module for studioModels.raw.
- */
-
 export const STUDIO_MODELS_RAW = [
   {
     shareYN: true,

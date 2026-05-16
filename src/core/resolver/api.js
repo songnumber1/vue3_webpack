@@ -1,9 +1,3 @@
-/**
- * @file api.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {isAndroidApp} from "@/core/config";
 
 const baseApi = {

@@ -1,8 +1,3 @@
-/**
- * @file useChatSubmit.js
- * @description Chat submit and fake streaming workflow separated from visual components.
- */
-
 import {nextTick, ref} from "vue";
 import {streamText} from "@/utils/fakeStream";
 

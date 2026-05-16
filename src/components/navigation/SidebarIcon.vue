@@ -1,9 +1,3 @@
-<!--
-@file SidebarIcon.vue
-@description Reusable navigation SVG icon component used by the application sidebar.
-@author OpenAI
--->
-
 <template>
   <component :is="bare ? 'svg' : 'span'" v-bind="rootAttrs">
     <svg

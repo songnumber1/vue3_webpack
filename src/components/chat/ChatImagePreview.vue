@@ -1,9 +1,3 @@
-<!--
-@file ChatImagePreview.vue
-@description Full-screen image preview dialog for chat attachment images.
-@author OpenAI
--->
-
 <template>
   <div
     v-if="image"

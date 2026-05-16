@@ -1,8 +1,3 @@
-<!--
-@file LanguageSheet.vue
-@description Language selector rendered as a bottom sheet for mobile and popover trigger flows.
--->
-
 <template>
   <BaseBottomSheet
     :open="open"

@@ -1,8 +1,3 @@
-/**
- * @file promptAdapter.js
- * @description JavaScript module for promptAdapter.
- */
-
 export function adaptExamplePrompt(raw = {}) {
   return {
     id: raw.question_id,

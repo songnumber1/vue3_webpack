@@ -1,8 +1,3 @@
-<!--
-@file ChevronDownIcon.vue
-@description Reusable chevron icon for expandable menu sections.
--->
-
 <template>
   <svg
     class="app-icon app-icon--chevron"

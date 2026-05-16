@@ -1,8 +1,3 @@
-/**
- * @file chatBootstrap.js
- * @description Chat 화면 초기화에 필요한 분산 API를 병렬 호출하고 UI ViewModel로 정규화하는 business layer입니다.
- */
-
 import {resolveChatApis} from "@/api/runtime/chatApis";
 import {adaptAssistantList} from "@/adapters/assistantAdapter";
 import {adaptModelList, filterAvailableModels} from "@/adapters/modelAdapter";

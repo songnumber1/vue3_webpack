@@ -1,8 +1,3 @@
-<!--
-@file ChevronLeftIcon.vue
-@description Reusable left chevron icon for mobile navigation headers.
--->
-
 <template>
   <svg
     class="app-icon app-icon--chevron-left"

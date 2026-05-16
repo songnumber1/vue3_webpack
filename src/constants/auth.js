@@ -1,9 +1,4 @@
 /**
- * @file auth.js
- * @description Router authentication guard policy for access/info.do.
- */
-
-/**
  * Converts a Vue CLI env value into a boolean while keeping an explicit default.
  *
  * @param {string|undefined} value - Environment value such as "true" or "false".

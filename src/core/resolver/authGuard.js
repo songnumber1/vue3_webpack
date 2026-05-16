@@ -1,8 +1,3 @@
-/**
- * @file authGuard.js
- * @description vue-router 전역 가드에서 사용하는 로그인/접근권한 확인 로직입니다.
- */
-
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
   AUTH_FAILURE_REASONS,

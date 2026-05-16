@@ -1,9 +1,3 @@
-/**
- * @file useSharedChat.js
- * @description Shared-chat message loader used by shared URL routes.
- * @author OpenAI
- */
-
 import {createId} from "@/utils/id";
 
 /**

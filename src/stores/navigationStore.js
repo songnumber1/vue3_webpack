@@ -1,8 +1,3 @@
-/**
- * @file navigationStore.js
- * @description Stores navigation-only UI state shared by ChatLayout and AppSidebar.
- */
-
 import {defineStore} from "pinia";
 
 /**

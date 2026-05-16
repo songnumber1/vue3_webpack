@@ -1,8 +1,3 @@
-<!--
-@file ChatReadonlyInput.vue
-@description Composer replacement used when the chat cannot accept new user input, such as shared chats or chats linked to deleted models.
--->
-
 <template>
   <footer
     class="shared-readonly-wrap"

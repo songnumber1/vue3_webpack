@@ -1,8 +1,3 @@
-<!--
-@file CheckIcon.vue
-@description Reusable check icon for selected menu options.
--->
-
 <template>
   <svg class="app-icon app-icon--check" viewBox="0 0 20 20" aria-hidden="true">
     <path

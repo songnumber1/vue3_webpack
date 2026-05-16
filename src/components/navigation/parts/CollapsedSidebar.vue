@@ -1,8 +1,3 @@
-<!--
-@file CollapsedSidebar.vue
-@description Collapsed desktop sidebar with quick actions and recent history popover.
--->
-
 <template>
   <div class="collapsed-sidebar" aria-label="접힌 사이드바">
     <div class="collapsed-sidebar-actions">

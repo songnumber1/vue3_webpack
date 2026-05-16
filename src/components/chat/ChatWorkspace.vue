@@ -1,9 +1,3 @@
-<!--
-@file ChatWorkspace.vue
-@description Main chat workspace that renders header, main landing, messages and composer area.
-@author OpenAI
--->
-
 <template>
   <ChatHeader
     :mode="mode"

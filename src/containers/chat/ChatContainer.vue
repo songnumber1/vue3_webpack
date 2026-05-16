@@ -1,8 +1,3 @@
-<!--
-@file ChatContainer.vue
-@description Thin chat page container. UI composition stays here; route/runtime/business behavior lives in useChatContainerController.
--->
-
 <template>
   <ChatLayout
     v-if="runtimeReady"

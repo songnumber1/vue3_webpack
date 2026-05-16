@@ -1,9 +1,3 @@
-/**
- * @file fakeStream.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 export function streamText(text, onChunk, options = {}) {
   const delay = options.delay ?? 14;
   let index = 0;

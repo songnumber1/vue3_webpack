@@ -1,8 +1,3 @@
-/**
- * @file examplePromptApi.live.js
- * @description 운영 example prompt 조회 Live API adapter입니다.
- */
-
 import {httpClient} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 

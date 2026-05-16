@@ -1,8 +1,3 @@
-<!--
-@file SwaggerPage.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
--->
-
 <template>
   <div class="swagger-page">
     <div class="swagger-toolbar">

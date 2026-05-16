@@ -1,9 +1,3 @@
-/**
- * @file swaggerRuntime.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,

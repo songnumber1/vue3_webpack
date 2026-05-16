@@ -1,8 +1,3 @@
-/**
- * @file assistantApi.mock.js
- * @description JavaScript module for assistantApi.mock.
- */
-
 import {ASSISTANTS_RAW} from "@/data/raw/assistants.raw";
 import {STUDIOS_RAW} from "@/data/raw/studios.raw";
 import {resolveMock} from "./mockUtils";

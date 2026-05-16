@@ -1,8 +1,3 @@
-<!--
-@file ChatMessage.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
--->
-
 <template>
   <UserMessage
     v-if="message.role === 'user'"

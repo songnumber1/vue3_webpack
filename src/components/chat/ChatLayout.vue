@@ -1,8 +1,3 @@
-<!--
-@file ChatLayout.vue
-@description Chat layout frame. It owns only page-level classes and delegates navigation state to AppSidebar/navigation store.
--->
-
 <template>
   <div
     class="chat-container chat-container-root"

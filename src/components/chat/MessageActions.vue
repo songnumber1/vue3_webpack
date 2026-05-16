@@ -1,8 +1,3 @@
-<!--
-@file MessageActions.vue
-@description Assistant/user message action bar. Assistant messages expose like, dislike, explicit feedback, and clipboard actions.
--->
-
 <template>
   <div class="message-actions-wrap" :class="`message-actions-wrap--${role}`">
     <div class="message-actions" :class="`message-actions--${role}`">

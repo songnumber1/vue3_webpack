@@ -1,8 +1,3 @@
-/**
- * @file chatHistoryList.raw.js
- * @description JavaScript module for chatHistoryList.raw.
- */
-
 export const CHAT_HISTORY_LIST_RAW = [
   {
     chatTitle:

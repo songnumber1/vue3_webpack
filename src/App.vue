@@ -1,8 +1,3 @@
-<!--
-@file App.vue
-@description Root application component that applies layout and platform access guard.
--->
-
 <template>
   <AppLayout>
     <section

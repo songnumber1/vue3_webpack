@@ -1,8 +1,3 @@
-<!--
-@file NoticeView.vue
-@description Notice content that can be rendered in desktop modal or mobile full-screen overlay.
--->
-
 <template>
   <div class="notice-view">
     <article

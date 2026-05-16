@@ -1,8 +1,3 @@
-/**
- * @file assistants.raw.js
- * @description JavaScript module for assistants.raw.
- */
-
 export const ASSISTANTS_RAW = [
   {
     delYN: false,

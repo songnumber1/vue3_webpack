@@ -1,8 +1,3 @@
-<!--
-@file PromptActionToolbar.vue
-@description Renders prompt composer actions: model selector, tools, attachment menu and send button.
--->
-
 <template>
   <div class="prompt-action-row">
     <div class="prompt-left-actions">

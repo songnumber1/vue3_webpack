@@ -1,8 +1,3 @@
-/**
- * @file uiTokens.js
- * @description Shared UI token values that must stay aligned with CSS custom properties.
- */
-
 /** Mobile breakpoint used by JavaScript viewport checks and CSS media queries. */
 export const MOBILE_BREAKPOINT_PX = 900;
 

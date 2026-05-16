@@ -1,8 +1,3 @@
-<!--
-@file PromptAttachmentPreviewList.vue
-@description Displays selected prompt attachments and emits image preview/remove events.
--->
-
 <template>
   <div v-if="attachments.length" class="attachment-preview-row" aria-label="첨부 파일 목록">
     <div

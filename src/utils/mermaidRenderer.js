@@ -1,9 +1,3 @@
-/**
- * @file mermaidRenderer.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {logWarn} from "@/utils/logger";
 
 let mermaidLoader = null;

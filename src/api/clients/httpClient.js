@@ -1,8 +1,3 @@
-/**
- * @file httpClient.js
- * @description Mock API와 Live API 전환 시 공통으로 사용하는 axios 기반 HTTP client factory입니다.
- */
-
 import axios from "axios";
 
 /**

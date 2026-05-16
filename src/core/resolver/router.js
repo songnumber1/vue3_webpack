@@ -1,8 +1,3 @@
-/**
- * @file router.js
- * @description JavaScript module for router.
- */
-
 import {createRouter, createWebHistory} from "vue-router";
 import AssistantRoot from "@/views/AssistantRoot.vue";
 import MainPage from "@/views/MainPage.vue";

@@ -1,8 +1,3 @@
-<!--
-@file GuidePage.vue
-@description Guide page for web and mobile navigation.
--->
-
 <template>
   <section class="guide-page">
     <header class="guide-hero">

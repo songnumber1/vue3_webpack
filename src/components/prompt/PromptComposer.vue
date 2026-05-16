@@ -1,8 +1,3 @@
-<!--
-@file PromptComposer.vue
-@description Shared prompt composer view. State, attachment handling and native bridge behavior are managed by usePromptComposer.
--->
-
 <template>
   <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">

@@ -1,8 +1,3 @@
-<!--
-@file BaseBottomSheet.vue
-@description Shared mobile bottom sheet view. Height measurement and drag behavior are isolated in useBottomSheetSizing.
--->
-
 <template>
   <teleport to="body">
     <transition name="sheet-fade">

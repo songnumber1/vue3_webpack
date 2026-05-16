@@ -1,8 +1,3 @@
-/**
- * @file chatHistoryApi.live.js
- * @description 운영 대화 목록/대화 상세 조회 Live API adapter입니다.
- */
-
 import {httpClient} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 

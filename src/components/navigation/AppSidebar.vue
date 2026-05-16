@@ -1,8 +1,3 @@
-<!--
-@file AppSidebar.vue
-@description Application navigation sidebar. It now delegates repeated desktop/mobile drawer parts to small navigation components and reads shared state from Pinia.
--->
-
 <template>
   <aside class="desktop-sidebar" :class="{'desktop-sidebar--collapsed': sidebarCollapsed}">
     <div v-if="!sidebarCollapsed" class="sidebar-content sidebar-content--assistant">

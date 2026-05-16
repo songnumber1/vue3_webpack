@@ -1,9 +1,3 @@
-/**
- * @file bridgeClient.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {
   AndroidToJsContract,
   BridgeContract,

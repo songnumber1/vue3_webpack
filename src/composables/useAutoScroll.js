@@ -1,9 +1,3 @@
-/**
- * @file useAutoScroll.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {nextTick} from "vue";
 
 /**

@@ -1,9 +1,3 @@
-/**
- * @file bootstrap.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {createApp} from "vue";
 import {createPinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";

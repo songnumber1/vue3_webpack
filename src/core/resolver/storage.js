@@ -1,9 +1,3 @@
-/**
- * @file storage.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {isNativeApp} from "@/core/config";
 import {callNative} from "@/bridge/bridgeClient";
 import {logWarn} from "@/utils/logger";

@@ -1,8 +1,3 @@
-<!--
-@file ResponsiveOverlay.vue
-@description Responsive modal that becomes a full-screen Android-style page on mobile.
--->
-
 <template>
   <teleport to="body">
     <transition :name="isMobile ? 'mobile-page' : 'modal-fade'">

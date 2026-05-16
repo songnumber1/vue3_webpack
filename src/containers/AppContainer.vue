@@ -1,8 +1,3 @@
-<!--
-@file AppContainer.vue
-@description Root application container that applies platform classes and hosts routed content.
--->
-
 <template>
   <div
     class="app-container"

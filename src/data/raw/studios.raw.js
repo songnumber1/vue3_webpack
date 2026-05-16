@@ -1,8 +1,3 @@
-/**
- * @file studios.raw.js
- * @description JavaScript module for studios.raw.
- */
-
 const defaultImage = {
   name: "",
   path: null,

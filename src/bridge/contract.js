@@ -1,9 +1,3 @@
-/**
- * @file contract.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {GetUserRequest, GetUserResponse} from "./schemas/getUser";
 import {LoginRequest, LoginResponse} from "./schemas/login";
 import {UploadFileRequest, UploadFileResponse} from "./schemas/uploadFile";

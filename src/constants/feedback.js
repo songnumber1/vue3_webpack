@@ -1,9 +1,4 @@
 /**
- * @file feedback.js
- * @description Constants for assistant message feedback UI and mock hallucination reason list.
- */
-
-/**
  * Feedback action keys used by the assistant message action bar.
  * @type {{LIKE: string, DISLIKE: string, SEND: string, COPY: string}}
  */

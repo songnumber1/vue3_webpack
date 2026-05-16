@@ -1,9 +1,3 @@
-/**
- * @file clipboard.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 export async function copyText(text) {
   const value = String(text ?? "");
 

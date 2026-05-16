@@ -1,8 +1,3 @@
-/**
- * @file useOutsideClick.js
- * @description Registers a document click listener and runs a callback when the target is outside supplied roots.
- */
-
 import {onBeforeUnmount, onMounted} from 'vue';
 
 function unwrapRoot(root) {

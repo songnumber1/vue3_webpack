@@ -1,9 +1,4 @@
 /**
- * @file promptSuggestions.js
- * @description Assistant/Studio별 예시 프롬프트 출력 정책을 정의합니다.
- */
-
-/**
  * 메인 화면에 출력할 Assistant/Studio 예시 프롬프트 최대 개수입니다.
  *
  * 특징:

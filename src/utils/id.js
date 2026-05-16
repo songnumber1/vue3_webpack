@@ -1,9 +1,3 @@
-/**
- * @file id.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 let fallbackCounter = 0;
 
 /**

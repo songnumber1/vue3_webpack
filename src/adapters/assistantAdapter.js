@@ -1,8 +1,3 @@
-/**
- * @file assistantAdapter.js
- * @description JavaScript module for assistantAdapter.
- */
-
 import {ASSISTANT_KEYS} from "@/constants/apiKeys";
 import {ASSISTANT_TYPES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";

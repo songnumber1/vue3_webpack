@@ -1,9 +1,3 @@
-<!--
-@file AssistantSheet.vue
-@description Bottom sheet used to select the active Assistant profile.
-@author OpenAI
--->
-
 <template>
   <BaseBottomSheet :open="open" title="Assistant 선택" @close="$emit('close')">
     <button

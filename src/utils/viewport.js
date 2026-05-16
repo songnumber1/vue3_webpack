@@ -1,8 +1,3 @@
-/**
- * @file viewport.js
- * @description Browser viewport helpers shared by chat, bottom-sheet and mobile keyboard handling.
- */
-
 export const DEFAULT_MOBILE_BREAKPOINT_PX = 900;
 
 export function getMobileBrowserFamily() {

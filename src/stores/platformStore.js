@@ -1,9 +1,3 @@
-/**
- * @file platformStore.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {defineStore} from "pinia";
 import {resolveDetailedPlatform} from "@/platform/platformDetector";
 

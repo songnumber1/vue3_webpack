@@ -1,8 +1,3 @@
-<!--
-@file MobileSettingsPanel.vue
-@description Full-screen mobile settings navigation panel. It provides a drawer-like settings index and detail pages for guide, notices, personalization, chat management and language.
--->
-
 <template>
   <teleport to="body">
     <transition name="mobile-page">

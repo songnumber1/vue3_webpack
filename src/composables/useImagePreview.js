@@ -1,9 +1,3 @@
-/**
- * @file useImagePreview.js
- * @description Shared image preview state and recovery logic for chat attachments.
- * @author OpenAI
- */
-
 import {onBeforeUnmount, onMounted, ref} from "vue";
 
 /**

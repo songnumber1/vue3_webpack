@@ -1,8 +1,3 @@
-/**
- * @file authAxios.js
- * @description 로그인 확인 전용 axios 인스턴스를 생성합니다. 공통 axios interceptor와 분리하여 401/500 공통 예외 UI가 라우터 인증 체크에 개입하지 않도록 합니다.
- */
-
 import axios from "axios";
 import {isAndroidApp, isIosApp} from "@/core/config";
 

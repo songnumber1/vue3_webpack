@@ -1,8 +1,3 @@
-/**
- * @file usePromptComposer.js
- * @description Prompt composer controller. Keeps attachment, native bridge, menus and textarea behavior out of PromptComposer.vue.
- */
-
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
 import {useI18n} from 'vue-i18n';
 import {usePlatformStore} from '@/stores/platformStore';

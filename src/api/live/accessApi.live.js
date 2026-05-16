@@ -1,8 +1,3 @@
-/**
- * @file accessApi.live.js
- * @description 운영 access/info.do API를 호출하는 Live API adapter입니다.
- */
-
 import {httpClient} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 

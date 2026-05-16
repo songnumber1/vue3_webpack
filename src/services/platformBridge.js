@@ -1,9 +1,3 @@
-/**
- * @file platformBridge.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 import {callNative} from "@/bridge/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";

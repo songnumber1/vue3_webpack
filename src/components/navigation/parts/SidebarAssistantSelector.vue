@@ -1,8 +1,3 @@
-<!--
-@file SidebarAssistantSelector.vue
-@description Assistant selector trigger and desktop dropdown used by the navigation sidebar.
--->
-
 <template>
   <div ref="rootRef" class="assistant-selector">
     <button class="assistant-trigger" type="button" :aria-label="t('chat.assistantSelect')" @click="$emit('toggle')">

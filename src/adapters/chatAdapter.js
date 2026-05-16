@@ -1,8 +1,3 @@
-/**
- * @file chatAdapter.js
- * @description 운영 chat-history API 응답을 UI에서 사용하는 Chat/Message ViewModel로 변환합니다.
- */
-
 import {CHAT_KEYS, MESSAGE_KEYS} from "@/constants/apiKeys";
 import {MESSAGE_ROLES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";

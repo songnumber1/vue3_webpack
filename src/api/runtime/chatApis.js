@@ -1,8 +1,3 @@
-/**
- * @file chatApis.js
- * @description Chat runtime에서 사용할 API 구현체(mock/live)를 선택합니다.
- */
-
 import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {assistantApiMock} from "@/api/mock/assistantApi.mock";
 import {modelApiMock} from "@/api/mock/modelApi.mock";

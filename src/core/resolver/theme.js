@@ -1,9 +1,3 @@
-/**
- * @file theme.js
- * @description JavaScript module used by the Vue application runtime.
- * @author OpenAI
- */
-
 const THEME_KEY = "app_theme";
 const allowedThemes = ["light", "dark"];
 
