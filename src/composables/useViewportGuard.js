@@ -10,30 +10,7 @@ import {
   MIN_VIEWPORT_HEIGHT_PX,
   MOBILE_BREAKPOINT_PX,
 } from "@/constants/uiTokens";
-
-/**
- * getViewportSize 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
- */
-function getViewportSize() {
-  const visualViewport =
-    typeof window !== "undefined" ? window.visualViewport : null;
-  return {
-    width: Math.round(visualViewport?.width || window.innerWidth || 0),
-    height: Math.round(visualViewport?.height || window.innerHeight || 0),
-    layoutWidth: Math.round(window.innerWidth || visualViewport?.width || 0),
-    layoutHeight: Math.round(window.innerHeight || visualViewport?.height || 0),
-    offsetTop: Math.round(visualViewport?.offsetTop || 0),
-  };
-}
-
-function getMobileBrowserFamily() {
-  const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  if (/SamsungBrowser/i.test(userAgent)) return "samsung";
-  if (/Firefox/i.test(userAgent)) return "firefox";
-  if (/Chrome/i.test(userAgent)) return "chrome";
-  return "default";
-}
+import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 
 /**
  * Applies browser-specific classes used by CSS fallback rules.

@@ -86,11 +86,12 @@
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {setAppLocale} from "@/i18n";
+import {useOutsideClick} from '@/composables/useOutsideClick';
 
 const emit = defineEmits(["notice", "personalization", "playground"]);
 const {t, locale} = useI18n();
@@ -142,19 +143,13 @@ function selectLocale(value) {
   languageOpen.value = false;
 }
 
-/**
- * Closes the dropdown when the user clicks outside of the menu.
- * @param {MouseEvent} event Native click event.
- * @returns {void}
- */
-function handleDocumentClick(event) {
-  if (menuRef.value?.contains(event.target)) return;
-  open.value = false;
-  languageOpen.value = false;
-}
 
-onMounted(() => document.addEventListener("click", handleDocumentClick));
-onBeforeUnmount(() =>
-  document.removeEventListener("click", handleDocumentClick)
+useOutsideClick(
+  () => menuRef.value,
+  () => {
+    open.value = false;
+    languageOpen.value = false;
+  }
 );
+
 </script>

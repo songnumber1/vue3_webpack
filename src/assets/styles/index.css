@@ -1,6 +1,12 @@
 @import "./themes.css";
 @import "./base.css";
-@import "./chat.css";
+@import "./chat/core.css";
+@import "./chat/responsive-keyboard.css";
+@import "./chat/markdown.css";
+@import "./chat/layout-overrides.css";
+@import "./chat/bottom-sheet-composer.css";
+@import "./chat/playground-feedback.css";
+@import "./chat/session-mobile-browser-fixes.css";
 @import "./chat-container.css";
 @import "./chat-prompt.css";
 @import "./chat-mobile.css";

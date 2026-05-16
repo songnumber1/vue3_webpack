@@ -63,6 +63,12 @@
 
 <script setup>
 import {computed, nextTick, onBeforeUnmount, watch, ref} from "vue";
+import {
+  getMobileBrowserFamily,
+  getSafeAreaBottom,
+  getViewportHeight as readViewportHeight,
+  isMobileViewport as readIsMobileViewport,
+} from "@/utils/viewport";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -94,84 +100,12 @@ const sheetStyle = computed(() => ({
   "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
 }));
 
-/**
- * Returns the current mobile browser family for viewport workarounds.
- * Firefox Android reports bottom-sheet viewport height differently from
- * Chromium based browsers, so content-sized sheets use the smallest reliable
- * visible viewport metric.
- *
- * @returns {string} Browser family key.
- */
-function getMobileBrowserFamily() {
-  if (typeof navigator === "undefined") return "default";
-  const userAgent = navigator.userAgent || "";
-  if (/SamsungBrowser/i.test(userAgent)) return "samsung";
-  if (/Firefox/i.test(userAgent)) return "firefox";
-  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
-  return "default";
-}
-
-/**
- * Reads a numeric CSS custom property from the root element.
- *
- * @param {string} name CSS custom property name.
- * @returns {number} Parsed pixel value, or 0 when unavailable.
- */
-function readRootPixelVar(name) {
-  if (typeof document === "undefined") return 0;
-  const value = window
-    .getComputedStyle(document.documentElement)
-    .getPropertyValue(name);
-  const parsed = Number.parseFloat(value || "0");
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
-/**
- * getViewportHeight 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
- */
 function getViewportHeight() {
-  if (typeof window === "undefined") return 720;
-
-  const visualHeight = Math.round(window.visualViewport?.height || 0);
-  const innerHeight = Math.round(window.innerHeight || 0);
-  const clientHeight = Math.round(document.documentElement?.clientHeight || 0);
-  const appHeight = Math.round(readRootPixelVar("--app-height") || 0);
-  const candidates = [
-    visualHeight,
-    innerHeight,
-    clientHeight,
-    appHeight,
-  ].filter((height) => Number.isFinite(height) && height >= 320);
-
-  if (!candidates.length) return 720;
-
-  if (isMobileViewport() && getMobileBrowserFamily() === "firefox") {
-    return Math.max(Math.min(...candidates), 320);
-  }
-
-  if (isMobileViewport() && visualHeight > 0) {
-    return Math.max(visualHeight, 320);
-  }
-
-  return Math.max(innerHeight || visualHeight || clientHeight, 320);
+  return readViewportHeight();
 }
 
-/**
- * Checks whether the current viewport should use mobile bottom-sheet sizing.
- * Firefox Android can under-report scrollable body height while a sheet is
- * transitioning, so mobile sheets reserve enough space for at least three
- * selectable rows.
- *
- * @returns {boolean} True when the visible layout width is mobile sized.
- */
 function isMobileViewport() {
-  if (typeof window === "undefined") return false;
-  const width = Math.min(
-    window.visualViewport?.width || window.innerWidth || 0,
-    window.innerWidth || window.visualViewport?.width || 0
-  );
-  return width > 0 && width <= MOBILE_BREAKPOINT_PX;
+  return readIsMobileViewport(MOBILE_BREAKPOINT_PX);
 }
 
 /**
@@ -262,24 +196,6 @@ function getMinimumSheetHeight() {
 }
 
 /**
- * getSafeBottom 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
- */
-function getSafeBottom() {
-  if (typeof window === "undefined") return 0;
-  const probe = document.createElement("div");
-  probe.style.cssText =
-    "position:fixed;bottom:env(safe-area-inset-bottom);height:0;visibility:hidden;";
-  document.body.appendChild(probe);
-  const value = Math.max(
-    0,
-    Math.round(window.innerHeight - probe.getBoundingClientRect().bottom)
-  );
-  probe.remove();
-  return Number.isFinite(value) ? value : 0;
-}
-
-/**
  * clampHeight 처리 함수입니다.
  * @param {*} height 함수 실행에 필요한 입력값입니다.
  * @returns {void}
@@ -289,23 +205,23 @@ function clampHeight(height) {
   const preferredMinHeight = getMinimumSheetHeight();
   const maxHeight = Math.max(
     preferredMinHeight,
-    Math.floor(viewportHeight * props.maxRatio) - getSafeBottom()
+    Math.floor(viewportHeight * props.maxRatio) - getSafeAreaBottom()
   );
   const minHeight = Math.min(preferredMinHeight, maxHeight);
   return Math.min(Math.max(height, minHeight), maxHeight);
 }
 
 /**
- * getContentHeight 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * Returns the full sheet height needed by the rendered slot content.
+ * @returns {number} Content-based sheet height in pixels.
  */
 function getContentHeight() {
   return getSheetChromeHeight() + getBodyContentHeight() + 8;
 }
 
 /**
- * getInitialHeight 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * Calculates the opening snap height from props and measured content.
+ * @returns {number} Initial sheet height in pixels.
  */
 function getInitialHeight() {
   const viewportHeight = getViewportHeight();
@@ -324,9 +240,9 @@ function getInitialHeight() {
 }
 
 /**
- * setHeight 처리 함수입니다.
- * @param {*} height 함수 실행에 필요한 입력값입니다.
- * @param {*} snap 함수 실행에 필요한 입력값입니다.
+ * Applies a clamped sheet height and records the active snap state.
+ * @param {number} height Requested height in pixels.
+ * @param {string} snap Snap state label.
  * @returns {void}
  */
 function setHeight(height, snap = "custom") {
@@ -336,26 +252,17 @@ function setHeight(height, snap = "custom") {
     currentHeight.value >= viewportHeight * 0.82 ? "full" : snap;
 }
 
-/**
- * expand 처리 함수입니다.
- * @returns {void}
- */
+/** Expands the sheet to the maximum configured height. */
 function expand() {
   setHeight(getViewportHeight() * props.maxRatio, "full");
 }
 
-/**
- * collapse 처리 함수입니다.
- * @returns {void}
- */
+/** Collapses the sheet to its minimum usable height. */
 function collapse() {
   setHeight(props.minHeight, "min");
 }
 
-/**
- * resetHeight 처리 함수입니다.
- * @returns {void}
- */
+/** Re-measures content after render and refreshes the opening height. */
 function resetHeight() {
   nextTick(() => {
     setHeight(getInitialHeight(), props.initialSnap);

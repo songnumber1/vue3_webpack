@@ -1,63 +1,22 @@
 <!--
 @file AppSidebar.vue
-@description Responsive chat sidebar with desktop history navigation and mobile service menu.
+@description Application navigation sidebar. It now delegates repeated desktop/mobile drawer parts to small navigation components and reads shared state from Pinia.
 -->
 
 <template>
-  <aside
-    class="desktop-sidebar"
-    :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
-  >
-    <div
-      v-if="!sidebarCollapsed"
-      class="sidebar-content sidebar-content--assistant"
-    >
+  <aside class="desktop-sidebar" :class="{'desktop-sidebar--collapsed': sidebarCollapsed}">
+    <div v-if="!sidebarCollapsed" class="sidebar-content sidebar-content--assistant">
       <div class="sidebar-top">
-        <div ref="assistantSelectorRef" class="assistant-selector">
-          <button
-            class="assistant-trigger"
-            type="button"
-            :aria-label="t('chat.assistantSelect')"
-            @click="openAssistantSelector"
-          >
-            <span>{{ currentAssistant.label }}</span>
-            <ChevronDownIcon class="chevron chevron--selector" />
-          </button>
-          <div
-            v-if="assistantMenuOpen && !isMobileSheet"
-            class="assistant-menu"
-          >
-            <button
-              v-for="assistant in assistants"
-              :key="assistant.id"
-              class="assistant-option"
-              :class="{active: assistant.id === selectedAssistantId}"
-              type="button"
-              @click="selectAssistant(assistant.id)"
-            >
-              <span class="assistant-option-main">
-                <strong>{{ assistant.label }}</strong>
-                <small>{{ assistant.description }}</small>
-              </span>
-              <span
-                v-if="assistant.id === selectedAssistantId"
-                class="option-selected-indicator"
-                aria-label="현재 선택된 값"
-              >
-                <CheckIcon class="option-check" />
-                <span class="sr-only">현재 선택된 값</span>
-              </span>
-            </button>
-          </div>
-        </div>
+        <SidebarAssistantSelector
+          ref="assistantSelectorRef"
+          :assistants="assistants"
+          :selected-assistant-id="selectedAssistantId"
+          :open="assistantMenuOpen"
+          @toggle="openAssistantSelector"
+          @select="selectAssistant"
+        />
         <div class="sidebar-top-actions">
-          <button
-            class="sidebar-round"
-            type="button"
-            :title="t('chat.hideSidebar')"
-            :aria-label="t('chat.hideSidebar')"
-            @click="emitSidebarCollapsed(true)"
-          >
+          <button class="sidebar-round" type="button" :title="t('chat.hideSidebar')" :aria-label="t('chat.hideSidebar')" @click="setSidebarCollapsed(true)">
             ☰
           </button>
         </div>
@@ -65,206 +24,73 @@
 
       <nav class="quick-menu quick-menu--assistant">
         <button class="quick-item active" type="button" @click="handleNewChat">
-          <Icon name="pencil" />{{ t("chat.newChat") }}
+          <Icon name="pencil" />{{ t('chat.newChat') }}
         </button>
         <button class="quick-item" type="button">
-          <Icon name="search" />{{ t("chat.chatSearch") }}
+          <Icon name="search" />{{ t('chat.chatSearch') }}
         </button>
       </nav>
 
-      <div class="section-label">{{ t("chat.conversations") }}</div>
-      <div class="sidebar-history sidebar-history--main">
-        <button
-          v-for="item in histories"
-          :key="item.id"
-          class="sidebar-history-item"
-          :class="{selected: String(item.id) === String(selectedChatId)}"
-          type="button"
-          :title="item.title"
-          @click="handleSelectHistory(item)"
-        >
-          <span>{{ item.title }}</span>
-        </button>
-      </div>
+      <div class="section-label">{{ t('chat.conversations') }}</div>
+      <SidebarHistoryList :histories="histories" :selected-chat-id="selectedChatId" @select="handleSelectHistory" />
     </div>
 
-    <div v-else class="collapsed-sidebar" aria-label="접힌 사이드바">
-      <div class="collapsed-sidebar-actions">
-        <button
-          class="collapsed-icon-button"
-          type="button"
-          :title="t('chat.openSidebar')"
-          :aria-label="t('chat.openSidebar')"
-          @click="emitSidebarCollapsed(false)"
-        >
-          <Icon name="panel" bare />
-        </button>
-        <button
-          class="collapsed-icon-button"
-          type="button"
-          :title="t('chat.newChat')"
-          :aria-label="t('chat.newChat')"
-          @click="handleNewChat"
-        >
-          <Icon name="pencil" bare />
-        </button>
-        <button
-          class="collapsed-icon-button"
-          type="button"
-          :title="t('chat.chatSearch')"
-          :aria-label="t('chat.chatSearch')"
-          @click="emitCollapsedRecentOpen(false)"
-        >
-          <Icon name="search" bare />
-        </button>
-        <button
-          class="collapsed-icon-button collapsed-icon-button--active"
-          type="button"
-          :title="t('chat.recentChats')"
-          :aria-label="t('chat.recentChats')"
-          @click="emitCollapsedRecentOpen(!collapsedRecentOpen)"
-        >
-          <Icon name="chat" bare />
-        </button>
-      </div>
-
-      <transition name="collapsed-popover-fade">
-        <section
-          v-if="collapsedRecentOpen"
-          class="collapsed-recent-popover"
-          :aria-label="t('chat.recentChats')"
-        >
-          <h2>{{ t("chat.recentChats") }}</h2>
-          <button
-            v-for="item in histories"
-            :key="item.id"
-            class="collapsed-recent-item"
-            type="button"
-            :title="item.title"
-            @click="handleSelectHistoryCollapsed(item)"
-          >
-            <span>{{ item.title }}</span>
-          </button>
-        </section>
-      </transition>
-    </div>
+    <CollapsedSidebar
+      v-else
+      :open="collapsedRecentOpen"
+      :histories="histories"
+      :selected-chat-id="selectedChatId"
+      @expand="setSidebarCollapsed(false)"
+      @new-chat="handleNewChat"
+      @set-recent-open="setCollapsedRecentOpen"
+      @select-history="handleSelectHistoryCollapsed"
+    />
   </aside>
 
   <transition name="drawer-fade">
-    <div
-      v-if="drawerOpen"
-      class="mobile-drawer-backdrop"
-      @click="emitDrawerOpen(false)"
-    ></div>
+    <div v-if="drawerOpen" class="mobile-drawer-backdrop" @click="setDrawerOpen(false)"></div>
   </transition>
 
   <transition name="drawer-slide">
     <aside v-if="drawerOpen" class="mobile-drawer">
-      <div
-        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
-      >
+      <div class="sidebar-content sidebar-content--mobile sidebar-content--assistant">
         <div class="sidebar-top">
-          <div class="assistant-selector">
-            <button
-              class="assistant-trigger"
-              type="button"
-              :aria-label="t('chat.assistantSelect')"
-              @click="openAssistantSelector"
-            >
-              <span>{{ currentAssistant.label }}</span>
-              <ChevronDownIcon class="chevron chevron--selector" />
-            </button>
-          </div>
+          <SidebarAssistantSelector
+            :assistants="assistants"
+            :selected-assistant-id="selectedAssistantId"
+            mobile
+            @toggle="openAssistantSelector"
+          />
           <div class="sidebar-top-actions">
-            <button
-              class="sidebar-round"
-              type="button"
-              :title="t('common.close')"
-              :aria-label="t('common.close')"
-              @click="emitDrawerOpen(false)"
-            >
+            <button class="sidebar-round" type="button" :title="t('common.close')" :aria-label="t('common.close')" @click="setDrawerOpen(false)">
               ×
             </button>
           </div>
         </div>
 
         <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
-          <button
-            class="quick-item active"
-            type="button"
-            @click="handleNewChat"
-          >
-            <Icon name="pencil" />{{ t("chat.newChat") }}
+          <button class="quick-item active" type="button" @click="handleNewChat">
+            <Icon name="pencil" />{{ t('chat.newChat') }}
           </button>
           <button class="quick-item" type="button">
-            <Icon name="search" />{{ t("chat.chatSearch") }}
+            <Icon name="search" />{{ t('chat.chatSearch') }}
           </button>
         </nav>
 
-        <div class="section-label">{{ t("chat.conversations") }}</div>
-        <div class="sidebar-history sidebar-history--main">
-          <button
-            v-for="item in histories"
-            :key="item.id"
-            class="sidebar-history-item"
-            :class="{selected: String(item.id) === String(selectedChatId)}"
-            type="button"
-            :title="item.title"
-            @click="handleSelectHistory(item)"
-          >
-            <span>{{ item.title }}</span>
-          </button>
-        </div>
+        <div class="section-label">{{ t('chat.conversations') }}</div>
+        <SidebarHistoryList :histories="histories" :selected-chat-id="selectedChatId" @select="handleSelectHistory" />
 
-        <div class="sidebar-user sidebar-user--mobile">
-          <button
-            class="sidebar-user-profile"
-            type="button"
-            :aria-label="t('common.settings')"
-            @click="openSettings"
-          >
-            <div class="user-avatar">민</div>
-            <div class="sidebar-user-main">
-              <strong>민우 송</strong><small>{{ t("common.plus") }}</small>
-            </div>
-          </button>
-          <div class="sidebar-user-actions">
-            <button
-              class="sidebar-user-action"
-              type="button"
-              :aria-label="t('common.theme')"
-              @click="toggleTheme"
-            >
-              <span class="theme-glyph"></span>
-            </button>
-            <button
-              class="sidebar-user-action"
-              type="button"
-              :aria-label="t('common.playground')"
-              :title="t('common.playground')"
-              @click="openPlayground"
-            >
-              <span class="playground-glyph">▦</span>
-            </button>
-            <button
-              class="sidebar-user-action"
-              type="button"
-              :aria-label="t('common.swagger')"
-              @click="openSwagger"
-            >
-              <SwaggerDocIcon />
-            </button>
-          </div>
-        </div>
+        <SidebarUserFooter
+          @open-settings="openSettings"
+          @toggle-theme="toggleTheme"
+          @open-playground="openPlayground"
+          @open-swagger="openSwagger"
+        />
       </div>
     </aside>
   </transition>
 
-  <BaseBottomSheet
-    :open="assistantMenuOpen && isMobileSheet"
-    :title="t('chat.assistantSelect')"
-    @close="assistantMenuOpen = false"
-  >
+  <BaseBottomSheet :open="assistantMenuOpen && isMobileSheet" :title="t('chat.assistantSelect')" @close="assistantMenuOpen = false">
     <button
       v-for="assistant in assistants"
       :key="assistant.id"
@@ -277,11 +103,7 @@
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
-      <span
-        v-if="assistant.id === selectedAssistantId"
-        class="bottom-sheet-selected-indicator"
-        aria-label="현재 선택된 값"
-      >
+      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" aria-label="현재 선택된 값">
         <CheckIcon class="bottom-sheet-check" />
         <span class="sr-only">현재 선택된 값</span>
       </span>
@@ -290,30 +112,33 @@
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
-import {storeToRefs} from "pinia";
-import {useI18n} from "vue-i18n";
-import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
-import Icon from "@/components/navigation/SidebarIcon.vue";
-import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import {useAssistantStore} from "@/stores/assistantStore";
-import {useChatStore} from "@/stores/chatStore";
-import {useNavigationStore} from "@/stores/navigationStore";
+import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {storeToRefs} from 'pinia';
+import {useI18n} from 'vue-i18n';
+import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import Icon from '@/components/navigation/SidebarIcon.vue';
+import CollapsedSidebar from '@/components/navigation/parts/CollapsedSidebar.vue';
+import SidebarAssistantSelector from '@/components/navigation/parts/SidebarAssistantSelector.vue';
+import SidebarHistoryList from '@/components/navigation/parts/SidebarHistoryList.vue';
+import SidebarUserFooter from '@/components/navigation/parts/SidebarUserFooter.vue';
+import {useAssistantStore} from '@/stores/assistantStore';
+import {useChatStore} from '@/stores/chatStore';
+import {useNavigationStore} from '@/stores/navigationStore';
+import {useOutsideClick} from '@/composables/useOutsideClick';
 
 const emit = defineEmits([
-  "new-chat",
-  "select-history",
-  "select-assistant",
-  "open-guide",
-  "open-notice",
-  "open-personalization",
-  "open-language",
-  "toggle-theme",
-  "open-swagger",
-  "open-playground",
-  "open-settings",
+  'new-chat',
+  'select-history',
+  'select-assistant',
+  'open-guide',
+  'open-notice',
+  'open-personalization',
+  'open-language',
+  'toggle-theme',
+  'open-swagger',
+  'open-playground',
+  'open-settings',
 ]);
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
@@ -325,11 +150,6 @@ const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigati
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
-const currentAssistant = computed(
-  () =>
-    assistants.value.find((item) => item.id === selectedAssistantId.value) ||
-    assistants.value[0] || {id: "", label: "Assistant", description: ""}
-);
 
 /**
  * Synchronizes whether assistant selection should render as a mobile bottom sheet.
@@ -337,139 +157,94 @@ const currentAssistant = computed(
  */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
-    window.matchMedia?.("(max-width: 900px)")?.matches ||
-    document.querySelector(".app-container--mobile")
+    window.matchMedia?.('(max-width: 900px)')?.matches ||
+      document.querySelector('.app-container--mobile')
   );
 }
 
-/**
- * Opens or closes the assistant selector.
- * @returns {void}
- */
+/** Opens or closes the assistant selector. @returns {void} */
 function openAssistantSelector() {
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
-/**
- * Selects an assistant and closes the selector.
- * @param {string} id Selected assistant id.
- * @returns {void}
- */
+/** @param {string} id Selected assistant id. @returns {void} */
 function selectAssistant(id) {
-  emit("select-assistant", id);
+  emit('select-assistant', id);
   assistantMenuOpen.value = false;
 }
 
-/**
- * Emits the sidebar collapsed state.
- * @param {boolean} value Collapsed state.
- * @returns {void}
- */
-function emitSidebarCollapsed(value) {
+/** @param {boolean} value Collapsed state. @returns {void} */
+function setSidebarCollapsed(value) {
   navigationStore.setSidebarCollapsed(value);
 }
 
-/**
- * Emits the mobile drawer open state.
- * @param {boolean} value Drawer open state.
- * @returns {void}
- */
-function emitDrawerOpen(value) {
+/** @param {boolean} value Drawer open state. @returns {void} */
+function setDrawerOpen(value) {
   navigationStore.setDrawerOpen(value);
 }
 
-/**
- * Emits the collapsed recent popover open state.
- * @param {boolean} value Popover open state.
- * @returns {void}
- */
-function emitCollapsedRecentOpen(value) {
+/** @param {boolean} value Collapsed recent popover open state. @returns {void} */
+function setCollapsedRecentOpen(value) {
   navigationStore.setCollapsedRecentOpen(value);
 }
 
-/**
- * Starts a new chat and closes temporary sidebar surfaces.
- * @returns {void}
- */
+/** Starts a new chat and closes temporary sidebar surfaces. @returns {void} */
 function handleNewChat() {
-  emit("new-chat");
-  emitDrawerOpen(false);
-  emitCollapsedRecentOpen(false);
+  emit('new-chat');
+  setDrawerOpen(false);
+  setCollapsedRecentOpen(false);
 }
 
-/**
- * Selects a history item from expanded sidebar.
- * @param {{id: string|number, title: string}} item Selected history item.
- * @returns {void}
- */
+/** @param {{id: string|number, title: string}} item Selected history item. @returns {void} */
 function handleSelectHistory(item) {
-  emit("select-history", item);
-  emitDrawerOpen(false);
+  emit('select-history', item);
+  setDrawerOpen(false);
 }
 
-/**
- * Selects a history item from collapsed sidebar popover.
- * @param {{id: string|number, title: string}} item Selected history item.
- * @returns {void}
- */
+/** @param {{id: string|number, title: string}} item Selected history item. @returns {void} */
 function handleSelectHistoryCollapsed(item) {
-  emit("select-history", item);
-  emitCollapsedRecentOpen(false);
+  emit('select-history', item);
+  setCollapsedRecentOpen(false);
 }
 
-/**
- * Opens the full-screen mobile settings navigator from the drawer user profile row.
- * @returns {void}
- */
+/** @returns {void} */
 function openSettings() {
-  emit("open-settings");
+  emit('open-settings');
 }
 
-/**
- * Toggles the theme from the mobile user area.
- * @returns {void}
- */
+/** @returns {void} */
 function toggleTheme() {
-  emit("toggle-theme");
+  emit('toggle-theme');
 }
 
-/**
- * Opens Swagger documentation from the mobile user area.
- * @returns {void}
- */
+/** @returns {void} */
 function openSwagger() {
-  emitDrawerOpen(false);
-  emit("open-swagger");
+  setDrawerOpen(false);
+  emit('open-swagger');
 }
 
-/**
- * Opens the playground route from the mobile user area.
- * @returns {void}
- */
+/** @returns {void} */
 function openPlayground() {
-  emitDrawerOpen(false);
-  emit("open-playground");
+  setDrawerOpen(false);
+  emit('open-playground');
 }
 
-/**
- * Closes the desktop assistant menu when the user clicks outside.
- * @param {MouseEvent} event Document click event.
- * @returns {void}
- */
-function handleDocumentClick(event) {
-  if (isMobileSheet.value) return;
-  if (assistantSelectorRef.value?.contains(event.target)) return;
-  assistantMenuOpen.value = false;
-}
+
+useOutsideClick(
+  () => assistantSelectorRef.value?.rootRef?.value || assistantSelectorRef.value?.rootRef,
+  () => {
+    assistantMenuOpen.value = false;
+  },
+  {shouldIgnore: () => isMobileSheet.value}
+);
 
 onMounted(() => {
   syncViewportMode();
-  document.addEventListener("click", handleDocumentClick);
-  window.addEventListener("resize", syncViewportMode, {passive: true});
+  window.addEventListener('resize', syncViewportMode, {passive: true});
 });
+
 onBeforeUnmount(() => {
-  document.removeEventListener("click", handleDocumentClick);
-  window.removeEventListener("resize", syncViewportMode);
+  window.removeEventListener('resize', syncViewportMode);
 });
 </script>
