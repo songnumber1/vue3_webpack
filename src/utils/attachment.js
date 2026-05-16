@@ -68,3 +68,11 @@ export function hydrateImageAttachment(attachment, onHydrated) {
   };
   reader.readAsDataURL(sourceFile);
 }
+
+
+export function formatFileSize(size) {
+  if (!size) return '0 B';
+  if (size < 1024) return `${size} B`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / 1024 / 1024).toFixed(1)} MB`;
+}

@@ -36,6 +36,7 @@
 </template>
 
 <script setup>
+import {formatFileSize} from '@/utils/attachment';
 defineProps({
   attachments: {type: Array, default: () => []},
 });
@@ -59,17 +60,5 @@ function getPreviewUrl(file) {
 function emitPreview(file) {
   if (file?.kind !== 'image') return;
   emit('preview', file);
-}
-
-/**
- * Formats byte size for compact attachment cards.
- * @param {number} size File size in bytes.
- * @returns {string} Human-readable size.
- */
-function formatFileSize(size) {
-  if (!size) return '0 B';
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 </script>

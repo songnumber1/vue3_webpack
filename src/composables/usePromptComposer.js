@@ -10,6 +10,17 @@ import {
 } from '@/utils/attachment';
 import {useOutsideClick} from '@/composables/useOutsideClick';
 import {logWarn} from '@/utils/logger';
+import {
+  ANDROID_TO_JS_EVENT,
+  ATTACH_MENU_OPTIONS,
+  DEFAULT_FALLBACK_MODEL,
+  FILE_PICKER_TYPE,
+  IMAGE_PREVIEW_EVENT,
+  NATIVE_FILE_SELECTED_TYPE,
+  PROMPT_TEXTAREA_HEIGHT,
+  PROMPT_TOOL_DEFINITIONS,
+  PROMPT_VIEWPORT_QUERY,
+} from '@/constants/promptComposer';
 
 /**
  * Creates prompt composer state and event handlers.
@@ -34,41 +45,35 @@ export function usePromptComposer(props, emit) {
   let lastHeight = 0;
   let removeViewportListener = null;
 
-  const fallbackModels = [
-    {id: props.modelValue, label: '빠른 모델', description: '현재 선택된 모델'},
-  ];
+  const fallbackModels = computed(() => [
+    {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
+  ]);
   const currentModels = computed(() =>
-    props.models.length ? props.models : fallbackModels
+    props.models.length ? props.models : fallbackModels.value
   );
   const currentModel = computed(
     () =>
       currentModels.value.find((model) => model.id === props.modelValue) ||
       currentModels.value[0]
   );
-  const tools = computed(() => [
-    {
-      id: 'image',
-      icon: '▧',
-      label: t('chat.suggestions.image'),
-      prompt: '이미지 생성 프롬프트를 만들어줘',
-    },
-    {
-      id: 'write',
-      icon: '✎',
-      label: t('chat.suggestions.writing'),
-      prompt: '아래 내용을 더 자연스럽게 다듬어줘',
-    },
-    {
-      id: 'find',
-      icon: '◎',
-      label: t('chat.suggestions.search'),
-      prompt: '프로젝트에서 빠진 항목을 찾아줘',
-    },
-  ]);
+  const tools = computed(() =>
+    PROMPT_TOOL_DEFINITIONS.map((tool) => ({
+      ...tool,
+      label: t(tool.labelKey),
+    }))
+  );
+  const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
+  const attachOptions = computed(() =>
+    ATTACH_MENU_OPTIONS.filter(
+      (option) => !option.requiresCamera || showCameraMenu.value
+    ).map((option) => ({
+      ...option,
+      label: t(option.labelKey),
+    }))
+  );
   const canSubmit = computed(
     () => text.value.trim().length > 0 || attachments.value.length > 0
   );
-  const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
   const textareaRef = computed(
     () => textareaComponentRef.value?.textareaRef || null
   );
@@ -93,7 +98,7 @@ export function usePromptComposer(props, emit) {
     // 모델/첨부 버튼 클릭 시 popover가 열리지 않고 BottomSheet도 열리지 않는 버그 발생.
     // viewport 너비 기준으로만 판단합니다.
     isMobileSheet.value = Boolean(
-      window.matchMedia?.('(max-width: 900px)')?.matches
+      window.matchMedia?.(PROMPT_VIEWPORT_QUERY)?.matches
     );
   }
 
@@ -101,10 +106,13 @@ export function usePromptComposer(props, emit) {
     const el = textareaRef.value;
     if (!el) return;
     el.style.height = 'auto';
-    const maxHeight = window.matchMedia?.('(max-width: 900px)')?.matches
-      ? 136
-      : 160;
-    const nextHeight = Math.min(Math.max(el.scrollHeight, 38), maxHeight);
+    const maxHeight = window.matchMedia?.(PROMPT_VIEWPORT_QUERY)?.matches
+      ? PROMPT_TEXTAREA_HEIGHT.mobileMax
+      : PROMPT_TEXTAREA_HEIGHT.desktopMax;
+    const nextHeight = Math.min(
+      Math.max(el.scrollHeight, PROMPT_TEXTAREA_HEIGHT.min),
+      maxHeight
+    );
     el.style.height = `${nextHeight}px`;
     el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
     if (nextHeight !== lastHeight) {
@@ -172,16 +180,20 @@ export function usePromptComposer(props, emit) {
     });
   }
 
-  async function openFilePicker(type) {
+  async function openFilePicker(type = FILE_PICKER_TYPE.all) {
     if (props.disabled) return;
     attachMenuOpen.value = false;
+
+    const option =
+      ATTACH_MENU_OPTIONS.find((item) => item.id === type) ||
+      ATTACH_MENU_OPTIONS.find((item) => item.id === FILE_PICKER_TYPE.all);
 
     if (platformStore.info.isAndroidApp) {
       try {
         await openNativeFilePicker({
-          source: type === 'camera' ? 'camera' : type === 'image' ? 'image' : 'all',
-          multiple: type !== 'camera',
-          accept: type === 'image' || type === 'camera' ? 'image/*' : '',
+          source: option.nativeSource,
+          multiple: option.multiple,
+          accept: option.accept,
         });
         return;
       } catch (error) {
@@ -191,13 +203,11 @@ export function usePromptComposer(props, emit) {
 
     const input = fileInputRef.value;
     if (!input) return;
-    const isCamera = type === 'camera';
-    const accept = type === 'image' || isCamera ? 'image/*' : '';
-    const capture = isCamera ? 'environment' : null;
-    fileAccept.value = accept;
-    captureMode.value = capture;
-    input.setAttribute('accept', accept);
-    if (capture) input.setAttribute('capture', capture);
+
+    fileAccept.value = option.accept;
+    captureMode.value = option.capture;
+    input.setAttribute('accept', option.accept);
+    if (option.capture) input.setAttribute('capture', option.capture);
     else input.removeAttribute('capture');
     input.value = '';
     input.click();
@@ -205,7 +215,7 @@ export function usePromptComposer(props, emit) {
 
   function handleNativeFileSelected(event) {
     const detail = event?.detail || {};
-    if (detail.type !== 'ON_FILE_SELECTED') return;
+    if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
     const nativeFiles = detail.payload?.files || [];
     const mapped = nativeFiles.map(createNativeAttachment);
     if (mapped.length) attachments.value = [...attachments.value, ...mapped];
@@ -255,7 +265,7 @@ export function usePromptComposer(props, emit) {
     if (!file) return;
     const previewUrl = file.dataUrl || file.previewUrl || file.url || '';
     window.dispatchEvent(
-      new CustomEvent('chat:image-preview', {
+      new CustomEvent(IMAGE_PREVIEW_EVENT, {
         detail: {...file, url: file.url || previewUrl, previewUrl},
       })
     );
@@ -280,7 +290,7 @@ export function usePromptComposer(props, emit) {
 
   onMounted(() => {
     syncViewportMode();
-    window.addEventListener('android-to-js', handleNativeFileSelected);
+    window.addEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
     resize();
     window.addEventListener('resize', syncViewportMode, {passive: true});
     removeViewportListener = () =>
@@ -288,7 +298,7 @@ export function usePromptComposer(props, emit) {
   });
 
   onBeforeUnmount(() => {
-    window.removeEventListener('android-to-js', handleNativeFileSelected);
+    window.removeEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
     removeViewportListener?.();
     attachments.value.forEach((file) => {
       revokeAttachmentUrl(file);
@@ -311,8 +321,8 @@ export function usePromptComposer(props, emit) {
     currentModels,
     currentModel,
     tools,
+    attachOptions,
     canSubmit,
-    showCameraMenu,
     resize,
     handleFocus,
     submit,

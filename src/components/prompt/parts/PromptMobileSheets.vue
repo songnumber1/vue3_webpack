@@ -16,7 +16,7 @@
     </button>
   </BaseBottomSheet>
 
-  <BaseBottomSheet :open="toolOpen" title="Tools" @close="$emit('close-tool')">
+  <BaseBottomSheet :open="toolOpen" :title="toolTitle" @close="$emit('close-tool')">
     <button
       v-for="tool in tools"
       :key="tool.id"
@@ -31,18 +31,13 @@
 
   <BaseBottomSheet :open="attachOpen" :title="attachTitle" @close="$emit('close-attach')">
     <button
-      v-if="showCameraMenu"
+      v-for="option in attachOptions"
+      :key="option.id"
       class="bottom-sheet-option bottom-sheet-option--row"
       type="button"
-      @click="$emit('open-file-picker', 'camera')"
+      @click="$emit('open-file-picker', option.id)"
     >
-      <span aria-hidden="true">📷</span><strong>Camera</strong>
-    </button>
-    <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="$emit('open-file-picker', 'image')">
-      <span aria-hidden="true">🖼️</span><strong>Image</strong>
-    </button>
-    <button class="bottom-sheet-option bottom-sheet-option--row" type="button" @click="$emit('open-file-picker', 'all')">
-      <span aria-hidden="true">📎</span><strong>File</strong>
+      <span aria-hidden="true">{{ option.icon }}</span><strong>{{ option.label }}</strong>
     </button>
   </BaseBottomSheet>
 </template>
@@ -57,8 +52,9 @@ defineProps({
   attachOpen: {type: Boolean, default: false},
   models: {type: Array, default: () => []},
   tools: {type: Array, default: () => []},
+  attachOptions: {type: Array, default: () => []},
   modelValue: {type: String, default: ''},
-  showCameraMenu: {type: Boolean, default: false},
+  toolTitle: {type: String, default: 'Tools'},
   modelTitle: {type: String, default: '모델 선택'},
   attachTitle: {type: String, default: '첨부'},
 });

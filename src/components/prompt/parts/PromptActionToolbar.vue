@@ -81,17 +81,15 @@
           </svg>
         </button>
         <div v-if="attachMenuOpen && !isMobileSheet" class="prompt-popover attach-menu" role="menu">
-          <button v-if="showCameraMenu" type="button" role="menuitem" @click="$emit('open-file-picker', 'camera')">
-            <span aria-hidden="true">📷</span>
-            <p>Camera</p>
-          </button>
-          <button type="button" role="menuitem" @click="$emit('open-file-picker', 'image')">
-            <span aria-hidden="true">🖼️</span>
-            <p>Image</p>
-          </button>
-          <button type="button" role="menuitem" @click="$emit('open-file-picker', 'all')">
-            <span aria-hidden="true">📎</span>
-            <p>File</p>
+          <button
+            v-for="option in attachOptions"
+            :key="option.id"
+            type="button"
+            role="menuitem"
+            @click="$emit('open-file-picker', option.id)"
+          >
+            <span aria-hidden="true">{{ option.icon }}</span>
+            <p>{{ option.label }}</p>
           </button>
         </div>
       </div>
@@ -124,11 +122,11 @@ defineProps({
   currentModel: {type: Object, required: true},
   models: {type: Array, default: () => []},
   tools: {type: Array, default: () => []},
+  attachOptions: {type: Array, default: () => []},
   modelMenuOpen: {type: Boolean, default: false},
   toolMenuOpen: {type: Boolean, default: false},
   attachMenuOpen: {type: Boolean, default: false},
   isMobileSheet: {type: Boolean, default: false},
-  showCameraMenu: {type: Boolean, default: false},
   canSubmit: {type: Boolean, default: false},
   attachLabel: {type: String, default: 'Attach'},
   sendLabel: {type: String, default: 'Send'},

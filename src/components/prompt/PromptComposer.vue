@@ -32,7 +32,7 @@
         :tool-menu-open="toolMenuOpen"
         :attach-menu-open="attachMenuOpen"
         :is-mobile-sheet="isMobileSheet"
-        :show-camera-menu="showCameraMenu"
+        :attach-options="attachOptions"
         :can-submit="canSubmit"
         :attach-label="t('chat.attach')"
         :send-label="t('chat.send')"
@@ -67,7 +67,8 @@
       :models="currentModels"
       :tools="tools"
       :model-value="modelValue"
-      :show-camera-menu="showCameraMenu"
+      :attach-options="attachOptions"
+      :tool-title="t('chat.tools')"
       :model-title="t('chat.modelSelect')"
       :attach-title="t('chat.attach')"
       @close-model="modelMenuOpen = false"
@@ -121,8 +122,8 @@ const {
   currentModels,
   currentModel,
   tools,
+  attachOptions,
   canSubmit,
-  showCameraMenu,
   resize,
   handleFocus,
   submit,

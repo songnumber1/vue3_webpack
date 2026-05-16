@@ -2238,17 +2238,17 @@
 
 .app-container--mobile .attachment-preview-card,
 .app-container--mobile .attachment-preview-card--image {
-  flex: 0 0 72px !important;
-  width: 72px !important;
-  height: 72px !important;
-  min-width: 72px !important;
-  min-height: 72px !important;
-  max-width: 72px !important;
-  max-height: 72px !important;
+  flex: 0 0 var(--attachment-mobile-size) !important;
+  width: var(--attachment-mobile-size) !important;
+  height: var(--attachment-mobile-size) !important;
+  min-width: var(--attachment-mobile-size) !important;
+  min-height: var(--attachment-mobile-size) !important;
+  max-width: var(--attachment-mobile-size) !important;
+  max-height: var(--attachment-mobile-size) !important;
   display: grid !important;
   place-items: center !important;
   padding: 6px !important;
-  border-radius: 14px !important;
+  border-radius: var(--attachment-mobile-radius) !important;
   overflow: visible !important;
 }
 
@@ -2260,14 +2260,14 @@
   min-height: 0 !important;
   display: grid !important;
   place-items: center !important;
-  border-radius: 10px !important;
+  border-radius: var(--attachment-mobile-thumb-radius) !important;
 }
 
 .app-container--mobile .attachment-preview-thumb img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  border-radius: 10px !important;
+  border-radius: var(--attachment-mobile-thumb-radius) !important;
 }
 
 .app-container--mobile .attachment-preview-file {
@@ -2285,12 +2285,12 @@
 
 .app-container--mobile .attachment-preview-remove,
 .app-container--mobile .attachment-preview-card--image .attachment-preview-remove {
-  top: -10px !important;
-  right: -10px !important;
-  width: 30px !important;
-  height: 30px !important;
-  min-width: 30px !important;
-  min-height: 30px !important;
+  top: var(--attachment-mobile-remove-offset) !important;
+  right: var(--attachment-mobile-remove-offset) !important;
+  width: var(--attachment-mobile-remove-size) !important;
+  height: var(--attachment-mobile-remove-size) !important;
+  min-width: var(--attachment-mobile-remove-size) !important;
+  min-height: var(--attachment-mobile-remove-size) !important;
   padding: 0 0 2px !important;
   font-size: 22px !important;
   line-height: 1 !important;

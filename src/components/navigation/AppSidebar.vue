@@ -110,6 +110,7 @@
 import {onBeforeUnmount, onMounted, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
+import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import Icon from '@/components/navigation/SidebarIcon.vue';
@@ -152,7 +153,7 @@ const assistantSelectorRef = ref(null);
  */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
-    window.matchMedia?.('(max-width: 900px)')?.matches ||
+    window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
       document.querySelector('.app-container--mobile')
   );
 }

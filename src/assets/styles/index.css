@@ -5,6 +5,7 @@
 @import "./chat/markdown.css";
 @import "./chat/bottom-sheet-composer.css";
 @import "./chat/playground-feedback.css";
+@import "./chat/attachment-preview-tokens.css";
 
 @import "./chat/responsive-keyboard.css";
 @import "./chat/session-mobile-browser-fixes.css";

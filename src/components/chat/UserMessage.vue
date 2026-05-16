@@ -45,6 +45,8 @@
 
 <script setup>
 import {computed} from "vue";
+import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
+import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
 const props = defineProps({message: {type: Object, required: true}});
 defineEmits(["rendered"]);
@@ -68,20 +70,9 @@ function getPreviewUrl(file) {
  */
 function openImage(file) {
   window.dispatchEvent(
-    new CustomEvent("chat:image-preview", {
+    new CustomEvent(IMAGE_PREVIEW_EVENT, {
       detail: {...file, url: getPreviewUrl(file)},
     })
   );
-}
-/**
- * formatFileSize 처리 함수입니다.
- * @param {*} size 함수 실행에 필요한 입력값입니다.
- * @returns {void}
- */
-function formatFileSize(size) {
-  if (!size) return "0 B";
-  if (size < 1024) return `${size} B`;
-  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }
 </script>

@@ -1,4 +1,5 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
+import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 
 /**
  * Returns unique preview source URLs from an attachment detail object.
@@ -142,10 +143,10 @@ export function useImagePreview() {
   }
 
   onMounted(() =>
-    window.addEventListener("chat:image-preview", openImagePreview)
+    window.addEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
   );
   onBeforeUnmount(() =>
-    window.removeEventListener("chat:image-preview", openImagePreview)
+    window.removeEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
   );
 
   return {

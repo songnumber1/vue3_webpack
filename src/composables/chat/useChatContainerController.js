@@ -12,6 +12,7 @@ import {useNavigationStore} from '@/stores/navigationStore';
 import {addMediaQueryListener} from '@/utils/dom';
 import {renderMermaidInElement} from '@/utils/mermaidRenderer';
 import {PROMPT_SUGGESTION_LIMIT} from '@/constants/promptSuggestions';
+import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 
 /**
  * Creates the page controller for ChatContainer.vue.
@@ -136,8 +137,8 @@ export function useChatContainerController(props) {
 
   function updateMobileState() {
     isMobile.value = Boolean(
-      window.matchMedia?.('(max-width: 900px)')?.matches ||
-        window.innerWidth <= 900 ||
+      window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
+        window.innerWidth <= MOBILE_BREAKPOINT_PX ||
         document.querySelector('.app-container--mobile')
     );
   }
@@ -342,7 +343,7 @@ export function useChatContainerController(props) {
   onMounted(async () => {
     updateMobileState();
     removeMobileMediaQueryListener = addMediaQueryListener(
-      '(max-width: 900px)',
+      `(max-width: ${MOBILE_BREAKPOINT_PX}px)`,
       updateMobileState
     );
     window.addEventListener('resize', updateMobileState, {passive: true});
