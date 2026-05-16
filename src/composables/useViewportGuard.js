@@ -4,6 +4,7 @@ import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   MOBILE_BREAKPOINT_PX,
+  VIEWPORT_GUARD_DELAY_MS,
 } from "@/constants/uiTokens";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 
@@ -206,7 +207,10 @@ export function useViewportGuard(options = {}) {
     window.clearTimeout(resizeTimer);
     apply();
     const browserFamily = getMobileBrowserFamily();
-    const delay = browserFamily === 'samsung' ? 200 : 80;
+    const delay =
+      browserFamily === 'samsung'
+        ? VIEWPORT_GUARD_DELAY_MS.samsung
+        : VIEWPORT_GUARD_DELAY_MS.default;
     resizeTimer = window.setTimeout(apply, delay);
   }
 

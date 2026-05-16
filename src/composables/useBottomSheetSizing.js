@@ -1,5 +1,10 @@
 import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
 import {
+  BOTTOM_SHEET_SNAP_RATIO,
+  BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
+  MOBILE_BREAKPOINT_PX,
+} from '@/constants/uiTokens';
+import {
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   getMobileBrowserFamily,
   getSafeAreaBottom,
@@ -7,7 +12,6 @@ import {
   isMobileViewport as readIsMobileViewport,
 } from '@/utils/viewport';
 
-const MOBILE_BREAKPOINT_PX = 900;
 const MIN_VISIBLE_OPTION_COUNT = 3;
 const DEFAULT_OPTION_HEIGHT_PX = 58;
 const DEFAULT_SHEET_CHROME_HEIGHT_PX = 122;
@@ -30,6 +34,7 @@ export function useBottomSheetSizing(props, emit) {
   let previousBodyOverflow = '';
   let viewportTimer = null;
   let measureRaf = 0;
+  let viewportListenersRegistered = false;
 
   const sheetStyle = computed(() => ({
     '--bottom-sheet-height': `${Math.round(currentHeight.value)}px`,
@@ -188,12 +193,14 @@ export function useBottomSheetSizing(props, emit) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.initialSnap === 'full') return viewportHeight * props.maxRatio;
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.initialSnap === 'half') return viewportHeight * 0.58;
+    if (props.initialSnap === 'half') return viewportHeight * BOTTOM_SHEET_SNAP_RATIO.half;
 
     const minimumSheetHeight = getMinimumSheetHeight();
     const contentHeight = getContentHeight();
     const contentSnapRatio =
-      isMobileViewport() && getMobileBrowserFamily() === 'firefox' ? 0.64 : 0.72;
+      isMobileViewport() && getMobileBrowserFamily() === 'firefox'
+        ? BOTTOM_SHEET_SNAP_RATIO.contentFirefox
+        : BOTTOM_SHEET_SNAP_RATIO.contentDefault;
 
     // 계산된 결과를 호출부로 반환합니다.
     return Math.max(
@@ -211,7 +218,9 @@ export function useBottomSheetSizing(props, emit) {
   function setHeight(height, snap = 'custom') {
     currentHeight.value = clampHeight(height);
     currentSnap.value =
-      currentHeight.value >= getViewportHeight() * 0.82 ? 'full' : snap;
+      currentHeight.value >= getViewportHeight() * BOTTOM_SHEET_SNAP_RATIO.fullThreshold
+        ? 'full'
+        : snap;
   }
 
   /**
@@ -323,8 +332,8 @@ export function useBottomSheetSizing(props, emit) {
 
     const viewportHeight = getViewportHeight();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (currentHeight.value > viewportHeight * 0.76) expand();
-    else if (currentHeight.value < props.minHeight * 0.82) emit('close');
+    if (currentHeight.value > viewportHeight * BOTTOM_SHEET_SNAP_RATIO.expandThreshold) expand();
+    else if (currentHeight.value < props.minHeight * BOTTOM_SHEET_SNAP_RATIO.closeThreshold) emit('close');
   }
 
   /**
@@ -338,7 +347,47 @@ export function useBottomSheetSizing(props, emit) {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!props.open) return;
       setHeight(currentHeight.value, currentSnap.value);
-    }, 60);
+    }, BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS);
+  }
+
+  /**
+   * @description 바텀시트가 열려 있는 동안 필요한 viewport 리스너를 한 번만 등록합니다.
+   * @returns {void} 이미 등록된 경우 중복 등록하지 않습니다.
+   */
+  function registerViewportListeners() {
+    if (viewportListenersRegistered) return;
+    window.addEventListener('resize', scheduleViewportRefresh, {
+      passive: true,
+    });
+    window.visualViewport?.addEventListener(
+      'resize',
+      scheduleViewportRefresh,
+      {passive: true}
+    );
+    window.visualViewport?.addEventListener(
+      'scroll',
+      scheduleViewportRefresh,
+      {passive: true}
+    );
+    viewportListenersRegistered = true;
+  }
+
+  /**
+   * @description 바텀시트 viewport 리스너를 안전하게 해제합니다.
+   * @returns {void} 등록된 리스너가 있을 때만 해제합니다.
+   */
+  function unregisterViewportListeners() {
+    if (!viewportListenersRegistered) return;
+    window.removeEventListener('resize', scheduleViewportRefresh);
+    window.visualViewport?.removeEventListener(
+      'resize',
+      scheduleViewportRefresh
+    );
+    window.visualViewport?.removeEventListener(
+      'scroll',
+      scheduleViewportRefresh
+    );
+    viewportListenersRegistered = false;
   }
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
@@ -349,30 +398,10 @@ export function useBottomSheetSizing(props, emit) {
       if (isOpen) {
         lockBodyScroll();
         resetHeight();
-        window.addEventListener('resize', scheduleViewportRefresh, {
-          passive: true,
-        });
-        window.visualViewport?.addEventListener(
-          'resize',
-          scheduleViewportRefresh,
-          {passive: true}
-        );
-        window.visualViewport?.addEventListener(
-          'scroll',
-          scheduleViewportRefresh,
-          {passive: true}
-        );
+        registerViewportListeners();
       } else {
         unlockBodyScroll();
-        window.removeEventListener('resize', scheduleViewportRefresh);
-        window.visualViewport?.removeEventListener(
-          'resize',
-          scheduleViewportRefresh
-        );
-        window.visualViewport?.removeEventListener(
-          'scroll',
-          scheduleViewportRefresh
-        );
+        unregisterViewportListeners();
       }
     },
     {immediate: true}
@@ -387,9 +416,7 @@ export function useBottomSheetSizing(props, emit) {
     window.removeEventListener('pointermove', handleDrag);
     window.removeEventListener('pointerup', stopDrag);
     window.removeEventListener('pointercancel', stopDrag);
-    window.removeEventListener('resize', scheduleViewportRefresh);
-    window.visualViewport?.removeEventListener('resize', scheduleViewportRefresh);
-    window.visualViewport?.removeEventListener('scroll', scheduleViewportRefresh);
+    unregisterViewportListeners();
   });
 
   // 계산된 결과를 호출부로 반환합니다.

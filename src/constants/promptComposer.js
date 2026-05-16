@@ -2,6 +2,12 @@ import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const PROMPT_VIEWPORT_QUERY = `(max-width: ${MOBILE_BREAKPOINT_PX}px)`;
+export const PROMPT_MENU_TYPE = Object.freeze({
+  model: 'model',
+  tool: 'tool',
+  attach: 'attach',
+});
+export const PROMPT_SPEECH_LANGUAGE = 'ko-KR';
 
 export const PROMPT_TEXTAREA_HEIGHT = Object.freeze({
   min: 38,

@@ -19,6 +19,8 @@ import {
   FILE_PICKER_TYPE,
   IMAGE_PREVIEW_EVENT,
   NATIVE_FILE_SELECTED_TYPE,
+  PROMPT_MENU_TYPE,
+  PROMPT_SPEECH_LANGUAGE,
   PROMPT_TEXTAREA_HEIGHT,
   PROMPT_TOOL_DEFINITIONS,
   PROMPT_VIEWPORT_QUERY,
@@ -46,7 +48,7 @@ export function usePromptComposer(props, emit) {
   const isMobileSheet = ref(false);
   const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
   let lastHeight = 0;
-  let removeViewportListener = null;
+  let viewportResizeListenerRegistered = false;
 
   const fallbackModels = computed(() => [
     {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
@@ -79,7 +81,7 @@ export function usePromptComposer(props, emit) {
     () => hasPromptText.value || attachments.value.length > 0
   );
   const speech = useSpeechRecognition({
-    language: 'ko-KR',
+    language: PROMPT_SPEECH_LANGUAGE,
     onText: (nextText) => {
       text.value = nextText;
       nextTick(resize);
@@ -170,12 +172,10 @@ export function usePromptComposer(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function closeMenus(except = '') {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (except !== 'model') modelMenuOpen.value = false;
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (except !== 'tool') toolMenuOpen.value = false;
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (except !== 'attach') attachMenuOpen.value = false;
+    // 현재 열어야 하는 메뉴를 제외하고 나머지 메뉴 상태를 닫습니다.
+    if (except !== PROMPT_MENU_TYPE.model) modelMenuOpen.value = false;
+    if (except !== PROMPT_MENU_TYPE.tool) toolMenuOpen.value = false;
+    if (except !== PROMPT_MENU_TYPE.attach) attachMenuOpen.value = false;
   }
 
   /**
@@ -188,7 +188,7 @@ export function usePromptComposer(props, emit) {
     if (props.disabled || props.modelReadonly) return;
     syncViewportMode();
     const next = !modelMenuOpen.value;
-    closeMenus('model');
+    closeMenus(PROMPT_MENU_TYPE.model);
     modelMenuOpen.value = next;
   }
 
@@ -202,7 +202,7 @@ export function usePromptComposer(props, emit) {
     if (props.disabled) return;
     syncViewportMode();
     const next = !toolMenuOpen.value;
-    closeMenus('tool');
+    closeMenus(PROMPT_MENU_TYPE.tool);
     toolMenuOpen.value = next;
   }
 
@@ -216,7 +216,7 @@ export function usePromptComposer(props, emit) {
     if (props.disabled) return;
     syncViewportMode();
     const next = !attachMenuOpen.value;
-    closeMenus('attach');
+    closeMenus(PROMPT_MENU_TYPE.attach);
     attachMenuOpen.value = next;
   }
 
@@ -419,6 +419,26 @@ export function usePromptComposer(props, emit) {
     nextTick(resize);
   }
 
+  /**
+   * @description 프롬프트 입력 영역의 모바일/데스크톱 전환 감지 리스너를 1회만 등록합니다.
+   * @returns {void} resize 리스너 중복 등록 없이 내부 상태만 갱신합니다.
+   */
+  function registerViewportModeListener() {
+    if (viewportResizeListenerRegistered) return;
+    window.addEventListener('resize', syncViewportMode, {passive: true});
+    viewportResizeListenerRegistered = true;
+  }
+
+  /**
+   * @description 프롬프트 입력 영역의 viewport resize 리스너를 안전하게 해제합니다.
+   * @returns {void} 등록된 리스너가 있을 때만 해제하여 중복 remove 호출을 방지합니다.
+   */
+  function unregisterViewportModeListener() {
+    if (!viewportResizeListenerRegistered) return;
+    window.removeEventListener('resize', syncViewportMode);
+    viewportResizeListenerRegistered = false;
+  }
+
   useOutsideClick(
     [
       () => getToolbarRoot('modelRoot'),
@@ -434,15 +454,13 @@ export function usePromptComposer(props, emit) {
     syncViewportMode();
     window.addEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
     resize();
-    window.addEventListener('resize', syncViewportMode, {passive: true});
-    removeViewportListener = () =>
-      window.removeEventListener('resize', syncViewportMode);
+    registerViewportModeListener();
   });
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     window.removeEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
-    removeViewportListener?.();
+    unregisterViewportModeListener();
     attachments.value.forEach((file) => {
       revokeAttachmentUrl(file);
     });

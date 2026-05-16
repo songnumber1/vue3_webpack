@@ -107,6 +107,36 @@ export function useSpeechRecognition(options = {}) {
   }
 
   /**
+   * @description SpeechRecognition 인스턴스에 연결된 브라우저 이벤트 핸들러를 모두 해제합니다.
+   * @param {SpeechRecognition|null} instance - 이벤트 핸들러를 제거할 음성 인식 인스턴스입니다.
+   * @returns {void} 인스턴스가 없으면 아무 작업도 하지 않습니다.
+   */
+  function detachRecognitionHandlers(instance) {
+    if (!instance) return;
+    instance.onstart = null;
+    instance.onresult = null;
+    instance.onerror = null;
+    instance.onend = null;
+  }
+
+  /**
+   * @description 현재 인스턴스를 중지하고 이벤트 핸들러를 해제해 재생성 시 중복 호출을 방지합니다.
+   * @param {boolean} abortActive - true이면 브라우저 인식 작업도 함께 abort 처리합니다.
+   * @returns {void} 내부 recognition 참조를 항상 null로 정리합니다.
+   */
+  function cleanupRecognition(abortActive = false) {
+    const current = recognition;
+    recognition = null;
+    if (!current) return;
+    detachRecognitionHandlers(current);
+    if (!abortActive) return;
+    try {
+      current.abort();
+    } catch (error) {
+    }
+  }
+
+  /**
    * @description buildRecognition 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
    * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
@@ -175,7 +205,9 @@ export function useSpeechRecognition(options = {}) {
 
     instance.onend = () => {
       isListening.value = false;
+      const endedRecognition = recognition;
       recognition = null;
+      detachRecognitionHandlers(endedRecognition);
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!shouldAutoRestart || hasManualStop.value) return;
       clearRestartTimer();
@@ -214,14 +246,7 @@ export function useSpeechRecognition(options = {}) {
     committedTranscript = "";
     interimTranscript = "";
 
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (recognition) {
-      // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
-      try {
-        recognition.abort();
-      } catch (error) {
-      }
-    }
+    cleanupRecognition(true);
 
     recognition = buildRecognition();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
@@ -234,7 +259,7 @@ export function useSpeechRecognition(options = {}) {
       return true;
     } catch (error) {
       errorMessage.value = error?.message || "speech-recognition-start-failed";
-      recognition = null;
+      cleanupRecognition(false);
       // 계산된 결과를 호출부로 반환합니다.
       return false;
     }
@@ -259,7 +284,7 @@ export function useSpeechRecognition(options = {}) {
       recognition.stop();
     } catch (error) {
       isListening.value = false;
-      recognition = null;
+      cleanupRecognition(false);
     }
   }
 
@@ -279,13 +304,7 @@ export function useSpeechRecognition(options = {}) {
   onBeforeUnmount(() => {
     shouldAutoRestart = false;
     clearRestartTimer();
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!recognition) return;
-    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
-    try {
-      recognition.abort();
-    } catch (error) {
-    }
+    cleanupRecognition(true);
   });
 
   // 계산된 결과를 호출부로 반환합니다.

@@ -4,4 +4,11 @@
   --attachment-mobile-thumb-radius: 10px;
   --attachment-mobile-remove-size: 30px;
   --attachment-mobile-remove-offset: -10px;
+
+  --prompt-action-size: 38px;
+  --prompt-action-icon-size: 20px;
+  --voice-stop-bg: #ef4444;
+  --voice-stop-text: #fff;
+  --voice-stop-ring: rgba(239, 68, 68, 0.14);
+  --voice-stop-icon-size: 13px;
 }
