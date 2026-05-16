@@ -224,7 +224,7 @@ import {useAppContext} from "@/composables/useAppContext";
 import {isAndroidApp} from "@/core/config";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
-import BaseBottomSheet from "@/components/chat/BaseBottomSheet.vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 

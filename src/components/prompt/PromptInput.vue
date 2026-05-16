@@ -1,6 +1,7 @@
 <!--
-@file PromptInput.vue * @description Vue component used in the chat web
-application runtime. * @author OpenAI
+@file PromptInput.vue
+@description Shared prompt composer used by main and chat screens. It owns textarea, model selector trigger, attachment menu trigger, and submit actions.
+@author OpenAI
 -->
 
 <template>
@@ -304,7 +305,7 @@ import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
 import {openNativeFilePicker} from "@/services/platformBridge";
 import {createId} from "@/utils/id";
-import BaseBottomSheet from "./BaseBottomSheet.vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const {t} = useI18n();

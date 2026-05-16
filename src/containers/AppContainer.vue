@@ -22,7 +22,9 @@ const {appInfo} = useAppContext();
 const platformStore = usePlatformStore();
 
 const platformInfo = computed(() => platformStore.info || {});
-const platformName = computed(() => platformInfo.value.env || appInfo?.platform || "web");
+const platformName = computed(
+  () => platformInfo.value.env || appInfo?.platform || "web"
+);
 const browserName = computed(() => platformInfo.value.browser || "unknown");
 const deviceName = computed(() => platformInfo.value.device || "unknown");
 const isMobileContainer = computed(

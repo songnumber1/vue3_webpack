@@ -1,5 +1,5 @@
 <!--
-@file ChatSidebar.vue
+@file AppSidebar.vue
 @description Responsive chat sidebar with desktop history navigation and mobile service menu.
 -->
 
@@ -292,8 +292,8 @@
 <script setup>
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
-import BaseBottomSheet from "./BaseBottomSheet.vue";
-import Icon from "./ChatSidebarIcon.vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import Icon from "@/components/navigation/SidebarIcon.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";

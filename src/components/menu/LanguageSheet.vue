@@ -33,7 +33,7 @@
 <script setup>
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import BaseBottomSheet from "@/components/chat/BaseBottomSheet.vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import {setAppLocale} from "@/i18n";
 
 const props = defineProps({open: {type: Boolean, default: false}});

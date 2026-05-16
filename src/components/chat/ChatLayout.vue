@@ -13,7 +13,7 @@
       'chat-container-root--sidebar-collapsed': sidebarCollapsed,
     }"
   >
-    <ChatSidebar
+    <AppSidebar
       :histories="histories"
       :assistants="assistants"
       :selected-assistant-id="selectedAssistantId"
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import ChatSidebar from "./ChatSidebar.vue";
+import AppSidebar from "@/components/navigation/AppSidebar.vue";
 
 defineProps({
   histories: {type: Array, required: true},

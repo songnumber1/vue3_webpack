@@ -184,7 +184,10 @@
     bottom: calc(
       var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
     ) !important;
-    padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(
+      var(--space-3, 12px),
+      env(safe-area-inset-bottom, 0px)
+    ) !important;
     max-height: var(--mobile-main-composer-space, 174px) !important;
     overflow: visible !important;
     overscroll-behavior: none !important;
@@ -220,8 +223,12 @@
     --mobile-main-composer-space: 150px;
   }
 
-  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt,
-  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+  .app-container--mobile
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt,
+  .app-container--mobile
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt.prompt-wrap,
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt,
@@ -238,7 +245,8 @@
     top: auto !important;
     right: 0 !important;
     bottom: calc(
-      var(--composer-keyboard-inset, 0px) + var(--mobile-browser-safe-bottom, 0px)
+      var(--composer-keyboard-inset, 0px) +
+        var(--mobile-browser-safe-bottom, 0px)
     ) !important;
     left: 0 !important;
     z-index: var(--mobile-main-composer-z, 90) !important;
@@ -261,7 +269,10 @@
     will-change: bottom !important;
   }
 
-  .app-container--mobile .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+  .app-container--mobile
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt
+    .prompt-box,
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
@@ -288,7 +299,10 @@
     padding-bottom: 0 !important;
   }
 
-  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-history,
+  .mobile-browser-firefox
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-history,
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
@@ -356,8 +370,10 @@
 
   .mobile-browser-firefox .chat-container-root--mode-chat,
   .mobile-browser-firefox .chat-container-root--mode-shared,
-  .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-chat,
-  .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-shared {
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-chat,
+  .app-container--mobile.app-container--browser-firefox
+    .chat-container-root--mode-shared {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
   }
@@ -375,7 +391,8 @@
   }
 
   .mobile-browser-samsung .mobile-drawer,
-  .app-container--mobile.app-container--browser-samsung-internet .mobile-drawer {
+  .app-container--mobile.app-container--browser-samsung-internet
+    .mobile-drawer {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
     min-height: 0 !important;
@@ -395,7 +412,10 @@
     padding-bottom: 0 !important;
   }
 
-  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-history,
+  .mobile-browser-samsung
+    .mobile-drawer
+    .sidebar-content--mobile
+    .sidebar-history,
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-content--mobile
@@ -420,7 +440,10 @@
     bottom: auto !important;
     flex: 0 0 auto !important;
     margin-top: auto !important;
-    padding-bottom: max(var(--space-4, 16px), env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(
+      var(--space-4, 16px),
+      env(safe-area-inset-bottom, 0px)
+    ) !important;
     transform: none !important;
   }
 }

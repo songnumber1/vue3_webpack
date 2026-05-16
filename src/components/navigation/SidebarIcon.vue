@@ -1,6 +1,7 @@
 <!--
-@file ChatSidebarIcon.vue * @description Vue component used in the chat
-web application runtime. * @author OpenAI
+@file SidebarIcon.vue
+@description Reusable navigation SVG icon component used by the application sidebar.
+@author OpenAI
 -->
 
 <template>

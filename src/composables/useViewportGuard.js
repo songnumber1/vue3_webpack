@@ -27,7 +27,6 @@ function getViewportSize() {
   };
 }
 
-
 function getMobileBrowserFamily() {
   const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
   if (/SamsungBrowser/i.test(userAgent)) return "samsung";
@@ -90,9 +89,13 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
   );
   const offsetTop = Math.max(size.offsetTop || 0, 0);
   const visualBottom = offsetTop + visualHeight;
-  const activeElement = typeof document !== "undefined" ? document.activeElement : null;
+  const activeElement =
+    typeof document !== "undefined" ? document.activeElement : null;
   const hasTextFocus = isTextEditingElement(activeElement);
-  const candidateFromLayout = Math.max((size.layoutHeight || 0) - visualBottom, 0);
+  const candidateFromLayout = Math.max(
+    (size.layoutHeight || 0) - visualBottom,
+    0
+  );
   const candidateFromBaseline = Math.max(layoutHeight - visualBottom, 0);
   const browserFamily = getMobileBrowserFamily();
   const keyboardHeight = hasTextFocus
@@ -123,10 +126,8 @@ function setCssViewportVars(size, baselineHeight = 0) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
   const browserFamily = getMobileBrowserFamily();
-  const {layoutHeight, keyboardHeight, composerInset, offsetTop} = getKeyboardMetrics(
-    size,
-    baselineHeight
-  );
+  const {layoutHeight, keyboardHeight, composerInset, offsetTop} =
+    getKeyboardMetrics(size, baselineHeight);
   const browserSafeBottom = browserFamily === "firefox" ? 0 : null;
 
   applyBrowserViewportClass(browserFamily);
@@ -154,7 +155,9 @@ function setCssViewportVars(size, baselineHeight = 0) {
     `${offsetTop}px`
   );
   if (browserSafeBottom === null) {
-    document.documentElement.style.removeProperty("--mobile-browser-safe-bottom");
+    document.documentElement.style.removeProperty(
+      "--mobile-browser-safe-bottom"
+    );
   } else {
     document.documentElement.style.setProperty(
       "--mobile-browser-safe-bottom",
@@ -191,13 +194,18 @@ export function useViewportGuard(options = {}) {
     const size = getViewportSize();
     viewportHeight.value = size.height;
     viewportWidth.value = size.width;
-    const activeElement = typeof document !== "undefined" ? document.activeElement : null;
+    const activeElement =
+      typeof document !== "undefined" ? document.activeElement : null;
     const hasTextFocus = isTextEditingElement(activeElement);
     const stableHeight = Math.max(size.height || 0, size.layoutHeight || 0);
-    if (!hasTextFocus && (!baselineHeight.value || stableHeight > baselineHeight.value)) {
+    if (
+      !hasTextFocus &&
+      (!baselineHeight.value || stableHeight > baselineHeight.value)
+    ) {
       baselineHeight.value = stableHeight;
     }
-    if (!baselineHeight.value) baselineHeight.value = stableHeight || size.height;
+    if (!baselineHeight.value)
+      baselineHeight.value = stableHeight || size.height;
 
     const metrics = setCssViewportVars(size, baselineHeight.value);
 

@@ -1,5 +1,5 @@
 <!--
-@file ChatAssistantSheet.vue
+@file AssistantSheet.vue
 @description Bottom sheet used to select the active Assistant profile.
 @author OpenAI
 -->
@@ -31,7 +31,7 @@
 </template>
 
 <script setup>
-import BaseBottomSheet from "./BaseBottomSheet.vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 defineProps({

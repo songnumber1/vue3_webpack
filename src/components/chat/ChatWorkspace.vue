@@ -118,7 +118,7 @@ import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
-import PromptInput from "./PromptInput.vue";
+import PromptInput from "@/components/prompt/PromptInput.vue";
 
 const {t} = useI18n();
 const listRef = ref(null);

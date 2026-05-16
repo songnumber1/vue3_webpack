@@ -1,6 +1,7 @@
 <!--
-@file BaseBottomSheet.vue * @description Vue component used in the chat
-web application runtime. * @author OpenAI
+@file BaseBottomSheet.vue
+@description Shared mobile bottom sheet component used by assistant, language, playground, and prompt menus.
+@author OpenAI
 -->
 
 <template>
@@ -118,7 +119,9 @@ function getMobileBrowserFamily() {
  */
 function readRootPixelVar(name) {
   if (typeof document === "undefined") return 0;
-  const value = window.getComputedStyle(document.documentElement).getPropertyValue(name);
+  const value = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue(name);
   const parsed = Number.parseFloat(value || "0");
   return Number.isFinite(parsed) ? parsed : 0;
 }
@@ -134,9 +137,12 @@ function getViewportHeight() {
   const innerHeight = Math.round(window.innerHeight || 0);
   const clientHeight = Math.round(document.documentElement?.clientHeight || 0);
   const appHeight = Math.round(readRootPixelVar("--app-height") || 0);
-  const candidates = [visualHeight, innerHeight, clientHeight, appHeight].filter(
-    (height) => Number.isFinite(height) && height >= 320
-  );
+  const candidates = [
+    visualHeight,
+    innerHeight,
+    clientHeight,
+    appHeight,
+  ].filter((height) => Number.isFinite(height) && height >= 320);
 
   if (!candidates.length) return 720;
 
@@ -204,7 +210,8 @@ function getMinimumVisibleBodyHeight() {
     body?.querySelectorAll?.(".bottom-sheet-option") || []
   );
 
-  if (!options.length) return DEFAULT_OPTION_HEIGHT_PX * MIN_VISIBLE_OPTION_COUNT;
+  if (!options.length)
+    return DEFAULT_OPTION_HEIGHT_PX * MIN_VISIBLE_OPTION_COUNT;
 
   const visibleOptions = options.slice(0, MIN_VISIBLE_OPTION_COUNT);
   const totalOptionHeight = visibleOptions.reduce((sum, option) => {
@@ -214,7 +221,6 @@ function getMinimumVisibleBodyHeight() {
 
   return Math.ceil(totalOptionHeight + 12);
 }
-
 
 /**
  * Measures only the real slot content height instead of the flex-expanded sheet

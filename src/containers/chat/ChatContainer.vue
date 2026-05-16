@@ -74,7 +74,7 @@
       @error="handlePreviewError"
     />
 
-    <ChatAssistantSheet
+    <AssistantSheet
       :open="assistantSheetOpen"
       :assistants="assistants"
       :selected-assistant-id="selectedAssistantId"
@@ -130,7 +130,7 @@ import {useViewportGuard} from "@/composables/useViewportGuard";
 import {addMediaQueryListener} from "@/utils/dom";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
-import ChatAssistantSheet from "@/components/chat/ChatAssistantSheet.vue";
+import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
 import ChatWorkspace from "@/components/chat/ChatWorkspace.vue";
@@ -508,7 +508,8 @@ function openPlayground() {
  * @returns {void}
  */
 function openMobileDrawer() {
-  const activeElement = typeof document !== "undefined" ? document.activeElement : null;
+  const activeElement =
+    typeof document !== "undefined" ? document.activeElement : null;
   if (activeElement?.blur) activeElement.blur();
   drawerOpen.value = true;
   window.setTimeout(refreshViewport, 50);
