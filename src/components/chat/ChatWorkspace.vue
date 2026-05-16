@@ -117,14 +117,16 @@ import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "@/components/prompt/PromptInput.vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
 let composerResizeObserver = null;
 
 /**
- * Updates the global composer height CSS variable used to position the scroll-to-bottom button.
- * @returns {void}
+ * @description updateComposerHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function updateComposerHeight() {
   const height = composerSlotRef.value?.offsetHeight || 0;
@@ -135,14 +137,17 @@ function updateComposerHeight() {
 }
 
 /**
- * Starts observing composer size changes so the floating bottom button never sits behind the input.
- * @returns {void}
+ * @description observeComposerHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function observeComposerHeight() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!composerSlotRef.value) return;
 
   updateComposerHeight();
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof ResizeObserver !== "undefined") {
     composerResizeObserver = new ResizeObserver(updateComposerHeight);
     composerResizeObserver.observe(composerSlotRef.value);
@@ -150,19 +155,22 @@ function observeComposerHeight() {
 }
 
 /**
- * Stops observing composer size changes and clears the observer reference.
- * @returns {void}
+ * @description cleanupComposerHeightObserver 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function cleanupComposerHeightObserver() {
   composerResizeObserver?.disconnect();
   composerResizeObserver = null;
 }
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onMounted(async () => {
   await nextTick();
   observeComposerHeight();
 });
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onBeforeUnmount(cleanupComposerHeightObserver);
 
 const props = defineProps({
@@ -202,6 +210,7 @@ defineEmits([
   "scroll-bottom",
 ]);
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 watch(
   () => [
     props.readonly,

@@ -48,6 +48,7 @@ import {computed} from "vue";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({message: {type: Object, required: true}});
 defineEmits(["rendered"]);
 const hasAttachments = computed(
@@ -56,17 +57,18 @@ const hasAttachments = computed(
     props.message.attachments.length > 0
 );
 /**
- * getPreviewUrl 처리 함수입니다.
- * @param {*} file 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getPreviewUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} file - file 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getPreviewUrl(file) {
+  // 계산된 결과를 호출부로 반환합니다.
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
 /**
- * openImage 처리 함수입니다.
- * @param {*} file 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description openImage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} file - file 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function openImage(file) {
   window.dispatchEvent(

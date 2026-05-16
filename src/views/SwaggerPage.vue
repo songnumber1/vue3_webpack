@@ -54,6 +54,7 @@ import {RouterLink} from "vue-router";
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
 import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
 } from "@/bridge/swaggerRuntime";
@@ -68,22 +69,26 @@ const categoryOptions = getOpenApiCategoryOptions();
 const selectedCategory = ref(BRIDGE_CATEGORY.ALL);
 
 /**
- * clearSwaggerRoot 처리 함수입니다.
- * @returns {void}
+ * @description clearSwaggerRoot 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function clearSwaggerRoot() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (swaggerRoot.value) {
     swaggerRoot.value.innerHTML = "";
   }
 }
 
 /**
- * renderSwagger 함수입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description renderSwagger 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 const renderSwagger = async () => {
   renderError.value = "";
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     installWebViewCompat();
     const [{default: SwaggerUI}] = await Promise.all([
@@ -95,6 +100,7 @@ const renderSwagger = async () => {
     await nextTick();
     clearSwaggerRoot();
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!swaggerRoot.value) return;
 
     swaggerInstance = SwaggerUI({
@@ -123,18 +129,21 @@ const renderSwagger = async () => {
   }
 };
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onMounted(async () => {
   installWebViewCompat();
   installSwaggerRuntime();
   await renderSwagger();
 });
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onBeforeUnmount(() => {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (swaggerInstance?.getSystem) {
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       swaggerInstance.getSystem().specActions.updateSpec("");
     } catch {
-      // ignore swagger cleanup errors
     }
   }
   swaggerInstance = null;

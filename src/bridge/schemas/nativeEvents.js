@@ -1,5 +1,6 @@
 import {z} from "../zod";
 import {BaseRequest, createResponseSchema} from "./base";
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const NativeEventAckData = z.object({
   handled: z.boolean().openapi({description: "JS 수신 여부", example: true}),
   eventName: z

@@ -88,6 +88,7 @@ import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {setAppLocale} from "@/i18n";
 import {useOutsideClick} from '@/composables/useOutsideClick';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const emit = defineEmits(["notice", "personalization", "playground"]);
 const {t, locale} = useI18n();
 const open = ref(false);
@@ -100,26 +101,29 @@ const languageOptions = computed(() => [
 ]);
 
 /**
- * Toggles the desktop user dropdown menu.
- * @returns {void}
+ * @description toggleOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function toggleOpen() {
   open.value = !open.value;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!open.value) languageOpen.value = false;
 }
 
 /**
- * Toggles the nested language selector inside the desktop user menu.
- * @returns {void}
+ * @description toggleLanguageOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function toggleLanguageOpen() {
   languageOpen.value = !languageOpen.value;
 }
 
 /**
- * Emits a selected user-menu action and closes the menu.
- * @param {'notice'|'personalization'|'playground'} action Selected action key.
- * @returns {void}
+ * @description select 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} action - action 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function select(action) {
   open.value = false;
@@ -128,9 +132,9 @@ function select(action) {
 }
 
 /**
- * Applies the selected locale without leaving the desktop selector menu in a broken state.
- * @param {'ko'|'en'} value Locale code selected by the user.
- * @returns {void}
+ * @description selectLocale 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function selectLocale(value) {
   setAppLocale(value);

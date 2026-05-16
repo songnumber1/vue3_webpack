@@ -10,34 +10,41 @@ import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * textContent 처리 함수입니다.
- * @param {*} node 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description textContent 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} node - node 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function textContent(node) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!node) return "";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof node.value === "string") return node.value;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!Array.isArray(node.children)) return "";
+  // 계산된 결과를 호출부로 반환합니다.
   return node.children.map(textContent).join("");
 }
 
 /**
- * Resolves a markdown toolbar label from the active i18n locale.
- * @param {string} key Translation key.
- * @returns {string} Resolved translated label.
+ * @description mdLabel 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} key - key 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function mdLabel(key) {
+  // 계산된 결과를 호출부로 반환합니다.
   return i18n.global.t(key);
 }
 
 /**
- * Creates an icon-only markdown table toolbar button.
- * @param {'copy'|'csv'} action Table action key.
- * @param {string} label Accessible button label.
- * @returns {object} HAST button node.
+ * @description tableActionButton 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} action - action 입력값입니다.
+ * @param {*} label - label 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function tableActionButton(action, label) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     type: "element",
     tagName: "button",
@@ -71,13 +78,17 @@ function tableActionButton(action, label) {
 }
 
 /**
- * rehypeTableWrapper 처리 함수입니다.
- * @returns {void}
+ * @description rehypeTableWrapper 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function rehypeTableWrapper() {
+  // 계산된 결과를 호출부로 반환합니다.
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!parent || typeof index !== "number") return;
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (node.tagName !== "table") return;
 
       parent.children[index] = {
@@ -120,19 +131,24 @@ function rehypeTableWrapper() {
 }
 
 /**
- * rehypeMermaidBlock 처리 함수입니다.
- * @returns {void}
+ * @description rehypeMermaidBlock 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function rehypeMermaidBlock() {
+  // 계산된 결과를 호출부로 반환합니다.
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!parent || typeof index !== "number") return;
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (node.tagName !== "pre") return;
 
       const codeNode = node.children?.[0];
       const classNames = codeNode?.properties?.className || [];
       const isMermaid =
         codeNode?.tagName === "code" && classNames.includes("language-mermaid");
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!isMermaid) return;
 
       parent.children[index] = {
@@ -164,21 +180,23 @@ const processor = unified()
   .use(rehypeStringify);
 
 /**
- * renderMarkdown 함수입니다.
- * @param {*} text 함수 실행에 필요한 값입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description renderMarkdown 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} text - text 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export async function renderMarkdown(text) {
   const file = await processor.process(String(text ?? ""));
   const html = String(file).trim();
+  // 계산된 결과를 호출부로 반환합니다.
   return html || "<p></p>";
 }
 
 /**
- * isMarkdownRenderable 함수입니다.
- * @param {*} value 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description isMarkdownRenderable 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isMarkdownRenderable(value) {
+  // 계산된 결과를 호출부로 반환합니다.
   return value !== undefined && value !== null;
 }

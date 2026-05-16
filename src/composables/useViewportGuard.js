@@ -1,5 +1,6 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   MOBILE_BREAKPOINT_PX,
@@ -7,14 +8,12 @@ import {
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 
 /**
- * Applies browser-specific classes used by CSS fallback rules.
- * Firefox Android and Samsung Internet report viewport metrics differently,
- * so the fixed mobile composer uses these classes for small spacing overrides.
- *
- * @param {string} browserFamily Normalized mobile browser name.
- * @returns {void}
+ * @description applyBrowserViewportClass 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} browserFamily - browserFamily 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function applyBrowserViewportClass(browserFamily) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   const body = document.body;
@@ -31,9 +30,16 @@ function applyBrowserViewportClass(browserFamily) {
   body?.classList.add(className);
 }
 
+/**
+ * @description isTextEditingElement 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} element - element 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function isTextEditingElement(element) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!element) return false;
   const tagName = element.tagName?.toLowerCase?.();
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     tagName === "textarea" ||
     tagName === "input" ||
@@ -42,13 +48,10 @@ function isTextEditingElement(element) {
 }
 
 /**
- * Calculates the virtual keyboard inset using both layout viewport and baseline values.
- * Samsung Internet, Chrome and Firefox Android report different visualViewport values,
- * so the composer uses a conservative inset while the keyboard is actually focused.
- *
- * @param {object} size Current viewport metrics.
- * @param {number} baselineHeight Largest stable viewport height seen while keyboard is closed.
- * @returns {{layoutHeight:number, keyboardHeight:number, offsetTop:number}}
+ * @description getKeyboardMetrics 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} size - size 입력값입니다.
+ * @param {*} baselineHeight - baselineHeight 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getKeyboardMetrics(size, baselineHeight = 0) {
   const visualHeight = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
@@ -78,6 +81,7 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
       : candidateFromLayout
     : 0;
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     layoutHeight,
     keyboardHeight,
@@ -87,11 +91,10 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
 }
 
 /**
- * Mirrors current viewport metrics to CSS variables consumed by mobile layouts.
- *
- * @param {object} size Current visual/layout viewport metrics.
- * @param {number} baselineHeight Largest known stable viewport height.
- * @returns {{keyboardHeight:number, layoutHeight:number}}
+ * @description setCssViewportVars 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} size - size 입력값입니다.
+ * @param {*} baselineHeight - baselineHeight 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function setCssViewportVars(size, baselineHeight = 0) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
@@ -125,6 +128,7 @@ function setCssViewportVars(size, baselineHeight = 0) {
     "--visual-viewport-offset-top",
     `${offsetTop}px`
   );
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserSafeBottom === null) {
     document.documentElement.style.removeProperty(
       "--mobile-browser-safe-bottom"
@@ -137,13 +141,14 @@ function setCssViewportVars(size, baselineHeight = 0) {
   }
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {keyboardHeight, layoutHeight};
 }
 
 /**
- * Keeps the chat layout aligned with the real visible viewport.
- * Android Chrome and Android WebView resize the visual viewport when the keyboard opens.
- * This composable mirrors that size to CSS variables and exposes a keyboard-open flag.
+ * @description useViewportGuard 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
@@ -158,8 +163,9 @@ export function useViewportGuard(options = {}) {
   );
 
   /**
-   * apply 처리 함수입니다.
-   * @returns {void}
+   * @description apply 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function apply() {
     const size = getViewportSize();
@@ -169,12 +175,14 @@ export function useViewportGuard(options = {}) {
       typeof document !== "undefined" ? document.activeElement : null;
     const hasTextFocus = isTextEditingElement(activeElement);
     const stableHeight = Math.max(size.height || 0, size.layoutHeight || 0);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (
       !hasTextFocus &&
       (!baselineHeight.value || stableHeight > baselineHeight.value)
     ) {
       baselineHeight.value = stableHeight;
     }
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!baselineHeight.value)
       baselineHeight.value = stableHeight || size.height;
 
@@ -190,28 +198,32 @@ export function useViewportGuard(options = {}) {
   }
 
   /**
-   * scheduleApply 처리 함수입니다.
-   * @returns {void}
+   * @description scheduleApply 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
     apply();
-    // Samsung Internet는 visualViewport 업데이트가 150~200ms 지연되므로
-    // 한 번 더 적용하여 키보드 올라올 때 레이아웃 밀림 보정
     const browserFamily = getMobileBrowserFamily();
     const delay = browserFamily === 'samsung' ? 200 : 80;
     resizeTimer = window.setTimeout(apply, delay);
   }
 
-  // Firefox Android는 visualViewport resize 이벤트가 발생하지 않는 경우가 있어
-  // window resize를 추가로 구독합니다.
+  /**
+   * @description handleWindowResize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function handleWindowResize() {
     const browserFamily = getMobileBrowserFamily();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (browserFamily === 'firefox') {
       scheduleApply();
     }
   }
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onMounted(() => {
     apply();
     window.addEventListener("resize", scheduleApply, {passive: true});
@@ -229,6 +241,7 @@ export function useViewportGuard(options = {}) {
     document.addEventListener("focusout", scheduleApply, {passive: true});
   });
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     window.clearTimeout(resizeTimer);
     window.removeEventListener("resize", scheduleApply);
@@ -240,6 +253,7 @@ export function useViewportGuard(options = {}) {
     document.removeEventListener("focusout", scheduleApply);
   });
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     viewportHeight,
     viewportWidth,

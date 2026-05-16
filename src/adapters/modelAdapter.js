@@ -1,21 +1,17 @@
 import {MODEL_KEYS} from "@/constants/apiKeys";
 import {toBoolean} from "./booleanAdapter";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * 단일 모델 raw row를 ModelViewModel로 변환합니다.
- *
- * method: adapter
- * payload: model/info/model.do 또는 model/info/studio-model.do row
- * response: { id, assistId, label, isAuthorized, isDeleted }
- * 특징: delYN=true 모델은 기존 대화방 복원을 위해 allModels에는 보존하고 신규 선택 목록에서는 제외합니다.
- *
- * @param {object} raw - 모델 raw row입니다.
- * @returns {object} ModelViewModel입니다.
+ * @description adaptModel 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} raw - raw 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptModel(raw = {}) {
   const id = raw[MODEL_KEYS.ID];
   const label = raw[MODEL_KEYS.NAME] || "Model";
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     id,
     sourceId: id,
@@ -37,31 +33,34 @@ export function adaptModel(raw = {}) {
 }
 
 /**
- * 모델 raw 배열을 ModelViewModel 배열로 변환합니다.
- *
- * @param {Array<object>} rawItems - 모델 raw 배열입니다.
- * @param {object} options - 필터 옵션입니다.
- * @param {boolean} [options.includeDeleted=false] - 삭제 모델 포함 여부입니다.
- * @param {boolean} [options.includeUnauthorized=false] - 권한 없는 모델 포함 여부입니다.
- * @returns {Array<object>} 정규화된 모델 목록입니다.
+ * @description adaptModelList 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} rawItems - rawItems 입력값입니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptModelList(rawItems = [], options = {}) {
   const {includeDeleted = false, includeUnauthorized = false} = options;
 
+  // 계산된 결과를 호출부로 반환합니다.
   return rawItems.map(adaptModel).filter((item) => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!item.id || !item.assistId) return false;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!includeUnauthorized && !item.isAuthorized) return false;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!includeDeleted && item.isDeleted) return false;
+    // 계산된 결과를 호출부로 반환합니다.
     return true;
   });
 }
 
 /**
- * 신규 대화 생성/모델 선택에 표시 가능한 모델만 필터링합니다.
- * @param {Array<object>} models - 전체 모델 목록입니다.
- * @returns {Array<object>} 권한 있고 삭제되지 않은 모델 목록입니다.
+ * @description filterAvailableModels 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} models - models 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function filterAvailableModels(models = []) {
+  // 계산된 결과를 호출부로 반환합니다.
   return models.filter(
     (item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted
   );

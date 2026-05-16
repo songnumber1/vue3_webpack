@@ -1,5 +1,6 @@
 import {createI18n} from "vue-i18n";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const SUPPORT_LOCALES = ["ko", "en"];
 
 export const messages = {
@@ -317,14 +318,17 @@ export const i18n = createI18n({
 });
 
 /**
- * Persists and applies the requested application locale.
- * @param {string} locale Locale code to apply.
- * @returns {void}
+ * @description setAppLocale 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} locale - locale 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function setAppLocale(locale) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!SUPPORT_LOCALES.includes(locale)) return;
   i18n.global.locale.value = locale;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof document !== "undefined") document.documentElement.lang = locale;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof localStorage !== "undefined")
     localStorage.setItem("app-locale", locale);
 }

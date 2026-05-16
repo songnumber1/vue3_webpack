@@ -1,29 +1,29 @@
-/**
- * Android 실제 단말 WebView는 시뮬레이터/PC Chrome보다 일부 Web API가 늦게 들어오는 경우가 있다.
- * Swagger UI는 내부적으로 crypto.randomUUID, ResizeObserver, requestIdleCallback 등에 의존할 수 있어
- * 해당 API가 없는 단말에서는 화면이 렌더링되기 전에 JS 오류로 중단될 수 있다.
- */
 let resizeObserverId = 0;
 
 /**
- * getCryptoObject 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getCryptoObject 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getCryptoObject() {
+  // 계산된 결과를 호출부로 반환합니다.
   return globalThis.crypto || globalThis.msCrypto || null;
 }
 
 /**
- * createUuidV4Fallback 처리 함수입니다.
- * @returns {void}
+ * @description createUuidV4Fallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createUuidV4Fallback() {
   const cryptoObj = getCryptoObject();
   const bytes = new Uint8Array(16);
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (cryptoObj?.getRandomValues) {
     cryptoObj.getRandomValues(bytes);
   } else {
+    // 목록 또는 결과 집합을 순회하면서 필요한 값만 선별합니다.
     for (let i = 0; i < bytes.length; i += 1) {
       bytes[i] = Math.floor(Math.random() * 256);
     }
@@ -32,53 +32,58 @@ function createUuidV4Fallback() {
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
+  // 계산된 결과를 호출부로 반환합니다.
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
 
 /**
- * installGlobalThisFallback 처리 함수입니다.
- * @returns {void}
+ * @description installGlobalThisFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function installGlobalThisFallback() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof globalThis !== "undefined") return;
 
-  // eslint-disable-next-line no-extend-native
   Object.defineProperty(Object.prototype, "__magic_global_this__", {
     get() {
+      // 계산된 결과를 호출부로 반환합니다.
       return this;
     },
     configurable: true,
   });
 
-  // eslint-disable-next-line no-undef
   __magic_global_this__.globalThis = __magic_global_this__;
-  // eslint-disable-next-line no-undef
   delete Object.prototype.__magic_global_this__;
 }
 
 /**
- * installCryptoRandomUuidFallback 처리 함수입니다.
- * @returns {void}
+ * @description installCryptoRandomUuidFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function installCryptoRandomUuidFallback() {
   const cryptoObj = getCryptoObject();
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!cryptoObj || typeof cryptoObj.randomUUID === "function") return;
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     Object.defineProperty(cryptoObj, "randomUUID", {
       value: createUuidV4Fallback,
       configurable: true,
     });
   } catch {
-    // 일부 WebView는 crypto 객체 확장이 막혀 있을 수 있다. 이 경우 createId fallback이 별도로 동작한다.
   }
 }
 
 /**
- * installIdleCallbackFallback 처리 함수입니다.
- * @returns {void}
+ * @description installIdleCallbackFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function installIdleCallbackFallback() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.requestIdleCallback !== "function") {
     window.requestIdleCallback = (callback) =>
       window.setTimeout(() => {
@@ -86,16 +91,19 @@ function installIdleCallbackFallback() {
       }, 1);
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.cancelIdleCallback !== "function") {
     window.cancelIdleCallback = (id) => window.clearTimeout(id);
   }
 }
 
 /**
- * installResizeObserverFallback 처리 함수입니다.
- * @returns {void}
+ * @description installResizeObserverFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function installResizeObserverFallback() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.ResizeObserver === "function") return;
 
   window.ResizeObserver = class ResizeObserverFallback {
@@ -108,6 +116,7 @@ function installResizeObserverFallback() {
     }
 
     observe(target) {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!target) return;
       this.targets.add(target);
       this.flush();
@@ -127,16 +136,19 @@ function installResizeObserverFallback() {
         target,
         contentRect: target.getBoundingClientRect(),
       }));
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (entries.length) this.callback(entries, this);
     }
   };
 }
 
 /**
- * updateViewportCssVars 처리 함수입니다.
- * @returns {void}
+ * @description updateViewportCssVars 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function updateViewportCssVars() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined" || typeof document === "undefined") return;
   const viewport = window.visualViewport;
   const height = Math.max(
@@ -153,8 +165,9 @@ function updateViewportCssVars() {
 }
 
 /**
- * installViewportCssVars 처리 함수입니다.
- * @returns {void}
+ * @description installViewportCssVars 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function installViewportCssVars() {
   updateViewportCssVars();
@@ -171,10 +184,12 @@ function installViewportCssVars() {
 }
 
 /**
- * installWebViewCompat 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description installWebViewCompat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function installWebViewCompat() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") return;
 
   installGlobalThisFallback();

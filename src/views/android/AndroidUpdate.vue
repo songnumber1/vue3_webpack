@@ -42,6 +42,7 @@
 import {computed} from "vue";
 import {useAppContext} from "@/composables/useAppContext";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {appInfo, bridge} = useAppContext();
 
 const versionInfo = computed(() => appInfo.lastVersionInfo || {});
@@ -60,15 +61,18 @@ const message = computed(
 );
 
 /**
- * requestUpdate 처리 함수입니다.
- * @returns {void}
+ * @description requestUpdate 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function requestUpdate() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof bridge?.openMarket === "function") {
     bridge.openMarket();
     return;
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.AndroidBridge?.openMarket === "function") {
     window.AndroidBridge.openMarket();
   }

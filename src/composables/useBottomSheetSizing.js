@@ -1,5 +1,6 @@
 import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   getMobileBrowserFamily,
   getSafeAreaBottom,
   getViewportHeight as readViewportHeight,
@@ -12,10 +13,10 @@ const DEFAULT_OPTION_HEIGHT_PX = 58;
 const DEFAULT_SHEET_CHROME_HEIGHT_PX = 122;
 
 /**
- * Manages bottom sheet layout, dragging and viewport refresh.
- * @param {object} props BaseBottomSheet props.
- * @param {Function} emit Component emit function.
- * @returns {object} Bottom sheet controller API.
+ * @description useBottomSheetSizing 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} props - props 입력값입니다.
+ * @param {*} emit - emit 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function useBottomSheetSizing(props, emit) {
   const sheetRef = ref(null);
@@ -34,16 +35,34 @@ export function useBottomSheetSizing(props, emit) {
     '--bottom-sheet-height': `${Math.round(currentHeight.value)}px`,
   }));
 
+  /**
+   * @description getViewportHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getViewportHeight() {
+    // 계산된 결과를 호출부로 반환합니다.
     return readViewportHeight();
   }
 
+  /**
+   * @description isMobileViewport 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function isMobileViewport() {
+    // 계산된 결과를 호출부로 반환합니다.
     return readIsMobileViewport(MOBILE_BREAKPOINT_PX);
   }
 
+  /**
+   * @description getSheetChromeHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getSheetChromeHeight() {
     const sheet = sheetRef.value;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!sheet) return DEFAULT_SHEET_CHROME_HEIGHT_PX;
 
     const dragArea = sheet.querySelector('.bottom-sheet-drag-area');
@@ -51,6 +70,7 @@ export function useBottomSheetSizing(props, emit) {
     const style = window.getComputedStyle(sheet);
     const paddingBottom = Number.parseFloat(style.paddingBottom || '0') || 0;
 
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.ceil(
       (dragArea?.getBoundingClientRect().height || 28) +
         (header?.getBoundingClientRect().height || 50) +
@@ -59,13 +79,20 @@ export function useBottomSheetSizing(props, emit) {
     );
   }
 
+  /**
+   * @description getMinimumVisibleBodyHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getMinimumVisibleBodyHeight() {
     const body = bodyRef.value;
     const options = Array.from(
       body?.querySelectorAll?.('.bottom-sheet-option') || []
     );
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!options.length) {
+      // 계산된 결과를 호출부로 반환합니다.
       return DEFAULT_OPTION_HEIGHT_PX * MIN_VISIBLE_OPTION_COUNT;
     }
 
@@ -73,21 +100,31 @@ export function useBottomSheetSizing(props, emit) {
       .slice(0, MIN_VISIBLE_OPTION_COUNT)
       .reduce((sum, option) => {
         const height = option.getBoundingClientRect().height;
+        // 계산된 결과를 호출부로 반환합니다.
         return sum + (height > 0 ? height : DEFAULT_OPTION_HEIGHT_PX);
       }, 0);
 
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.ceil(totalOptionHeight + 12);
   }
 
+  /**
+   * @description getBodyContentHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getBodyContentHeight() {
     const body = bodyRef.value;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!body) return 0;
 
     const children = Array.from(body.children || []);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!children.length) return body.scrollHeight || 0;
 
     const contentHeight = children.reduce((sum, child) => {
       const height = child.getBoundingClientRect().height;
+      // 계산된 결과를 호출부로 반환합니다.
       return sum + (height > 0 ? height : child.scrollHeight || 0);
     }, 0);
 
@@ -95,17 +132,30 @@ export function useBottomSheetSizing(props, emit) {
     const paddingTop = Number.parseFloat(style.paddingTop || '0') || 0;
     const paddingBottom = Number.parseFloat(style.paddingBottom || '0') || 0;
 
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.ceil(contentHeight + paddingTop + paddingBottom);
   }
 
+  /**
+   * @description getMinimumSheetHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getMinimumSheetHeight() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!isMobileViewport()) return props.minHeight;
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.max(
       props.minHeight,
       getSheetChromeHeight() + getMinimumVisibleBodyHeight()
     );
   }
 
+  /**
+   * @description clampHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} height - height 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function clampHeight(height) {
     const viewportHeight = getViewportHeight();
     const preferredMinHeight = getMinimumSheetHeight();
@@ -114,16 +164,30 @@ export function useBottomSheetSizing(props, emit) {
       Math.floor(viewportHeight * props.maxRatio) - getSafeAreaBottom()
     );
     const minHeight = Math.min(preferredMinHeight, maxHeight);
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.min(Math.max(height, minHeight), maxHeight);
   }
 
+  /**
+   * @description getContentHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getContentHeight() {
+    // 계산된 결과를 호출부로 반환합니다.
     return getSheetChromeHeight() + getBodyContentHeight() + 8;
   }
 
+  /**
+   * @description getInitialHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getInitialHeight() {
     const viewportHeight = getViewportHeight();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.initialSnap === 'full') return viewportHeight * props.maxRatio;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.initialSnap === 'half') return viewportHeight * 0.58;
 
     const minimumSheetHeight = getMinimumSheetHeight();
@@ -131,30 +195,57 @@ export function useBottomSheetSizing(props, emit) {
     const contentSnapRatio =
       isMobileViewport() && getMobileBrowserFamily() === 'firefox' ? 0.64 : 0.72;
 
+    // 계산된 결과를 호출부로 반환합니다.
     return Math.max(
       minimumSheetHeight,
       Math.min(contentHeight, viewportHeight * contentSnapRatio)
     );
   }
 
+  /**
+   * @description setHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} height - height 입력값입니다.
+   * @param {*} snap - snap 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function setHeight(height, snap = 'custom') {
     currentHeight.value = clampHeight(height);
     currentSnap.value =
       currentHeight.value >= getViewportHeight() * 0.82 ? 'full' : snap;
   }
 
+  /**
+   * @description expand 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function expand() {
     setHeight(getViewportHeight() * props.maxRatio, 'full');
   }
 
+  /**
+   * @description collapse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function collapse() {
     setHeight(props.minHeight, 'min');
   }
 
+  /**
+   * @description measureOpeningHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function measureOpeningHeight() {
     setHeight(getInitialHeight(), props.initialSnap);
   }
 
+  /**
+   * @description resetHeight 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function resetHeight() {
     window.cancelAnimationFrame?.(measureRaf);
     nextTick(() => {
@@ -164,18 +255,36 @@ export function useBottomSheetSizing(props, emit) {
     });
   }
 
+  /**
+   * @description lockBodyScroll 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function lockBodyScroll() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (typeof document === 'undefined') return;
     previousBodyOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
   }
 
+  /**
+   * @description unlockBodyScroll 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function unlockBodyScroll() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (typeof document === 'undefined') return;
     document.body.style.overflow = previousBodyOverflow;
   }
 
+  /**
+   * @description startDrag 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} event - event 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function startDrag(event) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!event.isPrimary && event.pointerType !== 'mouse') return;
     dragging.value = true;
     dragStartY = event.clientY;
@@ -186,14 +295,26 @@ export function useBottomSheetSizing(props, emit) {
     window.addEventListener('pointercancel', stopDrag, {passive: true});
   }
 
+  /**
+   * @description handleDrag 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} event - event 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function handleDrag(event) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!dragging.value) return;
     event.preventDefault();
     const delta = dragStartY - event.clientY;
     setHeight(dragStartHeight + delta);
   }
 
+  /**
+   * @description stopDrag 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function stopDrag() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!dragging.value) return;
     dragging.value = false;
     window.removeEventListener('pointermove', handleDrag);
@@ -201,21 +322,30 @@ export function useBottomSheetSizing(props, emit) {
     window.removeEventListener('pointercancel', stopDrag);
 
     const viewportHeight = getViewportHeight();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (currentHeight.value > viewportHeight * 0.76) expand();
     else if (currentHeight.value < props.minHeight * 0.82) emit('close');
   }
 
+  /**
+   * @description scheduleViewportRefresh 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function scheduleViewportRefresh() {
     window.clearTimeout(viewportTimer);
     viewportTimer = window.setTimeout(() => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!props.open) return;
       setHeight(currentHeight.value, currentSnap.value);
     }, 60);
   }
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   watch(
     () => props.open,
     (isOpen) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (isOpen) {
         lockBodyScroll();
         resetHeight();
@@ -248,9 +378,11 @@ export function useBottomSheetSizing(props, emit) {
     {immediate: true}
   );
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     unlockBodyScroll();
     window.clearTimeout(viewportTimer);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (measureRaf) window.cancelAnimationFrame?.(measureRaf);
     window.removeEventListener('pointermove', handleDrag);
     window.removeEventListener('pointerup', stopDrag);
@@ -260,6 +392,7 @@ export function useBottomSheetSizing(props, emit) {
     window.visualViewport?.removeEventListener('scroll', scheduleViewportRefresh);
   });
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     sheetRef,
     bodyRef,

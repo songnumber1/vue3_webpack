@@ -6,33 +6,74 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   ENABLE_AUTH_GUARD,
   ENABLE_AUTH_GUARD_DEBUG,
   AUTH_FAILURE_REASONS,
 } from "@/constants/auth";
 import {logInfo} from "@/utils/logger";
 
+/**
+ * @description ChatPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
+/**
+ * @description SwaggerPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const SwaggerPage = () =>
   import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
+/**
+ * @description GuidePage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const GuidePage = () =>
   import(/* webpackChunkName: "guide" */ "@/views/GuidePage.vue");
+/**
+ * @description SharedPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const SharedPage = () =>
   import(/* webpackChunkName: "shared" */ "@/views/SharedPage.vue");
+/**
+ * @description PlaygroundPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const PlaygroundPage = () =>
   import(
-    /* webpackChunkName: "playground" */ "@/views/playground/PlaygroundPage.vue"
+ "@/views/playground/PlaygroundPage.vue"
   );
+/**
+ * @description NotFoundPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const NotFoundPage = () =>
   import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
+/**
+ * @description LoginRequiredPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const LoginRequiredPage = () =>
   import(
-    /* webpackChunkName: "login-required" */ "@/views/LoginRequiredPage.vue"
+ "@/views/LoginRequiredPage.vue"
   );
+/**
+ * @description AndroidUpdate 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const AndroidUpdate = () =>
   import(
-    /* webpackChunkName: "android-update" */ "@/views/android/AndroidUpdate.vue"
+ "@/views/android/AndroidUpdate.vue"
   );
 
 const ANDROID_UPDATE_ROUTE_NAME = "android-update";
@@ -113,41 +154,45 @@ const notFoundRoute = {
 };
 
 /**
- * Android 앱의 강제 업데이트 필요 여부를 판단합니다.
- *
- * @param {object} appInfo - resolveAppConfig에서 생성된 앱 정보입니다.
- * @returns {boolean} 강제 업데이트 라우트로 이동해야 하는지 여부입니다.
+ * @description shouldRequireAndroidUpdate 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} appInfo - appInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldRequireAndroidUpdate(appInfo) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!isAndroidApp(appInfo)) return false;
   const currentVersion = appInfo?.appVersion;
   const latestVersion = appInfo?.lastVersionInfo?.version;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!currentVersion || !latestVersion) return false;
+  // 계산된 결과를 호출부로 반환합니다.
   return isVersionLowerThan(currentVersion, latestVersion);
 }
 
 /**
- * 상위 route record의 meta.requireAuth를 포함해 인증 필요 여부를 판단합니다.
- *
- * @param {import('vue-router').RouteLocationNormalized} to - 이동 대상 라우트입니다.
- * @returns {boolean} 로그인 확인이 필요한 라우트인지 여부입니다.
+ * @description shouldCheckAuth 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} to - to 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldCheckAuth(to) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!ENABLE_AUTH_GUARD) return false;
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (to.meta?.skipAuthCheck) return false;
 
+  // 계산된 결과를 호출부로 반환합니다.
   return to.matched.some((record) => record.meta?.requireAuth);
 }
 
 /**
- * 로그인 확인 실패 시 로그인 필요 안내 화면으로 이동할 route location을 생성합니다.
- *
- * @param {import('vue-router').RouteLocationNormalized} to - 원래 이동하려던 라우트입니다.
- * @param {string} reason - LOGIN_REQUIRED, ACCESS_DENIED, USER_AGREE_REQUIRED, AUTH_ERROR 등의 사유입니다.
- * @returns {object} vue-router redirect location입니다.
+ * @description createLoginRequiredRedirect 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} to - to 입력값입니다.
+ * @param {*} reason - reason 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createLoginRequiredRedirect(to, reason) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     name: LOGIN_REQUIRED_ROUTE_NAME,
     query: {
@@ -159,30 +204,25 @@ function createLoginRequiredRedirect(to, reason) {
 }
 
 /**
- * 라우터 인증 가드 디버그 로그를 출력합니다.
- *
- * @param {...*} args - 디버그 로그로 출력할 값입니다.
- * @returns {void}
+ * @description debugRouteGuard 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} args - args 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function debugRouteGuard(...args) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (ENABLE_AUTH_GUARD_DEBUG) {
     logInfo("[route-guard]", ...args);
   }
 }
 
 /**
- * 부모 route record의 requireAuth 값을 children meta에 명시적으로 전파합니다.
- *
- * 특징:
- * - vue-router의 to.matched 검사만으로도 부모 meta는 상속 판정 가능하지만,
- *   개발자가 Vue Devtools/route config에서 children meta를 확인할 때도 requireAuth가 보이도록 보강합니다.
- * - 직접 URL 입력 시에도 beforeEach에서 to.matched 기준으로 동일하게 동작합니다.
- *
- * @param {Array<object>} routes - route config 배열입니다.
- * @param {boolean} inheritedRequireAuth - 상위 route의 requireAuth 여부입니다.
- * @returns {Array<object>} requireAuth가 명시 전파된 route config 배열입니다.
+ * @description applyInheritedRequireAuth 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} routes - routes 입력값입니다.
+ * @param {*} inheritedRequireAuth - inheritedRequireAuth 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
+  // 계산된 결과를 호출부로 반환합니다.
   return routes.map((route) => {
     const ownMeta = route.meta || {};
     const requireAuth = Boolean(ownMeta.requireAuth || inheritedRequireAuth);
@@ -191,6 +231,7 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
       meta: requireAuth ? {...ownMeta, requireAuth: true} : ownMeta,
     };
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (Array.isArray(route.children)) {
       normalizedRoute.children = applyInheritedRequireAuth(
         route.children,
@@ -198,22 +239,17 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
       );
     }
 
+    // 계산된 결과를 호출부로 반환합니다.
     return normalizedRoute;
   });
 }
 
 /**
- * vue-router 전역 가드를 등록합니다.
- *
- * method: beforeEach / afterEach
- * payload: route location, appInfo, authAxios
- * response: 인증/버전 상태에 따라 라우트 이동 허용 또는 redirect location 반환
- *
- * @param {import('vue-router').Router} router - Vue Router 인스턴스입니다.
- * @param {object} appInfo - resolveAppConfig에서 생성된 앱 정보입니다.
- * @param {object} context - 라우터 가드에 필요한 외부 의존성입니다.
- * @param {import('axios').AxiosInstance} context.authAxios - 로그인 확인 전용 axios 인스턴스입니다.
- * @returns {void}
+ * @description registerRouteGuard 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} router - router 입력값입니다.
+ * @param {*} appInfo - appInfo 입력값입니다.
+ * @param {*} context - context 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function registerRouteGuard(router, appInfo, context = {}) {
   const {authAxios} = context;
@@ -235,40 +271,43 @@ function registerRouteGuard(router, appInfo, context = {}) {
       platformAccess: platformStore.isAccess,
     });
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (requiresAuth) {
       const authResult = await ensureRouteAuthenticated({to, authAxios});
 
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!authResult.authenticated) {
         debugRouteGuard("redirect login-required", authResult);
+        // 계산된 결과를 호출부로 반환합니다.
         return createLoginRequiredRedirect(to, authResult.reason);
       }
     }
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!platformStore.isAccess) return true;
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (to.meta?.skipVersionCheck) return true;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (to.name === ANDROID_UPDATE_ROUTE_NAME) return true;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (shouldRequireAndroidUpdate(appInfo))
+      // 계산된 결과를 호출부로 반환합니다.
       return {name: ANDROID_UPDATE_ROUTE_NAME, replace: true};
+    // 계산된 결과를 호출부로 반환합니다.
     return true;
   });
   router.afterEach((to) => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (to.meta?.title) document.title = to.meta.title;
   });
 }
 
 /**
- * 애플리케이션 라우터를 생성합니다.
- *
- * 특징:
- * - path: '/' route record에 requireAuth: true를 부여합니다.
- * - children route는 to.matched 기반으로 부모 인증 정책을 자동 상속합니다.
- * - 로그인 확인은 공통 axios가 아닌 authAxios로 access/info.do를 호출합니다.
- *
- * @param {object} appInfo - resolveAppConfig에서 생성된 앱 정보입니다.
- * @param {object} context - 라우터 생성에 필요한 의존성입니다.
- * @param {import('axios').AxiosInstance} context.authAxios - 로그인 확인 전용 axios 인스턴스입니다.
- * @returns {import('vue-router').Router} Vue Router 인스턴스입니다.
+ * @description resolveRouter 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} appInfo - appInfo 입력값입니다.
+ * @param {*} context - context 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function resolveRouter(appInfo, context = {}) {
   const routes = applyInheritedRequireAuth([
@@ -280,5 +319,6 @@ export function resolveRouter(appInfo, context = {}) {
   ]);
   const router = createRouter({history: createWebHistory(), routes});
   registerRouteGuard(router, appInfo, context);
+  // 계산된 결과를 호출부로 반환합니다.
   return router;
 }

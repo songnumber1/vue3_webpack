@@ -43,6 +43,7 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
 const memoryEnabled = ref(true);
 const selectedStyle = ref("detailed");

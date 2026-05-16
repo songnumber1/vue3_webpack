@@ -14,10 +14,11 @@ import {renderMermaidInElement} from '@/utils/mermaidRenderer';
 import {PROMPT_SUGGESTION_LIMIT} from '@/constants/promptSuggestions';
 import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * Creates the page controller for ChatContainer.vue.
- * @param {{mode: string}} props Component props.
- * @returns {object} Reactive state and event handlers consumed by the template.
+ * @description useChatContainerController 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} props - props 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function useChatContainerController(props) {
   const {t, locale} = useI18n();
@@ -29,6 +30,7 @@ export function useChatContainerController(props) {
   const {scrollToBottom} = useAutoScroll({value: null});
   const {keyboardOpen, refreshViewport} = useViewportGuard({
     onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (props.mode !== 'main' && isCompact && isKeyboardOpen) {
         scrollBottom({stable: true});
       }
@@ -79,33 +81,45 @@ export function useChatContainerController(props) {
   );
   const isReadOnly = computed(() => props.mode === 'shared');
   const activeHistoryId = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'chat') return route.params.id;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'shared') return route.params.shareId;
+    // 계산된 결과를 호출부로 반환합니다.
     return null;
   });
   const activeHistory = computed(() => getHistory(activeHistoryId.value));
   const activeConversationTitle = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'shared') {
+      // 계산된 결과를 호출부로 반환합니다.
       return `공유 대화 ${activeHistoryId.value || ''}`.trim();
     }
+    // 계산된 결과를 호출부로 반환합니다.
     return activeHistory.value?.title || '';
   });
   const workspaceAssistantLabel = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (activeSession.value?.displayAssistantLabel) {
+      // 계산된 결과를 호출부로 반환합니다.
       return activeSession.value.displayAssistantLabel;
     }
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (
       activeSession.value?.assistantLabel &&
       !activeSession.value?.isModelUnavailable
     ) {
+      // 계산된 결과를 호출부로 반환합니다.
       return activeSession.value.assistantLabel;
     }
+    // 계산된 결과를 호출부로 반환합니다.
     return currentAssistant.value?.label || 'Assistant';
   });
   const suggestions = computed(() => {
     const assistantPrompts = currentExamplePrompts.value || [];
     const isEnglish = locale.value === 'en';
 
+    // 계산된 결과를 호출부로 반환합니다.
     return assistantPrompts
       .slice(0, PROMPT_SUGGESTION_LIMIT)
       .map((prompt) => {
@@ -118,6 +132,7 @@ export function useChatContainerController(props) {
         const text = localizedTitle || localizedContent;
         const content = localizedContent || localizedTitle;
 
+        // 계산된 결과를 호출부로 반환합니다.
         return {
           id: prompt.id,
           text,
@@ -128,13 +143,26 @@ export function useChatContainerController(props) {
       .filter((item) => item.text && item.prompt);
   });
 
+  /**
+   * @description getMessageListRef 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function getMessageListRef() {
     const exposed = workspaceRef.value?.listRef;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (exposed?.scrollToBottom) return exposed;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (exposed?.value?.scrollToBottom) return exposed.value;
+    // 계산된 결과를 호출부로 반환합니다.
     return null;
   }
 
+  /**
+   * @description updateMobileState 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function updateMobileState() {
     isMobile.value = Boolean(
       window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
@@ -143,16 +171,33 @@ export function useChatContainerController(props) {
     );
   }
 
+  /**
+   * @description markForceBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} duration - duration 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function markForceBottom(duration = 1800) {
     forceBottomUntil = Date.now() + duration;
   }
 
+  /**
+   * @description shouldKeepForceBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function shouldKeepForceBottom() {
+    // 계산된 결과를 호출부로 반환합니다.
     return Date.now() <= forceBottomUntil;
   }
 
+  /**
+   * @description scrollBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} options - options 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function scrollBottom(options = {}) {
     const list = getMessageListRef();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (list?.scrollToBottom) {
       list.scrollToBottom(options);
     } else {
@@ -161,6 +206,11 @@ export function useChatContainerController(props) {
     updateScrollBottomButton();
   }
 
+  /**
+   * @description updateScrollBottomButton 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function updateScrollBottomButton() {
     const list = getMessageListRef();
     showScrollBottom.value =
@@ -168,29 +218,59 @@ export function useChatContainerController(props) {
       Boolean(list && !list.isAtBottom?.());
   }
 
+  /**
+   * @description scheduleBottomStateCheck 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function scheduleBottomStateCheck() {
     window.clearTimeout(bottomStateTimer);
     bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
   }
 
+  /**
+   * @description handleMessageContentRendered 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function handleMessageContentRendered() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
     scheduleBottomStateCheck();
   }
 
+  /**
+   * @description handlePromptFocus 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function handlePromptFocus() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
     refreshViewport();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'main') return;
     scrollBottom({stable: true, force: isMobile.value});
   }
 
+  /**
+   * @description handlePromptResize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function handlePromptResize() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'main') return;
     scrollBottom({stable: true, force: isMobile.value});
   }
 
+  /**
+   * @description startNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function startNewChat() {
     revokeMessageAttachments(messages.value);
     messages.value = [];
@@ -200,6 +280,11 @@ export function useChatContainerController(props) {
     await router.push('/');
   }
 
+  /**
+   * @description startNewChatWithAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function startNewChatWithAssistant(id) {
     revokeMessageAttachments(messages.value);
     messages.value = [];
@@ -210,18 +295,30 @@ export function useChatContainerController(props) {
     await router.push('/');
   }
 
+  /**
+   * @description openHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} item - item 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function openHistory(item) {
     navigationStore.closeTransientPanels();
     await router.push({name: 'chat', params: {id: item.id}});
   }
 
+  /**
+   * @description loadRouteConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function loadRouteConversation() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'main') {
       messages.value = [];
       clearCurrentChatSelection();
       return;
     }
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (props.mode === 'shared') {
       messages.value = await loadSharedConversation(activeHistoryId.value);
       markForceBottom();
@@ -231,6 +328,7 @@ export function useChatContainerController(props) {
     }
 
     const history = getHistory(activeHistoryId.value);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!history) {
       await router.replace('/');
       return;
@@ -241,6 +339,11 @@ export function useChatContainerController(props) {
     await scrollBottom({behavior: 'auto', force: true, stable: true});
   }
 
+  /**
+   * @description renderAfterStream 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function renderAfterStream() {
     markForceBottom(1000);
     await renderMermaidInElement(document.querySelector('.message-list'), {
@@ -264,11 +367,22 @@ export function useChatContainerController(props) {
     renderAfterStream,
   });
 
+  /**
+   * @description submitIfWritable 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} payload - payload 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function submitIfWritable(payload) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
     handleSubmit(payload);
   }
 
+  /**
+   * @description toggleTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function toggleTheme() {
     theme.toggle();
     themeName.value = theme.current;
@@ -279,25 +393,47 @@ export function useChatContainerController(props) {
     scrollBottom({stable: true});
   }
 
+  /**
+   * @description openSwagger 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openSwagger() {
     router.push('/swagger');
   }
 
+  /**
+   * @description openPlayground 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openPlayground() {
     navigationStore.setDrawerOpen(false);
     router.push({name: 'playground'});
   }
 
+  /**
+   * @description openMobileDrawer 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openMobileDrawer() {
     const activeElement =
       typeof document !== 'undefined' ? document.activeElement : null;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (activeElement?.blur) activeElement.blur();
     navigationStore.setDrawerOpen(true);
     window.setTimeout(refreshViewport, 50);
     window.setTimeout(refreshViewport, 180);
   }
 
+  /**
+   * @description openSettings 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openSettings() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (isMobile.value) {
       navigationStore.setDrawerOpen(false);
       mobileSettingsOpen.value = true;
@@ -306,40 +442,73 @@ export function useChatContainerController(props) {
     openPersonalization();
   }
 
+  /**
+   * @description openGuide 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openGuide() {
     navigationStore.setDrawerOpen(false);
     router.push({name: 'guide'});
   }
 
+  /**
+   * @description openNotice 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openNotice() {
     navigationStore.setDrawerOpen(false);
     noticeOpen.value = true;
   }
 
+  /**
+   * @description openPersonalization 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openPersonalization() {
     navigationStore.setDrawerOpen(false);
     personalizationOpen.value = true;
   }
 
+  /**
+   * @description openLanguage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openLanguage() {
     languageSheetOpen.value = true;
   }
 
+  /**
+   * @description openAssistantFromHeader 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function openAssistantFromHeader() {
     assistantSheetOpen.value = true;
   }
 
+  /**
+   * @description selectAssistantFromSheet 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function selectAssistantFromSheet(id) {
     startNewChatWithAssistant(id);
   }
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   watch(
     () => [route.params.id, route.params.shareId, props.mode],
     () => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (runtimeReady.value) loadRouteConversation();
     }
   );
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onMounted(async () => {
     updateMobileState();
     removeMobileMediaQueryListener = addMediaQueryListener(
@@ -353,6 +522,7 @@ export function useChatContainerController(props) {
     runtimeReady.value = true;
   });
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     window.clearTimeout(bottomStateTimer);
     removeMobileMediaQueryListener?.();
@@ -361,6 +531,7 @@ export function useChatContainerController(props) {
     revokeMessageAttachments(messages.value);
   });
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     t,
     runtimeReady,

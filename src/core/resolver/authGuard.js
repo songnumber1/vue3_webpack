@@ -1,5 +1,6 @@
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   AUTH_FAILURE_REASONS,
   AUTH_MOCK_SCENARIOS,
   AUTH_MOCK_SCENARIO_STORAGE_KEY,
@@ -13,16 +14,12 @@ import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
 
 /**
- * access/info.do 요청 payload를 생성합니다.
- *
- * method: POST
- * payload: route location
- * response: { language, entryType, shareId, chatId, msgId, studioId }
- *
- * @param {import('vue-router').RouteLocationNormalized} to - 이동 대상 라우트입니다.
- * @returns {object} access/info.do 로그인 확인 요청 payload입니다.
+ * @description createAccessPayload 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} to - to 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createAccessPayload(to) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     language: "ko",
     entryType: to?.name === "chat" ? "chat" : "main",
@@ -34,33 +31,35 @@ function createAccessPayload(to) {
 }
 
 /**
- * Y/N, boolean, 문자열 boolean 값을 안전하게 true/false로 변환합니다.
- *
- * @param {*} value - API 응답의 boolean 유사 값입니다.
- * @returns {boolean} true로 해석 가능한 값 여부입니다.
+ * @description isTruthyFlag 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isTruthyFlag(value) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (value === true) return true;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof value === "string") {
+    // 계산된 결과를 호출부로 반환합니다.
     return ["true", "y", "yes", "1"].includes(value.toLowerCase());
   }
+  // 계산된 결과를 호출부로 반환합니다.
   return value === 1;
 }
 
 /**
- * 현재 브라우저 localStorage에 설정된 mock 인증 시나리오를 조회합니다.
- *
- * method: localStorage.getItem
- * payload: DS_AUTH_MOCK_SCENARIO
- * response: authenticated | login | access-denied | user-agree | error
- *
- * @returns {string} mock 인증 시나리오입니다.
+ * @description getStoredMockScenario 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getStoredMockScenario() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") {
+    // 계산된 결과를 호출부로 반환합니다.
     return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     window.localStorage.getItem(AUTH_MOCK_SCENARIO_STORAGE_KEY) ||
     process.env.VUE_APP_MOCK_AUTH_SCENARIO ||
@@ -69,15 +68,12 @@ function getStoredMockScenario() {
 }
 
 /**
- * 현재 인증 확인을 mock API로 처리할지 판단합니다.
- *
- * method: env/localStorage runtime flag read
- * payload: VUE_APP_USE_MOCK_AUTH, DS_AUTH_MOCK_SCENARIO
- * response: true이면 accessApiMock, false이면 authAxios를 사용합니다.
- *
- * @returns {boolean} mock access/info.do 사용 여부입니다.
+ * @description shouldUseMockAuth 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldUseMockAuth() {
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     USE_MOCK_AUTH ||
     (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
@@ -85,25 +81,21 @@ function shouldUseMockAuth() {
 }
 
 /**
- * 인증 가드 디버그 로그를 출력합니다.
- *
- * @param {...*} args - 디버그 로그로 출력할 값입니다.
- * @returns {void}
+ * @description debugAuthGuard 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} args - args 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function debugAuthGuard(...args) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (ENABLE_AUTH_GUARD_DEBUG) {
     logInfo("[auth-guard]", ...args);
   }
 }
 
 /**
- * access/info.do 응답에서 로그인 필요 여부를 판단합니다.
- *
- * 백엔드 응답 필드가 확정되지 않은 운영 API에 맞추기 위해 Login, loginRequired,
- * valid=false, user 없음 등 여러 케이스를 방어적으로 처리합니다.
- *
- * @param {object} accessInfo - access/info.do 응답 body입니다.
- * @returns {boolean} 로그인 필요 여부입니다.
+ * @description isLoginRequired 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} accessInfo - accessInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isLoginRequired(accessInfo = {}) {
   const valid = accessInfo.valid;
@@ -111,6 +103,7 @@ function isLoginRequired(accessInfo = {}) {
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     valid === false ||
     status === "login" ||
@@ -122,16 +115,16 @@ function isLoginRequired(accessInfo = {}) {
 }
 
 /**
- * access/info.do 응답에서 접근 거부 여부를 판단합니다.
- *
- * @param {object} accessInfo - access/info.do 응답 body입니다.
- * @returns {boolean} 접근 거부 여부입니다.
+ * @description isAccessDenied 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} accessInfo - accessInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isAccessDenied(accessInfo = {}) {
   const status = String(
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     status === "accessdeny" ||
     status === "access_denied" ||
@@ -143,16 +136,16 @@ function isAccessDenied(accessInfo = {}) {
 }
 
 /**
- * access/info.do 응답에서 사용자 동의 필요 여부를 판단합니다.
- *
- * @param {object} accessInfo - access/info.do 응답 body입니다.
- * @returns {boolean} 사용자 동의 필요 여부입니다.
+ * @description isUserAgreementRequired 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} accessInfo - accessInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isUserAgreementRequired(accessInfo = {}) {
   const status = String(
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     status === "useragree" ||
     status === "user_agree" ||
@@ -164,15 +157,10 @@ function isUserAgreementRequired(accessInfo = {}) {
 }
 
 /**
- * mock/live 로그인 확인 API를 호출합니다.
- *
- * method: POST
- * payload: { language, entryType, shareId, chatId, msgId, studioId }
- * response: access/info.do 응답 객체
- *
- * @param {import('axios').AxiosInstance} authAxios - 로그인 확인 전용 axios입니다.
- * @param {object} payload - access/info.do 요청 payload입니다.
- * @returns {Promise<object>} access/info.do 응답 body입니다.
+ * @description requestAccessInfo 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} authAxios - authAxios 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function requestAccessInfo(authAxios, payload) {
   const useMock = shouldUseMockAuth();
@@ -185,26 +173,31 @@ async function requestAccessInfo(authAxios, payload) {
     payload,
   });
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (useMock) {
+    // 계산된 결과를 호출부로 반환합니다.
     return accessApiMock.getAccessInfo(payload, {scenario});
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!authAxios) {
     throw new Error("로그인 확인 전용 axios가 생성되지 않았습니다.");
   }
 
   const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);
+  // 계산된 결과를 호출부로 반환합니다.
   return response?.data || {};
 }
 
 /**
- * 로그인 확인 결과를 정규화합니다.
- *
- * @param {object} accessInfo - access/info.do 응답 body입니다.
- * @returns {{authenticated: boolean, reason: string, accessInfo: object}} 라우터 가드에서 사용할 인증 결과입니다.
+ * @description normalizeAccessResult 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} accessInfo - accessInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function normalizeAccessResult(accessInfo = {}) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isAccessDenied(accessInfo)) {
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.ACCESS_DENIED,
@@ -212,7 +205,9 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isUserAgreementRequired(accessInfo)) {
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.USER_AGREE_REQUIRED,
@@ -220,7 +215,9 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isLoginRequired(accessInfo)) {
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.LOGIN_REQUIRED,
@@ -228,6 +225,7 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     authenticated: true,
     reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
@@ -236,24 +234,14 @@ function normalizeAccessResult(accessInfo = {}) {
 }
 
 /**
- * 라우터 가드에서 로그인 상태를 확인합니다.
- *
- * 특징:
- * - 최초 requireAuth 라우트 접근 시 access/info.do를 호출합니다.
- * - 공통 axios가 아닌 authAxios를 사용하여 interceptor 예외 처리를 분리합니다.
- * - mock 사용 시 localStorage 또는 env로 Login/AccessDeny/UserAgree 시나리오를 재현할 수 있습니다.
- * - 성공 시 authStore에 사용자/권한 정보를 저장합니다.
- * - 오류 발생 시 페이지 접근을 막고 login-required 화면으로 이동할 수 있도록 실패 결과를 반환합니다.
- *
- * @param {object} params - 로그인 확인 파라미터입니다.
- * @param {import('vue-router').RouteLocationNormalized} params.to - 이동 대상 라우트입니다.
- * @param {import('axios').AxiosInstance} params.authAxios - 로그인 확인 전용 axios입니다.
- * @param {boolean} [params.force=false] - true이면 캐시를 무시하고 다시 확인합니다.
- * @returns {Promise<{authenticated: boolean, reason: string, error?: Error}>} 로그인 확인 결과입니다.
+ * @description ensureRouteAuthenticated 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   const authStore = useAuthStore();
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (
     ENABLE_AUTH_GUARD_CACHE &&
     !force &&
@@ -263,6 +251,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     debugAuthGuard(
       "skip access/info.do because auth store is already authenticated"
     );
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: true,
       reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
@@ -271,22 +260,26 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
 
   const payload = createAccessPayload(to);
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     const accessInfo = await requestAccessInfo(authAxios, payload);
     const result = normalizeAccessResult(accessInfo);
 
     debugAuthGuard("access/info.do normalized result", result);
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (result.authenticated) {
       authStore.setAuthenticatedAccessInfo(result.accessInfo);
     } else {
       authStore.setAuthFailure(result.reason, result.accessInfo);
     }
 
+    // 계산된 결과를 호출부로 반환합니다.
     return result;
   } catch (error) {
     debugAuthGuard("access/info.do error", error);
     authStore.setAuthError(error);
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.AUTH_ERROR,

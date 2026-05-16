@@ -108,6 +108,7 @@ import NoticeView from '@/views/settings/NoticeView.vue';
 import PersonalizationView from '@/views/settings/PersonalizationView.vue';
 import MobileSettingsPanel from '@/views/settings/MobileSettingsPanel.vue';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({mode: {type: String, default: 'main'}});
 
 const {

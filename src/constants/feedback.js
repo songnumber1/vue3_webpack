@@ -1,7 +1,3 @@
-/**
- * Feedback action keys used by the assistant message action bar.
- * @type {{LIKE: string, DISLIKE: string, SEND: string, COPY: string}}
- */
 export const FEEDBACK_ACTIONS = {
   LIKE: "like",
   DISLIKE: "dislike",
@@ -9,11 +5,6 @@ export const FEEDBACK_ACTIONS = {
   COPY: "copy",
 };
 
-/**
- * Default hallucination feedback reasons. This mirrors the future
- * message-feedback-history/ex-list.do response until the real API is connected.
- * @type {Array<{id: string, ko: string, en: string, default: boolean}>}
- */
 export const HALLUCINATION_REASONS = [
   {
     id: "incorrect-information",

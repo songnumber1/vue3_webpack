@@ -22,6 +22,7 @@
 import {nextTick, onBeforeUnmount, ref} from "vue";
 import ChatMessage from "./ChatMessage.vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 
@@ -38,44 +39,52 @@ const userIsAtBottom = ref(true);
 let stableScrollTimerIds = [];
 
 /**
- * getScrollElement 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getScrollElement 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getScrollElement() {
+  // 계산된 결과를 호출부로 반환합니다.
   return scrollRef.value;
 }
 
 /**
- * isNearBottom 처리 함수입니다.
- * @returns {boolean|*} 처리 결과를 반환합니다.
+ * @description isNearBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isNearBottom() {
   const el = getScrollElement();
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!el) return true;
 
   const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
+  // 계산된 결과를 호출부로 반환합니다.
   return remaining <= BOTTOM_THRESHOLD;
 }
 
 /**
- * updateBottomState 처리 함수입니다.
- * @returns {void}
+ * @description updateBottomState 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function updateBottomState() {
   userIsAtBottom.value = isNearBottom();
 }
 
 /**
- * handleScroll 처리 함수입니다.
- * @returns {void}
+ * @description handleScroll 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function handleScroll() {
   updateBottomState();
 }
 
 /**
- * clearStableTimers 처리 함수입니다.
- * @returns {void}
+ * @description clearStableTimers 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function clearStableTimers() {
   stableScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
@@ -83,14 +92,16 @@ function clearStableTimers() {
 }
 
 /**
- * applyBottomScroll 처리 함수입니다.
- * @param {*} behavior 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description applyBottomScroll 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} behavior - behavior 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function applyBottomScroll(behavior = "auto") {
   const el = getScrollElement();
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!el) return;
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (bottomRef.value?.scrollIntoView) {
     bottomRef.value.scrollIntoView({
       block: "end",
@@ -99,22 +110,21 @@ function applyBottomScroll(behavior = "auto") {
     });
   }
 
-  // Direct assignment is kept as a fallback and as an Android Chrome correction.
-  // Some delayed Markdown/Mermaid layouts update scrollHeight after scrollIntoView.
   el.scrollTop = el.scrollHeight;
   userIsAtBottom.value = true;
 }
 
 /**
- * scrollToBottom 처리 함수입니다.
- * @param {*} options 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description scrollToBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function scrollToBottom(options = {}) {
   const force = options.force === true;
   const stable = options.stable === true;
   const behavior = options.behavior || "auto";
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!force && !userIsAtBottom.value) {
     return;
   }
@@ -122,6 +132,7 @@ function scrollToBottom(options = {}) {
   clearStableTimers();
   applyBottomScroll(behavior);
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!stable) return;
 
   STABLE_SCROLL_DELAYS.forEach((delay) => {
@@ -133,27 +144,28 @@ function scrollToBottom(options = {}) {
 }
 
 /**
- * handleMessageRendered 처리 함수입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description handleMessageRendered 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function handleMessageRendered() {
   emit("content-rendered");
 
   await nextTick();
-  // If the user is already at the bottom, keep the bottom anchored after late
-  // Markdown, code highlight, image, or Mermaid layout changes. If the user has
-  // scrolled up, this does nothing and preserves their reading position.
   scrollToBottom({stable: true});
 }
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onBeforeUnmount(clearStableTimers);
 
 /**
- * getIsAtBottom 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getIsAtBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getIsAtBottom() {
   updateBottomState();
+  // 계산된 결과를 호출부로 반환합니다.
   return userIsAtBottom.value;
 }
 

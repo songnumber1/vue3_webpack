@@ -9,32 +9,26 @@ import {modelApiLive} from "@/api/live/modelApi.live";
 import {examplePromptApiLive} from "@/api/live/examplePromptApi.live";
 import {chatHistoryApiLive} from "@/api/live/chatHistoryApi.live";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * Chat runtime API가 mock을 사용할지 판단합니다.
- *
- * method: env flag read
- * payload: VUE_APP_USE_MOCK_API
- * response: true이면 src/api/mock, false이면 src/api/live 사용
- * 특징: 기본값은 mock입니다. 운영 연결 시 .env에 VUE_APP_USE_MOCK_API=false를 지정하면 live API로 전환됩니다.
- *
- * @returns {boolean} mock API 사용 여부입니다.
+ * @description shouldUseMockChatApi 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function shouldUseMockChatApi() {
+  // 계산된 결과를 호출부로 반환합니다.
   return process.env.VUE_APP_USE_MOCK_API !== "false";
 }
 
 /**
- * Chat runtime에 필요한 API facade를 반환합니다.
- *
- * method: resolve
- * payload: VUE_APP_USE_MOCK_API
- * response: { accessApi, assistantApi, modelApi, examplePromptApi, chatHistoryApi }
- * 특징: UI/Business 계층은 mock/live 여부를 몰라도 동일한 method 이름으로 API를 호출합니다.
- *
- * @returns {{accessApi: object, assistantApi: object, modelApi: object, examplePromptApi: object, chatHistoryApi: object}} API facade입니다.
+ * @description resolveChatApis 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function resolveChatApis() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (shouldUseMockChatApi()) {
+    // 계산된 결과를 호출부로 반환합니다.
     return {
       accessApi: accessApiMock,
       assistantApi: assistantApiMock,
@@ -44,6 +38,7 @@ export function resolveChatApis() {
     };
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     accessApi: accessApiLive,
     assistantApi: assistantApiLive,

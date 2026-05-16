@@ -18,17 +18,11 @@
 </template>
 
 <script setup>
-/**
- * @file LoginRequiredPage.vue
- * @description requireAuth 라우터 접근 시 로그인 확인 실패/오류가 발생하면 노출되는 안내 페이지입니다.
- * method: vue-router route rendering
- * payload: route.query.reason
- * response: 로그인 필요 안내 UI와 홈 이동 버튼을 렌더링합니다.
- */
 
 import {computed} from "vue";
 import {useRoute, useRouter} from "vue-router";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const route = useRoute();
 const router = useRouter();
 
@@ -44,13 +38,9 @@ const message = computed(
 );
 
 /**
- * 홈페이지로 이동합니다.
- *
- * 특징:
- * - 홈페이지도 requireAuth 대상이므로 로그인 상태가 아니면 다시 현재 안내 화면으로 이동합니다.
- * - 실제 운영 로그인 페이지가 연결되면 이 함수의 이동 대상만 교체하면 됩니다.
- *
- * @returns {void}
+ * @description goHome 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function goHome() {
   router.replace({path: "/"});

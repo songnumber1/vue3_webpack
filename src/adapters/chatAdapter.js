@@ -2,25 +2,19 @@ import {CHAT_KEYS, MESSAGE_KEYS} from "@/constants/apiKeys";
 import {MESSAGE_ROLES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * chat-history/list.do의 단일 row를 ChatHistoryViewModel로 변환합니다.
- *
- * method: adapter
- * payload: raw chat history row
- * response: { id, title, modelId, assistantId, isPinned, endedAt }
- * 특징: 운영 API의 modeId 오타/legacy key를 modelId로 흡수합니다.
- *
- * @param {object} raw - chat-history/list.do raw row입니다.
- * @param {object} context - assistant/model lookup context입니다.
- * @param {Record<string, object>} context.modelMap - 모델 lookup map입니다.
- * @param {Record<string, object>} context.assistantMap - Assistant lookup map입니다.
- * @returns {object} ChatHistoryViewModel입니다.
+ * @description adaptChatHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} raw - raw 입력값입니다.
+ * @param {*} context - context 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptChatHistory(raw = {}, context = {}) {
   const modelId = raw[CHAT_KEYS.MODEL_ID] || raw[CHAT_KEYS.LEGACY_MODEL_ID];
   const model = context.modelMap?.[modelId] || null;
   const assistant = model ? context.assistantMap?.[model.assistId] : null;
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     id: raw[CHAT_KEYS.ID],
     title: raw[CHAT_KEYS.TITLE] || "새 대화",
@@ -38,18 +32,20 @@ export function adaptChatHistory(raw = {}, context = {}) {
 }
 
 /**
- * 대화 목록 raw 배열을 정렬된 ChatHistoryViewModel 배열로 변환합니다.
- *
- * @param {Array<object>} rawItems - chat-history/list.do raw 배열입니다.
- * @param {object} context - adapter lookup context입니다.
- * @returns {Array<object>} pinned 우선, 최신순 정렬된 대화 목록입니다.
+ * @description adaptChatHistoryList 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} rawItems - rawItems 입력값입니다.
+ * @param {*} context - context 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptChatHistoryList(rawItems = [], context = {}) {
+  // 계산된 결과를 호출부로 반환합니다.
   return rawItems
     .map((item) => adaptChatHistory(item, context))
     .filter((item) => item.id)
     .sort((a, b) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+      // 계산된 결과를 호출부로 반환합니다.
       return (
         new Date(b.endedAt || 0).getTime() - new Date(a.endedAt || 0).getTime()
       );
@@ -57,17 +53,12 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
 }
 
 /**
- * chat-history/history.do의 단일 메시지를 MessageViewModel로 변환합니다.
- *
- * method: adapter
- * payload: raw message row
- * response: { id, role, content, createdAt, references }
- * 특징: refreences 오타 legacy key를 references로 흡수합니다.
- *
- * @param {object} raw - 메시지 raw row입니다.
- * @returns {object} MessageViewModel입니다.
+ * @description adaptMessage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} raw - raw 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptMessage(raw = {}) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     id: raw[MESSAGE_KEYS.ID],
     role:
@@ -88,11 +79,12 @@ export function adaptMessage(raw = {}) {
 }
 
 /**
- * 메시지 raw 배열을 시간순 MessageViewModel 배열로 변환합니다.
- * @param {Array<object>} rawItems - chat-history/history.do raw 배열입니다.
- * @returns {Array<object>} 정렬된 메시지 ViewModel 배열입니다.
+ * @description adaptMessageList 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} rawItems - rawItems 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptMessageList(rawItems = []) {
+  // 계산된 결과를 호출부로 반환합니다.
   return rawItems
     .map(adaptMessage)
     .filter((item) => item.id && item.content !== undefined)

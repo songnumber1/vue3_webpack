@@ -2,6 +2,7 @@ import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   bootstrapChatRuntime,
   loadChatMessages,
   loadExamplePrompts,
@@ -12,21 +13,13 @@ import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
 
 /**
- * 서버 저장 전 임시 대화 history ViewModel을 생성합니다.
- *
- * method: local create
- * payload: { text, assistant, model }
- * response: ChatHistoryViewModel
- * 특징: 실제 API 연결 시 temporaryChatId → serverChatId 동기화 포인트입니다.
- *
- * @param {object} params - 생성 파라미터입니다.
- * @param {string} params.text - 최초 사용자 입력입니다.
- * @param {object|null} params.assistant - 현재 선택 Assistant입니다.
- * @param {object|null} params.model - 현재 선택 모델입니다.
- * @returns {object} 임시 대화 목록 ViewModel입니다.
+ * @description createLocalHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`;
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     id,
     temporary: true,
@@ -46,21 +39,14 @@ function createLocalHistory({text, assistant, model}) {
 }
 
 /**
- * 대화 목록 row에서 현재 대화방 session context를 복원합니다.
- *
- * method: session restore
- * payload: ChatHistoryViewModel + modelMap + assistantMap
- * response: ActiveChatSession
- * 특징:
- * - 삭제 모델은 대화 조회는 허용하되 입력을 막기 위해 isModelDeleted=true로 보존합니다.
- * - 모델/Assistant 매핑 실패는 별도 unavailable reason으로 분리해 UI가 안전하게 안내할 수 있게 합니다.
- *
- * @param {object} history - 정규화된 대화 목록 row입니다.
- * @param {Record<string, object>} modelMap - 삭제 모델 포함 전체 모델 map입니다.
- * @param {Record<string, object>} assistantMap - Assistant/Studio map입니다.
- * @returns {object|null} 현재 대화방 session context입니다.
+ * @description createSessionFromHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} history - history 입력값입니다.
+ * @param {*} modelMap - modelMap 입력값입니다.
+ * @param {*} assistantMap - assistantMap 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!history) return null;
   const model = modelMap[history.modelId] || null;
   const assistant =
@@ -78,6 +64,7 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
         ? "missing-assistant"
         : "";
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     chatId: history.id,
     assistantId: assistant?.id || history.assistantId || model?.assistId || "",
@@ -98,14 +85,9 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
 }
 
 /**
- * Chat runtime composable을 생성합니다.
- *
- * method: Composition API composable
- * payload: 없음
- * response: ChatContainer에서 사용하는 reactive state와 action 묶음
- * 특징: Component는 API/raw key를 알지 못하고 ViewModel과 action만 사용합니다.
- *
- * @returns {object} Chat runtime state/action facade입니다.
+ * @description useChatRuntime 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function useChatRuntime() {
   const appRuntimeStore = useAppRuntimeStore();
@@ -132,7 +114,9 @@ export function useChatRuntime() {
     Boolean(chatStore.activeSession?.isModelUnavailable)
   );
   const models = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!chatStore.isModelLocked) return assistantStore.currentModels;
+    // 계산된 결과를 호출부로 반환합니다.
     return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(
       Boolean
     );
@@ -140,6 +124,7 @@ export function useChatRuntime() {
   const selectedModel = computed({
     get: () => chatStore.activeSession?.modelId || selectedModelId.value,
     set: (id) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (chatStore.isModelLocked) return;
       assistantStore.selectModel(id);
     },
@@ -148,22 +133,20 @@ export function useChatRuntime() {
   const conversations = computed(() => chatStore.messageMap);
 
   /**
-   * 앱 최초 진입 시 chat runtime에 필요한 데이터를 초기화합니다.
-   *
-   * method: bootstrapChatRuntime
-   * payload: authStore.accessInfo optional override
-   * response: Assistant/Model/History/Prompt store 초기화
-   * 특징: auth guard가 이미 조회한 accessInfo를 재사용해 mock/live 불일치를 방지합니다.
-   *
-   * @returns {Promise<void>} 초기화 완료 Promise입니다.
+   * @description initialize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function initialize() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (appRuntimeStore.initialized || appRuntimeStore.loading) return;
     appRuntimeStore.startLoading();
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       const data = await bootstrapChatRuntime({
         accessInfoOverride: authStore.accessInfo || null,
       });
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (data.accessInfo?.user) {
         authStore.setAuthenticatedAccessInfo(data.accessInfo);
       } else {
@@ -179,12 +162,12 @@ export function useChatRuntime() {
   }
 
   /**
-   * 특정 Assistant의 예시 프롬프트를 필요 시 lazy load합니다.
-   *
-   * @param {string} assistantId - Assistant 또는 Studio ID입니다.
-   * @returns {Promise<void>} 프롬프트 로딩 완료 Promise입니다.
+   * @description preloadExamplePrompts 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} assistantId - assistantId 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function preloadExamplePrompts(assistantId) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
     const assistant = assistantStore.assistantMap[assistantId];
     const prompts = await loadExamplePrompts({
@@ -195,22 +178,21 @@ export function useChatRuntime() {
   }
 
   /**
-   * 새 대화 상태가 아닐 때 Assistant 선택을 처리합니다.
-   *
-   * @param {string} id - 선택할 Assistant ID입니다.
-   * @returns {void}
+   * @description selectAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function selectAssistant(id) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (chatStore.isModelLocked) return;
     assistantStore.selectAssistant(id);
     await preloadExamplePrompts(id);
   }
 
   /**
-   * Assistant 선택과 동시에 기존 대화 session을 초기화해 새 대화 상태로 전환합니다.
-   *
-   * @param {string} id - 선택할 Assistant ID입니다.
-   * @returns {void}
+   * @description selectAssistantForNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function selectAssistantForNewChat(id) {
     assistantStore.selectAssistant(id);
@@ -219,27 +201,23 @@ export function useChatRuntime() {
   }
 
   /**
-   * ID에 해당하는 대화 목록 row를 조회합니다.
-   * @param {string} id - chatId입니다.
-   * @returns {object|null} 대화 목록 ViewModel입니다.
+   * @description getHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function getHistory(id) {
+    // 계산된 결과를 호출부로 반환합니다.
     return chatStore.getHistory(id);
   }
 
   /**
-   * route의 chatId에 맞는 대화방 session과 메시지를 보장합니다.
-   *
-   * method: chat-history/history.do
-   * payload: { chatId, assistId, modelId, studio }
-   * response: Array<MessageViewModel>
-   * 특징: session 복원 실패/삭제 모델 상태도 activeSession에 저장해 composer UI가 안전하게 분기합니다.
-   *
-   * @param {string} historyId - 열려는 chatId입니다.
-   * @returns {Promise<Array<object>>} 메시지 목록입니다.
+   * @description ensureConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} historyId - historyId 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function ensureConversation(historyId) {
     const history = getHistory(historyId);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!history) return [];
 
     const session = createSessionFromHistory(
@@ -258,6 +236,7 @@ export function useChatRuntime() {
       ? fallbackAssistant
       : assistantStore.assistantMap[session.assistantId] || fallbackAssistant;
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (displayAssistant?.id) {
       assistantStore.selectAssistant(displayAssistant.id);
       session.displayAssistantId = displayAssistant.id;
@@ -266,6 +245,7 @@ export function useChatRuntime() {
 
     chatStore.setActiveSession(session);
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!chatStore.messageMap[history.id]) {
       const messages = await loadChatMessages({
         chatId: history.id,
@@ -276,24 +256,24 @@ export function useChatRuntime() {
       chatStore.setMessages(history.id, messages);
     }
 
+    // 계산된 결과를 호출부로 반환합니다.
     return chatStore.messageMap[history.id] || [];
   }
 
   /**
-   * 특정 대화방의 메시지를 store에 저장합니다.
-   * @param {string} historyId - chatId입니다.
-   * @param {Array<object>} messages - 메시지 목록입니다.
-   * @returns {void}
+   * @description setConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} historyId - historyId 입력값입니다.
+   * @param {*} messages - messages 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function setConversation(historyId, messages) {
     chatStore.setMessages(historyId, messages);
   }
 
   /**
-   * 서버 저장 전 로컬 대화를 생성합니다.
-   * @param {object} [params] - 생성 옵션입니다.
-   * @param {string} [params.text] - 최초 메시지입니다.
-   * @returns {object} 생성된 local history입니다.
+   * @description createLocalConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} value - value 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function createLocalConversation({text} = {}) {
     const history = createLocalHistory({
@@ -310,36 +290,40 @@ export function useChatRuntime() {
         assistantStore.assistantMap
       )
     );
+    // 계산된 결과를 호출부로 반환합니다.
     return history;
   }
 
   /**
-   * 현재 대화방 선택/session을 초기화합니다.
-   * @returns {void}
+   * @description clearCurrentChatSelection 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function clearCurrentChatSelection() {
     chatStore.clearActiveSession();
   }
 
   /**
-   * blob URL 첨부 미리보기 리소스를 해제합니다.
-   * @param {Array<object>} items - 메시지 목록입니다.
-   * @returns {void}
+   * @description revokeMessageAttachments 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} items - items 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function revokeMessageAttachments(items = []) {
     items.forEach((message) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!Array.isArray(message.attachments)) return;
       message.attachments.forEach((file) => {
+        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (file?.url?.startsWith?.("blob:")) URL.revokeObjectURL(file.url);
       });
     });
   }
 
   /**
-   * 사용자 메시지와 빈 assistant streaming 메시지를 현재 대화방에 추가합니다.
-   * @param {string} chatId - 대상 chatId입니다.
-   * @param {object} normalized - 정규화된 submit payload입니다.
-   * @returns {{messages: Array<object>, assistantMessage: object}} 추가 결과입니다.
+   * @description appendUserAndAssistantMessages 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} chatId - chatId 입력값입니다.
+   * @param {*} normalized - normalized 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function appendUserAndAssistantMessages(chatId, normalized) {
     const currentMessages = chatStore.messageMap[chatId] || [];
@@ -358,9 +342,11 @@ export function useChatRuntime() {
     };
     const nextMessages = [...currentMessages, userMessage, assistantMessage];
     chatStore.setMessages(chatId, nextMessages);
+    // 계산된 결과를 호출부로 반환합니다.
     return {messages: nextMessages, assistantMessage};
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     initialize,
     assistants,

@@ -31,6 +31,7 @@
 <script setup>
 import {computed} from "vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const ICONS = {
   pencil: {
     markup:
@@ -63,9 +64,7 @@ const ICONS = {
 };
 
 const props = defineProps({
-  /** @type {'pencil' | 'search' | 'panel' | 'chat'} */
   name: {type: String, required: true},
-  /** true이면 wrapper 없이 svg 자체를 버튼 내부 아이콘으로 렌더링합니다. */
   bare: {type: Boolean, default: false},
 });
 

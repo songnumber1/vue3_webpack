@@ -1,69 +1,33 @@
 /**
- * Converts a Vue CLI env value into a boolean while keeping an explicit default.
- *
- * @param {string|undefined} value - Environment value such as "true" or "false".
- * @param {boolean} fallback - Value used when the env variable is not defined.
- * @returns {boolean} Parsed boolean value.
+ * @description readBooleanEnv 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @param {*} fallback - fallback 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function readBooleanEnv(value, fallback) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (value === undefined || value === null || value === "") return fallback;
+  // 계산된 결과를 호출부로 반환합니다.
   return ["true", "1", "yes", "y"].includes(String(value).toLowerCase());
 }
 
-/**
- * Enables route-level authentication checks for routes with meta.requireAuth.
- *
- * method: vue-router beforeEach
- * payload: route.matched meta.requireAuth
- * response: true calls access/info.do before entering protected pages.
- *
- * Environment override:
- * - VUE_APP_ENABLE_AUTH_GUARD=true
- * - VUE_APP_ENABLE_AUTH_GUARD=false
- *
- * @type {boolean}
- */
 export const ENABLE_AUTH_GUARD = readBooleanEnv(
   process.env.VUE_APP_ENABLE_AUTH_GUARD,
   false
 );
 
-/**
- * Enables mock authentication responses instead of a real network call.
- *
- * method: auth guard access/info.do resolver
- * payload: access/info.do request payload
- * response: true uses mock data and no browser network request is expected.
- *
- * @type {boolean}
- */
 export const USE_MOCK_AUTH = readBooleanEnv(
   process.env.VUE_APP_USE_MOCK_AUTH,
   false
 );
 
-/**
- * Allows localStorage to override mock auth scenario while USE_MOCK_AUTH is enabled.
- *
- * @type {boolean}
- */
 export const ALLOW_LOCAL_STORAGE_MOCK_AUTH = readBooleanEnv(
   process.env.VUE_APP_ALLOW_LOCAL_STORAGE_MOCK_AUTH,
   false
 );
 
-/**
- * localStorage key used to force a mock authentication scenario.
- *
- * @type {string}
- */
 export const AUTH_MOCK_SCENARIO_STORAGE_KEY = "DS_AUTH_MOCK_SCENARIO";
 
-/**
- * access/info.do mock response scenarios.
- *
- * @type {Readonly<Record<string, string>>}
- */
 export const AUTH_MOCK_SCENARIOS = Object.freeze({
   AUTHENTICATED: "authenticated",
   LOGIN_REQUIRED: "login",
@@ -72,11 +36,6 @@ export const AUTH_MOCK_SCENARIOS = Object.freeze({
   ERROR: "error",
 });
 
-/**
- * Normalized route authentication failure reasons.
- *
- * @type {Readonly<Record<string, string>>}
- */
 export const AUTH_FAILURE_REASONS = Object.freeze({
   AUTHENTICATED: "AUTHENTICATED",
   LOGIN_REQUIRED: "LOGIN_REQUIRED",
@@ -85,21 +44,11 @@ export const AUTH_FAILURE_REASONS = Object.freeze({
   AUTH_ERROR: "AUTH_ERROR",
 });
 
-/**
- * Reuses successful auth store state when true. Keep false for session-sensitive services.
- *
- * @type {boolean}
- */
 export const ENABLE_AUTH_GUARD_CACHE = readBooleanEnv(
   process.env.VUE_APP_ENABLE_AUTH_GUARD_CACHE,
   false
 );
 
-/**
- * Emits route/auth guard console logs when enabled.
- *
- * @type {boolean}
- */
 export const ENABLE_AUTH_GUARD_DEBUG = readBooleanEnv(
   process.env.VUE_APP_ENABLE_AUTH_GUARD_DEBUG,
   false

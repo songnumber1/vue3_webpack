@@ -1,34 +1,28 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * Returns unique preview source URLs from an attachment detail object.
- * @param {{dataUrl?: string, previewUrl?: string, url?: string}} detail Attachment preview event detail
- * @returns {string[]} Unique source URLs ordered by priority
- */
-/**
- * getPreviewSources 처리 함수입니다.
- * @param {*} detail 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getPreviewSources 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} detail - detail 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getPreviewSources(detail = {}) {
+  // 계산된 결과를 호출부로 반환합니다.
   return [detail.dataUrl, detail.previewUrl, detail.url]
     .filter((url) => typeof url === "string" && url.length > 0)
     .filter((url, index, array) => array.indexOf(url) === index);
 }
 
 /**
- * Reads a browser File as data URL for preview fallback.
- * @param {File|null|undefined} file Browser file object
- * @returns {Promise<string>} Data URL or empty string
- */
-/**
- * readPreviewDataUrl 처리 함수입니다.
- * @param {*} file 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description readPreviewDataUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} file - file 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function readPreviewDataUrl(file) {
+  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve) => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!file || typeof FileReader === "undefined") return resolve("");
     const reader = new FileReader();
     reader.onload = () =>
@@ -39,19 +33,21 @@ function readPreviewDataUrl(file) {
 }
 
 /**
- * Manages the global chat:image-preview event and image fallback handling.
- * @returns {{previewImage: import('vue').Ref<Object|null>, closeImagePreview: Function, handlePreviewLoad: Function, handlePreviewError: Function}}
+ * @description useImagePreview 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function useImagePreview() {
   const previewImage = ref(null);
 
   /**
-   * hydrateOpenPreviewFromFile 처리 함수입니다.
-   * @param {*} targetPreview 함수 실행에 필요한 입력값입니다.
-   * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+   * @description hydrateOpenPreviewFromFile 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} targetPreview - targetPreview 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function hydrateOpenPreviewFromFile(targetPreview) {
     const dataUrl = await readPreviewDataUrl(targetPreview?.file);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!dataUrl || previewImage.value?.id !== targetPreview.id) return;
     previewImage.value = {
       ...previewImage.value,
@@ -66,9 +62,9 @@ export function useImagePreview() {
   }
 
   /**
-   * openImagePreview 처리 함수입니다.
-   * @param {*} event 함수 실행에 필요한 입력값입니다.
-   * @returns {void}
+   * @description openImagePreview 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} event - event 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function openImagePreview(event) {
     const detail = event?.detail || {};
@@ -82,29 +78,35 @@ export function useImagePreview() {
       loading: Boolean(firstUrl || detail.file),
       error: !firstUrl && !detail.file,
     };
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (detail.file && !detail.dataUrl)
       hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
   }
 
   /**
-   * handlePreviewLoad 처리 함수입니다.
-   * @returns {void}
+   * @description handlePreviewLoad 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function handlePreviewLoad() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!previewImage.value) return;
     previewImage.value.loading = false;
     previewImage.value.error = false;
   }
 
   /**
-   * handlePreviewError 처리 함수입니다.
-   * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+   * @description handlePreviewError 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function handlePreviewError() {
     const current = previewImage.value;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!current) return;
     const nextIndex = Number(current.sourceIndex || 0) + 1;
     const nextUrl = current.sources?.[nextIndex];
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (nextUrl) {
       previewImage.value = {
         ...current,
@@ -116,6 +118,7 @@ export function useImagePreview() {
       return;
     }
     const dataUrl = await readPreviewDataUrl(current.file);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (dataUrl && previewImage.value?.id === current.id) {
       previewImage.value = {
         ...previewImage.value,
@@ -128,6 +131,7 @@ export function useImagePreview() {
       };
       return;
     }
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (previewImage.value?.id === current.id) {
       previewImage.value.loading = false;
       previewImage.value.error = true;
@@ -135,20 +139,24 @@ export function useImagePreview() {
   }
 
   /**
-   * closeImagePreview 처리 함수입니다.
-   * @returns {void}
+   * @description closeImagePreview 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function closeImagePreview() {
     previewImage.value = null;
   }
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onMounted(() =>
     window.addEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
   );
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() =>
     window.removeEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
   );
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     previewImage,
     closeImagePreview,

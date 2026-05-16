@@ -1,4 +1,5 @@
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   AndroidToJsContract,
   BridgeContract,
   JsToAndroidContract,
@@ -12,43 +13,50 @@ import {logWarn} from "@/utils/logger";
 const callbacks = {};
 
 /**
- * createRequestId 처리 함수입니다.
- * @returns {void}
+ * @description createRequestId 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createRequestId() {
+  // 계산된 결과를 호출부로 반환합니다.
   return `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 }
 
 /**
- * createIsoDate 처리 함수입니다.
- * @returns {void}
+ * @description createIsoDate 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createIsoDate() {
+  // 계산된 결과를 호출부로 반환합니다.
   return new Date().toISOString();
 }
 
 /**
- * getContract 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getContract 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} contractMap - contractMap 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getContract(type, contractMap = BridgeContract) {
   const contract = contractMap[type];
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!contract) {
     throw new Error(`Unknown bridge type: ${type}`);
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return contract;
 }
 
 /**
- * formatZodIssues 처리 함수입니다.
- * @param {*} error 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description formatZodIssues 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} error - error 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function formatZodIssues(error) {
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     error?.errors
       ?.map((issue) => `${issue.path.join(".") || "root"}: ${issue.message}`)
@@ -57,13 +65,13 @@ function formatZodIssues(error) {
 }
 
 /**
- * createContractError 처리 함수입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} message 함수 실행에 필요한 입력값입니다.
- * @param {*} code 함수 실행에 필요한 입력값입니다.
- * @param {*} status 함수 실행에 필요한 입력값입니다.
- * @param {*} meta 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createContractError 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} message - message 입력값입니다.
+ * @param {*} code - code 입력값입니다.
+ * @param {*} status - status 입력값입니다.
+ * @param {*} meta - meta 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createContractError(request, message, code, status = 400, meta = {}) {
   const errorResponse = createErrorResponse(request, message, code);
@@ -76,20 +84,22 @@ function createContractError(request, message, code, status = 400, meta = {}) {
   const error = new Error(message);
   error.response = errorResponse;
   error.status = status;
+  // 계산된 결과를 호출부로 반환합니다.
   return error;
 }
 
 /**
- * safeParseBySchema 처리 함수입니다.
- * @param {*} schema 함수 실행에 필요한 입력값입니다.
- * @param {*} value 함수 실행에 필요한 입력값입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} options 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description safeParseBySchema 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} schema - schema 입력값입니다.
+ * @param {*} value - value 입력값입니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function safeParseBySchema(schema, value, request, options) {
   const parsed = schema.safeParse(value || {});
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!parsed.success) {
     const detail = formatZodIssues(parsed.error);
     throw createContractError(
@@ -101,15 +111,17 @@ function safeParseBySchema(schema, value, request, options) {
     );
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return parsed.data;
 }
 
 /**
- * createBridgeRequest 처리 함수입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createBridgeRequest 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createBridgeRequest(payload = {}) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     requestId: payload.requestId || createRequestId(),
     requestDate: payload.requestDate || createIsoDate(),
@@ -118,16 +130,17 @@ function createBridgeRequest(payload = {}) {
 }
 
 /**
- * validateBridgeRequest 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description validateBridgeRequest 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @param {*} contractMap - contractMap 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
   const contract = getContract(type, contractMap);
   const request = createBridgeRequest(payload);
 
+  // 계산된 결과를 호출부로 반환합니다.
   return safeParseBySchema(contract.request, request, request, {
     code: "INVALID_BRIDGE_REQUEST",
     status: 400,
@@ -136,14 +149,6 @@ function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
   });
 }
 
-/**
- * 브릿지 응답 데이터가 계약 스키마와 일치하는지 검증합니다.
- * @param {string} type 브릿지 계약 타입입니다.
- * @param {*} data 검증할 응답 데이터입니다.
- * @param {*} contractMap 브릿지 계약 맵입니다.
- * @param {*} fallbackRequest 응답에 요청 식별자가 없을 때 사용할 요청 정보입니다.
- * @returns {*} 검증된 브릿지 응답을 반환합니다.
- */
 function validateBridgeResponse(
   type,
   data,
@@ -156,6 +161,7 @@ function validateBridgeResponse(
     requestDate: data?.requestDate || fallbackRequest?.requestDate,
   };
 
+  // 계산된 결과를 호출부로 반환합니다.
   return safeParseBySchema(contract.response, data, request, {
     code: "INVALID_BRIDGE_RESPONSE",
     status: 500,
@@ -164,14 +170,6 @@ function validateBridgeResponse(
   });
 }
 
-/**
- * 브릿지 오류 응답 데이터가 계약 스키마와 일치하는지 검증합니다.
- * @param {string} type 브릿지 계약 타입입니다.
- * @param {*} data 검증할 오류 응답 데이터입니다.
- * @param {*} contractMap 브릿지 계약 맵입니다.
- * @param {*} fallbackRequest 응답에 요청 식별자가 없을 때 사용할 요청 정보입니다.
- * @returns {*} 검증된 브릿지 오류 응답을 반환합니다.
- */
 function validateBridgeErrorResponse(
   type,
   data,
@@ -184,6 +182,7 @@ function validateBridgeErrorResponse(
     requestDate: data?.requestDate || fallbackRequest?.requestDate,
   };
 
+  // 계산된 결과를 호출부로 반환합니다.
   return safeParseBySchema(contract.error, data, request, {
     code: "INVALID_BRIDGE_ERROR_RESPONSE",
     status: 500,
@@ -193,9 +192,9 @@ function validateBridgeErrorResponse(
 }
 
 /**
- * getAndroidBridgeMethodName 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getAndroidBridgeMethodName 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getAndroidBridgeMethodName(type) {
   const methodMap = {
@@ -217,62 +216,71 @@ function getAndroidBridgeMethodName(type) {
     CLOSE_APP: "closeApp",
   };
 
+  // 계산된 결과를 호출부로 반환합니다.
   return methodMap[type];
 }
 
 /**
- * getAndroidBridge 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getAndroidBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getAndroidBridge() {
+  // 계산된 결과를 호출부로 반환합니다.
   return window.AndroidBridge || null;
 }
 
 /**
- * hasPostMessageBridge 처리 함수입니다.
- * @returns {boolean|*} 처리 결과를 반환합니다.
+ * @description hasPostMessageBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function hasPostMessageBridge() {
+  // 계산된 결과를 호출부로 반환합니다.
   return typeof getAndroidBridge()?.postMessage === "function";
 }
 
 /**
- * hasDirectAndroidBridge 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @returns {boolean|*} 처리 결과를 반환합니다.
+ * @description hasDirectAndroidBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function hasDirectAndroidBridge(type) {
   const methodName = getAndroidBridgeMethodName(type);
   const bridge = getAndroidBridge();
 
+  // 계산된 결과를 호출부로 반환합니다.
   return Boolean(
     bridge && methodName && typeof bridge[methodName] === "function"
   );
 }
 
 /**
- * callDirectAndroidBridge 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description callDirectAndroidBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function callDirectAndroidBridge(type, payload) {
   const methodName = getAndroidBridgeMethodName(type);
   const bridge = getAndroidBridge();
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!bridge || !methodName || typeof bridge[methodName] !== "function") {
+    // 계산된 결과를 호출부로 반환합니다.
     return null;
   }
 
   const raw = bridge[methodName](JSON.stringify(payload));
+  // 계산된 결과를 호출부로 반환합니다.
   return Promise.resolve(raw);
 }
 
 /**
- * createBridgeUnavailableResponse 처리 함수입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createBridgeUnavailableResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} type - type 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createBridgeUnavailableResponse(request, type) {
   const response = createErrorResponse(
@@ -286,38 +294,36 @@ function createBridgeUnavailableResponse(request, type) {
     phase: "native-bridge",
     status: 503,
   };
+  // 계산된 결과를 호출부로 반환합니다.
   return response;
 }
 
 /**
- * parseNativePayload 처리 함수입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description parseNativePayload 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function parseNativePayload(payload) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof payload !== "string") return payload || {};
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
+    // 계산된 결과를 호출부로 반환합니다.
     return payload ? JSON.parse(payload) : {};
   } catch (error) {
+    // 계산된 결과를 호출부로 반환합니다.
     return {rawPayload: payload};
   }
 }
 
-/**
- * 네이티브 미연결 또는 Swagger 테스트 환경에서 사용할 성공 응답 객체를 생성합니다.
- * @param {*} request 원본 브릿지 요청 정보입니다.
- * @param {*} data 응답 데이터입니다.
- * @param {string} message 응답 메시지입니다.
- * @param {*} meta 부가 메타 데이터입니다.
- * @returns {*} 표준 성공 응답 객체를 반환합니다.
- */
 function createSuccessResponse(
   request,
   data,
   message = "정상 처리되었습니다.",
   meta = {}
 ) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     requestId: request.requestId,
     requestDate: request.requestDate,
@@ -331,11 +337,11 @@ function createSuccessResponse(
 }
 
 /**
- * createErrorResponse 처리 함수입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} error 함수 실행에 필요한 입력값입니다.
- * @param {*} code 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createErrorResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} error - error 입력값입니다.
+ * @param {*} code - code 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
   const message =
@@ -343,6 +349,7 @@ function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
       ? error.message
       : String(error || "Bridge response error");
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     requestId: request?.requestId || createRequestId(),
     requestDate: request?.requestDate || createIsoDate(),
@@ -360,16 +367,20 @@ function createErrorResponse(request, error, code = "BRIDGE_ERROR") {
 }
 
 /**
- * normalizeBridgeResponse 처리 함수입니다.
- * @param {*} response 함수 실행에 필요한 입력값입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description normalizeBridgeResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} response - response 입력값입니다.
+ * @param {*} request - request 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function normalizeBridgeResponse(response, request) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof response === "string") {
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
+      // 계산된 결과를 호출부로 반환합니다.
       return JSON.parse(response);
     } catch (error) {
+      // 계산된 결과를 호출부로 반환합니다.
       return createErrorResponse(
         request,
         "Invalid bridge response JSON",
@@ -378,7 +389,9 @@ function normalizeBridgeResponse(response, request) {
     }
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!response) {
+    // 계산된 결과를 호출부로 반환합니다.
     return createErrorResponse(
       request,
       "Empty bridge response",
@@ -386,11 +399,15 @@ function normalizeBridgeResponse(response, request) {
     );
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof response.isSuccess === "boolean") {
+    // 계산된 결과를 호출부로 반환합니다.
     return response;
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (response.error) {
+    // 계산된 결과를 호출부로 반환합니다.
     return createErrorResponse(
       {
         requestId: response.requestId || request?.requestId,
@@ -401,6 +418,7 @@ function normalizeBridgeResponse(response, request) {
     );
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return createSuccessResponse(
     {
       requestId: response.requestId || request?.requestId,
@@ -411,39 +429,45 @@ function normalizeBridgeResponse(response, request) {
 }
 
 /**
- * completeBridgeResponse 처리 함수입니다.
- * @param {*} rawResponse 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description completeBridgeResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} rawResponse - rawResponse 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function completeBridgeResponse(rawResponse) {
   const requestId =
     typeof rawResponse === "string"
       ? (() => {
+          // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
           try {
+            // 계산된 결과를 호출부로 반환합니다.
             return JSON.parse(rawResponse)?.requestId;
           } catch (error) {
+            // 계산된 결과를 호출부로 반환합니다.
             return null;
           }
         })()
       : rawResponse?.requestId;
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!requestId) return;
 
   const callback = callbacks[requestId];
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!callback) return;
 
   callback(rawResponse);
 }
 
 /**
- * throwIfErrorResponse 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @param {*} response 함수 실행에 필요한 입력값입니다.
- * @param {*} contractMap 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description throwIfErrorResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} response - response 입력값입니다.
+ * @param {*} contractMap - contractMap 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function throwIfErrorResponse(type, response, contractMap) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (response.isSuccess) return;
 
   const errorResponse = validateBridgeErrorResponse(
@@ -463,93 +487,109 @@ function throwIfErrorResponse(type, response, contractMap) {
 }
 
 /**
- * getApiBaseUrl 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getApiBaseUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getApiBaseUrl() {
   const configured = process.env.VUE_APP_API_BASE_URL || "/api";
+  // 계산된 결과를 호출부로 반환합니다.
   return configured.replace(/\/$/, "");
 }
 
 /**
- * interpolatePath 처리 함수입니다.
- * @param {*} path 함수 실행에 필요한 입력값입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description interpolatePath 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} path - path 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function interpolatePath(path, payload) {
+  // 계산된 결과를 호출부로 반환합니다.
   return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) =>
     encodeURIComponent(payload?.[key] ?? "")
   );
 }
 
 /**
- * buildBackendUrl 처리 함수입니다.
- * @param {*} contract 함수 실행에 필요한 입력값입니다.
- * @param {*} payload 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description buildBackendUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} contract - contract 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function buildBackendUrl(contract, payload) {
   const rawPath =
     contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
   const path = interpolatePath(rawPath, payload);
+  // 계산된 결과를 호출부로 반환합니다.
   return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
 /**
- * pickRequestBody 처리 함수입니다.
- * @param {*} method 함수 실행에 필요한 입력값입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description pickRequestBody 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} method - method 입력값입니다.
+ * @param {*} request - request 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function pickRequestBody(method, request) {
   const normalizedMethod = method.toUpperCase();
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (normalizedMethod === "GET" || normalizedMethod === "HEAD") {
+    // 계산된 결과를 호출부로 반환합니다.
     return undefined;
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return JSON.stringify(request);
 }
 
 /**
- * parseBackendBody 처리 함수입니다.
- * @param {*} response 함수 실행에 필요한 입력값입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description parseBackendBody 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} response - response 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function parseBackendBody(response) {
   const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!text) return null;
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (contentType.includes("application/json")) {
+    // 계산된 결과를 호출부로 반환합니다.
     return JSON.parse(text);
   }
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
+    // 계산된 결과를 호출부로 반환합니다.
     return JSON.parse(text);
   } catch (error) {
+    // 계산된 결과를 호출부로 반환합니다.
     return text;
   }
 }
 
 /**
- * normalizeBackendSuccess 처리 함수입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} backendBody 함수 실행에 필요한 입력값입니다.
- * @param {*} contract 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description normalizeBackendSuccess 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} backendBody - backendBody 입력값입니다.
+ * @param {*} contract - contract 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function normalizeBackendSuccess(request, backendBody, contract) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (
     backendBody &&
     typeof backendBody === "object" &&
     typeof backendBody.isSuccess === "boolean"
   ) {
+    // 계산된 결과를 호출부로 반환합니다.
     return backendBody;
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return createSuccessResponse(
     request,
     backendBody,
@@ -564,12 +604,12 @@ function normalizeBackendSuccess(request, backendBody, contract) {
 }
 
 /**
- * normalizeBackendError 처리 함수입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} response 함수 실행에 필요한 입력값입니다.
- * @param {*} backendBody 함수 실행에 필요한 입력값입니다.
- * @param {*} contract 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description normalizeBackendError 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} response - response 입력값입니다.
+ * @param {*} backendBody - backendBody 입력값입니다.
+ * @param {*} contract - contract 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function normalizeBackendError(request, response, backendBody, contract) {
   const status = response?.status || 500;
@@ -592,15 +632,16 @@ function normalizeBackendError(request, response, backendBody, contract) {
     raw: backendBody,
   };
 
+  // 계산된 결과를 호출부로 반환합니다.
   return error;
 }
 
 /**
- * requestBackend 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @param {*} request 함수 실행에 필요한 입력값입니다.
- * @param {*} contract 함수 실행에 필요한 입력값입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description requestBackend 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} contract - contract 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function requestBackend(type, request, contract) {
   const method = (contract.httpMethod || "POST").toUpperCase();
@@ -615,34 +656,39 @@ async function requestBackend(type, request, contract) {
   });
   const backendBody = await parseBackendBody(response);
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!response.ok) {
+    // 계산된 결과를 호출부로 반환합니다.
     return normalizeBackendError(request, response, backendBody, contract);
   }
 
+  // 계산된 결과를 호출부로 반환합니다.
   return normalizeBackendSuccess(request, backendBody, contract);
 }
 
 /**
- * executeWebApi 함수입니다.
- * @param {*} type 함수 실행에 필요한 값입니다.
- * @param {*} payload 함수 실행에 필요한 값입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description executeWebApi 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export async function executeWebApi(type, payload = {}) {
   const contract = getContract(type, WebApiContract);
   const request = createBridgeRequest(payload);
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     const response = await requestBackend(type, request, contract);
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!response.isSuccess) {
       throwIfErrorResponse(type, response, WebApiContract);
     }
 
-    // REST/Web API는 backend contract를 신뢰한다.
-    // JS ↔ Android boundary와 달리 zod safeParse를 강제하지 않고 실제 backend 응답을 그대로 표준 envelope로 반환한다.
+    // 계산된 결과를 호출부로 반환합니다.
     return response;
   } catch (error) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (error?.response) throw error;
 
     const errorResponse = createErrorResponse(
@@ -659,21 +705,24 @@ export async function executeWebApi(type, payload = {}) {
     };
 
     throwIfErrorResponse(type, errorResponse, WebApiContract);
+    // 계산된 결과를 호출부로 반환합니다.
     return errorResponse;
   }
 }
 
 /**
- * callNative 함수입니다.
- * @param {*} type 함수 실행에 필요한 값입니다.
- * @param {*} payload 함수 실행에 필요한 값입니다.
- * @param {*} timeout 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description callNative 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @param {*} timeout - timeout 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
+  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve, reject) => {
     let validPayload;
 
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       validPayload = validateBridgeRequest(type, payload, JsToAndroidContract);
     } catch (error) {
@@ -685,6 +734,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
     const canUsePostMessage = hasPostMessageBridge();
     const canUseDirectMethod = hasDirectAndroidBridge(type);
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!canUsePostMessage && !canUseDirectMethod) {
       const errorResponse = createBridgeUnavailableResponse(validPayload, type);
       const error = new Error(errorResponse.message);
@@ -696,6 +746,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 
     let settled = false;
     const timer = window.setTimeout(() => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (settled) return;
 
       settled = true;
@@ -719,12 +770,14 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
     }, timeout);
 
     callbacks[requestId] = (rawResponse) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (settled) return;
 
       settled = true;
       window.clearTimeout(timer);
       delete callbacks[requestId];
 
+      // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
       try {
         const response = normalizeBridgeResponse(rawResponse, validPayload);
         throwIfErrorResponse(type, response, JsToAndroidContract);
@@ -741,7 +794,9 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       }
     };
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (canUsePostMessage) {
+      // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
       try {
         const rawResponse = getAndroidBridge().postMessage(
           JSON.stringify({
@@ -750,6 +805,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
             payload: validPayload,
           })
         );
+        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (rawResponse) {
           completeBridgeResponse(
             normalizeBridgeResponse(rawResponse, validPayload)
@@ -796,17 +852,19 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
 }
 
 /**
- * rejectAndroidToJsSwaggerExecution 함수입니다.
- * @param {*} type 함수 실행에 필요한 값입니다.
- * @param {*} payload 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description rejectAndroidToJsSwaggerExecution 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
   let request;
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     request = validateBridgeRequest(type, payload, AndroidToJsContract);
   } catch (error) {
+    // 계산된 결과를 호출부로 반환합니다.
     return Promise.reject(error);
   }
 
@@ -825,14 +883,15 @@ export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
   const error = new Error(errorResponse.message);
   error.response = errorResponse;
   error.status = 501;
+  // 계산된 결과를 호출부로 반환합니다.
   return Promise.reject(error);
 }
 
 /**
- * receiveNativeEvent 함수입니다.
- * @param {*} type 함수 실행에 필요한 값입니다.
- * @param {*} payload 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description receiveNativeEvent 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function receiveNativeEvent(type, payload = {}) {
   const request = validateBridgeRequest(
@@ -841,8 +900,10 @@ export function receiveNativeEvent(type, payload = {}) {
     AndroidToJsContract
   );
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     const activePinia = getActivePinia();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (activePinia) {
       usePlatformStore(activePinia).recordNativeEvent(type, request);
     } else {
@@ -867,6 +928,7 @@ export function receiveNativeEvent(type, payload = {}) {
   const globalHandlerName = `__${type}`;
   const globalHandler = window[globalHandlerName];
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof globalHandler === "function") {
     globalHandler(request);
   }
@@ -881,20 +943,25 @@ export function receiveNativeEvent(type, payload = {}) {
     {category: "android-to-js", runtime: "native-dispatch"}
   );
 
+  // 계산된 결과를 호출부로 반환합니다.
   return validateBridgeResponse(type, response, AndroidToJsContract, request);
 }
 
 /**
- * createNativeEventHandler 처리 함수입니다.
- * @param {*} type 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createNativeEventHandler 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createNativeEventHandler(type) {
+  // 계산된 결과를 호출부로 반환합니다.
   return (payload = {}) => {
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       const response = receiveNativeEvent(type, payload);
+      // 계산된 결과를 호출부로 반환합니다.
       return JSON.stringify(response);
     } catch (error) {
+      // 계산된 결과를 호출부로 반환합니다.
       return JSON.stringify(
         error?.response ||
           createErrorResponse(
@@ -908,25 +975,33 @@ function createNativeEventHandler(type) {
 }
 
 /**
- * executeContract 함수입니다.
- * @param {*} category 함수 실행에 필요한 값입니다.
- * @param {*} type 함수 실행에 필요한 값입니다.
- * @param {*} payload 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description executeContract 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} category - category 입력값입니다.
+ * @param {*} type - type 입력값입니다.
+ * @param {*} payload - payload 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function executeContract(category, type, payload = {}) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === "web-api") return executeWebApi(type, payload);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === "js-to-android") return callNative(type, payload);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === "android-to-js")
+    // 계산된 결과를 호출부로 반환합니다.
     return rejectAndroidToJsSwaggerExecution(type, payload);
+  // 계산된 결과를 호출부로 반환합니다.
   return executeWebApi(type, payload);
 }
 
 window.__bridgeResponse = completeBridgeResponse;
 window.__receiveNativeEvent = (type, payload = {}) => {
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
+    // 계산된 결과를 호출부로 반환합니다.
     return JSON.stringify(receiveNativeEvent(type, payload));
   } catch (error) {
+    // 계산된 결과를 호출부로 반환합니다.
     return JSON.stringify(
       error?.response ||
         createErrorResponse(

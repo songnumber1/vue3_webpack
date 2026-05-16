@@ -223,6 +223,7 @@ import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vu
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
 const {appInfo} = useAppContext();
 const noticeOpen = ref(false);
@@ -269,9 +270,9 @@ const popupSamples = {
 const activePopup = computed(() => popupSamples[activePopupType.value]);
 
 /**
- * Opens a popup sample by type.
- * @param {'alert'|'warning'|'confirm'} type Popup sample type.
- * @returns {void}
+ * @description openPopup 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} type - type 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function openPopup(type) {
   activePopupType.value = type;
@@ -279,9 +280,9 @@ function openPopup(type) {
 }
 
 /**
- * Closes the active popup and records the selected action in the playground log.
- * @param {string} action Selected popup action label.
- * @returns {void}
+ * @description closePopup 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} action - action 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function closePopup(action) {
   popupOpen.value = false;
@@ -289,8 +290,9 @@ function closePopup(action) {
 }
 
 /**
- * Synchronizes responsive playground mode with viewport and app platform.
- * @returns {void}
+ * @description syncMobile 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function syncMobile() {
   isMobile.value = Boolean(
@@ -298,10 +300,12 @@ function syncMobile() {
   );
 }
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onMounted(() => {
   syncMobile();
   window.addEventListener("resize", syncMobile, {passive: true});
 });
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onBeforeUnmount(() => window.removeEventListener("resize", syncMobile));
 </script>

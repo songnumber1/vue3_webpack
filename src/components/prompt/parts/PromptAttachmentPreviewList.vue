@@ -37,6 +37,7 @@
 
 <script setup>
 import {formatFileSize} from '@/utils/attachment';
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 defineProps({
   attachments: {type: Array, default: () => []},
 });
@@ -44,20 +45,22 @@ defineProps({
 const emit = defineEmits(['preview', 'remove', 'preview-error']);
 
 /**
- * Returns the best available preview URL for a local or native attachment.
- * @param {object} file Attachment view model.
- * @returns {string} Resolved preview URL.
+ * @description getPreviewUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} file - file 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getPreviewUrl(file) {
+  // 계산된 결과를 호출부로 반환합니다.
   return file?.dataUrl || file?.previewUrl || file?.url || '';
 }
 
 /**
- * Emits preview only for image attachments.
- * @param {object} file Attachment view model.
- * @returns {void}
+ * @description emitPreview 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} file - file 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function emitPreview(file) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (file?.kind !== 'image') return;
   emit('preview', file);
 }

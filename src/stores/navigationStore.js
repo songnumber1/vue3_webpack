@@ -1,13 +1,6 @@
 import {defineStore} from "pinia";
 
-/**
- * Navigation UI state store.
- *
- * method: Pinia store
- * payload: sidebar/drawer visibility state
- * response: reactive navigation state/actions
- * 특징: ChatContainer → ChatLayout → AppSidebar prop drilling을 줄이기 위해 UI navigation 상태를 중앙화합니다.
- */
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const useNavigationStore = defineStore("navigation", {
   state: () => ({
     sidebarCollapsed: false,

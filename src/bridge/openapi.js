@@ -1,4 +1,5 @@
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
@@ -37,12 +38,13 @@ const CATEGORY_OPTIONS = [
 ];
 
 /**
- * createErrorResponse 처리 함수입니다.
- * @param {*} description 함수 실행에 필요한 입력값입니다.
- * @param {*} schema 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description createErrorResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} description - description 입력값입니다.
+ * @param {*} schema - schema 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createErrorResponse(description, schema) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     description,
     content: {
@@ -54,22 +56,26 @@ function createErrorResponse(description, schema) {
 }
 
 /**
- * getCategoryPath 처리 함수입니다.
- * @param {*} category 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getCategoryPath 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} category - category 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getCategoryPath(category) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.JS_TO_ANDROID) return JS_TO_ANDROID_PATH;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.ANDROID_TO_JS) return ANDROID_TO_JS_PATH;
+  // 계산된 결과를 호출부로 반환합니다.
   return WEB_API_PATH;
 }
 
 /**
- * getCategoryDescription 처리 함수입니다.
- * @param {*} category 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getCategoryDescription 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} category - category 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getCategoryDescription(category) {
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
     "Bridge contract"
@@ -77,12 +83,13 @@ function getCategoryDescription(category) {
 }
 
 /**
- * shouldIncludeContract 처리 함수입니다.
- * @param {*} selectedCategory 함수 실행에 필요한 입력값입니다.
- * @param {*} contract 함수 실행에 필요한 입력값입니다.
- * @returns {boolean|*} 처리 결과를 반환합니다.
+ * @description shouldIncludeContract 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} selectedCategory - selectedCategory 입력값입니다.
+ * @param {*} contract - contract 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldIncludeContract(selectedCategory, contract) {
+  // 계산된 결과를 호출부로 반환합니다.
   return (
     selectedCategory === BRIDGE_CATEGORY.ALL ||
     contract.category === selectedCategory
@@ -90,17 +97,19 @@ function shouldIncludeContract(selectedCategory, contract) {
 }
 
 /**
- * getOpenApiCategoryOptions 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getOpenApiCategoryOptions 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function getOpenApiCategoryOptions() {
+  // 계산된 결과를 호출부로 반환합니다.
   return CATEGORY_OPTIONS;
 }
 
 /**
- * generateOpenApi 함수입니다.
- * @param {*} selectedCategory 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description generateOpenApi 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} selectedCategory - selectedCategory 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
   const registry = new OpenAPIRegistry();
@@ -153,6 +162,7 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
 
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
+  // 계산된 결과를 호출부로 반환합니다.
   return generator.generateDocument({
     openapi: "3.0.0",
     info: {

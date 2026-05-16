@@ -1,5 +1,6 @@
 import {z} from "../zod";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const BaseRequest = z.object({
   requestId: z.string().min(1).openapi({
     description: "요청 추적 ID",
@@ -75,11 +76,12 @@ export const BaseResponseError = BaseResponse.extend({
 });
 
 /**
- * createResponseSchema 함수입니다.
- * @param {*} dataSchema 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description createResponseSchema 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} dataSchema - dataSchema 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function createResponseSchema(dataSchema) {
+  // 계산된 결과를 호출부로 반환합니다.
   return BaseResponse.extend({
     isSuccess: z.literal(true).openapi({
       description: "성공 여부",

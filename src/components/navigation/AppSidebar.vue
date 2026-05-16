@@ -123,6 +123,7 @@ import {useChatStore} from '@/stores/chatStore';
 import {useNavigationStore} from '@/stores/navigationStore';
 import {useOutsideClick} from '@/composables/useOutsideClick';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const emit = defineEmits([
   'new-chat',
   'select-history',
@@ -148,8 +149,9 @@ const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 
 /**
- * Synchronizes whether assistant selection should render as a mobile bottom sheet.
- * @returns {void}
+ * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
@@ -158,69 +160,117 @@ function syncViewportMode() {
   );
 }
 
-/** Opens or closes the assistant selector. @returns {void} */
+/**
+ * @description openAssistantSelector 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function openAssistantSelector() {
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
-/** @param {string} id Selected assistant id. @returns {void} */
+/**
+ * @description selectAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} id - id 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function selectAssistant(id) {
   emit('select-assistant', id);
   assistantMenuOpen.value = false;
 }
 
-/** @param {boolean} value Collapsed state. @returns {void} */
+/**
+ * @description setSidebarCollapsed 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function setSidebarCollapsed(value) {
   navigationStore.setSidebarCollapsed(value);
 }
 
-/** @param {boolean} value Drawer open state. @returns {void} */
+/**
+ * @description setDrawerOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function setDrawerOpen(value) {
   navigationStore.setDrawerOpen(value);
 }
 
-/** @param {boolean} value Collapsed recent popover open state. @returns {void} */
+/**
+ * @description setCollapsedRecentOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function setCollapsedRecentOpen(value) {
   navigationStore.setCollapsedRecentOpen(value);
 }
 
-/** Starts a new chat and closes temporary sidebar surfaces. @returns {void} */
+/**
+ * @description handleNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function handleNewChat() {
   emit('new-chat');
   setDrawerOpen(false);
   setCollapsedRecentOpen(false);
 }
 
-/** @param {{id: string|number, title: string}} item Selected history item. @returns {void} */
+/**
+ * @description handleSelectHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} item - item 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function handleSelectHistory(item) {
   emit('select-history', item);
   setDrawerOpen(false);
 }
 
-/** @param {{id: string|number, title: string}} item Selected history item. @returns {void} */
+/**
+ * @description handleSelectHistoryCollapsed 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} item - item 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function handleSelectHistoryCollapsed(item) {
   emit('select-history', item);
   setCollapsedRecentOpen(false);
 }
 
-/** @returns {void} */
+/**
+ * @description openSettings 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function openSettings() {
   emit('open-settings');
 }
 
-/** @returns {void} */
+/**
+ * @description toggleTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function toggleTheme() {
   emit('toggle-theme');
 }
 
-/** @returns {void} */
+/**
+ * @description openSwagger 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function openSwagger() {
   setDrawerOpen(false);
   emit('open-swagger');
 }
 
-/** @returns {void} */
+/**
+ * @description openPlayground 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function openPlayground() {
   setDrawerOpen(false);
   emit('open-playground');
@@ -235,11 +285,13 @@ useOutsideClick(
   {shouldIgnore: () => isMobileSheet.value}
 );
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onMounted(() => {
   syncViewportMode();
   window.addEventListener('resize', syncViewportMode, {passive: true});
 });
 
+// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
 onBeforeUnmount(() => {
   window.removeEventListener('resize', syncViewportMode);
 });

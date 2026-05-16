@@ -2,6 +2,7 @@ import {GetUserRequest, GetUserResponse} from "./schemas/getUser";
 import {LoginRequest, LoginResponse} from "./schemas/login";
 import {UploadFileRequest, UploadFileResponse} from "./schemas/uploadFile";
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   CancelRequestRequest,
   CancelRequestResponse,
   CheckNetworkResponse,
@@ -81,14 +82,6 @@ export const WebApiContract = {
   },
 };
 
-/**
- * JS에서 Android 네이티브로 호출하는 브릿지 계약 객체를 생성합니다.
- * @param {*} request 요청 스키마입니다.
- * @param {*} response 응답 스키마입니다.
- * @param {string} description Swagger와 문서에 표시할 설명입니다.
- * @param {string} required 필수 여부 표시 값입니다.
- * @returns {*} JS → Android 브릿지 계약 객체를 반환합니다.
- */
 const jsToAndroid = (
   request,
   response,
@@ -196,11 +189,11 @@ export const JsToAndroidContract = {
 };
 
 /**
- * androidToJs 함수입니다.
- * @param {*} request 함수 실행에 필요한 값입니다.
- * @param {*} description 함수 실행에 필요한 값입니다.
- * @param {*} required 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description androidToJs 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} request - request 입력값입니다.
+ * @param {*} description - description 입력값입니다.
+ * @param {*} required - required 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 const androidToJs = (request, description, required = "required") => ({
   request,
@@ -268,11 +261,13 @@ export const BridgeContractGroups = {
   [BRIDGE_CATEGORY.ANDROID_TO_JS]: AndroidToJsContract,
 };
 /**
- * getContractsByCategory 함수입니다.
- * @param {*} category 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getContractsByCategory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} category - category 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function getContractsByCategory(category = BRIDGE_CATEGORY.ALL) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.ALL) return BridgeContract;
+  // 계산된 결과를 호출부로 반환합니다.
   return BridgeContractGroups[category] || BridgeContract;
 }

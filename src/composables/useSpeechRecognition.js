@@ -1,14 +1,27 @@
 import {computed, onBeforeUnmount, ref} from "vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const DEFAULT_LANGUAGE = "ko-KR";
 const AUTO_RESTART_DELAY = 250;
 const DUPLICATE_NORMALIZE_PATTERN = /\s+/g;
 
+/**
+ * @description getSpeechRecognitionConstructor 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 function getSpeechRecognitionConstructor() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") return null;
+  // 계산된 결과를 호출부로 반환합니다.
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
+/**
+ * @description useSpeechRecognition 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 export function useSpeechRecognition(options = {}) {
   const isListening = ref(false);
   const isSupported = ref(Boolean(getSpeechRecognitionConstructor()));
@@ -24,30 +37,59 @@ export function useSpeechRecognition(options = {}) {
 
   const language = computed(() => options.language || DEFAULT_LANGUAGE);
 
+  /**
+   * @description clearRestartTimer 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function clearRestartTimer() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!restartTimer) return;
     window.clearTimeout(restartTimer);
     restartTimer = null;
   }
 
+  /**
+   * @description normalizeText 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} value - value 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function normalizeText(value) {
+    // 계산된 결과를 호출부로 반환합니다.
     return String(value || "")
       .replace(DUPLICATE_NORMALIZE_PATTERN, " ")
       .trim();
   }
 
+  /**
+   * @description mergeText 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} parts - parts 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function mergeText(...parts) {
+    // 계산된 결과를 호출부로 반환합니다.
     return parts.map(normalizeText).filter(Boolean).join(" ");
   }
 
+  /**
+   * @description emitText 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} nextText - nextText 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function emitText(nextText) {
     transcriptText.value = nextText;
     options.onText?.(nextText);
   }
 
+  /**
+   * @description buildRecognition 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function buildRecognition() {
     const SpeechRecognition = getSpeechRecognitionConstructor();
     isSupported.value = Boolean(SpeechRecognition);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!SpeechRecognition) return null;
 
     const instance = new SpeechRecognition();
@@ -64,6 +106,7 @@ export function useSpeechRecognition(options = {}) {
     instance.onresult = (event) => {
       interimTranscript = "";
 
+      // 목록 또는 결과 집합을 순회하면서 필요한 값만 선별합니다.
       for (
         let index = event.resultIndex;
         index < event.results.length;
@@ -71,8 +114,10 @@ export function useSpeechRecognition(options = {}) {
       ) {
         const result = event.results[index];
         const resultText = normalizeText(result?.[0]?.transcript || "");
+        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (!resultText) continue;
 
+        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (result.isFinal) {
           const currentFinal = normalizeText(committedTranscript);
           const alreadyIncluded =
@@ -80,6 +125,7 @@ export function useSpeechRecognition(options = {}) {
             (currentFinal === resultText ||
               currentFinal.endsWith(` ${resultText}`));
 
+          // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
           if (alreadyIncluded) {
             continue;
           }
@@ -105,27 +151,36 @@ export function useSpeechRecognition(options = {}) {
     instance.onend = () => {
       isListening.value = false;
       recognition = null;
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!shouldAutoRestart || hasManualStop.value) return;
       clearRestartTimer();
       restartTimer = window.setTimeout(() => {
+        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (shouldAutoRestart && !hasManualStop.value)
           start(transcriptText.value);
       }, AUTO_RESTART_DELAY);
     };
 
+    // 계산된 결과를 호출부로 반환합니다.
     return instance;
   }
 
+  /**
+   * @description start 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} currentText - currentText 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function start(currentText = "") {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!isSupported.value) {
       errorMessage.value = "speech-recognition-not-supported";
+      // 계산된 결과를 호출부로 반환합니다.
       return false;
     }
 
     clearRestartTimer();
     hasManualStop.value = false;
 
-    // TODO : 자동 재생 안되도록 설정하려면 false로 변경
     shouldAutoRestart = true;
 
     baseText.value = normalizeText(currentText);
@@ -133,35 +188,47 @@ export function useSpeechRecognition(options = {}) {
     committedTranscript = "";
     interimTranscript = "";
 
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (recognition) {
+      // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
       try {
         recognition.abort();
       } catch (error) {
-        // Ignore abort race conditions from browser recognition engines.
       }
     }
 
     recognition = buildRecognition();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!recognition) return false;
 
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       recognition.start();
+      // 계산된 결과를 호출부로 반환합니다.
       return true;
     } catch (error) {
       errorMessage.value = error?.message || "speech-recognition-start-failed";
       recognition = null;
+      // 계산된 결과를 호출부로 반환합니다.
       return false;
     }
   }
 
+  /**
+   * @description stopByUser 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function stopByUser() {
     hasManualStop.value = true;
     shouldAutoRestart = false;
     clearRestartTimer();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!recognition) {
       isListening.value = false;
       return;
     }
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       recognition.stop();
     } catch (error) {
@@ -170,6 +237,11 @@ export function useSpeechRecognition(options = {}) {
     }
   }
 
+  /**
+   * @description resetToMic 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function resetToMic() {
     hasManualStop.value = false;
     errorMessage.value = "";
@@ -177,17 +249,20 @@ export function useSpeechRecognition(options = {}) {
     interimTranscript = "";
   }
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     shouldAutoRestart = false;
     clearRestartTimer();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!recognition) return;
+    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       recognition.abort();
     } catch (error) {
-      // Ignore cleanup errors.
     }
   });
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     isSupported,
     isListening,

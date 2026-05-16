@@ -1,12 +1,7 @@
 import {RUN_ENV, PLATFORM} from "./constants";
 import {createId} from "@/utils/id";
 
-/**
- * Android 앱에서 웹 런타임이 요구하는 최소/최신 버전 정보입니다.
- *
- * - currentVersion(appInfo.appVersion)이 latestVersion보다 낮으면 업데이트 페이지로 이동합니다.
- * - Android Chrome처럼 window.AndroidBridge가 없는 경우에는 Android native config가 생성되지 않으므로 이 정책이 적용되지 않습니다.
- */
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const LAST_VERSION_INFO = Object.freeze({
   version: "1.0.0",
   title: "앱 업데이트가 필요합니다.",
@@ -15,28 +10,32 @@ export const LAST_VERSION_INFO = Object.freeze({
 });
 
 /**
- * readAndroidValue 처리 함수입니다.
- * @param {*} bridge 함수 실행에 필요한 입력값입니다.
- * @param {*} methodName 함수 실행에 필요한 입력값입니다.
- * @param {*} fallback 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description readAndroidValue 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} bridge - bridge 입력값입니다.
+ * @param {*} methodName - methodName 입력값입니다.
+ * @param {*} fallback - fallback 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function readAndroidValue(bridge, methodName, fallback = null) {
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     const member = bridge?.[methodName];
     const value = typeof member === "function" ? member.call(bridge) : member;
+    // 계산된 결과를 호출부로 반환합니다.
     return value == null || value === "" ? fallback : String(value);
   } catch {
+    // 계산된 결과를 호출부로 반환합니다.
     return fallback;
   }
 }
 
 /**
- * createAndroidConfig 함수입니다.
- * @param {*} bridge 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description createAndroidConfig 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} bridge - bridge 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function createAndroidConfig(bridge = window.AndroidBridge) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     env: RUN_ENV.NATIVE,
     platform: PLATFORM.ANDROID,

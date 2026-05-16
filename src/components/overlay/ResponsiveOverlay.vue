@@ -49,6 +49,7 @@
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
 
 const props = defineProps({
@@ -56,11 +57,6 @@ const props = defineProps({
   isMobile: {type: Boolean, default: false},
   title: {type: String, required: true},
   subtitle: {type: String, default: ""},
-  /**
-   * Mobile rendering strategy.
-   * - fullscreen: keeps the existing notice/personalization mobile page behavior.
-   * - dialog: keeps alert/warning/confirm as popup dialogs on mobile.
-   */
   mobileMode: {
     type: String,
     default: "fullscreen",

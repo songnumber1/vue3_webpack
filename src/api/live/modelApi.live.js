@@ -1,31 +1,26 @@
 import {httpClient} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * 일반 Assistant 모델 목록을 조회합니다.
- *
- * method: GET
- * payload: 없음
- * response: model/info/model.do response array
- *
- * @returns {Promise<Array<object>>} 모델 raw 목록입니다.
+ * @description getModels 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function getModels() {
   const response = await httpClient.get(API_ENDPOINTS.MODEL_INFO);
+  // 계산된 결과를 호출부로 반환합니다.
   return response?.data || [];
 }
 
 /**
- * Studio Assistant 모델 목록을 조회합니다.
- *
- * method: GET
- * payload: 없음
- * response: model/info/studio-model.do response array
- *
- * @returns {Promise<Array<object>>} Studio 모델 raw 목록입니다.
+ * @description getStudioModels 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function getStudioModels() {
   const response = await httpClient.get(API_ENDPOINTS.STUDIO_MODEL_INFO);
+  // 계산된 결과를 호출부로 반환합니다.
   return response?.data || [];
 }
 

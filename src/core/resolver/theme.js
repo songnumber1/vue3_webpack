@@ -2,15 +2,16 @@ const THEME_KEY = "app_theme";
 const allowedThemes = ["light", "dark"];
 
 /**
- * resolveTheme 함수입니다.
- * @param {*} storage 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description resolveTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} storage - storage 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function resolveTheme(storage) {
   const stored = storage.get(THEME_KEY);
   const initial = allowedThemes.includes(stored) ? stored : "light";
   document.documentElement.dataset.theme = initial;
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     current: initial,
     set(name) {

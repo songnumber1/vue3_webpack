@@ -150,6 +150,7 @@ import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
 import {copyClipboardByPlatform} from "@/services/platformBridge";
 import {logWarn} from "@/utils/logger";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   role: {type: String, required: true},
   content: {type: String, default: ""},
@@ -177,12 +178,13 @@ const hasMoreReasons = computed(
 );
 
 /**
- * Toggles a feedback value on the current message and resets nested panels when needed.
- * @param {'like'|'dislike'} value Feedback action.
- * @returns {void}
+ * @description setFeedback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function setFeedback(value) {
   feedback.value = feedback.value === value ? "" : value;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (feedback.value !== FEEDBACK_ACTIONS.DISLIKE) {
     showAllReasons.value = false;
     selectedReasons.value = [];
@@ -190,44 +192,47 @@ function setFeedback(value) {
 }
 
 /**
- * Opens the explicit feedback dialog with a textarea and footer actions.
- * @returns {void}
+ * @description openFeedbackDialog 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function openFeedbackDialog() {
   feedbackDialogOpen.value = true;
 }
 
 /**
- * Closes the explicit feedback dialog without mutating message content.
- * @returns {void}
+ * @description closeFeedbackDialog 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function closeFeedbackDialog() {
   feedbackDialogOpen.value = false;
 }
 
 /**
- * Mock submit handler for future message feedback API integration.
- * @returns {void}
+ * @description submitFeedback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function submitFeedback() {
-  // 실제 feedback API 연동 전까지는 입력값만 초기화한다.
   feedbackText.value = "";
   closeFeedbackDialog();
 }
 
 /**
- * Returns a localized hallucination reason label.
- * @param {{ko: string, en: string}} reason Feedback reason object.
- * @returns {string} Localized reason label.
+ * @description reasonLabel 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} reason - reason 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function reasonLabel(reason) {
+  // 계산된 결과를 호출부로 반환합니다.
   return locale.value === "ko" ? reason.ko : reason.en;
 }
 
 /**
- * Adds or removes a selected hallucination reason id.
- * @param {string} id Feedback reason id.
- * @returns {void}
+ * @description toggleReason 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} id - id 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function toggleReason(id) {
   selectedReasons.value = selectedReasons.value.includes(id)
@@ -236,10 +241,12 @@ function toggleReason(id) {
 }
 
 /**
- * Copies the message text through the platform clipboard bridge when available.
- * @returns {Promise<void>} Copy completion promise.
+ * @description copy 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function copy() {
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     await copyClipboardByPlatform(props.content || "");
   } catch (error) {

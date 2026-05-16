@@ -1,6 +1,7 @@
 import {z} from "../zod";
 import {BaseRequest, createResponseSchema} from "./base";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const EmptyNativeRequest = BaseRequest.extend({});
 export const BooleanAckData = z.object({
   ok: z.boolean().openapi({description: "처리 성공 여부", example: true}),

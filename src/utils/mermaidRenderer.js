@@ -1,25 +1,30 @@
 import {logWarn} from "@/utils/logger";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 let mermaidLoader = null;
 
 const MERMAID_CDN =
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
 
 /**
- * isDarkTheme 처리 함수입니다.
- * @returns {boolean|*} 처리 결과를 반환합니다.
+ * @description isDarkTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isDarkTheme() {
+  // 계산된 결과를 호출부로 반환합니다.
   return document.documentElement.getAttribute("data-theme") === "dark";
 }
 
 /**
- * getMermaidConfig 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getMermaidConfig 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getMermaidConfig() {
   const dark = isDarkTheme();
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     startOnLoad: false,
     securityLevel: "strict",
@@ -77,14 +82,17 @@ function getMermaidConfig() {
 }
 
 /**
- * loadScript 처리 함수입니다.
- * @param {*} src 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description loadScript 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} src - src 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function loadScript(src) {
+  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (existing) {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (window.mermaid) {
         resolve();
         return;
@@ -104,15 +112,19 @@ function loadScript(src) {
 }
 
 /**
- * ensureMermaid 처리 함수입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description ensureMermaid 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 async function ensureMermaid() {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (window.mermaid) {
     window.mermaid.initialize(getMermaidConfig());
+    // 계산된 결과를 호출부로 반환합니다.
     return window.mermaid;
   }
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!mermaidLoader) {
     mermaidLoader = loadScript(MERMAID_CDN)
       .then(() => window.mermaid)
@@ -121,19 +133,21 @@ async function ensureMermaid() {
           "Mermaid could not be loaded. The source code block will remain visible.",
           error
         );
+        // 계산된 결과를 호출부로 반환합니다.
         return null;
       });
   }
 
   const mermaid = await mermaidLoader;
   mermaid?.initialize?.(getMermaidConfig());
+  // 계산된 결과를 호출부로 반환합니다.
   return mermaid;
 }
 
 /**
- * resetRenderedMermaid 처리 함수입니다.
- * @param {*} root 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description resetRenderedMermaid 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} root - root 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
@@ -142,6 +156,7 @@ function resetRenderedMermaid(root) {
 
   rendered.forEach((target) => {
     const source = target.getAttribute("data-mermaid-source");
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!source) return;
 
     target.removeAttribute("data-processed");
@@ -151,14 +166,16 @@ function resetRenderedMermaid(root) {
 }
 
 /**
- * renderMermaidInElement 함수입니다.
- * @param {*} root 함수 실행에 필요한 값입니다.
- * @param {*} options 함수 실행에 필요한 값입니다.
- * @returns {Promise<*>} 비동기 처리 결과를 반환합니다.
+ * @description renderMermaidInElement 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} root - root 입력값입니다.
+ * @param {*} options - options 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export async function renderMermaidInElement(root, options = {}) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!root) return;
 
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (options.force) {
     resetRenderedMermaid(root);
   }
@@ -166,15 +183,18 @@ export async function renderMermaidInElement(root, options = {}) {
   const targets = Array.from(
     root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
   );
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (targets.length === 0) return;
 
   targets.forEach((target) => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!target.getAttribute("data-mermaid-source")) {
       target.setAttribute("data-mermaid-source", target.textContent || "");
     }
   });
 
   const mermaid = await ensureMermaid();
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!mermaid?.run) return;
 
   targets.forEach((target) => {
@@ -182,6 +202,7 @@ export async function renderMermaidInElement(root, options = {}) {
     target.removeAttribute("data-mermaid-error");
   });
 
+  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     await mermaid.run({nodes: targets});
   } catch (error) {

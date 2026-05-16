@@ -1,3 +1,10 @@
+/**
+ * @description user 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} id - id 입력값입니다.
+ * @param {*} content - content 입력값입니다.
+ * @param {*} sendTime - sendTime 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const user = (id, content, sendTime) => ({
   role: "user",
   content,
@@ -11,6 +18,14 @@ const user = (id, content, sendTime) => ({
   refreences: [],
 });
 
+/**
+ * @description assistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} id - id 입력값입니다.
+ * @param {*} content - content 입력값입니다.
+ * @param {*} sendTime - sendTime 입력값입니다.
+ * @param {*} references - references 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 const assistant = (id, content, sendTime, references = []) => ({
   role: "assistant",
   content,
@@ -80,6 +95,11 @@ flowchart TD
 ## 3. Source Code
 
 \`\`\`js
+/**
+ * @description bootstrapChatRuntime 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 export async function bootstrapChatRuntime() {
   const [accessInfo, assistants, studios, models, studioModels, histories] = await Promise.all([
     accessApi.getAccessInfo(),
@@ -90,6 +110,7 @@ export async function bootstrapChatRuntime() {
     chatHistoryApi.getChatHistoryList(),
   ]);
 
+  // 계산된 결과를 호출부로 반환합니다.
   return normalizeBootstrapResult({ accessInfo, assistants, studios, models, studioModels, histories });
 }
 \`\`\`
@@ -216,6 +237,7 @@ sequenceDiagram
 | Linux | rx buffer 적체 | 커널 지표 모니터링 |
 
 \`\`\`java
+// 계산된 결과를 호출부로 반환합니다.
 return webClient.post()
     .uri("/external/stream")
     .retrieve()
@@ -247,7 +269,13 @@ export const CHAT_KEYS = Object.freeze({
   LEGACY_MODEL_ID: 'modeId',
 });
 
+/**
+ * @description adaptChatHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} raw - raw 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 export function adaptChatHistory(raw) {
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     id: raw[CHAT_KEYS.ID],
     title: raw[CHAT_KEYS.TITLE],

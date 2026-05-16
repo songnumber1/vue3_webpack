@@ -86,6 +86,7 @@ import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   mode: {type: String, default: "main"},
   isMobile: {type: Boolean, default: false},

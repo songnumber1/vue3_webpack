@@ -97,6 +97,7 @@ import PromptAttachmentPreviewList from '@/components/prompt/parts/PromptAttachm
 import PromptMobileSheets from '@/components/prompt/parts/PromptMobileSheets.vue';
 import PromptTextarea from '@/components/prompt/parts/PromptTextarea.vue';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   disabled: {type: Boolean, default: false},
   floating: {type: Boolean, default: false},

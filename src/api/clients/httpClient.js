@@ -1,16 +1,13 @@
 import axios from "axios";
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
- * 서비스 API 호출용 axios instance를 생성합니다.
- *
- * method: axios.create
- * payload: { baseURL, timeout, withCredentials }
- * response: AxiosInstance
- * 특징: 공통 화면 interceptor와 분리된 순수 API client이므로 mock/live 전환과 테스트가 쉽습니다.
- *
- * @returns {import('axios').AxiosInstance} API 호출 전용 axios 인스턴스입니다.
+ * @description createHttpClient 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function createHttpClient() {
+  // 계산된 결과를 호출부로 반환합니다.
   return axios.create({
     baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
     timeout: Number(process.env.VUE_APP_API_TIMEOUT || 15000),

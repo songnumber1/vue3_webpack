@@ -1,4 +1,5 @@
 import {
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   RUN_ENV,
   PLATFORM,
   hasAndroidBridge,
@@ -7,113 +8,148 @@ import {
 } from "@/core/config";
 
 /**
- * getNavigator 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getNavigator 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getNavigator() {
+  // 계산된 결과를 호출부로 반환합니다.
   return typeof window === "undefined" ? {} : window.navigator || {};
 }
 /**
- * getScreen 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getScreen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getScreen() {
+  // 계산된 결과를 호출부로 반환합니다.
   return typeof window === "undefined" ? {} : window.screen || {};
 }
 /**
- * parseVersion 처리 함수입니다.
- * @param {*} ua 함수 실행에 필요한 입력값입니다.
- * @param {*} pattern 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description parseVersion 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} ua - ua 입력값입니다.
+ * @param {*} pattern - pattern 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function parseVersion(ua, pattern) {
   const match = ua.match(pattern);
+  // 계산된 결과를 호출부로 반환합니다.
   return match?.[1] || "";
 }
 /**
- * getBrowserName 처리 함수입니다.
- * @param {*} ua 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getBrowserName 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} ua - ua 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getBrowserName(ua) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Edg\//i.test(ua)) return "edge";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/OPR\//i.test(ua)) return "opera";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/SamsungBrowser\//i.test(ua)) return "samsung-internet";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/CriOS|Chrome\//i.test(ua)) return "chrome";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/FxiOS|Firefox\//i.test(ua)) return "firefox";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Safari\//i.test(ua)) return "safari";
+  // 계산된 결과를 호출부로 반환합니다.
   return "unknown";
 }
 /**
- * getBrowserVersion 처리 함수입니다.
- * @param {*} ua 함수 실행에 필요한 입력값입니다.
- * @param {*} browserName 함수 실행에 필요한 입력값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getBrowserVersion 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} ua - ua 입력값입니다.
+ * @param {*} browserName - browserName 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getBrowserVersion(ua, browserName) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "edge") return parseVersion(ua, /Edg\/([\d.]+)/i);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "chrome")
+    // 계산된 결과를 호출부로 반환합니다.
     return parseVersion(ua, /(?:Chrome|CriOS)\/([\d.]+)/i);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "firefox")
+    // 계산된 결과를 호출부로 반환합니다.
     return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "samsung-internet")
+    // 계산된 결과를 호출부로 반환합니다.
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
+  // 계산된 결과를 호출부로 반환합니다.
   return "";
 }
 /**
- * detectEnv 처리 함수입니다.
- * @param {*} ua 함수 실행에 필요한 입력값입니다.
- * @param {*} platform 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description detectEnv 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} ua - ua 입력값입니다.
+ * @param {*} platform - platform 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function detectEnv(ua, platform) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Android/i.test(ua)) return PLATFORM.ANDROID;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/iPhone|iPad|iPod/i.test(ua)) return PLATFORM.IOS;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Win/i.test(platform)) return PLATFORM.WINDOWS;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Mac/i.test(platform)) return PLATFORM.MAC;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Linux/i.test(platform)) return PLATFORM.LINUX;
+  // 계산된 결과를 호출부로 반환합니다.
   return PLATFORM.UNKNOWN;
 }
 /**
- * detectDevice 처리 함수입니다.
- * @param {*} options 함수 실행에 필요한 입력값입니다.
- * @param {*} env 함수 실행에 필요한 입력값입니다.
- * @param {*} browserName 함수 실행에 필요한 입력값입니다.
- * @returns {void}
+ * @description detectDevice 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} value - value 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function detectDevice({env, browserName}) {
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (hasAndroidBridge() || hasIosBridge()) return "app";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (
     env === PLATFORM.WINDOWS ||
     env === PLATFORM.MAC ||
     env === PLATFORM.LINUX
   )
+    // 계산된 결과를 호출부로 반환합니다.
     return browserName === "unknown" ? "pc" : browserName;
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (env === PLATFORM.ANDROID) return browserName || "android-browser";
+  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (env === PLATFORM.IOS) return browserName || "ios-browser";
+  // 계산된 결과를 호출부로 반환합니다.
   return "unknown";
 }
 /**
- * getAppVersionFromBridge 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getAppVersionFromBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
+  // 계산된 결과를 호출부로 반환합니다.
   return bridge?.appVersion || bridge?.version || "";
 }
 /**
- * getBridgeVersionFromBridge 처리 함수입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description getBridgeVersionFromBridge 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getBridgeVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
+  // 계산된 결과를 호출부로 반환합니다.
   return bridge?.bridgeVersion || "";
 }
 /**
- * resolveDetailedPlatform 함수입니다.
- * @param {*} baseAppInfo 함수 실행에 필요한 값입니다.
- * @returns {*} 처리 결과를 반환합니다.
+ * @description resolveDetailedPlatform 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} baseAppInfo - baseAppInfo 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function resolveDetailedPlatform(baseAppInfo = {}) {
   const nav = getNavigator();
@@ -141,6 +177,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     env,
     runtime,
