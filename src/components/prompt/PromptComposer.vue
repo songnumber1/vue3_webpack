@@ -34,6 +34,7 @@
         :is-mobile-sheet="isMobileSheet"
         :attach-options="attachOptions"
         :can-submit="canSubmit"
+        :has-prompt-text="hasPromptText"
         :is-mic-enabled="isMicEnabled"
         :is-voice-listening="isVoiceListening"
         :has-voice-stopped="hasVoiceStopped"
@@ -135,6 +136,7 @@ const {
   currentModel,
   tools,
   attachOptions,
+  hasPromptText,
   canSubmit,
   resize,
   handleFocus,

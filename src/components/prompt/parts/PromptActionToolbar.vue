@@ -170,6 +170,7 @@ const props = defineProps({
   attachMenuOpen: {type: Boolean, default: false},
   isMobileSheet: {type: Boolean, default: false},
   canSubmit: {type: Boolean, default: false},
+  hasPromptText: {type: Boolean, default: false},
   isMicEnabled: {type: Boolean, default: false},
   isVoiceListening: {type: Boolean, default: false},
   hasVoiceStopped: {type: Boolean, default: false},
@@ -197,9 +198,8 @@ const showVoiceStartButton = computed(
   () =>
     props.isMicEnabled &&
     props.isSpeechSupported &&
-    !props.canSubmit &&
-    !props.isVoiceListening &&
-    !props.hasVoiceStopped
+    !props.hasPromptText &&
+    !props.isVoiceListening
 );
 const showVoiceStopButton = computed(
   () => props.isMicEnabled && props.isVoiceListening

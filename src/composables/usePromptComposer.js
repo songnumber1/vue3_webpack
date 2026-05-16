@@ -73,8 +73,9 @@ export function usePromptComposer(props, emit) {
       label: t(option.labelKey),
     }))
   );
+  const hasPromptText = computed(() => text.value.trim().length > 0);
   const canSubmit = computed(
-    () => text.value.trim().length > 0 || attachments.value.length > 0
+    () => hasPromptText.value || attachments.value.length > 0
   );
   const speech = useSpeechRecognition({
     language: 'ko-KR',
@@ -350,6 +351,7 @@ export function usePromptComposer(props, emit) {
     currentModel,
     tools,
     attachOptions,
+    hasPromptText,
     canSubmit,
     resize,
     handleFocus,
