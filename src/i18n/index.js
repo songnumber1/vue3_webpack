@@ -5,6 +5,10 @@ export const SUPPORT_LOCALES = ["ko", "en"];
 
 export const messages = {
   ko: {
+    accessDenied: {
+      title: "지원하지 않는 접속 환경입니다.",
+      description: "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
+    },
     common: {
       back: "뒤로",
       close: "닫기",
@@ -167,6 +171,10 @@ export const messages = {
     },
   },
   en: {
+    accessDenied: {
+      title: "Unsupported access environment.",
+      description: "iOS app, iOS Chrome, and iOS Safari are not supported.",
+    },
     common: {
       back: "Back",
       close: "Close",

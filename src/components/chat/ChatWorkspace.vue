@@ -5,16 +5,16 @@
     :assistant-label="assistantLabel"
     :conversation-title="conversationTitle"
     :theme-name="themeName"
-    @open-drawer="$emit('open-drawer')"
-    @toggle-theme="$emit('toggle-theme')"
-    @open-swagger="$emit('open-swagger')"
-    @open-settings="$emit('open-settings')"
-    @open-assistant="$emit('open-assistant')"
-    @open-guide="$emit('open-guide')"
-    @open-notice="$emit('open-notice')"
-    @open-personalization="$emit('open-personalization')"
-    @open-language="$emit('open-language')"
-    @open-playground="$emit('open-playground')"
+    @open-drawer="headerActions.openDrawer"
+    @toggle-theme="headerActions.toggleTheme"
+    @open-swagger="headerActions.openSwagger"
+    @open-settings="headerActions.openSettings"
+    @open-assistant="headerActions.openAssistant"
+    @open-guide="headerActions.openGuide"
+    @open-notice="headerActions.openNotice"
+    @open-personalization="headerActions.openPersonalization"
+    @open-language="headerActions.openLanguage"
+    @open-playground="headerActions.openPlayground"
   />
 
   <section
@@ -38,9 +38,8 @@
         </button>
       </div>
       <PromptInput
-        v-if="!isMobile"
-        :is-mobile="false"
-        class="desktop-center-prompt"
+        :is-mobile="isMobile"
+        :class="mainPromptClass"
         :floating="false"
         :model-value="selectedModel"
         :models="models"
@@ -53,21 +52,6 @@
         @height-change="$emit('prompt-resize', $event)"
       />
     </div>
-    <PromptInput
-      v-if="isMobile"
-      :is-mobile="true"
-      class="mobile-main-fixed-prompt"
-      :floating="false"
-      :model-value="selectedModel"
-      :models="models"
-      :disabled="isGenerating"
-      :model-readonly="modelReadonly"
-      :show-help="false"
-      @update:model-value="$emit('update:selectedModel', $event)"
-      @submit="$emit('submit', $event)"
-      @focus="$emit('prompt-focus')"
-      @height-change="$emit('prompt-resize', $event)"
-    />
   </section>
 
   <template v-else>
@@ -110,15 +94,17 @@
 </template>
 
 <script setup>
-import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
 import PromptInput from "@/components/prompt/PromptInput.vue";
+import {useChatHeaderActions} from "@/composables/chat/container/useChatHeaderActions";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
+const headerActions = useChatHeaderActions();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
 let composerResizeObserver = null;
@@ -191,18 +177,13 @@ const props = defineProps({
   showScrollBottom: {type: Boolean, default: false},
 });
 
+
+const mainPromptClass = computed(() =>
+  props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
+);
+
 defineEmits([
   "update:selectedModel",
-  "open-drawer",
-  "toggle-theme",
-  "open-swagger",
-  "open-settings",
-  "open-assistant",
-  "open-guide",
-  "open-notice",
-  "open-personalization",
-  "open-language",
-  "open-playground",
   "submit",
   "prompt-focus",
   "prompt-resize",
