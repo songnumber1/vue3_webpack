@@ -1,4 +1,5 @@
-import {computed, nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
+import {useEventListener, useMediaQuery} from '@vueuse/core';
 import {useI18n} from 'vue-i18n';
 import {usePlatformStore} from '@/stores/platformStore';
 import {openNativeFilePicker} from '@/services/platformBridge';
@@ -47,8 +48,8 @@ export function usePromptComposer(props, emit) {
   const captureMode = ref(null);
   const isMobileSheet = ref(false);
   const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
+  const isPromptCompactViewport = useMediaQuery(PROMPT_VIEWPORT_QUERY);
   let lastHeight = 0;
-  let viewportResizeListenerRegistered = false;
 
   const fallbackModels = computed(() => [
     {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
@@ -108,9 +109,7 @@ export function usePromptComposer(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function syncViewportMode() {
-    isMobileSheet.value = Boolean(
-      window.matchMedia?.(PROMPT_VIEWPORT_QUERY)?.matches
-    );
+    isMobileSheet.value = Boolean(isPromptCompactViewport.value);
   }
 
   /**
@@ -419,26 +418,6 @@ export function usePromptComposer(props, emit) {
     nextTick(resize);
   }
 
-  /**
-   * @description 프롬프트 입력 영역의 모바일/데스크톱 전환 감지 리스너를 1회만 등록합니다.
-   * @returns {void} resize 리스너 중복 등록 없이 내부 상태만 갱신합니다.
-   */
-  function registerViewportModeListener() {
-    if (viewportResizeListenerRegistered) return;
-    window.addEventListener('resize', syncViewportMode, {passive: true});
-    viewportResizeListenerRegistered = true;
-  }
-
-  /**
-   * @description 프롬프트 입력 영역의 viewport resize 리스너를 안전하게 해제합니다.
-   * @returns {void} 등록된 리스너가 있을 때만 해제하여 중복 remove 호출을 방지합니다.
-   */
-  function unregisterViewportModeListener() {
-    if (!viewportResizeListenerRegistered) return;
-    window.removeEventListener('resize', syncViewportMode);
-    viewportResizeListenerRegistered = false;
-  }
-
   useOutsideClick(
     [
       () => getToolbarRoot('modelRoot'),
@@ -449,18 +428,19 @@ export function usePromptComposer(props, emit) {
     {shouldIgnore: () => isMobileSheet.value}
   );
 
+
+  watch(isPromptCompactViewport, syncViewportMode);
+  useEventListener(window, 'resize', syncViewportMode, {passive: true});
+  useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
+
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onMounted(() => {
     syncViewportMode();
-    window.addEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
     resize();
-    registerViewportModeListener();
   });
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
-    window.removeEventListener(ANDROID_TO_JS_EVENT, handleNativeFileSelected);
-    unregisterViewportModeListener();
     attachments.value.forEach((file) => {
       revokeAttachmentUrl(file);
     });

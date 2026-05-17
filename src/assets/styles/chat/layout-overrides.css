@@ -1755,7 +1755,7 @@
 .bottom-sheet-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 2500;
+  z-index: 1300;
   background: rgba(0, 0, 0, 0.45);
   touch-action: none;
 }
@@ -1764,7 +1764,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2510;
+  z-index: 1310;
   width: 100%;
   height: var(--bottom-sheet-height, min(calc(var(--vh, 1vh) * 78), 520px));
   max-height: calc(var(--app-height, 100vh) - env(safe-area-inset-top));
@@ -2427,8 +2427,8 @@
 
 .chat-history-context-menu {
   position: fixed;
-  z-index: 2400;
-  min-width: 208px;
+  z-index: 1200;
+  min-width: 192px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));
   border-radius: 14px;

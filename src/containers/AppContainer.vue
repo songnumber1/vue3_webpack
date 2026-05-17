@@ -23,7 +23,12 @@ const platformName = computed(
 );
 const browserName = computed(() => platformInfo.value.browser || "unknown");
 const deviceName = computed(() => platformInfo.value.device || "unknown");
-const isMobileContainer = computed(() => platformStore.isMobileUi);
+const isMobileContainer = computed(
+  () =>
+    platformInfo.value.isMobileBrowser ||
+    platformInfo.value.isAndroidApp ||
+    platformInfo.value.isIosApp
+);
 
 const containerClasses = computed(() => ({
   "app-container--web": !isMobileContainer.value,

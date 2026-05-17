@@ -1,4 +1,5 @@
-import {onBeforeUnmount, onMounted, ref} from "vue";
+import {ref} from "vue";
+import {useEventListener} from "@vueuse/core";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
@@ -147,14 +148,7 @@ export function useImagePreview() {
     previewImage.value = null;
   }
 
-  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
-  onMounted(() =>
-    window.addEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
-  );
-  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
-  onBeforeUnmount(() =>
-    window.removeEventListener(IMAGE_PREVIEW_EVENT, openImagePreview)
-  );
+  useEventListener(window, IMAGE_PREVIEW_EVENT, openImagePreview);
 
   // 계산된 결과를 호출부로 반환합니다.
   return {

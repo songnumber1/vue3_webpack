@@ -33,6 +33,16 @@
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
       @update:selected-model="selectedModel = $event"
+      @open-drawer="openMobileDrawer"
+      @toggle-theme="toggleTheme"
+      @open-swagger="openSwagger"
+      @open-settings="openSettings"
+      @open-assistant="openAssistantFromHeader"
+      @open-guide="openGuide"
+      @open-notice="openNotice"
+      @open-personalization="openPersonalization"
+      @open-language="openLanguage"
+      @open-playground="openPlayground"
       @submit="submitIfWritable"
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
@@ -95,14 +105,14 @@
     <ResponsiveOverlay
       :open="historyNoticeOpen"
       :is-mobile="isMobile"
-      :title="t('chat.historyMenu.noticeTitle')"
+      title="알림"
       mobile-mode="dialog"
       @close="historyNoticeOpen = false"
     >
       <div class="chat-history-dialog">
         <p class="chat-history-dialog__message">{{ historyNoticeMessage }}</p>
         <div class="chat-history-dialog__actions">
-          <button class="playground-button" type="button" @click="historyNoticeOpen = false">{{ t('common.confirm') }}</button>
+          <button class="playground-button" type="button" @click="historyNoticeOpen = false">확인</button>
         </div>
       </div>
     </ResponsiveOverlay>
@@ -126,7 +136,6 @@ import PersonalizationView from '@/views/settings/PersonalizationView.vue';
 import MobileSettingsPanel from '@/views/settings/MobileSettingsPanel.vue';
 import ChatHistoryDialog from '@/components/navigation/parts/ChatHistoryDialog.vue';
 import ResponsiveOverlay from '@/components/overlay/ResponsiveOverlay.vue';
-import {provideChatHeaderActions} from '@/composables/chat/container/useChatHeaderActions';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({mode: {type: String, default: 'main'}});
@@ -190,17 +199,4 @@ const {
   handleMessageContentRendered,
   scrollBottom,
 } = useChatContainerController(props);
-
-provideChatHeaderActions({
-  openDrawer: openMobileDrawer,
-  toggleTheme,
-  openSwagger,
-  openSettings,
-  openAssistant: openAssistantFromHeader,
-  openGuide,
-  openNotice,
-  openPersonalization,
-  openLanguage,
-  openPlayground,
-});
 </script>

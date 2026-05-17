@@ -5,10 +5,6 @@ export const SUPPORT_LOCALES = ["ko", "en"];
 
 export const messages = {
   ko: {
-    accessDenied: {
-      title: "지원하지 않는 접속 환경입니다.",
-      description: "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
-    },
     common: {
       back: "뒤로",
       close: "닫기",
@@ -27,11 +23,6 @@ export const messages = {
       swagger: "Swagger 문서",
       settings: "설정",
       playground: "Playground",
-    },
-    bottomSheet: {
-      defaultTitle: "선택",
-      resizeLabel: "바텀시트 크기 조절",
-      selectedLabel: "현재 선택된 값",
     },
     feedback: {
       like: "좋아요",
@@ -73,7 +64,6 @@ export const messages = {
       sharedReadonly: "공유 받은 대화입니다.",
       scrollBottom: "맨 아래로 이동",
       assistant: "Assistant",
-      sharedConversationTitle: "공유 대화 {id}",
       promptPlaceholder: "무엇이든 물어보세요",
       send: "전송",
       voiceStart: "음성 입력 시작",
@@ -84,30 +74,13 @@ export const messages = {
         writing: "글쓰기 또는 편집",
         search: "필요한 항목 찾기",
       },
-      mockResponse: {
-        attachmentSummary: "\n\n첨부 파일 {count}개를 함께 받았습니다. 이미지/파일 미리보기와 메시지 액션 영역도 유지됩니다.",
-        emptyAttachmentRequest: "첨부 기반 요청",
-        body: "요청하신 내용을 현재 선택된 Assistant/Model 세션 기준으로 정리하겠습니다.\n\n- 입력: {input}\n- 새 대화에서는 Assistant와 모델을 변경할 수 있습니다.\n- 기존 대화방에 진입하면 해당 대화의 모델 세션이 고정되어 모델 변경이 차단됩니다.\n- 현재 응답은 실제 API 호출 구조를 모사한 mock data + adapter + business + Pinia cache 흐름으로 동작합니다.{fileSummary}",
-      },
-      sharedMock: {
-        user: "공유 URL로 전달된 대화입니다.\n\nshareId: {shareId}",
-        assistant: "이 화면은 공유 받은 대화 전용 읽기 모드입니다. 기존 채팅 화면과 동일한 메시지 레이아웃을 사용하지만 하단 입력 영역은 전송 가능한 입력창이 아니라 안내 영역으로 표시됩니다.",
-      },
       historyMenu: {
         title: "대화방 메뉴",
-        pinnedLabel: "즐겨찾기 대화방",
         pin: "즐겨찾기",
         unpin: "즐겨찾기 해지",
         rename: "제목 변경",
         share: "공유",
         delete: "삭제",
-        renameTitle: "대화방 제목 변경",
-        deleteTitle: "대화방 삭제",
-        titleLabel: "대화방 제목",
-        deleteMessage: "'{title}'을(를) 삭제하시겠습니까?",
-        deleteDefaultTitle: "선택한 대화방",
-        shareNotice: "공유 버튼을 선택했습니다.",
-        noticeTitle: "알림",
       },
     },
     menu: {
@@ -186,10 +159,6 @@ export const messages = {
     },
   },
   en: {
-    accessDenied: {
-      title: "Unsupported access environment.",
-      description: "iOS app, iOS Chrome, and iOS Safari are not supported.",
-    },
     common: {
       back: "Back",
       close: "Close",
@@ -208,11 +177,6 @@ export const messages = {
       swagger: "Swagger Docs",
       settings: "Settings",
       playground: "Playground",
-    },
-    bottomSheet: {
-      defaultTitle: "Select",
-      resizeLabel: "Resize bottom sheet",
-      selectedLabel: "Currently selected",
     },
     feedback: {
       like: "Like",
@@ -254,7 +218,6 @@ export const messages = {
       sharedReadonly: "This is a shared conversation.",
       scrollBottom: "Scroll to bottom",
       assistant: "Assistant",
-      sharedConversationTitle: "Shared chat {id}",
       promptPlaceholder: "Ask anything",
       send: "Send",
       voiceStart: "Start voice input",
@@ -265,30 +228,13 @@ export const messages = {
         writing: "Write or edit",
         search: "Find what you need",
       },
-      mockResponse: {
-        attachmentSummary: "\n\nReceived {count} attachment(s). Image/file previews and message actions are preserved.",
-        emptyAttachmentRequest: "attachment-based request",
-        body: "I will summarize your request using the currently selected Assistant/Model session.\n\n- Input: {input}\n- In a new chat, you can change the Assistant and model.\n- When entering an existing chat, that chat session model is locked and model changes are blocked.\n- This response currently uses a mock data + adapter + business + Pinia cache flow that simulates the production API call structure.{fileSummary}",
-      },
-      sharedMock: {
-        user: "This conversation was opened from a shared URL.\n\nshareId: {shareId}",
-        assistant: "This is a read-only shared conversation view. It uses the same message layout as the normal chat screen, but the bottom area is shown as a read-only notice instead of a sendable input.",
-      },
       historyMenu: {
         title: "Chat menu",
-        pinnedLabel: "Pinned chat",
-        pin: "Pin",
-        unpin: "Unpin",
+        pin: "Add to favorites",
+        unpin: "Remove from favorites",
         rename: "Rename",
         share: "Share",
         delete: "Delete",
-        renameTitle: "Rename chat",
-        deleteTitle: "Delete chat",
-        titleLabel: "Chat title",
-        deleteMessage: "Delete '{title}'?",
-        deleteDefaultTitle: "selected chat",
-        shareNotice: "Share was selected.",
-        noticeTitle: "Notice",
       },
     },
     menu: {

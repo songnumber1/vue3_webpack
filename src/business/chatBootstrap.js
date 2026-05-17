@@ -71,25 +71,6 @@ function pickInitialModel(
   return models.find((item) => item.id === presetModelId) || models[0] || null;
 }
 
-function settledValue(result, fallback, label = '') {
-  if (result?.status === 'fulfilled') return result.value;
-  if (label && result?.reason) {
-    console.warn(`[chatBootstrap] ${label} failed`, result.reason);
-  }
-  return fallback;
-}
-
-async function settledExamplePromptEntry(api, assistant) {
-  const result = await Promise.allSettled([
-    api.getExamplePrompts({
-      assistId: assistant.id,
-      studioYN: assistant.type === "studio",
-    }),
-  ]);
-  const response = settledValue(result[0], [], `example prompts:${assistant.id}`);
-  return [assistant.id, adaptExamplePromptList(response)];
-}
-
 /**
  * @description bootstrapChatRuntime 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {*} options - options 입력값입니다.
@@ -105,13 +86,13 @@ export async function bootstrapChatRuntime(options = {}) {
     : accessApi.getAccessInfo({language: "ko", entryType: "main"});
 
   const [
-    accessInfoResult,
-    assistantRawResult,
-    studioRawResult,
-    modelRawResult,
-    studioModelRawResult,
-    chatHistoryRawResult,
-  ] = await Promise.allSettled([
+    accessInfo,
+    assistantRaw,
+    studioRaw,
+    modelRaw,
+    studioModelRaw,
+    chatHistoryRaw,
+  ] = await Promise.all([
     accessInfoPromise,
     assistantApi.getAssistants(),
     assistantApi.getStudios(),
@@ -119,13 +100,6 @@ export async function bootstrapChatRuntime(options = {}) {
     modelApi.getStudioModels(),
     chatHistoryApi.getChatHistoryList(),
   ]);
-
-  const accessInfo = settledValue(accessInfoResult, {}, 'access info');
-  const assistantRaw = settledValue(assistantRawResult, [], 'assistants');
-  const studioRaw = settledValue(studioRawResult, [], 'studios');
-  const modelRaw = settledValue(modelRawResult, [], 'models');
-  const studioModelRaw = settledValue(studioModelRawResult, [], 'studio models');
-  const chatHistoryRaw = settledValue(chatHistoryRawResult, [], 'chat history');
 
   const assistants = [
     ...adaptAssistantList(assistantRaw),
@@ -147,9 +121,14 @@ export async function bootstrapChatRuntime(options = {}) {
     modelMap,
   });
   const examplePromptEntries = await Promise.all(
-    assistants.map((assistant) =>
-      settledExamplePromptEntry(examplePromptApi, assistant)
-    )
+    assistants.map(async (assistant) => {
+      const response = await examplePromptApi.getExamplePrompts({
+        assistId: assistant.id,
+        studioYN: assistant.type === "studio",
+      });
+      // 계산된 결과를 호출부로 반환합니다.
+      return [assistant.id, adaptExamplePromptList(response)];
+    })
   );
   const examplePromptMap = Object.fromEntries(examplePromptEntries);
   const initialAssistant = pickInitialAssistant(assistants, accessInfo);

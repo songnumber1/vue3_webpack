@@ -7,12 +7,13 @@
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
-    "format": "prettier --write \"src/**/*.{js,vue,json,css,md}\"",
-    "test": "node tests/run-all.cjs"
+    "format": "prettier --write \"src/**/*.{js,vue,json,css,md}\""
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
+    "@floating-ui/vue": "^1.1.6",
     "@vue/cli-service": "^5.0.8",
+    "@vueuse/core": "^10.11.0",
     "axios": "^1.6.8",
     "core-js": "^3.37.1",
     "highlight.js": "^11.11.1",
@@ -30,15 +31,15 @@
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
     "vue": "^3.4.21",
+    "vue-i18n": "^9.10.2",
     "vue-router": "^4.3.0",
-    "zod": "^3.25.76",
-    "vue-i18n": "^9.10.2"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.25.9",
     "eslint": "^8.57.1",
-    "eslint-plugin-vue": "^9.33.0",
-    "prettier": "^3.3.3",
     "eslint-config-prettier": "^9.1.0",
-    "@babel/eslint-parser": "^7.25.9"
+    "eslint-plugin-vue": "^9.33.0",
+    "prettier": "^3.3.3"
   }
 }

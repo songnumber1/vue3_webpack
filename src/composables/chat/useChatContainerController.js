@@ -1,21 +1,25 @@
-import {computed, onBeforeUnmount, onMounted, ref, watch} from 'vue';
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
+import {useEventListener, useMediaQuery} from '@vueuse/core';
 import {useI18n} from 'vue-i18n';
 import {useRoute, useRouter} from 'vue-router';
 import {useAppContext} from '@/composables/useAppContext';
+import {useAutoScroll} from '@/composables/useAutoScroll';
 import {useChatRuntime} from '@/composables/useChatRuntime';
 import {useChatSubmit} from '@/composables/useChatSubmit';
 import {useImagePreview} from '@/composables/useImagePreview';
+import {loadSharedConversation} from '@/composables/useSharedChat';
 import {useViewportGuard} from '@/composables/useViewportGuard';
 import {useNavigationStore} from '@/stores/navigationStore';
-import {useChatMobileState} from '@/composables/chat/container/useChatMobileState';
-import {useChatHistoryDialog} from '@/composables/chat/container/useChatHistoryDialog';
-import {useChatOverlayController} from '@/composables/chat/container/useChatOverlayController';
-import {useChatScrollController} from '@/composables/chat/container/useChatScrollController';
-import {useChatNavigationActions} from '@/composables/chat/container/useChatNavigationActions';
-import {useChatRouteConversation} from '@/composables/chat/container/useChatRouteConversation';
 import {renderMermaidInElement} from '@/utils/mermaidRenderer';
 import {PROMPT_SUGGESTION_LIMIT} from '@/constants/promptSuggestions';
+import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 
+// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+/**
+ * @description useChatContainerController 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} props - props 입력값입니다.
+ * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ */
 export function useChatContainerController(props) {
   const {t, locale} = useI18n();
   const router = useRouter();
@@ -23,41 +27,10 @@ export function useChatContainerController(props) {
   const {theme} = useAppContext();
   const runtime = useChatRuntime();
   const navigationStore = useNavigationStore();
-  const workspaceRef = ref(null);
-  const themeName = ref(theme.current);
-  const messages = ref([]);
-  const runtimeReady = ref(false);
-
-  const {isMobile, startMobileStateWatch, stopMobileStateWatch} =
-    useChatMobileState();
-  const overlay = useChatOverlayController();
-  const {
-    assistantSheetOpen,
-    noticeOpen,
-    personalizationOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    historyDialogOpen,
-    historyNoticeOpen,
-    overlayKeys,
-    openOverlay,
-    closeOverlay,
-  } = overlay;
-
-  const scrollController = useChatScrollController({props, workspaceRef});
-  const {
-    showScrollBottom,
-    markForceBottom,
-    resetForceBottom,
-    scrollBottom,
-    scrollToRouteBottom,
-    scheduleBottomStateCheck,
-    handleMessageContentRendered,
-    cleanupScrollController,
-  } = scrollController;
-
+  const {scrollToBottom} = useAutoScroll({value: null});
   const {keyboardOpen, refreshViewport} = useViewportGuard({
     onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (props.mode !== 'main' && isCompact && isKeyboardOpen) {
         scrollBottom({stable: true});
       }
@@ -88,66 +61,132 @@ export function useChatContainerController(props) {
     removeHistory,
   } = runtime;
 
-  const {
-    previewImage,
-    closeImagePreview,
-    handlePreviewLoad,
-    handlePreviewError,
-  } = useImagePreview();
+  const workspaceRef = ref(null);
+  const themeName = ref(theme.current);
+  const isMobile = ref(false);
+  const messages = ref([]);
+  const showScrollBottom = ref(false);
+  const assistantSheetOpen = ref(false);
+  const noticeOpen = ref(false);
+  const personalizationOpen = ref(false);
+  const languageSheetOpen = ref(false);
+  const mobileSettingsOpen = ref(false);
+  const historyDialogOpen = ref(false);
+  const historyDialogMode = ref('rename');
+  const historyDialogTarget = ref(null);
+  const historyNoticeOpen = ref(false);
+  const historyNoticeMessage = ref('');
+  const runtimeReady = ref(false);
+  const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
+    useImagePreview();
+
+  const isCompactScreen = useMediaQuery(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`);
+  let bottomStateTimer = 0;
+  let forceBottomUntil = 0;
 
   const layoutKeyboardOpen = computed(
     () => props.mode !== 'main' && keyboardOpen.value
   );
   const isReadOnly = computed(() => props.mode === 'shared');
-
-  const routeConversation = useChatRouteConversation({
-    props,
-    t,
-    route,
-    router,
-    messages,
-    activeSession,
-    currentAssistant,
-    getHistory,
-    ensureConversation,
-    clearCurrentChatSelection,
-    scrollToRouteBottom,
+  const activeHistoryId = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'chat') return route.params.id;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'shared') return route.params.shareId;
+    // 계산된 결과를 호출부로 반환합니다.
+    return null;
   });
-  const {
-    activeHistoryId,
-    activeConversationTitle,
-    workspaceAssistantLabel,
-    loadRouteConversation,
-  } = routeConversation;
-
-  const historyDialog = useChatHistoryDialog({
-    t,
-    activeHistoryId,
-    messages,
-    router,
-    renameHistory,
-    removeHistory,
-    openOverlay,
-    closeOverlay,
-    overlayKeys,
+  const activeHistory = computed(() => getHistory(activeHistoryId.value));
+  const activeConversationTitle = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'shared') {
+      // 계산된 결과를 호출부로 반환합니다.
+      return `공유 대화 ${activeHistoryId.value || ''}`.trim();
+    }
+    // 계산된 결과를 호출부로 반환합니다.
+    return activeHistory.value?.title || '';
   });
-  const {
-    historyDialogMode,
-    historyDialogTarget,
-    historyNoticeMessage,
-    historyDialogTitle,
-    historyDialogMessage,
-    openRenameDialog,
-    openDeleteDialog,
-    openNotice: openHistoryNotice,
-    closeHistoryDialog,
-    confirmHistoryDialog,
-  } = historyDialog;
+  const workspaceAssistantLabel = computed(() => {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (activeSession.value?.displayAssistantLabel) {
+      // 계산된 결과를 호출부로 반환합니다.
+      return activeSession.value.displayAssistantLabel;
+    }
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (
+      activeSession.value?.assistantLabel &&
+      !activeSession.value?.isModelUnavailable
+    ) {
+      // 계산된 결과를 호출부로 반환합니다.
+      return activeSession.value.assistantLabel;
+    }
+    // 계산된 결과를 호출부로 반환합니다.
+    return currentAssistant.value?.label || 'Assistant';
+  });
+
+  const historyDialogTitle = computed(() =>
+    historyDialogMode.value === 'delete' ? '대화방 삭제' : '대화방 제목 변경'
+  );
+  const historyDialogMessage = computed(() =>
+    historyDialogMode.value === 'delete'
+      ? `'${historyDialogTarget.value?.title || '선택한 대화방'}'을(를) 삭제하시겠습니까?`
+      : ''
+  );
+
+  function closeHistoryDialog() {
+    historyDialogOpen.value = false;
+    historyDialogTarget.value = null;
+  }
+
+  async function confirmHistoryDialog(value) {
+    const target = historyDialogTarget.value;
+    if (!target) {
+      closeHistoryDialog();
+      return;
+    }
+    if (historyDialogMode.value === 'rename') {
+      const nextTitle = String(value || '').trim();
+      if (!nextTitle) return;
+      await renameHistory(target, nextTitle);
+    } else if (historyDialogMode.value === 'delete') {
+      await removeHistory(target);
+      if (String(activeHistoryId.value) === String(target.id)) {
+        messages.value = [];
+        await router.replace('/');
+      }
+    }
+    closeHistoryDialog();
+  }
+
+  async function handleHistoryMenuAction({action, history} = {}) {
+    if (!history || !action) return;
+    if (action === 'pin' || action === 'unpin') {
+      await toggleHistoryBookmark(history);
+      return;
+    }
+    if (action === 'rename') {
+      historyDialogTarget.value = history;
+      historyDialogMode.value = 'rename';
+      historyDialogOpen.value = true;
+      return;
+    }
+    if (action === 'share') {
+      historyNoticeMessage.value = '공유 버튼을 선택했습니다.';
+      historyNoticeOpen.value = true;
+      return;
+    }
+    if (action === 'delete') {
+      historyDialogTarget.value = history;
+      historyDialogMode.value = 'delete';
+      historyDialogOpen.value = true;
+    }
+  }
 
   const suggestions = computed(() => {
     const assistantPrompts = currentExamplePrompts.value || [];
     const isEnglish = locale.value === 'en';
 
+    // 계산된 결과를 호출부로 반환합니다.
     return assistantPrompts
       .slice(0, PROMPT_SUGGESTION_LIMIT)
       .map((prompt) => {
@@ -160,6 +199,7 @@ export function useChatContainerController(props) {
         const text = localizedTitle || localizedContent;
         const content = localizedContent || localizedTitle;
 
+        // 계산된 결과를 호출부로 반환합니다.
         return {
           id: prompt.id,
           text,
@@ -170,13 +210,205 @@ export function useChatContainerController(props) {
       .filter((item) => item.text && item.prompt);
   });
 
-  function resetChatState() {
-    revokeMessageAttachments(messages.value);
-    messages.value = [];
-    navigationStore.closeTransientPanels();
-    resetForceBottom();
+  /**
+   * @description getMessageListRef 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function getMessageListRef() {
+    const exposed = workspaceRef.value?.listRef;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (exposed?.scrollToBottom) return exposed;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (exposed?.value?.scrollToBottom) return exposed.value;
+    // 계산된 결과를 호출부로 반환합니다.
+    return null;
   }
 
+  /**
+   * @description updateMobileState 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function updateMobileState() {
+    isMobile.value = Boolean(
+      isCompactScreen.value || document.querySelector('.app-container--mobile')
+    );
+  }
+
+  /**
+   * @description markForceBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} duration - duration 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function markForceBottom(duration = 1800) {
+    forceBottomUntil = Date.now() + duration;
+  }
+
+  /**
+   * @description shouldKeepForceBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function shouldKeepForceBottom() {
+    // 계산된 결과를 호출부로 반환합니다.
+    return Date.now() <= forceBottomUntil;
+  }
+
+  /**
+   * @description scrollBottom 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} options - options 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function scrollBottom(options = {}) {
+    const list = getMessageListRef();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (list?.scrollToBottom) {
+      list.scrollToBottom(options);
+    } else {
+      await scrollToBottom(options);
+    }
+    updateScrollBottomButton();
+  }
+
+  /**
+   * @description updateScrollBottomButton 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function updateScrollBottomButton() {
+    const list = getMessageListRef();
+    showScrollBottom.value =
+      (props.mode === 'chat' || props.mode === 'shared') &&
+      Boolean(list && !list.isAtBottom?.());
+  }
+
+  /**
+   * @description scheduleBottomStateCheck 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function scheduleBottomStateCheck() {
+    window.clearTimeout(bottomStateTimer);
+    bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
+  }
+
+  /**
+   * @description handleMessageContentRendered 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function handleMessageContentRendered() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
+    scheduleBottomStateCheck();
+  }
+
+  /**
+   * @description handlePromptFocus 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function handlePromptFocus() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (isReadOnly.value || isActiveModelUnavailable.value) return;
+    refreshViewport();
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'main') return;
+    scrollBottom({stable: true, force: isMobile.value});
+  }
+
+  /**
+   * @description handlePromptResize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function handlePromptResize() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (isReadOnly.value || isActiveModelUnavailable.value) return;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'main') return;
+    scrollBottom({stable: true, force: isMobile.value});
+  }
+
+  /**
+   * @description startNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function startNewChat() {
+    revokeMessageAttachments(messages.value);
+    messages.value = [];
+    clearCurrentChatSelection();
+    navigationStore.closeTransientPanels();
+    forceBottomUntil = 0;
+    await router.push('/');
+  }
+
+  /**
+   * @description startNewChatWithAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function startNewChatWithAssistant(id) {
+    revokeMessageAttachments(messages.value);
+    messages.value = [];
+    await selectAssistantForNewChat(id);
+    navigationStore.closeTransientPanels();
+    assistantSheetOpen.value = false;
+    forceBottomUntil = 0;
+    await router.push('/');
+  }
+
+  /**
+   * @description openHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} item - item 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function openHistory(item) {
+    navigationStore.closeTransientPanels();
+    await router.push({name: 'chat', params: {id: item.id}});
+  }
+
+  /**
+   * @description loadRouteConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function loadRouteConversation() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'main') {
+      messages.value = [];
+      clearCurrentChatSelection();
+      return;
+    }
+
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (props.mode === 'shared') {
+      messages.value = await loadSharedConversation(activeHistoryId.value);
+      markForceBottom();
+      await nextTick();
+      await scrollBottom({behavior: 'auto', force: true, stable: true});
+      return;
+    }
+
+    const history = getHistory(activeHistoryId.value);
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (!history) {
+      await router.replace('/');
+      return;
+    }
+    messages.value = await ensureConversation(history.id);
+    markForceBottom();
+    await nextTick();
+    await scrollBottom({behavior: 'auto', force: true, stable: true});
+  }
+
+  /**
+   * @description renderAfterStream 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   async function renderAfterStream() {
     markForceBottom(1000);
     await renderMermaidInElement(document.querySelector('.message-list'), {
@@ -186,7 +418,6 @@ export function useChatContainerController(props) {
   }
 
   const {isGenerating, handleSubmit} = useChatSubmit({
-    t,
     router,
     route,
     histories,
@@ -201,92 +432,167 @@ export function useChatContainerController(props) {
     renderAfterStream,
   });
 
+  /**
+   * @description submitIfWritable 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} payload - payload 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
   function submitIfWritable(payload) {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
     handleSubmit(payload);
   }
 
-  function syncPromptViewport({refresh = false} = {}) {
-    if (isReadOnly.value || isActiveModelUnavailable.value) return;
-    if (refresh) refreshViewport();
-    if (props.mode === 'main') return;
-    scrollBottom({stable: true, force: isMobile.value});
-  }
-
-  function handlePromptFocus() {
-    syncPromptViewport({refresh: true});
-  }
-
-  function handlePromptResize() {
-    syncPromptViewport();
-  }
-
-  async function toggleThemeAndRender() {
-    await navigationActions.toggleTheme();
+  /**
+   * @description toggleTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  async function toggleTheme() {
+    theme.toggle();
+    themeName.value = theme.current;
+    await nextTick();
+    await renderMermaidInElement(document.querySelector('.message-list'), {
+      force: true,
+    });
     scrollBottom({stable: true});
   }
 
-  async function handleHistoryMenuAction(payload = {}) {
-    const {action, history} = payload;
-    if (!history || !action) return;
-
-    if (action === 'pin' || action === 'unpin') {
-      await toggleHistoryBookmark(history);
-      return;
-    }
-
-    if (action === 'rename') {
-      openRenameDialog(history);
-      return;
-    }
-
-    if (action === 'share') {
-      openHistoryNotice(t('chat.historyMenu.shareNotice'));
-      return;
-    }
-
-    if (action === 'delete') {
-      openDeleteDialog(history);
-    }
+  /**
+   * @description openSwagger 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openSwagger() {
+    router.push('/swagger');
   }
 
-  const navigationActions = useChatNavigationActions({
-    router,
-    navigationStore,
-    theme,
-    themeName,
-    isMobile,
-    refreshViewport,
-    overlayKeys,
-    openOverlay,
-    closeOverlay,
-    resetChatState,
-    clearCurrentChatSelection,
-    selectAssistantForNewChat,
-  });
+  /**
+   * @description openPlayground 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openPlayground() {
+    navigationStore.setDrawerOpen(false);
+    router.push({name: 'playground'});
+  }
 
+  /**
+   * @description openMobileDrawer 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openMobileDrawer() {
+    const activeElement =
+      typeof document !== 'undefined' ? document.activeElement : null;
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (activeElement?.blur) activeElement.blur();
+    navigationStore.setDrawerOpen(true);
+    window.setTimeout(refreshViewport, 50);
+    window.setTimeout(refreshViewport, 180);
+  }
+
+  /**
+   * @description openSettings 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openSettings() {
+    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+    if (isMobile.value) {
+      navigationStore.setDrawerOpen(false);
+      mobileSettingsOpen.value = true;
+      return;
+    }
+    openPersonalization();
+  }
+
+  /**
+   * @description openGuide 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openGuide() {
+    navigationStore.setDrawerOpen(false);
+    router.push({name: 'guide'});
+  }
+
+  /**
+   * @description openNotice 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openNotice() {
+    navigationStore.setDrawerOpen(false);
+    noticeOpen.value = true;
+  }
+
+  /**
+   * @description openPersonalization 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openPersonalization() {
+    navigationStore.setDrawerOpen(false);
+    personalizationOpen.value = true;
+  }
+
+  /**
+   * @description openLanguage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openLanguage() {
+    languageSheetOpen.value = true;
+  }
+
+  /**
+   * @description openAssistantFromHeader 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function openAssistantFromHeader() {
+    assistantSheetOpen.value = true;
+  }
+
+  /**
+   * @description selectAssistantFromSheet 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+   * @param {*} id - id 입력값입니다.
+   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+   */
+  function selectAssistantFromSheet(id) {
+    startNewChatWithAssistant(id);
+  }
+
+
+  watch(isCompactScreen, updateMobileState);
+  useEventListener(window, 'resize', updateMobileState, {passive: true});
+  useEventListener(window, 'scroll', scheduleBottomStateCheck, {capture: true, passive: true});
+
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   watch(
     () => [route.params.id, route.params.shareId, props.mode],
     () => {
+      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (runtimeReady.value) loadRouteConversation();
     }
   );
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onMounted(async () => {
-    startMobileStateWatch();
-    window.addEventListener('scroll', scheduleBottomStateCheck, true);
+    updateMobileState();
     await runtime.initialize();
     await loadRouteConversation();
     runtimeReady.value = true;
   });
 
+  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
-    cleanupScrollController();
-    stopMobileStateWatch();
-    window.removeEventListener('scroll', scheduleBottomStateCheck, true);
+    window.clearTimeout(bottomStateTimer);
     revokeMessageAttachments(messages.value);
   });
 
+  // 계산된 결과를 호출부로 반환합니다.
   return {
     t,
     runtimeReady,
@@ -323,23 +629,23 @@ export function useChatContainerController(props) {
     closeImagePreview,
     handlePreviewLoad,
     handlePreviewError,
-    startNewChatWithAssistant: navigationActions.startNewChatWithAssistant,
-    startNewChat: navigationActions.startNewChat,
-    openHistory: navigationActions.openHistory,
+    startNewChatWithAssistant,
+    startNewChat,
+    openHistory,
     handleHistoryMenuAction,
     closeHistoryDialog,
     confirmHistoryDialog,
-    openMobileDrawer: navigationActions.openMobileDrawer,
-    toggleTheme: toggleThemeAndRender,
-    openSwagger: navigationActions.openSwagger,
-    openPlayground: navigationActions.openPlayground,
-    openSettings: navigationActions.openSettings,
-    openGuide: navigationActions.openGuide,
-    openNotice: navigationActions.openNotice,
-    openPersonalization: navigationActions.openPersonalization,
-    openLanguage: navigationActions.openLanguage,
-    openAssistantFromHeader: navigationActions.openAssistantFromHeader,
-    selectAssistantFromSheet: navigationActions.selectAssistantFromSheet,
+    openMobileDrawer,
+    toggleTheme,
+    openSwagger,
+    openPlayground,
+    openSettings,
+    openGuide,
+    openNotice,
+    openPersonalization,
+    openLanguage,
+    openAssistantFromHeader,
+    selectAssistantFromSheet,
     submitIfWritable,
     handlePromptFocus,
     handlePromptResize,

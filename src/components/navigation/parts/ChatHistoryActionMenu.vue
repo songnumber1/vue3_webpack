@@ -27,7 +27,7 @@
         v-if="desktopOpen"
         ref="menuRef"
         class="chat-history-context-menu"
-        :style="desktopStyle"
+        :style="floatingStyles"
         role="menu"
       >
         <button
@@ -48,28 +48,36 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue';
+import {computed, nextTick, ref, watch} from 'vue';
 import {useI18n} from 'vue-i18n';
+import {autoUpdate, flip, offset, shift, useFloating} from '@floating-ui/vue';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
 
 const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: false},
   target: {type: Object, default: null},
-  position: {type: Object, default: () => ({top: 0, left: 0})},
+  referenceEl: {type: Object, default: null},
 });
 
 defineEmits(['close', 'select']);
 const {t} = useI18n();
 const menuRef = ref(null);
+const referenceRef = computed(() => props.referenceEl || null);
+
+const {floatingStyles, update} = useFloating(referenceRef, menuRef, {
+  placement: 'right-start',
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    offset(8),
+    flip({fallbackPlacements: ['left-start', 'bottom-end']}),
+    shift({padding: 12}),
+  ],
+});
 
 const mobileOpen = computed(() => props.open && props.isMobile);
 const desktopOpen = computed(() => props.open && !props.isMobile);
 const targetTitle = computed(() => props.target?.title || t('chat.historyMenu.title'));
-const desktopStyle = computed(() => ({
-  top: `${props.position.top || 0}px`,
-  left: `${props.position.left || 0}px`,
-}));
 const actions = computed(() => {
   const pinAction = props.target?.isPinned
     ? {key: 'unpin', label: t('chat.historyMenu.unpin'), icon: '☆'}
@@ -81,6 +89,16 @@ const actions = computed(() => {
     {key: 'delete', label: t('chat.historyMenu.delete'), icon: '🗑', danger: true},
   ];
 });
+
+watch(
+  () => [desktopOpen.value, props.referenceEl],
+  async () => {
+    if (!desktopOpen.value) return;
+    await nextTick();
+    update?.();
+  },
+  {flush: 'post'}
+);
 
 defineExpose({menuRef});
 </script>

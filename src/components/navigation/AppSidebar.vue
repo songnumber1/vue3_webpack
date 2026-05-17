@@ -108,9 +108,9 @@
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
-      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" :aria-label="t('bottomSheet.selectedLabel')">
+      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" aria-label="현재 선택된 값">
         <CheckIcon class="bottom-sheet-check" />
-        <span class="sr-only">{{ t('bottomSheet.selectedLabel') }}</span>
+        <span class="sr-only">현재 선택된 값</span>
       </span>
     </button>
   </BaseBottomSheet>
@@ -120,16 +120,18 @@
     :open="historyMenuOpen"
     :is-mobile="isMobileSheet"
     :target="historyMenuTarget"
-    :position="historyMenuPosition"
+    :reference-el="historyMenuReferenceEl"
     @close="closeHistoryMenu"
     @select="selectHistoryMenuAction"
   />
 </template>
 
 <script setup>
-import {computed, ref} from 'vue';
+import {computed, ref, watch} from 'vue';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
+import {useEventListener, useWindowSize} from '@vueuse/core';
+import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import Icon from '@/components/navigation/SidebarIcon.vue';
@@ -141,9 +143,6 @@ import SidebarUserFooter from '@/components/navigation/parts/SidebarUserFooter.v
 import {useAssistantStore} from '@/stores/assistantStore';
 import {useChatStore} from '@/stores/chatStore';
 import {useNavigationStore} from '@/stores/navigationStore';
-import {usePlatformStore} from '@/stores/platformStore';
-import {useOverlayStore} from '@/stores/overlayStore';
-import {OVERLAY_KEYS} from '@/constants/overlayTypes';
 import {useOutsideClick} from '@/composables/useOutsideClick';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
@@ -165,35 +164,18 @@ const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
-const platformStore = usePlatformStore();
-const overlayStore = useOverlayStore();
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigationStore);
-const assistantMenuOpen = computed({
-  get: () => overlayStore.isOpen(OVERLAY_KEYS.SIDEBAR_ASSISTANT),
-  set: (value) => {
-    if (value) overlayStore.open(OVERLAY_KEYS.SIDEBAR_ASSISTANT);
-    else overlayStore.close(OVERLAY_KEYS.SIDEBAR_ASSISTANT);
-  },
-});
-const historyMenuOpen = computed({
-  get: () => overlayStore.isOpen(OVERLAY_KEYS.HISTORY_MENU),
-  set: (value) => {
-    if (value) overlayStore.open(OVERLAY_KEYS.HISTORY_MENU);
-    else overlayStore.close(OVERLAY_KEYS.HISTORY_MENU);
-  },
-});
-const isMobileSheet = computed(() => platformStore.isMobileUi);
+const assistantMenuOpen = ref(false);
+const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
 const historyMenuRef = ref(null);
+const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
-const historyMenuPosition = ref({top: 0, left: 0});
-
-const HISTORY_MENU_WIDTH_PX = 208;
-const HISTORY_MENU_HEIGHT_PX = 196;
-const HISTORY_MENU_GAP_PX = 8;
-const VIEWPORT_PADDING_PX = 12;
+const historyMenuReferenceEl = ref(null);
+const {width} = useWindowSize();
+const isCompactViewport = computed(() => width.value <= MOBILE_BREAKPOINT_PX);
 
 /**
  * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -201,7 +183,9 @@ const VIEWPORT_PADDING_PX = 12;
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function syncViewportMode() {
-  platformStore.refreshViewport();
+  isMobileSheet.value = Boolean(
+    isCompactViewport.value || document.querySelector('.app-container--mobile')
+  );
 }
 
 /**
@@ -272,41 +256,8 @@ function openHistoryMenu(payload = {}) {
   const {item, event} = payload;
   syncViewportMode();
   historyMenuTarget.value = item || null;
-  historyMenuPosition.value = getHistoryMenuPosition(event?.currentTarget);
+  historyMenuReferenceEl.value = event?.currentTarget || null;
   historyMenuOpen.value = true;
-}
-
-/**
- * @description 대화방 메뉴는 기본적으로 메뉴 버튼의 오른쪽에 띄우고, 화면 밖으로 나갈 때만 왼쪽 또는 화면 안쪽으로 보정합니다.
- * @param {HTMLElement|null} triggerElement - 메뉴 버튼 요소입니다.
- * @returns {{top: number, left: number}} fixed 레이어 좌표입니다.
- */
-function getHistoryMenuPosition(triggerElement) {
-  const rect = triggerElement?.getBoundingClientRect?.();
-  const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
-  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-
-  if (!rect) {
-    return {top: VIEWPORT_PADDING_PX, left: VIEWPORT_PADDING_PX};
-  }
-
-  const preferredLeft = rect.right + HISTORY_MENU_GAP_PX;
-  const fallbackLeft = rect.left - HISTORY_MENU_WIDTH_PX - HISTORY_MENU_GAP_PX;
-  const maxLeft = Math.max(VIEWPORT_PADDING_PX, viewportWidth - HISTORY_MENU_WIDTH_PX - VIEWPORT_PADDING_PX);
-  const left =
-    preferredLeft + HISTORY_MENU_WIDTH_PX <= viewportWidth - VIEWPORT_PADDING_PX
-      ? preferredLeft
-      : fallbackLeft >= VIEWPORT_PADDING_PX
-        ? fallbackLeft
-        : Math.min(Math.max(preferredLeft, VIEWPORT_PADDING_PX), maxLeft);
-
-  const preferredTop = rect.top;
-  const maxTop = Math.max(VIEWPORT_PADDING_PX, viewportHeight - HISTORY_MENU_HEIGHT_PX - VIEWPORT_PADDING_PX);
-
-  return {
-    top: Math.min(Math.max(preferredTop, VIEWPORT_PADDING_PX), maxTop),
-    left: Math.min(Math.max(left, VIEWPORT_PADDING_PX), maxLeft),
-  };
 }
 
 /**
@@ -316,6 +267,7 @@ function getHistoryMenuPosition(triggerElement) {
 function closeHistoryMenu() {
   historyMenuOpen.value = false;
   historyMenuTarget.value = null;
+  historyMenuReferenceEl.value = null;
 }
 
 /**
@@ -403,4 +355,7 @@ useOutsideClick(
   {shouldIgnore: () => isMobileSheet.value || !historyMenuOpen.value}
 );
 
+syncViewportMode();
+watch(isCompactViewport, syncViewportMode);
+useEventListener(window, 'resize', syncViewportMode, {passive: true});
 </script>
