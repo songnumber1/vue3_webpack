@@ -122,7 +122,7 @@ export function usePromptComposer(props, emit) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!el) return;
     el.style.height = "auto";
-    const maxHeight = window.matchMedia?.(PROMPT_VIEWPORT_QUERY)?.matches
+    const maxHeight = isMobileSheet.value
       ? PROMPT_TEXTAREA_HEIGHT.mobileMax
       : PROMPT_TEXTAREA_HEIGHT.desktopMax;
     const nextHeight = Math.min(
@@ -434,6 +434,15 @@ export function usePromptComposer(props, emit) {
 
   watch(isPromptCompactViewport, syncViewportMode);
   useEventListener(window, "resize", syncViewportMode, {passive: true});
+  useEventListener(window, "orientationchange", syncViewportMode, {passive: true});
+  if (typeof window !== "undefined" && window.visualViewport) {
+    useEventListener(window.visualViewport, "resize", syncViewportMode, {
+      passive: true,
+    });
+    useEventListener(window.visualViewport, "scroll", syncViewportMode, {
+      passive: true,
+    });
+  }
   useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.

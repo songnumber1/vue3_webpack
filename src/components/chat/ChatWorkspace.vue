@@ -27,37 +27,21 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
-      <PromptInput
-        v-if="!isMobile"
-        :is-mobile="false"
-        class="desktop-center-prompt"
+      <ChatPromptInput
+        :is-mobile="isMobile"
+        :class="mainPromptClass"
         :floating="false"
-        :model-value="selectedModel"
+        :selected-model="selectedModel"
         :models="models"
         :disabled="isGenerating"
         :model-readonly="modelReadonly"
         :show-help="false"
-        @update:model-value="$emit('update:selectedModel', $event)"
+        @update:selected-model="$emit('update:selectedModel', $event)"
         @submit="$emit('submit', $event)"
         @focus="$emit('prompt-focus')"
         @height-change="$emit('prompt-resize', $event)"
       />
     </div>
-    <PromptInput
-      v-if="isMobile"
-      :is-mobile="true"
-      class="mobile-main-fixed-prompt"
-      :floating="false"
-      :model-value="selectedModel"
-      :models="models"
-      :disabled="isGenerating"
-      :model-readonly="modelReadonly"
-      :show-help="false"
-      @update:model-value="$emit('update:selectedModel', $event)"
-      @submit="$emit('submit', $event)"
-      @focus="$emit('prompt-focus')"
-      @height-change="$emit('prompt-resize', $event)"
-    />
   </section>
 
   <template v-else>
@@ -82,15 +66,15 @@
         v-else-if="isActiveModelUnavailable"
         :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
       />
-      <PromptInput
+      <ChatPromptInput
         v-else
         :is-mobile="isMobile"
-        :model-value="selectedModel"
+        :selected-model="selectedModel"
         :models="models"
         :disabled="isGenerating"
         :model-readonly="modelReadonly"
         :show-help="false"
-        @update:model-value="$emit('update:selectedModel', $event)"
+        @update:selected-model="$emit('update:selectedModel', $event)"
         @submit="$emit('submit', $event)"
         @focus="$emit('prompt-focus')"
         @height-change="$emit('prompt-resize', $event)"
@@ -100,12 +84,12 @@
 </template>
 
 <script setup>
-import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
-import PromptInput from "@/components/prompt/PromptInput.vue";
+import ChatPromptInput from "./ChatPromptInput.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
@@ -180,6 +164,10 @@ const props = defineProps({
   messages: {type: Array, default: () => []},
   showScrollBottom: {type: Boolean, default: false},
 });
+
+const mainPromptClass = computed(() =>
+  props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
+);
 
 defineEmits([
   "update:selectedModel",

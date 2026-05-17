@@ -159,6 +159,7 @@ export function useViewportGuard(options = {}) {
   const keyboardOpen = ref(false);
   const baselineHeight = ref(0);
   let resizeTimer = null;
+  let resizeFrame = null;
 
   const isCompact = computed(
     () => viewportWidth.value > 0 && viewportWidth.value <= MOBILE_BREAKPOINT_PX
@@ -206,7 +207,13 @@ export function useViewportGuard(options = {}) {
    */
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
-    apply();
+    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+
+    resizeFrame = window.requestAnimationFrame(() => {
+      resizeFrame = null;
+      apply();
+    });
+
     const browserFamily = getMobileBrowserFamily();
     const delay =
       browserFamily === "samsung"
@@ -215,21 +222,7 @@ export function useViewportGuard(options = {}) {
     resizeTimer = window.setTimeout(apply, delay);
   }
 
-  /**
-   * @description handleWindowResize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function handleWindowResize() {
-    const browserFamily = getMobileBrowserFamily();
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (browserFamily === "firefox") {
-      scheduleApply();
-    }
-  }
-
   useEventListener(window, "resize", scheduleApply, {passive: true});
-  useEventListener(window, "resize", handleWindowResize, {passive: true});
   useEventListener(window, "orientationchange", scheduleApply, {passive: true});
   if (typeof window !== "undefined" && window.visualViewport) {
     useEventListener(window.visualViewport, "resize", scheduleApply, {
@@ -250,6 +243,8 @@ export function useViewportGuard(options = {}) {
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     window.clearTimeout(resizeTimer);
+    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+    resizeFrame = null;
   });
 
   // 계산된 결과를 호출부로 반환합니다.

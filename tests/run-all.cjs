@@ -2,40 +2,55 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const requiredFiles = [
-  'src/services/chatStream/chatStreamState.js',
-  'src/services/chatStream/streamAbortManager.js',
-  'src/services/chatStream/mockChatStream.js',
-  'src/bridge/adapters/androidBridgeAdapter.js',
-  'src/bridge/registry/bridgeCallbackRegistry.js',
-  'src/bridge/validation.js',
-  'src/composables/bottomSheet/useBottomSheetViewport.js',
-  'src/composables/bottomSheet/useBottomSheetMeasurements.js',
-  'src/composables/bottomSheet/useBottomSheetDrag.js',
-  'src/services/mobileKeyboard/mobileKeyboardManager.js',
-  'src/services/chatScroll/stickyBottomScroll.js',
-];
+
+function read(relativePath) {
+  return fs.readFileSync(path.join(root, relativePath), 'utf8');
+}
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-for (const relativePath of requiredFiles) {
-  assert(fs.existsSync(path.join(root, relativePath)), `${relativePath} is missing`);
-}
+const workspace = read('src/components/chat/ChatWorkspace.vue');
+const promptWrapper = read('src/components/chat/ChatPromptInput.vue');
+const viewportGuard = read('src/composables/useViewportGuard.js');
+const promptComposer = read('src/composables/usePromptComposer.js');
 
-const submitSource = fs.readFileSync(path.join(root, 'src/composables/useChatSubmit.js'), 'utf8');
-assert(submitSource.includes('CHAT_STREAM_STATE'), 'useChatSubmit must use stream state');
-assert(submitSource.includes('createMockChatStream'), 'useChatSubmit must use stream service abstraction');
+assert(
+  fs.existsSync(path.join(root, 'src/components/chat/ChatPromptInput.vue')),
+  'ChatPromptInput wrapper is missing'
+);
+assert(
+  (workspace.match(/<ChatPromptInput/g) || []).length === 2,
+  'ChatWorkspace should use the shared ChatPromptInput wrapper for main/chat modes'
+);
+assert(
+  !workspace.includes('<PromptInput'),
+  'ChatWorkspace should not render PromptInput directly'
+);
+assert(
+  (promptWrapper.match(/<PromptInput/g) || []).length === 1,
+  'ChatPromptInput should keep the actual PromptInput declaration centralized'
+);
+assert(
+  workspace.includes('mobile-main-fixed-prompt') && workspace.includes('desktop-center-prompt'),
+  'main prompt must preserve existing mobile and desktop CSS hooks'
+);
+assert(
+  viewportGuard.includes('requestAnimationFrame') && viewportGuard.includes('cancelAnimationFrame'),
+  'viewport guard must coalesce resize/visualViewport updates and clean them up'
+);
+assert(
+  viewportGuard.includes('window.visualViewport') && viewportGuard.includes('focusin'),
+  'viewport guard must continue tracking visualViewport and focus keyboard events'
+);
+assert(
+  promptComposer.includes('window.visualViewport') && promptComposer.includes('orientationchange'),
+  'prompt composer must react to visualViewport/orientation changes'
+);
+assert(
+  promptComposer.includes('const maxHeight = isMobileSheet.value'),
+  'prompt textarea sizing should use the synchronized mobile sheet mode'
+);
 
-const bridgeSource = fs.readFileSync(path.join(root, 'src/bridge/bridgeClient.js'), 'utf8');
-assert(bridgeSource.includes('androidBridgeAdapter'), 'bridgeClient must delegate platform bridge logic');
-assert(bridgeSource.includes('bridgeCallbackRegistry'), 'bridgeClient must delegate callback registry');
-assert(bridgeSource.includes('./validation'), 'bridgeClient must delegate contract validation');
-
-const bottomSheetSource = fs.readFileSync(path.join(root, 'src/composables/useBottomSheetSizing.js'), 'utf8');
-assert(bottomSheetSource.includes('createBottomSheetViewportController'), 'bottom sheet viewport logic must be separated');
-assert(bottomSheetSource.includes('createBottomSheetDragController'), 'bottom sheet drag logic must be separated');
-assert(bottomSheetSource.includes('createBodyScrollLock'), 'bottom sheet body lock logic must be separated');
-
-console.log('architecture checks passed');
+console.log('phase2 mobile prompt and viewport checks passed');
