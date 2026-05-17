@@ -1,0 +1,3 @@
+export const MIN_VISIBLE_OPTION_COUNT = 3;
+export const DEFAULT_OPTION_HEIGHT_PX = 58;
+export const DEFAULT_SHEET_CHROME_HEIGHT_PX = 122;
