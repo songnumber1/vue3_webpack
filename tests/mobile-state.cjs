@@ -23,8 +23,10 @@ assert(
   'viewport guard must keep visualViewport and keyboard focus tracking'
 );
 assert(
-  mobileState.includes('useMediaQuery') || mobileState.includes('isMobile'),
-  'chat mobile state should keep a dedicated mobile state composable'
+  mobileState.includes('isMobilePlatform') &&
+    mobileState.includes('platformInfo.value') &&
+    !mobileState.includes('querySelector'),
+  'chat mobile state should derive mobile mode from media/platform state without DOM class probing'
 );
 assert(
   viewportUtils.includes('getMobileBrowserFamily') &&

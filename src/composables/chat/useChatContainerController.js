@@ -10,6 +10,7 @@ import {useImagePreview} from "@/composables/useImagePreview";
 import {loadSharedConversation} from "@/composables/useSharedChat";
 import {useViewportGuard} from "@/composables/useViewportGuard";
 import {useNavigationStore} from "@/stores/navigationStore";
+import {usePlatformStore} from "@/stores/platformStore";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
@@ -26,6 +27,7 @@ export function useChatContainerController(props) {
   const {theme} = useAppContext();
   const runtime = useChatRuntime();
   const navigationStore = useNavigationStore();
+  const platformStore = usePlatformStore();
   const {scrollToBottom} = useAutoScroll({value: null});
 
   const workspaceRef = ref(null);
@@ -72,7 +74,11 @@ export function useChatContainerController(props) {
   const isCompactScreen = useMediaQuery(
     `(max-width: ${MOBILE_BREAKPOINT_PX}px)`
   );
-  const {isMobile, updateMobileState} = useChatMobileState({isCompactScreen});
+  const platformInfo = computed(() => platformStore.info || {});
+  const {isMobile, updateMobileState} = useChatMobileState({
+    isCompactScreen,
+    platformInfo,
+  });
   const {
     showScrollBottom,
     markForceBottom,
@@ -267,6 +273,7 @@ export function useChatContainerController(props) {
   });
 
   watch(isCompactScreen, updateMobileState);
+  watch(platformInfo, updateMobileState);
   useEventListener(window, "resize", updateMobileState, {passive: true});
   useEventListener(window, "scroll", scheduleBottomStateCheck, {
     capture: true,
