@@ -1,5 +1,5 @@
 import {nextTick, ref} from 'vue';
-import {streamText} from '@/utils/fakeStream';
+import {CHAT_STREAM_STATE, createMockChatStream} from '@/services/chatStream';
 
 function normalizePromptPayload(payload) {
   if (typeof payload === 'string') return {text: payload.trim(), attachments: []};
@@ -21,7 +21,21 @@ function buildAssistantResponse(normalized, t) {
 
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
+  const streamState = ref(CHAT_STREAM_STATE.IDLE);
+  const streamError = ref(null);
   const t = options.t || ((key) => key);
+  let activeStream = null;
+
+  function setStreamState(nextState) {
+    streamState.value = nextState;
+    isGenerating.value =
+      nextState === CHAT_STREAM_STATE.SUBMITTING ||
+      nextState === CHAT_STREAM_STATE.STREAMING;
+  }
+
+  function abortStream(reason = 'user-abort') {
+    activeStream?.abort(reason);
+  }
 
   async function handleSubmit(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -48,23 +62,31 @@ export function useChatSubmit(options) {
     await nextTick();
     await options.scrollBottom({force: true, stable: true});
 
-    isGenerating.value = true;
+    streamError.value = null;
+    activeStream = createMockChatStream({onStateChange: setStreamState});
     try {
-      await streamText(
-        buildAssistantResponse(normalized, t),
-        (chunk) => {
+      await activeStream.start({
+        text: buildAssistantResponse(normalized, t),
+        delay: 9,
+        onChunk: (chunk) => {
           assistantMessage.content = chunk;
           options.setConversation(targetHistoryId, messages);
         },
-        {delay: 9}
-      );
+      });
+    } catch (error) {
+      streamError.value = error;
+      setStreamState(CHAT_STREAM_STATE.ERROR);
+      throw error;
     } finally {
-      isGenerating.value = false;
+      if (streamState.value !== CHAT_STREAM_STATE.ERROR) {
+        setStreamState(CHAT_STREAM_STATE.IDLE);
+      }
+      activeStream = null;
     }
     options.setConversation(targetHistoryId, messages);
     await nextTick();
     await options.renderAfterStream();
   }
 
-  return {isGenerating, handleSubmit};
+  return {isGenerating, streamState, streamError, abortStream, handleSubmit};
 }

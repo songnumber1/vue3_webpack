@@ -1,11 +1,12 @@
 import {nextTick, ref} from 'vue';
 import {useAutoScroll} from '@/composables/useAutoScroll';
+import {createForceBottomWindow, shouldShowScrollBottomButton} from '@/services/chatScroll/stickyBottomScroll';
 
 export function useChatScrollController({props, workspaceRef}) {
   const {scrollToBottom} = useAutoScroll({value: null});
   const showScrollBottom = ref(false);
   let bottomStateTimer = 0;
-  let forceBottomUntil = 0;
+  const forceBottom = createForceBottomWindow();
 
   function getMessageListRef() {
     const exposed = workspaceRef.value?.listRef;
@@ -15,15 +16,15 @@ export function useChatScrollController({props, workspaceRef}) {
   }
 
   function markForceBottom(duration = 1800) {
-    forceBottomUntil = Date.now() + duration;
+    forceBottom.mark(duration);
   }
 
   function resetForceBottom() {
-    forceBottomUntil = 0;
+    forceBottom.reset();
   }
 
   function shouldKeepForceBottom() {
-    return Date.now() <= forceBottomUntil;
+    return forceBottom.active();
   }
 
   async function scrollBottom(options = {}) {
@@ -38,9 +39,10 @@ export function useChatScrollController({props, workspaceRef}) {
 
   function updateScrollBottomButton() {
     const list = getMessageListRef();
-    showScrollBottom.value =
-      (props.mode === 'chat' || props.mode === 'shared') &&
-      Boolean(list && !list.isAtBottom?.());
+    showScrollBottom.value = shouldShowScrollBottomButton({
+    mode: props.mode,
+    listRef: list,
+  });
   }
 
   function scheduleBottomStateCheck() {
