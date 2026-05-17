@@ -9,8 +9,11 @@ import {BRIDGE_CATEGORY, BRIDGE_TIMEOUT} from "./bridgeConstants";
 import {getActivePinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logWarn} from "@/utils/logger";
-
-const callbacks = {};
+import {
+  completeRegisteredBridgeResponse,
+  registerBridgeCallback,
+  removeBridgeCallback,
+} from "@/bridge/runtime/callbackRegistry";
 
 /**
  * @description createRequestId 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -429,34 +432,12 @@ function normalizeBridgeResponse(response, request) {
 }
 
 /**
- * @description completeBridgeResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} rawResponse - rawResponse 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ * @description Native에서 전달된 bridge 응답을 callback registry에 위임합니다.
+ * @param {*} rawResponse - Native 원본 응답입니다.
+ * @returns {void}
  */
 function completeBridgeResponse(rawResponse) {
-  const requestId =
-    typeof rawResponse === "string"
-      ? (() => {
-          // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
-          try {
-            // 계산된 결과를 호출부로 반환합니다.
-            return JSON.parse(rawResponse)?.requestId;
-          } catch (error) {
-            // 계산된 결과를 호출부로 반환합니다.
-            return null;
-          }
-        })()
-      : rawResponse?.requestId;
-
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (!requestId) return;
-
-  const callback = callbacks[requestId];
-
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (!callback) return;
-
-  callback(rawResponse);
+  completeRegisteredBridgeResponse(rawResponse);
 }
 
 /**
@@ -750,7 +731,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       if (settled) return;
 
       settled = true;
-      delete callbacks[requestId];
+      removeBridgeCallback(requestId);
 
       const errorResponse = createErrorResponse(
         validPayload,
@@ -769,13 +750,13 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       reject(error);
     }, timeout);
 
-    callbacks[requestId] = (rawResponse) => {
+    registerBridgeCallback(requestId, (rawResponse) => {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (settled) return;
 
       settled = true;
       window.clearTimeout(timer);
-      delete callbacks[requestId];
+      removeBridgeCallback(requestId);
 
       // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
       try {
@@ -792,7 +773,7 @@ export function callNative(type, payload, timeout = BRIDGE_TIMEOUT) {
       } catch (error) {
         reject(error);
       }
-    };
+    });
 
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (canUsePostMessage) {

@@ -1,16 +1,33 @@
-import {defineStore} from "pinia";
-import {resolveDetailedPlatform} from "@/platform/platformDetector";
+import {defineStore} from 'pinia';
+import {resolveDetailedPlatform} from '@/platform/platformDetector';
+import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-export const usePlatformStore = defineStore("platform", {
+function getViewportInfo() {
+  if (typeof window === 'undefined') {
+    return {width: 0, height: 0, isCompact: false};
+  }
+  const width = window.innerWidth || document.documentElement.clientWidth || 0;
+  const height = window.innerHeight || document.documentElement.clientHeight || 0;
+  return {
+    width,
+    height,
+    isCompact: width <= MOBILE_BREAKPOINT_PX,
+  };
+}
+
+/**
+ * @description 플랫폼/viewport 판별의 single source of truth입니다.
+ */
+export const usePlatformStore = defineStore('platform', {
   state: () => ({
     info: resolveDetailedPlatform(),
+    viewport: getViewportInfo(),
     nativeEvents: [],
     lastNativeEvent: null,
     network: {
-      online: typeof navigator === "undefined" ? true : navigator.onLine,
+      online: typeof navigator === 'undefined' ? true : navigator.onLine,
     },
-    pushToken: "",
+    pushToken: '',
     appVersionInfo: null,
   }),
   getters: {
@@ -18,22 +35,37 @@ export const usePlatformStore = defineStore("platform", {
     isAndroidApp: (state) => state.info.isAndroidApp,
     isIos: (state) => state.info.isIos,
     isWindowsWeb: (state) => state.info.isWindows && !state.info.isNativeApp,
+    isMobileUi: (state) =>
+      Boolean(state.info.isMobile || state.info.isNativeApp || state.viewport.isCompact),
+    isCompactViewport: (state) => state.viewport.isCompact,
   },
   actions: {
     initialize(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform(baseAppInfo);
+      this.viewport = getViewportInfo();
       this.network.online =
-        typeof navigator === "undefined" ? true : navigator.onLine;
+        typeof navigator === 'undefined' ? true : navigator.onLine;
     },
     refresh(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform({...this.info, ...baseAppInfo});
+      this.viewport = getViewportInfo();
+    },
+    refreshViewport() {
+      this.viewport = getViewportInfo();
+      this.info = {
+        ...this.info,
+        viewport: {
+          width: this.viewport.width,
+          height: this.viewport.height,
+        },
+        updatedAt: new Date().toISOString(),
+      };
     },
     setPushToken(token) {
-      this.pushToken = token || "";
+      this.pushToken = token || '';
     },
     setAppVersionInfo(data) {
       this.appVersionInfo = data || null;
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (data?.appVersion) this.info.appVersion = data.appVersion;
     },
     setNetwork(status = {}) {
@@ -43,9 +75,9 @@ export const usePlatformStore = defineStore("platform", {
       const item = {type, payload, receivedAt: new Date().toISOString()};
       this.lastNativeEvent = item;
       this.nativeEvents = [item, ...this.nativeEvents].slice(0, 50);
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-      if (type === "ON_NETWORK_CHANGE")
+      if (type === 'ON_NETWORK_CHANGE') {
         this.setNetwork(payload.status || payload);
+      }
     },
   },
 });

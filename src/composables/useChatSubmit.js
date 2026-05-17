@@ -1,67 +1,29 @@
-import {nextTick, ref} from "vue";
-import {streamText} from "@/utils/fakeStream";
-
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-/**
- * @description normalizePromptPayload 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} payload - payload 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function normalizePromptPayload(payload) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (typeof payload === "string")
-    // 계산된 결과를 호출부로 반환합니다.
-    return {text: payload.trim(), attachments: []};
-  // 계산된 결과를 호출부로 반환합니다.
-  return {
-    text: String(payload?.text || "").trim(),
-    attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
-  };
-}
+import {nextTick, ref} from 'vue';
+import {normalizePromptPayload} from '@/services/chatStream/chatResponseBuilder';
+import {streamAssistantResponse} from '@/services/chatStream/chatStreamService';
 
 /**
- * @description buildAssistantResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} normalized - normalized 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function buildAssistantResponse(normalized) {
-  const fileSummary = normalized.attachments.length
-    ? `\n\n첨부 파일 ${normalized.attachments.length}개를 함께 받았습니다. 이미지/파일 미리보기와 메시지 액션 영역도 유지됩니다.`
-    : "";
-  // 계산된 결과를 호출부로 반환합니다.
-  return `요청하신 내용을 현재 선택된 Assistant/Model 세션 기준으로 정리하겠습니다.\n\n- 입력: ${
-    normalized.text || "첨부 기반 요청"
-  }\n- 새 대화에서는 Assistant와 모델을 변경할 수 있습니다.\n- 기존 대화방에 진입하면 해당 대화의 모델 세션이 고정되어 모델 변경이 차단됩니다.\n- 현재 응답은 실제 API 호출 구조를 모사한 mock data + adapter + business + Pinia cache 흐름으로 동작합니다.${fileSummary}`;
-}
-
-/**
- * @description useChatSubmit 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} options - options 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ * @description 채팅 전송과 assistant 응답 스트림 상태를 관리합니다.
+ * @param {*} options - router, route, message/cache 관련 의존성입니다.
+ * @returns {{isGenerating: import('vue').Ref<boolean>, handleSubmit: Function}} 전송 상태와 실행 함수입니다.
  */
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
 
-  /**
-   * @description handleSubmit 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} payload - payload 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   async function handleSubmit(payload) {
     const normalized = normalizePromptPayload(payload);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (
       (!normalized.text && normalized.attachments.length === 0) ||
       isGenerating.value
-    )
+    ) {
       return;
+    }
 
-    let targetHistoryId = String(options.route.params.id || "");
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (options.route.name === "main") {
+    let targetHistoryId = String(options.route.params.id || '');
+    if (options.route.name === 'main') {
       const history = options.createLocalConversation(normalized);
       targetHistoryId = history.id;
-      await options.router.push({name: "chat", params: {id: targetHistoryId}});
+      await options.router.push({name: 'chat', params: {id: targetHistoryId}});
       await nextTick();
     }
 
@@ -73,21 +35,24 @@ export function useChatSubmit(options) {
     await nextTick();
     await options.scrollBottom({force: true, stable: true});
 
-    isGenerating.value = true;
-    await streamText(
-      buildAssistantResponse(normalized),
-      (chunk) => {
-        assistantMessage.content = chunk;
-        options.setConversation(targetHistoryId, messages);
-      },
-      {delay: 9}
-    );
-    isGenerating.value = false;
-    options.setConversation(targetHistoryId, messages);
+    try {
+      isGenerating.value = true;
+      await streamAssistantResponse(
+        normalized,
+        (chunk) => {
+          assistantMessage.content = chunk;
+          options.setConversation(targetHistoryId, messages);
+        },
+        {delay: 9}
+      );
+      options.setConversation(targetHistoryId, messages);
+    } finally {
+      isGenerating.value = false;
+    }
+
     await nextTick();
     await options.renderAfterStream();
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {isGenerating, handleSubmit};
 }

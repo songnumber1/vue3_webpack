@@ -1,21 +1,19 @@
-import {ref} from 'vue';
+import {computed} from 'vue';
 import {addMediaQueryListener} from '@/utils/dom';
 import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
+import {usePlatformStore} from '@/stores/platformStore';
 
+/**
+ * @description 모바일 UI 여부를 platformStore로 단일화합니다.
+ * @returns {*} 모바일 UI 상태와 viewport watch 제어 함수입니다.
+ */
 export function useChatMobileState() {
-  const isMobile = ref(false);
+  const platformStore = usePlatformStore();
+  const isMobile = computed(() => platformStore.isMobileUi);
   let removeMediaQueryListener = null;
 
-  function resolveMobileState() {
-    if (typeof window === 'undefined') return false;
-    return Boolean(
-      window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
-        window.innerWidth <= MOBILE_BREAKPOINT_PX
-    );
-  }
-
   function updateMobileState() {
-    isMobile.value = resolveMobileState();
+    platformStore.refreshViewport();
   }
 
   function startMobileStateWatch() {

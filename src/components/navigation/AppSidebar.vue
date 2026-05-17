@@ -127,10 +127,9 @@
 </template>
 
 <script setup>
-import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
-import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 import Icon from '@/components/navigation/SidebarIcon.vue';
@@ -142,6 +141,7 @@ import SidebarUserFooter from '@/components/navigation/parts/SidebarUserFooter.v
 import {useAssistantStore} from '@/stores/assistantStore';
 import {useChatStore} from '@/stores/chatStore';
 import {useNavigationStore} from '@/stores/navigationStore';
+import {usePlatformStore} from '@/stores/platformStore';
 import {useOutsideClick} from '@/composables/useOutsideClick';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
@@ -163,11 +163,12 @@ const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
+const platformStore = usePlatformStore();
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigationStore);
 const assistantMenuOpen = ref(false);
-const isMobileSheet = ref(false);
+const isMobileSheet = computed(() => platformStore.isMobileUi);
 const assistantSelectorRef = ref(null);
 const historyMenuRef = ref(null);
 const historyMenuOpen = ref(false);
@@ -185,10 +186,7 @@ const VIEWPORT_PADDING_PX = 12;
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function syncViewportMode() {
-  isMobileSheet.value = Boolean(
-    window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
-      document.querySelector('.app-container--mobile')
-  );
+  platformStore.refreshViewport();
 }
 
 /**
