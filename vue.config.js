@@ -1,14 +1,11 @@
 const fs = require("fs");
+const path = require("path");
 const {defineConfig} = require("@vue/cli-service");
 
-const isHttps = process.env.VUE_APP_HTTPS === "true";
+const certDir = path.resolve(__dirname, "cert");
 
-const httpsOptions = isHttps
-  ? {
-      key: fs.readFileSync("./cert/localhost+1-key.pem"),
-      cert: fs.readFileSync("./cert/localhost+1.pem"),
-    }
-  : false;
+const keyPath = path.join(certDir, "localhost+1-key.pem");
+const certPath = path.join(certDir, "localhost+1.pem");
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -32,7 +29,10 @@ module.exports = defineConfig({
 
     historyApiFallback: true,
 
-    https: httpsOptions,
+    https: {
+      key: fs.readFileSync(keyPath),
+      cert: fs.readFileSync(certPath),
+    },
 
     allowedHosts: "all",
 
