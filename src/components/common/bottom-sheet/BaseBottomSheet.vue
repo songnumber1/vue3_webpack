@@ -3,7 +3,7 @@
     <transition name="sheet-fade">
       <div
         v-if="open"
-        class="bottom-sheet-backdrop"
+        :class="['bottom-sheet-backdrop', overlayClass]"
         @click="emit('close')"
       ></div>
     </transition>
@@ -12,11 +12,14 @@
       <section
         v-if="open"
         ref="sheetRef"
-        class="bottom-sheet"
-        :class="{
-          'bottom-sheet--dragging': dragging,
-          'bottom-sheet--fullscreen': currentSnap === 'full',
-        }"
+        :class="[
+          'bottom-sheet',
+          overlayClass,
+          {
+            'bottom-sheet--dragging': dragging,
+            'bottom-sheet--fullscreen': currentSnap === 'full',
+          },
+        ]"
         role="dialog"
         aria-modal="true"
         :aria-label="title || t('common.select')"
@@ -67,6 +70,7 @@ const props = defineProps({
   initialSnap: {type: String, default: "content"},
   minHeight: {type: Number, default: 260},
   maxRatio: {type: Number, default: 0.92},
+  overlayClass: {type: String, default: ""},
 });
 
 const emit = defineEmits(["close"]);

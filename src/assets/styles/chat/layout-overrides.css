@@ -2446,8 +2446,19 @@
 }
 
 .chat-history-context-menu-shell {
-  z-index: 1500;
+  z-index: var(--z-chat-history-menu, 2147483000);
   isolation: isolate;
+}
+
+
+
+/* Keep the chat history action popup above every app surface on desktop and mobile. */
+.chat-history-menu-overlay.bottom-sheet-backdrop {
+  z-index: var(--z-chat-history-menu-backdrop, 2147482990) !important;
+}
+
+.chat-history-menu-overlay.bottom-sheet {
+  z-index: var(--z-chat-history-menu, 2147483000) !important;
 }
 
 .chat-history-context-menu {
@@ -2496,6 +2507,28 @@
 
 .chat-history-action-option {
   justify-content: flex-start;
+}
+
+
+/* Ensure every confirmation/notice popup opened from the mobile drawer is above the drawer and any bottom sheet.
+   The drawer intentionally remains mounted while history actions run, so dialog overlays must own
+   the top application layer instead of inheriting the base responsive overlay z-index. */
+.responsive-overlay.responsive-overlay--mobile-dialog {
+  z-index: var(--z-app-dialog-front, 2147483100) !important;
+  isolation: isolate;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-overlay-backdrop {
+  z-index: 0;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
+  z-index: 1;
+}
+
+/* Desktop dialogs should also stay above transient menus without changing their layout. */
+.responsive-overlay:not(.responsive-overlay--mobile):not(.responsive-overlay--mobile-dialog) {
+  z-index: var(--z-app-dialog, 2147482500) !important;
 }
 
 .chat-history-dialog {

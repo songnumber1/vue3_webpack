@@ -4,6 +4,7 @@
     :title="targetTitle"
     initial-snap="content"
     :min-height="280"
+    overlay-class="chat-history-menu-overlay"
     @close="$emit('close')"
   >
     <div class="chat-history-sheet-options">
