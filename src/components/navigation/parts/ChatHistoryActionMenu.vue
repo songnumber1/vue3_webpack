@@ -22,28 +22,33 @@
   </BaseBottomSheet>
 
   <teleport to="body">
-    <transition name="modal-fade">
-      <div
-        v-if="desktopOpen"
-        ref="menuRef"
-        class="chat-history-context-menu"
-        :style="floatingStyles"
-        role="menu"
-      >
-        <button
-          v-for="action in actions"
-          :key="action.key"
-          class="chat-history-context-menu__item"
-          :class="{'chat-history-context-menu__item--danger': action.danger}"
-          type="button"
-          role="menuitem"
-          @click="$emit('select', action.key)"
+    <div
+      v-if="desktopOpen"
+      ref="menuRef"
+      class="chat-history-context-menu-shell"
+      :style="contextMenuStyle"
+    >
+      <transition name="context-menu-fade">
+        <div
+          v-show="positionReady"
+          class="chat-history-context-menu"
+          role="menu"
         >
-          <span aria-hidden="true">{{ action.icon }}</span>
-          <span>{{ action.label }}</span>
-        </button>
-      </div>
-    </transition>
+          <button
+            v-for="action in actions"
+            :key="action.key"
+            class="chat-history-context-menu__item"
+            :class="{'chat-history-context-menu__item--danger': action.danger}"
+            type="button"
+            role="menuitem"
+            @click="$emit('select', action.key)"
+          >
+            <span aria-hidden="true">{{ action.icon }}</span>
+            <span>{{ action.label }}</span>
+          </button>
+        </div>
+      </transition>
+    </div>
   </teleport>
 </template>
 
@@ -65,8 +70,10 @@ const {t} = useI18n();
 const menuRef = ref(null);
 const referenceRef = computed(() => props.referenceEl || null);
 
-const {floatingStyles, update} = useFloating(referenceRef, menuRef, {
+const {floatingStyles, update, x, y} = useFloating(referenceRef, menuRef, {
   placement: "right-start",
+  strategy: "fixed",
+  transform: false,
   whileElementsMounted: autoUpdate,
   middleware: [
     offset(8),
@@ -77,6 +84,19 @@ const {floatingStyles, update} = useFloating(referenceRef, menuRef, {
 
 const mobileOpen = computed(() => props.open && props.isMobile);
 const desktopOpen = computed(() => props.open && !props.isMobile);
+const positionReady = ref(false);
+const hasMeasuredPosition = computed(
+  () => Number.isFinite(x.value) && Number.isFinite(y.value)
+);
+const contextMenuStyle = computed(() => {
+  const ready = desktopOpen.value && positionReady.value && hasMeasuredPosition.value;
+  return {
+    ...floatingStyles.value,
+    position: "fixed",
+    visibility: ready ? "visible" : "hidden",
+    pointerEvents: ready ? "auto" : "none",
+  };
+});
 const targetTitle = computed(
   () => props.target?.title || t("chat.historyMenu.title")
 );
@@ -100,9 +120,13 @@ const actions = computed(() => {
 watch(
   () => [desktopOpen.value, props.referenceEl],
   async () => {
+    positionReady.value = false;
     if (!desktopOpen.value) return;
     await nextTick();
-    update?.();
+    await update?.();
+    await nextTick();
+    await update?.();
+    positionReady.value = hasMeasuredPosition.value;
   },
   {flush: "post"}
 );

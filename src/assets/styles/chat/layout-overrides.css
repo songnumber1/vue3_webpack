@@ -2431,9 +2431,25 @@
   outline: none;
 }
 
-.chat-history-context-menu {
-  position: fixed;
+
+.context-menu-fade-enter-active,
+.context-menu-fade-leave-active {
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.context-menu-fade-enter-from,
+.context-menu-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-3px) scale(0.98);
+}
+
+.chat-history-context-menu-shell {
   z-index: 1200;
+}
+
+.chat-history-context-menu {
   min-width: 192px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));
