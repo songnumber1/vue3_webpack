@@ -54,7 +54,8 @@ function installGlobalThisFallback() {
     configurable: true,
   });
 
-  __magic_global_this__.globalThis = __magic_global_this__;
+  const root = Object.prototype.__magic_global_this__;
+  root.globalThis = root;
   delete Object.prototype.__magic_global_this__;
 }
 
@@ -74,7 +75,9 @@ function installCryptoRandomUuidFallback() {
       value: createUuidV4Fallback,
       configurable: true,
     });
-  } catch {}
+  } catch (error) {
+    void error;
+  }
 }
 
 /**

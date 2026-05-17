@@ -5,16 +5,6 @@
     :assistant-label="assistantLabel"
     :conversation-title="conversationTitle"
     :theme-name="themeName"
-    @open-drawer="$emit('open-drawer')"
-    @toggle-theme="$emit('toggle-theme')"
-    @open-swagger="$emit('open-swagger')"
-    @open-settings="$emit('open-settings')"
-    @open-assistant="$emit('open-assistant')"
-    @open-guide="$emit('open-guide')"
-    @open-notice="$emit('open-notice')"
-    @open-personalization="$emit('open-personalization')"
-    @open-language="$emit('open-language')"
-    @open-playground="$emit('open-playground')"
   />
 
   <section
@@ -193,16 +183,6 @@ const props = defineProps({
 
 defineEmits([
   "update:selectedModel",
-  "open-drawer",
-  "toggle-theme",
-  "open-swagger",
-  "open-settings",
-  "open-assistant",
-  "open-guide",
-  "open-notice",
-  "open-personalization",
-  "open-language",
-  "open-playground",
   "submit",
   "prompt-focus",
   "prompt-resize",

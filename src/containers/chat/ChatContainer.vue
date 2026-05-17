@@ -33,16 +33,6 @@
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
       @update:selected-model="selectedModel = $event"
-      @open-drawer="openMobileDrawer"
-      @toggle-theme="toggleTheme"
-      @open-swagger="openSwagger"
-      @open-settings="openSettings"
-      @open-assistant="openAssistantFromHeader"
-      @open-guide="openGuide"
-      @open-notice="openNotice"
-      @open-personalization="openPersonalization"
-      @open-language="openLanguage"
-      @open-playground="openPlayground"
       @submit="submitIfWritable"
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
@@ -64,7 +54,7 @@
       :assistants="assistants"
       :selected-assistant-id="selectedAssistantId"
       @close="assistantSheetOpen = false"
-      @select="selectAssistantFromSheet"
+      @select="startNewChatWithAssistant"
     />
 
     <AppOverlayProvider
@@ -110,7 +100,7 @@
     <ResponsiveOverlay
       :open="historyNoticeOpen"
       :is-mobile="isMobile"
-      title="알림"
+      :title="t('common.notice')"
       mobile-mode="dialog"
       @close="historyNoticeOpen = false"
     >
@@ -122,7 +112,7 @@
             type="button"
             @click="historyNoticeOpen = false"
           >
-            확인
+            {{ t("common.confirm") }}
           </button>
         </div>
       </div>
@@ -135,7 +125,9 @@
 </template>
 
 <script setup>
+import {provide} from "vue";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
+import {CHAT_ACTIONS_KEY} from "@/composables/chat/chatActionContext";
 import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -203,11 +195,24 @@ const {
   openPersonalization,
   openLanguage,
   openAssistantFromHeader,
-  selectAssistantFromSheet,
   submitIfWritable,
   handlePromptFocus,
   handlePromptResize,
   handleMessageContentRendered,
   scrollBottom,
 } = useChatContainerController(props);
+
+provide(CHAT_ACTIONS_KEY, {
+  openDrawer: openMobileDrawer,
+  toggleTheme,
+  openSwagger,
+  openSettings,
+  openAssistant: openAssistantFromHeader,
+  openGuide,
+  openNotice,
+  openPersonalization,
+  openLanguage,
+  openPlayground,
+});
+
 </script>

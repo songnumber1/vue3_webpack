@@ -134,7 +134,9 @@ export function useSpeechRecognition(options = {}) {
     if (!abortActive) return;
     try {
       current.abort();
-    } catch (error) {}
+    } catch (error) {
+      void error;
+    }
   }
 
   /**

@@ -85,14 +85,7 @@ export async function bootstrapChatRuntime(options = {}) {
     ? Promise.resolve(accessInfoOverride)
     : accessApi.getAccessInfo({language: "ko", entryType: "main"});
 
-  const [
-    accessInfo,
-    assistantRaw,
-    studioRaw,
-    modelRaw,
-    studioModelRaw,
-    chatHistoryRaw,
-  ] = await Promise.all([
+  const bootstrapResults = await Promise.allSettled([
     accessInfoPromise,
     assistantApi.getAssistants(),
     assistantApi.getStudios(),
@@ -100,6 +93,22 @@ export async function bootstrapChatRuntime(options = {}) {
     modelApi.getStudioModels(),
     chatHistoryApi.getChatHistoryList(),
   ]);
+
+  const readSettledValue = (index, fallbackValue) =>
+    bootstrapResults[index].status === "fulfilled"
+      ? bootstrapResults[index].value
+      : fallbackValue;
+
+  const accessInfo = readSettledValue(0, null);
+  if (!accessInfo) {
+    throw bootstrapResults[0].reason || new Error("Access info bootstrap failed.");
+  }
+
+  const assistantRaw = readSettledValue(1, []);
+  const studioRaw = readSettledValue(2, []);
+  const modelRaw = readSettledValue(3, []);
+  const studioModelRaw = readSettledValue(4, []);
+  const chatHistoryRaw = readSettledValue(5, []);
 
   const assistants = [
     ...adaptAssistantList(assistantRaw),
@@ -120,17 +129,20 @@ export async function bootstrapChatRuntime(options = {}) {
     assistantMap,
     modelMap,
   });
-  const examplePromptEntries = await Promise.all(
+  const examplePromptResults = await Promise.allSettled(
     assistants.map(async (assistant) => {
       const response = await examplePromptApi.getExamplePrompts({
         assistId: assistant.id,
         studioYN: assistant.type === "studio",
       });
-      // 계산된 결과를 호출부로 반환합니다.
       return [assistant.id, adaptExamplePromptList(response)];
     })
   );
-  const examplePromptMap = Object.fromEntries(examplePromptEntries);
+  const examplePromptMap = Object.fromEntries(
+    examplePromptResults
+      .filter((result) => result.status === "fulfilled")
+      .map((result) => result.value)
+  );
   const initialAssistant = pickInitialAssistant(assistants, accessInfo);
   const initialModel = pickInitialModel(
     initialAssistant,

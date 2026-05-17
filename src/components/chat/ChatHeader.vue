@@ -8,7 +8,7 @@
         class="round-icon menu-toggle"
         type="button"
         :aria-label="t('chat.openSidebar')"
-        @click="$emit('open-drawer')"
+        @click="chatActions.openDrawer"
       >
         <span class="icon-lines"></span>
       </button>
@@ -18,7 +18,7 @@
         class="model-trigger model-trigger--assistant"
         type="button"
         :aria-label="t('chat.assistantSelect')"
-        @click="$emit('open-assistant')"
+        @click="chatActions.openAssistant"
       >
         <span>{{ assistantLabel }}</span>
         <ChevronDownIcon class="chevron chevron--selector" />
@@ -44,7 +44,7 @@
         type="button"
         :aria-label="t('common.guide')"
         :title="t('common.guide')"
-        @click="$emit('open-guide')"
+        @click="chatActions.openGuide"
       >
         <GuideIcon />
       </button>
@@ -52,7 +52,7 @@
         class="round-icon theme-toggle"
         type="button"
         :aria-label="t('common.theme')"
-        @click="$emit('toggle-theme')"
+        @click="chatActions.toggleTheme"
       >
         <span
           class="theme-glyph"
@@ -64,27 +64,31 @@
         type="button"
         :aria-label="t('common.swagger')"
         :title="t('common.swagger')"
-        @click="$emit('open-swagger')"
+        @click="chatActions.openSwagger"
       >
         <SwaggerDocIcon />
       </button>
       <UserMenu
-        @notice="$emit('open-notice')"
-        @personalization="$emit('open-personalization')"
-        @language="$emit('open-language')"
-        @playground="$emit('open-playground')"
+        @notice="chatActions.openNotice"
+        @personalization="chatActions.openPersonalization"
+        @language="chatActions.openLanguage"
+        @playground="chatActions.openPlayground"
       />
     </div>
   </header>
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, inject} from "vue";
 import {useI18n} from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
@@ -95,20 +99,9 @@ const props = defineProps({
   themeName: {type: String, default: "dark"},
 });
 
-defineEmits([
-  "toggle-theme",
-  "open-drawer",
-  "open-swagger",
-  "open-settings",
-  "open-assistant",
-  "open-guide",
-  "open-notice",
-  "open-personalization",
-  "open-language",
-  "open-playground",
-]);
 
 const {t} = useI18n();
+const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(

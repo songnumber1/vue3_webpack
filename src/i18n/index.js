@@ -5,6 +5,10 @@ export const SUPPORT_LOCALES = ["ko", "en"];
 
 export const messages = {
   ko: {
+    app: {
+      unsupportedTitle: "지원하지 않는 접속 환경입니다.",
+      unsupportedMessage: "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
+    },
     common: {
       back: "뒤로",
       close: "닫기",
@@ -64,6 +68,7 @@ export const messages = {
       sharedReadonly: "공유 받은 대화입니다.",
       scrollBottom: "맨 아래로 이동",
       assistant: "Assistant",
+      sharedConversationTitle: "공유 대화 {id}",
       promptPlaceholder: "무엇이든 물어보세요",
       send: "전송",
       voiceStart: "음성 입력 시작",
@@ -81,6 +86,13 @@ export const messages = {
         rename: "제목 변경",
         share: "공유",
         delete: "삭제",
+      },
+      historyDialog: {
+        deleteTitle: "대화방 삭제",
+        renameTitle: "대화방 제목 변경",
+        selectedConversation: "선택한 대화방",
+        deleteMessage: "'{title}'을(를) 삭제하시겠습니까?",
+        shareSelected: "공유 버튼을 선택했습니다.",
       },
     },
     menu: {
@@ -159,6 +171,10 @@ export const messages = {
     },
   },
   en: {
+    app: {
+      unsupportedTitle: "Unsupported access environment.",
+      unsupportedMessage: "iOS app, iOS Chrome, and iOS Safari are not supported.",
+    },
     common: {
       back: "Back",
       close: "Close",
@@ -218,6 +234,7 @@ export const messages = {
       sharedReadonly: "This is a shared conversation.",
       scrollBottom: "Scroll to bottom",
       assistant: "Assistant",
+      sharedConversationTitle: "Shared chat {id}",
       promptPlaceholder: "Ask anything",
       send: "Send",
       voiceStart: "Start voice input",
@@ -235,6 +252,13 @@ export const messages = {
         rename: "Rename",
         share: "Share",
         delete: "Delete",
+      },
+      historyDialog: {
+        deleteTitle: "Delete chat",
+        renameTitle: "Rename chat",
+        selectedConversation: "selected chat",
+        deleteMessage: "Delete '{title}'?",
+        shareSelected: "Share was selected.",
       },
     },
     menu: {
