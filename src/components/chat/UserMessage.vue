@@ -11,7 +11,7 @@
             v-if="file.kind === 'image'"
             type="button"
             class="message-image-card"
-            :aria-label="`${file.name} 크게 보기`"
+            :aria-label="t('chat.imagePreview.enlarge', {name: file.name})"
             @click.stop="openImage(file)"
           >
             <img
@@ -44,6 +44,9 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 import {computed} from "vue";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";

@@ -1,4 +1,5 @@
 export const CHAT_ACTIONS_KEY = Symbol("CHAT_ACTIONS");
+export const WORKSPACE_ACTIONS_KEY = Symbol("WORKSPACE_ACTIONS");
 
 export function createEmptyChatActions() {
   return {
@@ -12,5 +13,16 @@ export function createEmptyChatActions() {
     openPersonalization: () => {},
     openLanguage: () => {},
     openPlayground: () => {},
+  };
+}
+
+export function createEmptyWorkspaceActions() {
+  return {
+    submit: () => {},
+    updateSelectedModel: () => {},
+    handlePromptFocus: () => {},
+    handlePromptResize: () => {},
+    handleMessageContentRendered: () => {},
+    scrollBottom: () => {},
   };
 }

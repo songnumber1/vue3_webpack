@@ -13,15 +13,15 @@
         <RouterLink
           class="toolbar-link"
           to="/"
-          title="홈으로 이동"
-          aria-label="홈으로 이동"
+          :title="t('swagger.goHome')"
+          :aria-label="t('swagger.goHome')"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
               d="M4 10.5 12 4l8 6.5V20a.5.5 0 0 1-.5.5h-5v-6h-5v6h-5A.5.5 0 0 1 4 20v-9.5Z"
             />
           </svg>
-          홈
+          t('swagger.home')
         </RouterLink>
         <select
           v-model="selectedCategory"
@@ -40,7 +40,7 @@
     </div>
 
     <div v-if="renderError" class="swagger-error">
-      <strong>Swagger 렌더링 오류</strong>
+      <strong>{{ t("swagger.renderError") }}</strong>
       <p>{{ renderError }}</p>
     </div>
 
@@ -49,6 +49,9 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
@@ -128,7 +131,7 @@ const renderSwagger = async () => {
       tryItOutEnabled: false,
     });
   } catch (error) {
-    renderError.value = error?.message || "Swagger UI를 렌더링하지 못했습니다.";
+    renderError.value = error?.message || t("swagger.renderErrorFallback");
     logError("[SwaggerPage] render failed", error);
   }
 };

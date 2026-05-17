@@ -1,7 +1,7 @@
 <template>
   <BaseBottomSheet
     :open="modelOpen"
-    :title="modelTitle"
+    :title="resolvedModelTitle"
     @close="$emit('close-model')"
   >
     <button
@@ -16,6 +16,7 @@
         <strong>{{ model.label }}</strong>
         <small>{{ model.description }}</small>
       </span>
+
       <CheckIcon v-if="model.id === modelValue" class="bottom-sheet-check" />
     </button>
   </BaseBottomSheet>
@@ -32,14 +33,19 @@
       type="button"
       @click="$emit('apply-tool', tool)"
     >
-      <span aria-hidden="true">{{ tool.icon }}</span>
-      <strong>{{ tool.label }}</strong>
+      <span aria-hidden="true">
+        {{ tool.icon }}
+      </span>
+
+      <strong>
+        {{ tool.label }}
+      </strong>
     </button>
   </BaseBottomSheet>
 
   <BaseBottomSheet
     :open="attachOpen"
-    :title="attachTitle"
+    :title="resolvedAttachTitle"
     @close="$emit('close-attach')"
   >
     <button
@@ -49,28 +55,76 @@
       type="button"
       @click="$emit('open-file-picker', option.id)"
     >
-      <span aria-hidden="true">{{ option.icon }}</span
-      ><strong>{{ option.label }}</strong>
+      <span aria-hidden="true">
+        {{ option.icon }}
+      </span>
+
+      <strong>
+        {{ option.label }}
+      </strong>
     </button>
   </BaseBottomSheet>
 </template>
 
 <script setup>
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
+
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-defineProps({
-  modelOpen: {type: Boolean, default: false},
-  toolOpen: {type: Boolean, default: false},
-  attachOpen: {type: Boolean, default: false},
-  models: {type: Array, default: () => []},
-  tools: {type: Array, default: () => []},
-  attachOptions: {type: Array, default: () => []},
-  modelValue: {type: String, default: ""},
-  toolTitle: {type: String, default: "Tools"},
-  modelTitle: {type: String, default: "모델 선택"},
-  attachTitle: {type: String, default: "첨부"},
+const {t} = useI18n();
+
+const props = defineProps({
+  modelOpen: {
+    type: Boolean,
+    default: false,
+  },
+
+  toolOpen: {
+    type: Boolean,
+    default: false,
+  },
+
+  attachOpen: {
+    type: Boolean,
+    default: false,
+  },
+
+  models: {
+    type: Array,
+    default: () => [],
+  },
+
+  tools: {
+    type: Array,
+    default: () => [],
+  },
+
+  attachOptions: {
+    type: Array,
+    default: () => [],
+  },
+
+  modelValue: {
+    type: String,
+    default: "",
+  },
+
+  toolTitle: {
+    type: String,
+    default: "Tools",
+  },
+
+  modelTitle: {
+    type: String,
+    default: "",
+  },
+
+  attachTitle: {
+    type: String,
+    default: "",
+  },
 });
 
 defineEmits([
@@ -81,4 +135,12 @@ defineEmits([
   "apply-tool",
   "open-file-picker",
 ]);
+
+const resolvedModelTitle = computed(() => {
+  return props.modelTitle || t("prompt.modelSelect");
+});
+
+const resolvedAttachTitle = computed(() => {
+  return props.attachTitle || t("prompt.attach");
+});
 </script>

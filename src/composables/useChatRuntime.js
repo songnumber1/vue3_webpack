@@ -1,6 +1,7 @@
 import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
+import {logWarn} from "@/utils/logger";
 import {
   // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   bootstrapChatRuntime,
@@ -28,8 +29,8 @@ function createLocalHistory({text, assistant, model}) {
     id,
     temporary: true,
     syncStatus: "local",
-    title: text || "새 채팅",
-    preview: text || "첨부 파일 기반 새 대화",
+    title: text || "New chat",
+    preview: text || "New conversation from attachments",
     modelId: model?.id || "",
     assistantId: assistant?.id || model?.assistId || "",
     assistantType: assistant?.type || "",
@@ -166,38 +167,58 @@ export function useChatRuntime() {
   }
 
   async function refreshHistories() {
-    const chatHistories = await loadChatHistoryList({
-      assistantMap: assistantStore.assistantMap,
-      modelMap: assistantStore.modelMap,
-    });
-    chatStore.setHistories(chatHistories);
-    return chatHistories;
+    try {
+      const chatHistories = await loadChatHistoryList({
+        assistantMap: assistantStore.assistantMap,
+        modelMap: assistantStore.modelMap,
+      });
+      chatStore.setHistories(chatHistories);
+      return chatHistories;
+    } catch (error) {
+      logWarn("[useChatRuntime] refreshHistories 오류:", error);
+      return chatStore.histories;
+    }
   }
 
   async function toggleHistoryBookmark(history) {
     if (!history?.id) return;
-    await updateChatBookmark({
-      chatId: history.id,
-      bookmarkYN: !history.isPinned,
-    });
-    await refreshHistories();
+    try {
+      await updateChatBookmark({
+        chatId: history.id,
+        bookmarkYN: !history.isPinned,
+      });
+      await refreshHistories();
+    } catch (error) {
+      logWarn("[useChatRuntime] toggleHistoryBookmark 오류:", error);
+      throw error;
+    }
   }
 
   async function renameHistory(history, title) {
     const chatTitle = String(title || "").trim();
     if (!history?.id || !chatTitle) return;
-    await renameChatHistory({chatId: history.id, chatTitle});
-    await refreshHistories();
+    try {
+      await renameChatHistory({chatId: history.id, chatTitle});
+      await refreshHistories();
+    } catch (error) {
+      logWarn("[useChatRuntime] renameHistory 오류:", error);
+      throw error;
+    }
   }
 
   async function removeHistory(history) {
     if (!history?.id) return;
-    await deleteChatHistory({chatId: history.id});
-    delete chatStore.messageMap[history.id];
-    if (String(chatStore.selectedChatId) === String(history.id)) {
-      chatStore.clearActiveSession();
+    try {
+      await deleteChatHistory({chatId: history.id});
+      delete chatStore.messageMap[history.id];
+      if (String(chatStore.selectedChatId) === String(history.id)) {
+        chatStore.clearActiveSession();
+      }
+      await refreshHistories();
+    } catch (error) {
+      logWarn("[useChatRuntime] removeHistory 오류:", error);
+      throw error;
     }
-    await refreshHistories();
   }
 
   /**
@@ -206,21 +227,28 @@ export function useChatRuntime() {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   async function preloadExamplePrompts(assistantId) {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
-    const assistant = assistantStore.assistantMap[assistantId];
-    const prompts = await loadExamplePrompts({
-      assistantId,
-      studioYN: assistant?.type === "studio",
-    });
-    assistantStore.setExamplePrompts(assistantId, prompts);
+    try {
+      const assistant = assistantStore.assistantMap[assistantId];
+      const prompts = await loadExamplePrompts({
+        assistantId,
+        studioYN: assistant?.type === "studio",
+      });
+      assistantStore.setExamplePrompts(assistantId, prompts);
+    } catch (error) {
+      logWarn("[useChatRuntime] preloadExamplePrompts 오류:", error);
+    }
   }
 
   async function selectAssistant(id, {forNewChat = false} = {}) {
     if (!forNewChat && chatStore.isModelLocked) return;
-    assistantStore.selectAssistant(id);
-    if (forNewChat) chatStore.clearActiveSession();
-    await preloadExamplePrompts(id);
+    try {
+      assistantStore.selectAssistant(id);
+      if (forNewChat) chatStore.clearActiveSession();
+      await preloadExamplePrompts(id);
+    } catch (error) {
+      logWarn("[useChatRuntime] selectAssistant 오류:", error);
+    }
   }
 
   function selectAssistantForNewChat(id) {

@@ -172,6 +172,7 @@ import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList
 import ChatHistoryActionMenu from "@/components/navigation/parts/ChatHistoryActionMenu.vue";
 import SidebarUserFooter from "@/components/navigation/parts/SidebarUserFooter.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
+import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/useOutsideClick";
@@ -192,6 +193,7 @@ const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
 const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const platformStore = usePlatformStore();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
@@ -208,8 +210,13 @@ const {width} = useWindowSize();
 const isCompactViewport = computed(() => width.value <= MOBILE_BREAKPOINT_PX);
 
 function syncViewportMode() {
+  const platformInfo = platformStore.info || {};
   isMobileSheet.value = Boolean(
-    isCompactViewport.value || document.querySelector(".app-container--mobile")
+    isCompactViewport.value ||
+    platformInfo.isMobileBrowser ||
+    platformInfo.isAndroidApp ||
+    platformInfo.isIosApp ||
+    document.querySelector(".app-container--mobile")
   );
 }
 

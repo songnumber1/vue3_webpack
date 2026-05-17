@@ -37,11 +37,7 @@ function safeParseBySchema(schema, value, request, options) {
   return parsed.data;
 }
 
-export function validateBridgeRequest(
-  type,
-  payload,
-  contractMap = BridgeContract
-) {
+export function validateBridgeRequest(type, payload, contractMap = BridgeContract) {
   const contract = getContract(type, contractMap);
   const request = createBridgeRequest(payload);
 

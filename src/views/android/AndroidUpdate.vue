@@ -6,15 +6,11 @@
       <p class="exception-description">{{ message }}</p>
       <div class="exception-info-list">
         <div class="exception-info-item">
-          <span class="exception-info-label">{{
-            t("androidUpdate.currentVersion")
-          }}</span>
+          <span class="exception-info-label">{{ t("androidUpdate.currentVersion") }}</span>
           <strong class="exception-info-value">{{ currentVersion }}</strong>
         </div>
         <div class="exception-info-item">
-          <span class="exception-info-label">{{
-            t("androidUpdate.latestVersion")
-          }}</span>
+          <span class="exception-info-label">{{ t("androidUpdate.latestVersion") }}</span>
           <strong class="exception-info-value">{{ latestVersion }}</strong>
         </div>
       </div>
@@ -38,12 +34,8 @@ const {t} = useI18n();
 const versionInfo = computed(() => appInfo.lastVersionInfo || {});
 const currentVersion = computed(() => appInfo.appVersion || "unknown");
 const latestVersion = computed(() => versionInfo.value.version || "unknown");
-const title = computed(
-  () => versionInfo.value.title || t("androidUpdate.defaultTitle")
-);
-const message = computed(
-  () => versionInfo.value.message || t("androidUpdate.defaultMessage")
-);
+const title = computed(() => versionInfo.value.title || t("androidUpdate.defaultTitle"));
+const message = computed(() => versionInfo.value.message || t("androidUpdate.defaultMessage"));
 
 function requestUpdate() {
   if (typeof bridge?.openMarket === "function") {

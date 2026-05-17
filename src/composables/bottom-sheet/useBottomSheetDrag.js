@@ -14,15 +14,8 @@ import {BOTTOM_SHEET_SNAP_RATIO} from "@/constants/uiTokens";
  * @returns {object} startDrag/cleanupDrag 함수입니다.
  */
 export function createBottomSheetDrag(options) {
-  const {
-    props,
-    dragging,
-    currentHeight,
-    setHeight,
-    expand,
-    getViewportHeight,
-    emit,
-  } = options;
+  const {props, dragging, currentHeight, setHeight, expand, getViewportHeight, emit} =
+    options;
 
   let dragStartY = 0;
   let dragStartHeight = 0;

@@ -52,7 +52,7 @@ export const useAuthStore = defineStore("auth", {
       this.isAuthenticated = false;
       this.authFailureReason = "AUTH_ERROR";
       this.authErrorMessage =
-        error?.message || "로그인 확인 중 오류가 발생했습니다.";
+        error?.message || "[authStore] Login verification failed.";
     },
 
     resetAuth() {

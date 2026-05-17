@@ -24,14 +24,6 @@
       :is-generating="isGenerating"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
-      @update:selected-model="selectedModel = $event"
-      @submit="submitIfWritable"
-      @prompt-focus="handlePromptFocus"
-      @prompt-resize="handlePromptResize"
-      @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="
-        scrollBottom({force: true, behavior: 'smooth', stable: true})
-      "
     />
 
     <ChatImagePreview
@@ -119,7 +111,7 @@
 <script setup>
 import {provide} from "vue";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
-import {CHAT_ACTIONS_KEY} from "@/composables/chat/chatActionContext";
+import {CHAT_ACTIONS_KEY, WORKSPACE_ACTIONS_KEY} from "@/composables/chat/chatActionContext";
 import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -204,5 +196,14 @@ provide(CHAT_ACTIONS_KEY, {
   openPersonalization,
   openLanguage,
   openPlayground,
+});
+
+provide(WORKSPACE_ACTIONS_KEY, {
+  submit: submitIfWritable,
+  updateSelectedModel: (val) => { selectedModel.value = val; },
+  handlePromptFocus,
+  handlePromptResize,
+  handleMessageContentRendered,
+  scrollBottom: () => scrollBottom({force: true, behavior: "smooth", stable: true}),
 });
 </script>

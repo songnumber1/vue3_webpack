@@ -2,7 +2,7 @@
   <div
     v-if="attachments.length"
     class="attachment-preview-row"
-    aria-label="첨부 파일 목록"
+    :aria-label="t('chat.attachment.listLabel')"
   >
     <div
       v-for="file in attachments"
@@ -11,7 +11,7 @@
       :class="{'attachment-preview-card--image': file.kind === 'image'}"
       :role="file.kind === 'image' ? 'button' : undefined"
       :tabindex="file.kind === 'image' ? 0 : undefined"
-      :aria-label="file.kind === 'image' ? `${file.name} 미리보기` : undefined"
+      :aria-label="file.kind === 'image' ? t('chat.attachment.preview', {name: file.name}) : undefined"
       @click="emitPreview(file)"
       @keydown.enter.prevent="emitPreview(file)"
       @keydown.space.prevent="emitPreview(file)"
@@ -35,7 +35,7 @@
       <button
         type="button"
         class="attachment-preview-remove"
-        :aria-label="`${file.name} 제거`"
+        :aria-label="t('chat.attachment.remove', {name: file.name})"
         @pointerdown.stop
         @mousedown.stop
         @touchstart.stop
@@ -48,31 +48,22 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
 import {formatFileSize} from "@/utils/attachment";
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+
+const {t} = useI18n();
+
 defineProps({
   attachments: {type: Array, default: () => []},
 });
 
 const emit = defineEmits(["preview", "remove", "preview-error"]);
 
-/**
- * @description getPreviewUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} file - file 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function getPreviewUrl(file) {
-  // 계산된 결과를 호출부로 반환합니다.
   return file?.dataUrl || file?.previewUrl || file?.url || "";
 }
 
-/**
- * @description emitPreview 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} file - file 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function emitPreview(file) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (file?.kind !== "image") return;
   emit("preview", file);
 }

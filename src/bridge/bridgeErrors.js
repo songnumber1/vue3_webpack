@@ -1,12 +1,6 @@
 import {createErrorResponse} from "./bridgeResponses";
 
-export function createContractError(
-  request,
-  message,
-  code,
-  status = 400,
-  meta = {}
-) {
+export function createContractError(request, message, code, status = 400, meta = {}) {
   const errorResponse = createErrorResponse(request, message, code);
   errorResponse.meta = {
     ...errorResponse.meta,

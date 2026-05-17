@@ -19,14 +19,14 @@
         }"
         role="dialog"
         aria-modal="true"
-        :aria-label="title"
+        :aria-label="title || t('common.select')"
         :style="sheetStyle"
       >
         <div
           class="bottom-sheet-drag-area"
           role="button"
           tabindex="0"
-          aria-label="바텀시트 크기 조절"
+          :aria-label="t('common.resize')"
           @pointerdown="startDrag"
           @keydown.up.prevent="expand"
           @keydown.down.prevent="collapse"
@@ -36,11 +36,11 @@
         </div>
 
         <header class="bottom-sheet-header">
-          <h2>{{ title }}</h2>
+          <h2>{{ title || t('common.select') }}</h2>
           <button
             type="button"
             class="bottom-sheet-close"
-            aria-label="닫기"
+            :aria-label="t('common.close')"
             @click="emit('close')"
           >
             ×
@@ -56,12 +56,14 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
 import {useBottomSheetSizing} from "@/composables/useBottomSheetSizing";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+const {t} = useI18n();
+
 const props = defineProps({
   open: {type: Boolean, default: false},
-  title: {type: String, default: "선택"},
+  title: {type: String, default: ""},
   initialSnap: {type: String, default: "content"},
   minHeight: {type: Number, default: 260},
   maxRatio: {type: Number, default: 0.92},

@@ -2431,6 +2431,7 @@
   outline: none;
 }
 
+
 .context-menu-fade-enter-active,
 .context-menu-fade-leave-active {
   transition:
@@ -2445,7 +2446,8 @@
 }
 
 .chat-history-context-menu-shell {
-  z-index: 1200;
+  z-index: 1500;
+  isolation: isolate;
 }
 
 .chat-history-context-menu {

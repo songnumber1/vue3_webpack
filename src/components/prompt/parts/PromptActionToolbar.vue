@@ -6,7 +6,7 @@
           class="prompt-model-trigger"
           type="button"
           :disabled="disabled || modelReadonly"
-          :title="modelReadonly ? readonlyTitle : undefined"
+          :title="modelReadonly ? resolvedReadonlyTitle : undefined"
           :aria-label="modelSelectLabel"
           @click="$emit('open-model')"
         >
@@ -165,6 +165,9 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
 import {computed, ref} from "vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
@@ -196,8 +199,12 @@ const props = defineProps({
   attachLabel: {type: String, default: "Attach"},
   sendLabel: {type: String, default: "Send"},
   modelSelectLabel: {type: String, default: "Select model"},
-  readonlyTitle: {type: String, default: "대화방 모델은 변경할 수 없습니다."},
+  readonlyTitle: {type: String, default: ""},
 });
+
+const resolvedReadonlyTitle = computed(
+  () => props.readonlyTitle || t("prompt.modelReadonly")
+);
 
 defineEmits([
   "open-model",

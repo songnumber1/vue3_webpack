@@ -55,19 +55,15 @@ const {t} = useI18n();
 
 const titleText = computed(() => {
   if (props.title) return props.title;
-  if (props.variant === "deleted-model")
-    return t("chat.readonlyInput.deletedModelTitle");
-  if (props.variant === "unavailable-model")
-    return t("chat.readonlyInput.unavailableModelTitle");
+  if (props.variant === "deleted-model") return t("chat.readonlyInput.deletedModelTitle");
+  if (props.variant === "unavailable-model") return t("chat.readonlyInput.unavailableModelTitle");
   return t("chat.sharedReadonly");
 });
 
 const descriptionText = computed(() => {
   if (props.description) return props.description;
-  if (props.variant === "deleted-model")
-    return t("chat.readonlyInput.deletedModelDesc");
-  if (props.variant === "unavailable-model")
-    return t("chat.readonlyInput.unavailableModelDesc");
+  if (props.variant === "deleted-model") return t("chat.readonlyInput.deletedModelDesc");
+  if (props.variant === "unavailable-model") return t("chat.readonlyInput.unavailableModelDesc");
   return t("chat.readonlyInput.sharedDesc");
 });
 </script>

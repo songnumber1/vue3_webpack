@@ -7,8 +7,7 @@ export const messages = {
   ko: {
     app: {
       unsupportedTitle: "지원하지 않는 접속 환경입니다.",
-      unsupportedMessage:
-        "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
+      unsupportedMessage: "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
     },
     common: {
       back: "뒤로",
@@ -28,6 +27,8 @@ export const messages = {
       swagger: "Swagger 문서",
       settings: "설정",
       playground: "Playground",
+      resize: "크기 조절",
+      select: "선택",
     },
     feedback: {
       like: "좋아요",
@@ -71,11 +72,9 @@ export const messages = {
       sharedReadonly: "공유 받은 대화입니다.",
       readonlyInput: {
         deletedModelTitle: "삭제된 모델입니다.",
-        deletedModelDesc:
-          "이전 대화 내용은 확인할 수 있지만 새 메시지는 보낼 수 없습니다.",
+        deletedModelDesc: "이전 대화 내용은 확인할 수 있지만 새 메시지는 보낼 수 없습니다.",
         unavailableModelTitle: "사용할 수 없는 모델입니다.",
-        unavailableModelDesc:
-          "대화 이력은 열 수 있지만 모델 정보를 찾을 수 없어 새 메시지는 보낼 수 없습니다.",
+        unavailableModelDesc: "대화 이력은 열 수 있지만 모델 정보를 찾을 수 없어 새 메시지는 보낼 수 없습니다.",
         sharedDesc: "이 화면에서는 메시지를 입력하거나 전송할 수 없습니다.",
       },
       scrollBottom: "맨 아래로 이동",
@@ -105,7 +104,33 @@ export const messages = {
         selectedConversation: "선택한 대화방",
         deleteMessage: "'{title}'을(를) 삭제하시겠습니까?",
         shareSelected: "공유 버튼을 선택했습니다.",
+        titleField: "대화방 제목",
       },
+      imagePreview: {
+        loading: "이미지를 불러오는 중입니다...",
+        error: "이미지를 미리보기로 표시할 수 없습니다.",
+        close: "닫기",
+        enlarge: "{name} 크게 보기",
+      },
+      attachment: {
+        listLabel: "첨부 파일 목록",
+        preview: "{name} 미리보기",
+        remove: "{name} 제거",
+      },
+    },
+    prompt: {
+      modelSelect: "모델 선택",
+      attach: "첨부",
+      modelReadonly: "대화방 모델은 변경할 수 없습니다.",
+    },
+    swagger: {
+      goHome: "홈으로 이동",
+      home: "홈",
+      renderError: "Swagger 렌더링 오류",
+      renderErrorFallback: "Swagger UI를 렌더링하지 못했습니다.",
+    },
+    error: {
+      authCheck: "로그인 확인 중 오류가 발생했습니다.",
     },
     menu: {
       serviceMenu: "설정",
@@ -209,8 +234,7 @@ export const messages = {
   en: {
     app: {
       unsupportedTitle: "Unsupported access environment.",
-      unsupportedMessage:
-        "iOS app, iOS Chrome, and iOS Safari are not supported.",
+      unsupportedMessage: "iOS app, iOS Chrome, and iOS Safari are not supported.",
     },
     common: {
       back: "Back",
@@ -230,6 +254,8 @@ export const messages = {
       swagger: "Swagger Docs",
       settings: "Settings",
       playground: "Playground",
+      resize: "크기 조절",
+      select: "선택",
     },
     feedback: {
       like: "Like",
@@ -273,11 +299,9 @@ export const messages = {
       sharedReadonly: "This is a shared conversation.",
       readonlyInput: {
         deletedModelTitle: "This model has been deleted.",
-        deletedModelDesc:
-          "You can view this conversation, but you cannot send new messages.",
+        deletedModelDesc: "You can view this conversation, but you cannot send new messages.",
         unavailableModelTitle: "This model is unavailable.",
-        unavailableModelDesc:
-          "You can view this conversation, but model metadata is missing so new messages are blocked.",
+        unavailableModelDesc: "You can view this conversation, but model metadata is missing so new messages are blocked.",
         sharedDesc: "You cannot send messages from this screen.",
       },
       scrollBottom: "Scroll to bottom",
@@ -307,7 +331,33 @@ export const messages = {
         selectedConversation: "selected chat",
         deleteMessage: "Delete '{title}'?",
         shareSelected: "Share was selected.",
+        titleField: "Conversation title",
       },
+      imagePreview: {
+        loading: "Loading image...",
+        error: "Unable to display image preview.",
+        close: "Close",
+        enlarge: "Enlarge {name}",
+      },
+      attachment: {
+        listLabel: "Attached files",
+        preview: "Preview {name}",
+        remove: "Remove {name}",
+      },
+    },
+    prompt: {
+      modelSelect: "Select model",
+      attach: "Attach",
+      modelReadonly: "The model for this chat cannot be changed.",
+    },
+    swagger: {
+      goHome: "Go to home",
+      home: "Home",
+      renderError: "Swagger render error",
+      renderErrorFallback: "Failed to render Swagger UI.",
+    },
+    error: {
+      authCheck: "An error occurred while verifying login.",
     },
     menu: {
       serviceMenu: "Settings",
@@ -376,8 +426,7 @@ export const messages = {
     },
     notFound: {
       title: "Page not found.",
-      description:
-        "The requested page does not exist or the address has changed.",
+      description: "The requested page does not exist or the address has changed.",
       goHome: "Go home",
       goBack: "Previous page",
     },

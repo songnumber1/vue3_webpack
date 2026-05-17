@@ -1,9 +1,5 @@
 import {BRIDGE_CATEGORY} from "./bridgeConstants";
-import {
-  createBridgeRequest,
-  createIsoDate,
-  createRequestId,
-} from "./bridgeUtils";
+import {createBridgeRequest, createIsoDate, createRequestId} from "./bridgeUtils";
 
 export function createSuccessResponse(
   request,
@@ -59,11 +55,7 @@ export function normalizeBridgeResponse(response, request) {
   }
 
   if (!response) {
-    return createErrorResponse(
-      request,
-      "Empty bridge response",
-      "EMPTY_RESPONSE"
-    );
+    return createErrorResponse(request, "Empty bridge response", "EMPTY_RESPONSE");
   }
 
   if (typeof response.isSuccess === "boolean") {

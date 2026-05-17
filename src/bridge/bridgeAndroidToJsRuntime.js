@@ -24,10 +24,7 @@ export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
   }
 
   return Promise.reject(
-    createResponseError(
-      createNativeDispatchRequiredResponse(request, type),
-      501
-    )
+    createResponseError(createNativeDispatchRequiredResponse(request, type), 501)
   );
 }
 
@@ -96,7 +93,10 @@ export function createNativeEventHandler(type) {
     } catch (error) {
       return JSON.stringify(
         error?.response ||
-          createAndroidToJsFallbackError(parseNativePayload(payload), error)
+          createAndroidToJsFallbackError(
+            parseNativePayload(payload),
+            error
+          )
       );
     }
   };

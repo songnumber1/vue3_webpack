@@ -10,17 +10,17 @@
     <button
       type="button"
       class="image-preview-close"
-      aria-label="닫기"
+      :aria-label="t('chat.imagePreview.close')"
       @click.stop="$emit('close')"
     >
       ×
     </button>
     <div class="image-preview-stage" @click.stop>
       <div v-if="image.loading" class="image-preview-loading" role="status">
-        이미지를 불러오는 중입니다...
+        {{ t("chat.imagePreview.loading") }}
       </div>
       <div v-if="image.error" class="image-preview-error" role="alert">
-        이미지를 미리보기로 표시할 수 없습니다.
+        {{ t("chat.imagePreview.error") }}
       </div>
       <img
         v-if="image.url && !image.error"
@@ -37,6 +37,10 @@
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
+
+const {t} = useI18n();
+
 defineProps({
   image: {type: Object, default: null},
 });

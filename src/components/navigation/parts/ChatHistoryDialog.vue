@@ -9,7 +9,7 @@
     <div class="chat-history-dialog">
       <p v-if="message" class="chat-history-dialog__message">{{ message }}</p>
       <label v-if="mode === 'rename'" class="chat-history-dialog__field">
-        <span>대화방 제목</span>
+        <span>{{ t("chat.historyDialog.titleField") }}</span>
         <input
           v-model="draftTitle"
           class="chat-history-dialog__input"
@@ -25,10 +25,10 @@
           type="button"
           @click="$emit('cancel')"
         >
-          취소
+          {{ t("common.cancel") }}
         </button>
         <button class="playground-button" type="button" @click="confirm">
-          확인
+          {{ t("common.confirm") }}
         </button>
       </div>
     </div>
@@ -37,13 +37,16 @@
 
 <script setup>
 import {ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
+
+const {t} = useI18n();
 
 const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: false},
   mode: {type: String, default: "rename"},
-  title: {type: String, default: "확인"},
+  title: {type: String, default: ""},
   message: {type: String, default: ""},
   initialTitle: {type: String, default: ""},
 });
