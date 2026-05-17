@@ -1,7 +1,11 @@
 <template>
   <teleport to="body">
     <transition name="sheet-fade">
-      <div v-if="open" class="bottom-sheet-backdrop" @click="emit('close')"></div>
+      <div
+        v-if="open"
+        class="bottom-sheet-backdrop"
+        @click="emit('close')"
+      ></div>
     </transition>
 
     <transition name="sheet-slide">
@@ -52,18 +56,18 @@
 </template>
 
 <script setup>
-import {useBottomSheetSizing} from '@/composables/useBottomSheetSizing';
+import {useBottomSheetSizing} from "@/composables/useBottomSheetSizing";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   open: {type: Boolean, default: false},
-  title: {type: String, default: '선택'},
-  initialSnap: {type: String, default: 'content'},
+  title: {type: String, default: "선택"},
+  initialSnap: {type: String, default: "content"},
   minHeight: {type: Number, default: 260},
   maxRatio: {type: Number, default: 0.92},
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const {
   sheetRef,

@@ -86,7 +86,7 @@ import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {setAppLocale} from "@/i18n";
-import {useOutsideClick} from '@/composables/useOutsideClick';
+import {useOutsideClick} from "@/composables/useOutsideClick";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const emit = defineEmits(["notice", "personalization", "playground"]);
@@ -142,7 +142,6 @@ function selectLocale(value) {
   languageOpen.value = false;
 }
 
-
 useOutsideClick(
   () => menuRef.value,
   () => {
@@ -150,5 +149,4 @@ useOutsideClick(
     languageOpen.value = false;
   }
 );
-
 </script>

@@ -1,6 +1,6 @@
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   AUTH_FAILURE_REASONS,
   AUTH_MOCK_SCENARIOS,
   AUTH_MOCK_SCENARIO_STORAGE_KEY,

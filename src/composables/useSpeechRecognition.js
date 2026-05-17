@@ -27,7 +27,9 @@ function isAndroidFirefoxBrowser() {
  */
 function isSpeechRecognitionRuntimeSupported() {
   // 브라우저 생성자 지원 여부와 Firefox Android 제외 정책을 함께 확인합니다.
-  return Boolean(getSpeechRecognitionConstructor()) && !isAndroidFirefoxBrowser();
+  return (
+    Boolean(getSpeechRecognitionConstructor()) && !isAndroidFirefoxBrowser()
+  );
 }
 
 /**
@@ -132,8 +134,7 @@ export function useSpeechRecognition(options = {}) {
     if (!abortActive) return;
     try {
       current.abort();
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   /**

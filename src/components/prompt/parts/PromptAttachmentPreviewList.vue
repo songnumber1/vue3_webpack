@@ -1,5 +1,9 @@
 <template>
-  <div v-if="attachments.length" class="attachment-preview-row" aria-label="첨부 파일 목록">
+  <div
+    v-if="attachments.length"
+    class="attachment-preview-row"
+    aria-label="첨부 파일 목록"
+  >
     <div
       v-for="file in attachments"
       :key="file.id"
@@ -12,8 +16,16 @@
       @keydown.enter.prevent="emitPreview(file)"
       @keydown.space.prevent="emitPreview(file)"
     >
-      <div v-if="file.kind === 'image'" class="attachment-preview-thumb" aria-hidden="true">
-        <img :src="getPreviewUrl(file)" :alt="file.name" @error="$emit('preview-error', file)" />
+      <div
+        v-if="file.kind === 'image'"
+        class="attachment-preview-thumb"
+        aria-hidden="true"
+      >
+        <img
+          :src="getPreviewUrl(file)"
+          :alt="file.name"
+          @error="$emit('preview-error', file)"
+        />
       </div>
       <div v-else class="attachment-preview-file" aria-hidden="true">📄</div>
       <div class="attachment-preview-info">
@@ -36,13 +48,13 @@
 </template>
 
 <script setup>
-import {formatFileSize} from '@/utils/attachment';
+import {formatFileSize} from "@/utils/attachment";
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 defineProps({
   attachments: {type: Array, default: () => []},
 });
 
-const emit = defineEmits(['preview', 'remove', 'preview-error']);
+const emit = defineEmits(["preview", "remove", "preview-error"]);
 
 /**
  * @description getPreviewUrl 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -51,7 +63,7 @@ const emit = defineEmits(['preview', 'remove', 'preview-error']);
  */
 function getPreviewUrl(file) {
   // 계산된 결과를 호출부로 반환합니다.
-  return file?.dataUrl || file?.previewUrl || file?.url || '';
+  return file?.dataUrl || file?.previewUrl || file?.url || "";
 }
 
 /**
@@ -61,7 +73,7 @@ function getPreviewUrl(file) {
  */
 function emitPreview(file) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (file?.kind !== 'image') return;
-  emit('preview', file);
+  if (file?.kind !== "image") return;
+  emit("preview", file);
 }
 </script>

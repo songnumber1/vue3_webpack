@@ -41,10 +41,13 @@
 <script setup>
 defineProps({
   histories: {type: Array, default: () => []},
-  selectedChatId: {type: [String, Number], default: ''},
-  containerClass: {type: String, default: 'sidebar-history sidebar-history--main'},
-  itemClass: {type: String, default: 'sidebar-history-item'},
+  selectedChatId: {type: [String, Number], default: ""},
+  containerClass: {
+    type: String,
+    default: "sidebar-history sidebar-history--main",
+  },
+  itemClass: {type: String, default: "sidebar-history-item"},
 });
 
-defineEmits(['select', 'open-menu']);
+defineEmits(["select", "open-menu"]);
 </script>

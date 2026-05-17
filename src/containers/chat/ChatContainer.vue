@@ -47,7 +47,9 @@
       @prompt-focus="handlePromptFocus"
       @prompt-resize="handlePromptResize"
       @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="scrollBottom({force: true, behavior: 'smooth', stable: true})"
+      @scroll-bottom="
+        scrollBottom({force: true, behavior: 'smooth', stable: true})
+      "
     />
 
     <ChatImagePreview
@@ -84,7 +86,10 @@
       </template>
     </AppOverlayProvider>
 
-    <LanguageSheet :open="languageSheetOpen" @close="languageSheetOpen = false" />
+    <LanguageSheet
+      :open="languageSheetOpen"
+      @close="languageSheetOpen = false"
+    />
 
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
@@ -112,7 +117,13 @@
       <div class="chat-history-dialog">
         <p class="chat-history-dialog__message">{{ historyNoticeMessage }}</p>
         <div class="chat-history-dialog__actions">
-          <button class="playground-button" type="button" @click="historyNoticeOpen = false">확인</button>
+          <button
+            class="playground-button"
+            type="button"
+            @click="historyNoticeOpen = false"
+          >
+            확인
+          </button>
         </div>
       </div>
     </ResponsiveOverlay>
@@ -124,21 +135,21 @@
 </template>
 
 <script setup>
-import {useChatContainerController} from '@/composables/chat/useChatContainerController';
-import AssistantSheet from '@/components/assistant/AssistantSheet.vue';
-import ChatImagePreview from '@/components/chat/ChatImagePreview.vue';
-import ChatLayout from '@/components/chat/ChatLayout.vue';
-import ChatWorkspace from '@/components/chat/ChatWorkspace.vue';
-import LanguageSheet from '@/components/menu/LanguageSheet.vue';
-import AppOverlayProvider from '@/components/overlay/AppOverlayProvider.vue';
-import NoticeView from '@/views/settings/NoticeView.vue';
-import PersonalizationView from '@/views/settings/PersonalizationView.vue';
-import MobileSettingsPanel from '@/views/settings/MobileSettingsPanel.vue';
-import ChatHistoryDialog from '@/components/navigation/parts/ChatHistoryDialog.vue';
-import ResponsiveOverlay from '@/components/overlay/ResponsiveOverlay.vue';
+import {useChatContainerController} from "@/composables/chat/useChatContainerController";
+import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
+import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
+import ChatLayout from "@/components/chat/ChatLayout.vue";
+import ChatWorkspace from "@/components/chat/ChatWorkspace.vue";
+import LanguageSheet from "@/components/menu/LanguageSheet.vue";
+import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
+import NoticeView from "@/views/settings/NoticeView.vue";
+import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
+import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
+import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-const props = defineProps({mode: {type: String, default: 'main'}});
+const props = defineProps({mode: {type: String, default: "main"}});
 
 const {
   t,

@@ -74,8 +74,7 @@ function installCryptoRandomUuidFallback() {
       value: createUuidV4Fallback,
       configurable: true,
     });
-  } catch {
-  }
+  } catch {}
 }
 
 /**

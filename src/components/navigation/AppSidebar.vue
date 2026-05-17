@@ -1,6 +1,12 @@
 <template>
-  <aside class="desktop-sidebar" :class="{'desktop-sidebar--collapsed': sidebarCollapsed}">
-    <div v-if="!sidebarCollapsed" class="sidebar-content sidebar-content--assistant">
+  <aside
+    class="desktop-sidebar"
+    :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
+  >
+    <div
+      v-if="!sidebarCollapsed"
+      class="sidebar-content sidebar-content--assistant"
+    >
       <div class="sidebar-top">
         <SidebarAssistantSelector
           ref="assistantSelectorRef"
@@ -11,7 +17,13 @@
           @select="selectAssistant"
         />
         <div class="sidebar-top-actions">
-          <button class="sidebar-round" type="button" :title="t('chat.hideSidebar')" :aria-label="t('chat.hideSidebar')" @click="setSidebarCollapsed(true)">
+          <button
+            class="sidebar-round"
+            type="button"
+            :title="t('chat.hideSidebar')"
+            :aria-label="t('chat.hideSidebar')"
+            @click="setSidebarCollapsed(true)"
+          >
             ☰
           </button>
         </div>
@@ -19,14 +31,14 @@
 
       <nav class="quick-menu quick-menu--assistant">
         <button class="quick-item active" type="button" @click="handleNewChat">
-          <Icon name="pencil" />{{ t('chat.newChat') }}
+          <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
         <button class="quick-item" type="button">
-          <Icon name="search" />{{ t('chat.chatSearch') }}
+          <Icon name="search" />{{ t("chat.chatSearch") }}
         </button>
       </nav>
 
-      <div class="section-label">{{ t('chat.conversations') }}</div>
+      <div class="section-label">{{ t("chat.conversations") }}</div>
       <SidebarHistoryList
         :histories="histories"
         :selected-chat-id="selectedChatId"
@@ -48,12 +60,18 @@
   </aside>
 
   <transition name="drawer-fade">
-    <div v-if="drawerOpen" class="mobile-drawer-backdrop" @click="setDrawerOpen(false)"></div>
+    <div
+      v-if="drawerOpen"
+      class="mobile-drawer-backdrop"
+      @click="setDrawerOpen(false)"
+    ></div>
   </transition>
 
   <transition name="drawer-slide">
     <aside v-if="drawerOpen" class="mobile-drawer">
-      <div class="sidebar-content sidebar-content--mobile sidebar-content--assistant">
+      <div
+        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
+      >
         <div class="sidebar-top">
           <SidebarAssistantSelector
             :assistants="assistants"
@@ -62,22 +80,32 @@
             @toggle="openAssistantSelector"
           />
           <div class="sidebar-top-actions">
-            <button class="sidebar-round" type="button" :title="t('common.close')" :aria-label="t('common.close')" @click="setDrawerOpen(false)">
+            <button
+              class="sidebar-round"
+              type="button"
+              :title="t('common.close')"
+              :aria-label="t('common.close')"
+              @click="setDrawerOpen(false)"
+            >
               ×
             </button>
           </div>
         </div>
 
         <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
-          <button class="quick-item active" type="button" @click="handleNewChat">
-            <Icon name="pencil" />{{ t('chat.newChat') }}
+          <button
+            class="quick-item active"
+            type="button"
+            @click="handleNewChat"
+          >
+            <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
           <button class="quick-item" type="button">
-            <Icon name="search" />{{ t('chat.chatSearch') }}
+            <Icon name="search" />{{ t("chat.chatSearch") }}
           </button>
         </nav>
 
-        <div class="section-label">{{ t('chat.conversations') }}</div>
+        <div class="section-label">{{ t("chat.conversations") }}</div>
         <SidebarHistoryList
           :histories="histories"
           :selected-chat-id="selectedChatId"
@@ -95,7 +123,11 @@
     </aside>
   </transition>
 
-  <BaseBottomSheet :open="assistantMenuOpen && isMobileSheet" :title="t('chat.assistantSelect')" @close="assistantMenuOpen = false">
+  <BaseBottomSheet
+    :open="assistantMenuOpen && isMobileSheet"
+    :title="t('chat.assistantSelect')"
+    @close="assistantMenuOpen = false"
+  >
     <button
       v-for="assistant in assistants"
       :key="assistant.id"
@@ -108,7 +140,11 @@
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
-      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" aria-label="현재 선택된 값">
+      <span
+        v-if="assistant.id === selectedAssistantId"
+        class="bottom-sheet-selected-indicator"
+        aria-label="현재 선택된 값"
+      >
         <CheckIcon class="bottom-sheet-check" />
         <span class="sr-only">현재 선택된 값</span>
       </span>
@@ -127,38 +163,38 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from 'vue';
-import {storeToRefs} from 'pinia';
-import {useI18n} from 'vue-i18n';
-import {useEventListener, useWindowSize} from '@vueuse/core';
-import {MOBILE_BREAKPOINT_PX} from '@/constants/uiTokens';
-import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
-import Icon from '@/components/navigation/SidebarIcon.vue';
-import CollapsedSidebar from '@/components/navigation/parts/CollapsedSidebar.vue';
-import SidebarAssistantSelector from '@/components/navigation/parts/SidebarAssistantSelector.vue';
-import SidebarHistoryList from '@/components/navigation/parts/SidebarHistoryList.vue';
-import ChatHistoryActionMenu from '@/components/navigation/parts/ChatHistoryActionMenu.vue';
-import SidebarUserFooter from '@/components/navigation/parts/SidebarUserFooter.vue';
-import {useAssistantStore} from '@/stores/assistantStore';
-import {useChatStore} from '@/stores/chatStore';
-import {useNavigationStore} from '@/stores/navigationStore';
-import {useOutsideClick} from '@/composables/useOutsideClick';
+import {computed, ref, watch} from "vue";
+import {storeToRefs} from "pinia";
+import {useI18n} from "vue-i18n";
+import {useEventListener, useWindowSize} from "@vueuse/core";
+import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
+import Icon from "@/components/navigation/SidebarIcon.vue";
+import CollapsedSidebar from "@/components/navigation/parts/CollapsedSidebar.vue";
+import SidebarAssistantSelector from "@/components/navigation/parts/SidebarAssistantSelector.vue";
+import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList.vue";
+import ChatHistoryActionMenu from "@/components/navigation/parts/ChatHistoryActionMenu.vue";
+import SidebarUserFooter from "@/components/navigation/parts/SidebarUserFooter.vue";
+import {useAssistantStore} from "@/stores/assistantStore";
+import {useChatStore} from "@/stores/chatStore";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useOutsideClick} from "@/composables/useOutsideClick";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const emit = defineEmits([
-  'new-chat',
-  'select-history',
-  'history-menu-action',
-  'select-assistant',
-  'open-guide',
-  'open-notice',
-  'open-personalization',
-  'open-language',
-  'toggle-theme',
-  'open-swagger',
-  'open-playground',
-  'open-settings',
+  "new-chat",
+  "select-history",
+  "history-menu-action",
+  "select-assistant",
+  "open-guide",
+  "open-notice",
+  "open-personalization",
+  "open-language",
+  "toggle-theme",
+  "open-swagger",
+  "open-playground",
+  "open-settings",
 ]);
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
@@ -166,7 +202,8 @@ const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
-const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigationStore);
+const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} =
+  storeToRefs(navigationStore);
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
@@ -184,7 +221,7 @@ const isCompactViewport = computed(() => width.value <= MOBILE_BREAKPOINT_PX);
  */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
-    isCompactViewport.value || document.querySelector('.app-container--mobile')
+    isCompactViewport.value || document.querySelector(".app-container--mobile")
   );
 }
 
@@ -204,7 +241,7 @@ function openAssistantSelector() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function selectAssistant(id) {
-  emit('select-assistant', id);
+  emit("select-assistant", id);
   assistantMenuOpen.value = false;
 }
 
@@ -241,11 +278,10 @@ function setCollapsedRecentOpen(value) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function handleNewChat() {
-  emit('new-chat');
+  emit("new-chat");
   setDrawerOpen(false);
   setCollapsedRecentOpen(false);
 }
-
 
 /**
  * @description openHistoryMenu 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -279,7 +315,7 @@ function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
   if (!history || !action) return;
-  emit('history-menu-action', {action, history});
+  emit("history-menu-action", {action, history});
 }
 
 /**
@@ -288,7 +324,7 @@ function selectHistoryMenuAction(action) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function handleSelectHistory(item) {
-  emit('select-history', item);
+  emit("select-history", item);
   setDrawerOpen(false);
 }
 
@@ -298,7 +334,7 @@ function handleSelectHistory(item) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function handleSelectHistoryCollapsed(item) {
-  emit('select-history', item);
+  emit("select-history", item);
   setCollapsedRecentOpen(false);
 }
 
@@ -308,7 +344,7 @@ function handleSelectHistoryCollapsed(item) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function openSettings() {
-  emit('open-settings');
+  emit("open-settings");
 }
 
 /**
@@ -317,7 +353,7 @@ function openSettings() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function toggleTheme() {
-  emit('toggle-theme');
+  emit("toggle-theme");
 }
 
 /**
@@ -327,7 +363,7 @@ function toggleTheme() {
  */
 function openSwagger() {
   setDrawerOpen(false);
-  emit('open-swagger');
+  emit("open-swagger");
 }
 
 /**
@@ -337,12 +373,13 @@ function openSwagger() {
  */
 function openPlayground() {
   setDrawerOpen(false);
-  emit('open-playground');
+  emit("open-playground");
 }
 
-
 useOutsideClick(
-  () => assistantSelectorRef.value?.rootRef?.value || assistantSelectorRef.value?.rootRef,
+  () =>
+    assistantSelectorRef.value?.rootRef?.value ||
+    assistantSelectorRef.value?.rootRef,
   () => {
     assistantMenuOpen.value = false;
   },
@@ -357,5 +394,5 @@ useOutsideClick(
 
 syncViewportMode();
 watch(isCompactViewport, syncViewportMode);
-useEventListener(window, 'resize', syncViewportMode, {passive: true});
+useEventListener(window, "resize", syncViewportMode, {passive: true});
 </script>

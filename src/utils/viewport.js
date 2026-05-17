@@ -6,15 +6,16 @@ export const DEFAULT_MOBILE_BREAKPOINT_PX = 900;
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function getMobileBrowserFamily() {
-  const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  const userAgent =
+    typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/SamsungBrowser/i.test(userAgent)) return 'samsung';
+  if (/SamsungBrowser/i.test(userAgent)) return "samsung";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/Firefox/i.test(userAgent)) return 'firefox';
+  if (/Firefox/i.test(userAgent)) return "firefox";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return 'chrome';
+  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
   // 계산된 결과를 호출부로 반환합니다.
-  return 'default';
+  return "default";
 }
 
 /**
@@ -23,7 +24,8 @@ export function getMobileBrowserFamily() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function getViewportSize() {
-  const visualViewport = typeof window !== 'undefined' ? window.visualViewport : null;
+  const visualViewport =
+    typeof window !== "undefined" ? window.visualViewport : null;
   // 계산된 결과를 호출부로 반환합니다.
   return {
     width: Math.round(visualViewport?.width || window.innerWidth || 0),
@@ -41,7 +43,7 @@ export function getViewportSize() {
  */
 export function isMobileViewport(breakpoint = DEFAULT_MOBILE_BREAKPOINT_PX) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (typeof window === 'undefined') return false;
+  if (typeof window === "undefined") return false;
   const width = Math.min(
     window.visualViewport?.width || window.innerWidth || 0,
     window.innerWidth || window.visualViewport?.width || 0
@@ -57,11 +59,11 @@ export function isMobileViewport(breakpoint = DEFAULT_MOBILE_BREAKPOINT_PX) {
  */
 export function readRootPixelVar(name) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (typeof document === 'undefined') return 0;
+  if (typeof document === "undefined") return 0;
   const value = window
     .getComputedStyle(document.documentElement)
     .getPropertyValue(name);
-  const parsed = Number.parseFloat(value || '0');
+  const parsed = Number.parseFloat(value || "0");
   // 계산된 결과를 호출부로 반환합니다.
   return Number.isFinite(parsed) ? parsed : 0;
 }
@@ -73,20 +75,23 @@ export function readRootPixelVar(name) {
  */
 export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (typeof window === 'undefined') return fallback;
+  if (typeof window === "undefined") return fallback;
 
   const visualHeight = Math.round(window.visualViewport?.height || 0);
   const innerHeight = Math.round(window.innerHeight || 0);
   const clientHeight = Math.round(document.documentElement?.clientHeight || 0);
-  const appHeight = Math.round(readRootPixelVar('--app-height') || 0);
-  const candidates = [visualHeight, innerHeight, clientHeight, appHeight].filter(
-    (height) => Number.isFinite(height) && height >= minHeight
-  );
+  const appHeight = Math.round(readRootPixelVar("--app-height") || 0);
+  const candidates = [
+    visualHeight,
+    innerHeight,
+    clientHeight,
+    appHeight,
+  ].filter((height) => Number.isFinite(height) && height >= minHeight);
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!candidates.length) return fallback;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (isMobileViewport() && getMobileBrowserFamily() === 'firefox') {
+  if (isMobileViewport() && getMobileBrowserFamily() === "firefox") {
     // 계산된 결과를 호출부로 반환합니다.
     return Math.max(Math.min(...candidates), minHeight);
   }
@@ -106,10 +111,11 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
  */
 export function getSafeAreaBottom() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (typeof window === 'undefined' || typeof document === 'undefined') return 0;
-  const probe = document.createElement('div');
+  if (typeof window === "undefined" || typeof document === "undefined")
+    return 0;
+  const probe = document.createElement("div");
   probe.style.cssText =
-    'position:fixed;bottom:env(safe-area-inset-bottom);height:0;visibility:hidden;';
+    "position:fixed;bottom:env(safe-area-inset-bottom);height:0;visibility:hidden;";
   document.body.appendChild(probe);
   const value = Math.max(
     0,

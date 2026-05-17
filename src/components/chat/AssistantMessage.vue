@@ -16,17 +16,17 @@
 </template>
 
 <script setup>
-import {nextTick, onMounted, ref, watch} from 'vue';
-import {useI18n} from 'vue-i18n';
-import {renderMermaidInElement} from '@/utils/mermaidRenderer';
-import {useMarkdownMessageInteractions} from '@/composables/useMarkdownMessageInteractions';
-import MessageActions from './MessageActions.vue';
+import {nextTick, onMounted, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {useMarkdownMessageInteractions} from "@/composables/useMarkdownMessageInteractions";
+import MessageActions from "./MessageActions.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({message: {type: Object, required: true}});
 const {locale} = useI18n();
-const emit = defineEmits(['rendered']);
-const html = ref('<p></p>');
+const emit = defineEmits(["rendered"]);
+const html = ref("<p></p>");
 const contentRef = ref(null);
 const {handleMarkdownClick} = useMarkdownMessageInteractions(contentRef);
 let renderVersion = 0;
@@ -38,18 +38,16 @@ let renderVersion = 0;
  */
 async function renderContent() {
   const currentVersion = ++renderVersion;
-  const {renderMarkdown} = await import(
- '@/utils/markdown'
-  );
+  const {renderMarkdown} = await import("@/utils/markdown");
   const rendered = props.message.content
     ? await renderMarkdown(props.message.content)
-    : '';
+    : "";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (currentVersion !== renderVersion) return;
   html.value = rendered;
   await nextTick();
   await renderMermaidInElement(contentRef.value);
-  emit('rendered');
+  emit("rendered");
 }
 
 // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.

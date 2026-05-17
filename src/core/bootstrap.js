@@ -25,7 +25,6 @@ import {i18n} from "@/i18n";
 export async function bootstrap() {
   const appInfo = resolveAppConfig();
 
-
   const bridge = resolveBridge(appInfo);
   const storage = resolveStorage(appInfo, bridge);
   const theme = resolveTheme(storage);

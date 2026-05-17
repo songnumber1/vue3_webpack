@@ -1,5 +1,5 @@
-import {httpClient} from '@/api/clients/httpClient';
-import {API_ENDPOINTS} from '@/constants/apiEndpoints';
+import {httpClient} from "@/api/clients/httpClient";
+import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 async function getChatHistoryList() {
   const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST);
@@ -15,17 +15,26 @@ async function getChatHistoryDetail(payload = {}) {
 }
 
 async function updateBookmark(payload = {}) {
-  const response = await httpClient.post(API_ENDPOINTS.CHAT_HISTORY_BOOKMARK, payload);
+  const response = await httpClient.post(
+    API_ENDPOINTS.CHAT_HISTORY_BOOKMARK,
+    payload
+  );
   return response?.data || {};
 }
 
 async function renameChat(payload = {}) {
-  const response = await httpClient.post(API_ENDPOINTS.CHAT_HISTORY_RENAME, payload);
+  const response = await httpClient.post(
+    API_ENDPOINTS.CHAT_HISTORY_RENAME,
+    payload
+  );
   return response?.data || {};
 }
 
 async function deleteChat(payload = {}) {
-  const response = await httpClient.post(API_ENDPOINTS.CHAT_HISTORY_DELETE, payload);
+  const response = await httpClient.post(
+    API_ENDPOINTS.CHAT_HISTORY_DELETE,
+    payload
+  );
   return response?.data || {};
 }
 

@@ -2213,7 +2213,6 @@
   }
 }
 
-
 /* =========================================================
    FINAL MOBILE-ONLY ATTACHMENT PREVIEW COMPACT OVERRIDE
    - Applies only when AppContainer detects mobile mode.
@@ -2281,12 +2280,16 @@
 .app-container--mobile .attachment-preview-info,
 .app-container--mobile .attachment-preview-info strong,
 .app-container--mobile .attachment-preview-info span,
-.app-container--mobile .attachment-preview-card--image .attachment-preview-info {
+.app-container--mobile
+  .attachment-preview-card--image
+  .attachment-preview-info {
   display: none !important;
 }
 
 .app-container--mobile .attachment-preview-remove,
-.app-container--mobile .attachment-preview-card--image .attachment-preview-remove {
+.app-container--mobile
+  .attachment-preview-card--image
+  .attachment-preview-remove {
   top: var(--attachment-mobile-remove-offset) !important;
   right: var(--attachment-mobile-remove-offset) !important;
   width: var(--attachment-mobile-remove-size) !important;
@@ -2318,7 +2321,10 @@
   line-height: 1;
   cursor: pointer;
   flex: 0 0 auto;
-  transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+  transition:
+    transform 0.16s ease,
+    opacity 0.16s ease,
+    background 0.16s ease;
 }
 
 .prompt-box--gemini .voice-button svg,

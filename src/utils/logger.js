@@ -1,7 +1,7 @@
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 const isDebugEnabled =
-  typeof window !== 'undefined' &&
-  (window.localStorage?.getItem('DS_DEBUG') === 'true' ||
+  typeof window !== "undefined" &&
+  (window.localStorage?.getItem("DS_DEBUG") === "true" ||
     window.__DS_DEBUG__ === true);
 
 /**
@@ -13,7 +13,7 @@ function shouldLog(level) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!isProduction) return true;
   // 계산된 결과를 호출부로 반환합니다.
-  return isDebugEnabled && level !== 'debug';
+  return isDebugEnabled && level !== "debug";
 }
 
 /**
@@ -23,7 +23,7 @@ function shouldLog(level) {
  */
 export function logInfo(...args) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (shouldLog('info')) console.info(...args);
+  if (shouldLog("info")) console.info(...args);
 }
 
 /**
@@ -33,7 +33,7 @@ export function logInfo(...args) {
  */
 export function logWarn(...args) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (shouldLog('warn')) console.warn(...args);
+  if (shouldLog("warn")) console.warn(...args);
 }
 
 /**
@@ -43,7 +43,7 @@ export function logWarn(...args) {
  */
 export function logError(...args) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (shouldLog('error')) console.error(...args);
+  if (shouldLog("error")) console.error(...args);
 }
 
 /**
@@ -53,5 +53,5 @@ export function logError(...args) {
  */
 export function logDebug(...args) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (shouldLog('debug')) console.debug(...args);
+  if (shouldLog("debug")) console.debug(...args);
 }

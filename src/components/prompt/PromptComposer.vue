@@ -91,29 +91,29 @@
 </template>
 
 <script setup>
-import {usePromptComposer} from '@/composables/usePromptComposer';
-import PromptActionToolbar from '@/components/prompt/parts/PromptActionToolbar.vue';
-import PromptAttachmentPreviewList from '@/components/prompt/parts/PromptAttachmentPreviewList.vue';
-import PromptMobileSheets from '@/components/prompt/parts/PromptMobileSheets.vue';
-import PromptTextarea from '@/components/prompt/parts/PromptTextarea.vue';
+import {usePromptComposer} from "@/composables/usePromptComposer";
+import PromptActionToolbar from "@/components/prompt/parts/PromptActionToolbar.vue";
+import PromptAttachmentPreviewList from "@/components/prompt/parts/PromptAttachmentPreviewList.vue";
+import PromptMobileSheets from "@/components/prompt/parts/PromptMobileSheets.vue";
+import PromptTextarea from "@/components/prompt/parts/PromptTextarea.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   disabled: {type: Boolean, default: false},
   floating: {type: Boolean, default: false},
   showHelp: {type: Boolean, default: true},
-  placeholder: {type: String, default: ''},
-  modelValue: {type: String, default: 'gpt-5-thinking'},
+  placeholder: {type: String, default: ""},
+  modelValue: {type: String, default: "gpt-5-thinking"},
   models: {type: Array, default: () => []},
   modelReadonly: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
-  'submit',
-  'focus',
-  'blur',
-  'height-change',
-  'update:modelValue',
+  "submit",
+  "focus",
+  "blur",
+  "height-change",
+  "update:modelValue",
 ]);
 
 const {

@@ -1,18 +1,18 @@
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from 'vue';
-import {useEventListener, useMediaQuery} from '@vueuse/core';
-import {useI18n} from 'vue-i18n';
-import {usePlatformStore} from '@/stores/platformStore';
-import {openNativeFilePicker} from '@/services/platformBridge';
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {useEventListener, useMediaQuery} from "@vueuse/core";
+import {useI18n} from "vue-i18n";
+import {usePlatformStore} from "@/stores/platformStore";
+import {openNativeFilePicker} from "@/services/platformBridge";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   createBrowserAttachment,
   createNativeAttachment,
   hydrateImageAttachment,
   revokeAttachmentUrl,
-} from '@/utils/attachment';
-import {useOutsideClick} from '@/composables/useOutsideClick';
-import {useSpeechRecognition} from '@/composables/useSpeechRecognition';
-import {logWarn} from '@/utils/logger';
+} from "@/utils/attachment";
+import {useOutsideClick} from "@/composables/useOutsideClick";
+import {useSpeechRecognition} from "@/composables/useSpeechRecognition";
+import {logWarn} from "@/utils/logger";
 import {
   ANDROID_TO_JS_EVENT,
   ATTACH_MENU_OPTIONS,
@@ -25,7 +25,7 @@ import {
   PROMPT_TEXTAREA_HEIGHT,
   PROMPT_TOOL_DEFINITIONS,
   PROMPT_VIEWPORT_QUERY,
-} from '@/constants/promptComposer';
+} from "@/constants/promptComposer";
 
 /**
  * @description usePromptComposer 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -36,7 +36,7 @@ import {
 export function usePromptComposer(props, emit) {
   const {t} = useI18n();
   const platformStore = usePlatformStore();
-  const text = ref('');
+  const text = ref("");
   const textareaComponentRef = ref(null);
   const toolbarRef = ref(null);
   const fileInputRef = ref(null);
@@ -44,7 +44,7 @@ export function usePromptComposer(props, emit) {
   const attachMenuOpen = ref(false);
   const modelMenuOpen = ref(false);
   const toolMenuOpen = ref(false);
-  const fileAccept = ref('');
+  const fileAccept = ref("");
   const captureMode = ref(null);
   const isMobileSheet = ref(false);
   const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
@@ -121,7 +121,7 @@ export function usePromptComposer(props, emit) {
     const el = textareaRef.value;
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!el) return;
-    el.style.height = 'auto';
+    el.style.height = "auto";
     const maxHeight = window.matchMedia?.(PROMPT_VIEWPORT_QUERY)?.matches
       ? PROMPT_TEXTAREA_HEIGHT.mobileMax
       : PROMPT_TEXTAREA_HEIGHT.desktopMax;
@@ -130,11 +130,11 @@ export function usePromptComposer(props, emit) {
       maxHeight
     );
     el.style.height = `${nextHeight}px`;
-    el.style.overflowY = el.scrollHeight > maxHeight ? 'auto' : 'hidden';
+    el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (nextHeight !== lastHeight) {
       lastHeight = nextHeight;
-      emit('height-change', nextHeight);
+      emit("height-change", nextHeight);
     }
   }
 
@@ -144,7 +144,7 @@ export function usePromptComposer(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function handleFocus() {
-    emit('focus');
+    emit("focus");
     nextTick(resize);
   }
 
@@ -157,8 +157,8 @@ export function usePromptComposer(props, emit) {
     const value = text.value.trim();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if ((!value && attachments.value.length === 0) || props.disabled) return;
-    emit('submit', {text: value, attachments: attachments.value});
-    text.value = '';
+    emit("submit", {text: value, attachments: attachments.value});
+    text.value = "";
     attachments.value = [];
     speech.resetToMic();
     closeMenus();
@@ -170,7 +170,7 @@ export function usePromptComposer(props, emit) {
    * @param {*} except - except 입력값입니다.
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
-  function closeMenus(except = '') {
+  function closeMenus(except = "") {
     // 현재 열어야 하는 메뉴를 제외하고 나머지 메뉴 상태를 닫습니다.
     if (except !== PROMPT_MENU_TYPE.model) modelMenuOpen.value = false;
     if (except !== PROMPT_MENU_TYPE.tool) toolMenuOpen.value = false;
@@ -226,7 +226,8 @@ export function usePromptComposer(props, emit) {
    */
   function startVoiceInput() {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled || !isMicEnabled.value || !speech.isSupported.value) return;
+    if (props.disabled || !isMicEnabled.value || !speech.isSupported.value)
+      return;
     closeMenus();
     speech.start(text.value);
   }
@@ -250,7 +251,7 @@ export function usePromptComposer(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function selectModel(id) {
-    emit('update:modelValue', id);
+    emit("update:modelValue", id);
     modelMenuOpen.value = false;
   }
 
@@ -293,7 +294,10 @@ export function usePromptComposer(props, emit) {
         });
         return;
       } catch (error) {
-        logWarn('Android file picker failed. Falling back to web input.', error);
+        logWarn(
+          "Android file picker failed. Falling back to web input.",
+          error
+        );
       }
     }
 
@@ -303,11 +307,11 @@ export function usePromptComposer(props, emit) {
 
     fileAccept.value = option.accept;
     captureMode.value = option.capture;
-    input.setAttribute('accept', option.accept);
+    input.setAttribute("accept", option.accept);
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (option.capture) input.setAttribute('capture', option.capture);
-    else input.removeAttribute('capture');
-    input.value = '';
+    if (option.capture) input.setAttribute("capture", option.capture);
+    else input.removeAttribute("capture");
+    input.value = "";
     input.click();
   }
 
@@ -333,7 +337,7 @@ export function usePromptComposer(props, emit) {
    */
   function handleFileChange(event) {
     addFiles(event.target.files);
-    event.target.value = '';
+    event.target.value = "";
   }
 
   /**
@@ -360,7 +364,7 @@ export function usePromptComposer(props, emit) {
 
     attachments.value = [...attachments.value, ...mapped];
     mapped
-      .filter((file) => file.kind === 'image')
+      .filter((file) => file.kind === "image")
       .forEach((attachment) => {
         hydrateImageAttachment(attachment, (dataUrl) => {
           const target = attachments.value.find(
@@ -376,7 +380,7 @@ export function usePromptComposer(props, emit) {
 
     nextTick(() => {
       resize();
-      emit('height-change', lastHeight);
+      emit("height-change", lastHeight);
     });
   }
 
@@ -398,7 +402,7 @@ export function usePromptComposer(props, emit) {
   function previewImage(file) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!file) return;
-    const previewUrl = file.dataUrl || file.previewUrl || file.url || '';
+    const previewUrl = file.dataUrl || file.previewUrl || file.url || "";
     window.dispatchEvent(
       new CustomEvent(IMAGE_PREVIEW_EVENT, {
         detail: {...file, url: file.url || previewUrl, previewUrl},
@@ -420,17 +424,16 @@ export function usePromptComposer(props, emit) {
 
   useOutsideClick(
     [
-      () => getToolbarRoot('modelRoot'),
-      () => getToolbarRoot('toolRoot'),
-      () => getToolbarRoot('attachRoot'),
+      () => getToolbarRoot("modelRoot"),
+      () => getToolbarRoot("toolRoot"),
+      () => getToolbarRoot("attachRoot"),
     ],
     closeMenus,
     {shouldIgnore: () => isMobileSheet.value}
   );
 
-
   watch(isPromptCompactViewport, syncViewportMode);
-  useEventListener(window, 'resize', syncViewportMode, {passive: true});
+  useEventListener(window, "resize", syncViewportMode, {passive: true});
   useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.

@@ -2,7 +2,7 @@ import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   bootstrapChatRuntime,
   deleteChatHistory,
   loadChatHistoryList,
@@ -165,7 +165,6 @@ export function useChatRuntime() {
     }
   }
 
-
   async function refreshHistories() {
     const chatHistories = await loadChatHistoryList({
       assistantMap: assistantStore.assistantMap,
@@ -185,7 +184,7 @@ export function useChatRuntime() {
   }
 
   async function renameHistory(history, title) {
-    const chatTitle = String(title || '').trim();
+    const chatTitle = String(title || "").trim();
     if (!history?.id || !chatTitle) return;
     await renameChatHistory({chatId: history.id, chatTitle});
     await refreshHistories();

@@ -1,4 +1,4 @@
-import {useEventListener} from '@vueuse/core';
+import {useEventListener} from "@vueuse/core";
 
 /**
  * @description root getter/ref를 실제 DOM element로 변환합니다.
@@ -6,7 +6,7 @@ import {useEventListener} from '@vueuse/core';
  * @returns {*} 실제 DOM element를 반환합니다.
  */
 function unwrapRoot(root) {
-  const value = typeof root === 'function' ? root() : root;
+  const value = typeof root === "function" ? root() : root;
   return value?.value || value;
 }
 
@@ -29,5 +29,5 @@ export function useOutsideClick(roots, callback, options = {}) {
     callback(event);
   }
 
-  return useEventListener(document, 'click', handleClick);
+  return useEventListener(document, "click", handleClick);
 }

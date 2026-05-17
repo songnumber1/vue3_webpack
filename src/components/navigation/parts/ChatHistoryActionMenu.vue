@@ -48,10 +48,10 @@
 </template>
 
 <script setup>
-import {computed, nextTick, ref, watch} from 'vue';
-import {useI18n} from 'vue-i18n';
-import {autoUpdate, flip, offset, shift, useFloating} from '@floating-ui/vue';
-import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
+import {computed, nextTick, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
+import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -60,33 +60,40 @@ const props = defineProps({
   referenceEl: {type: Object, default: null},
 });
 
-defineEmits(['close', 'select']);
+defineEmits(["close", "select"]);
 const {t} = useI18n();
 const menuRef = ref(null);
 const referenceRef = computed(() => props.referenceEl || null);
 
 const {floatingStyles, update} = useFloating(referenceRef, menuRef, {
-  placement: 'right-start',
+  placement: "right-start",
   whileElementsMounted: autoUpdate,
   middleware: [
     offset(8),
-    flip({fallbackPlacements: ['left-start', 'bottom-end']}),
+    flip({fallbackPlacements: ["left-start", "bottom-end"]}),
     shift({padding: 12}),
   ],
 });
 
 const mobileOpen = computed(() => props.open && props.isMobile);
 const desktopOpen = computed(() => props.open && !props.isMobile);
-const targetTitle = computed(() => props.target?.title || t('chat.historyMenu.title'));
+const targetTitle = computed(
+  () => props.target?.title || t("chat.historyMenu.title")
+);
 const actions = computed(() => {
   const pinAction = props.target?.isPinned
-    ? {key: 'unpin', label: t('chat.historyMenu.unpin'), icon: '☆'}
-    : {key: 'pin', label: t('chat.historyMenu.pin'), icon: '★'};
+    ? {key: "unpin", label: t("chat.historyMenu.unpin"), icon: "☆"}
+    : {key: "pin", label: t("chat.historyMenu.pin"), icon: "★"};
   return [
     pinAction,
-    {key: 'rename', label: t('chat.historyMenu.rename'), icon: '✎'},
-    {key: 'share', label: t('chat.historyMenu.share'), icon: '↗'},
-    {key: 'delete', label: t('chat.historyMenu.delete'), icon: '🗑', danger: true},
+    {key: "rename", label: t("chat.historyMenu.rename"), icon: "✎"},
+    {key: "share", label: t("chat.historyMenu.share"), icon: "↗"},
+    {
+      key: "delete",
+      label: t("chat.historyMenu.delete"),
+      icon: "🗑",
+      danger: true,
+    },
   ];
 });
 
@@ -97,7 +104,7 @@ watch(
     await nextTick();
     update?.();
   },
-  {flush: 'post'}
+  {flush: "post"}
 );
 
 defineExpose({menuRef});

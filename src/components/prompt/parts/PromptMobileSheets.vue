@@ -1,5 +1,9 @@
 <template>
-  <BaseBottomSheet :open="modelOpen" :title="modelTitle" @close="$emit('close-model')">
+  <BaseBottomSheet
+    :open="modelOpen"
+    :title="modelTitle"
+    @close="$emit('close-model')"
+  >
     <button
       v-for="model in models"
       :key="model.id"
@@ -16,7 +20,11 @@
     </button>
   </BaseBottomSheet>
 
-  <BaseBottomSheet :open="toolOpen" :title="toolTitle" @close="$emit('close-tool')">
+  <BaseBottomSheet
+    :open="toolOpen"
+    :title="toolTitle"
+    @close="$emit('close-tool')"
+  >
     <button
       v-for="tool in tools"
       :key="tool.id"
@@ -29,7 +37,11 @@
     </button>
   </BaseBottomSheet>
 
-  <BaseBottomSheet :open="attachOpen" :title="attachTitle" @close="$emit('close-attach')">
+  <BaseBottomSheet
+    :open="attachOpen"
+    :title="attachTitle"
+    @close="$emit('close-attach')"
+  >
     <button
       v-for="option in attachOptions"
       :key="option.id"
@@ -37,14 +49,15 @@
       type="button"
       @click="$emit('open-file-picker', option.id)"
     >
-      <span aria-hidden="true">{{ option.icon }}</span><strong>{{ option.label }}</strong>
+      <span aria-hidden="true">{{ option.icon }}</span
+      ><strong>{{ option.label }}</strong>
     </button>
   </BaseBottomSheet>
 </template>
 
 <script setup>
-import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 defineProps({
@@ -54,18 +67,18 @@ defineProps({
   models: {type: Array, default: () => []},
   tools: {type: Array, default: () => []},
   attachOptions: {type: Array, default: () => []},
-  modelValue: {type: String, default: ''},
-  toolTitle: {type: String, default: 'Tools'},
-  modelTitle: {type: String, default: '모델 선택'},
-  attachTitle: {type: String, default: '첨부'},
+  modelValue: {type: String, default: ""},
+  toolTitle: {type: String, default: "Tools"},
+  modelTitle: {type: String, default: "모델 선택"},
+  attachTitle: {type: String, default: "첨부"},
 });
 
 defineEmits([
-  'close-model',
-  'close-tool',
-  'close-attach',
-  'select-model',
-  'apply-tool',
-  'open-file-picker',
+  "close-model",
+  "close-tool",
+  "close-attach",
+  "select-model",
+  "apply-tool",
+  "open-file-picker",
 ]);
 </script>

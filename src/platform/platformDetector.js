@@ -1,5 +1,5 @@
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   RUN_ENV,
   PLATFORM,
   hasAndroidBridge,
@@ -154,7 +154,11 @@ function getBridgeVersionFromBridge() {
  * @param {string} value.browserName - User-Agent로 판별한 브라우저 이름입니다.
  * @returns {boolean} Android Chrome 또는 Samsung Internet 모바일 브라우저이면 true를 반환합니다.
  */
-function isSupportedMobileMicBrowser({isAndroid, isMobileBrowser, browserName}) {
+function isSupportedMobileMicBrowser({
+  isAndroid,
+  isMobileBrowser,
+  browserName,
+}) {
   // Android 모바일 브라우저가 아니면 PC와 동일하게 전송 버튼 fallback을 사용합니다.
   if (!isAndroid || !isMobileBrowser) return false;
 

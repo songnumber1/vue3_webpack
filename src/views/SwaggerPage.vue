@@ -54,7 +54,7 @@ import {RouterLink} from "vue-router";
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
 import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
 } from "@/bridge/swaggerRuntime";
@@ -92,8 +92,12 @@ const renderSwagger = async () => {
   try {
     installWebViewCompat();
     const [{default: SwaggerUI}] = await Promise.all([
-      import(/* webpackChunkName: "swagger-ui-runtime" */ "swagger-ui-dist/swagger-ui-es-bundle"),
-      import(/* webpackChunkName: "swagger-ui-style" */ "swagger-ui-dist/swagger-ui.css"),
+      import(
+        /* webpackChunkName: "swagger-ui-runtime" */ "swagger-ui-dist/swagger-ui-es-bundle"
+      ),
+      import(
+        /* webpackChunkName: "swagger-ui-style" */ "swagger-ui-dist/swagger-ui.css"
+      ),
     ]);
     const spec = generateOpenApi(selectedCategory.value);
 
@@ -143,8 +147,7 @@ onBeforeUnmount(() => {
     // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       swaggerInstance.getSystem().specActions.updateSpec("");
-    } catch {
-    }
+    } catch {}
   }
   swaggerInstance = null;
   clearSwaggerRoot();

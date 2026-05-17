@@ -1,7 +1,7 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   MOBILE_BREAKPOINT_PX,
@@ -209,7 +209,7 @@ export function useViewportGuard(options = {}) {
     apply();
     const browserFamily = getMobileBrowserFamily();
     const delay =
-      browserFamily === 'samsung'
+      browserFamily === "samsung"
         ? VIEWPORT_GUARD_DELAY_MS.samsung
         : VIEWPORT_GUARD_DELAY_MS.default;
     resizeTimer = window.setTimeout(apply, delay);
@@ -223,7 +223,7 @@ export function useViewportGuard(options = {}) {
   function handleWindowResize() {
     const browserFamily = getMobileBrowserFamily();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (browserFamily === 'firefox') {
+    if (browserFamily === "firefox") {
       scheduleApply();
     }
   }
@@ -232,8 +232,12 @@ export function useViewportGuard(options = {}) {
   useEventListener(window, "resize", handleWindowResize, {passive: true});
   useEventListener(window, "orientationchange", scheduleApply, {passive: true});
   if (typeof window !== "undefined" && window.visualViewport) {
-    useEventListener(window.visualViewport, "resize", scheduleApply, {passive: true});
-    useEventListener(window.visualViewport, "scroll", scheduleApply, {passive: true});
+    useEventListener(window.visualViewport, "resize", scheduleApply, {
+      passive: true,
+    });
+    useEventListener(window.visualViewport, "scroll", scheduleApply, {
+      passive: true,
+    });
   }
   useEventListener(document, "focusin", scheduleApply, {passive: true});
   useEventListener(document, "focusout", scheduleApply, {passive: true});

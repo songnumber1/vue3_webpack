@@ -6,7 +6,7 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   ENABLE_AUTH_GUARD,
   ENABLE_AUTH_GUARD_DEBUG,
   AUTH_FAILURE_REASONS,
@@ -46,10 +46,7 @@ const SharedPage = () =>
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
-const PlaygroundPage = () =>
-  import(
- "@/views/playground/PlaygroundPage.vue"
-  );
+const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
 /**
  * @description NotFoundPage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
@@ -62,19 +59,13 @@ const NotFoundPage = () =>
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
-const LoginRequiredPage = () =>
-  import(
- "@/views/LoginRequiredPage.vue"
-  );
+const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
 /**
  * @description AndroidUpdate 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
-const AndroidUpdate = () =>
-  import(
- "@/views/android/AndroidUpdate.vue"
-  );
+const AndroidUpdate = () => import("@/views/android/AndroidUpdate.vue");
 
 const ANDROID_UPDATE_ROUTE_NAME = "android-update";
 const LOGIN_REQUIRED_ROUTE_NAME = "login-required";

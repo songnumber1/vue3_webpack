@@ -1,17 +1,17 @@
-import {computed, nextTick, onBeforeUnmount, ref, watch} from 'vue';
-import {useEventListener, useScrollLock} from '@vueuse/core';
+import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
+import {useEventListener, useScrollLock} from "@vueuse/core";
 import {
   BOTTOM_SHEET_SNAP_RATIO,
   BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
   MOBILE_BREAKPOINT_PX,
-} from '@/constants/uiTokens';
+} from "@/constants/uiTokens";
 import {
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   getMobileBrowserFamily,
   getSafeAreaBottom,
   getViewportHeight as readViewportHeight,
   isMobileViewport as readIsMobileViewport,
-} from '@/utils/viewport';
+} from "@/utils/viewport";
 
 const MIN_VISIBLE_OPTION_COUNT = 3;
 const DEFAULT_OPTION_HEIGHT_PX = 58;
@@ -28,12 +28,12 @@ export function useBottomSheetSizing(props, emit) {
   const bodyRef = ref(null);
   const dragging = ref(false);
   const currentHeight = ref(320);
-  const currentSnap = ref('content');
+  const currentSnap = ref("content");
 
   let dragStartY = 0;
   let dragStartHeight = 0;
   const bodyScrollLocked =
-    typeof document === 'undefined' ? ref(false) : useScrollLock(document.body);
+    typeof document === "undefined" ? ref(false) : useScrollLock(document.body);
   let viewportTimer = null;
   let measureRaf = 0;
   let stopPointerMove = null;
@@ -44,7 +44,7 @@ export function useBottomSheetSizing(props, emit) {
   let stopVisualViewportScroll = null;
 
   const sheetStyle = computed(() => ({
-    '--bottom-sheet-height': `${Math.round(currentHeight.value)}px`,
+    "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
   }));
 
   /**
@@ -77,10 +77,10 @@ export function useBottomSheetSizing(props, emit) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!sheet) return DEFAULT_SHEET_CHROME_HEIGHT_PX;
 
-    const dragArea = sheet.querySelector('.bottom-sheet-drag-area');
-    const header = sheet.querySelector('.bottom-sheet-header');
+    const dragArea = sheet.querySelector(".bottom-sheet-drag-area");
+    const header = sheet.querySelector(".bottom-sheet-header");
     const style = window.getComputedStyle(sheet);
-    const paddingBottom = Number.parseFloat(style.paddingBottom || '0') || 0;
+    const paddingBottom = Number.parseFloat(style.paddingBottom || "0") || 0;
 
     // 계산된 결과를 호출부로 반환합니다.
     return Math.ceil(
@@ -99,7 +99,7 @@ export function useBottomSheetSizing(props, emit) {
   function getMinimumVisibleBodyHeight() {
     const body = bodyRef.value;
     const options = Array.from(
-      body?.querySelectorAll?.('.bottom-sheet-option') || []
+      body?.querySelectorAll?.(".bottom-sheet-option") || []
     );
 
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
@@ -141,8 +141,8 @@ export function useBottomSheetSizing(props, emit) {
     }, 0);
 
     const style = window.getComputedStyle(body);
-    const paddingTop = Number.parseFloat(style.paddingTop || '0') || 0;
-    const paddingBottom = Number.parseFloat(style.paddingBottom || '0') || 0;
+    const paddingTop = Number.parseFloat(style.paddingTop || "0") || 0;
+    const paddingBottom = Number.parseFloat(style.paddingBottom || "0") || 0;
 
     // 계산된 결과를 호출부로 반환합니다.
     return Math.ceil(contentHeight + paddingTop + paddingBottom);
@@ -198,14 +198,15 @@ export function useBottomSheetSizing(props, emit) {
   function getInitialHeight() {
     const viewportHeight = getViewportHeight();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.initialSnap === 'full') return viewportHeight * props.maxRatio;
+    if (props.initialSnap === "full") return viewportHeight * props.maxRatio;
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.initialSnap === 'half') return viewportHeight * BOTTOM_SHEET_SNAP_RATIO.half;
+    if (props.initialSnap === "half")
+      return viewportHeight * BOTTOM_SHEET_SNAP_RATIO.half;
 
     const minimumSheetHeight = getMinimumSheetHeight();
     const contentHeight = getContentHeight();
     const contentSnapRatio =
-      isMobileViewport() && getMobileBrowserFamily() === 'firefox'
+      isMobileViewport() && getMobileBrowserFamily() === "firefox"
         ? BOTTOM_SHEET_SNAP_RATIO.contentFirefox
         : BOTTOM_SHEET_SNAP_RATIO.contentDefault;
 
@@ -222,11 +223,12 @@ export function useBottomSheetSizing(props, emit) {
    * @param {*} snap - snap 입력값입니다.
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
-  function setHeight(height, snap = 'custom') {
+  function setHeight(height, snap = "custom") {
     currentHeight.value = clampHeight(height);
     currentSnap.value =
-      currentHeight.value >= getViewportHeight() * BOTTOM_SHEET_SNAP_RATIO.fullThreshold
-        ? 'full'
+      currentHeight.value >=
+      getViewportHeight() * BOTTOM_SHEET_SNAP_RATIO.fullThreshold
+        ? "full"
         : snap;
   }
 
@@ -236,7 +238,7 @@ export function useBottomSheetSizing(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function expand() {
-    setHeight(getViewportHeight() * props.maxRatio, 'full');
+    setHeight(getViewportHeight() * props.maxRatio, "full");
   }
 
   /**
@@ -245,7 +247,7 @@ export function useBottomSheetSizing(props, emit) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function collapse() {
-    setHeight(props.minHeight, 'min');
+    setHeight(props.minHeight, "min");
   }
 
   /**
@@ -296,14 +298,20 @@ export function useBottomSheetSizing(props, emit) {
    */
   function startDrag(event) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!event.isPrimary && event.pointerType !== 'mouse') return;
+    if (!event.isPrimary && event.pointerType !== "mouse") return;
     dragging.value = true;
     dragStartY = event.clientY;
     dragStartHeight = currentHeight.value;
     event.currentTarget?.setPointerCapture?.(event.pointerId);
-    stopPointerMove = useEventListener(window, 'pointermove', handleDrag, {passive: false});
-    stopPointerUp = useEventListener(window, 'pointerup', stopDrag, {passive: true});
-    stopPointerCancel = useEventListener(window, 'pointercancel', stopDrag, {passive: true});
+    stopPointerMove = useEventListener(window, "pointermove", handleDrag, {
+      passive: false,
+    });
+    stopPointerUp = useEventListener(window, "pointerup", stopDrag, {
+      passive: true,
+    });
+    stopPointerCancel = useEventListener(window, "pointercancel", stopDrag, {
+      passive: true,
+    });
   }
 
   /**
@@ -337,8 +345,16 @@ export function useBottomSheetSizing(props, emit) {
 
     const viewportHeight = getViewportHeight();
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (currentHeight.value > viewportHeight * BOTTOM_SHEET_SNAP_RATIO.expandThreshold) expand();
-    else if (currentHeight.value < props.minHeight * BOTTOM_SHEET_SNAP_RATIO.closeThreshold) emit('close');
+    if (
+      currentHeight.value >
+      viewportHeight * BOTTOM_SHEET_SNAP_RATIO.expandThreshold
+    )
+      expand();
+    else if (
+      currentHeight.value <
+      props.minHeight * BOTTOM_SHEET_SNAP_RATIO.closeThreshold
+    )
+      emit("close");
   }
 
   /**
@@ -361,19 +377,24 @@ export function useBottomSheetSizing(props, emit) {
    */
   function registerViewportListeners() {
     if (stopViewportResize) return;
-    stopViewportResize = useEventListener(window, 'resize', scheduleViewportRefresh, {
-      passive: true,
-    });
+    stopViewportResize = useEventListener(
+      window,
+      "resize",
+      scheduleViewportRefresh,
+      {
+        passive: true,
+      }
+    );
     if (window.visualViewport) {
       stopVisualViewportResize = useEventListener(
         window.visualViewport,
-        'resize',
+        "resize",
         scheduleViewportRefresh,
         {passive: true}
       );
       stopVisualViewportScroll = useEventListener(
         window.visualViewport,
-        'scroll',
+        "scroll",
         scheduleViewportRefresh,
         {passive: true}
       );

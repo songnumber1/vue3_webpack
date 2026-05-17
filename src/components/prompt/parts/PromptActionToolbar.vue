@@ -22,7 +22,10 @@
             />
           </svg>
         </button>
-        <div v-if="modelMenuOpen && !isMobileSheet" class="prompt-popover model-menu prompt-model-menu">
+        <div
+          v-if="modelMenuOpen && !isMobileSheet"
+          class="prompt-popover model-menu prompt-model-menu"
+        >
           <button
             v-for="model in models"
             :key="model.id"
@@ -51,8 +54,16 @@
         >
           ＋
         </button>
-        <div v-if="toolMenuOpen && !isMobileSheet" class="prompt-popover prompt-tool-menu">
-          <button v-for="tool in tools" :key="tool.id" type="button" @click="$emit('apply-tool', tool)">
+        <div
+          v-if="toolMenuOpen && !isMobileSheet"
+          class="prompt-popover prompt-tool-menu"
+        >
+          <button
+            v-for="tool in tools"
+            :key="tool.id"
+            type="button"
+            @click="$emit('apply-tool', tool)"
+          >
             <span aria-hidden="true">{{ tool.icon }}</span>
             <p>{{ tool.label }}</p>
           </button>
@@ -80,7 +91,11 @@
             />
           </svg>
         </button>
-        <div v-if="attachMenuOpen && !isMobileSheet" class="prompt-popover attach-menu" role="menu">
+        <div
+          v-if="attachMenuOpen && !isMobileSheet"
+          class="prompt-popover attach-menu"
+          role="menu"
+        >
           <button
             v-for="option in attachOptions"
             :key="option.id"
@@ -150,8 +165,8 @@
 </template>
 
 <script setup>
-import {computed, ref} from 'vue';
-import CheckIcon from '@/components/icons/CheckIcon.vue';
+import {computed, ref} from "vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const modelRoot = ref(null);
@@ -161,7 +176,7 @@ const attachRoot = ref(null);
 const props = defineProps({
   disabled: {type: Boolean, default: false},
   modelReadonly: {type: Boolean, default: false},
-  modelValue: {type: String, default: ''},
+  modelValue: {type: String, default: ""},
   currentModel: {type: Object, required: true},
   models: {type: Array, default: () => []},
   tools: {type: Array, default: () => []},
@@ -176,23 +191,23 @@ const props = defineProps({
   isVoiceListening: {type: Boolean, default: false},
   hasVoiceStopped: {type: Boolean, default: false},
   isSpeechSupported: {type: Boolean, default: true},
-  voiceStartLabel: {type: String, default: 'Start voice input'},
-  voiceStopLabel: {type: String, default: 'Stop voice input'},
-  attachLabel: {type: String, default: 'Attach'},
-  sendLabel: {type: String, default: 'Send'},
-  modelSelectLabel: {type: String, default: 'Select model'},
-  readonlyTitle: {type: String, default: '대화방 모델은 변경할 수 없습니다.'},
+  voiceStartLabel: {type: String, default: "Start voice input"},
+  voiceStopLabel: {type: String, default: "Stop voice input"},
+  attachLabel: {type: String, default: "Attach"},
+  sendLabel: {type: String, default: "Send"},
+  modelSelectLabel: {type: String, default: "Select model"},
+  readonlyTitle: {type: String, default: "대화방 모델은 변경할 수 없습니다."},
 });
 
 defineEmits([
-  'open-model',
-  'open-tool',
-  'open-attach',
-  'select-model',
-  'apply-tool',
-  'open-file-picker',
-  'start-voice',
-  'stop-voice',
+  "open-model",
+  "open-tool",
+  "open-attach",
+  "select-model",
+  "apply-tool",
+  "open-file-picker",
+  "start-voice",
+  "stop-voice",
 ]);
 
 const showVoiceStartButton = computed(
