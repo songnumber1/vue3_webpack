@@ -174,6 +174,11 @@ const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuPosition = ref({top: 0, left: 0});
 
+const HISTORY_MENU_WIDTH_PX = 208;
+const HISTORY_MENU_HEIGHT_PX = 196;
+const HISTORY_MENU_GAP_PX = 8;
+const VIEWPORT_PADDING_PX = 12;
+
 /**
  * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
@@ -254,13 +259,41 @@ function openHistoryMenu(payload = {}) {
   const {item, event} = payload;
   syncViewportMode();
   historyMenuTarget.value = item || null;
-  const rect = event?.currentTarget?.getBoundingClientRect?.();
-  const menuWidth = 192;
-  historyMenuPosition.value = {
-    top: Math.min((rect?.bottom || 0) + 6, window.innerHeight - 220),
-    left: Math.max(12, Math.min((rect?.right || 0) - menuWidth, window.innerWidth - menuWidth - 12)),
-  };
+  historyMenuPosition.value = getHistoryMenuPosition(event?.currentTarget);
   historyMenuOpen.value = true;
+}
+
+/**
+ * @description 대화방 메뉴는 기본적으로 메뉴 버튼의 오른쪽에 띄우고, 화면 밖으로 나갈 때만 왼쪽 또는 화면 안쪽으로 보정합니다.
+ * @param {HTMLElement|null} triggerElement - 메뉴 버튼 요소입니다.
+ * @returns {{top: number, left: number}} fixed 레이어 좌표입니다.
+ */
+function getHistoryMenuPosition(triggerElement) {
+  const rect = triggerElement?.getBoundingClientRect?.();
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+  if (!rect) {
+    return {top: VIEWPORT_PADDING_PX, left: VIEWPORT_PADDING_PX};
+  }
+
+  const preferredLeft = rect.right + HISTORY_MENU_GAP_PX;
+  const fallbackLeft = rect.left - HISTORY_MENU_WIDTH_PX - HISTORY_MENU_GAP_PX;
+  const maxLeft = Math.max(VIEWPORT_PADDING_PX, viewportWidth - HISTORY_MENU_WIDTH_PX - VIEWPORT_PADDING_PX);
+  const left =
+    preferredLeft + HISTORY_MENU_WIDTH_PX <= viewportWidth - VIEWPORT_PADDING_PX
+      ? preferredLeft
+      : fallbackLeft >= VIEWPORT_PADDING_PX
+        ? fallbackLeft
+        : Math.min(Math.max(preferredLeft, VIEWPORT_PADDING_PX), maxLeft);
+
+  const preferredTop = rect.top;
+  const maxTop = Math.max(VIEWPORT_PADDING_PX, viewportHeight - HISTORY_MENU_HEIGHT_PX - VIEWPORT_PADDING_PX);
+
+  return {
+    top: Math.min(Math.max(preferredTop, VIEWPORT_PADDING_PX), maxTop),
+    left: Math.min(Math.max(left, VIEWPORT_PADDING_PX), maxLeft),
+  };
 }
 
 /**
