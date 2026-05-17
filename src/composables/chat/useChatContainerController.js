@@ -125,13 +125,15 @@ export function useChatContainerController(props) {
   });
 
   const historyDialogTitle = computed(() =>
-    historyDialogMode.value === 'delete' ? '대화방 삭제' : '대화방 제목 변경'
-  );
-  const historyDialogMessage = computed(() =>
     historyDialogMode.value === 'delete'
-      ? `'${historyDialogTarget.value?.title || '선택한 대화방'}'을(를) 삭제하시겠습니까?`
-      : ''
+      ? t('chat.historyMenu.deleteTitle')
+      : t('chat.historyMenu.renameTitle')
   );
+  const historyDialogMessage = computed(() => {
+    if (historyDialogMode.value !== 'delete') return '';
+    const title = historyDialogTarget.value?.title || t('chat.historyMenu.deleteDefaultTitle');
+    return t('chat.historyMenu.deleteMessage', {title});
+  });
 
   function closeHistoryDialog() {
     historyDialogOpen.value = false;
@@ -171,7 +173,7 @@ export function useChatContainerController(props) {
       return;
     }
     if (action === 'share') {
-      historyNoticeMessage.value = '공유 버튼을 선택했습니다.';
+      historyNoticeMessage.value = t('chat.historyMenu.shareNotice');
       historyNoticeOpen.value = true;
       return;
     }

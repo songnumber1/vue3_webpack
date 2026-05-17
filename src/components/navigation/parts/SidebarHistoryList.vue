@@ -19,16 +19,16 @@
         <span
           v-if="item.isPinned"
           class="sidebar-history-pin"
-          aria-label="즐겨찾기 대화방"
-          title="즐겨찾기"
+          :aria-label="t('chat.historyMenu.pinnedLabel')"
+          :title="t('chat.historyMenu.pin')"
         >
           📌
         </span>
         <button
           class="sidebar-history-menu-button"
           type="button"
-          aria-label="대화방 메뉴 열기"
-          title="대화방 메뉴"
+          :aria-label="t('chat.historyMenu.title')"
+          :title="t('chat.historyMenu.title')"
           @click.stop="$emit('open-menu', {item, event: $event})"
         >
           ⋯
@@ -39,6 +39,10 @@
 </template>
 
 <script setup>
+import {useI18n} from 'vue-i18n';
+
+const {t} = useI18n();
+
 defineProps({
   histories: {type: Array, default: () => []},
   selectedChatId: {type: [String, Number], default: ''},

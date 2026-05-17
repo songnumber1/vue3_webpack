@@ -49,6 +49,7 @@
 
 <script setup>
 import {computed, ref} from 'vue';
+import {useI18n} from 'vue-i18n';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
 
 const props = defineProps({
@@ -59,24 +60,25 @@ const props = defineProps({
 });
 
 defineEmits(['close', 'select']);
+const {t} = useI18n();
 const menuRef = ref(null);
 
 const mobileOpen = computed(() => props.open && props.isMobile);
 const desktopOpen = computed(() => props.open && !props.isMobile);
-const targetTitle = computed(() => props.target?.title || '대화방 메뉴');
+const targetTitle = computed(() => props.target?.title || t('chat.historyMenu.title'));
 const desktopStyle = computed(() => ({
   top: `${props.position.top || 0}px`,
   left: `${props.position.left || 0}px`,
 }));
 const actions = computed(() => {
   const pinAction = props.target?.isPinned
-    ? {key: 'unpin', label: '즐겨찾기 해지', icon: '☆'}
-    : {key: 'pin', label: '즐겨찾기', icon: '★'};
+    ? {key: 'unpin', label: t('chat.historyMenu.unpin'), icon: '☆'}
+    : {key: 'pin', label: t('chat.historyMenu.pin'), icon: '★'};
   return [
     pinAction,
-    {key: 'rename', label: '제목 변경', icon: '✎'},
-    {key: 'share', label: '공유', icon: '↗'},
-    {key: 'delete', label: '삭제', icon: '🗑', danger: true},
+    {key: 'rename', label: t('chat.historyMenu.rename'), icon: '✎'},
+    {key: 'share', label: t('chat.historyMenu.share'), icon: '↗'},
+    {key: 'delete', label: t('chat.historyMenu.delete'), icon: '🗑', danger: true},
   ];
 });
 

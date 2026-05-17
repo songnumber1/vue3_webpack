@@ -105,14 +105,14 @@
     <ResponsiveOverlay
       :open="historyNoticeOpen"
       :is-mobile="isMobile"
-      title="알림"
+      :title="t('chat.historyMenu.noticeTitle')"
       mobile-mode="dialog"
       @close="historyNoticeOpen = false"
     >
       <div class="chat-history-dialog">
         <p class="chat-history-dialog__message">{{ historyNoticeMessage }}</p>
         <div class="chat-history-dialog__actions">
-          <button class="playground-button" type="button" @click="historyNoticeOpen = false">확인</button>
+          <button class="playground-button" type="button" @click="historyNoticeOpen = false">{{ t('common.confirm') }}</button>
         </div>
       </div>
     </ResponsiveOverlay>
