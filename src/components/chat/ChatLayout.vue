@@ -10,6 +10,7 @@
     <AppSidebar
       @new-chat="$emit('new-chat')"
       @select-history="$emit('select-history', $event)"
+      @history-menu-action="$emit('history-menu-action', $event)"
       @select-assistant="$emit('select-assistant', $event)"
       @open-guide="$emit('open-guide')"
       @open-notice="$emit('open-notice')"
@@ -44,6 +45,7 @@ defineProps({
 defineEmits([
   "new-chat",
   "select-history",
+  "history-menu-action",
   "select-assistant",
   "open-guide",
   "open-notice",

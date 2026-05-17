@@ -4,8 +4,12 @@ import {createId} from "@/utils/id";
 import {
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   bootstrapChatRuntime,
+  deleteChatHistory,
+  loadChatHistoryList,
   loadChatMessages,
   loadExamplePrompts,
+  renameChatHistory,
+  updateChatBookmark,
 } from "@/business/chatBootstrap";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
@@ -159,6 +163,42 @@ export function useChatRuntime() {
       appRuntimeStore.fail(error);
       throw error;
     }
+  }
+
+
+  async function refreshHistories() {
+    const chatHistories = await loadChatHistoryList({
+      assistantMap: assistantStore.assistantMap,
+      modelMap: assistantStore.modelMap,
+    });
+    chatStore.setHistories(chatHistories);
+    return chatHistories;
+  }
+
+  async function toggleHistoryBookmark(history) {
+    if (!history?.id) return;
+    await updateChatBookmark({
+      chatId: history.id,
+      bookmarkYN: !history.isPinned,
+    });
+    await refreshHistories();
+  }
+
+  async function renameHistory(history, title) {
+    const chatTitle = String(title || '').trim();
+    if (!history?.id || !chatTitle) return;
+    await renameChatHistory({chatId: history.id, chatTitle});
+    await refreshHistories();
+  }
+
+  async function removeHistory(history) {
+    if (!history?.id) return;
+    await deleteChatHistory({chatId: history.id});
+    delete chatStore.messageMap[history.id];
+    if (String(chatStore.selectedChatId) === String(history.id)) {
+      chatStore.clearActiveSession();
+    }
+    await refreshHistories();
   }
 
   /**
@@ -361,6 +401,10 @@ export function useChatRuntime() {
     isActiveModelDeleted,
     isActiveModelUnavailable,
     conversations,
+    refreshHistories,
+    toggleHistoryBookmark,
+    renameHistory,
+    removeHistory,
     selectAssistant,
     selectAssistantForNewChat,
     getHistory,

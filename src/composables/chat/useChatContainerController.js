@@ -56,6 +56,9 @@ export function useChatContainerController(props) {
     currentExamplePrompts,
     getHistory,
     revokeMessageAttachments,
+    toggleHistoryBookmark,
+    renameHistory,
+    removeHistory,
   } = runtime;
 
   const workspaceRef = ref(null);
@@ -68,6 +71,11 @@ export function useChatContainerController(props) {
   const personalizationOpen = ref(false);
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
+  const historyDialogOpen = ref(false);
+  const historyDialogMode = ref('rename');
+  const historyDialogTarget = ref(null);
+  const historyNoticeOpen = ref(false);
+  const historyNoticeMessage = ref('');
   const runtimeReady = ref(false);
   const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
     useImagePreview();
@@ -115,6 +123,65 @@ export function useChatContainerController(props) {
     // 계산된 결과를 호출부로 반환합니다.
     return currentAssistant.value?.label || 'Assistant';
   });
+
+  const historyDialogTitle = computed(() =>
+    historyDialogMode.value === 'delete' ? '대화방 삭제' : '대화방 제목 변경'
+  );
+  const historyDialogMessage = computed(() =>
+    historyDialogMode.value === 'delete'
+      ? `'${historyDialogTarget.value?.title || '선택한 대화방'}'을(를) 삭제하시겠습니까?`
+      : ''
+  );
+
+  function closeHistoryDialog() {
+    historyDialogOpen.value = false;
+    historyDialogTarget.value = null;
+  }
+
+  async function confirmHistoryDialog(value) {
+    const target = historyDialogTarget.value;
+    if (!target) {
+      closeHistoryDialog();
+      return;
+    }
+    if (historyDialogMode.value === 'rename') {
+      const nextTitle = String(value || '').trim();
+      if (!nextTitle) return;
+      await renameHistory(target, nextTitle);
+    } else if (historyDialogMode.value === 'delete') {
+      await removeHistory(target);
+      if (String(activeHistoryId.value) === String(target.id)) {
+        messages.value = [];
+        await router.replace('/');
+      }
+    }
+    closeHistoryDialog();
+  }
+
+  async function handleHistoryMenuAction({action, history} = {}) {
+    if (!history || !action) return;
+    if (action === 'pin' || action === 'unpin') {
+      await toggleHistoryBookmark(history);
+      return;
+    }
+    if (action === 'rename') {
+      historyDialogTarget.value = history;
+      historyDialogMode.value = 'rename';
+      historyDialogOpen.value = true;
+      return;
+    }
+    if (action === 'share') {
+      historyNoticeMessage.value = '공유 버튼을 선택했습니다.';
+      historyNoticeOpen.value = true;
+      return;
+    }
+    if (action === 'delete') {
+      historyDialogTarget.value = history;
+      historyDialogMode.value = 'delete';
+      historyDialogOpen.value = true;
+    }
+  }
+
   const suggestions = computed(() => {
     const assistantPrompts = currentExamplePrompts.value || [];
     const isEnglish = locale.value === 'en';
@@ -549,6 +616,13 @@ export function useChatContainerController(props) {
     personalizationOpen,
     languageSheetOpen,
     mobileSettingsOpen,
+    historyDialogOpen,
+    historyDialogMode,
+    historyDialogTarget,
+    historyDialogTitle,
+    historyDialogMessage,
+    historyNoticeOpen,
+    historyNoticeMessage,
     previewImage,
     themeName,
     isMobile,
@@ -564,6 +638,9 @@ export function useChatContainerController(props) {
     startNewChatWithAssistant,
     startNewChat,
     openHistory,
+    handleHistoryMenuAction,
+    closeHistoryDialog,
+    confirmHistoryDialog,
     openMobileDrawer,
     toggleTheme,
     openSwagger,

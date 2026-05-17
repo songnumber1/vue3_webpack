@@ -1,15 +1,37 @@
-import {CHAT_HISTORY_LIST_RAW} from "@/data/raw/chatHistoryList.raw";
-import {CHAT_MESSAGES_RAW} from "@/data/raw/chatMessages.raw";
-import {resolveMock} from "./mockUtils";
+import {CHAT_KEYS} from '@/constants/apiKeys';
+import {CHAT_HISTORY_LIST_RAW} from '@/data/raw/chatHistoryList.raw';
+import {CHAT_MESSAGES_RAW} from '@/data/raw/chatMessages.raw';
+import {resolveMock} from './mockUtils';
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
+const historyStore = CHAT_HISTORY_LIST_RAW.map((item) => ({...item}));
+
+function findHistory(chatId) {
+  return historyStore.find((item) => String(item[CHAT_KEYS.ID]) === String(chatId));
+}
+
 export const chatHistoryApiMock = {
   getChatHistoryList() {
-    // 계산된 결과를 호출부로 반환합니다.
-    return resolveMock(CHAT_HISTORY_LIST_RAW, 210);
+    return resolveMock(historyStore, 210);
   },
   getChatHistoryDetail({chatId} = {}) {
-    // 계산된 결과를 호출부로 반환합니다.
     return resolveMock(CHAT_MESSAGES_RAW[chatId] || [], 180);
+  },
+  updateBookmark({chatId, bookmarkYN} = {}) {
+    const target = findHistory(chatId);
+    if (target) {
+      target[CHAT_KEYS.BOOKMARK_YN] = Boolean(bookmarkYN);
+      target[CHAT_KEYS.ENDED_AT] = target[CHAT_KEYS.ENDED_AT] || new Date().toISOString();
+    }
+    return resolveMock({success: true}, 140);
+  },
+  renameChat({chatId, chatTitle} = {}) {
+    const target = findHistory(chatId);
+    if (target && chatTitle) target[CHAT_KEYS.TITLE] = chatTitle;
+    return resolveMock({success: true}, 140);
+  },
+  deleteChat({chatId} = {}) {
+    const index = historyStore.findIndex((item) => String(item[CHAT_KEYS.ID]) === String(chatId));
+    if (index >= 0) historyStore.splice(index, 1);
+    return resolveMock({success: true}, 140);
   },
 };

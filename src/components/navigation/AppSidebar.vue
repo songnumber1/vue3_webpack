@@ -27,7 +27,12 @@
       </nav>
 
       <div class="section-label">{{ t('chat.conversations') }}</div>
-      <SidebarHistoryList :histories="histories" :selected-chat-id="selectedChatId" @select="handleSelectHistory" />
+      <SidebarHistoryList
+        :histories="histories"
+        :selected-chat-id="selectedChatId"
+        @select="handleSelectHistory"
+        @open-menu="openHistoryMenu"
+      />
     </div>
 
     <CollapsedSidebar
@@ -73,7 +78,12 @@
         </nav>
 
         <div class="section-label">{{ t('chat.conversations') }}</div>
-        <SidebarHistoryList :histories="histories" :selected-chat-id="selectedChatId" @select="handleSelectHistory" />
+        <SidebarHistoryList
+          :histories="histories"
+          :selected-chat-id="selectedChatId"
+          @select="handleSelectHistory"
+          @open-menu="openHistoryMenu"
+        />
 
         <SidebarUserFooter
           @open-settings="openSettings"
@@ -104,6 +114,16 @@
       </span>
     </button>
   </BaseBottomSheet>
+
+  <ChatHistoryActionMenu
+    ref="historyMenuRef"
+    :open="historyMenuOpen"
+    :is-mobile="isMobileSheet"
+    :target="historyMenuTarget"
+    :position="historyMenuPosition"
+    @close="closeHistoryMenu"
+    @select="selectHistoryMenuAction"
+  />
 </template>
 
 <script setup>
@@ -117,6 +137,7 @@ import Icon from '@/components/navigation/SidebarIcon.vue';
 import CollapsedSidebar from '@/components/navigation/parts/CollapsedSidebar.vue';
 import SidebarAssistantSelector from '@/components/navigation/parts/SidebarAssistantSelector.vue';
 import SidebarHistoryList from '@/components/navigation/parts/SidebarHistoryList.vue';
+import ChatHistoryActionMenu from '@/components/navigation/parts/ChatHistoryActionMenu.vue';
 import SidebarUserFooter from '@/components/navigation/parts/SidebarUserFooter.vue';
 import {useAssistantStore} from '@/stores/assistantStore';
 import {useChatStore} from '@/stores/chatStore';
@@ -127,6 +148,7 @@ import {useOutsideClick} from '@/composables/useOutsideClick';
 const emit = defineEmits([
   'new-chat',
   'select-history',
+  'history-menu-action',
   'select-assistant',
   'open-guide',
   'open-notice',
@@ -147,6 +169,10 @@ const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigati
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
+const historyMenuRef = ref(null);
+const historyMenuOpen = ref(false);
+const historyMenuTarget = ref(null);
+const historyMenuPosition = ref({top: 0, left: 0});
 
 /**
  * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
@@ -218,6 +244,46 @@ function handleNewChat() {
   setCollapsedRecentOpen(false);
 }
 
+
+/**
+ * @description openHistoryMenu 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {*} payload - 메뉴 대상 대화방과 클릭 이벤트입니다.
+ * @returns {void}
+ */
+function openHistoryMenu(payload = {}) {
+  const {item, event} = payload;
+  syncViewportMode();
+  historyMenuTarget.value = item || null;
+  const rect = event?.currentTarget?.getBoundingClientRect?.();
+  const menuWidth = 192;
+  historyMenuPosition.value = {
+    top: Math.min((rect?.bottom || 0) + 6, window.innerHeight - 220),
+    left: Math.max(12, Math.min((rect?.right || 0) - menuWidth, window.innerWidth - menuWidth - 12)),
+  };
+  historyMenuOpen.value = true;
+}
+
+/**
+ * @description closeHistoryMenu 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @returns {void}
+ */
+function closeHistoryMenu() {
+  historyMenuOpen.value = false;
+  historyMenuTarget.value = null;
+}
+
+/**
+ * @description selectHistoryMenuAction 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
+ * @param {string} action - 선택된 메뉴 액션입니다.
+ * @returns {void}
+ */
+function selectHistoryMenuAction(action) {
+  const history = historyMenuTarget.value;
+  historyMenuOpen.value = false;
+  if (!history || !action) return;
+  emit('history-menu-action', {action, history});
+}
+
 /**
  * @description handleSelectHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
  * @param {*} item - item 입력값입니다.
@@ -283,6 +349,12 @@ useOutsideClick(
     assistantMenuOpen.value = false;
   },
   {shouldIgnore: () => isMobileSheet.value}
+);
+
+useOutsideClick(
+  () => historyMenuRef.value?.menuRef?.value || historyMenuRef.value?.menuRef,
+  closeHistoryMenu,
+  {shouldIgnore: () => isMobileSheet.value || !historyMenuOpen.value}
 );
 
 // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.

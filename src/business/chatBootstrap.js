@@ -159,6 +159,27 @@ export async function bootstrapChatRuntime(options = {}) {
  * @param {*} payload - payload 입력값입니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
+export async function loadChatHistoryList(context = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  const rawHistories = await chatHistoryApi.getChatHistoryList();
+  return adaptChatHistoryList(rawHistories, context);
+}
+
+export async function updateChatBookmark(payload = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  return chatHistoryApi.updateBookmark(payload);
+}
+
+export async function renameChatHistory(payload = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  return chatHistoryApi.renameChat(payload);
+}
+
+export async function deleteChatHistory(payload = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  return chatHistoryApi.deleteChat(payload);
+}
+
 export async function loadChatMessages(payload = {}) {
   const {chatHistoryApi} = resolveChatApis();
   const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);

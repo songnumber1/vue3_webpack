@@ -6,6 +6,7 @@
     @select-assistant="startNewChatWithAssistant"
     @new-chat="startNewChat"
     @select-history="openHistory"
+    @history-menu-action="handleHistoryMenuAction"
     @open-guide="openGuide"
     @open-notice="openNotice"
     @open-personalization="openPersonalization"
@@ -89,6 +90,32 @@
       :open="mobileSettingsOpen"
       @close="mobileSettingsOpen = false"
     />
+
+    <ChatHistoryDialog
+      :open="historyDialogOpen"
+      :is-mobile="isMobile"
+      :mode="historyDialogMode"
+      :title="historyDialogTitle"
+      :message="historyDialogMessage"
+      :initial-title="historyDialogTarget?.title || ''"
+      @cancel="closeHistoryDialog"
+      @confirm="confirmHistoryDialog"
+    />
+
+    <ResponsiveOverlay
+      :open="historyNoticeOpen"
+      :is-mobile="isMobile"
+      title="알림"
+      mobile-mode="dialog"
+      @close="historyNoticeOpen = false"
+    >
+      <div class="chat-history-dialog">
+        <p class="chat-history-dialog__message">{{ historyNoticeMessage }}</p>
+        <div class="chat-history-dialog__actions">
+          <button class="playground-button" type="button" @click="historyNoticeOpen = false">확인</button>
+        </div>
+      </div>
+    </ResponsiveOverlay>
   </ChatLayout>
 
   <div v-else class="chat-bootstrap-loading" aria-live="polite">
@@ -107,6 +134,8 @@ import AppOverlayProvider from '@/components/overlay/AppOverlayProvider.vue';
 import NoticeView from '@/views/settings/NoticeView.vue';
 import PersonalizationView from '@/views/settings/PersonalizationView.vue';
 import MobileSettingsPanel from '@/views/settings/MobileSettingsPanel.vue';
+import ChatHistoryDialog from '@/components/navigation/parts/ChatHistoryDialog.vue';
+import ResponsiveOverlay from '@/components/overlay/ResponsiveOverlay.vue';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({mode: {type: String, default: 'main'}});
@@ -128,6 +157,13 @@ const {
   personalizationOpen,
   languageSheetOpen,
   mobileSettingsOpen,
+  historyDialogOpen,
+  historyDialogMode,
+  historyDialogTarget,
+  historyDialogTitle,
+  historyDialogMessage,
+  historyNoticeOpen,
+  historyNoticeMessage,
   previewImage,
   themeName,
   isMobile,
@@ -143,6 +179,9 @@ const {
   startNewChatWithAssistant,
   startNewChat,
   openHistory,
+  handleHistoryMenuAction,
+  closeHistoryDialog,
+  confirmHistoryDialog,
   openMobileDrawer,
   toggleTheme,
   openSwagger,

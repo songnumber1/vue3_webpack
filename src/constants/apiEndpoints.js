@@ -7,5 +7,8 @@ export const API_ENDPOINTS = Object.freeze({
   FEEDBACK_HISTORY: "/message-feedback-history/ex-list.do",
   CHAT_HISTORY_LIST: "/chat-history/list.do",
   CHAT_HISTORY_DETAIL: "/chat-history/history.do",
+  CHAT_HISTORY_BOOKMARK: "/chat-history/bookmark.do",
+  CHAT_HISTORY_RENAME: "/chat-history/title.do",
+  CHAT_HISTORY_DELETE: "/chat-history/delete.do",
   EXAMPLE_PROMPTS: "/example-prompts/list.do",
 });
