@@ -1,14 +1,7 @@
 import {nextTick, ref} from 'vue';
 import {useAutoScroll} from '@/composables/useAutoScroll';
-import {renderMermaidInElement} from '@/utils/mermaidRenderer';
 
-/**
- * @description 메시지 리스트 스크롤, 하단 버튼 상태, 스트림 렌더 후 보정 로직을 관리합니다.
- * @param {{mode: string}} props - ChatContainer props입니다.
- * @param {*} workspaceRef - ChatWorkspace expose ref입니다.
- * @returns {*} 스크롤 상태와 액션입니다.
- */
-export function useChatScrollController(props, workspaceRef) {
+export function useChatScrollController({props, workspaceRef}) {
   const {scrollToBottom} = useAutoScroll({value: null});
   const showScrollBottom = ref(false);
   let bottomStateTimer = 0;
@@ -55,23 +48,15 @@ export function useChatScrollController(props, workspaceRef) {
     bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
   }
 
-  function handleMessageContentRendered() {
-    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
-    scheduleBottomStateCheck();
-  }
-
-  async function renderAfterStream() {
-    markForceBottom(1000);
-    await renderMermaidInElement(document.querySelector('.message-list'), {
-      force: true,
-    });
-    scrollBottom({force: true, stable: true});
-  }
-
-  async function scrollRouteToBottom() {
+  async function scrollToRouteBottom() {
     markForceBottom();
     await nextTick();
     await scrollBottom({behavior: 'auto', force: true, stable: true});
+  }
+
+  function handleMessageContentRendered() {
+    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
+    scheduleBottomStateCheck();
   }
 
   function cleanupScrollController() {
@@ -83,11 +68,9 @@ export function useChatScrollController(props, workspaceRef) {
     markForceBottom,
     resetForceBottom,
     scrollBottom,
-    updateScrollBottomButton,
+    scrollToRouteBottom,
     scheduleBottomStateCheck,
     handleMessageContentRendered,
-    renderAfterStream,
-    scrollRouteToBottom,
     cleanupScrollController,
   };
 }

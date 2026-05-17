@@ -2427,7 +2427,7 @@
 
 .chat-history-context-menu {
   position: fixed;
-  z-index: 4200;
+  z-index: 2400;
   min-width: 208px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));

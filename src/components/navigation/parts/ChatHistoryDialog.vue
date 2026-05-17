@@ -40,7 +40,7 @@ const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: false},
   mode: {type: String, default: 'rename'},
-  title: {type: String, default: '확인'},
+  title: {type: String, default: ''},
   message: {type: String, default: ''},
   initialTitle: {type: String, default: ''},
 });

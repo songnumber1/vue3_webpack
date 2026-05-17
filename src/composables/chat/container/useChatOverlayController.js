@@ -1,29 +1,53 @@
-import {ref} from 'vue';
+import {computed} from 'vue';
+import {useOverlayStore} from '@/stores/overlayStore';
+import {OVERLAY_KEYS} from '@/constants/overlayTypes';
 
-/**
- * @description ChatContainer에서 사용하는 공통 overlay/sheet open 상태를 한 곳에서 관리합니다.
- * @returns {*} overlay 상태와 open/close 핸들러입니다.
- */
 export function useChatOverlayController() {
-  const assistantSheetOpen = ref(false);
-  const noticeOpen = ref(false);
-  const personalizationOpen = ref(false);
-  const languageSheetOpen = ref(false);
-  const mobileSettingsOpen = ref(false);
+  const overlayStore = useOverlayStore();
 
-  function closePrimaryOverlays() {
-    noticeOpen.value = false;
-    personalizationOpen.value = false;
-    languageSheetOpen.value = false;
-    mobileSettingsOpen.value = false;
+  function overlayModel(key) {
+    return computed({
+      get: () => overlayStore.isOpen(key),
+      set: (value) => {
+        if (value) overlayStore.open(key);
+        else overlayStore.close(key);
+      },
+    });
+  }
+
+  const assistantSheetOpen = overlayModel(OVERLAY_KEYS.ASSISTANT_SHEET);
+  const noticeOpen = overlayModel(OVERLAY_KEYS.NOTICE);
+  const personalizationOpen = overlayModel(OVERLAY_KEYS.PERSONALIZATION);
+  const languageSheetOpen = overlayModel(OVERLAY_KEYS.LANGUAGE);
+  const mobileSettingsOpen = overlayModel(OVERLAY_KEYS.MOBILE_SETTINGS);
+  const historyDialogOpen = overlayModel(OVERLAY_KEYS.HISTORY_DIALOG);
+  const historyNoticeOpen = overlayModel(OVERLAY_KEYS.HISTORY_NOTICE);
+
+  function openOverlay(key, payload = null) {
+    overlayStore.open(key, payload);
+  }
+
+  function closeOverlay(key) {
+    overlayStore.close(key);
+  }
+
+  function setOverlayOpen(key, value, payload = null) {
+    if (value) overlayStore.open(key, payload);
+    else overlayStore.close(key);
   }
 
   return {
+    overlayStore,
+    overlayKeys: OVERLAY_KEYS,
     assistantSheetOpen,
     noticeOpen,
     personalizationOpen,
     languageSheetOpen,
     mobileSettingsOpen,
-    closePrimaryOverlays,
+    historyDialogOpen,
+    historyNoticeOpen,
+    openOverlay,
+    closeOverlay,
+    setOverlayOpen,
   };
 }

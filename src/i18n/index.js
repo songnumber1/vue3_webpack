@@ -28,6 +28,11 @@ export const messages = {
       settings: "설정",
       playground: "Playground",
     },
+    bottomSheet: {
+      defaultTitle: "선택",
+      resizeLabel: "바텀시트 크기 조절",
+      selectedLabel: "현재 선택된 값",
+    },
     feedback: {
       like: "좋아요",
       dislike: "싫어요",
@@ -66,9 +71,9 @@ export const messages = {
       recentChats: "최근 채팅",
       startQuestion: "어디서부터 시작할까요?",
       sharedReadonly: "공유 받은 대화입니다.",
-      sharedConversationTitle: "공유 대화 {id}",
       scrollBottom: "맨 아래로 이동",
       assistant: "Assistant",
+      sharedConversationTitle: "공유 대화 {id}",
       promptPlaceholder: "무엇이든 물어보세요",
       send: "전송",
       voiceStart: "음성 입력 시작",
@@ -78,6 +83,15 @@ export const messages = {
         image: "이미지 만들기",
         writing: "글쓰기 또는 편집",
         search: "필요한 항목 찾기",
+      },
+      mockResponse: {
+        attachmentSummary: "\n\n첨부 파일 {count}개를 함께 받았습니다. 이미지/파일 미리보기와 메시지 액션 영역도 유지됩니다.",
+        emptyAttachmentRequest: "첨부 기반 요청",
+        body: "요청하신 내용을 현재 선택된 Assistant/Model 세션 기준으로 정리하겠습니다.\n\n- 입력: {input}\n- 새 대화에서는 Assistant와 모델을 변경할 수 있습니다.\n- 기존 대화방에 진입하면 해당 대화의 모델 세션이 고정되어 모델 변경이 차단됩니다.\n- 현재 응답은 실제 API 호출 구조를 모사한 mock data + adapter + business + Pinia cache 흐름으로 동작합니다.{fileSummary}",
+      },
+      sharedMock: {
+        user: "공유 URL로 전달된 대화입니다.\n\nshareId: {shareId}",
+        assistant: "이 화면은 공유 받은 대화 전용 읽기 모드입니다. 기존 채팅 화면과 동일한 메시지 레이아웃을 사용하지만 하단 입력 영역은 전송 가능한 입력창이 아니라 안내 영역으로 표시됩니다.",
       },
       historyMenu: {
         title: "대화방 메뉴",
@@ -195,6 +209,11 @@ export const messages = {
       settings: "Settings",
       playground: "Playground",
     },
+    bottomSheet: {
+      defaultTitle: "Select",
+      resizeLabel: "Resize bottom sheet",
+      selectedLabel: "Currently selected",
+    },
     feedback: {
       like: "Like",
       dislike: "Dislike",
@@ -233,9 +252,9 @@ export const messages = {
       recentChats: "Recent chats",
       startQuestion: "Where should we start?",
       sharedReadonly: "This is a shared conversation.",
-      sharedConversationTitle: "Shared chat {id}",
       scrollBottom: "Scroll to bottom",
       assistant: "Assistant",
+      sharedConversationTitle: "Shared chat {id}",
       promptPlaceholder: "Ask anything",
       send: "Send",
       voiceStart: "Start voice input",
@@ -245,6 +264,15 @@ export const messages = {
         image: "Create image",
         writing: "Write or edit",
         search: "Find what you need",
+      },
+      mockResponse: {
+        attachmentSummary: "\n\nReceived {count} attachment(s). Image/file previews and message actions are preserved.",
+        emptyAttachmentRequest: "attachment-based request",
+        body: "I will summarize your request using the currently selected Assistant/Model session.\n\n- Input: {input}\n- In a new chat, you can change the Assistant and model.\n- When entering an existing chat, that chat session model is locked and model changes are blocked.\n- This response currently uses a mock data + adapter + business + Pinia cache flow that simulates the production API call structure.{fileSummary}",
+      },
+      sharedMock: {
+        user: "This conversation was opened from a shared URL.\n\nshareId: {shareId}",
+        assistant: "This is a read-only shared conversation view. It uses the same message layout as the normal chat screen, but the bottom area is shown as a read-only notice instead of a sendable input.",
       },
       historyMenu: {
         title: "Chat menu",

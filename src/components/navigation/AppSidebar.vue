@@ -108,9 +108,9 @@
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
-      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" aria-label="현재 선택된 값">
+      <span v-if="assistant.id === selectedAssistantId" class="bottom-sheet-selected-indicator" :aria-label="t('bottomSheet.selectedLabel')">
         <CheckIcon class="bottom-sheet-check" />
-        <span class="sr-only">현재 선택된 값</span>
+        <span class="sr-only">{{ t('bottomSheet.selectedLabel') }}</span>
       </span>
     </button>
   </BaseBottomSheet>
@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from 'vue';
+import {computed, ref} from 'vue';
 import {storeToRefs} from 'pinia';
 import {useI18n} from 'vue-i18n';
 import BaseBottomSheet from '@/components/common/bottom-sheet/BaseBottomSheet.vue';
@@ -142,6 +142,8 @@ import {useAssistantStore} from '@/stores/assistantStore';
 import {useChatStore} from '@/stores/chatStore';
 import {useNavigationStore} from '@/stores/navigationStore';
 import {usePlatformStore} from '@/stores/platformStore';
+import {useOverlayStore} from '@/stores/overlayStore';
+import {OVERLAY_KEYS} from '@/constants/overlayTypes';
 import {useOutsideClick} from '@/composables/useOutsideClick';
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
@@ -164,14 +166,27 @@ const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
 const platformStore = usePlatformStore();
+const overlayStore = useOverlayStore();
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} = storeToRefs(navigationStore);
-const assistantMenuOpen = ref(false);
+const assistantMenuOpen = computed({
+  get: () => overlayStore.isOpen(OVERLAY_KEYS.SIDEBAR_ASSISTANT),
+  set: (value) => {
+    if (value) overlayStore.open(OVERLAY_KEYS.SIDEBAR_ASSISTANT);
+    else overlayStore.close(OVERLAY_KEYS.SIDEBAR_ASSISTANT);
+  },
+});
+const historyMenuOpen = computed({
+  get: () => overlayStore.isOpen(OVERLAY_KEYS.HISTORY_MENU),
+  set: (value) => {
+    if (value) overlayStore.open(OVERLAY_KEYS.HISTORY_MENU);
+    else overlayStore.close(OVERLAY_KEYS.HISTORY_MENU);
+  },
+});
 const isMobileSheet = computed(() => platformStore.isMobileUi);
 const assistantSelectorRef = ref(null);
 const historyMenuRef = ref(null);
-const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuPosition = ref({top: 0, left: 0});
 
@@ -388,14 +403,4 @@ useOutsideClick(
   {shouldIgnore: () => isMobileSheet.value || !historyMenuOpen.value}
 );
 
-// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
-onMounted(() => {
-  syncViewportMode();
-  window.addEventListener('resize', syncViewportMode, {passive: true});
-});
-
-// Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', syncViewportMode);
-});
 </script>

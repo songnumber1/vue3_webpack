@@ -1,10 +1,18 @@
 import {computed, ref} from 'vue';
 
-export function useChatHistoryDialog({t, activeHistoryId, messages, router, renameHistory, removeHistory}) {
-  const historyDialogOpen = ref(false);
+export function useChatHistoryDialog({
+  t,
+  activeHistoryId,
+  messages,
+  router,
+  renameHistory,
+  removeHistory,
+  openOverlay,
+  closeOverlay,
+  overlayKeys,
+}) {
   const historyDialogMode = ref('rename');
   const historyDialogTarget = ref(null);
-  const historyNoticeOpen = ref(false);
   const historyNoticeMessage = ref('');
 
   const historyDialogTitle = computed(() =>
@@ -20,25 +28,27 @@ export function useChatHistoryDialog({t, activeHistoryId, messages, router, rena
     return t('chat.historyMenu.deleteMessage', {title});
   });
 
-  function openRenameDialog(history) {
+  function openHistoryDialog(mode, history) {
     historyDialogTarget.value = history;
-    historyDialogMode.value = 'rename';
-    historyDialogOpen.value = true;
+    historyDialogMode.value = mode;
+    openOverlay(overlayKeys.HISTORY_DIALOG);
+  }
+
+  function openRenameDialog(history) {
+    openHistoryDialog('rename', history);
   }
 
   function openDeleteDialog(history) {
-    historyDialogTarget.value = history;
-    historyDialogMode.value = 'delete';
-    historyDialogOpen.value = true;
+    openHistoryDialog('delete', history);
   }
 
   function openNotice(message) {
     historyNoticeMessage.value = message;
-    historyNoticeOpen.value = true;
+    openOverlay(overlayKeys.HISTORY_NOTICE);
   }
 
   function closeHistoryDialog() {
-    historyDialogOpen.value = false;
+    closeOverlay(overlayKeys.HISTORY_DIALOG);
     historyDialogTarget.value = null;
   }
 
@@ -65,10 +75,8 @@ export function useChatHistoryDialog({t, activeHistoryId, messages, router, rena
   }
 
   return {
-    historyDialogOpen,
     historyDialogMode,
     historyDialogTarget,
-    historyNoticeOpen,
     historyNoticeMessage,
     historyDialogTitle,
     historyDialogMessage,
