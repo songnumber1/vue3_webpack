@@ -113,12 +113,7 @@
           @open-menu="openHistoryMenu"
         />
 
-        <SidebarUserFooter
-          @open-settings="openSettings"
-          @toggle-theme="toggleTheme"
-          @open-playground="openPlayground"
-          @open-swagger="openSwagger"
-        />
+        <SidebarUserFooter />
       </div>
     </aside>
   </transition>
@@ -143,10 +138,10 @@
       <span
         v-if="assistant.id === selectedAssistantId"
         class="bottom-sheet-selected-indicator"
-        aria-label="현재 선택된 값"
+        :aria-label="t('chat.assistantSelected')"
       >
         <CheckIcon class="bottom-sheet-check" />
-        <span class="sr-only">현재 선택된 값</span>
+        <span class="sr-only">{{ t("chat.assistantSelected") }}</span>
       </span>
     </button>
   </BaseBottomSheet>
@@ -163,7 +158,7 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from "vue";
+import {computed, inject, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useEventListener, useWindowSize} from "@vueuse/core";
@@ -180,26 +175,24 @@ import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/useOutsideClick";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const emit = defineEmits([
   "new-chat",
   "select-history",
   "history-menu-action",
   "select-assistant",
-  "open-guide",
-  "open-notice",
-  "open-personalization",
-  "open-language",
-  "toggle-theme",
-  "open-swagger",
-  "open-playground",
-  "open-settings",
 ]);
+
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
+const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} =
@@ -214,80 +207,40 @@ const historyMenuReferenceEl = ref(null);
 const {width} = useWindowSize();
 const isCompactViewport = computed(() => width.value <= MOBILE_BREAKPOINT_PX);
 
-/**
- * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function syncViewportMode() {
   isMobileSheet.value = Boolean(
     isCompactViewport.value || document.querySelector(".app-container--mobile")
   );
 }
 
-/**
- * @description openAssistantSelector 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function openAssistantSelector() {
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
-/**
- * @description selectAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} id - id 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function selectAssistant(id) {
   emit("select-assistant", id);
   assistantMenuOpen.value = false;
 }
 
-/**
- * @description setSidebarCollapsed 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function setSidebarCollapsed(value) {
   navigationStore.setSidebarCollapsed(value);
 }
 
-/**
- * @description setDrawerOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function setDrawerOpen(value) {
   navigationStore.setDrawerOpen(value);
 }
 
-/**
- * @description setCollapsedRecentOpen 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function setCollapsedRecentOpen(value) {
   navigationStore.setCollapsedRecentOpen(value);
 }
 
-/**
- * @description handleNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function handleNewChat() {
   emit("new-chat");
   setDrawerOpen(false);
   setCollapsedRecentOpen(false);
 }
 
-/**
- * @description openHistoryMenu 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} payload - 메뉴 대상 대화방과 클릭 이벤트입니다.
- * @returns {void}
- */
 function openHistoryMenu(payload = {}) {
   const {item, event} = payload;
   syncViewportMode();
@@ -296,21 +249,12 @@ function openHistoryMenu(payload = {}) {
   historyMenuOpen.value = true;
 }
 
-/**
- * @description closeHistoryMenu 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @returns {void}
- */
 function closeHistoryMenu() {
   historyMenuOpen.value = false;
   historyMenuTarget.value = null;
   historyMenuReferenceEl.value = null;
 }
 
-/**
- * @description selectHistoryMenuAction 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {string} action - 선택된 메뉴 액션입니다.
- * @returns {void}
- */
 function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
@@ -318,62 +262,14 @@ function selectHistoryMenuAction(action) {
   emit("history-menu-action", {action, history});
 }
 
-/**
- * @description handleSelectHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} item - item 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function handleSelectHistory(item) {
   emit("select-history", item);
   setDrawerOpen(false);
 }
 
-/**
- * @description handleSelectHistoryCollapsed 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} item - item 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function handleSelectHistoryCollapsed(item) {
   emit("select-history", item);
   setCollapsedRecentOpen(false);
-}
-
-/**
- * @description openSettings 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function openSettings() {
-  emit("open-settings");
-}
-
-/**
- * @description toggleTheme 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function toggleTheme() {
-  emit("toggle-theme");
-}
-
-/**
- * @description openSwagger 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function openSwagger() {
-  setDrawerOpen(false);
-  emit("open-swagger");
-}
-
-/**
- * @description openPlayground 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
-function openPlayground() {
-  setDrawerOpen(false);
-  emit("open-playground");
 }
 
 useOutsideClick(

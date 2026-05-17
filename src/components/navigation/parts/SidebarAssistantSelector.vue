@@ -25,10 +25,10 @@
         <span
           v-if="assistant.id === selectedAssistantId"
           class="option-selected-indicator"
-          aria-label="현재 선택된 값"
+          :aria-label="t('chat.assistantSelected')"
         >
           <CheckIcon class="option-check" />
-          <span class="sr-only">현재 선택된 값</span>
+          <span class="sr-only">{{ t("chat.assistantSelected") }}</span>
         </span>
       </button>
     </div>

@@ -1,4 +1,5 @@
 import {computed, ref} from "vue";
+import {logWarn} from "@/utils/logger";
 
 export function useChatHistoryDialog({
   t,
@@ -41,24 +42,33 @@ export function useChatHistoryDialog({
       closeHistoryDialog();
       return;
     }
-    if (historyDialogMode.value === "rename") {
-      const nextTitle = String(value || "").trim();
-      if (!nextTitle) return;
-      await renameHistory(target, nextTitle);
-    } else if (historyDialogMode.value === "delete") {
-      await removeHistory(target);
-      if (String(activeHistoryId.value) === String(target.id)) {
-        messages.value = [];
-        await router.replace("/");
+    try {
+      if (historyDialogMode.value === "rename") {
+        const nextTitle = String(value || "").trim();
+        if (!nextTitle) return;
+        await renameHistory(target, nextTitle);
+      } else if (historyDialogMode.value === "delete") {
+        await removeHistory(target);
+        if (String(activeHistoryId.value) === String(target.id)) {
+          messages.value = [];
+          await router.replace("/").catch(() => {});
+        }
       }
+    } catch (error) {
+      logWarn("[useChatHistoryDialog] confirmHistoryDialog 오류:", error);
+    } finally {
+      closeHistoryDialog();
     }
-    closeHistoryDialog();
   }
 
   async function handleHistoryMenuAction({action, history} = {}) {
     if (!history || !action) return;
     if (action === "pin" || action === "unpin") {
-      await toggleHistoryBookmark(history);
+      try {
+        await toggleHistoryBookmark(history);
+      } catch (error) {
+        logWarn("[useChatHistoryDialog] toggleHistoryBookmark 오류:", error);
+      }
       return;
     }
     if (action === "rename") {

@@ -1,5 +1,5 @@
 <template>
-  <div class="collapsed-sidebar" aria-label="접힌 사이드바">
+  <div class="collapsed-sidebar" :aria-label="t('chat.collapsedSidebar')">
     <div class="collapsed-sidebar-actions">
       <button
         class="collapsed-icon-button"

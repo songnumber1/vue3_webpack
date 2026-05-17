@@ -101,7 +101,9 @@ export async function bootstrapChatRuntime(options = {}) {
 
   const accessInfo = readSettledValue(0, null);
   if (!accessInfo) {
-    throw bootstrapResults[0].reason || new Error("Access info bootstrap failed.");
+    throw (
+      bootstrapResults[0].reason || new Error("Access info bootstrap failed.")
+    );
   }
 
   const assistantRaw = readSettledValue(1, []);

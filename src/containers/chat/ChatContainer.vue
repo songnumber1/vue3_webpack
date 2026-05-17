@@ -7,14 +7,6 @@
     @new-chat="startNewChat"
     @select-history="openHistory"
     @history-menu-action="handleHistoryMenuAction"
-    @open-guide="openGuide"
-    @open-notice="openNotice"
-    @open-personalization="openPersonalization"
-    @open-language="openLanguage"
-    @toggle-theme="toggleTheme"
-    @open-swagger="openSwagger"
-    @open-playground="openPlayground"
-    @open-settings="openSettings"
   >
     <ChatWorkspace
       ref="workspaceRef"
@@ -140,7 +132,6 @@ import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({mode: {type: String, default: "main"}});
 
 const {
@@ -214,5 +205,4 @@ provide(CHAT_ACTIONS_KEY, {
   openLanguage,
   openPlayground,
 });
-
 </script>

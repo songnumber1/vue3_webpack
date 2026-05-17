@@ -4,11 +4,12 @@
       class="sidebar-user-profile"
       type="button"
       :aria-label="t('common.settings')"
-      @click="$emit('open-settings')"
+      @click="actions.openSettings()"
     >
-      <div class="user-avatar">민</div>
+      <div class="user-avatar">{{ userInitial }}</div>
       <div class="sidebar-user-main">
-        <strong>민우 송</strong><small>{{ t("common.plus") }}</small>
+        <strong>{{ displayName }}</strong
+        ><small>{{ t("common.plus") }}</small>
       </div>
     </button>
     <div class="sidebar-user-actions">
@@ -16,7 +17,7 @@
         class="sidebar-user-action"
         type="button"
         :aria-label="t('common.theme')"
-        @click="$emit('toggle-theme')"
+        @click="actions.toggleTheme()"
       >
         <span class="theme-glyph"></span>
       </button>
@@ -25,7 +26,7 @@
         type="button"
         :aria-label="t('common.playground')"
         :title="t('common.playground')"
-        @click="$emit('open-playground')"
+        @click="actions.openPlayground()"
       >
         <span class="playground-glyph">▦</span>
       </button>
@@ -33,7 +34,7 @@
         class="sidebar-user-action"
         type="button"
         :aria-label="t('common.swagger')"
-        @click="$emit('open-swagger')"
+        @click="actions.openSwagger()"
       >
         <SwaggerDocIcon />
       </button>
@@ -42,15 +43,25 @@
 </template>
 
 <script setup>
+import {computed, inject} from "vue";
 import {useI18n} from "vue-i18n";
+import {storeToRefs} from "pinia";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
+import {useAuthStore} from "@/stores/authStore";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
-defineEmits([
-  "open-settings",
-  "toggle-theme",
-  "open-playground",
-  "open-swagger",
-]);
+const authStore = useAuthStore();
+const {userName} = storeToRefs(authStore);
+
+const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+
+const displayName = computed(() => userName.value || t("common.user"));
+const userInitial = computed(() => {
+  const name = displayName.value;
+  return name ? name.charAt(0) : "U";
+});
 </script>

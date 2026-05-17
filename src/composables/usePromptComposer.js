@@ -434,7 +434,9 @@ export function usePromptComposer(props, emit) {
 
   watch(isPromptCompactViewport, syncViewportMode);
   useEventListener(window, "resize", syncViewportMode, {passive: true});
-  useEventListener(window, "orientationchange", syncViewportMode, {passive: true});
+  useEventListener(window, "orientationchange", syncViewportMode, {
+    passive: true,
+  });
   if (typeof window !== "undefined" && window.visualViewport) {
     useEventListener(window.visualViewport, "resize", syncViewportMode, {
       passive: true,

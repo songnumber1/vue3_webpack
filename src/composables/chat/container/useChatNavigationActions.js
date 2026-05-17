@@ -1,5 +1,6 @@
 import {nextTick} from "vue";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {logWarn} from "@/utils/logger";
 
 export function useChatNavigationActions({
   router,
@@ -24,14 +25,21 @@ export function useChatNavigationActions({
     revokeMessageAttachments(messages.value);
     messages.value = [];
     if (assistantId) {
-      await selectAssistantForNewChat(assistantId);
+      try {
+        await selectAssistantForNewChat(assistantId);
+      } catch (error) {
+        logWarn(
+          "[useChatNavigationActions] selectAssistantForNewChat 오류:",
+          error
+        );
+      }
       assistantSheetOpen.value = false;
     } else {
       clearCurrentChatSelection();
     }
     navigationStore.closeTransientPanels();
     clearForceBottom();
-    await router.push("/");
+    await router.push("/").catch(() => {});
   }
 
   function startNewChat() {
@@ -44,26 +52,30 @@ export function useChatNavigationActions({
 
   async function openHistory(item) {
     navigationStore.closeTransientPanels();
-    await router.push({name: "chat", params: {id: item.id}});
+    await router.push({name: "chat", params: {id: item.id}}).catch(() => {});
   }
 
   async function toggleTheme() {
-    theme.toggle();
-    themeName.value = theme.current;
-    await nextTick();
-    await renderMermaidInElement(document.querySelector(".message-list"), {
-      force: true,
-    });
-    scrollBottom({stable: true});
+    try {
+      theme.toggle();
+      themeName.value = theme.current;
+      await nextTick();
+      await renderMermaidInElement(document.querySelector(".message-list"), {
+        force: true,
+      });
+      scrollBottom({stable: true});
+    } catch (error) {
+      logWarn("[useChatNavigationActions] toggleTheme 오류:", error);
+    }
   }
 
   function openSwagger() {
-    router.push("/swagger");
+    router.push("/swagger").catch(() => {});
   }
 
   function openPlayground() {
     navigationStore.setDrawerOpen(false);
-    router.push({name: "playground"});
+    router.push({name: "playground"}).catch(() => {});
   }
 
   function openMobileDrawer() {
@@ -86,7 +98,7 @@ export function useChatNavigationActions({
 
   function openGuide() {
     navigationStore.setDrawerOpen(false);
-    router.push({name: "guide"});
+    router.push({name: "guide"}).catch(() => {});
   }
 
   function openNotice() {

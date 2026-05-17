@@ -8,7 +8,7 @@
         class="round-icon menu-toggle"
         type="button"
         :aria-label="t('chat.openSidebar')"
-        @click="chatActions.openDrawer"
+        @click="chatActions.openDrawer()"
       >
         <span class="icon-lines"></span>
       </button>
@@ -18,7 +18,7 @@
         class="model-trigger model-trigger--assistant"
         type="button"
         :aria-label="t('chat.assistantSelect')"
-        @click="chatActions.openAssistant"
+        @click="chatActions.openAssistant()"
       >
         <span>{{ assistantLabel }}</span>
         <ChevronDownIcon class="chevron chevron--selector" />
@@ -44,7 +44,7 @@
         type="button"
         :aria-label="t('common.guide')"
         :title="t('common.guide')"
-        @click="chatActions.openGuide"
+        @click="chatActions.openGuide()"
       >
         <GuideIcon />
       </button>
@@ -52,7 +52,7 @@
         class="round-icon theme-toggle"
         type="button"
         :aria-label="t('common.theme')"
-        @click="chatActions.toggleTheme"
+        @click="chatActions.toggleTheme()"
       >
         <span
           class="theme-glyph"
@@ -64,15 +64,15 @@
         type="button"
         :aria-label="t('common.swagger')"
         :title="t('common.swagger')"
-        @click="chatActions.openSwagger"
+        @click="chatActions.openSwagger()"
       >
         <SwaggerDocIcon />
       </button>
       <UserMenu
-        @notice="chatActions.openNotice"
-        @personalization="chatActions.openPersonalization"
-        @language="chatActions.openLanguage"
-        @playground="chatActions.openPlayground"
+        @notice="chatActions.openNotice()"
+        @personalization="chatActions.openPersonalization()"
+        @language="chatActions.openLanguage()"
+        @playground="chatActions.openPlayground()"
       />
     </div>
   </header>
@@ -90,7 +90,6 @@ import {
   createEmptyChatActions,
 } from "@/composables/chat/chatActionContext";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   mode: {type: String, default: "main"},
   isMobile: {type: Boolean, default: false},
@@ -98,7 +97,6 @@ const props = defineProps({
   conversationTitle: {type: String, default: ""},
   themeName: {type: String, default: "dark"},
 });
-
 
 const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());

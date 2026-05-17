@@ -7,7 +7,8 @@ export const messages = {
   ko: {
     app: {
       unsupportedTitle: "지원하지 않는 접속 환경입니다.",
-      unsupportedMessage: "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
+      unsupportedMessage:
+        "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
     },
     common: {
       back: "뒤로",
@@ -50,6 +51,7 @@ export const messages = {
     },
     chat: {
       assistantSelect: "Assistant 선택",
+      assistantSelected: "현재 선택된 어시스턴트",
       modelSelect: "모델 선택",
       modelReadonly: "대화방 모델은 변경할 수 없습니다.",
       tools: "도구",
@@ -59,6 +61,7 @@ export const messages = {
         file: "파일",
       },
       hideSidebar: "사이드바 숨기기",
+      collapsedSidebar: "접힌 사이드바",
       openSidebar: "사이드바 열기",
       newChat: "새 채팅",
       chatSearch: "채팅 검색",
@@ -66,6 +69,15 @@ export const messages = {
       recentChats: "최근 채팅",
       startQuestion: "어디서부터 시작할까요?",
       sharedReadonly: "공유 받은 대화입니다.",
+      readonlyInput: {
+        deletedModelTitle: "삭제된 모델입니다.",
+        deletedModelDesc:
+          "이전 대화 내용은 확인할 수 있지만 새 메시지는 보낼 수 없습니다.",
+        unavailableModelTitle: "사용할 수 없는 모델입니다.",
+        unavailableModelDesc:
+          "대화 이력은 열 수 있지만 모델 정보를 찾을 수 없어 새 메시지는 보낼 수 없습니다.",
+        sharedDesc: "이 화면에서는 메시지를 입력하거나 전송할 수 없습니다.",
+      },
       scrollBottom: "맨 아래로 이동",
       assistant: "Assistant",
       sharedConversationTitle: "공유 대화 {id}",
@@ -151,6 +163,30 @@ export const messages = {
       copyTableShort: "복사",
       downloadCsvShort: "CSV",
     },
+    loginRequired: {
+      title: "로그인이 필요합니다.",
+      goHome: "홈페이지로 이동",
+      reasons: {
+        ACCESS_DENIED: "현재 계정으로는 해당 페이지에 접근할 수 없습니다.",
+        USER_AGREE_REQUIRED: "서비스 이용 동의가 필요합니다.",
+        AUTH_ERROR: "로그인 확인 중 오류가 발생했습니다.",
+        LOGIN_REQUIRED: "서비스를 이용하려면 먼저 로그인해 주세요.",
+      },
+    },
+    notFound: {
+      title: "페이지를 찾을 수 없습니다.",
+      description: "요청한 페이지가 존재하지 않거나 주소가 변경되었습니다.",
+      goHome: "홈으로 이동",
+      goBack: "이전 페이지",
+    },
+    androidUpdate: {
+      label: "UPDATE REQUIRED",
+      defaultTitle: "앱 업데이트가 필요합니다.",
+      defaultMessage: "최신 버전으로 업데이트 후 다시 실행해 주세요.",
+      currentVersion: "현재 버전",
+      latestVersion: "최신 버전",
+      doUpdate: "업데이트 진행",
+    },
     guide: {
       title: "사용 가이드",
       subtitle: "채팅, 공유 대화, 문서 기능을 빠르게 시작하세요.",
@@ -173,7 +209,8 @@ export const messages = {
   en: {
     app: {
       unsupportedTitle: "Unsupported access environment.",
-      unsupportedMessage: "iOS app, iOS Chrome, and iOS Safari are not supported.",
+      unsupportedMessage:
+        "iOS app, iOS Chrome, and iOS Safari are not supported.",
     },
     common: {
       back: "Back",
@@ -216,6 +253,7 @@ export const messages = {
     },
     chat: {
       assistantSelect: "Select assistant",
+      assistantSelected: "Currently selected assistant",
       modelSelect: "Select model",
       modelReadonly: "The model for this chat cannot be changed.",
       tools: "Tools",
@@ -225,6 +263,7 @@ export const messages = {
         file: "File",
       },
       hideSidebar: "Hide sidebar",
+      collapsedSidebar: "Collapsed sidebar",
       openSidebar: "Open sidebar",
       newChat: "New chat",
       chatSearch: "Search chats",
@@ -232,6 +271,15 @@ export const messages = {
       recentChats: "Recent chats",
       startQuestion: "Where should we start?",
       sharedReadonly: "This is a shared conversation.",
+      readonlyInput: {
+        deletedModelTitle: "This model has been deleted.",
+        deletedModelDesc:
+          "You can view this conversation, but you cannot send new messages.",
+        unavailableModelTitle: "This model is unavailable.",
+        unavailableModelDesc:
+          "You can view this conversation, but model metadata is missing so new messages are blocked.",
+        sharedDesc: "You cannot send messages from this screen.",
+      },
       scrollBottom: "Scroll to bottom",
       assistant: "Assistant",
       sharedConversationTitle: "Shared chat {id}",
@@ -315,6 +363,31 @@ export const messages = {
       downloadCsv: "Download CSV",
       copyTableShort: "Copy",
       downloadCsvShort: "CSV",
+    },
+    loginRequired: {
+      title: "Login required.",
+      goHome: "Go to home",
+      reasons: {
+        ACCESS_DENIED: "Your account does not have access to this page.",
+        USER_AGREE_REQUIRED: "You must agree to the terms of service.",
+        AUTH_ERROR: "An error occurred while verifying login.",
+        LOGIN_REQUIRED: "Please log in to use this service.",
+      },
+    },
+    notFound: {
+      title: "Page not found.",
+      description:
+        "The requested page does not exist or the address has changed.",
+      goHome: "Go home",
+      goBack: "Previous page",
+    },
+    androidUpdate: {
+      label: "UPDATE REQUIRED",
+      defaultTitle: "App update required.",
+      defaultMessage: "Please update to the latest version and try again.",
+      currentVersion: "Current version",
+      latestVersion: "Latest version",
+      doUpdate: "Update now",
     },
     guide: {
       title: "Guide",

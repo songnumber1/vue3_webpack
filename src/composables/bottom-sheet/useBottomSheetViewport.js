@@ -104,7 +104,8 @@ export function createBottomSheetViewport(options) {
     const preferredMinHeight = getMinimumSheetHeight();
     const maxHeight = Math.max(
       preferredMinHeight,
-      Math.floor(viewportHeight * props.maxRatio) - readBottomSheetSafeAreaBottom()
+      Math.floor(viewportHeight * props.maxRatio) -
+        readBottomSheetSafeAreaBottom()
     );
     const minHeight = Math.min(preferredMinHeight, maxHeight);
     return Math.min(Math.max(height, minHeight), maxHeight);

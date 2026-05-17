@@ -89,7 +89,8 @@ const hasMeasuredPosition = computed(
   () => Number.isFinite(x.value) && Number.isFinite(y.value)
 );
 const contextMenuStyle = computed(() => {
-  const ready = desktopOpen.value && positionReady.value && hasMeasuredPosition.value;
+  const ready =
+    desktopOpen.value && positionReady.value && hasMeasuredPosition.value;
   return {
     ...floatingStyles.value,
     position: "fixed",

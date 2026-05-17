@@ -181,7 +181,7 @@ async function requestAccessInfo(authAxios, payload) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!authAxios) {
-    throw new Error("로그인 확인 전용 axios가 생성되지 않았습니다.");
+    throw new Error("[authGuard] Auth axios instance is not initialized.");
   }
 
   const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);

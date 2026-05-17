@@ -12,6 +12,7 @@ import {useViewportGuard} from "@/composables/useViewportGuard";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
@@ -79,6 +80,7 @@ export function useChatContainerController(props) {
     isCompactScreen,
     platformInfo,
   });
+
   const {
     showScrollBottom,
     markForceBottom,
@@ -191,31 +193,42 @@ export function useChatContainerController(props) {
       return;
     }
 
-    if (props.mode === "shared") {
-      messages.value = await loadSharedConversation(activeHistoryId.value);
+    try {
+      if (props.mode === "shared") {
+        messages.value = await loadSharedConversation(activeHistoryId.value);
+        markForceBottom();
+        await nextTick();
+        await scrollBottom({behavior: "auto", force: true, stable: true});
+        return;
+      }
+
+      const history = getHistory(activeHistoryId.value);
+      if (!history) {
+        await router.replace("/").catch(() => {});
+        return;
+      }
+      messages.value = await ensureConversation(history.id);
       markForceBottom();
       await nextTick();
       await scrollBottom({behavior: "auto", force: true, stable: true});
-      return;
+    } catch (error) {
+      logWarn(
+        "[useChatContainerController] loadRouteConversation 오류:",
+        error
+      );
     }
-
-    const history = getHistory(activeHistoryId.value);
-    if (!history) {
-      await router.replace("/");
-      return;
-    }
-    messages.value = await ensureConversation(history.id);
-    markForceBottom();
-    await nextTick();
-    await scrollBottom({behavior: "auto", force: true, stable: true});
   }
 
   async function renderAfterStream() {
-    markForceBottom(1000);
-    await renderMermaidInElement(document.querySelector(".message-list"), {
-      force: true,
-    });
-    scrollBottom({force: true, stable: true});
+    try {
+      markForceBottom(1000);
+      await renderMermaidInElement(document.querySelector(".message-list"), {
+        force: true,
+      });
+      scrollBottom({force: true, stable: true});
+    } catch (error) {
+      logWarn("[useChatContainerController] renderAfterStream 오류:", error);
+    }
   }
 
   const {isGenerating, handleSubmit} = useChatSubmit({
@@ -289,7 +302,11 @@ export function useChatContainerController(props) {
 
   onMounted(async () => {
     updateMobileState();
-    await runtime.initialize();
+    try {
+      await runtime.initialize();
+    } catch (error) {
+      logWarn("[useChatContainerController] runtime.initialize 오류:", error);
+    }
     await loadRouteConversation();
     runtimeReady.value = true;
   });

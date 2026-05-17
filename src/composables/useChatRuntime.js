@@ -216,36 +216,18 @@ export function useChatRuntime() {
     assistantStore.setExamplePrompts(assistantId, prompts);
   }
 
-  /**
-   * @description selectAssistant 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} id - id 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  async function selectAssistant(id) {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (chatStore.isModelLocked) return;
+  async function selectAssistant(id, {forNewChat = false} = {}) {
+    if (!forNewChat && chatStore.isModelLocked) return;
     assistantStore.selectAssistant(id);
+    if (forNewChat) chatStore.clearActiveSession();
     await preloadExamplePrompts(id);
   }
 
-  /**
-   * @description selectAssistantForNewChat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} id - id 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  async function selectAssistantForNewChat(id) {
-    assistantStore.selectAssistant(id);
-    chatStore.clearActiveSession();
-    await preloadExamplePrompts(id);
+  function selectAssistantForNewChat(id) {
+    return selectAssistant(id, {forNewChat: true});
   }
 
-  /**
-   * @description getHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} id - id 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function getHistory(id) {
-    // 계산된 결과를 호출부로 반환합니다.
     return chatStore.getHistory(id);
   }
 
