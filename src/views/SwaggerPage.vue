@@ -21,7 +21,7 @@
               d="M4 10.5 12 4l8 6.5V20a.5.5 0 0 1-.5.5h-5v-6h-5v6h-5A.5.5 0 0 1 4 20v-9.5Z"
             />
           </svg>
-          t('swagger.home')
+          {{ t("swagger.home") }}
         </RouterLink>
         <select
           v-model="selectedCategory"
