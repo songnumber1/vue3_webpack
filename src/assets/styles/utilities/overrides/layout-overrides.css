@@ -535,10 +535,6 @@ body.mobile-mode .attachment-preview-card--image {
     width: 118px;
   }
 
-body.mobile-mode .attachment-preview-thumb {
-    height: 86px;
-  }
-
 body.mobile-mode .message-image-card {
     width: min(78vw, 360px);
     max-height: 360px;
