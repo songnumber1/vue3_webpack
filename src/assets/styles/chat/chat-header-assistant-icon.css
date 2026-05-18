@@ -1,0 +1,51 @@
+/*
+ * Chat header assistant icon and mobile chat header spacing refinement.
+ * Scoped to chat/shared header surfaces to avoid changing main screen layout,
+ * drawer buttons, prompt buttons, or desktop sidebar controls.
+ */
+
+.conversation-title-wrap--chat {
+  gap: 8px;
+}
+
+.assistant-brand-logo--header {
+  width: 20px;
+  height: 20px;
+}
+
+.conversation-title-wrap--chat .assistant-brand-logo--header + strong {
+  margin-left: 0;
+}
+
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar,body.mobile-mode 
+  .app-container--mobile .chat-container-root--mode-shared .mobile-topbar {
+    height: 44px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .round-icon,body.mobile-mode 
+  .app-container--mobile .chat-container-root--mode-shared .mobile-topbar .round-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .model-trigger,body.mobile-mode 
+  .app-container--mobile .chat-container-root--mode-shared .mobile-topbar .model-trigger {
+    height: 34px;
+    min-width: 100px;
+    font-size: 15px;
+  }
+
+body.mobile-mode .app-container--mobile
+    .chat-container-root--mode-chat
+    .mobile-topbar
+    .model-trigger--assistant,body.mobile-mode 
+  .app-container--mobile
+    .chat-container-root--mode-shared
+    .mobile-topbar
+    .model-trigger--assistant {
+    gap: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }

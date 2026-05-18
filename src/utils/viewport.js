@@ -1,5 +1,4 @@
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
-import {MOBILE_BROWSER_FAMILY, RUNTIME_CSS_VARS} from "@/constants/runtimeContracts";
 
 export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
 
@@ -12,13 +11,13 @@ export function getMobileBrowserFamily() {
   const userAgent =
     typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/SamsungBrowser/i.test(userAgent)) return MOBILE_BROWSER_FAMILY.samsung;
+  if (/SamsungBrowser/i.test(userAgent)) return "samsung";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/Firefox/i.test(userAgent)) return MOBILE_BROWSER_FAMILY.firefox;
+  if (/Firefox/i.test(userAgent)) return "firefox";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return MOBILE_BROWSER_FAMILY.chrome;
+  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
   // 계산된 결과를 호출부로 반환합니다.
-  return MOBILE_BROWSER_FAMILY.default;
+  return "default";
 }
 
 /**
@@ -83,7 +82,7 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
   const visualHeight = Math.round(window.visualViewport?.height || 0);
   const innerHeight = Math.round(window.innerHeight || 0);
   const clientHeight = Math.round(document.documentElement?.clientHeight || 0);
-  const appHeight = Math.round(readRootPixelVar(RUNTIME_CSS_VARS.appHeight) || 0);
+  const appHeight = Math.round(readRootPixelVar("--app-height") || 0);
   const candidates = [
     visualHeight,
     innerHeight,
@@ -94,7 +93,7 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!candidates.length) return fallback;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (isMobileViewport() && getMobileBrowserFamily() === MOBILE_BROWSER_FAMILY.firefox) {
+  if (isMobileViewport() && getMobileBrowserFamily() === "firefox") {
     // 계산된 결과를 호출부로 반환합니다.
     return Math.max(Math.min(...candidates), minHeight);
   }

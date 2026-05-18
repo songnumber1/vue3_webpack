@@ -33,13 +33,37 @@
   padding: 14px 8px;
 }
 
+.collapsed-nav-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--control-bg);
+  color: var(--text);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  font-weight: 900;
+  transition:
+    background var(--duration-fast),
+    transform var(--duration-fast),
+    border-color var(--duration-fast);
+}
+
+.collapsed-nav-button:hover {
+  background: var(--control-hover);
+  transform: translateY(-1px);
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.document-toggle svg {
+.document-toggle svg,
+.test-toggle svg {
   width: 20px;
   height: 20px;
   fill: none;
@@ -65,13 +89,19 @@
   gap: 8px;
   padding: 0 7px 6px;
 }
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
 .sidebar-top-actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 .sidebar-round,
-.round-icon {
+.round-icon,
+.top-icon {
   width: 40px;
   height: 40px;
   border-radius: 999px;
@@ -87,18 +117,21 @@
     border-color var(--duration-fast);
 }
 .sidebar-round:hover,
-.round-icon:hover {
+.round-icon:hover,
+.top-icon:hover {
   background: var(--control-hover);
   transform: translateY(-1px);
 }
 
 .quick-menu,
+.project-list,
 .sidebar-history {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 .quick-item,
+.project-item,
 .sidebar-history-item {
   width: 100%;
   min-height: 36px;
@@ -116,13 +149,15 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.quick-item span {
+.quick-item span,
+.project-item span {
   width: 20px;
   text-align: center;
   color: var(--sidebar-icon);
   font-size: 17px;
 }
 .quick-item:hover,
+.project-item:hover,
 .sidebar-history-item:hover,
 .quick-item.active,
 .project-item.selected {
@@ -274,8 +309,8 @@
 }
 .desktop-center-prompt {
   width: min(650px, 100%);
-  padding: 0;
-  border: 0;
+  padding: 0 !important;
+  border: 0 !important;
 }
 .suggestion-row {
   display: flex;
@@ -373,6 +408,18 @@
 .bubble-content code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
+.bubble-tools {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+.bubble-tools button {
+  border: 1px solid var(--control-border);
+  color: var(--text-muted);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
 .typing-row {
   display: flex;
   gap: 6px;
@@ -426,6 +473,7 @@
   color: var(--placeholder);
 }
 .attach-button,
+.mic-button,
 .send-button {
   width: 38px;
   height: 38px;
@@ -436,7 +484,8 @@
   font-weight: 900;
   font-size: 20px;
 }
-.attach-button {
+.attach-button,
+.mic-button {
   background: transparent;
   color: var(--text);
 }
@@ -532,10 +581,6 @@ body.mobile-mode .model-trigger {
     font-size: 26px;
   }
 
-body.mobile-mode .mobile-actions {
-    gap: 10px;
-  }
-
 body.mobile-mode .model-menu {
     left: 50%;
     transform: translateX(-50%);
@@ -552,78 +597,6 @@ body.mobile-mode .empty-stage {
     display: block;
     overflow: auto;
     padding: 22px 28px 120px;
-  }
-
-body.mobile-mode .mobile-project-home {
-    display: block;
-  }
-
-body.mobile-mode .project-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-body.mobile-mode .project-title h1 {
-    margin: 0;
-    font-size: 38px;
-    line-height: 1.1;
-    font-weight: 600;
-    letter-spacing: -0.05em;
-  }
-
-body.mobile-mode .folder-icon {
-    font-size: 36px;
-    color: var(--text);
-  }
-
-body.mobile-mode .source-chip {
-    margin-top: 22px;
-    height: 58px;
-    border-radius: 999px;
-    border: 1px solid var(--control-border);
-    background: transparent;
-    color: var(--text);
-    padding: 0 24px;
-    font-size: 22px;
-    font-weight: 800;
-  }
-
-body.mobile-mode .mobile-recent-list {
-    margin-top: 42px;
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-  }
-
-body.mobile-mode .mobile-recent-card {
-    border: 0;
-    background: transparent;
-    color: var(--text);
-    text-align: left;
-    padding: 0;
-  }
-
-body.mobile-mode .mobile-recent-card strong {
-    display: block;
-    font-size: 27px;
-    font-weight: 550;
-    letter-spacing: -0.04em;
-    margin-bottom: 7px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-body.mobile-mode .mobile-recent-card span {
-    display: block;
-    color: var(--text-muted);
-    font-size: 22px;
-    line-height: 1.35;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
 body.mobile-mode .message-list {
@@ -777,24 +750,6 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
     font-size: 25px;
   }
 
-body.mobile-mode .mobile-new-chat-fab {
-    position: absolute;
-    right: 36px;
-    bottom: calc(84px + env(safe-area-inset-bottom));
-    height: 82px;
-    border: 0;
-    border-radius: 999px;
-    padding: 0 30px;
-    display: inline-flex;
-    align-items: center;
-    gap: 14px;
-    background: var(--fab-bg);
-    color: var(--fab-text);
-    font-size: 25px;
-    font-weight: 800;
-    box-shadow: var(--shadow-menu);
-  }
-
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
     position: absolute;
     left: 0;
@@ -815,6 +770,9 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
 
 /* Stable container/composer contract migrated from legacy wrapper CSS files. */
 .chat-container-root,
+.chat-container-root--mode-main,
+.chat-container-root--mode-chat,
+.chat-container-root--mode-shared,
 .chat-workspace {
   min-width: 0;
 }

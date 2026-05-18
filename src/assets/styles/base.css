@@ -1,0 +1,58 @@
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#app {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: var(--font-family);
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, var(--bg-gradient-a), transparent 34%),
+    radial-gradient(circle at top right, var(--bg-gradient-b), transparent 30%),
+    var(--bg);
+  overflow: hidden;
+}
+button,
+textarea {
+  font-family: inherit;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+.app-container {
+  height: 100%;
+  width: 100%;
+}
+.app-container--mobile {
+  max-width: none;
+  margin: 0;
+  background: var(--surface);
+}
+
+/* Android Chrome/WebView safe viewport variables. Updated by useViewportGuard. */
+:root {
+  --app-height: 100vh;
+  --app-width: 100vw;
+}
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
+}
+html,
+body,
+#app,
+.app-container {
+  min-height: 0;
+  height: var(--app-height);
+  overscroll-behavior: none;
+}

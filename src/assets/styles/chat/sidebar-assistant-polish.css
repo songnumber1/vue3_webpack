@@ -1,0 +1,65 @@
+/*
+ * Web-only sidebar assistant polish.
+ * Kept separate from core/layout CSS to avoid changing mobile drawer, mobile
+ * topbar, prompt buttons, or shared round icon styles.
+ */
+body.desktop-mode .desktop-sidebar .sidebar-top {
+    position: relative;
+  }
+body.desktop-mode .desktop-sidebar .sidebar-round {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+body.desktop-mode .desktop-sidebar .sidebar-round:hover,body.desktop-mode 
+  .desktop-sidebar .sidebar-round:focus-visible {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+  }
+body.desktop-mode .desktop-sidebar .sidebar-round:hover {
+    transform: none;
+  }
+body.desktop-mode .desktop-sidebar .assistant-selector {
+    position: static;
+  }
+body.desktop-mode .desktop-sidebar .assistant-menu {
+    top: calc(100% + 8px);
+    left: 50%;
+    width: calc(100% - 8px);
+    min-width: 0;
+    max-width: 232px;
+    transform: translateX(-50%);
+  }
+
+/* Main screen Assistant brand mark. */
+.conversation-title-wrap--main {
+  align-items: center;
+  gap: 12px;
+}
+
+.conversation-title-wrap--main .conversation-title-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.assistant-brand-logo {
+  display: inline-block;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.assistant-brand-logo--desktop {
+  width: 48px;
+  height: 48px;
+}
+
+.assistant-brand-logo--mobile {
+  width: 20px;
+  height: 20px;
+}
+
+body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
+    margin-right: 2px;
+  }

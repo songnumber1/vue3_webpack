@@ -77,11 +77,11 @@ body.mobile-mode .app-container--mobile .message--user .message-action-icon svg,
 
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .sidebar-history-row.selected {
-    background: var(--sidebar-hover, #ececf1);
+    background: var(--sidebar-hover, #ececf1) !important;
   }
 
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected .sidebar-history-item,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .sidebar-history-row.selected .sidebar-history-item {
-    background: transparent;
+    background: transparent !important;
     font-weight: 800;
   }

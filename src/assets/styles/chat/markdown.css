@@ -198,19 +198,19 @@ body.mobile-mode .md-table-wrapper table {
 }
 :root[data-theme="dark"] .md-mermaid,
 :root[data-theme="dark"] .md-mermaid svg {
-  background: #212121;
+  background: #212121 !important;
 }
 :root[data-theme="dark"] .md-mermaid svg,
 :root[data-theme="dark"] .md-mermaid svg * {
-  color: #f4f4f4;
+  color: #f4f4f4 !important;
 }
 :root[data-theme="dark"] .md-mermaid .node rect,
 :root[data-theme="dark"] .md-mermaid .node circle,
 :root[data-theme="dark"] .md-mermaid .node ellipse,
 :root[data-theme="dark"] .md-mermaid .node polygon,
 :root[data-theme="dark"] .md-mermaid .node path {
-  fill: #2f2f2f;
-  stroke: #d1d5db;
+  fill: #2f2f2f !important;
+  stroke: #d1d5db !important;
 }
 :root[data-theme="dark"] .md-mermaid .edgePath path,
 :root[data-theme="dark"] .md-mermaid path.flowchart-link,
@@ -218,13 +218,13 @@ body.mobile-mode .md-table-wrapper table {
 :root[data-theme="dark"] .md-mermaid .messageLine0,
 :root[data-theme="dark"] .md-mermaid .messageLine1,
 :root[data-theme="dark"] .md-mermaid line {
-  stroke: #e5e7eb;
+  stroke: #e5e7eb !important;
 }
 :root[data-theme="dark"] .md-mermaid marker path,
 :root[data-theme="dark"] .md-mermaid marker polygon,
 :root[data-theme="dark"] .md-mermaid marker circle {
-  fill: #e5e7eb;
-  stroke: #e5e7eb;
+  fill: #e5e7eb !important;
+  stroke: #e5e7eb !important;
 }
 :root[data-theme="dark"] .md-mermaid text,
 :root[data-theme="dark"] .md-mermaid tspan,
@@ -233,12 +233,12 @@ body.mobile-mode .md-table-wrapper table {
 :root[data-theme="dark"] .md-mermaid .edgeLabel,
 :root[data-theme="dark"] .md-mermaid .actor,
 :root[data-theme="dark"] .md-mermaid .messageText {
-  fill: #f4f4f4;
-  color: #f4f4f4;
+  fill: #f4f4f4 !important;
+  color: #f4f4f4 !important;
 }
 :root[data-theme="dark"] .md-mermaid .edgeLabel,
 :root[data-theme="dark"] .md-mermaid .labelBkg,
 :root[data-theme="dark"] .md-mermaid .edgeLabel rect {
-  background: #111827;
-  fill: #111827;
+  background: #111827 !important;
+  fill: #111827 !important;
 }

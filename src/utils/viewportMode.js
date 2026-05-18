@@ -1,9 +1,9 @@
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
-import {
-  RUNTIME_CSS_VARS,
-  VIEWPORT_MODE_CLASSES,
-  VIEWPORT_MODE_DATASET_KEY,
-} from "@/constants/runtimeContracts";
+
+const VIEWPORT_MODE_CLASSES = Object.freeze({
+  mobile: "mobile-mode",
+  desktop: "desktop-mode",
+});
 
 let cleanupViewportModeListeners = null;
 
@@ -38,8 +38,8 @@ export function syncViewportModeClass(breakpoint = MOBILE_BREAKPOINT_PX) {
   if (!body) return isMobile;
   body.classList.toggle(VIEWPORT_MODE_CLASSES.mobile, isMobile);
   body.classList.toggle(VIEWPORT_MODE_CLASSES.desktop, !isMobile);
-  body.dataset[VIEWPORT_MODE_DATASET_KEY] = isMobile ? "mobile" : "desktop";
-  body.style.setProperty(RUNTIME_CSS_VARS.viewportModeBreakpoint, `${breakpoint}px`);
+  body.dataset.viewportMode = isMobile ? "mobile" : "desktop";
+  body.style.setProperty("--viewport-mode-breakpoint", `${breakpoint}px`);
 
   return isMobile;
 }

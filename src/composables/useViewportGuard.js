@@ -7,12 +7,6 @@ import {
   MOBILE_BREAKPOINT_PX,
   VIEWPORT_GUARD_DELAY_MS,
 } from "@/constants/uiTokens";
-import {
-  MOBILE_BROWSER_CLASSES,
-  MOBILE_BROWSER_CLASS_PREFIX,
-  MOBILE_BROWSER_FAMILY,
-  RUNTIME_CSS_VARS,
-} from "@/constants/runtimeContracts";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 
 /**
@@ -25,9 +19,15 @@ function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   const body = document.body;
-  root.classList.remove(...MOBILE_BROWSER_CLASSES);
-  body?.classList.remove(...MOBILE_BROWSER_CLASSES);
-  const className = `${MOBILE_BROWSER_CLASS_PREFIX}-${browserFamily || MOBILE_BROWSER_FAMILY.default}`;
+  const classes = [
+    "mobile-browser-default",
+    "mobile-browser-chrome",
+    "mobile-browser-firefox",
+    "mobile-browser-samsung",
+  ];
+  root.classList.remove(...classes);
+  body?.classList.remove(...classes);
+  const className = `mobile-browser-${browserFamily || "default"}`;
   root.classList.add(className);
   body?.classList.add(className);
 }
@@ -78,7 +78,7 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     ? Math.max(candidateFromLayout, candidateFromBaseline)
     : 0;
   const composerInset = hasTextFocus
-    ? browserFamily === MOBILE_BROWSER_FAMILY.samsung || browserFamily === MOBILE_BROWSER_FAMILY.firefox
+    ? browserFamily === "samsung" || browserFamily === "firefox"
       ? Math.max(candidateFromLayout, candidateFromBaseline)
       : candidateFromLayout
     : 0;
@@ -104,52 +104,52 @@ function setCssViewportVars(size, baselineHeight = 0) {
   const browserFamily = getMobileBrowserFamily();
   const {layoutHeight, keyboardHeight, composerInset, offsetTop} =
     getKeyboardMetrics(size, baselineHeight);
-  const browserSafeBottom = browserFamily === MOBILE_BROWSER_FAMILY.firefox ? 0 : null;
+  const browserSafeBottom = browserFamily === "firefox" ? 0 : null;
 
   applyBrowserViewportClass(browserFamily);
 
-  document.documentElement.style.setProperty(RUNTIME_CSS_VARS.appHeight, `${height}px`);
-  document.documentElement.style.setProperty(RUNTIME_CSS_VARS.appWidth, `${width}px`);
+  document.documentElement.style.setProperty("--app-height", `${height}px`);
+  document.documentElement.style.setProperty("--app-width", `${width}px`);
   document.documentElement.style.setProperty(
-    RUNTIME_CSS_VARS.layoutViewportHeight,
+    "--layout-viewport-height",
     `${layoutHeight}px`
   );
   document.documentElement.style.setProperty(
-    RUNTIME_CSS_VARS.keyboardHeight,
+    "--keyboard-height",
     `${keyboardHeight}px`
   );
   document.documentElement.style.setProperty(
-    RUNTIME_CSS_VARS.mobileKeyboardInset,
+    "--mobile-keyboard-inset",
     `${keyboardHeight}px`
   );
   document.documentElement.style.setProperty(
-    RUNTIME_CSS_VARS.composerKeyboardInset,
+    "--composer-keyboard-inset",
     `${composerInset}px`
   );
-  if (browserFamily === MOBILE_BROWSER_FAMILY.firefox) {
+  if (browserFamily === "firefox") {
     document.documentElement.style.setProperty(
-      RUNTIME_CSS_VARS.firefoxMainComposerBottom,
+      "--firefox-main-composer-bottom",
       `${composerInset}px`
     );
   } else {
-    document.documentElement.style.removeProperty(RUNTIME_CSS_VARS.firefoxMainComposerBottom);
+    document.documentElement.style.removeProperty("--firefox-main-composer-bottom");
   }
   document.documentElement.style.setProperty(
-    RUNTIME_CSS_VARS.visualViewportOffsetTop,
+    "--visual-viewport-offset-top",
     `${offsetTop}px`
   );
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserSafeBottom === null) {
     document.documentElement.style.removeProperty(
-      RUNTIME_CSS_VARS.mobileBrowserSafeBottom
+      "--mobile-browser-safe-bottom"
     );
   } else {
     document.documentElement.style.setProperty(
-      RUNTIME_CSS_VARS.mobileBrowserSafeBottom,
+      "--mobile-browser-safe-bottom",
       `${browserSafeBottom}px`
     );
   }
-  document.documentElement.style.setProperty(RUNTIME_CSS_VARS.vh, `${height * 0.01}px`);
+  document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 
   // 계산된 결과를 호출부로 반환합니다.
   return {keyboardHeight, layoutHeight};
@@ -224,7 +224,7 @@ export function useViewportGuard(options = {}) {
 
     const browserFamily = getMobileBrowserFamily();
     const delay =
-      browserFamily === MOBILE_BROWSER_FAMILY.samsung
+      browserFamily === "samsung"
         ? VIEWPORT_GUARD_DELAY_MS.samsung
         : VIEWPORT_GUARD_DELAY_MS.default;
     resizeTimer = window.setTimeout(apply, delay);
