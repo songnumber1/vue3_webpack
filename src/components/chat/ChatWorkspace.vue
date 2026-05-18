@@ -74,6 +74,7 @@
       />
       <ChatPromptInput
         v-else
+        :class="{'mobile-chat-prompt': isMobile}"
         :is-mobile="isMobile"
         :selected-model="selectedModel"
         :models="models"
