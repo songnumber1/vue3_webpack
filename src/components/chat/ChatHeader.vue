@@ -21,7 +21,6 @@
         @click="chatActions.openAssistant()"
       >
         <img
-          v-if="mode === 'main'"
           class="assistant-brand-logo assistant-brand-logo--mobile"
           :src="mobileAssistantIcon"
           alt=""
@@ -33,8 +32,14 @@
 
       <div
         v-else-if="showDesktopConversationTitle"
-        class="conversation-title-wrap"
+        class="conversation-title-wrap conversation-title-wrap--chat"
       >
+        <img
+          class="assistant-brand-logo assistant-brand-logo--header"
+          :src="headerAssistantIcon"
+          alt=""
+          aria-hidden="true"
+        />
         <strong>{{ assistantLabel }}</strong>
         <span>{{ conversationTitle }}</span>
       </div>
@@ -121,6 +126,7 @@ const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const desktopAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 48));
 const mobileAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 20));
+const headerAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 20));
 
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);

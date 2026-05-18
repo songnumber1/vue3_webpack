@@ -19,3 +19,5 @@
 
 @import "./chat/ui-shape-interaction-fixes.css";
 @import "./chat/mobile-tap-and-button-radius-final.css";
+
+@import "./chat/chat-header-assistant-icon.css";
