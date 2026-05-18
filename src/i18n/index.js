@@ -117,6 +117,10 @@ export const messages = {
         preview: "{name} 미리보기",
         remove: "{name} 제거",
       },
+      reasoning: {
+        thinking: "생각중입니다.",
+        completed: "생각이 완료되었습니다.",
+      },
     },
     prompt: {
       modelSelect: "모델 선택",
@@ -343,6 +347,10 @@ export const messages = {
         listLabel: "Attached files",
         preview: "Preview {name}",
         remove: "Remove {name}",
+      },
+      reasoning: {
+        thinking: "Thinking...",
+        completed: "Thought completed.",
       },
     },
     prompt: {

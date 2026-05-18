@@ -25,13 +25,15 @@
 }
 
 .reasoning-chevron {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   width: 16px;
   height: 16px;
-  font-size: 14px;
-  line-height: 1;
+  flex: 0 0 auto;
+  color: currentColor;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   transform: rotate(0deg);
   transition: transform var(--duration-fast);
 }
@@ -101,5 +103,27 @@
 
   .message--user .bubble-content--plain {
     font-size: 15px;
+  }
+}
+
+/* Web chat alignment: remove the unused right avatar column on user messages so
+   the user bubble's right edge shares the same content boundary as assistant
+   answer boxes. */
+@media (min-width: 901px) {
+  .message--user {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .message--user .bubble {
+    grid-column: 1;
+    justify-self: end;
+    max-width: min(720px, 74%);
+    padding: 17px 19px 11px;
+  }
+
+  .message--user .bubble-content--plain {
+    font-size: 17px;
+    line-height: 1.66;
+    letter-spacing: -0.012em;
   }
 }

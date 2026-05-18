@@ -11,7 +11,14 @@
           :aria-expanded="reasoningOpen"
           @click="reasoningOpen = !reasoningOpen"
         >
-          <span class="reasoning-chevron" aria-hidden="true">&gt;</span>
+          <svg
+            class="reasoning-chevron"
+            aria-hidden="true"
+            viewBox="0 0 16 16"
+            focusable="false"
+          >
+            <path d="M6 4l4 4-4 4" />
+          </svg>
           <span>{{ reasoningTitle }}</span>
         </button>
         <div
@@ -43,7 +50,7 @@ import {useMarkdownMessageInteractions} from "@/composables/useMarkdownMessageIn
 import MessageActions from "./MessageActions.vue";
 
 const props = defineProps({message: {type: Object, required: true}});
-const {locale} = useI18n();
+const {locale, t} = useI18n();
 const emit = defineEmits(["rendered"]);
 const html = ref("<p></p>");
 const reasoningHtml = ref("<p></p>");
@@ -59,8 +66,8 @@ let reasoningRenderVersion = 0;
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"
-    ? "생각중입니다."
-    : "생각이 완료되었습니다."
+    ? t("chat.reasoning.thinking")
+    : t("chat.reasoning.completed")
 );
 
 async function renderContent() {
