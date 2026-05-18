@@ -34,7 +34,7 @@
               :key="item.key"
               class="mobile-settings-item"
               type="button"
-              @click="activeMenu = item.key"
+              @click="selectMenuItem(item.key)"
             >
               <span class="mobile-settings-item-icon" aria-hidden="true">{{
                 item.icon
@@ -66,6 +66,7 @@
             </div>
 
             <NoticeView v-else-if="activeMenu === 'notice'" />
+            <PrivacyPolicyView v-else-if="activeMenu === 'privacy'" />
             <PersonalizationView v-else-if="activeMenu === 'personalization'" />
 
             <section
@@ -107,8 +108,10 @@
 <script setup>
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import {useRouter} from "vue-router";
 import {setAppLocale} from "@/i18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
+import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
@@ -117,6 +120,7 @@ import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
 const props = defineProps({open: {type: Boolean, default: false}});
 const emit = defineEmits(["close"]);
 const {t, tm, locale} = useI18n();
+const router = useRouter();
 const activeMenu = ref("");
 
 const menuItems = computed(() => [
@@ -131,6 +135,18 @@ const menuItems = computed(() => [
     icon: "!",
     label: t("common.notice"),
     description: t("menu.noticeSummary"),
+  },
+  {
+    key: "privacy",
+    icon: "P",
+    label: t("common.privacy"),
+    description: t("menu.privacySummary"),
+  },
+  {
+    key: "terms",
+    icon: "T",
+    label: t("common.terms"),
+    description: t("menu.termsSummary"),
   },
   {
     key: "personalization",
@@ -170,6 +186,15 @@ const languageOptions = computed(() => [
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
+function selectMenuItem(key) {
+  if (key === "terms") {
+    closePanel();
+    router.push({name: "terms"}).catch(() => {});
+    return;
+  }
+  activeMenu.value = key;
+}
+
 function handleBack() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (activeMenu.value) {

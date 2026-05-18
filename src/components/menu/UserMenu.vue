@@ -26,6 +26,24 @@
           class="user-menu-item"
           type="button"
           role="menuitem"
+          @click="select('privacy')"
+        >
+          <strong>{{ t("common.privacy") }}</strong>
+          <small>{{ t("menu.privacySummary") }}</small>
+        </button>
+        <button
+          class="user-menu-item"
+          type="button"
+          role="menuitem"
+          @click="select('terms')"
+        >
+          <strong>{{ t("common.terms") }}</strong>
+          <small>{{ t("menu.termsSummary") }}</small>
+        </button>
+        <button
+          class="user-menu-item"
+          type="button"
+          role="menuitem"
           @click="select('personalization')"
         >
           <strong>{{ t("common.personalization") }}</strong>
@@ -90,7 +108,7 @@ import {setAppLocale} from "@/i18n";
 import {useOutsideClick} from "@/composables/useOutsideClick";
 import {useAuthStore} from "@/stores/authStore";
 
-const emit = defineEmits(["notice", "personalization", "playground"]);
+const emit = defineEmits(["notice", "privacy", "terms", "personalization", "playground"]);
 const {t, locale} = useI18n();
 const authStore = useAuthStore();
 const {userName} = storeToRefs(authStore);

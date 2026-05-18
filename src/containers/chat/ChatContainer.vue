@@ -43,17 +43,24 @@
 
     <AppOverlayProvider
       :notice-open="noticeOpen"
+      :privacy-open="privacyOpen"
       :personalization-open="personalizationOpen"
       :is-mobile="isMobile"
       :notice-title="t('notice.title')"
       :notice-subtitle="t('notice.subtitle')"
+      :privacy-title="t('legal.privacy.title')"
+      :privacy-subtitle="t('legal.privacy.description')"
       :personalization-title="t('personalization.title')"
       :personalization-subtitle="t('personalization.subtitle')"
       @close-notice="noticeOpen = false"
+      @close-privacy="privacyOpen = false"
       @close-personalization="personalizationOpen = false"
     >
       <template #notice>
         <NoticeView />
+      </template>
+      <template #privacy>
+        <PrivacyPolicyView />
       </template>
       <template #personalization>
         <PersonalizationView />
@@ -119,6 +126,7 @@ import ChatWorkspace from "@/components/chat/ChatWorkspace.vue";
 import LanguageSheet from "@/components/menu/LanguageSheet.vue";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
+import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
@@ -140,6 +148,7 @@ const {
   showScrollBottom,
   assistantSheetOpen,
   noticeOpen,
+  privacyOpen,
   personalizationOpen,
   languageSheetOpen,
   mobileSettingsOpen,
@@ -175,6 +184,8 @@ const {
   openSettings,
   openGuide,
   openNotice,
+  openPrivacy,
+  openTerms,
   openPersonalization,
   openLanguage,
   openAssistantFromHeader,
@@ -193,6 +204,8 @@ provide(CHAT_ACTIONS_KEY, {
   openAssistant: openAssistantFromHeader,
   openGuide,
   openNotice,
+  openPrivacy,
+  openTerms,
   openPersonalization,
   openLanguage,
   openPlayground,

@@ -10,6 +10,8 @@ export function createEmptyChatActions() {
     openAssistant: () => {},
     openGuide: () => {},
     openNotice: () => {},
+    openPrivacy: () => {},
+    openTerms: () => {},
     openPersonalization: () => {},
     openLanguage: () => {},
     openPlayground: () => {},

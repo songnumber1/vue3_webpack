@@ -67,6 +67,9 @@ const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
  */
 const AndroidUpdate = () => import("@/views/android/AndroidUpdate.vue");
 
+const TermsPage = () =>
+  import(/* webpackChunkName: "terms" */ "@/views/TermsPage.vue");
+
 const ANDROID_UPDATE_ROUTE_NAME = "android-update";
 const LOGIN_REQUIRED_ROUTE_NAME = "login-required";
 
@@ -110,6 +113,19 @@ const baseRoutes = [
         meta: {title: "Playground"},
       },
     ],
+  },
+];
+
+const legalRoutes = [
+  {
+    path: "/terms",
+    name: "terms",
+    component: TermsPage,
+    meta: {
+      title: "Terms of Service",
+      requireAuth: true,
+      standalone: true,
+    },
   },
 ];
 const authRoutes = [
@@ -303,6 +319,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
 export function resolveRouter(appInfo, context = {}) {
   const routes = applyInheritedRequireAuth([
     ...baseRoutes,
+    ...legalRoutes,
     ...authRoutes,
     ...(isAndroidApp(appInfo) ? androidRoutes : []),
     ...(isIosApp(appInfo) ? iosRoutes : []),

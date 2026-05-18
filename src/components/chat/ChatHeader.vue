@@ -70,6 +70,8 @@
       </button>
       <UserMenu
         @notice="chatActions.openNotice()"
+        @privacy="chatActions.openPrivacy()"
+        @terms="chatActions.openTerms()"
         @personalization="chatActions.openPersonalization()"
         @language="chatActions.openLanguage()"
         @playground="chatActions.openPlayground()"

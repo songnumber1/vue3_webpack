@@ -36,6 +36,7 @@ export function useChatContainerController(props) {
   const messages = ref([]);
   const assistantSheetOpen = ref(false);
   const noticeOpen = ref(false);
+  const privacyOpen = ref(false);
   const personalizationOpen = ref(false);
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
@@ -257,6 +258,8 @@ export function useChatContainerController(props) {
     openSettings,
     openGuide,
     openNotice,
+    openPrivacy,
+    openTerms,
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,
@@ -268,6 +271,7 @@ export function useChatContainerController(props) {
     isMobile,
     assistantSheetOpen,
     noticeOpen,
+    privacyOpen,
     personalizationOpen,
     languageSheetOpen,
     mobileSettingsOpen,
@@ -325,6 +329,7 @@ export function useChatContainerController(props) {
     showScrollBottom,
     assistantSheetOpen,
     noticeOpen,
+    privacyOpen,
     personalizationOpen,
     languageSheetOpen,
     mobileSettingsOpen,
@@ -360,6 +365,8 @@ export function useChatContainerController(props) {
     openSettings,
     openGuide,
     openNotice,
+    openPrivacy,
+    openTerms,
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,

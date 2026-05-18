@@ -10,6 +10,7 @@ export function useChatNavigationActions({
   isMobile,
   assistantSheetOpen,
   noticeOpen,
+  privacyOpen,
   personalizationOpen,
   languageSheetOpen,
   mobileSettingsOpen,
@@ -103,6 +104,16 @@ export function useChatNavigationActions({
     noticeOpen.value = true;
   }
 
+  function openPrivacy() {
+    navigationStore.setDrawerOpen(false);
+    privacyOpen.value = true;
+  }
+
+  function openTerms() {
+    navigationStore.setDrawerOpen(false);
+    router.push({name: "terms"}).catch(() => {});
+  }
+
   function openPersonalization() {
     navigationStore.setDrawerOpen(false);
     personalizationOpen.value = true;
@@ -127,6 +138,8 @@ export function useChatNavigationActions({
     openSettings,
     openGuide,
     openNotice,
+    openPrivacy,
+    openTerms,
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,

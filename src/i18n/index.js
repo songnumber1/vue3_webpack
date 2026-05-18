@@ -27,6 +27,8 @@ export const messages = {
       swagger: "Swagger 문서",
       settings: "설정",
       playground: "Playground",
+      privacy: "개인정보처리방침",
+      terms: "이용 약관",
       resize: "크기 조절",
       select: "선택",
     },
@@ -144,6 +146,8 @@ export const messages = {
       openPersonalization: "개인화 설정",
       openLanguage: "언어 선택",
       noticeSummary: "서비스 업데이트와 운영 안내를 확인하세요.",
+      privacySummary: "개인정보 처리 기준을 확인하세요.",
+      termsSummary: "서비스 이용 약관을 확인하고 동의합니다.",
       personalizationSummary: "응답 방식과 화면 취향을 조정하세요.",
       languageSummary: "한국어 또는 영어로 화면 언어를 변경합니다.",
       playgroundSummary: "공통 UI와 플랫폼별 화면을 독립적으로 테스트합니다.",
@@ -191,6 +195,87 @@ export const messages = {
       downloadCsv: "CSV 다운로드",
       copyTableShort: "복사",
       downloadCsvShort: "CSV",
+    },
+
+    legal: {
+      updatedAt: "시행일: 2026.05.18",
+      privacy: {
+        eyebrow: "Privacy",
+        title: "개인정보처리방침",
+        description:
+          "DS Assistant는 서비스 제공에 필요한 최소한의 개인정보를 안전하게 처리합니다.",
+        sections: [
+          {
+            title: "1. 수집하는 개인정보",
+            body:
+              "서비스 인증, 대화 이력 제공, 오류 대응을 위해 계정 식별 정보, 접속 환경, 서비스 이용 기록, 첨부 파일 메타데이터를 처리할 수 있습니다.",
+          },
+          {
+            title: "2. 개인정보 이용 목적",
+            body:
+              "사용자 인증, 대화 서비스 제공, 보안 점검, 장애 분석, 고객 문의 대응 및 서비스 품질 개선 목적으로 이용합니다.",
+          },
+          {
+            title: "3. 보관 및 파기",
+            body:
+              "개인정보는 목적 달성 후 내부 정책과 관련 법령에 따라 지체 없이 파기하며, 필요한 경우 법령상 보관 기간 동안만 분리 보관합니다.",
+          },
+          {
+            title: "4. 제3자 제공 및 위탁",
+            body:
+              "법령에 따른 경우를 제외하고 사용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다. 위탁이 필요한 경우 목적과 범위를 명확히 고지합니다.",
+          },
+          {
+            title: "5. 이용자의 권리",
+            body:
+              "사용자는 개인정보 열람, 정정, 삭제, 처리 정지를 요청할 수 있으며, 회사는 본인 확인 후 관련 법령에 따라 처리합니다.",
+          },
+          {
+            title: "6. 안전성 확보 조치",
+            body:
+              "접근 권한 관리, 암호화, 접속 기록 점검, 보안 업데이트 등 개인정보 보호를 위한 기술적·관리적 조치를 적용합니다.",
+          },
+        ],
+      },
+      terms: {
+        eyebrow: "Terms",
+        title: "이용 약관",
+        description:
+          "DS Assistant 이용 전 서비스 이용 조건과 사용자 책임을 확인해 주세요.",
+        agreeLabel: "이용 약관 내용을 확인했으며 동의합니다.",
+        sections: [
+          {
+            title: "1. 목적",
+            body:
+              "본 약관은 DS Assistant 서비스 이용과 관련하여 회사와 이용자 사이의 권리, 의무 및 책임 사항을 정하는 것을 목적으로 합니다.",
+          },
+          {
+            title: "2. 서비스 이용",
+            body:
+              "이용자는 인증 절차를 완료한 뒤 서비스를 사용할 수 있으며, 회사는 운영상 필요한 경우 서비스의 일부를 변경하거나 제한할 수 있습니다.",
+          },
+          {
+            title: "3. 이용자 의무",
+            body:
+              "이용자는 타인의 권리를 침해하거나 서비스 안정성을 해치는 행위를 해서는 안 되며, 계정과 접속 권한을 안전하게 관리해야 합니다.",
+          },
+          {
+            title: "4. 생성 콘텐츠",
+            body:
+              "AI 응답은 참고 자료로 제공되며, 중요한 의사결정에는 사용자의 검토와 확인이 필요합니다. 이용자는 입력한 정보와 활용 결과에 대한 책임을 집니다.",
+          },
+          {
+            title: "5. 서비스 제한",
+            body:
+              "보안 위협, 비정상 이용, 법령 또는 약관 위반이 확인되는 경우 회사는 서비스 이용을 제한할 수 있습니다.",
+          },
+          {
+            title: "6. 약관 변경",
+            body:
+              "회사는 필요한 경우 약관을 변경할 수 있으며, 중요한 변경 사항은 서비스 화면 또는 별도 공지로 안내합니다.",
+          },
+        ],
+      },
     },
     loginRequired: {
       title: "로그인이 필요합니다.",
@@ -258,8 +343,10 @@ export const messages = {
       swagger: "Swagger Docs",
       settings: "Settings",
       playground: "Playground",
-      resize: "크기 조절",
-      select: "선택",
+      privacy: "Privacy Policy",
+      terms: "Terms of Service",
+      resize: "Resize",
+      select: "Select",
     },
     feedback: {
       like: "Like",
@@ -375,6 +462,8 @@ export const messages = {
       openPersonalization: "Personalization settings",
       openLanguage: "Choose language",
       noticeSummary: "Check service updates and announcements.",
+      privacySummary: "Review how personal information is processed.",
+      termsSummary: "Review and agree to the service terms.",
       personalizationSummary: "Adjust response style and preferences.",
       languageSummary: "Switch the UI between Korean and English.",
       playgroundSummary:
@@ -421,6 +510,87 @@ export const messages = {
       downloadCsv: "Download CSV",
       copyTableShort: "Copy",
       downloadCsvShort: "CSV",
+    },
+
+    legal: {
+      updatedAt: "Effective date: 2026.05.18",
+      privacy: {
+        eyebrow: "Privacy",
+        title: "Privacy Policy",
+        description:
+          "DS Assistant processes only the minimum personal information needed to provide the service safely.",
+        sections: [
+          {
+            title: "1. Information we process",
+            body:
+              "We may process account identifiers, access environment data, service usage records, and attachment metadata for authentication, chat history, troubleshooting, and security.",
+          },
+          {
+            title: "2. Purpose of use",
+            body:
+              "Information is used for user authentication, chat service delivery, security checks, incident analysis, support, and service quality improvement.",
+          },
+          {
+            title: "3. Retention and deletion",
+            body:
+              "Personal information is deleted after the purpose is fulfilled, except where retention is required by internal policy or applicable law.",
+          },
+          {
+            title: "4. Sharing and outsourcing",
+            body:
+              "We do not provide personal information to third parties without consent unless required by law. Any necessary outsourcing will be clearly disclosed.",
+          },
+          {
+            title: "5. User rights",
+            body:
+              "Users may request access, correction, deletion, or suspension of processing, and requests will be handled after identity verification under applicable law.",
+          },
+          {
+            title: "6. Security measures",
+            body:
+              "We apply technical and administrative safeguards such as access control, encryption, log review, and security updates.",
+          },
+        ],
+      },
+      terms: {
+        eyebrow: "Terms",
+        title: "Terms of Service",
+        description:
+          "Please review the service conditions and user responsibilities before using DS Assistant.",
+        agreeLabel: "I have read and agree to the Terms of Service.",
+        sections: [
+          {
+            title: "1. Purpose",
+            body:
+              "These terms define the rights, obligations, and responsibilities between the company and users regarding DS Assistant.",
+          },
+          {
+            title: "2. Service use",
+            body:
+              "Users may use the service after authentication, and the company may change or restrict parts of the service when operationally necessary.",
+          },
+          {
+            title: "3. User obligations",
+            body:
+              "Users must not infringe the rights of others or disrupt service stability and must securely manage their account and access rights.",
+          },
+          {
+            title: "4. Generated content",
+            body:
+              "AI responses are provided as references. Important decisions require user review and verification, and users are responsible for their inputs and use of outputs.",
+          },
+          {
+            title: "5. Service restrictions",
+            body:
+              "The company may restrict service use when security threats, abnormal use, or violations of laws or these terms are identified.",
+          },
+          {
+            title: "6. Changes to terms",
+            body:
+              "The company may revise these terms when necessary, and important changes will be announced through the service screen or separate notice.",
+          },
+        ],
+      },
     },
     loginRequired: {
       title: "Login required.",
