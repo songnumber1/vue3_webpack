@@ -1,7 +1,20 @@
-import {ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useEventListener, useMediaQuery} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/useOutsideClick";
 import {PROMPT_MENU_TYPE, PROMPT_VIEWPORT_QUERY} from "@/constants/promptComposer";
+
+function createMenuOpenRef(activeMenu, menuType) {
+  return computed({
+    get: () => activeMenu.value === menuType,
+    set: (open) => {
+      if (open) {
+        activeMenu.value = menuType;
+        return;
+      }
+      if (activeMenu.value === menuType) activeMenu.value = null;
+    },
+  });
+}
 
 /**
  * @description 뷰포트 모드 감지와 메뉴 공통 상태를 관리합니다.
@@ -9,9 +22,10 @@ import {PROMPT_MENU_TYPE, PROMPT_VIEWPORT_QUERY} from "@/constants/promptCompose
  */
 export function usePromptMenu() {
   const toolbarRef = ref(null);
-  const modelMenuOpen = ref(false);
-  const toolMenuOpen = ref(false);
-  const attachMenuOpen = ref(false);
+  const activeMenu = ref(null);
+  const modelMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.model);
+  const toolMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.tool);
+  const attachMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.attach);
   const isMobileSheet = ref(false);
   const isPromptCompactViewport = useMediaQuery(PROMPT_VIEWPORT_QUERY);
 
@@ -20,9 +34,20 @@ export function usePromptMenu() {
   }
 
   function closeMenus(except = "") {
-    if (except !== PROMPT_MENU_TYPE.model) modelMenuOpen.value = false;
-    if (except !== PROMPT_MENU_TYPE.tool) toolMenuOpen.value = false;
-    if (except !== PROMPT_MENU_TYPE.attach) attachMenuOpen.value = false;
+    if (except && activeMenu.value === except) return;
+    activeMenu.value = null;
+  }
+
+  function openMenu(menuType) {
+    activeMenu.value = menuType;
+  }
+
+  function closeMenu(menuType) {
+    if (!menuType || activeMenu.value === menuType) activeMenu.value = null;
+  }
+
+  function toggleMenu(menuType) {
+    activeMenu.value = activeMenu.value === menuType ? null : menuType;
   }
 
   function getToolbarRoot(key) {
@@ -50,12 +75,16 @@ export function usePromptMenu() {
 
   return {
     toolbarRef,
+    activeMenu,
     modelMenuOpen,
     toolMenuOpen,
     attachMenuOpen,
     isMobileSheet,
     syncViewportMode,
     closeMenus,
+    openMenu,
+    closeMenu,
+    toggleMenu,
     getToolbarRoot,
   };
 }

@@ -15,6 +15,7 @@ import {
   FILE_PICKER_TYPE,
   IMAGE_PREVIEW_EVENT,
   NATIVE_FILE_SELECTED_TYPE,
+  PROMPT_MENU_TYPE,
 } from "@/constants/promptComposer";
 import {useI18n} from "vue-i18n";
 
@@ -29,7 +30,7 @@ export function usePromptAttachment({
   getLastHeight,
   emit,
   disabled,
-  closeMenus,
+  toggleMenu,
 }) {
   const {t} = useI18n();
   const platformStore = usePlatformStore();
@@ -51,10 +52,7 @@ export function usePromptAttachment({
   function openAttachSelector() {
     if (disabled.value) return;
 
-    const next = !attachMenuOpen.value;
-
-    closeMenus();
-    attachMenuOpen.value = next;
+    toggleMenu(PROMPT_MENU_TYPE.attach);
   }
 
   async function openFilePicker(type = FILE_PICKER_TYPE.all) {
@@ -150,6 +148,9 @@ export function usePromptAttachment({
   }
 
   function clearAttachments() {
+    attachments.value.forEach((file) => {
+      revokeAttachmentUrl(file);
+    });
     attachments.value = [];
   }
 

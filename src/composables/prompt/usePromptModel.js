@@ -6,7 +6,7 @@ import {DEFAULT_FALLBACK_MODEL, PROMPT_MENU_TYPE} from "@/constants/promptCompos
  * @param {object} options - props, modelMenuOpen ref, syncViewportMode 함수, closeMenus 함수, emit 함수
  * @returns {object} 모델 관련 상태 및 핸들러
  */
-export function usePromptModel({props, modelMenuOpen, syncViewportMode, closeMenus, emit}) {
+export function usePromptModel({props, modelMenuOpen, syncViewportMode, toggleMenu, emit}) {
   const fallbackModels = computed(() => [
     {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
   ]);
@@ -24,9 +24,7 @@ export function usePromptModel({props, modelMenuOpen, syncViewportMode, closeMen
   function openModelSelector() {
     if (props.disabled || props.modelReadonly) return;
     syncViewportMode();
-    const next = !modelMenuOpen.value;
-    closeMenus(PROMPT_MENU_TYPE.model);
-    modelMenuOpen.value = next;
+    toggleMenu(PROMPT_MENU_TYPE.model);
   }
 
   function selectModel(id) {

@@ -12,7 +12,7 @@ export function usePromptTool({
   props,
   toolMenuOpen,
   syncViewportMode,
-  closeMenus,
+  toggleMenu,
   text,
   resize,
   focusTextarea,
@@ -29,9 +29,7 @@ export function usePromptTool({
   function openToolSelector() {
     if (props.disabled) return;
     syncViewportMode();
-    const next = !toolMenuOpen.value;
-    closeMenus(PROMPT_MENU_TYPE.tool);
-    toolMenuOpen.value = next;
+    toggleMenu(PROMPT_MENU_TYPE.tool);
   }
 
   function applyTool(tool) {

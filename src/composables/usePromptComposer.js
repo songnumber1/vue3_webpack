@@ -27,6 +27,7 @@ export function usePromptComposer(props, emit) {
     isMobileSheet,
     syncViewportMode,
     closeMenus,
+    toggleMenu,
   } = usePromptMenu();
 
   // ── 텍스트 입력 + 리사이즈 ────────────────────────────────────────────
@@ -62,7 +63,7 @@ export function usePromptComposer(props, emit) {
     getLastHeight,
     emit,
     disabled,
-    closeMenus,
+    toggleMenu,
   });
 
   // ── 음성 입력 ─────────────────────────────────────────────────────────
@@ -78,14 +79,14 @@ export function usePromptComposer(props, emit) {
 
   // ── 모델 선택 ─────────────────────────────────────────────────────────
   const {currentModels, currentModel, openModelSelector, selectModel} =
-    usePromptModel({props, modelMenuOpen, syncViewportMode, closeMenus, emit});
+    usePromptModel({props, modelMenuOpen, syncViewportMode, toggleMenu, emit});
 
   // ── 툴 선택 ───────────────────────────────────────────────────────────
   const {tools, openToolSelector, applyTool} = usePromptTool({
     props,
     toolMenuOpen,
     syncViewportMode,
-    closeMenus,
+    toggleMenu,
     text,
     resize,
     focusTextarea,
