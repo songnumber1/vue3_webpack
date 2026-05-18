@@ -387,6 +387,8 @@ export function useChatRuntime() {
       id: createId("message"),
       role: "assistant",
       content: "",
+      reasoningContent: "",
+      reasoningStatus: "thinking",
       createdAt: new Date().toISOString(),
     };
     const nextMessages = [...currentMessages, userMessage, assistantMessage];

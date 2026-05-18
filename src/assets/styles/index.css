@@ -11,5 +11,6 @@
 @import "./chat/session-mobile-browser-fixes.css";
 @import "./chat-mobile.css";
 @import "./chat/layout-overrides.css";
+@import "./chat/reasoning.css";
 
 @import "./exception.css";

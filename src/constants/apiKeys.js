@@ -37,4 +37,6 @@ export const MESSAGE_KEYS = Object.freeze({
   SENT_AT: "sendTime",
   REFERENCES: "references",
   LEGACY_REFERENCES: "refreences",
+  REASONING_CONTENT: "reasoningContent",
+  REASONING_STATUS: "reasoningStatus",
 });

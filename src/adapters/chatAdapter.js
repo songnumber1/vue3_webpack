@@ -66,6 +66,10 @@ export function adaptMessage(raw = {}) {
         ? MESSAGE_ROLES.USER
         : MESSAGE_ROLES.ASSISTANT,
     content: raw[MESSAGE_KEYS.CONTENT] || "",
+    reasoningContent: raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "",
+    reasoningStatus:
+      raw[MESSAGE_KEYS.REASONING_STATUS] ||
+      (raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning ? "completed" : ""),
     createdAt: raw[MESSAGE_KEYS.SENT_AT] || "",
     isSent: toBoolean(raw.isSend),
     isRag: toBoolean(raw.isRAG),

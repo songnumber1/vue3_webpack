@@ -11,6 +11,20 @@ function normalizePromptPayload(payload) {
   };
 }
 
+function buildMockReasoningContent(normalized) {
+  const target = normalized.text || "첨부 기반 요청";
+  return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.
+
+- 요청: ${target}
+- 현재는 실제 API가 없으므로 mock reasoningContent로 추론 영역을 검증합니다.
+- 최종 답변과 구분되도록 더 작은 글자 크기와 다른 배경 스타일로 표시합니다.`;
+}
+
+export function updateAssistantReasoningTitle(message, status = "completed") {
+  if (!message) return;
+  message.reasoningStatus = status;
+}
+
 function buildAssistantResponse(normalized) {
   const fileSummary = normalized.attachments.length
     ? `\n\n첨부 파일 ${normalized.attachments.length}개를 함께 받았습니다. 이미지/파일 미리보기와 메시지 액션 영역도 유지됩니다.`
@@ -49,6 +63,9 @@ export function useChatSubmit(options) {
     await nextTick();
     await options.scrollBottom({force: true, stable: true});
 
+    assistantMessage.reasoningContent = buildMockReasoningContent(normalized);
+    updateAssistantReasoningTitle(assistantMessage, "thinking");
+
     isGenerating.value = true;
     try {
       await streamText(
@@ -59,11 +76,13 @@ export function useChatSubmit(options) {
         },
         {delay: 9}
       );
+      updateAssistantReasoningTitle(assistantMessage, "completed");
       options.setConversation(targetHistoryId, messages);
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
       logWarn("[useChatSubmit] 스트리밍 오류:", error);
+      updateAssistantReasoningTitle(assistantMessage, "completed");
       assistantMessage.content =
         assistantMessage.content || "(응답 생성 중 오류가 발생했습니다.)";
       options.setConversation(targetHistoryId, messages);
