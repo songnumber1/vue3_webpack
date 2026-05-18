@@ -1,0 +1,166 @@
+/*
+ * Mobile composer targeted fixes.
+ * Scope: mobile-mode only. Keeps desktop-width web layout unchanged while making
+ * the mobile chat composer match the mobile main composer and keeping attachment
+ * previews left aligned/compact after the viewport-mode refactor.
+ */
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini {
+  align-items: stretch !important;
+}
+
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-action-row,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-action-row,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .chat-composer-slot .prompt-action-row,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-shared .chat-composer-slot .prompt-action-row {
+  width: 100% !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+}
+
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-left-actions,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-left-actions,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .chat-composer-slot .prompt-left-actions,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-shared .chat-composer-slot .prompt-left-actions {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  justify-content: flex-start !important;
+  margin-right: auto !important;
+}
+
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .send-button,
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .voice-button,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .send-button,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .voice-button,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .chat-composer-slot .send-button,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .chat-composer-slot .voice-button,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-shared .chat-composer-slot .send-button,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-shared .chat-composer-slot .voice-button {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+}
+
+body.mobile-mode .attachment-preview-row,
+body.mobile-mode .app-container--mobile .attachment-preview-row,
+body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot .attachment-preview-row,
+body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot .attachment-preview-row {
+  width: 100% !important;
+  align-self: stretch !important;
+  justify-content: flex-start !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 38px 8px 2px !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.mobile-mode .attachment-preview-row::-webkit-scrollbar,
+body.mobile-mode .app-container--mobile .attachment-preview-row::-webkit-scrollbar {
+  display: none !important;
+}
+
+body.mobile-mode .attachment-preview-card,
+body.mobile-mode .attachment-preview-card--image,
+body.mobile-mode .app-container--mobile .attachment-preview-card,
+body.mobile-mode .app-container--mobile .attachment-preview-card--image {
+  flex: 0 0 var(--attachment-mobile-size) !important;
+  width: var(--attachment-mobile-size) !important;
+  height: var(--attachment-mobile-size) !important;
+  min-width: var(--attachment-mobile-size) !important;
+  min-height: var(--attachment-mobile-size) !important;
+  max-width: var(--attachment-mobile-size) !important;
+  max-height: var(--attachment-mobile-size) !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 6px !important;
+  border-radius: var(--attachment-mobile-radius) !important;
+  overflow: visible !important;
+}
+
+body.mobile-mode .attachment-preview-thumb,
+body.mobile-mode .attachment-preview-file,
+body.mobile-mode .app-container--mobile .attachment-preview-thumb,
+body.mobile-mode .app-container--mobile .attachment-preview-file {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: var(--attachment-mobile-thumb-radius) !important;
+}
+
+body.mobile-mode .attachment-preview-thumb img,
+body.mobile-mode .app-container--mobile .attachment-preview-thumb img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: var(--attachment-mobile-thumb-radius) !important;
+}
+
+body.mobile-mode .attachment-preview-file,
+body.mobile-mode .app-container--mobile .attachment-preview-file {
+  font-size: 28px !important;
+  line-height: 1 !important;
+  background: var(--surface, #f8fafc) !important;
+}
+
+body.mobile-mode .attachment-preview-info,
+body.mobile-mode .attachment-preview-info strong,
+body.mobile-mode .attachment-preview-info span,
+body.mobile-mode .attachment-preview-card--image .attachment-preview-info,
+body.mobile-mode .app-container--mobile .attachment-preview-info,
+body.mobile-mode .app-container--mobile .attachment-preview-info strong,
+body.mobile-mode .app-container--mobile .attachment-preview-info span,
+body.mobile-mode .app-container--mobile .attachment-preview-card--image .attachment-preview-info {
+  display: none !important;
+}
+
+body.mobile-mode .attachment-preview-remove,
+body.mobile-mode .attachment-preview-card--image .attachment-preview-remove,
+body.mobile-mode .app-container--mobile .attachment-preview-remove,
+body.mobile-mode .app-container--mobile .attachment-preview-card--image .attachment-preview-remove {
+  top: var(--attachment-mobile-remove-offset) !important;
+  right: var(--attachment-mobile-remove-offset) !important;
+  width: var(--attachment-mobile-remove-size) !important;
+  height: var(--attachment-mobile-remove-size) !important;
+  min-width: var(--attachment-mobile-remove-size) !important;
+  min-height: var(--attachment-mobile-remove-size) !important;
+  padding: 0 0 2px !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
+}
+
+body.mobile-mode .attachment-preview-remove::before,
+body.mobile-mode .app-container--mobile .attachment-preview-remove::before {
+  inset: -8px !important;
+}
+
+/* Align the mobile main header with the compact chat-room header spacing. */
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .mobile-topbar {
+  height: 44px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .mobile-topbar .round-icon {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .mobile-topbar .model-trigger,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .mobile-topbar .model-trigger--assistant {
+  height: 34px !important;
+  min-width: 100px !important;
+  font-size: 15px !important;
+  gap: 6px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
