@@ -320,6 +320,7 @@ export function useChatContainerController(props) {
     runtimeReady,
     workspaceRef,
     assistants,
+    currentAssistant,
     models,
     selectedAssistantId,
     selectedModel,

@@ -1,0 +1,8 @@
+<svg width="96" height="96" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">DS Assistant</title>
+  <desc id="desc">DS Assistant brand mark</desc>
+  <rect x="10" y="10" width="76" height="76" rx="24" fill="#10A37F"/>
+  <path d="M29 50.5C29 40.3 36.7 32.5 47 32.5C57.3 32.5 65 40.3 65 50.5C65 60.7 57.3 68.5 47 68.5H34.8C31.6 68.5 29 65.9 29 62.7V50.5Z" fill="white" fill-opacity="0.94"/>
+  <path d="M39 47.5H55M39 55H49" stroke="#10A37F" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="66" cy="31" r="8" fill="#CEF7EA"/>
+</svg>

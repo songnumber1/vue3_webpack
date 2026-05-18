@@ -3,6 +3,7 @@
     :mode="mode"
     :is-mobile="isMobile"
     :assistant-label="assistantLabel"
+    :assistant="assistant"
     :conversation-title="conversationTitle"
     :theme-name="themeName"
   />
@@ -13,6 +14,11 @@
     :class="{'empty-stage--mobile-main': isMobile}"
   >
     <div class="empty-center">
+      <img
+        class="empty-assistant-logo"
+        :src="mainAssistantIcon"
+        :alt="assistantLabel"
+      />
       <h1>{{ t("chat.startQuestion") }}</h1>
       <div class="suggestion-row suggestion-row--between">
         <button
@@ -94,6 +100,7 @@ import {
   WORKSPACE_ACTIONS_KEY,
   createEmptyWorkspaceActions,
 } from "@/composables/chat/chatActionContext";
+import {getAssistantImageBySize} from "@/constants/assistantImages";
 
 const {t} = useI18n();
 const listRef = ref(null);
@@ -139,6 +146,7 @@ const props = defineProps({
   readonly: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: false},
   assistantLabel: {type: String, default: "Assistant"},
+  assistant: {type: Object, default: null},
   conversationTitle: {type: String, default: ""},
   themeName: {type: String, default: "light"},
   suggestions: {type: Array, default: () => []},
@@ -151,6 +159,8 @@ const props = defineProps({
   messages: {type: Array, default: () => []},
   showScrollBottom: {type: Boolean, default: false},
 });
+
+const mainAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 48));
 
 const mainPromptClass = computed(() =>
   props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"

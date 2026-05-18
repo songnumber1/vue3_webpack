@@ -1,10 +1,6 @@
-const defaultImage = {
-  name: "",
-  path: null,
-  size: null,
-  type: "",
-  default: true,
-};
+import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
+
+const defaultImage = DEFAULT_ASSISTANT_IMAGE.Image48Src;
 
 export const STUDIOS_RAW = [
   {

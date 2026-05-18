@@ -20,6 +20,13 @@
         :aria-label="t('chat.assistantSelect')"
         @click="chatActions.openAssistant()"
       >
+        <img
+          v-if="mode === 'main'"
+          class="assistant-brand-logo assistant-brand-logo--mobile"
+          :src="mobileAssistantIcon"
+          alt=""
+          aria-hidden="true"
+        />
         <span>{{ assistantLabel }}</span>
         <ChevronDownIcon class="chevron chevron--selector" />
       </button>
@@ -33,8 +40,16 @@
       </div>
 
       <div v-else class="conversation-title-wrap conversation-title-wrap--main">
-        <strong>{{ assistantLabel }}</strong>
-        <span>{{ t("chat.startQuestion") }}</span>
+        <img
+          class="assistant-brand-logo assistant-brand-logo--desktop"
+          :src="desktopAssistantIcon"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="conversation-title-copy">
+          <strong>{{ assistantLabel }}</strong>
+          <span>{{ t("chat.startQuestion") }}</span>
+        </span>
       </div>
     </div>
 
@@ -87,6 +102,7 @@ import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
+import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {
   CHAT_ACTIONS_KEY,
   createEmptyChatActions,
@@ -96,12 +112,16 @@ const props = defineProps({
   mode: {type: String, default: "main"},
   isMobile: {type: Boolean, default: false},
   assistantLabel: {type: String, default: "Assistant"},
+  assistant: {type: Object, default: null},
   conversationTitle: {type: String, default: ""},
   themeName: {type: String, default: "dark"},
 });
 
 const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const desktopAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 48));
+const mobileAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 20));
+
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(

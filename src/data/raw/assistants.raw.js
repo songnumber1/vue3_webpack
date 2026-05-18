@@ -1,3 +1,5 @@
+import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
+
 export const ASSISTANTS_RAW = [
   {
     delYN: false,
@@ -11,6 +13,7 @@ export const ASSISTANTS_RAW = [
     assistOrder: 0,
     ragYN: true,
     assistId: "assist-ds",
+    ...DEFAULT_ASSISTANT_IMAGE,
   },
   {
     delYN: false,
@@ -24,6 +27,7 @@ export const ASSISTANTS_RAW = [
     assistOrder: 1,
     ragYN: false,
     assistId: "assist-code",
+    ...DEFAULT_ASSISTANT_IMAGE,
   },
   {
     delYN: false,
@@ -37,6 +41,7 @@ export const ASSISTANTS_RAW = [
     assistOrder: 2,
     ragYN: true,
     assistId: "assist-arch",
+    ...DEFAULT_ASSISTANT_IMAGE,
   },
   {
     delYN: false,
@@ -50,6 +55,7 @@ export const ASSISTANTS_RAW = [
     assistOrder: 3,
     ragYN: false,
     assistId: "assist-writing",
+    ...DEFAULT_ASSISTANT_IMAGE,
   },
   {
     delYN: false,
@@ -63,5 +69,6 @@ export const ASSISTANTS_RAW = [
     assistOrder: 4,
     ragYN: true,
     assistId: "assist-data",
+    ...DEFAULT_ASSISTANT_IMAGE,
   },
 ];

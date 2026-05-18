@@ -8,6 +8,9 @@ export const ASSISTANT_KEYS = Object.freeze({
   DELETE_YN: "delYN",
   PRIVATE_YN: "privateYN",
   FIX_YN: "fixYN",
+  IMAGE_48_SRC: "Image48Src",
+  IMAGE_20_SRC: "image20Src",
+  IMAGE_16_SRC: "image16Src",
 });
 
 export const MODEL_KEYS = Object.freeze({

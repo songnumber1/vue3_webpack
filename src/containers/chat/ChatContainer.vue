@@ -14,6 +14,7 @@
       :readonly="isReadOnly"
       :is-mobile="isMobile"
       :assistant-label="workspaceAssistantLabel"
+      :assistant="currentAssistant"
       :conversation-title="activeConversationTitle"
       :theme-name="themeName"
       :suggestions="suggestions"
@@ -139,6 +140,7 @@ const {
   runtimeReady,
   workspaceRef,
   assistants,
+  currentAssistant,
   models,
   selectedAssistantId,
   selectedModel,

@@ -1,0 +1,30 @@
+/*
+ * Assistant selector and assistant icon binding refinements.
+ * Kept isolated so global button, prompt, sidebar, and modal styles are not
+ * changed unexpectedly.
+ */
+.assistant-trigger {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.assistant-trigger:hover,
+.assistant-trigger:focus-visible {
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.empty-assistant-logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  margin-bottom: -2px;
+}
+
+.empty-center h1 {
+  margin-top: 0;
+}

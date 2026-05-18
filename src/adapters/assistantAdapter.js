@@ -1,6 +1,7 @@
 import {ASSISTANT_KEYS} from "@/constants/apiKeys";
 import {ASSISTANT_TYPES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";
+import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
 
 // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 /**
@@ -8,6 +9,13 @@ import {toBoolean} from "./booleanAdapter";
  * @param {*} raw - raw 입력값입니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
+function resolveAssistantImage(raw, key, fallback) {
+  const value = raw?.[key];
+  if (typeof value === "string" && value) return value;
+  if (value?.path) return value.path;
+  return fallback;
+}
+
 export function adaptAssistant(raw = {}) {
   const isStudio = toBoolean(raw[ASSISTANT_KEYS.STUDIO_YN]);
   const id = raw[ASSISTANT_KEYS.ID];
@@ -32,6 +40,21 @@ export function adaptAssistant(raw = {}) {
     isFixed: toBoolean(raw[ASSISTANT_KEYS.FIX_YN]),
     isPrivate: toBoolean(raw[ASSISTANT_KEYS.PRIVATE_YN]),
     hasRag: toBoolean(raw[ASSISTANT_KEYS.RAG_YN]),
+    Image48Src: resolveAssistantImage(
+      raw,
+      ASSISTANT_KEYS.IMAGE_48_SRC,
+      DEFAULT_ASSISTANT_IMAGE.Image48Src
+    ),
+    image20Src: resolveAssistantImage(
+      raw,
+      ASSISTANT_KEYS.IMAGE_20_SRC,
+      DEFAULT_ASSISTANT_IMAGE.image20Src
+    ),
+    image16Src: resolveAssistantImage(
+      raw,
+      ASSISTANT_KEYS.IMAGE_16_SRC,
+      DEFAULT_ASSISTANT_IMAGE.image16Src
+    ),
     raw,
   };
 }
