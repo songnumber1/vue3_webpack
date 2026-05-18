@@ -1,35 +1,29 @@
 @import "./themes.css";
 @import "./base.css";
 
-/* core */
 @import "./chat/core.css";
-
-/* components */
 @import "./chat/markdown.css";
-@import "./chat/component-bottom-sheet-composer.css";
-@import "./chat/component-playground-feedback.css";
-@import "./chat/component-attachment-preview-tokens.css";
+@import "./chat/bottom-sheet-composer.css";
+@import "./chat/playground-feedback.css";
+@import "./chat/attachment-preview-tokens.css";
 
-/* platform */
-@import "./chat/platform-keyboard-viewport.css";
-@import "./chat/platform-mobile-browser-session.css";
-@import "./chat-mobile-layout.css";
-
-/* patches - keep cascade order for frozen UI/UX */
-@import "./chat/patch-layout-overrides.css";
+@import "./chat/responsive-keyboard.css";
+@import "./chat/session-mobile-browser-fixes.css";
+@import "./chat-mobile.css";
+@import "./chat/layout-overrides.css";
 @import "./chat/reasoning.css";
-@import "./chat/component-message-bubbles.css";
+@import "./chat/message-bubbles.css";
 
 @import "./exception.css";
-@import "./chat/component-sidebar-assistant-polish.css";
-@import "./chat/component-assistant-icon-binding.css";
+@import "./chat/sidebar-assistant-polish.css";
+@import "./chat/assistant-icon-binding.css";
 
-@import "./chat/patch-ui-shape-interaction.css";
-@import "./chat/patch-mobile-tap-button-radius.css";
+@import "./chat/ui-shape-interaction-fixes.css";
+@import "./chat/mobile-tap-and-button-radius-final.css";
 
-@import "./chat/component-chat-header-assistant-icon.css";
-@import "./chat/patch-targeted-chat-polish.css";
-@import "./chat/patch-mobile-composer-alignment.css";
-@import "./chat/platform-firefox-mobile-composer.css";
+@import "./chat/chat-header-assistant-icon.css";
+@import "./chat/targeted-chat-polish.css";
+@import "./chat/mobile-composer-targeted-fixes.css";
+@import "./patches/firefox-mobile-main-composer.css";
 
-@import "./chat/patch-desktop-main-feedback.css";
+@import "./chat/desktop-main-feedback-fix.css";
