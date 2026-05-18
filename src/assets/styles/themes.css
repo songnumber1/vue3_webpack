@@ -9,7 +9,7 @@
 
   /* Layout / responsive tokens. CSS custom properties cannot be used directly in @media queries,
      so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
-  --breakpoint-mobile: 900px;
+  --breakpoint-mobile: 768px;
   --layout-sidebar-width: 260px;
   --layout-sidebar-collapsed-width: 68px;
   --layout-message-width: 840px;

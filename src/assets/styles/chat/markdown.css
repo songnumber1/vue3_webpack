@@ -116,20 +116,18 @@
   white-space: pre;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
-@media (max-width: 900px) {
-  .markdown-body h1 {
+body.mobile-mode .markdown-body h1 {
     font-size: 1.32em;
   }
-  .markdown-body h2 {
+body.mobile-mode .markdown-body h2 {
     font-size: 1.2em;
   }
-  .markdown-body pre {
+body.mobile-mode .markdown-body pre {
     font-size: 12px;
   }
-  .md-table-wrapper table {
+body.mobile-mode .md-table-wrapper table {
     min-width: 520px;
   }
-}
 
 /* Markdown renderer additions */
 .markdown-body p,

@@ -3,95 +3,85 @@
  * Scope: requested web user bubble alignment/text size, web assistant menu ellipsis,
  * mobile user copy spacing, and mobile drawer selected chat visibility only.
  */
-@media (min-width: 901px) {
-  .message--user {
+body.desktop-mode .message--user {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
     grid-template-columns: minmax(0, 1fr);
   }
-
-  .message--user .bubble {
+body.desktop-mode .message--user .bubble {
     grid-column: 1;
     justify-self: end;
     margin-left: auto;
     margin-right: 0;
   }
-
-  .message--user .bubble-content--plain {
+body.desktop-mode .message--user .bubble-content--plain {
     font-size: var(--message-plain-desktop-compact-font-size, 15px);
   }
-
-  .desktop-sidebar .assistant-option {
+body.desktop-mode .desktop-sidebar .assistant-option {
     display: flex;
     align-items: center;
     gap: 10px;
     min-width: 0;
   }
-
-  .desktop-sidebar .assistant-option-main {
+body.desktop-mode .desktop-sidebar .assistant-option-main {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
   }
-
-  .desktop-sidebar .assistant-option-main strong,
+body.desktop-mode .desktop-sidebar .assistant-option-main strong,body.desktop-mode 
   .desktop-sidebar .assistant-option-main small {
     max-width: 100%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
   }
-
-  .desktop-sidebar .option-selected-indicator {
+body.desktop-mode .desktop-sidebar .option-selected-indicator {
     flex: 0 0 auto;
   }
-}
 
-@media (max-width: 900px) {
-  .app-container--mobile .message--user .bubble,
+body.mobile-mode .app-container--mobile .message--user .bubble,body.mobile-mode 
   .message--user .bubble {
     padding-bottom: 8px;
   }
 
-  .app-container--mobile .message--user .bubble-content--plain,
+body.mobile-mode .app-container--mobile .message--user .bubble-content--plain,body.mobile-mode 
   .message--user .bubble-content--plain {
     line-height: 1.5;
   }
 
-  .app-container--mobile .message--user .message-actions-wrap,
+body.mobile-mode .app-container--mobile .message--user .message-actions-wrap,body.mobile-mode 
   .message--user .message-actions-wrap {
     margin-top: 2px;
     gap: 0;
   }
 
-  .app-container--mobile .message--user .message-actions,
+body.mobile-mode .app-container--mobile .message--user .message-actions,body.mobile-mode 
   .message--user .message-actions {
     margin-top: 0;
     gap: 0;
   }
 
-  .app-container--mobile .message--user .message-action-icon,
+body.mobile-mode .app-container--mobile .message--user .message-action-icon,body.mobile-mode 
   .message--user .message-action-icon {
     width: 28px;
     height: 28px;
   }
 
-  .app-container--mobile .message--user .message-action-icon svg,
+body.mobile-mode .app-container--mobile .message--user .message-action-icon svg,body.mobile-mode 
   .message--user .message-action-icon svg {
     width: 18px;
     height: 18px;
   }
 
-  .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected,
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .sidebar-history-row.selected {
     background: var(--sidebar-hover, #ececf1) !important;
   }
 
-  .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected .sidebar-history-item,
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history-row.selected .sidebar-history-item,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .sidebar-history-row.selected .sidebar-history-item {
     background: transparent !important;
     font-weight: 800;
   }
-}

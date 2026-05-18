@@ -217,6 +217,7 @@ import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useAppContext} from "@/composables/useAppContext";
 import {isAndroidApp} from "@/core/config";
+import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
@@ -296,7 +297,8 @@ function closePopup(action) {
  */
 function syncMobile() {
   isMobile.value = Boolean(
-    window.matchMedia?.("(max-width: 900px)")?.matches || isAndroidApp(appInfo)
+    window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
+      isAndroidApp(appInfo)
   );
 }
 

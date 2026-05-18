@@ -17,31 +17,30 @@
   margin-left: 0;
 }
 
-@media (max-width: 900px) {
-  .app-container--mobile .chat-container-root--mode-chat .mobile-topbar,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar,body.mobile-mode 
   .app-container--mobile .chat-container-root--mode-shared .mobile-topbar {
     height: 44px;
     padding-top: 4px;
     padding-bottom: 4px;
   }
 
-  .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .round-icon,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .round-icon,body.mobile-mode 
   .app-container--mobile .chat-container-root--mode-shared .mobile-topbar .round-icon {
     width: 34px;
     height: 34px;
   }
 
-  .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .model-trigger,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-chat .mobile-topbar .model-trigger,body.mobile-mode 
   .app-container--mobile .chat-container-root--mode-shared .mobile-topbar .model-trigger {
     height: 34px;
     min-width: 100px;
     font-size: 15px;
   }
 
-  .app-container--mobile
+body.mobile-mode .app-container--mobile
     .chat-container-root--mode-chat
     .mobile-topbar
-    .model-trigger--assistant,
+    .model-trigger--assistant,body.mobile-mode 
   .app-container--mobile
     .chat-container-root--mode-shared
     .mobile-topbar
@@ -50,4 +49,3 @@
     padding-left: 10px;
     padding-right: 10px;
   }
-}

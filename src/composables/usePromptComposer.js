@@ -10,6 +10,7 @@ import {usePromptTool} from "@/composables/prompt/usePromptTool";
 /**
  * @description 프롬프트 입력 영역의 모든 기능을 조합하는 slim 조합기입니다.
  * 세부 로직은 각 sub-composable에 위임하고, 이 함수는 조합과 제출 흐름만 담당합니다.
+ * viewport 동기화는 usePromptMenu에서 orientationchange와 window.visualViewport 이벤트로 처리합니다.
  * @param {object} props - 컴포넌트 props
  * @param {Function} emit - 컴포넌트 emit 함수
  * @returns {object} 템플릿에 필요한 모든 상태와 핸들러

@@ -1,12 +1,10 @@
 /* Android WebView/Chrome bottom sheet fallback: avoid dvh-only sizing bugs. */
-@media (max-width: 900px) {
-  .bottom-sheet-option {
+body.mobile-mode .bottom-sheet-option {
     min-height: 50px;
   }
-  .bottom-sheet-body > *:last-child {
+body.mobile-mode .bottom-sheet-body > *:last-child {
     margin-bottom: 8px;
   }
-}
 
 /* Shared read-only composer */
 .shared-readonly-wrap {
@@ -36,26 +34,24 @@
   color: var(--text-muted);
   font-size: 13px;
 }
-@media (max-width: 900px) {
-  .shared-readonly-wrap,
+body.mobile-mode .shared-readonly-wrap,body.mobile-mode 
   .app-container--mobile .shared-readonly-wrap {
     padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
     background: var(--mobile-bg);
   }
-  .shared-readonly-box,
+body.mobile-mode .shared-readonly-box,body.mobile-mode 
   .app-container--mobile .shared-readonly-box {
     max-width: none;
     min-height: 52px;
     border-radius: 20px;
     padding: 10px 14px;
   }
-  .shared-readonly-box strong {
+body.mobile-mode .shared-readonly-box strong {
     font-size: 14px;
   }
-  .shared-readonly-box span {
+body.mobile-mode .shared-readonly-box span {
     font-size: 12px;
   }
-}
 
 /* Final chat scroll/composer spacing stabilization.
    The composer is already rendered as the last grid row, so the message list
@@ -88,24 +84,22 @@
   overflow: visible;
 }
 
-@media (max-width: 900px) {
-  :root {
+body.mobile-mode {
     --chat-message-bottom-gap: 14px;
     --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
   }
 
-  .chat-container-root--keyboard-open .message-list,
+body.mobile-mode .chat-container-root--keyboard-open .message-list,body.mobile-mode 
   .app-container--mobile .chat-container-root--keyboard-open .message-list {
     padding-bottom: 12px !important;
     scroll-padding-bottom: 12px;
   }
 
-  .scroll-bottom-button {
+body.mobile-mode .scroll-bottom-button {
     right: 16px !important;
     width: 44px;
     height: 44px;
   }
-}
 
 /* Final floating scroll button stabilization.
    The button is centered inside the chat workspace, not the whole viewport.
@@ -137,12 +131,11 @@
   transform: translateX(-50%) translateZ(0) !important;
 }
 
-@media (max-width: 900px) {
-  :root {
+body.mobile-mode {
     --chat-scroll-button-gap: 10px;
   }
 
-  .scroll-bottom-button,
+body.mobile-mode .scroll-bottom-button,body.mobile-mode 
   .app-container--mobile .scroll-bottom-button {
     left: 50% !important;
     right: auto !important;
@@ -152,7 +145,6 @@
     z-index: var(--z-prompt) !important;
     transform: translateX(-50%) translateZ(0) !important;
   }
-}
 
 /* =========================================================
    i18n/menu/overlay refinement
@@ -588,51 +580,58 @@
   margin: 0;
 }
 
-@media (min-width: 901px) {
-  .desktop-sidebar .sidebar-user,
+body.desktop-mode .desktop-sidebar .sidebar-user,body.desktop-mode 
   .desktop-sidebar .collapsed-user-button {
     display: none !important;
   }
-  .mobile-topbar .theme-toggle {
+
+body.desktop-mode .mobile-topbar .theme-toggle {
     position: static !important;
   }
-}
 
-@media (max-width: 900px) {
-  .topbar-actions--desktop {
+body.mobile-mode .topbar-actions--desktop {
     display: none !important;
   }
-  .responsive-overlay--mobile {
+
+body.mobile-mode .responsive-overlay--mobile {
     padding: 0;
     place-items: stretch;
   }
-  .responsive-overlay--mobile .responsive-panel {
+
+body.mobile-mode .responsive-overlay--mobile .responsive-panel {
     width: 100%;
     height: 100dvh;
     max-height: none;
     border: 0;
     border-radius: 0;
   }
-  .responsive-overlay--mobile .responsive-panel-header {
+
+body.mobile-mode .responsive-overlay--mobile .responsive-panel-header {
     min-height: 56px;
     padding: calc(8px + env(safe-area-inset-top)) 12px 8px;
   }
-  .responsive-overlay--mobile .responsive-panel-body {
+
+body.mobile-mode .responsive-overlay--mobile .responsive-panel-body {
     padding: 14px;
   }
-  .guide-page {
+
+body.mobile-mode .guide-page {
     padding: calc(20px + env(safe-area-inset-top)) 18px 28px;
   }
-  .guide-grid {
+
+body.mobile-mode .guide-grid {
     grid-template-columns: 1fr;
   }
-  .service-menu {
+
+body.mobile-mode .service-menu {
     margin: 0 12px;
   }
-  .sidebar-content--mobile {
+
+body.mobile-mode .sidebar-content--mobile {
     padding-bottom: 0 !important;
   }
-  .sidebar-content--mobile .sidebar-user,
+
+body.mobile-mode .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .sidebar-user {
     position: sticky !important;
     bottom: 0 !important;
@@ -641,17 +640,19 @@
     background: var(--mobile-bg) !important;
     border-top: 1px solid var(--sidebar-border);
   }
-  .md-table-toolbar {
+
+body.mobile-mode .md-table-toolbar {
     align-items: flex-start;
     flex-direction: column;
   }
-  .md-table-actions {
+
+body.mobile-mode .md-table-actions {
     width: 100%;
   }
-  .md-table-action {
+
+body.mobile-mode .md-table-action {
     flex: 1 1 auto;
   }
-}
 
 /* Refined menu/i18n/table-action overrides */
 .app-icon {
@@ -825,13 +826,13 @@
   transform: rotate(45deg);
 }
 
-@media (max-width: 900px) {
-  .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search,
+body.mobile-mode .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search,body.mobile-mode 
   .app-container--mobile .quick-menu--assistant.quick-menu--mobile-search {
     gap: 0 !important;
     padding: 4px 12px 2px !important;
   }
-  .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search .quick-item,
+
+body.mobile-mode .mobile-drawer .quick-menu--assistant.quick-menu--mobile-search .quick-item,body.mobile-mode 
   .app-container--mobile
     .quick-menu--assistant.quick-menu--mobile-search
     .quick-item {
@@ -840,42 +841,45 @@
     min-height: 40px !important;
     justify-content: flex-start !important;
   }
-  .mobile-drawer .service-menu.settings-menu,
+
+body.mobile-mode .mobile-drawer .service-menu.settings-menu,body.mobile-mode 
   .app-container--mobile .service-menu.settings-menu {
     margin: 0 12px 8px !important;
     border-color: var(--sidebar-border) !important;
   }
-  .mobile-drawer .mobile-new-chat-fab,
+
+body.mobile-mode .mobile-drawer .mobile-new-chat-fab,body.mobile-mode 
   .app-container--mobile .mobile-new-chat-fab {
     display: none !important;
   }
-  .mobile-drawer .sidebar-history--main,
+
+body.mobile-mode .mobile-drawer .sidebar-history--main,body.mobile-mode 
   .app-container--mobile .sidebar-history--main {
     flex: 1 1 auto;
   }
-  .md-table-toolbar {
+
+body.mobile-mode .md-table-toolbar {
     flex-direction: row !important;
     align-items: center !important;
   }
-  .md-table-actions {
+
+body.mobile-mode .md-table-actions {
     width: auto !important;
     flex: 0 0 auto;
   }
-  .md-table-action {
+
+body.mobile-mode .md-table-action {
     flex: 0 0 34px !important;
   }
-}
 
 /* =========================================================
    Header/menu final refinements
    ========================================================= */
-@media (min-width: 901px) {
-  .chat-workspace > .mobile-topbar,
-  .mobile-topbar,
+body.desktop-mode .chat-workspace > .mobile-topbar,body.desktop-mode 
+  .mobile-topbar,body.desktop-mode 
   .app-container--desktop .mobile-topbar {
     border-bottom: 1px solid var(--sidebar-border) !important;
   }
-}
 
 .guide-link.guide-link--icon {
   width: 44px;
@@ -1152,16 +1156,14 @@
   gap: 8px;
 }
 
-@media (max-width: 900px) {
-  .playground-page {
+body.mobile-mode .playground-page {
     padding: 18px;
   }
 
-  .playground-header {
+body.mobile-mode .playground-header {
     flex-direction: column;
   }
 
-  .playground-grid {
+body.mobile-mode .playground-grid {
     grid-template-columns: 1fr;
   }
-}

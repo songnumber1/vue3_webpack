@@ -1,4 +1,4 @@
-export const MOBILE_BREAKPOINT_PX = 900;
+export const MOBILE_BREAKPOINT_PX = 768;
 
 export const MIN_VIEWPORT_HEIGHT_PX = 320;
 

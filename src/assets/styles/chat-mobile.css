@@ -11,18 +11,16 @@
  * Chat page policy:
  * - Chat/shared rooms keep using chat-container-root--keyboard-open from ChatLayout.
  */
-@media (max-width: 900px) {
-  :root {
+body.mobile-mode {
     --mobile-main-composer-space: 174px;
     --mobile-main-content-top: var(--mobile-header-height, 76px);
     --mobile-main-content-inline: var(--space-4, 16px);
     --mobile-main-content-gap: var(--space-4, 16px);
     --mobile-main-composer-z: var(--z-prompt-floating);
   }
-
-  html,
-  body,
-  #app,
+html:has(>body.mobile-mode),
+  body.mobile-mode,body.mobile-mode 
+  #app,body.mobile-mode 
   .app-container--mobile {
     height: var(--layout-viewport-height, 100dvh) !important;
     min-height: var(--layout-viewport-height, 100dvh) !important;
@@ -30,8 +28,7 @@
     overflow: hidden !important;
     overscroll-behavior: none !important;
   }
-
-  .app-container--mobile .chat-container-root--mode-main,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main,body.mobile-mode 
   .chat-container-root--mode-main {
     position: relative !important;
     height: var(--layout-viewport-height, 100dvh) !important;
@@ -41,8 +38,7 @@
     overscroll-behavior: none !important;
     touch-action: none !important;
   }
-
-  .app-container--mobile .chat-container-root--mode-main .chat-workspace,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .chat-workspace,body.mobile-mode 
   .chat-container-root--mode-main .chat-workspace {
     position: relative !important;
     height: var(--layout-viewport-height, 100dvh) !important;
@@ -53,8 +49,7 @@
     overscroll-behavior: none !important;
     touch-action: none !important;
   }
-
-  .app-container--mobile .empty-stage--mobile-main,
+body.mobile-mode .app-container--mobile .empty-stage--mobile-main,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main {
     position: relative !important;
     display: block !important;
@@ -68,8 +63,7 @@
     overscroll-behavior: none !important;
     touch-action: none !important;
   }
-
-  .app-container--mobile .empty-stage--mobile-main .empty-center,
+body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
     position: absolute !important;
     top: var(--mobile-main-content-top) !important;
@@ -96,23 +90,20 @@
     touch-action: pan-y !important;
     transform: none !important;
   }
-
-  .app-container--mobile .empty-stage--mobile-main .empty-center h1,
+body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center h1,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1 {
     flex: 0 0 auto !important;
     margin: 0 0 var(--space-1, 4px) !important;
   }
-
-  .app-container--mobile .empty-stage--mobile-main .suggestion-row--between,
+body.mobile-mode .app-container--mobile .empty-stage--mobile-main .suggestion-row--between,body.mobile-mode 
   .chat-container-root--mode-main
     .empty-stage--mobile-main
     .suggestion-row--between {
     flex: 0 0 auto !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt,
-  .chat-container-root--mode-main .mobile-main-fixed-prompt,
-  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,body.mobile-mode 
+  .chat-container-root--mode-main .mobile-main-fixed-prompt,body.mobile-mode 
+  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
     position: fixed !important;
     top: auto !important;
@@ -137,27 +128,23 @@
     will-change: bottom !important;
     touch-action: manipulation !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
     width: min(100%, var(--layout-prompt-width, 820px)) !important;
     max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
     margin: 0 auto !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt textarea,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt textarea {
     overscroll-behavior: contain !important;
     touch-action: manipulation !important;
   }
-
-  .app-container--mobile .desktop-center-prompt.prompt-wrap--floating,
+body.mobile-mode .app-container--mobile .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
     position: static !important;
     bottom: auto !important;
     transform: none !important;
   }
-}
 
 /*
  * Cross-browser mobile composer stabilization.
@@ -166,8 +153,7 @@
  * - --mobile-keyboard-inset: content scroll reserve
  * - --composer-keyboard-inset: fixed composer bottom offset
  */
-@media (max-width: 900px) {
-  .app-container--mobile .chat-container-root--mode-main .empty-center,
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main .empty-center,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
     bottom: calc(
       var(--mobile-main-composer-space) + var(--mobile-keyboard-inset, 0px)
@@ -176,10 +162,9 @@
       var(--space-4, 16px) + var(--mobile-keyboard-inset, 0px)
     ) !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt,
-  .chat-container-root--mode-main .mobile-main-fixed-prompt,
-  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,body.mobile-mode 
+  .chat-container-root--mode-main .mobile-main-fixed-prompt,body.mobile-mode 
+  .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
     bottom: calc(
       var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
@@ -196,51 +181,45 @@
     overscroll-behavior: none !important;
     touch-action: manipulation !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
     transform: translateZ(0) !important;
   }
-
-  .app-container--mobile .mobile-main-fixed-prompt textarea,
-  .chat-container-root--mode-main .mobile-main-fixed-prompt textarea,
-  .app-container--mobile .mobile-main-fixed-prompt .prompt-action-row,
+body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,body.mobile-mode 
+  .chat-container-root--mode-main .mobile-main-fixed-prompt textarea,body.mobile-mode 
+  .app-container--mobile .mobile-main-fixed-prompt .prompt-action-row,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-action-row {
     overscroll-behavior: contain !important;
     touch-action: manipulation !important;
   }
-}
 
 /*
  * Firefox/Samsung/Chrome Android final mobile composer fallback.
  * Keep this block at the end of the mobile stylesheet because legacy chat.css
  * still contains high-specificity mobile-main-fixed-prompt rules.
  */
-@media (max-width: 900px) {
-  :root {
+body.mobile-mode {
     --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
   }
-
-  .mobile-browser-firefox {
+body.mobile-mode .mobile-browser-firefox {
     --mobile-browser-safe-bottom: 0px;
     --mobile-main-composer-space: 150px;
   }
-
+body.mobile-mode .app-container--mobile
+    .chat-container-root--mode-main
+    .mobile-main-fixed-prompt,body.mobile-mode 
   .app-container--mobile
     .chat-container-root--mode-main
-    .mobile-main-fixed-prompt,
-  .app-container--mobile
-    .chat-container-root--mode-main
-    .mobile-main-fixed-prompt.prompt-wrap,
+    .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-main
-    .mobile-main-fixed-prompt,
+    .mobile-main-fixed-prompt,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-main
-    .mobile-main-fixed-prompt.prompt-wrap,
+    .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .mobile-browser-firefox
     .chat-container-root--mode-main
-    .mobile-main-fixed-prompt,
+    .mobile-main-fixed-prompt,body.mobile-mode 
   .mobile-browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt.prompt-wrap {
@@ -271,15 +250,14 @@
     touch-action: manipulation !important;
     will-change: bottom !important;
   }
-
-  .app-container--mobile
+body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
-    .prompt-box,
+    .prompt-box,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
-    .prompt-box,
+    .prompt-box,body.mobile-mode 
   .mobile-browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
@@ -288,39 +266,34 @@
     max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
     margin: 0 auto !important;
   }
-
-  .mobile-browser-firefox .mobile-drawer,
+body.mobile-mode .mobile-browser-firefox .mobile-drawer,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox .mobile-drawer {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
   }
-
-  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile,
+body.mobile-mode .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile {
     padding-bottom: 0 !important;
   }
-
-  .mobile-browser-firefox
+body.mobile-mode .mobile-browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
-    .sidebar-history,
+    .sidebar-history,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
     .sidebar-history {
     padding-bottom: 12px !important;
   }
-
-  .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-user,
+body.mobile-mode .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
     .sidebar-user {
     padding-bottom: 12px !important;
   }
-}
 
 /* =========================================================
    Mobile browser final drawer/chat composer corrections
@@ -332,12 +305,11 @@
    out as a flex footer inside the visible drawer instead of relying on sticky
    bottom offsets.
    ========================================================= */
-@media (max-width: 900px) {
-  .mobile-browser-firefox .chat-container-root--mode-chat .prompt-wrap,
-  .mobile-browser-firefox .chat-container-root--mode-shared .prompt-wrap,
+body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .prompt-wrap,body.mobile-mode 
+  .mobile-browser-firefox .chat-container-root--mode-shared .prompt-wrap,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-chat
-    .prompt-wrap,
+    .prompt-wrap,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .prompt-wrap {
@@ -345,12 +317,11 @@
     padding-bottom: var(--space-2, 8px) !important;
     margin-bottom: 0 !important;
   }
-
-  .mobile-browser-firefox .chat-container-root--mode-chat .chat-composer-slot,
-  .mobile-browser-firefox .chat-container-root--mode-shared .chat-composer-slot,
+body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-composer-slot,body.mobile-mode 
+  .mobile-browser-firefox .chat-container-root--mode-shared .chat-composer-slot,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-chat
-    .chat-composer-slot,
+    .chat-composer-slot,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .chat-composer-slot {
@@ -358,42 +329,38 @@
     margin-bottom: 0 !important;
     align-self: end !important;
   }
-
-  .mobile-browser-firefox .chat-container-root--mode-chat .chat-workspace,
-  .mobile-browser-firefox .chat-container-root--mode-shared .chat-workspace,
+body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-workspace,body.mobile-mode 
+  .mobile-browser-firefox .chat-container-root--mode-shared .chat-workspace,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-chat
-    .chat-workspace,
+    .chat-workspace,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .chat-workspace {
     grid-template-rows: auto minmax(0, 1fr) auto !important;
     min-height: 0 !important;
   }
-
-  .mobile-browser-firefox .chat-container-root--mode-chat,
-  .mobile-browser-firefox .chat-container-root--mode-shared,
+body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat,body.mobile-mode 
+  .mobile-browser-firefox .chat-container-root--mode-shared,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
-    .chat-container-root--mode-chat,
+    .chat-container-root--mode-chat,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared {
     height: var(--app-height, 100dvh) !important;
     max-height: var(--app-height, 100dvh) !important;
   }
-
-  .mobile-browser-firefox .chat-container-root--mode-chat .message-list,
-  .mobile-browser-firefox .chat-container-root--mode-shared .message-list,
+body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .message-list,body.mobile-mode 
+  .mobile-browser-firefox .chat-container-root--mode-shared .message-list,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-chat
-    .message-list,
+    .message-list,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .message-list {
     padding-bottom: var(--space-3, 12px) !important;
     scroll-padding-bottom: var(--space-3, 12px) !important;
   }
-
-  .mobile-browser-samsung .mobile-drawer,
+body.mobile-mode .mobile-browser-samsung .mobile-drawer,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer {
     height: var(--app-height, 100dvh) !important;
@@ -401,8 +368,7 @@
     min-height: 0 !important;
     overflow: hidden !important;
   }
-
-  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile,
+body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-content--mobile {
@@ -414,11 +380,10 @@
     overflow: hidden !important;
     padding-bottom: 0 !important;
   }
-
-  .mobile-browser-samsung
+body.mobile-mode .mobile-browser-samsung
     .mobile-drawer
     .sidebar-content--mobile
-    .sidebar-history,
+    .sidebar-history,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-content--mobile
@@ -429,13 +394,12 @@
     -webkit-overflow-scrolling: touch !important;
     padding-bottom: var(--space-4, 16px) !important;
   }
-
-  .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-user,
-  .mobile-browser-samsung .mobile-drawer .sidebar-user--mobile,
+body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
+  .mobile-browser-samsung .mobile-drawer .sidebar-user--mobile,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-content--mobile
-    .sidebar-user,
+    .sidebar-user,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-user--mobile {
@@ -449,7 +413,6 @@
     ) !important;
     transform: none !important;
   }
-}
 
 /* =========================================================
    Firefox Android bottom sheet visible row stabilization
@@ -458,26 +421,22 @@
    transition. Reserve enough sheet/body height so three action rows are visible
    like Chrome and Samsung Internet.
    ========================================================= */
-@media (max-width: 900px) {
-  .mobile-browser-firefox .bottom-sheet,
+body.mobile-mode .mobile-browser-firefox .bottom-sheet,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox ~ .bottom-sheet,
-  body.mobile-browser-firefox .bottom-sheet {
+  body.mobile-mode.mobile-browser-firefox .bottom-sheet {
     min-height: 220px !important;
     max-height: calc(var(--app-height, 100dvh) - 12px) !important;
   }
-
-  .mobile-browser-firefox .bottom-sheet-body,
-  body.mobile-browser-firefox .bottom-sheet-body {
+body.mobile-mode .mobile-browser-firefox .bottom-sheet-body,
+  body.mobile-mode.mobile-browser-firefox .bottom-sheet-body {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     padding-bottom: var(--space-2, 8px) !important;
     overflow-y: auto !important;
     overscroll-behavior: contain !important;
   }
-
-  .mobile-browser-firefox .bottom-sheet-option,
-  body.mobile-browser-firefox .bottom-sheet-option {
+body.mobile-mode .mobile-browser-firefox .bottom-sheet-option,
+  body.mobile-mode.mobile-browser-firefox .bottom-sheet-option {
     min-height: 56px !important;
     flex: 0 0 auto !important;
   }
-}

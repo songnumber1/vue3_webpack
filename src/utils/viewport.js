@@ -1,4 +1,6 @@
-export const DEFAULT_MOBILE_BREAKPOINT_PX = 900;
+import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+
+export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
 
 /**
  * @description getMobileBrowserFamily 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
