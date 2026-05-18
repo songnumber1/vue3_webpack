@@ -1,0 +1,55 @@
+/*
+ * Canonical chat message bubble rules.
+ * Keep message/user bubble layout here instead of feature files such as reasoning.css.
+ * Earlier legacy mobile/keyboard files may set defensive values; this file is imported late
+ * to provide the final, theme-token based shape for desktop and mobile.
+ */
+.message--user {
+  grid-template-columns: minmax(0, 1fr);
+  justify-content: stretch;
+}
+
+.message--user .avatar {
+  display: none;
+}
+
+.message--user .bubble {
+  grid-column: 1;
+  justify-self: end;
+  margin-left: auto;
+  margin-right: 0;
+  max-width: var(--message-user-desktop-max);
+  padding: var(--message-user-padding);
+  border-color: transparent;
+  border-radius: var(--message-user-radius);
+  background: var(--message-user-bg);
+  color: var(--message-user-text);
+}
+
+.message--assistant .bubble {
+  padding-bottom: 10px;
+}
+
+.bubble-content--plain {
+  white-space: pre-wrap;
+  font-size: var(--message-plain-font-size);
+  line-height: var(--message-plain-line-height);
+  letter-spacing: -0.012em;
+}
+
+@media (max-width: 900px) {
+  .message--user .bubble,
+  .app-container--mobile .message--user .bubble {
+    max-width: var(--message-user-mobile-max);
+    padding: var(--message-user-mobile-padding);
+    border-radius: calc(var(--message-user-radius) - 4px);
+    background: var(--message-user-bg);
+    color: var(--message-user-text);
+  }
+
+  .bubble-content--plain,
+  .app-container--mobile .bubble-content--plain {
+    font-size: var(--message-plain-mobile-font-size);
+    line-height: 1.62;
+  }
+}

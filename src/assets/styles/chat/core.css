@@ -375,14 +375,14 @@
 .message--user .avatar {
   grid-column: 2;
   background: var(--bubble-user);
-  color: white;
+  color: var(--message-user-text);
 }
 .message--user .bubble {
   grid-column: 1;
   grid-row: 1;
   justify-self: end;
-  background: var(--bubble-user);
-  color: var(--bubble-user-text);
+  background: var(--message-user-bg);
+  color: var(--message-user-text);
   max-width: min(720px, 92%);
   border-color: transparent;
 }
@@ -412,7 +412,7 @@
   font-weight: 800;
 }
 .message--user .bubble-meta {
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--message-user-meta);
 }
 .bubble-content {
   line-height: 1.72;

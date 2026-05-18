@@ -2,9 +2,9 @@
 .reasoning-panel {
   margin: 0 0 12px;
   padding: 10px 12px;
-  border: 1px solid var(--message-border);
+  border: 1px solid var(--reasoning-border);
   border-radius: 14px;
-  background: var(--control-bg);
+  background: var(--reasoning-bg);
 }
 
 .reasoning-toggle {
@@ -45,7 +45,7 @@
 .reasoning-content {
   margin-top: 8px;
   padding-top: 8px;
-  border-top: 1px dashed var(--message-border);
+  border-top: 1px dashed var(--reasoning-border);
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.62;
@@ -69,87 +69,4 @@
 
 .reasoning-content pre {
   font-size: 12px;
-}
-
-.message--user .bubble {
-  justify-self: end !important;
-  margin-right: 0 !important;
-}
-
-.message--user .bubble-content--plain {
-  font-size: 16px;
-  line-height: 1.62;
-  letter-spacing: -0.01em;
-}
-
-.message--user .bubble-meta {
-  font-size: 12px;
-}
-
-@media (max-width: 900px) {
-  .reasoning-panel {
-    margin-bottom: 10px;
-    padding: 9px 10px;
-    border-radius: 13px;
-  }
-
-  .reasoning-toggle,
-  .reasoning-content,
-  .reasoning-content.markdown-body,
-  .reasoning-content.markdown-body p,
-  .reasoning-content.markdown-body li {
-    font-size: 12.5px;
-  }
-
-  .message--user .bubble-content--plain {
-    font-size: 15px;
-  }
-}
-
-/* Web chat alignment: remove the unused right avatar column on user messages so
-   the user bubble's right edge shares the same content boundary as assistant
-   answer boxes. */
-@media (min-width: 901px) {
-  .message--user {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .message--user .bubble {
-    grid-column: 1;
-    justify-self: end;
-    max-width: min(720px, 74%);
-    padding: 17px 19px 11px;
-  }
-
-  .message--user .bubble-content--plain {
-    font-size: 17px;
-    line-height: 1.66;
-    letter-spacing: -0.012em;
-  }
-}
-
-/* Final desktop user-message alignment patch.
-   User rows must use the same full conversation row width as assistant rows;
-   otherwise the bubble is right-aligned inside a narrow centered row and appears
-   visually centered on wide desktop screens. Mobile rules below 900px are left
-   untouched. */
-@media (min-width: 901px) {
-  .message-list > .message--user,
-  .app-container:not(.app-container--mobile) .message-list > .message--user {
-    width: 100% !important;
-    max-width: 100% !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    grid-template-columns: minmax(0, 1fr) !important;
-    justify-content: stretch !important;
-  }
-
-  .message-list > .message--user .bubble,
-  .app-container:not(.app-container--mobile) .message-list > .message--user .bubble {
-    grid-column: 1 !important;
-    justify-self: end !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-    max-width: min(720px, 74%) !important;
-  }
 }

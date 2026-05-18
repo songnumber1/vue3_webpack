@@ -2070,22 +2070,6 @@
 .empty-stage--main {
   min-height: 0;
 }
-.message--user {
-  justify-content: flex-end;
-}
-.message--user .bubble {
-  max-width: min(520px, 72%);
-  background: var(--message-user-bg, var(--control-bg));
-  border-radius: 22px;
-  padding: 16px 18px 10px;
-}
-.message--assistant .bubble {
-  padding-bottom: 10px;
-}
-.bubble-content--plain {
-  white-space: pre-wrap;
-  line-height: 1.55;
-}
 .message-actions {
   display: flex;
   align-items: center;
@@ -2187,9 +2171,6 @@
   .topbar-actions .round-icon {
     width: 42px;
     height: 42px;
-  }
-  .message--user .bubble {
-    max-width: 86%;
   }
   .message-actions button {
     font-size: 11px;

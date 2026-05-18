@@ -12,6 +12,7 @@
 @import "./chat-mobile.css";
 @import "./chat/layout-overrides.css";
 @import "./chat/reasoning.css";
+@import "./chat/message-bubbles.css";
 
 @import "./exception.css";
 @import "./chat/sidebar-assistant-polish.css";
@@ -21,3 +22,4 @@
 @import "./chat/mobile-tap-and-button-radius-final.css";
 
 @import "./chat/chat-header-assistant-icon.css";
+@import "./chat/targeted-chat-polish.css";
