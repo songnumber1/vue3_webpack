@@ -23,9 +23,30 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
-  --z-drawer: 90;
+  /* Z-index layer tokens.
+     Keep overlay order predictable across desktop, mobile browsers and Android WebView:
+     content < prompt < drawer < popover < bottom sheet < preview/modal < app dialogs. */
+  --z-content-raised: 20;
+  --z-prompt: 70;
+  --z-prompt-floating: 90;
+  --z-sidebar-collapsed: 80;
+  --z-sticky-control: 100;
+  --z-drawer-backdrop: 800;
+  --z-drawer: 810;
+  --z-popover: 900;
+  --z-overlay-backdrop: 1200;
+  --z-overlay-panel: 1210;
+  --z-modal-backdrop: 1300;
+  --z-bottom-sheet-backdrop: 1300;
   --z-bottom-sheet: 1310;
-  --z-modal: 1300;
+  --z-modal: 1320;
+  --z-image-preview-backdrop: 1500;
+  --z-image-preview-control: 1510;
+  --z-feedback-dialog: 1600;
+  --z-chat-history-menu-backdrop: 2147482990;
+  --z-chat-history-menu: 2147483000;
+  --z-app-dialog: 2147482500;
+  --z-app-dialog-front: 2147483100;
   --overlay-backdrop: rgba(15, 23, 42, 0.36);
   --drawer-backdrop: rgba(0, 0, 0, 0.45);
 }

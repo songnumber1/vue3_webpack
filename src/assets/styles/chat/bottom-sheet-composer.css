@@ -118,7 +118,7 @@
 
 .chat-composer-slot {
   position: relative;
-  z-index: 25;
+  z-index: var(--z-content-raised);
   min-width: 0;
 }
 
@@ -129,7 +129,7 @@
   bottom: calc(
     var(--chat-composer-height, 96px) + var(--chat-scroll-button-gap, 12px)
   ) !important;
-  z-index: 60 !important;
+  z-index: var(--z-prompt) !important;
   display: inline-grid !important;
   place-items: center !important;
   flex: 0 0 auto;
@@ -149,7 +149,7 @@
     bottom: calc(
       var(--chat-composer-height, 84px) + var(--chat-scroll-button-gap, 10px)
     ) !important;
-    z-index: 60 !important;
+    z-index: var(--z-prompt) !important;
     transform: translateX(-50%) translateZ(0) !important;
   }
 }
@@ -211,7 +211,7 @@
   background: var(--menu-bg);
   box-shadow: var(--shadow-menu);
   padding: 8px;
-  z-index: 90;
+  z-index: var(--z-popover);
 }
 .user-menu-item {
   width: 100%;
@@ -315,7 +315,7 @@
 .responsive-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: 24px;

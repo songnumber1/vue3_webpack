@@ -113,7 +113,7 @@
   position: relative;
   display: block;
   overflow: visible;
-  z-index: 80;
+  z-index: var(--z-sidebar-collapsed);
 }
 
 .collapsed-sidebar {
@@ -189,7 +189,7 @@
   background: var(--menu-bg);
   color: var(--text);
   box-shadow: var(--shadow-menu);
-  z-index: 100;
+  z-index: var(--z-popover);
 }
 
 .collapsed-recent-popover h2 {
@@ -293,7 +293,7 @@
   border-radius: 16px;
   background: var(--menu-bg);
   box-shadow: var(--shadow-menu);
-  z-index: 70;
+  z-index: var(--z-popover);
 }
 
 .attach-menu button {
@@ -485,7 +485,7 @@
 .image-preview-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: var(--z-image-preview-backdrop);
   display: grid;
   place-items: center;
   padding: 24px;
@@ -514,7 +514,7 @@
   color: #111827;
   font-size: 28px;
   line-height: 1;
-  z-index: 201;
+  z-index: var(--z-image-preview-control);
 }
 
 @media (max-width: 900px) {
@@ -708,7 +708,7 @@
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
-  z-index: 40;
+  z-index: var(--z-prompt);
 }
 
 .prompt-box,
@@ -1149,7 +1149,7 @@
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
-  z-index: 20;
+  z-index: var(--z-content-raised);
   pointer-events: auto;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -1222,7 +1222,7 @@
   inset: 0 !important;
   display: block !important;
   background: rgba(0, 0, 0, 0.45) !important;
-  z-index: 800 !important;
+  z-index: var(--z-drawer-backdrop) !important;
 }
 
 .app-container--mobile .mobile-drawer,
@@ -1237,7 +1237,7 @@
   max-height: var(--app-height, 100vh) !important;
   background: var(--sidebar-bg, #ffffff) !important;
   color: var(--sidebar-text, #202123) !important;
-  z-index: 810 !important;
+  z-index: var(--z-drawer) !important;
   overflow: hidden !important;
   box-shadow: 22px 0 54px rgba(15, 23, 42, 0.32) !important;
   transform: translate3d(0, 0, 0);
@@ -1410,7 +1410,7 @@
 }
 
 .image-preview-backdrop {
-  z-index: 1200 !important;
+  z-index: var(--z-image-preview-backdrop) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -1489,7 +1489,7 @@
 }
 
 .image-preview-close {
-  z-index: 1210 !important;
+  z-index: var(--z-image-preview-control) !important;
   width: 56px !important;
   height: 56px !important;
   top: calc(16px + env(safe-area-inset-top)) !important;
@@ -1552,7 +1552,7 @@
 .prompt-popover {
   position: absolute;
   left: 0;
-  z-index: 90;
+  z-index: var(--z-popover);
   min-width: 248px;
   padding: 8px;
   border: 1px solid var(--control-border);
@@ -1755,7 +1755,7 @@
 .bottom-sheet-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1300;
+  z-index: var(--z-bottom-sheet-backdrop);
   background: rgba(0, 0, 0, 0.45);
   touch-action: none;
 }
@@ -1764,7 +1764,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1310;
+  z-index: var(--z-bottom-sheet);
   width: 100%;
   height: var(--bottom-sheet-height, min(calc(var(--vh, 1vh) * 78), 520px));
   max-height: calc(var(--app-height, 100vh) - env(safe-area-inset-top));
@@ -2115,7 +2115,7 @@
   position: absolute;
   right: 32px;
   bottom: 116px;
-  z-index: 22;
+  z-index: var(--z-content-raised);
   width: 42px;
   height: 42px;
   border-radius: 999px;
@@ -2446,7 +2446,7 @@
 }
 
 .chat-history-context-menu-shell {
-  z-index: var(--z-chat-history-menu, 2147483000);
+  z-index: var(--z-chat-history-menu);
   isolation: isolate;
 }
 
@@ -2454,11 +2454,11 @@
 
 /* Keep the chat history action popup above every app surface on desktop and mobile. */
 .chat-history-menu-overlay.bottom-sheet-backdrop {
-  z-index: var(--z-chat-history-menu-backdrop, 2147482990) !important;
+  z-index: var(--z-chat-history-menu-backdrop) !important;
 }
 
 .chat-history-menu-overlay.bottom-sheet {
-  z-index: var(--z-chat-history-menu, 2147483000) !important;
+  z-index: var(--z-chat-history-menu) !important;
 }
 
 .chat-history-context-menu {
@@ -2514,7 +2514,7 @@
    The drawer intentionally remains mounted while history actions run, so dialog overlays must own
    the top application layer instead of inheriting the base responsive overlay z-index. */
 .responsive-overlay.responsive-overlay--mobile-dialog {
-  z-index: var(--z-app-dialog-front, 2147483100) !important;
+  z-index: var(--z-app-dialog-front) !important;
   isolation: isolate;
 }
 
@@ -2528,7 +2528,7 @@
 
 /* Desktop dialogs should also stay above transient menus without changing their layout. */
 .responsive-overlay:not(.responsive-overlay--mobile):not(.responsive-overlay--mobile-dialog) {
-  z-index: var(--z-app-dialog, 2147482500) !important;
+  z-index: var(--z-app-dialog) !important;
 }
 
 .chat-history-dialog {

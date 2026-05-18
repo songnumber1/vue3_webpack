@@ -17,7 +17,7 @@
     --mobile-main-content-top: var(--mobile-header-height, 76px);
     --mobile-main-content-inline: var(--space-4, 16px);
     --mobile-main-content-gap: var(--space-4, 16px);
-    --mobile-main-composer-z: 90;
+    --mobile-main-composer-z: var(--z-prompt-floating);
   }
 
   html,
@@ -252,7 +252,7 @@
         var(--mobile-browser-safe-bottom, 0px)
     ) !important;
     left: 0 !important;
-    z-index: var(--mobile-main-composer-z, 90) !important;
+    z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
     flex: none !important;
     width: 100% !important;
     max-width: none !important;
