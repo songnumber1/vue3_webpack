@@ -26,6 +26,11 @@
   /* Z-index layer tokens.
      Keep overlay order predictable across desktop, mobile browsers and Android WebView:
      content < prompt < drawer < popover < bottom sheet < preview/modal < app dialogs. */
+  --z-local-base: 0;
+  --z-local-panel: 1;
+  --z-local-raised: 2;
+  --z-mobile-fab: 3;
+  --z-attachment-control: 5;
   --z-content-raised: 20;
   --z-prompt: 70;
   --z-prompt-floating: 90;
