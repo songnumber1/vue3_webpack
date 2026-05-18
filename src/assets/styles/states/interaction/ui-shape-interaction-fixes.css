@@ -7,12 +7,12 @@
 /* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
 .suggestion-chip,
 .app-container--mobile .suggestion-chip {
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
 
 /* 2. Assistant feedback text button: reduce excessive pill radius. */
 .message-action-text-button {
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
 
 /* 3. Shared popup panels: reduce panel radius without changing layout. */
@@ -20,7 +20,7 @@
 .feedback-dialog,
 .responsive-overlay--mobile-dialog .responsive-panel,
 .responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
 
 /* 3.1 Popup footer/action buttons should be rectangular. */
@@ -28,7 +28,7 @@
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
 .responsive-panel .playground-button {
-  border-radius: 0;
+  border-radius: 0 !important;
 }
 
 /* 3.2 Positive/destructive confirmation actions use the primary color. */
@@ -38,9 +38,9 @@
 .playground-dialog-actions
   .playground-button:not(.playground-button--secondary),
 .responsive-panel .playground-button:not(.playground-button--secondary) {
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #ffffff;
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
 }
 
 .feedback-dialog-footer button:first-child:hover,
@@ -56,9 +56,9 @@
 .responsive-panel .playground-button:not(.playground-button--secondary):hover,
 .responsive-panel
   .playground-button:not(.playground-button--secondary):focus-visible {
-  border-color: var(--primary-strong, var(--primary));
-  background: var(--primary-strong, var(--primary));
-  color: #ffffff;
+  border-color: var(--primary-strong, var(--primary)) !important;
+  background: var(--primary-strong, var(--primary)) !important;
+  color: #ffffff !important;
 }
 
 /* 4. Mobile-only tap flash prevention for requested controls. */
@@ -79,9 +79,9 @@ body.mobile-mode
 }
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 body.mobile-mode .mobile-topbar .menu-toggle:hover,
 body.mobile-mode .mobile-topbar .menu-toggle:active,
@@ -114,11 +114,11 @@ body.mobile-mode
   .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant:focus-visible {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
   transform: none !important;
-  outline: none;
+  outline: none !important;
 }
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus,
@@ -135,7 +135,7 @@ body.mobile-mode
   .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip:focus-visible {
-  background: transparent;
-  box-shadow: none;
-  outline: none;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
 }

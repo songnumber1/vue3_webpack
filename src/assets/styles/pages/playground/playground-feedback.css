@@ -341,7 +341,7 @@ body.mobile-mode .markdown-body img {
   inline-size: auto;
   max-inline-size: 100%;
   width: auto;
-  max-width: 100%;
+  max-width: 100% !important;
   height: auto !important;
   margin-inline: auto;
   object-fit: contain;
@@ -385,7 +385,7 @@ body.mobile-mode .markdown-body img {
   inline-size: auto;
   max-inline-size: 100%;
   width: auto;
-  max-width: 100%;
+  max-width: 100% !important;
 }
 
 /* =========================================================
@@ -564,10 +564,10 @@ body.mobile-mode .markdown-body img {
 .message-action-icon {
   width: 32px;
   height: 32px;
-  padding: 0;
+  padding: 0 !important;
   display: grid;
   place-items: center;
-  font-size: 15px;
+  font-size: 15px !important;
 }
 .feedback-reason-panel,
 .feedback-send-panel {
@@ -634,8 +634,8 @@ body.mobile-mode .message-action-icon {
 
 .message-action-text-button {
   min-height: 32px;
-  padding: 0 12px;
-  border: 1px solid var(--control-border);
+  padding: 0 12px !important;
+  border: 1px solid var(--control-border) !important;
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
@@ -662,7 +662,7 @@ body.mobile-mode .message-action-icon {
   text-align: left;
   white-space: normal;
   line-height: 1.35;
-  border-radius: 12px;
+  border-radius: 12px !important;
 }
 
 .feedback-more-button {
@@ -771,9 +771,9 @@ body.mobile-mode .message-action-icon {
 
 body.mobile-mode .empty-stage--mobile-main,
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main {
-  place-items: start center;
-  align-content: start;
-  padding: 78px 16px calc(150px + env(safe-area-inset-bottom));
+  place-items: start center !important;
+  align-content: start !important;
+  padding: 78px 16px calc(150px + env(safe-area-inset-bottom)) !important;
   overflow-y: auto !important;
 }
 
@@ -782,11 +782,11 @@ body.mobile-mode
   .app-container--mobile
   .empty-stage--mobile-main
   .empty-center {
-  width: 100%;
+  width: 100% !important;
   min-height: auto;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 14px;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 14px !important;
 }
 
 body.mobile-mode .empty-stage--mobile-main .empty-center h1,
@@ -795,7 +795,7 @@ body.mobile-mode
   .empty-stage--mobile-main
   .empty-center
   h1 {
-  text-align: left;
+  text-align: left !important;
   font-size: 24px;
   line-height: 1.25;
 }
@@ -807,9 +807,9 @@ body.mobile-mode
   .suggestion-row--between {
   display: grid !important;
   grid-template-columns: 1fr !important;
-  gap: 10px;
-  width: 100%;
-  margin: 0;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 !important;
 }
 
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip,
@@ -817,10 +817,10 @@ body.mobile-mode
   .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip {
-  width: 100%;
+  width: 100% !important;
   min-height: 46px;
-  justify-content: flex-start;
-  padding: 0 16px;
+  justify-content: flex-start !important;
+  padding: 0 16px !important;
   text-align: left;
 }
 
@@ -845,8 +845,8 @@ body.mobile-mode
   right: 0 !important;
   bottom: 0 !important;
   z-index: var(--z-prompt) !important;
-  width: 100%;
-  padding: 10px 14px calc(12px + env(safe-area-inset-bottom));
+  width: 100% !important;
+  padding: 10px 14px calc(12px + env(safe-area-inset-bottom)) !important;
   background: linear-gradient(
     to top,
     var(--mobile-bg, var(--chat-bg)) 82%,

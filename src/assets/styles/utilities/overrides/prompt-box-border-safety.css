@@ -1,0 +1,19 @@
+/*
+ * Prompt box border safety patch.
+ * Restores the visible input border that was accidentally removed during
+ * prompt-box canonicalization. Layout, keyboard, safe-area and viewport rules
+ * remain owned by their existing runtime files.
+ */
+.prompt-box,
+.prompt-box--gemini,
+.app-container--mobile .prompt-box,
+.app-container--mobile .prompt-box--gemini {
+  border: 1px solid var(--prompt-border);
+}
+
+body.mobile-mode .prompt-box,
+body.mobile-mode .prompt-box--gemini,
+body.mobile-mode .app-container--mobile .prompt-box,
+body.mobile-mode .app-container--mobile .prompt-box--gemini {
+  border: 1px solid var(--prompt-border);
+}

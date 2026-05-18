@@ -9,11 +9,13 @@ export const BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS = 60;
 export const BOTTOM_SHEET_SNAP_RATIO = Object.freeze({
   half: 0.58,
   contentDefault: 0.72,
+  contentFirefox: 0.64,
   fullThreshold: 0.82,
   expandThreshold: 0.76,
   closeThreshold: 0.82,
 });
 
-export const VIEWPORT_GUARD_DELAY_MS = 80;
-
-export const VIEWPORT_GUARD_STABILIZE_DELAY_MS = 200;
+export const VIEWPORT_GUARD_DELAY_MS = Object.freeze({
+  default: 80,
+  samsung: 200,
+});

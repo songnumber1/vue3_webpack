@@ -228,6 +228,14 @@
   background: var(--chat-bg);
   z-index: var(--z-content-raised);
 }
+.mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.model-selector {
+  position: relative;
+}
 .model-trigger {
   min-width: 118px;
   height: 42px;
@@ -292,6 +300,13 @@
   place-items: center;
   overflow: hidden;
 }
+.desktop-empty-actions {
+  position: absolute;
+  top: 14px;
+  right: 20px;
+  display: flex;
+  gap: 10px;
+}
 .empty-center {
   width: min(760px, calc(100% - 40px));
   display: flex;
@@ -309,8 +324,8 @@
 }
 .desktop-center-prompt {
   width: min(650px, 100%);
-  padding: 0;
-  border: 0;
+  padding: 0 !important;
+  border: 0 !important;
 }
 .suggestion-row {
   display: flex;
@@ -333,6 +348,13 @@
 }
 .suggestion-chip:hover {
   background: var(--control-hover);
+}
+
+.mobile-project-home {
+  display: none;
+}
+.mobile-bottom-prompt {
+  display: none;
 }
 
 .message-list {
@@ -581,6 +603,10 @@ body.mobile-mode .model-trigger {
   font-size: 26px;
 }
 
+body.mobile-mode .mobile-actions {
+  gap: 10px;
+}
+
 body.mobile-mode .model-menu {
   left: 50%;
   transform: translateX(-50%);
@@ -597,6 +623,78 @@ body.mobile-mode .empty-stage {
   display: block;
   overflow: auto;
   padding: 22px 28px 120px;
+}
+
+body.mobile-mode .mobile-project-home {
+  display: block;
+}
+
+body.mobile-mode .project-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+body.mobile-mode .project-title h1 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+body.mobile-mode .folder-icon {
+  font-size: 36px;
+  color: var(--text);
+}
+
+body.mobile-mode .source-chip {
+  margin-top: 22px;
+  height: 58px;
+  border-radius: 999px;
+  border: 1px solid var(--control-border);
+  background: transparent;
+  color: var(--text);
+  padding: 0 24px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+body.mobile-mode .mobile-recent-list {
+  margin-top: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+body.mobile-mode .mobile-recent-card {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 0;
+}
+
+body.mobile-mode .mobile-recent-card strong {
+  display: block;
+  font-size: 27px;
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  margin-bottom: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.mobile-mode .mobile-recent-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 body.mobile-mode .message-list {
@@ -748,6 +846,24 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history {
 body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   display: block;
   font-size: 25px;
+}
+
+body.mobile-mode .mobile-new-chat-fab {
+  position: absolute;
+  right: 36px;
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  height: 82px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--fab-bg);
+  color: var(--fab-text);
+  font-size: 25px;
+  font-weight: 800;
+  box-shadow: var(--shadow-menu);
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user {

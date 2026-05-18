@@ -73,19 +73,19 @@ body.mobile-mode .shared-readonly-icon svg {
    - Feedback dialog follows the visual viewport when the mobile keyboard is open. */
 .conversation-title-wrap,
 .model-trigger--assistant {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .conversation-title-wrap {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .model-trigger--assistant:hover,
 .model-trigger--assistant:focus-visible {
-  background: var(--control-hover);
+  background: var(--control-hover) !important;
 }
 
 body.desktop-mode .message--user {
@@ -98,40 +98,40 @@ body.desktop-mode .message--user .avatar {
 
 body.desktop-mode .message--user .bubble {
   grid-column: 2 !important;
-  justify-self: end;
-  max-width: min(780px, 100%);
+  justify-self: end !important;
+  max-width: min(780px, 100%) !important;
 }
 
 body.mobile-mode .message--user .bubble {
-  max-width: 100%;
+  max-width: 100% !important;
 }
 
 body.mobile-mode .bottom-sheet-option--row {
-  justify-content: flex-start;
+  justify-content: flex-start !important;
 }
 
 body.mobile-mode .bottom-sheet-option--row span {
-  flex: 0 0 auto;
-  width: 24px;
-  text-align: center;
+  flex: 0 0 auto !important;
+  width: 24px !important;
+  text-align: center !important;
 }
 
 body.mobile-mode .bottom-sheet-option--row strong {
-  flex: 0 1 auto;
+  flex: 0 1 auto !important;
   display: inline !important;
-  min-width: 0;
-  margin: 0;
+  min-width: 0 !important;
+  margin: 0 !important;
 }
 
 body.mobile-mode .feedback-dialog-backdrop {
-  align-items: flex-start;
-  padding: calc(12px + env(safe-area-inset-top)) 12px 12px;
+  align-items: flex-start !important;
+  padding: calc(12px + env(safe-area-inset-top)) 12px 12px !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
 }
 
 body.mobile-mode .feedback-dialog {
-  width: 100%;
+  width: 100% !important;
   max-height: calc(
     var(--app-height, 100dvh) - 24px - env(safe-area-inset-top)
   ) !important;
@@ -198,8 +198,8 @@ body.mobile-mode
 
 .message--user .bubble {
   grid-column: 2 !important;
-  max-width: min(780px, 100%);
-  justify-self: end;
+  max-width: min(780px, 100%) !important;
+  justify-self: end !important;
 }
 
 .message--assistant .bubble {
@@ -254,22 +254,22 @@ body.mobile-mode .message-list {
 
 body.mobile-mode .message,
 body.mobile-mode .message--user {
-  width: 100%;
+  width: 100% !important;
   display: block !important;
 }
 
 body.mobile-mode .message--user .bubble,
 body.mobile-mode .message--assistant .bubble {
-  max-width: 100%;
+  max-width: 100% !important;
 }
 
 body.mobile-mode .sidebar-content--mobile {
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
-  margin-bottom: max(10px, env(safe-area-inset-bottom));
-  padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  margin-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
 }
 
 .chevron--selector,
@@ -302,7 +302,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 .mobile-settings-item-arrow {
-  font-size: 0;
+  font-size: 0 !important;
   width: 20px;
   height: 20px;
   position: relative;
@@ -320,25 +320,25 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 
 .bottom-sheet-option--row {
   display: inline-flex !important;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 12px;
-  text-align: left;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+  text-align: left !important;
 }
 
 .bottom-sheet-option--row > span[aria-hidden="true"] {
-  width: 24px;
-  min-width: 24px;
-  flex: 0 0 24px;
-  text-align: center;
+  width: 24px !important;
+  min-width: 24px !important;
+  flex: 0 0 24px !important;
+  text-align: center !important;
 }
 
 .bottom-sheet-option--row > strong {
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
   display: inline-block !important;
-  margin: 0;
-  text-align: left;
+  margin: 0 !important;
+  text-align: left !important;
 }
 
 .feedback-dialog-backdrop {
@@ -347,9 +347,9 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   min-height: 0 !important;
   height: var(--app-height, 100dvh) !important;
   display: grid !important;
-  place-items: center;
-  padding: 20px;
-  background: var(--overlay-backdrop);
+  place-items: center !important;
+  padding: 20px !important;
+  background: var(--overlay-backdrop) !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
 }
@@ -359,15 +359,15 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 body.mobile-mode .feedback-dialog-backdrop {
-  align-items: center;
-  justify-items: center;
-  padding: 12px;
+  align-items: center !important;
+  justify-items: center !important;
+  padding: 12px !important;
 }
 
 body.mobile-mode .feedback-dialog {
-  width: min(100%, 520px);
+  width: min(100%, 520px) !important;
   max-height: calc(var(--app-height, 100dvh) - 24px) !important;
-  border-radius: 22px;
+  border-radius: 22px !important;
 }
 
 body.mobile-mode .feedback-dialog-body textarea {
@@ -400,11 +400,11 @@ body.mobile-mode .sidebar-content--mobile {
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .sidebar-user--mobile {
-  margin-top: auto;
+  margin-top: auto !important;
   margin-bottom: calc(
     var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
   ) !important;
-  padding-bottom: var(--space-4);
+  padding-bottom: var(--space-4) !important;
 }
 
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
@@ -440,14 +440,14 @@ body.mobile-mode .app-container--mobile .message--assistant .bubble {
   display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 24px;
+  width: 24px !important;
   height: 24px !important;
-  font-size: 0;
+  font-size: 0 !important;
   color: var(--text-muted);
 }
 
 .mobile-settings-item-arrow::before {
-  content: none;
+  content: none !important;
 }
 
 .mobile-settings-item-arrow .chevron-right-icon {
@@ -512,19 +512,19 @@ body.mobile-mode
   .sidebar-content--mobile
   .sidebar-history,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
-  padding-bottom: 18px;
+  padding-bottom: 18px !important;
 }
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .app-container--mobile .sidebar-user--mobile,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  margin-top: auto;
+  margin-top: auto !important;
   margin-bottom: max(
     22px,
     calc(var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom))
   ) !important;
-  padding-bottom: 18px;
-  flex: 0 0 auto;
+  padding-bottom: 18px !important;
+  flex: 0 0 auto !important;
 }
 body.mobile-mode
   .app-container--mobile
@@ -626,10 +626,10 @@ body.mobile-mode .app-container--mobile .sidebar-content--mobile,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
   height: 100% !important;
   min-height: 0 !important;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
   overflow: hidden !important;
-  padding-bottom: 0;
+  padding-bottom: 0 !important;
 }
 
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-top,
@@ -638,7 +638,7 @@ body.mobile-mode .app-container--mobile .sidebar-content--mobile .quick-menu,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .quick-menu,
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .section-label,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .section-label {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
 }
 
 body.mobile-mode
@@ -646,11 +646,11 @@ body.mobile-mode
   .sidebar-content--mobile
   .sidebar-history,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
-  flex: 1 1 auto;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding-bottom: 14px;
+  padding-bottom: 14px !important;
   -webkit-overflow-scrolling: touch !important;
 }
 
@@ -662,13 +662,13 @@ body.mobile-mode .mobile-drawer .sidebar-user--mobile {
   left: auto !important;
   right: auto !important;
   bottom: auto !important;
-  flex: 0 0 auto;
-  margin-top: auto;
-  margin-bottom: 0;
-  padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom)));
+  flex: 0 0 auto !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom))) !important;
   border-top: 1px solid var(--control-border) !important;
-  background: var(--sidebar-bg, var(--mobile-bg));
-  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04);
+  background: var(--sidebar-bg, var(--mobile-bg)) !important;
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04) !important;
 }
 
 body.mobile-mode
@@ -704,8 +704,8 @@ body.mobile-mode
   ) !important;
   min-height: 0 !important;
   overflow: hidden !important;
-  padding-top: 78px;
-  padding-bottom: calc(150px + env(safe-area-inset-bottom));
+  padding-top: 78px !important;
+  padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
 }
 
 body.mobile-mode
@@ -716,7 +716,7 @@ body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .empty-center {
   transform: none !important;
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 
 body.mobile-mode
@@ -761,7 +761,7 @@ body.mobile-mode .empty-stage--mobile-main {
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding: 78px 16px calc(170px + env(safe-area-inset-bottom));
+  padding: 78px 16px calc(170px + env(safe-area-inset-bottom)) !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
 }
@@ -769,9 +769,9 @@ body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center,
 body.mobile-mode .empty-stage--mobile-main .empty-center {
   min-height: auto !important;
   transform: none !important;
-  margin-top: 0;
-  justify-content: flex-start;
-  align-items: stretch;
+  margin-top: 0 !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
 }
 body.mobile-mode
   .app-container--mobile
@@ -788,9 +788,9 @@ body.mobile-mode
     env(safe-area-inset-bottom)
   ) !important;
   transform: translate3d(0, 0, 0) !important;
-  width: 100%;
+  width: 100% !important;
   z-index: var(--z-prompt) !important;
-  padding: 10px 14px 12px;
+  padding: 10px 14px 12px !important;
   background: linear-gradient(
     to top,
     var(--mobile-bg, var(--chat-bg)) 82%,
@@ -807,8 +807,8 @@ body.mobile-mode
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
-  margin: 0 auto;
-  max-width: min(100%, var(--layout-prompt-width, 760px));
+  margin: 0 auto !important;
+  max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
 }
 
 /* =========================================================
@@ -853,9 +853,9 @@ body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
-  padding-top: 78px;
-  padding-right: 16px;
-  padding-left: 16px;
+  padding-top: 78px !important;
+  padding-right: 16px !important;
+  padding-left: 16px !important;
   padding-bottom: calc(
     var(--mobile-main-composer-space, 178px) + var(--keyboard-height, 0px) +
       env(safe-area-inset-bottom)
@@ -871,11 +871,11 @@ body.mobile-mode
   .empty-center,
 body.mobile-mode .chat-container-root--mode-main .empty-center {
   min-height: auto !important;
-  width: 100%;
+  width: 100% !important;
   transform: none !important;
-  margin: 0;
-  justify-content: flex-start;
-  align-items: stretch;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
 }
 body.mobile-mode
   .app-container--mobile
@@ -891,10 +891,10 @@ body.mobile-mode
     var(--keyboard-height, 0px),
     env(safe-area-inset-bottom)
   ) !important;
-  width: 100%;
+  width: 100% !important;
   z-index: var(--z-prompt) !important;
   transform: translate3d(0, 0, 0) !important;
-  padding: 10px 14px 12px;
+  padding: 10px 14px 12px !important;
   background: linear-gradient(
     to top,
     var(--mobile-bg, var(--chat-bg)) 82%,
@@ -911,8 +911,8 @@ body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
-  max-width: min(100%, var(--layout-prompt-width, 760px));
-  margin: 0 auto;
+  max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+  margin: 0 auto !important;
 }
 
 /* =========================================================
@@ -961,14 +961,14 @@ body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   max-height: 100% !important;
   min-height: 0 !important;
   overflow: hidden !important;
-  display: flex;
-  flex-direction: column;
-  justify-content: stretch;
-  align-items: stretch;
-  place-items: stretch;
-  align-content: stretch;
-  padding: 0;
-  background: var(--chat-bg);
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  place-items: stretch !important;
+  align-content: stretch !important;
+  padding: 0 !important;
+  background: var(--chat-bg) !important;
   overscroll-behavior: none !important;
 }
 body.mobile-mode
@@ -980,22 +980,22 @@ body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .empty-center {
-  flex: 1 1 auto;
+  flex: 1 1 auto !important;
   min-height: 0 !important;
-  width: 100%;
-  max-width: none;
+  width: 100% !important;
+  max-width: none !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 14px;
-  margin: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  gap: 14px !important;
+  margin: 0 !important;
   transform: none !important;
-  padding: 24px 16px 16px;
+  padding: 24px 16px 16px !important;
   scroll-padding-bottom: 24px !important;
   touch-action: pan-y !important;
 }
@@ -1010,8 +1010,8 @@ body.mobile-mode
   .empty-stage--mobile-main
   .empty-center
   h1 {
-  flex: 0 0 auto;
-  margin: 0 0 4px;
+  flex: 0 0 auto !important;
+  margin: 0 0 4px !important;
 }
 body.mobile-mode
   .app-container--mobile
@@ -1022,7 +1022,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .suggestion-row--between {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
 }
 body.mobile-mode
   .app-container--mobile
@@ -1036,21 +1036,21 @@ body.mobile-mode
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
-  flex: 0 0 auto;
+  flex: 0 0 auto !important;
   position: relative !important;
   left: auto !important;
   right: auto !important;
   bottom: auto !important;
-  width: 100%;
+  width: 100% !important;
   z-index: var(--z-content-raised) !important;
   transform: none !important;
-  padding: 10px 14px max(12px, env(safe-area-inset-bottom));
+  padding: 10px 14px max(12px, env(safe-area-inset-bottom)) !important;
   background: linear-gradient(
     to top,
     var(--mobile-bg, var(--chat-bg)) 86%,
     color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
   ) !important;
-  box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06) !important;
   will-change: auto !important;
   touch-action: manipulation !important;
 }
@@ -1063,8 +1063,8 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  max-width: min(100%, var(--layout-prompt-width, 760px));
-  margin: 0 auto;
+  max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+  margin: 0 auto !important;
 }
 body.mobile-mode
   .app-container--mobile

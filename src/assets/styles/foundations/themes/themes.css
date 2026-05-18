@@ -7,13 +7,6 @@
   --radius-lg: 24px;
   --duration-fast: 160ms;
 
-  /* Layout / responsive tokens. Mobile trigger/drawer/gutter sizes. */
-  --layout-mobile-assistant-trigger-min: 190px;
-  --layout-mobile-assistant-trigger-max: min(72vw, 320px);
-  --layout-mobile-drawer-footer-gap: 28px;
-  --layout-mobile-message-gutter: 16px;
-  --layout-desktop-message-gutter: 24px;
-
   /* Layout / responsive tokens. CSS custom properties cannot be used directly in @media queries,
      so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
   --breakpoint-mobile: 768px;
@@ -33,12 +26,6 @@
   /* Z-index layer tokens.
      Keep overlay order predictable across desktop, mobile browsers and Android WebView:
      content < prompt < drawer < popover < bottom sheet < preview/modal < app dialogs. */
-  /* Local stacking tokens used only inside a component stacking context. */
-  --z-local-base: 0;
-  --z-local-raised: 1;
-  --z-local-floating: 2;
-  --z-local-sticky: 3;
-  --z-local-overlay: 5;
   --z-content-raised: 20;
   --z-prompt: 70;
   --z-prompt-floating: 90;
@@ -135,7 +122,6 @@
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);
   --reasoning-border: var(--message-border);
-  --prompt-outer-bg: #ffffff;
 }
 
 :root[data-theme="dark"] {
@@ -209,5 +195,21 @@
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);
   --reasoning-border: var(--message-border);
+}
+
+/* DSLLM responsive extension tokens. */
+:root {
+  --layout-mobile-assistant-trigger-min: 190px;
+  --layout-mobile-assistant-trigger-max: min(72vw, 320px);
+  --layout-mobile-drawer-footer-gap: 28px;
+  --layout-mobile-message-gutter: 16px;
+  --layout-desktop-message-gutter: 24px;
+}
+
+:root[data-theme="light"] {
+  --prompt-outer-bg: #ffffff;
+}
+
+:root[data-theme="dark"] {
   --prompt-outer-bg: var(--chat-bg);
 }

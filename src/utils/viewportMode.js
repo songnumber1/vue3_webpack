@@ -1,5 +1,9 @@
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
-import {VIEWPORT_MODE_CLASSES} from "@/constants/runtimeContracts";
+
+const VIEWPORT_MODE_CLASSES = Object.freeze({
+  mobile: "mobile-mode",
+  desktop: "desktop-mode",
+});
 
 let cleanupViewportModeListeners = null;
 

@@ -4,16 +4,16 @@
  * changed unexpectedly.
  */
 .assistant-trigger {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .assistant-trigger:hover,
 .assistant-trigger:focus-visible {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .empty-assistant-logo {

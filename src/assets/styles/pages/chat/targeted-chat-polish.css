@@ -83,7 +83,7 @@ body.mobile-mode
   .app-container--mobile
   .sidebar-content--mobile
   .sidebar-history-row.selected {
-  background: var(--sidebar-hover, #ececf1);
+  background: var(--sidebar-hover, #ececf1) !important;
 }
 
 body.mobile-mode
@@ -96,6 +96,6 @@ body.mobile-mode
   .sidebar-content--mobile
   .sidebar-history-row.selected
   .sidebar-history-item {
-  background: transparent;
+  background: transparent !important;
   font-weight: 800;
 }
