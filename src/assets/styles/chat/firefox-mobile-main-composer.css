@@ -1,0 +1,87 @@
+/*
+ * Firefox Android mobile-main composer fix.
+ *
+ * Firefox reports mobile viewport/safe-area values differently from Chromium
+ * browsers.  Keep this file imported last and scope it to the main screen only
+ * so Chrome, Samsung Internet, chat rooms and desktop layouts keep their
+ * existing behavior.
+ */
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt,
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: var(--firefox-main-composer-bottom, var(--composer-keyboard-inset, 0px)) !important;
+  left: 0 !important;
+  z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
+  display: block !important;
+  flex: none !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: var(--space-3, 12px) var(--space-4, 16px)
+    var(--firefox-main-composer-padding-bottom, var(--space-3, 12px)) !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  transform: translate3d(0, 0, 0) !important;
+  overflow: visible !important;
+  overscroll-behavior: none !important;
+  touch-action: manipulation !important;
+  will-change: bottom !important;
+}
+
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::before,
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::after,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::before,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::after,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt::before,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt::after,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::before,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt::after {
+  display: none !important;
+  content: none !important;
+}
+
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini {
+  width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin: 0 auto !important;
+}
+
+html.mobile-browser-firefox body.mobile-mode .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .empty-stage--mobile-main .empty-center,
+body.mobile-mode.mobile-browser-firefox .app-container--mobile.app-container--browser-firefox .chat-container-root--mode-main .empty-stage--mobile-main .empty-center,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main .empty-center,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
+  padding-bottom: calc(var(--mobile-main-composer-space, 150px) + 8px) !important;
+  scroll-padding-bottom: calc(var(--mobile-main-composer-space, 150px) + 8px) !important;
+}
+
+
+/* Firefox Android keeps fixed elements relative to the layout viewport while the
+   IME is open on some devices.  The viewport guard writes
+   --firefox-main-composer-bottom from the stable pre-keyboard height so only the
+   main-screen composer is lifted above the keyboard; Chromium browsers do not
+   match this selector and keep their existing behavior. */
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open .mobile-main-fixed-prompt,
+html.mobile-browser-firefox body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main.chat-container-root--keyboard-open .mobile-main-fixed-prompt,
+body.mobile-mode.mobile-browser-firefox .chat-container-root--mode-main.chat-container-root--keyboard-open .mobile-main-fixed-prompt.prompt-wrap {
+  bottom: var(--firefox-main-composer-bottom, var(--composer-keyboard-inset, 0px)) !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
