@@ -25,3 +25,5 @@
 @import "./chat/targeted-chat-polish.css";
 @import "./chat/mobile-composer-targeted-fixes.css";
 @import "./chat/firefox-mobile-main-composer.css";
+
+@import "./chat/desktop-main-feedback-fix.css";

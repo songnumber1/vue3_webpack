@@ -1,0 +1,31 @@
+/*
+ * Desktop main composer and mobile feedback dialog shape fixes.
+ *
+ * Scope:
+ * - Desktop main screen only: keep the landing composer at the same practical
+ *   width as the chat composer instead of letting the empty-center wrapper cap it.
+ * - Mobile feedback dialog only: keep the panel corner radius identical to the
+ *   desktop feedback dialog. This file is imported last to override older mobile
+ *   dialog radius rules without touching bottom sheets, chat layout, or browsers.
+ */
+
+body.desktop-mode .chat-container-root--mode-main .empty-center {
+  width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt {
+  width: min(var(--layout-prompt-width, 820px), 100%) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini {
+  width: 100% !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+body.mobile-mode .feedback-dialog,
+body.mobile-mode .app-container--mobile .feedback-dialog {
+  border-radius: 5px !important;
+}
