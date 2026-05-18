@@ -4,33 +4,33 @@
  * topbar, prompt buttons, or shared round icon styles.
  */
 body.desktop-mode .desktop-sidebar .sidebar-top {
-    position: relative;
-  }
+  position: relative;
+}
 body.desktop-mode .desktop-sidebar .sidebar-round {
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
-body.desktop-mode .desktop-sidebar .sidebar-round:hover,body.desktop-mode 
-  .desktop-sidebar .sidebar-round:focus-visible {
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+body.desktop-mode .desktop-sidebar .sidebar-round:hover,
+body.desktop-mode .desktop-sidebar .sidebar-round:focus-visible {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
 body.desktop-mode .desktop-sidebar .sidebar-round:hover {
-    transform: none;
-  }
+  transform: none;
+}
 body.desktop-mode .desktop-sidebar .assistant-selector {
-    position: static;
-  }
+  position: static;
+}
 body.desktop-mode .desktop-sidebar .assistant-menu {
-    top: calc(100% + 8px);
-    left: 50%;
-    width: calc(100% - 8px);
-    min-width: 0;
-    max-width: 232px;
-    transform: translateX(-50%);
-  }
+  top: calc(100% + 8px);
+  left: 50%;
+  width: calc(100% - 8px);
+  min-width: 0;
+  max-width: 232px;
+  transform: translateX(-50%);
+}
 
 /* Main screen Assistant brand mark. */
 .conversation-title-wrap--main {
@@ -61,5 +61,5 @@ body.desktop-mode .desktop-sidebar .assistant-menu {
 }
 
 body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
-    margin-right: 2px;
-  }
+  margin-right: 2px;
+}

@@ -12,7 +12,7 @@ const isDebugEnabled =
 function shouldLog(level) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!isProduction) return true;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return isDebugEnabled && level !== "debug";
 }
 

@@ -6,30 +6,21 @@ import {
   MIN_VIEWPORT_HEIGHT_PX,
   MOBILE_BREAKPOINT_PX,
   VIEWPORT_GUARD_DELAY_MS,
+  VIEWPORT_GUARD_STABILIZE_DELAY_MS,
 } from "@/constants/uiTokens";
-import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
+import {getViewportSize} from "@/utils/viewport";
 
 /**
- * @description applyBrowserViewportClass 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} browserFamily - browserFamily 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ * @description Chrome/Samsung/Android WebView를 단일 mobile browser runtime 클래스로 관리합니다.
+ * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
+ * @returns {void} 공통 viewport class를 html/body에 반영합니다.
  */
-function applyBrowserViewportClass(browserFamily) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
+function applyMobileRuntimeViewportClass() {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   const body = document.body;
-  const classes = [
-    "mobile-browser-default",
-    "mobile-browser-chrome",
-    "mobile-browser-firefox",
-    "mobile-browser-samsung",
-  ];
-  root.classList.remove(...classes);
-  body?.classList.remove(...classes);
-  const className = `mobile-browser-${browserFamily || "default"}`;
-  root.classList.add(className);
-  body?.classList.add(className);
+  root.classList.add("mobile-browser-runtime");
+  body?.classList.add("mobile-browser-runtime");
 }
 
 /**
@@ -41,7 +32,7 @@ function isTextEditingElement(element) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!element) return false;
   const tagName = element.tagName?.toLowerCase?.();
-  // 계산된 결과를 호출부로 반환합니다.
+
   return (
     tagName === "textarea" ||
     tagName === "input" ||
@@ -73,17 +64,13 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     0
   );
   const candidateFromBaseline = Math.max(layoutHeight - visualBottom, 0);
-  const browserFamily = getMobileBrowserFamily();
   const keyboardHeight = hasTextFocus
     ? Math.max(candidateFromLayout, candidateFromBaseline)
     : 0;
   const composerInset = hasTextFocus
-    ? browserFamily === "samsung" || browserFamily === "firefox"
-      ? Math.max(candidateFromLayout, candidateFromBaseline)
-      : candidateFromLayout
+    ? Math.max(candidateFromLayout, candidateFromBaseline)
     : 0;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     layoutHeight,
     keyboardHeight,
@@ -101,12 +88,9 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
 function setCssViewportVars(size, baselineHeight = 0) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
-  const browserFamily = getMobileBrowserFamily();
   const {layoutHeight, keyboardHeight, composerInset, offsetTop} =
     getKeyboardMetrics(size, baselineHeight);
-  const browserSafeBottom = browserFamily === "firefox" ? 0 : null;
-
-  applyBrowserViewportClass(browserFamily);
+  applyMobileRuntimeViewportClass();
 
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
@@ -126,32 +110,13 @@ function setCssViewportVars(size, baselineHeight = 0) {
     "--composer-keyboard-inset",
     `${composerInset}px`
   );
-  if (browserFamily === "firefox") {
-    document.documentElement.style.setProperty(
-      "--firefox-main-composer-bottom",
-      `${composerInset}px`
-    );
-  } else {
-    document.documentElement.style.removeProperty("--firefox-main-composer-bottom");
-  }
   document.documentElement.style.setProperty(
     "--visual-viewport-offset-top",
     `${offsetTop}px`
   );
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (browserSafeBottom === null) {
-    document.documentElement.style.removeProperty(
-      "--mobile-browser-safe-bottom"
-    );
-  } else {
-    document.documentElement.style.setProperty(
-      "--mobile-browser-safe-bottom",
-      `${browserSafeBottom}px`
-    );
-  }
+  document.documentElement.style.removeProperty("--mobile-browser-safe-bottom");
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {keyboardHeight, layoutHeight};
 }
 
@@ -160,6 +125,17 @@ function setCssViewportVars(size, baselineHeight = 0) {
  * @param {*} options - options 입력값입니다.
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
+function scrollFocusedEditorIntoView() {
+  if (typeof document === "undefined") return;
+  const activeElement = document.activeElement;
+  if (!isTextEditingElement(activeElement)) return;
+  activeElement.scrollIntoView?.({
+    block: "nearest",
+    inline: "nearest",
+    behavior: "auto",
+  });
+}
+
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
   const viewportHeight = ref(0);
@@ -167,6 +143,7 @@ export function useViewportGuard(options = {}) {
   const keyboardOpen = ref(false);
   const baselineHeight = ref(0);
   let resizeTimer = null;
+  let stabilizeTimer = null;
   let resizeFrame = null;
 
   const isCompact = computed(
@@ -215,6 +192,7 @@ export function useViewportGuard(options = {}) {
    */
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
+    window.clearTimeout(stabilizeTimer);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
 
     resizeFrame = window.requestAnimationFrame(() => {
@@ -222,12 +200,12 @@ export function useViewportGuard(options = {}) {
       apply();
     });
 
-    const browserFamily = getMobileBrowserFamily();
-    const delay =
-      browserFamily === "samsung"
-        ? VIEWPORT_GUARD_DELAY_MS.samsung
-        : VIEWPORT_GUARD_DELAY_MS.default;
-    resizeTimer = window.setTimeout(apply, delay);
+    // Chrome/Samsung/Android WebView 공통 런타임: 즉시 반영 + 안정화 재측정을 함께 수행합니다.
+    resizeTimer = window.setTimeout(apply, VIEWPORT_GUARD_DELAY_MS);
+    stabilizeTimer = window.setTimeout(
+      apply,
+      VIEWPORT_GUARD_STABILIZE_DELAY_MS
+    );
   }
 
   useEventListener(window, "resize", scheduleApply, {passive: true});
@@ -240,7 +218,12 @@ export function useViewportGuard(options = {}) {
       passive: true,
     });
   }
-  useEventListener(document, "focusin", scheduleApply, {passive: true});
+  function handleFocusIn() {
+    scheduleApply();
+    window.setTimeout(scrollFocusedEditorIntoView, VIEWPORT_GUARD_DELAY_MS);
+  }
+
+  useEventListener(document, "focusin", handleFocusIn, {passive: true});
   useEventListener(document, "focusout", scheduleApply, {passive: true});
 
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
@@ -251,11 +234,11 @@ export function useViewportGuard(options = {}) {
   // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
   onBeforeUnmount(() => {
     window.clearTimeout(resizeTimer);
+    window.clearTimeout(stabilizeTimer);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
     resizeFrame = null;
   });
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     viewportHeight,
     viewportWidth,

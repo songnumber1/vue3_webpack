@@ -124,9 +124,15 @@ const props = defineProps({
 
 const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
-const desktopAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 48));
-const mobileAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 20));
-const headerAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 20));
+const desktopAssistantIcon = computed(() =>
+  getAssistantImageBySize(props.assistant, 48)
+);
+const mobileAssistantIcon = computed(() =>
+  getAssistantImageBySize(props.assistant, 20)
+);
+const headerAssistantIcon = computed(() =>
+  getAssistantImageBySize(props.assistant, 20)
+);
 
 const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);

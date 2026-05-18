@@ -2,13 +2,11 @@
    Values are fallback defaults only. Runtime JS updates viewport/keyboard values at runtime.
    Keep variable names synchronized with src/constants/runtimeContracts.js. */
 :root {
-  --layout-viewport-height: var(--app-height, 100vh);
+  --layout-viewport-height: var(--app-height, 100dvh);
   --keyboard-height: 0px;
   --mobile-keyboard-inset: 0px;
   --composer-keyboard-inset: 0px;
   --visual-viewport-offset-top: 0px;
   --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --firefox-main-composer-bottom: var(--composer-keyboard-inset, 0px);
-  --firefox-main-composer-padding-bottom: var(--space-3, 12px);
   --vh: 1vh;
 }

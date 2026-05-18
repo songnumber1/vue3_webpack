@@ -225,7 +225,6 @@ function submitFeedback() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function reasonLabel(reason) {
-  // 계산된 결과를 호출부로 반환합니다.
   return locale.value === "ko" ? reason.ko : reason.en;
 }
 

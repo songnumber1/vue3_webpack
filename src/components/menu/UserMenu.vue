@@ -108,7 +108,13 @@ import {setAppLocale} from "@/i18n";
 import {useOutsideClick} from "@/composables/useOutsideClick";
 import {useAuthStore} from "@/stores/authStore";
 
-const emit = defineEmits(["notice", "privacy", "terms", "personalization", "playground"]);
+const emit = defineEmits([
+  "notice",
+  "privacy",
+  "terms",
+  "personalization",
+  "playground",
+]);
 const {t, locale} = useI18n();
 const authStore = useAuthStore();
 const {userName} = storeToRefs(authStore);

@@ -39,7 +39,7 @@
         </div>
 
         <header class="bottom-sheet-header">
-          <h2>{{ title || t('common.select') }}</h2>
+          <h2>{{ title || t("common.select") }}</h2>
           <button
             type="button"
             class="bottom-sheet-close"

@@ -268,6 +268,6 @@ export const BridgeContractGroups = {
 export function getContractsByCategory(category = BRIDGE_CATEGORY.ALL) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.ALL) return BridgeContract;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return BridgeContractGroups[category] || BridgeContract;
 }

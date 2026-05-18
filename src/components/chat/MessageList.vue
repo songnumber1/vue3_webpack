@@ -44,7 +44,6 @@ let stableScrollTimerIds = [];
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getScrollElement() {
-  // 계산된 결과를 호출부로 반환합니다.
   return scrollRef.value;
 }
 
@@ -59,7 +58,7 @@ function isNearBottom() {
   if (!el) return true;
 
   const remaining = el.scrollHeight - el.scrollTop - el.clientHeight;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return remaining <= BOTTOM_THRESHOLD;
 }
 
@@ -165,7 +164,7 @@ onBeforeUnmount(clearStableTimers);
  */
 function getIsAtBottom() {
   updateBottomState();
-  // 계산된 결과를 호출부로 반환합니다.
+
   return userIsAtBottom.value;
 }
 

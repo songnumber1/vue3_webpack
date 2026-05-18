@@ -29,17 +29,16 @@ export function addMediaQueryListener(mediaQueryList, listener) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof mediaQueryList.addEventListener === "function") {
     mediaQueryList.addEventListener("change", listener);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return () => mediaQueryList.removeEventListener("change", listener);
   }
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof mediaQueryList.addListener === "function") {
     mediaQueryList.addListener(listener);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return () => mediaQueryList.removeListener(listener);
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return () => {};
 }

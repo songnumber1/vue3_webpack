@@ -11,7 +11,6 @@ export function adaptModel(raw = {}) {
   const id = raw[MODEL_KEYS.ID];
   const label = raw[MODEL_KEYS.NAME] || "Model";
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     id,
     sourceId: id,
@@ -41,7 +40,6 @@ export function adaptModel(raw = {}) {
 export function adaptModelList(rawItems = [], options = {}) {
   const {includeDeleted = false, includeUnauthorized = false} = options;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return rawItems.map(adaptModel).filter((item) => {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!item.id || !item.assistId) return false;
@@ -49,7 +47,7 @@ export function adaptModelList(rawItems = [], options = {}) {
     if (!includeUnauthorized && !item.isAuthorized) return false;
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!includeDeleted && item.isDeleted) return false;
-    // 계산된 결과를 호출부로 반환합니다.
+
     return true;
   });
 }
@@ -60,7 +58,6 @@ export function adaptModelList(rawItems = [], options = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function filterAvailableModels(models = []) {
-  // 계산된 결과를 호출부로 반환합니다.
   return models.filter(
     (item) => item.id && item.assistId && item.isAuthorized && !item.isDeleted
   );

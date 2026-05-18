@@ -110,7 +110,7 @@ export async function bootstrapChatRuntime() {
     chatHistoryApi.getChatHistoryList(),
   ]);
 
-  // 계산된 결과를 호출부로 반환합니다.
+  
   return normalizeBootstrapResult({ accessInfo, assistants, studios, models, studioModels, histories });
 }
 \`\`\`
@@ -237,7 +237,7 @@ sequenceDiagram
 | Linux | rx buffer 적체 | 커널 지표 모니터링 |
 
 \`\`\`java
-// 계산된 결과를 호출부로 반환합니다.
+
 return webClient.post()
     .uri("/external/stream")
     .retrieve()
@@ -275,7 +275,7 @@ export const CHAT_KEYS = Object.freeze({
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptChatHistory(raw) {
-  // 계산된 결과를 호출부로 반환합니다.
+  
   return {
     id: raw[CHAT_KEYS.ID],
     title: raw[CHAT_KEYS.TITLE],

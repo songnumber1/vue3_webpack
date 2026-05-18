@@ -7,7 +7,8 @@ function unwrapRoot(root) {
 
 function isEventInsideElement(event, element) {
   if (!element) return false;
-  const path = typeof event.composedPath === "function" ? event.composedPath() : [];
+  const path =
+    typeof event.composedPath === "function" ? event.composedPath() : [];
   if (path.length && path.includes(element)) return true;
   return element.contains?.(event.target) || false;
 }
@@ -30,7 +31,8 @@ export function useOutsideClick(roots, callback, options = {}) {
       .map(unwrapRoot)
       .filter(Boolean);
 
-    if (elements.some((element) => isEventInsideElement(event, element))) return;
+    if (elements.some((element) => isEventInsideElement(event, element)))
+      return;
     callback(event);
   }
 

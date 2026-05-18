@@ -8,7 +8,7 @@ import {createId} from "@/utils/id";
  */
 export async function loadSharedConversation(shareId) {
   const normalizedShareId = String(shareId || "").trim();
-  // 계산된 결과를 호출부로 반환합니다.
+
   return [
     {
       id: createId("message"),

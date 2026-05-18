@@ -9,7 +9,6 @@ export function streamText(text, onChunk, options = {}) {
   const delay = options.delay ?? 14;
   let index = 0;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve) => {
     const timer = setInterval(() => {
       index += 1;

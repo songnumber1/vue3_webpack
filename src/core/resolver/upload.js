@@ -11,18 +11,16 @@ import {isNativeApp} from "@/core/config";
 export function resolveUploadStrategy(appInfo, http, bridge) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isNativeApp(appInfo)) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       upload: (fileMeta) => bridge?.uploadFile?.(JSON.stringify(fileMeta)),
     };
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     upload: (file) => {
       const formData = new FormData();
       formData.append("file", file);
-      // 계산된 결과를 호출부로 반환합니다.
+
       return http.post("/upload", formData, {
         headers: {"Content-Type": "multipart/form-data"},
       });

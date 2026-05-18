@@ -73,7 +73,9 @@ export function useChatContainerController(props) {
     handlePreviewError,
   } = useImagePreview();
 
-  const isCompactScreen = useMediaQuery(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`);
+  const isCompactScreen = useMediaQuery(
+    `(max-width: ${MOBILE_BREAKPOINT_PX}px)`
+  );
   const platformInfo = computed(() => platformStore.info || {});
   const {isMobile, updateMobileState} = useChatMobileState({
     isCompactScreen,
@@ -211,7 +213,10 @@ export function useChatContainerController(props) {
       await nextTick();
       await scrollBottom({behavior: "auto", force: true, stable: true});
     } catch (error) {
-      logWarn("[useChatContainerController] loadRouteConversation 오류:", error);
+      logWarn(
+        "[useChatContainerController] loadRouteConversation 오류:",
+        error
+      );
     }
   }
 

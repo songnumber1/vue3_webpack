@@ -13,7 +13,6 @@ import {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getNavigator() {
-  // 계산된 결과를 호출부로 반환합니다.
   return typeof window === "undefined" ? {} : window.navigator || {};
 }
 /**
@@ -22,7 +21,6 @@ function getNavigator() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getScreen() {
-  // 계산된 결과를 호출부로 반환합니다.
   return typeof window === "undefined" ? {} : window.screen || {};
 }
 /**
@@ -33,7 +31,7 @@ function getScreen() {
  */
 function parseVersion(ua, pattern) {
   const match = ua.match(pattern);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return match?.[1] || "";
 }
 /**
@@ -51,10 +49,8 @@ function getBrowserName(ua) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/CriOS|Chrome\//i.test(ua)) return "chrome";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (/FxiOS|Firefox\//i.test(ua)) return "firefox";
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Safari\//i.test(ua)) return "safari";
-  // 계산된 결과를 호출부로 반환합니다.
+
   return "unknown";
 }
 /**
@@ -68,19 +64,13 @@ function getBrowserVersion(ua, browserName) {
   if (browserName === "edge") return parseVersion(ua, /Edg\/([\d.]+)/i);
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "chrome")
-    // 계산된 결과를 호출부로 반환합니다.
     return parseVersion(ua, /(?:Chrome|CriOS)\/([\d.]+)/i);
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-  if (browserName === "firefox")
-    // 계산된 결과를 호출부로 반환합니다.
-    return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (browserName === "samsung-internet")
-    // 계산된 결과를 호출부로 반환합니다.
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return "";
 }
 /**
@@ -100,7 +90,7 @@ function detectEnv(ua, platform) {
   if (/Mac/i.test(platform)) return PLATFORM.MAC;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Linux/i.test(platform)) return PLATFORM.LINUX;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return PLATFORM.UNKNOWN;
 }
 /**
@@ -117,13 +107,12 @@ function detectDevice({env, browserName}) {
     env === PLATFORM.MAC ||
     env === PLATFORM.LINUX
   )
-    // 계산된 결과를 호출부로 반환합니다.
     return browserName === "unknown" ? "pc" : browserName;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (env === PLATFORM.ANDROID) return browserName || "android-browser";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (env === PLATFORM.IOS) return browserName || "ios-browser";
-  // 계산된 결과를 호출부로 반환합니다.
+
   return "unknown";
 }
 /**
@@ -133,7 +122,7 @@ function detectDevice({env, browserName}) {
  */
 function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return bridge?.appVersion || bridge?.version || "";
 }
 /**
@@ -143,7 +132,7 @@ function getAppVersionFromBridge() {
  */
 function getBridgeVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return bridge?.bridgeVersion || "";
 }
 /**
@@ -162,7 +151,6 @@ function isSupportedMobileMicBrowser({
   // Android 모바일 브라우저가 아니면 PC와 동일하게 전송 버튼 fallback을 사용합니다.
   if (!isAndroid || !isMobileBrowser) return false;
 
-  // Firefox Android는 SpeechRecognition 런타임 지원이 없어 마이크 버튼 대상에서 제외합니다.
   return browserName === "chrome" || browserName === "samsung-internet";
 }
 
@@ -202,7 +190,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return {
     env,
     runtime,

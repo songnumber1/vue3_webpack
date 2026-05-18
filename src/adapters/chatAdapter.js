@@ -14,7 +14,6 @@ export function adaptChatHistory(raw = {}, context = {}) {
   const model = context.modelMap?.[modelId] || null;
   const assistant = model ? context.assistantMap?.[model.assistId] : null;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     id: raw[CHAT_KEYS.ID],
     title: raw[CHAT_KEYS.TITLE] || "새 대화",
@@ -38,14 +37,13 @@ export function adaptChatHistory(raw = {}, context = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptChatHistoryList(rawItems = [], context = {}) {
-  // 계산된 결과를 호출부로 반환합니다.
   return rawItems
     .map((item) => adaptChatHistory(item, context))
     .filter((item) => item.id)
     .sort((a, b) => {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
-      // 계산된 결과를 호출부로 반환합니다.
+
       return (
         new Date(b.endedAt || 0).getTime() - new Date(a.endedAt || 0).getTime()
       );
@@ -58,7 +56,6 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptMessage(raw = {}) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     id: raw[MESSAGE_KEYS.ID],
     role:
@@ -66,7 +63,8 @@ export function adaptMessage(raw = {}) {
         ? MESSAGE_ROLES.USER
         : MESSAGE_ROLES.ASSISTANT,
     content: raw[MESSAGE_KEYS.CONTENT] || "",
-    reasoningContent: raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "",
+    reasoningContent:
+      raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "",
     reasoningStatus:
       raw[MESSAGE_KEYS.REASONING_STATUS] ||
       (raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning ? "completed" : ""),
@@ -88,7 +86,6 @@ export function adaptMessage(raw = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function adaptMessageList(rawItems = []) {
-  // 계산된 결과를 호출부로 반환합니다.
   return rawItems
     .map(adaptMessage)
     .filter((item) => item.id && item.content !== undefined)

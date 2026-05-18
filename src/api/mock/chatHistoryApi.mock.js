@@ -14,7 +14,7 @@ const SAMPLE_REASONING_CONTENTS = [
   `대화 이력을 불러온 뒤 assistant 메시지에 추론 내용이 있는 경우만 별도 영역으로 보여주도록 판단했습니다.
 
 사용자에게는 최종 답변과 구분되는 보조 설명 영역으로 노출하는 것이 적절합니다.`,
-  `모바일과 웹에서 동일한 컴포넌트를 사용하되, 글자 크기와 여백은 답변 본문보다 작게 유지하는 방향이 안전합니다.`
+  `모바일과 웹에서 동일한 컴포넌트를 사용하되, 글자 크기와 여백은 답변 본문보다 작게 유지하는 방향이 안전합니다.`,
 ];
 
 function shouldAttachReasoning(message, index) {
@@ -46,7 +46,10 @@ export const chatHistoryApiMock = {
     return resolveMock(historyStore, 210);
   },
   getChatHistoryDetail({chatId} = {}) {
-    return resolveMock(attachMockReasoning(CHAT_MESSAGES_RAW[chatId] || []), 180);
+    return resolveMock(
+      attachMockReasoning(CHAT_MESSAGES_RAW[chatId] || []),
+      180
+    );
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

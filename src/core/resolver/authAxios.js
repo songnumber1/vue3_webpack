@@ -16,7 +16,6 @@ function resolveAuthHeaders(appInfo = {}) {
       ? "ios-webview"
       : "web";
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     "Content-Type": "application/json",
     "X-Client-Platform": platform,
@@ -32,7 +31,6 @@ function resolveAuthHeaders(appInfo = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function resolveAuthAxios(appInfo = {}) {
-  // 계산된 결과를 호출부로 반환합니다.
   return axios.create({
     baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
     timeout: Number(process.env.VUE_APP_AUTH_TIMEOUT || AUTH_TIMEOUT),

@@ -172,7 +172,7 @@ function shouldRequireAndroidUpdate(appInfo) {
   const latestVersion = appInfo?.lastVersionInfo?.version;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!currentVersion || !latestVersion) return false;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return isVersionLowerThan(currentVersion, latestVersion);
 }
 
@@ -188,7 +188,6 @@ function shouldCheckAuth(to) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (to.meta?.skipAuthCheck) return false;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return to.matched.some((record) => record.meta?.requireAuth);
 }
 
@@ -199,7 +198,6 @@ function shouldCheckAuth(to) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createLoginRequiredRedirect(to, reason) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     name: LOGIN_REQUIRED_ROUTE_NAME,
     query: {
@@ -229,7 +227,6 @@ function debugRouteGuard(...args) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
-  // 계산된 결과를 호출부로 반환합니다.
   return routes.map((route) => {
     const ownMeta = route.meta || {};
     const requireAuth = Boolean(ownMeta.requireAuth || inheritedRequireAuth);
@@ -246,7 +243,6 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
       );
     }
 
-    // 계산된 결과를 호출부로 반환합니다.
     return normalizedRoute;
   });
 }
@@ -285,7 +281,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!authResult.authenticated) {
         debugRouteGuard("redirect login-required", authResult);
-        // 계산된 결과를 호출부로 반환합니다.
+
         return createLoginRequiredRedirect(to, authResult.reason);
       }
     }
@@ -299,9 +295,8 @@ function registerRouteGuard(router, appInfo, context = {}) {
     if (to.name === ANDROID_UPDATE_ROUTE_NAME) return true;
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (shouldRequireAndroidUpdate(appInfo))
-      // 계산된 결과를 호출부로 반환합니다.
       return {name: ANDROID_UPDATE_ROUTE_NAME, replace: true};
-    // 계산된 결과를 호출부로 반환합니다.
+
     return true;
   });
   router.afterEach((to) => {
@@ -327,6 +322,6 @@ export function resolveRouter(appInfo, context = {}) {
   ]);
   const router = createRouter({history: createWebHistory(), routes});
   registerRouteGuard(router, appInfo, context);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return router;
 }

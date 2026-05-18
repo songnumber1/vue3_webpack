@@ -1,5 +1,9 @@
 <template>
-  <BaseBottomSheet :open="open" :title="t('chat.assistantSelect')" @close="$emit('close')">
+  <BaseBottomSheet
+    :open="open"
+    :title="t('chat.assistantSelect')"
+    @close="$emit('close')"
+  >
     <button
       v-for="assistant in assistants"
       :key="assistant.id"
@@ -48,7 +52,6 @@ defineProps({
 
 defineEmits(["close", "select"]);
 </script>
-
 
 <style scoped>
 .assistant-sheet-option-content {

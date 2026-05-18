@@ -9,7 +9,6 @@ import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getPreviewSources(detail = {}) {
-  // 계산된 결과를 호출부로 반환합니다.
   return [detail.dataUrl, detail.previewUrl, detail.url]
     .filter((url) => typeof url === "string" && url.length > 0)
     .filter((url, index, array) => array.indexOf(url) === index);
@@ -21,7 +20,6 @@ function getPreviewSources(detail = {}) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function readPreviewDataUrl(file) {
-  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve) => {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!file || typeof FileReader === "undefined") return resolve("");
@@ -150,7 +148,6 @@ export function useImagePreview() {
 
   useEventListener(window, IMAGE_PREVIEW_EVENT, openImagePreview);
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     previewImage,
     closeImagePreview,

@@ -19,7 +19,6 @@ import {logInfo} from "@/utils/logger";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createAccessPayload(to) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     language: "ko",
     entryType: to?.name === "chat" ? "chat" : "main",
@@ -40,10 +39,9 @@ function isTruthyFlag(value) {
   if (value === true) return true;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof value === "string") {
-    // 계산된 결과를 호출부로 반환합니다.
     return ["true", "y", "yes", "1"].includes(value.toLowerCase());
   }
-  // 계산된 결과를 호출부로 반환합니다.
+
   return value === 1;
 }
 
@@ -55,11 +53,9 @@ function isTruthyFlag(value) {
 function getStoredMockScenario() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") {
-    // 계산된 결과를 호출부로 반환합니다.
     return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     window.localStorage.getItem(AUTH_MOCK_SCENARIO_STORAGE_KEY) ||
     process.env.VUE_APP_MOCK_AUTH_SCENARIO ||
@@ -73,7 +69,6 @@ function getStoredMockScenario() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldUseMockAuth() {
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     USE_MOCK_AUTH ||
     (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
@@ -103,7 +98,6 @@ function isLoginRequired(accessInfo = {}) {
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     valid === false ||
     status === "login" ||
@@ -124,7 +118,6 @@ function isAccessDenied(accessInfo = {}) {
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     status === "accessdeny" ||
     status === "access_denied" ||
@@ -145,7 +138,6 @@ function isUserAgreementRequired(accessInfo = {}) {
     accessInfo.status || accessInfo.result || ""
   ).toLowerCase();
 
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     status === "useragree" ||
     status === "user_agree" ||
@@ -175,7 +167,6 @@ async function requestAccessInfo(authAxios, payload) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (useMock) {
-    // 계산된 결과를 호출부로 반환합니다.
     return accessApiMock.getAccessInfo(payload, {scenario});
   }
 
@@ -185,7 +176,7 @@ async function requestAccessInfo(authAxios, payload) {
   }
 
   const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return response?.data || {};
 }
 
@@ -197,7 +188,6 @@ async function requestAccessInfo(authAxios, payload) {
 function normalizeAccessResult(accessInfo = {}) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isAccessDenied(accessInfo)) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.ACCESS_DENIED,
@@ -207,7 +197,6 @@ function normalizeAccessResult(accessInfo = {}) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isUserAgreementRequired(accessInfo)) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.USER_AGREE_REQUIRED,
@@ -217,7 +206,6 @@ function normalizeAccessResult(accessInfo = {}) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isLoginRequired(accessInfo)) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.LOGIN_REQUIRED,
@@ -225,7 +213,6 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     authenticated: true,
     reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
@@ -251,7 +238,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     debugAuthGuard(
       "skip access/info.do because auth store is already authenticated"
     );
-    // 계산된 결과를 호출부로 반환합니다.
+
     return {
       authenticated: true,
       reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
@@ -274,12 +261,11 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
       authStore.setAuthFailure(result.reason, result.accessInfo);
     }
 
-    // 계산된 결과를 호출부로 반환합니다.
     return result;
   } catch (error) {
     debugAuthGuard("access/info.do error", error);
     authStore.setAuthError(error);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return {
       authenticated: false,
       reason: AUTH_FAILURE_REASONS.AUTH_ERROR,

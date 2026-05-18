@@ -19,7 +19,6 @@ function createAccessInfoResponse(payload = {}, options = {}) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (scenario === AUTH_MOCK_SCENARIOS.LOGIN_REQUIRED) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       ...base,
       valid: false,
@@ -32,7 +31,6 @@ function createAccessInfoResponse(payload = {}, options = {}) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (scenario === AUTH_MOCK_SCENARIOS.ACCESS_DENIED) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       ...base,
       valid: false,
@@ -45,7 +43,6 @@ function createAccessInfoResponse(payload = {}, options = {}) {
 
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (scenario === AUTH_MOCK_SCENARIOS.USER_AGREE_REQUIRED) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       ...base,
       valid: false,
@@ -55,7 +52,6 @@ function createAccessInfoResponse(payload = {}, options = {}) {
     };
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return base;
 }
 
@@ -63,11 +59,9 @@ export const accessApiMock = {
   getAccessInfo(payload = {}, options = {}) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (options.scenario === AUTH_MOCK_SCENARIOS.ERROR) {
-      // 계산된 결과를 호출부로 반환합니다.
       return Promise.reject(new Error("Mock access/info.do 인증 오류입니다."));
     }
 
-    // 계산된 결과를 호출부로 반환합니다.
     return resolveMock(createAccessInfoResponse(payload, options), 160);
   },
 };

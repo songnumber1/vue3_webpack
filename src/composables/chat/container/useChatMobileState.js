@@ -3,8 +3,8 @@ import {ref} from "vue";
 function isMobilePlatform(platformInfo = {}) {
   return Boolean(
     platformInfo.isMobileBrowser ||
-      platformInfo.isAndroidApp ||
-      platformInfo.isIosApp
+    platformInfo.isAndroidApp ||
+    platformInfo.isIosApp
   );
 }
 

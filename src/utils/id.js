@@ -10,7 +10,7 @@ function getRandomValuesSafe(bytes) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (cryptoObj?.getRandomValues) {
     cryptoObj.getRandomValues(bytes);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return bytes;
   }
 
@@ -18,7 +18,7 @@ function getRandomValuesSafe(bytes) {
   for (let i = 0; i < bytes.length; i += 1) {
     bytes[i] = Math.floor(Math.random() * 256);
   }
-  // 계산된 결과를 호출부로 반환합니다.
+
   return bytes;
 }
 
@@ -32,7 +32,7 @@ function createUuidV4Fallback() {
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
-  // 계산된 결과를 호출부로 반환합니다.
+
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
 
@@ -45,11 +45,10 @@ export function createId(prefix = "id") {
   const cryptoObj = globalThis.crypto || globalThis.msCrypto;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof cryptoObj?.randomUUID === "function") {
-    // 계산된 결과를 호출부로 반환합니다.
     return cryptoObj.randomUUID();
   }
 
   fallbackCounter += 1;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return `${prefix}-${Date.now().toString(36)}-${fallbackCounter.toString(36)}-${createUuidV4Fallback()}`;
 }

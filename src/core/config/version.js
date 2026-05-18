@@ -4,12 +4,11 @@
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function normalizeVersion(version) {
-  // 계산된 결과를 호출부로 반환합니다.
   return String(version || "0")
     .split(".")
     .map((part) => {
       const parsed = Number.parseInt(part, 10);
-      // 계산된 결과를 호출부로 반환합니다.
+
       return Number.isNaN(parsed) ? 0 : parsed;
     });
 }
@@ -36,7 +35,6 @@ export function compareVersion(currentVersion, targetVersion) {
     if (currentPart < targetPart) return -1;
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return 0;
 }
 
@@ -47,6 +45,5 @@ export function compareVersion(currentVersion, targetVersion) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isVersionLowerThan(currentVersion, targetVersion) {
-  // 계산된 결과를 호출부로 반환합니다.
   return compareVersion(currentVersion, targetVersion) < 0;
 }

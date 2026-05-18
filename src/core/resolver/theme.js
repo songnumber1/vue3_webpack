@@ -11,7 +11,6 @@ export function resolveTheme(storage) {
   const initial = allowedThemes.includes(stored) ? stored : "light";
   document.documentElement.dataset.theme = initial;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     current: initial,
     set(name) {

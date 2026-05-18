@@ -47,6 +47,5 @@ export function useAutoScroll(targetRef) {
     });
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {scrollToBottom};
 }

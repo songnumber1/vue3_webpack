@@ -23,7 +23,6 @@ export function resolveApi(appInfo, http) {
     ...(isAndroidApp(appInfo) ? androidApi : {}),
   };
 
-  // 계산된 결과를 호출부로 반환합니다.
   return Object.fromEntries(
     Object.entries(apiMap).map(([name, fn]) => [
       name,

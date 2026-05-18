@@ -100,10 +100,13 @@ watch(() => props.message.content, renderContent, {immediate: true});
 watch(() => props.message.reasoningContent, renderReasoningContent, {
   immediate: true,
 });
-watch(() => locale.value, () => {
-  renderContent();
-  renderReasoningContent();
-});
+watch(
+  () => locale.value,
+  () => {
+    renderContent();
+    renderReasoningContent();
+  }
+);
 onMounted(() => {
   renderContent();
   renderReasoningContent();

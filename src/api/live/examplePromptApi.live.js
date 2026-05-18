@@ -11,7 +11,7 @@ async function getExamplePrompts(params = {}) {
   const response = await httpClient.get(API_ENDPOINTS.EXAMPLE_PROMPTS, {
     params,
   });
-  // 계산된 결과를 호출부로 반환합니다.
+
   return response?.data || {list: []};
 }
 

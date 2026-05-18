@@ -7,7 +7,6 @@ let viewportCssVarsInstalled = false;
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getCryptoObject() {
-  // 계산된 결과를 호출부로 반환합니다.
   return globalThis.crypto || globalThis.msCrypto || null;
 }
 
@@ -33,7 +32,7 @@ function createUuidV4Fallback() {
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
   const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0"));
-  // 계산된 결과를 호출부로 반환합니다.
+
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
 
@@ -48,7 +47,6 @@ function installGlobalThisFallback() {
 
   Object.defineProperty(Object.prototype, "__magic_global_this__", {
     get() {
-      // 계산된 결과를 호출부로 반환합니다.
       return this;
     },
     configurable: true,

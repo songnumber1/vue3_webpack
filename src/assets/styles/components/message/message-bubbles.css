@@ -37,17 +37,17 @@
   letter-spacing: -0.012em;
 }
 
-body.mobile-mode .message--user .bubble,body.mobile-mode 
-  .app-container--mobile .message--user .bubble {
-    max-width: var(--message-user-mobile-max);
-    padding: var(--message-user-mobile-padding);
-    border-radius: calc(var(--message-user-radius) - 4px);
-    background: var(--message-user-bg);
-    color: var(--message-user-text);
-  }
+body.mobile-mode .message--user .bubble,
+body.mobile-mode .app-container--mobile .message--user .bubble {
+  max-width: var(--message-user-mobile-max);
+  padding: var(--message-user-mobile-padding);
+  border-radius: calc(var(--message-user-radius) - 4px);
+  background: var(--message-user-bg);
+  color: var(--message-user-text);
+}
 
-body.mobile-mode .bubble-content--plain,body.mobile-mode 
-  .app-container--mobile .bubble-content--plain {
-    font-size: var(--message-plain-mobile-font-size);
-    line-height: 1.62;
-  }
+body.mobile-mode .bubble-content--plain,
+body.mobile-mode .app-container--mobile .bubble-content--plain {
+  font-size: var(--message-plain-mobile-font-size);
+  line-height: 1.62;
+}

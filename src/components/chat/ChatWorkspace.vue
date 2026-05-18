@@ -91,7 +91,15 @@
 </template>
 
 <script setup>
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
@@ -161,7 +169,9 @@ const props = defineProps({
   showScrollBottom: {type: Boolean, default: false},
 });
 
-const mainAssistantIcon = computed(() => getAssistantImageBySize(props.assistant, 48));
+const mainAssistantIcon = computed(() =>
+  getAssistantImageBySize(props.assistant, 48)
+);
 
 const mainPromptClass = computed(() =>
   props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"

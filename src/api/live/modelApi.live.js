@@ -9,7 +9,7 @@ import {API_ENDPOINTS} from "@/constants/apiEndpoints";
  */
 async function getModels() {
   const response = await httpClient.get(API_ENDPOINTS.MODEL_INFO);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return response?.data || [];
 }
 
@@ -20,7 +20,7 @@ async function getModels() {
  */
 async function getStudioModels() {
   const response = await httpClient.get(API_ENDPOINTS.STUDIO_MODEL_INFO);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return response?.data || [];
 }
 

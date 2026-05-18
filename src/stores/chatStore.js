@@ -22,7 +22,6 @@ export const useChatStore = defineStore("chat", {
       this.histories = histories;
     },
     getHistory(id) {
-      // 계산된 결과를 호출부로 반환합니다.
       return (
         this.histories.find((item) => String(item.id) === String(id)) || null
       );

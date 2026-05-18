@@ -16,6 +16,6 @@ export function toBoolean(value) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (["false", "n", "no", "0", ""].includes(normalized)) return false;
   }
-  // 계산된 결과를 호출부로 반환합니다.
+
   return Boolean(value);
 }

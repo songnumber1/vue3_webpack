@@ -11,11 +11,10 @@ import {adaptExamplePromptList} from "@/adapters/promptAdapter";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function toMap(items = []) {
-  // 계산된 결과를 호출부로 반환합니다.
   return items.reduce((acc, item) => {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (item?.id) acc[item.id] = item;
-    // 계산된 결과를 호출부로 반환합니다.
+
     return acc;
   }, {});
 }
@@ -26,7 +25,6 @@ function toMap(items = []) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function groupModelsByAssistant(models = []) {
-  // 계산된 결과를 호출부로 반환합니다.
   return models.reduce((acc, model) => {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!model?.assistId) return acc;
@@ -34,7 +32,7 @@ function groupModelsByAssistant(models = []) {
     if (!acc[model.assistId]) acc[model.assistId] = [];
     acc[model.assistId].push(model);
     acc[model.assistId].sort((a, b) => a.order - b.order);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return acc;
   }, {});
 }
@@ -50,7 +48,7 @@ function pickInitialAssistant(assistants = [], accessInfo = {}) {
   const latestPreferredAssistantId = preferredIds.find((id) =>
     assistants.some((item) => item.id === id)
   );
-  // 계산된 결과를 호출부로 반환합니다.
+
   return (
     assistants.find((item) => item.id === latestPreferredAssistantId) ||
     assistants[0] ||
@@ -67,7 +65,7 @@ function pickInitialModel(
   if (!assistant) return null;
   const presetModelId = accessInfo?.user?.presetInfo?.assist?.[assistant.id];
   const models = modelMapByAssistant[assistant.id] || [];
-  // 계산된 결과를 호출부로 반환합니다.
+
   return models.find((item) => item.id === presetModelId) || models[0] || null;
 }
 
@@ -101,7 +99,9 @@ export async function bootstrapChatRuntime(options = {}) {
 
   const accessInfo = readSettledValue(0, null);
   if (!accessInfo) {
-    throw bootstrapResults[0].reason || new Error("Access info bootstrap failed.");
+    throw (
+      bootstrapResults[0].reason || new Error("Access info bootstrap failed.")
+    );
   }
 
   const assistantRaw = readSettledValue(1, []);
@@ -150,7 +150,6 @@ export async function bootstrapChatRuntime(options = {}) {
     accessInfo
   );
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     accessInfo,
     assistants,
@@ -195,7 +194,7 @@ export async function deleteChatHistory(payload = {}) {
 export async function loadChatMessages(payload = {}) {
   const {chatHistoryApi} = resolveChatApis();
   const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return adaptMessageList(rawMessages);
 }
 
@@ -210,6 +209,6 @@ export async function loadExamplePrompts({assistantId, studioYN = false} = {}) {
     assistId: assistantId,
     studioYN,
   });
-  // 계산된 결과를 호출부로 반환합니다.
+
   return adaptExamplePromptList(response);
 }

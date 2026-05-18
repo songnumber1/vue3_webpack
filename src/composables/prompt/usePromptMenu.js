@@ -1,7 +1,10 @@
 import {computed, ref, watch} from "vue";
 import {useEventListener, useMediaQuery} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/useOutsideClick";
-import {PROMPT_MENU_TYPE, PROMPT_VIEWPORT_QUERY} from "@/constants/promptComposer";
+import {
+  PROMPT_MENU_TYPE,
+  PROMPT_VIEWPORT_QUERY,
+} from "@/constants/promptComposer";
 
 function createMenuOpenRef(activeMenu, menuType) {
   return computed({
@@ -67,10 +70,16 @@ export function usePromptMenu() {
 
   watch(isPromptCompactViewport, syncViewportMode);
   useEventListener(window, "resize", syncViewportMode, {passive: true});
-  useEventListener(window, "orientationchange", syncViewportMode, {passive: true});
+  useEventListener(window, "orientationchange", syncViewportMode, {
+    passive: true,
+  });
   if (typeof window !== "undefined" && window.visualViewport) {
-    useEventListener(window.visualViewport, "resize", syncViewportMode, {passive: true});
-    useEventListener(window.visualViewport, "scroll", syncViewportMode, {passive: true});
+    useEventListener(window.visualViewport, "resize", syncViewportMode, {
+      passive: true,
+    });
+    useEventListener(window.visualViewport, "scroll", syncViewportMode, {
+      passive: true,
+    });
   }
 
   return {

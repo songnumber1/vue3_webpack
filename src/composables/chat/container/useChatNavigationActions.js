@@ -29,7 +29,10 @@ export function useChatNavigationActions({
       try {
         await selectAssistantForNewChat(assistantId);
       } catch (error) {
-        logWarn("[useChatNavigationActions] selectAssistantForNewChat 오류:", error);
+        logWarn(
+          "[useChatNavigationActions] selectAssistantForNewChat 오류:",
+          error
+        );
       }
       assistantSheetOpen.value = false;
     } else {

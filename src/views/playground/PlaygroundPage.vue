@@ -298,7 +298,7 @@ function closePopup(action) {
 function syncMobile() {
   isMobile.value = Boolean(
     window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
-      isAndroidApp(appInfo)
+    isAndroidApp(appInfo)
   );
 }
 

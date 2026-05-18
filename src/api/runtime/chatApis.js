@@ -16,7 +16,6 @@ import {chatHistoryApiLive} from "@/api/live/chatHistoryApi.live";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function shouldUseMockChatApi() {
-  // 계산된 결과를 호출부로 반환합니다.
   return process.env.VUE_APP_USE_MOCK_API !== "false";
 }
 
@@ -28,7 +27,6 @@ export function shouldUseMockChatApi() {
 export function resolveChatApis() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (shouldUseMockChatApi()) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       accessApi: accessApiMock,
       assistantApi: assistantApiMock,
@@ -38,7 +36,6 @@ export function resolveChatApis() {
     };
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     accessApi: accessApiLive,
     assistantApi: assistantApiLive,

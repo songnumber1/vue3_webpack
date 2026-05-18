@@ -23,7 +23,7 @@ function textContent(node) {
   if (typeof node.value === "string") return node.value;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!Array.isArray(node.children)) return "";
-  // 계산된 결과를 호출부로 반환합니다.
+
   return node.children.map(textContent).join("");
 }
 
@@ -33,7 +33,6 @@ function textContent(node) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function mdLabel(key) {
-  // 계산된 결과를 호출부로 반환합니다.
   return i18n.global.t(key);
 }
 
@@ -44,7 +43,6 @@ function mdLabel(key) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function tableActionButton(action, label) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     type: "element",
     tagName: "button",
@@ -83,7 +81,6 @@ function tableActionButton(action, label) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function rehypeTableWrapper() {
-  // 계산된 결과를 호출부로 반환합니다.
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
@@ -136,7 +133,6 @@ function rehypeTableWrapper() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function rehypeMermaidBlock() {
-  // 계산된 결과를 호출부로 반환합니다.
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
       // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
@@ -187,7 +183,7 @@ const processor = unified()
 export async function renderMarkdown(text) {
   const file = await processor.process(String(text ?? ""));
   const html = String(file).trim();
-  // 계산된 결과를 호출부로 반환합니다.
+
   return html || "<p></p>";
 }
 
@@ -197,6 +193,5 @@ export async function renderMarkdown(text) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isMarkdownRenderable(value) {
-  // 계산된 결과를 호출부로 반환합니다.
   return value !== undefined && value !== null;
 }

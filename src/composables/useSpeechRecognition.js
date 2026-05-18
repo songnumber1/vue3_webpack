@@ -6,30 +6,13 @@ const AUTO_RESTART_DELAY = 250;
 const DUPLICATE_NORMALIZE_PATTERN = /\s+/g;
 
 /**
- * @description 현재 브라우저가 Android Firefox인지 확인합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {boolean} Android Firefox 환경이면 true를 반환합니다.
- */
-function isAndroidFirefoxBrowser() {
-  // SSR 또는 테스트 환경에서는 브라우저 정보가 없으므로 미지원 브라우저로 판단하지 않습니다.
-  if (typeof navigator === "undefined") return false;
-
-  const userAgent = navigator.userAgent || "";
-
-  // Firefox Android는 Web Speech API의 SpeechRecognition 구현이 없어 마이크 시작을 방어합니다.
-  return /Android/i.test(userAgent) && /Firefox/i.test(userAgent);
-}
-
-/**
  * @description 현재 런타임에서 SpeechRecognition을 안전하게 실행할 수 있는지 확인합니다.
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {boolean} SpeechRecognition 생성자가 있고 Android Firefox가 아니면 true를 반환합니다.
+ * @returns {boolean} SpeechRecognition 생성자가 있으면 true를 반환합니다.
  */
 function isSpeechRecognitionRuntimeSupported() {
-  // 브라우저 생성자 지원 여부와 Firefox Android 제외 정책을 함께 확인합니다.
-  return (
-    Boolean(getSpeechRecognitionConstructor()) && !isAndroidFirefoxBrowser()
-  );
+  // Chrome/Samsung/WebView 공통 런타임 기준으로 생성자 지원 여부만 확인합니다.
+  return Boolean(getSpeechRecognitionConstructor());
 }
 
 /**
@@ -40,7 +23,7 @@ function isSpeechRecognitionRuntimeSupported() {
 function getSpeechRecognitionConstructor() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") return null;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
@@ -82,7 +65,6 @@ export function useSpeechRecognition(options = {}) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function normalizeText(value) {
-    // 계산된 결과를 호출부로 반환합니다.
     return String(value || "")
       .replace(DUPLICATE_NORMALIZE_PATTERN, " ")
       .trim();
@@ -94,7 +76,6 @@ export function useSpeechRecognition(options = {}) {
    * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
    */
   function mergeText(...parts) {
-    // 계산된 결과를 호출부로 반환합니다.
     return parts.map(normalizeText).filter(Boolean).join(" ");
   }
 
@@ -221,7 +202,6 @@ export function useSpeechRecognition(options = {}) {
       }, AUTO_RESTART_DELAY);
     };
 
-    // 계산된 결과를 호출부로 반환합니다.
     return instance;
   }
 
@@ -235,7 +215,7 @@ export function useSpeechRecognition(options = {}) {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!isSupported.value) {
       errorMessage.value = "speech-recognition-not-supported";
-      // 계산된 결과를 호출부로 반환합니다.
+
       return false;
     }
 
@@ -258,12 +238,12 @@ export function useSpeechRecognition(options = {}) {
     // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       recognition.start();
-      // 계산된 결과를 호출부로 반환합니다.
+
       return true;
     } catch (error) {
       errorMessage.value = error?.message || "speech-recognition-start-failed";
       cleanupRecognition(false);
-      // 계산된 결과를 호출부로 반환합니다.
+
       return false;
     }
   }
@@ -310,7 +290,6 @@ export function useSpeechRecognition(options = {}) {
     cleanupRecognition(true);
   });
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     isSupported,
     isListening,
@@ -321,3 +300,5 @@ export function useSpeechRecognition(options = {}) {
     resetToMic,
   };
 }
+
+export default useSpeechRecognition;

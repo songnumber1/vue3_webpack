@@ -72,7 +72,10 @@ export function usePromptAttachment({
         });
         return;
       } catch (error) {
-        logWarn("Android file picker failed. Falling back to web input.", error);
+        logWarn(
+          "Android file picker failed. Falling back to web input.",
+          error
+        );
       }
     }
 

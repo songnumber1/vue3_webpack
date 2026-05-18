@@ -21,10 +21,9 @@ function readAndroidValue(bridge, methodName, fallback = null) {
   try {
     const member = bridge?.[methodName];
     const value = typeof member === "function" ? member.call(bridge) : member;
-    // 계산된 결과를 호출부로 반환합니다.
+
     return value == null || value === "" ? fallback : String(value);
   } catch {
-    // 계산된 결과를 호출부로 반환합니다.
     return fallback;
   }
 }
@@ -35,7 +34,6 @@ function readAndroidValue(bridge, methodName, fallback = null) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function createAndroidConfig(bridge = window.AndroidBridge) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     env: RUN_ENV.NATIVE,
     platform: PLATFORM.ANDROID,

@@ -44,7 +44,6 @@ const CATEGORY_OPTIONS = [
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function createErrorResponse(description, schema) {
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     description,
     content: {
@@ -65,7 +64,7 @@ function getCategoryPath(category) {
   if (category === BRIDGE_CATEGORY.JS_TO_ANDROID) return JS_TO_ANDROID_PATH;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.ANDROID_TO_JS) return ANDROID_TO_JS_PATH;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return WEB_API_PATH;
 }
 
@@ -75,7 +74,6 @@ function getCategoryPath(category) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getCategoryDescription(category) {
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
     "Bridge contract"
@@ -89,7 +87,6 @@ function getCategoryDescription(category) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function shouldIncludeContract(selectedCategory, contract) {
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     selectedCategory === BRIDGE_CATEGORY.ALL ||
     contract.category === selectedCategory
@@ -102,7 +99,6 @@ function shouldIncludeContract(selectedCategory, contract) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function getOpenApiCategoryOptions() {
-  // 계산된 결과를 호출부로 반환합니다.
   return CATEGORY_OPTIONS;
 }
 
@@ -162,7 +158,6 @@ export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
 
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
-  // 계산된 결과를 호출부로 반환합니다.
   return generator.generateDocument({
     openapi: "3.0.0",
     info: {

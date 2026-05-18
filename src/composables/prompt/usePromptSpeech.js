@@ -8,7 +8,13 @@ import {PROMPT_SPEECH_LANGUAGE} from "@/constants/promptComposer";
  * @param {object} options - text ref, resize 함수, closeMenus 함수, disabled props ref
  * @returns {object} 음성 관련 상태 및 핸들러
  */
-export function usePromptSpeech({text, resize, closeMenus, disabled, focusTextarea}) {
+export function usePromptSpeech({
+  text,
+  resize,
+  closeMenus,
+  disabled,
+  focusTextarea,
+}) {
   const platformStore = usePlatformStore();
 
   const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
@@ -22,7 +28,8 @@ export function usePromptSpeech({text, resize, closeMenus, disabled, focusTextar
   });
 
   function startVoiceInput() {
-    if (disabled.value || !isMicEnabled.value || !speech.isSupported.value) return;
+    if (disabled.value || !isMicEnabled.value || !speech.isSupported.value)
+      return;
     closeMenus();
     speech.start(text.value);
   }

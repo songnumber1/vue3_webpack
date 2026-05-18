@@ -22,14 +22,11 @@ const noopBridge = {
 export function resolveBridge(appInfo) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isAndroidApp(appInfo) && window.AndroidBridge)
-    // 계산된 결과를 호출부로 반환합니다.
     return window.AndroidBridge;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isIosApp(appInfo) && window.webkit?.messageHandlers?.AppBridge) {
-    // 계산된 결과를 호출부로 반환합니다.
     return window.webkit.messageHandlers.AppBridge;
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return noopBridge;
 }

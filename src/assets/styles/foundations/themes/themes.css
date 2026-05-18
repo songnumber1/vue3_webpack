@@ -7,6 +7,13 @@
   --radius-lg: 24px;
   --duration-fast: 160ms;
 
+  /* Layout / responsive tokens. Mobile trigger/drawer/gutter sizes. */
+  --layout-mobile-assistant-trigger-min: 190px;
+  --layout-mobile-assistant-trigger-max: min(72vw, 320px);
+  --layout-mobile-drawer-footer-gap: 28px;
+  --layout-mobile-message-gutter: 16px;
+  --layout-desktop-message-gutter: 24px;
+
   /* Layout / responsive tokens. CSS custom properties cannot be used directly in @media queries,
      so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
   --breakpoint-mobile: 768px;
@@ -128,6 +135,7 @@
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);
   --reasoning-border: var(--message-border);
+  --prompt-outer-bg: #ffffff;
 }
 
 :root[data-theme="dark"] {
@@ -201,21 +209,5 @@
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);
   --reasoning-border: var(--message-border);
-}
-
-/* DSLLM responsive extension tokens. */
-:root {
-  --layout-mobile-assistant-trigger-min: 190px;
-  --layout-mobile-assistant-trigger-max: min(72vw, 320px);
-  --layout-mobile-drawer-footer-gap: 28px;
-  --layout-mobile-message-gutter: 16px;
-  --layout-desktop-message-gutter: 24px;
-}
-
-:root[data-theme="light"] {
-  --prompt-outer-bg: #ffffff;
-}
-
-:root[data-theme="dark"] {
   --prompt-outer-bg: var(--chat-bg);
 }

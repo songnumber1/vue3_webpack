@@ -8,7 +8,8 @@
     >
       <div class="user-avatar">{{ userInitial }}</div>
       <div class="sidebar-user-main">
-        <strong>{{ displayName }}</strong><small>{{ t('common.plus') }}</small>
+        <strong>{{ displayName }}</strong
+        ><small>{{ t("common.plus") }}</small>
       </div>
     </button>
     <div class="sidebar-user-actions">
@@ -42,12 +43,15 @@
 </template>
 
 <script setup>
-import {computed, inject} from 'vue';
-import {useI18n} from 'vue-i18n';
-import {storeToRefs} from 'pinia';
-import SwaggerDocIcon from '@/components/icons/SwaggerDocIcon.vue';
-import {useAuthStore} from '@/stores/authStore';
-import {CHAT_ACTIONS_KEY, createEmptyChatActions} from '@/composables/chat/chatActionContext';
+import {computed, inject} from "vue";
+import {useI18n} from "vue-i18n";
+import {storeToRefs} from "pinia";
+import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
+import {useAuthStore} from "@/stores/authStore";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 
 const {t} = useI18n();
 const authStore = useAuthStore();
@@ -55,9 +59,9 @@ const {userName} = storeToRefs(authStore);
 
 const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 
-const displayName = computed(() => userName.value || t('common.user'));
+const displayName = computed(() => userName.value || t("common.user"));
 const userInitial = computed(() => {
   const name = displayName.value;
-  return name ? name.charAt(0) : 'U';
+  return name ? name.charAt(0) : "U";
 });
 </script>

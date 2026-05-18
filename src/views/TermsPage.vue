@@ -2,9 +2,9 @@
   <main class="legal-page legal-page--terms" role="main">
     <section class="legal-card" aria-labelledby="terms-title">
       <header class="legal-header">
-        <p class="legal-eyebrow">{{ t('legal.terms.eyebrow') }}</p>
-        <h1 id="terms-title">{{ t('legal.terms.title') }}</h1>
-        <p class="legal-description">{{ t('legal.terms.description') }}</p>
+        <p class="legal-eyebrow">{{ t("legal.terms.eyebrow") }}</p>
+        <h1 id="terms-title">{{ t("legal.terms.title") }}</h1>
+        <p class="legal-description">{{ t("legal.terms.description") }}</p>
       </header>
 
       <div class="legal-content">
@@ -21,7 +21,7 @@
       <footer class="terms-agreement" aria-label="terms agreement">
         <label class="terms-check">
           <input v-model="agreed" type="checkbox" />
-          <span>{{ t('legal.terms.agreeLabel') }}</span>
+          <span>{{ t("legal.terms.agreeLabel") }}</span>
         </label>
         <button
           type="button"
@@ -29,7 +29,7 @@
           :disabled="!agreed"
           @click="confirmTerms"
         >
-          {{ t('common.confirm') }}
+          {{ t("common.confirm") }}
         </button>
       </footer>
     </section>

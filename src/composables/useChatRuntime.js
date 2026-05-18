@@ -24,7 +24,7 @@ import {useChatStore} from "@/stores/chatStore";
  */
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return {
     id,
     temporary: true,
@@ -69,7 +69,6 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
         ? "missing-assistant"
         : "";
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     chatId: history.id,
     assistantId: assistant?.id || history.assistantId || model?.assistId || "",
@@ -121,7 +120,7 @@ export function useChatRuntime() {
   const models = computed(() => {
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!chatStore.isModelLocked) return assistantStore.currentModels;
-    // 계산된 결과를 호출부로 반환합니다.
+
     return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(
       Boolean
     );
@@ -305,7 +304,6 @@ export function useChatRuntime() {
       chatStore.setMessages(history.id, messages);
     }
 
-    // 계산된 결과를 호출부로 반환합니다.
     return chatStore.messageMap[history.id] || [];
   }
 
@@ -339,7 +337,7 @@ export function useChatRuntime() {
         assistantStore.assistantMap
       )
     );
-    // 계산된 결과를 호출부로 반환합니다.
+
     return history;
   }
 
@@ -393,11 +391,10 @@ export function useChatRuntime() {
     };
     const nextMessages = [...currentMessages, userMessage, assistantMessage];
     chatStore.setMessages(chatId, nextMessages);
-    // 계산된 결과를 호출부로 반환합니다.
+
     return {messages: nextMessages, assistantMessage};
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     initialize,
     assistants,

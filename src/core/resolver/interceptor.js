@@ -15,7 +15,6 @@ function applyWebRequestInterceptor(instance) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-    // 계산된 결과를 호출부로 반환합니다.
     return config;
   });
 }
@@ -40,7 +39,6 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
     config.headers["X-App-Build-Version"] = appInfo?.appBuildVersion || "";
     config.headers["X-Bridge-Version"] = appInfo?.bridgeVersion || "";
 
-    // 계산된 결과를 호출부로 반환합니다.
     return config;
   });
 }
@@ -67,7 +65,6 @@ function applyResponseInterceptor(instance, errorUI) {
         errorUI?.notify?.("서버 오류가 발생했습니다.");
       }
 
-      // 계산된 결과를 호출부로 반환합니다.
       return Promise.reject(error);
     }
   );

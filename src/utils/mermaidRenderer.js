@@ -12,7 +12,6 @@ const MERMAID_CDN =
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function isDarkTheme() {
-  // 계산된 결과를 호출부로 반환합니다.
   return document.documentElement.getAttribute("data-theme") === "dark";
 }
 
@@ -24,7 +23,6 @@ function isDarkTheme() {
 function getMermaidConfig() {
   const dark = isDarkTheme();
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     startOnLoad: false,
     securityLevel: "strict",
@@ -87,7 +85,6 @@ function getMermaidConfig() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function loadScript(src) {
-  // 계산된 결과를 호출부로 반환합니다.
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
     // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
@@ -120,7 +117,7 @@ async function ensureMermaid() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (window.mermaid) {
     window.mermaid.initialize(getMermaidConfig());
-    // 계산된 결과를 호출부로 반환합니다.
+
     return window.mermaid;
   }
 
@@ -133,14 +130,14 @@ async function ensureMermaid() {
           "Mermaid could not be loaded. The source code block will remain visible.",
           error
         );
-        // 계산된 결과를 호출부로 반환합니다.
+
         return null;
       });
   }
 
   const mermaid = await mermaidLoader;
   mermaid?.initialize?.(getMermaidConfig());
-  // 계산된 결과를 호출부로 반환합니다.
+
   return mermaid;
 }
 

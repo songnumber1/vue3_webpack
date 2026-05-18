@@ -1,9 +1,9 @@
 <template>
   <div class="privacy-policy-view">
     <header class="privacy-policy-header">
-      <p class="privacy-policy-eyebrow">{{ t('legal.privacy.eyebrow') }}</p>
-      <h2>{{ t('legal.privacy.title') }}</h2>
-      <p>{{ t('legal.privacy.description') }}</p>
+      <p class="privacy-policy-eyebrow">{{ t("legal.privacy.eyebrow") }}</p>
+      <h2>{{ t("legal.privacy.title") }}</h2>
+      <p>{{ t("legal.privacy.description") }}</p>
     </header>
 
     <div class="privacy-policy-sections">
@@ -17,7 +17,7 @@
       </article>
     </div>
 
-    <p class="privacy-policy-updated">{{ t('legal.updatedAt') }}</p>
+    <p class="privacy-policy-updated">{{ t("legal.updatedAt") }}</p>
   </div>
 </template>
 
@@ -28,7 +28,6 @@ import {useI18n} from "vue-i18n";
 const {t, tm} = useI18n();
 const privacySections = computed(() => tm("legal.privacy.sections") || []);
 </script>
-
 
 <style scoped>
 .privacy-policy-view {

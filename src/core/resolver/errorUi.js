@@ -11,7 +11,6 @@ import {logWarn} from "@/utils/logger";
 export function resolveErrorUI(appInfo, bridge) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isNativeApp(appInfo)) {
-    // 계산된 결과를 호출부로 반환합니다.
     return {
       notify(message) {
         bridge?.toast?.(message);
@@ -19,7 +18,6 @@ export function resolveErrorUI(appInfo, bridge) {
     };
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     notify(message) {
       logWarn(message);

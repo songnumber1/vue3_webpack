@@ -11,7 +11,6 @@ import {createExtensionConfig} from "./extension";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function getNavigator() {
-  // 계산된 결과를 호출부로 반환합니다.
   return typeof window === "undefined" ? null : window.navigator;
 }
 
@@ -21,7 +20,6 @@ function getNavigator() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function hasAndroidBridge() {
-  // 계산된 결과를 호출부로 반환합니다.
   return typeof window !== "undefined" && Boolean(window.AndroidBridge);
 }
 
@@ -31,7 +29,6 @@ export function hasAndroidBridge() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function hasIosBridge() {
-  // 계산된 결과를 호출부로 반환합니다.
   return (
     typeof window !== "undefined" &&
     Boolean(window.webkit?.messageHandlers?.AppBridge)
@@ -46,7 +43,7 @@ export function hasIosBridge() {
 export function hasExtensionRuntime() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") return false;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return Boolean(window.chrome?.runtime?.id || window.browser?.runtime?.id);
 }
 
@@ -71,7 +68,6 @@ export function detectBrowserPlatform() {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/Linux/i.test(platform)) return PLATFORM.LINUX;
 
-  // 계산된 결과를 호출부로 반환합니다.
   return PLATFORM.UNKNOWN;
 }
 
@@ -87,10 +83,8 @@ export function resolveAppConfig() {
   if (hasIosBridge()) return createIosConfig();
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (hasExtensionRuntime())
-    // 계산된 결과를 호출부로 반환합니다.
     return createExtensionConfig(detectBrowserPlatform());
 
-  // 계산된 결과를 호출부로 반환합니다.
   return createDefaultConfig(detectBrowserPlatform());
 }
 
@@ -100,7 +94,6 @@ export function resolveAppConfig() {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isNativeApp(appInfo) {
-  // 계산된 결과를 호출부로 반환합니다.
   return appInfo?.env === RUN_ENV.NATIVE;
 }
 
@@ -110,7 +103,6 @@ export function isNativeApp(appInfo) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isBrowserApp(appInfo) {
-  // 계산된 결과를 호출부로 반환합니다.
   return appInfo?.env === RUN_ENV.BROWSER;
 }
 
@@ -120,7 +112,6 @@ export function isBrowserApp(appInfo) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isExtensionApp(appInfo) {
-  // 계산된 결과를 호출부로 반환합니다.
   return appInfo?.env === RUN_ENV.EXTENSION;
 }
 
@@ -130,7 +121,6 @@ export function isExtensionApp(appInfo) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isAndroidApp(appInfo) {
-  // 계산된 결과를 호출부로 반환합니다.
   return isNativeApp(appInfo) && appInfo?.platform === PLATFORM.ANDROID;
 }
 
@@ -140,7 +130,6 @@ export function isAndroidApp(appInfo) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isIosApp(appInfo) {
-  // 계산된 결과를 호출부로 반환합니다.
   return isNativeApp(appInfo) && appInfo?.platform === PLATFORM.IOS;
 }
 

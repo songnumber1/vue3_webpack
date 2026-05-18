@@ -117,17 +117,17 @@
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 body.mobile-mode .markdown-body h1 {
-    font-size: 1.32em;
-  }
+  font-size: 1.32em;
+}
 body.mobile-mode .markdown-body h2 {
-    font-size: 1.2em;
-  }
+  font-size: 1.2em;
+}
 body.mobile-mode .markdown-body pre {
-    font-size: 12px;
-  }
+  font-size: 12px;
+}
 body.mobile-mode .md-table-wrapper table {
-    min-width: 520px;
-  }
+  min-width: 520px;
+}
 
 /* Markdown renderer additions */
 .markdown-body p,

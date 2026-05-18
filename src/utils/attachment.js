@@ -20,7 +20,7 @@ export function inferMimeType(name = "") {
   if (/\.bmp$/.test(normalized)) return "image/bmp";
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (/\.(heic|heif)$/.test(normalized)) return "image/heic";
-  // 계산된 결과를 호출부로 반환합니다.
+
   return "";
 }
 
@@ -30,7 +30,6 @@ export function inferMimeType(name = "") {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 export function isImageFile(file) {
-  // 계산된 결과를 호출부로 반환합니다.
   return Boolean(
     file?.type?.startsWith("image/") ||
     /\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(file?.name || "")
@@ -45,7 +44,7 @@ export function isImageFile(file) {
 export function createBrowserAttachment(file) {
   const image = isImageFile(file);
   const objectUrl = URL.createObjectURL(file);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return {
     id: createId("attachment"),
     name: file.name || "첨부 파일",
@@ -68,7 +67,7 @@ export function createBrowserAttachment(file) {
 export function createNativeAttachment(file) {
   const type =
     file.type || inferMimeType(file.name) || "application/octet-stream";
-  // 계산된 결과를 호출부로 반환합니다.
+
   return {
     id: createId("attachment"),
     name: file.name || "네이티브 첨부 파일",
@@ -128,6 +127,6 @@ export function formatFileSize(size) {
   if (size < 1024) return `${size} B`;
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return `${(size / 1024 / 1024).toFixed(1)} MB`;
 }

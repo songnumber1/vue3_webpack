@@ -9,7 +9,7 @@ import {API_ENDPOINTS} from "@/constants/apiEndpoints";
  */
 export async function getAccessInfo(payload = {}) {
   const response = await httpClient.post(API_ENDPOINTS.ACCESS_INFO, payload);
-  // 계산된 결과를 호출부로 반환합니다.
+
   return response?.data || {};
 }
 

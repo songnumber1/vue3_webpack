@@ -11,7 +11,6 @@ import {usePlatformStore} from "@/stores/platformStore";
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function tableToText(table) {
-  // 계산된 결과를 호출부로 반환합니다.
   return Array.from(table.rows)
     .map((row) =>
       Array.from(row.cells)
@@ -27,7 +26,6 @@ function tableToText(table) {
  * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
  */
 function tableToCsv(table) {
-  // 계산된 결과를 호출부로 반환합니다.
   return Array.from(table.rows)
     .map((row) =>
       Array.from(row.cells)
@@ -120,6 +118,5 @@ export function useMarkdownMessageInteractions(contentRef) {
     await openExternalBrowser(anchor.href);
   }
 
-  // 계산된 결과를 호출부로 반환합니다.
   return {handleMarkdownClick};
 }

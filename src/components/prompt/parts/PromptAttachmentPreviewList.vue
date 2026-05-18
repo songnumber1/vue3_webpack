@@ -11,7 +11,11 @@
       :class="{'attachment-preview-card--image': file.kind === 'image'}"
       :role="file.kind === 'image' ? 'button' : undefined"
       :tabindex="file.kind === 'image' ? 0 : undefined"
-      :aria-label="file.kind === 'image' ? t('chat.attachment.preview', {name: file.name}) : undefined"
+      :aria-label="
+        file.kind === 'image'
+          ? t('chat.attachment.preview', {name: file.name})
+          : undefined
+      "
       @click="emitPreview(file)"
       @keydown.enter.prevent="emitPreview(file)"
       @keydown.space.prevent="emitPreview(file)"

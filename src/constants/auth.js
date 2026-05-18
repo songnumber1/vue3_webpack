@@ -7,7 +7,7 @@
 function readBooleanEnv(value, fallback) {
   // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (value === undefined || value === null || value === "") return fallback;
-  // 계산된 결과를 호출부로 반환합니다.
+
   return ["true", "1", "yes", "y"].includes(String(value).toLowerCase());
 }
 

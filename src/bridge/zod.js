@@ -5,7 +5,6 @@ import {z, ZodType} from "zod";
 if (typeof ZodType?.prototype?.openapi !== "function") {
   Object.defineProperty(ZodType.prototype, "openapi", {
     value() {
-      // 계산된 결과를 호출부로 반환합니다.
       return this;
     },
     configurable: true,
