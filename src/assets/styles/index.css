@@ -16,3 +16,5 @@
 @import "./exception.css";
 @import "./chat/sidebar-assistant-polish.css";
 @import "./chat/assistant-icon-binding.css";
+
+@import "./chat/ui-shape-interaction-fixes.css";

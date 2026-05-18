@@ -1,0 +1,109 @@
+/*
+ * UI shape and mobile interaction refinements.
+ * This file is intentionally imported last and scoped to the requested
+ * surfaces so existing layout, prompt, drawer, and overlay behavior stays intact.
+ */
+
+/* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
+.suggestion-chip,
+.app-container--mobile .suggestion-chip {
+  border-radius: 5px !important;
+}
+
+/* 2. Assistant feedback text button: reduce excessive pill radius. */
+.message-action-text-button {
+  border-radius: 5px !important;
+}
+
+/* 3. Shared popup panels: reduce panel radius without changing layout. */
+.responsive-panel,
+.feedback-dialog,
+.responsive-overlay--mobile-dialog .responsive-panel,
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
+  border-radius: 5px !important;
+}
+
+/* 3.1 Popup footer/action buttons should be rectangular. */
+.feedback-dialog-footer button,
+.chat-history-dialog__actions .playground-button,
+.playground-dialog-actions .playground-button,
+.responsive-panel .playground-button {
+  border-radius: 0 !important;
+}
+
+/* 3.2 Positive/destructive confirmation actions use the primary color. */
+.feedback-dialog-footer button:first-child,
+.chat-history-dialog__actions .playground-button:not(.playground-button--secondary),
+.playground-dialog-actions .playground-button:not(.playground-button--secondary),
+.responsive-panel .playground-button:not(.playground-button--secondary) {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: #ffffff !important;
+}
+
+.feedback-dialog-footer button:first-child:hover,
+.feedback-dialog-footer button:first-child:focus-visible,
+.chat-history-dialog__actions .playground-button:not(.playground-button--secondary):hover,
+.chat-history-dialog__actions .playground-button:not(.playground-button--secondary):focus-visible,
+.playground-dialog-actions .playground-button:not(.playground-button--secondary):hover,
+.playground-dialog-actions .playground-button:not(.playground-button--secondary):focus-visible,
+.responsive-panel .playground-button:not(.playground-button--secondary):hover,
+.responsive-panel .playground-button:not(.playground-button--secondary):focus-visible {
+  border-color: var(--primary-strong, var(--primary)) !important;
+  background: var(--primary-strong, var(--primary)) !important;
+  color: #ffffff !important;
+}
+
+/* 4. Mobile-only tap flash prevention for requested controls. */
+@media (max-width: 900px) {
+  .mobile-topbar .menu-toggle,
+  .mobile-topbar .model-trigger--assistant,
+  .app-container--mobile .mobile-topbar .menu-toggle,
+  .app-container--mobile .mobile-topbar .model-trigger--assistant,
+  .empty-stage--mobile-main .suggestion-chip,
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .mobile-topbar .menu-toggle,
+  .app-container--mobile .mobile-topbar .menu-toggle {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mobile-topbar .menu-toggle:hover,
+  .mobile-topbar .menu-toggle:active,
+  .mobile-topbar .menu-toggle:focus,
+  .mobile-topbar .menu-toggle:focus-visible,
+  .app-container--mobile .mobile-topbar .menu-toggle:hover,
+  .app-container--mobile .mobile-topbar .menu-toggle:active,
+  .app-container--mobile .mobile-topbar .menu-toggle:focus,
+  .app-container--mobile .mobile-topbar .menu-toggle:focus-visible,
+  .mobile-topbar .model-trigger--assistant:hover,
+  .mobile-topbar .model-trigger--assistant:active,
+  .mobile-topbar .model-trigger--assistant:focus,
+  .mobile-topbar .model-trigger--assistant:focus-visible,
+  .app-container--mobile .mobile-topbar .model-trigger--assistant:hover,
+  .app-container--mobile .mobile-topbar .model-trigger--assistant:active,
+  .app-container--mobile .mobile-topbar .model-trigger--assistant:focus,
+  .app-container--mobile .mobile-topbar .model-trigger--assistant:focus-visible {
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    outline: none !important;
+  }
+
+  .empty-stage--mobile-main .suggestion-chip:active,
+  .empty-stage--mobile-main .suggestion-chip:focus,
+  .empty-stage--mobile-main .suggestion-chip:focus-visible,
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip:active,
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip:focus,
+  .app-container--mobile .empty-stage--mobile-main .suggestion-chip:focus-visible {
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
+}
