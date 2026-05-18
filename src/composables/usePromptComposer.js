@@ -62,6 +62,7 @@ export function usePromptComposer(props, emit) {
     getLastHeight,
     emit,
     disabled,
+    closeMenus,
   });
 
   // ── 음성 입력 ─────────────────────────────────────────────────────────

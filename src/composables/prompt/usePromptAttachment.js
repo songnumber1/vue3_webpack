@@ -23,7 +23,14 @@ import {useI18n} from "vue-i18n";
  * @param {object} options - attachMenuOpen ref, resize 함수, getLastHeight 함수, emit 함수, disabled props ref
  * @returns {object} attachments 상태 및 첨부 관련 핸들러
  */
-export function usePromptAttachment({attachMenuOpen, resize, getLastHeight, emit, disabled}) {
+export function usePromptAttachment({
+  attachMenuOpen,
+  resize,
+  getLastHeight,
+  emit,
+  disabled,
+  closeMenus,
+}) {
   const {t} = useI18n();
   const platformStore = usePlatformStore();
   const fileInputRef = ref(null);
@@ -43,7 +50,11 @@ export function usePromptAttachment({attachMenuOpen, resize, getLastHeight, emit
 
   function openAttachSelector() {
     if (disabled.value) return;
-    attachMenuOpen.value = !attachMenuOpen.value;
+
+    const next = !attachMenuOpen.value;
+
+    closeMenus();
+    attachMenuOpen.value = next;
   }
 
   async function openFilePicker(type = FILE_PICKER_TYPE.all) {
