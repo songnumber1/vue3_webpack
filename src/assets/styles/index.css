@@ -1,29 +1,24 @@
-@import "./themes.css";
-@import "./base.css";
-
-@import "./chat/core.css";
-@import "./chat/markdown.css";
-@import "./chat/bottom-sheet-composer.css";
-@import "./chat/playground-feedback.css";
-@import "./chat/attachment-preview-tokens.css";
-
-@import "./chat/responsive-keyboard.css";
-@import "./chat/session-mobile-browser-fixes.css";
-@import "./chat-mobile.css";
-@import "./chat/layout-overrides.css";
-@import "./chat/reasoning.css";
-@import "./chat/message-bubbles.css";
-
-@import "./exception.css";
-@import "./chat/sidebar-assistant-polish.css";
-@import "./chat/assistant-icon-binding.css";
-
-@import "./chat/ui-shape-interaction-fixes.css";
-@import "./chat/mobile-tap-and-button-radius-final.css";
-
-@import "./chat/chat-header-assistant-icon.css";
-@import "./chat/targeted-chat-polish.css";
-@import "./chat/mobile-composer-targeted-fixes.css";
-@import "./patches/firefox-mobile-main-composer.css";
-
-@import "./chat/desktop-main-feedback-fix.css";
+@import "./foundations/themes/themes.css";
+@import "./foundations/reset/base.css";
+@import "./foundations/tokens/runtime-contracts.css";
+@import "./layouts/chat/core.css";
+@import "./components/markdown/markdown.css";
+@import "./components/bottom-sheet/bottom-sheet-composer.css";
+@import "./pages/playground/playground-feedback.css";
+@import "./components/attachment/attachment-preview-tokens.css";
+@import "./mobile-runtime/keyboard/responsive-keyboard.css";
+@import "./mobile-runtime/viewport/session-mobile-browser-fixes.css";
+@import "./mobile-runtime/mobile-layout/chat-mobile.css";
+@import "./mobile-runtime/overflow/layout-overrides.css";
+@import "./states/reasoning/reasoning.css";
+@import "./components/message/message-bubbles.css";
+@import "./states/error/exception.css";
+@import "./layouts/sidebar/sidebar-assistant-polish.css";
+@import "./components/assistant/assistant-icon-binding.css";
+@import "./states/interaction/ui-shape-interaction-fixes.css";
+@import "./mobile-runtime/gestures/mobile-tap-and-button-radius-final.css";
+@import "./layouts/header/chat-header-assistant-icon.css";
+@import "./pages/chat/targeted-chat-polish.css";
+@import "./mobile-runtime/mobile-layout/mobile-composer-targeted-fixes.css";
+@import "./browser-patches/firefox/firefox-mobile-main-composer.css";
+@import "./layouts/responsive/desktop-main-feedback-fix.css";

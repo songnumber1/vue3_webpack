@@ -138,40 +138,6 @@ body.mobile-mode .empty-stage {
     padding: 16px 20px 96px;
   }
 
-body.mobile-mode .project-title {
-    margin-top: 8px;
-    gap: 9px;
-  }
-
-body.mobile-mode .project-title h1 {
-    font-size: 28px;
-  }
-
-body.mobile-mode .folder-icon {
-    font-size: 26px;
-  }
-
-body.mobile-mode .source-chip {
-    margin-top: 14px;
-    height: 38px;
-    padding: 0 16px;
-    font-size: 15px;
-  }
-
-body.mobile-mode .mobile-recent-list {
-    margin-top: 28px;
-    gap: 20px;
-  }
-
-body.mobile-mode .mobile-recent-card strong {
-    font-size: 19px;
-    margin-bottom: 4px;
-  }
-
-body.mobile-mode .mobile-recent-card span {
-    font-size: 15px;
-  }
-
 body.mobile-mode .message-list {
     padding: 12px 16px 94px;
   }
@@ -303,15 +269,6 @@ body.mobile-mode .sidebar-content--mobile .section-label {
     font-size: 15px;
   }
 
-body.mobile-mode .mobile-new-chat-fab {
-    right: 24px;
-    bottom: calc(72px + env(safe-area-inset-bottom));
-    height: 56px;
-    padding: 0 22px;
-    gap: 10px;
-    font-size: 18px;
-  }
-
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
     position: static;
     margin-top: 0;
@@ -352,30 +309,6 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   display: block;
   overflow: auto;
   padding: 16px 20px 96px;
-}
-.app-container--mobile .mobile-project-home {
-  display: block;
-}
-.app-container--mobile .project-title h1 {
-  font-size: 28px;
-}
-.app-container--mobile .folder-icon {
-  font-size: 26px;
-}
-.app-container--mobile .source-chip {
-  height: 38px;
-  font-size: 15px;
-  margin-top: 14px;
-}
-.app-container--mobile .mobile-recent-list {
-  margin-top: 28px;
-  gap: 20px;
-}
-.app-container--mobile .mobile-recent-card strong {
-  font-size: 19px;
-}
-.app-container--mobile .mobile-recent-card span {
-  font-size: 15px;
 }
 .app-container--mobile .message-list {
   padding: 12px 16px 94px;
@@ -463,6 +396,11 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 /* Final mobile polish: compact Android/WebView scale and simple project icon */
+.project-item.new-project span {
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
 .app-container--mobile {
   max-width: none;
   width: 100%;
@@ -515,43 +453,6 @@ body.mobile-mode .app-container--mobile .model-option small,body.mobile-mode
 body.mobile-mode .app-container--mobile .empty-stage,body.mobile-mode 
   .empty-stage {
     padding: 12px 16px 86px;
-  }
-body.mobile-mode .app-container--mobile .project-title,body.mobile-mode 
-  .project-title {
-    margin-top: 4px;
-    gap: 8px;
-  }
-body.mobile-mode .app-container--mobile .project-title h1,body.mobile-mode 
-  .project-title h1 {
-    font-size: 23px;
-    line-height: 1.22;
-    letter-spacing: -0.04em;
-  }
-body.mobile-mode .app-container--mobile .folder-icon,body.mobile-mode 
-  .folder-icon {
-    font-size: 22px;
-  }
-body.mobile-mode .app-container--mobile .source-chip,body.mobile-mode 
-  .source-chip {
-    margin-top: 12px;
-    height: 34px;
-    padding: 0 14px;
-    font-size: 13.5px;
-  }
-body.mobile-mode .app-container--mobile .mobile-recent-list,body.mobile-mode 
-  .mobile-recent-list {
-    margin-top: 22px;
-    gap: 15px;
-  }
-body.mobile-mode .app-container--mobile .mobile-recent-card strong,body.mobile-mode 
-  .mobile-recent-card strong {
-    font-size: 16.5px;
-    margin-bottom: 3px;
-  }
-body.mobile-mode .app-container--mobile .mobile-recent-card span,body.mobile-mode 
-  .mobile-recent-card span {
-    font-size: 13.5px;
-    line-height: 1.35;
   }
 body.mobile-mode .app-container--mobile .message-list,body.mobile-mode 
   .message-list {
@@ -670,15 +571,6 @@ body.mobile-mode .app-container--mobile .sidebar-content--mobile .section-label,
     padding: 10px 17px 2px;
     font-size: 13px;
   }
-body.mobile-mode .app-container--mobile .mobile-new-chat-fab,body.mobile-mode 
-  .mobile-new-chat-fab {
-    right: 20px;
-    bottom: calc(64px + env(safe-area-inset-bottom));
-    height: 50px;
-    padding: 0 19px;
-    gap: 8px;
-    font-size: 16px;
-  }
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .sidebar-content--mobile .sidebar-user {
     padding: 8px 17px calc(7px + env(safe-area-inset-bottom));
@@ -708,18 +600,18 @@ body,
   width: 100%;
 }
 .app-container--mobile {
-  max-width: none;
-  margin: 0;
-  border-radius: 0;
+  max-width: none !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
 }
 .chat-container-root {
   height: 100dvh;
 }
 .icon-wrap {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 22px;
+  width: 22px !important;
   height: 22px;
   flex: 0 0 22px;
   color: var(--sidebar-icon);
@@ -741,55 +633,23 @@ body,
 .quick-item.active .icon-wrap {
   color: var(--text);
 }
-.folder-icon.nav-icon {
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
-  color: var(--text);
-  stroke-width: 2.15;
-}
 
 body.mobile-mode .app-container--mobile,body.mobile-mode 
   .app-container--mobile .chat-container-root,body.mobile-mode 
   .chat-container-root,body.mobile-mode 
   .chat-workspace,body.mobile-mode 
   .empty-stage {
-    width: 100vw;
-    max-width: none;
+    width: 100vw !important;
+    max-width: none !important;
   }
 
 body.mobile-mode .empty-stage {
-    padding-left: clamp(14px, 4vw, 22px);
-    padding-right: clamp(14px, 4vw, 22px);
-  }
-
-body.mobile-mode .mobile-project-home {
-    width: 100%;
-    max-width: none;
-  }
-
-body.mobile-mode .project-title {
-    width: 100%;
-    max-width: none;
-  }
-
-body.mobile-mode .mobile-recent-list {
-    width: 100%;
-    max-width: none;
-  }
-
-body.mobile-mode .mobile-recent-card {
-    width: 100%;
-  }
-
-body.mobile-mode .folder-icon.nav-icon {
-    width: 20px;
-    height: 20px;
-    flex-basis: 20px;
+    padding-left: clamp(14px, 4vw, 22px) !important;
+    padding-right: clamp(14px, 4vw, 22px) !important;
   }
 
 body.mobile-mode .icon-wrap {
-    width: 20px;
+    width: 20px !important;
     height: 20px;
     flex-basis: 20px;
   }
@@ -805,35 +665,11 @@ body.mobile-mode .sidebar-content--mobile .quick-item,body.mobile-mode
     align-items: center;
   }
 
-/* =========================================================
-   FINAL FLUID MOBILE FIX
-   - Mobile new-chat recent list uses full available width.
-   - Mobile conversation view keeps the same card/bubble style
-     as desktop, scaled to the available viewport.
-   - These rules intentionally come last to override previous
-     mobile patches that made assistant messages transparent.
-   ========================================================= */
-
 /* When the Android/mobile layout is selected, keep the project home fluid
    even if the browser viewport is wider than the CSS breakpoint. */
 .app-container--mobile .empty-stage {
   width: 100%;
   max-width: none;
-}
-
-.app-container--mobile .mobile-project-home,
-.app-container--mobile .mobile-recent-list,
-.app-container--mobile .mobile-recent-card {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.app-container--mobile .mobile-recent-card strong,
-.app-container--mobile .mobile-recent-card span {
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
 }
 
 /* Desktop-like message cards for mobile layout. */
@@ -918,25 +754,6 @@ body.mobile-mode .sidebar-content--mobile .quick-item,body.mobile-mode
 body.mobile-mode .empty-stage {
     width: 100%;
     max-width: none;
-  }
-
-body.mobile-mode .mobile-project-home,body.mobile-mode 
-  .mobile-recent-list,body.mobile-mode 
-  .mobile-recent-card {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-  }
-
-body.mobile-mode .mobile-recent-card {
-    display: block;
-  }
-
-body.mobile-mode .mobile-recent-card strong,body.mobile-mode 
-  .mobile-recent-card span {
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
   }
 
 body.mobile-mode .message-list,body.mobile-mode 
@@ -1088,10 +905,10 @@ body.mobile-mode .prompt-wrap,body.mobile-mode
   .app-container--mobile .prompt-wrap--floating,body.mobile-mode 
   .mobile-bottom-prompt,body.mobile-mode 
   .app-container--mobile .mobile-bottom-prompt {
-    position: relative;
-    left: auto;
-    right: auto;
-    bottom: auto;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
     display: block;
     width: 100%;
     background: var(--mobile-bg);
@@ -1099,7 +916,7 @@ body.mobile-mode .prompt-wrap,body.mobile-mode
 
 body.mobile-mode .desktop-center-prompt,body.mobile-mode 
   .app-container--mobile .desktop-center-prompt {
-    display: none;
+    display: none !important;
   }
 
 body.mobile-mode .chat-container-root--keyboard-open .mobile-topbar,body.mobile-mode 

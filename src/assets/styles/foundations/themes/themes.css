@@ -26,11 +26,12 @@
   /* Z-index layer tokens.
      Keep overlay order predictable across desktop, mobile browsers and Android WebView:
      content < prompt < drawer < popover < bottom sheet < preview/modal < app dialogs. */
+  /* Local stacking tokens used only inside a component stacking context. */
   --z-local-base: 0;
-  --z-local-panel: 1;
-  --z-local-raised: 2;
-  --z-mobile-fab: 3;
-  --z-attachment-control: 5;
+  --z-local-raised: 1;
+  --z-local-floating: 2;
+  --z-local-sticky: 3;
+  --z-local-overlay: 5;
   --z-content-raised: 20;
   --z-prompt: 70;
   --z-prompt-floating: 90;

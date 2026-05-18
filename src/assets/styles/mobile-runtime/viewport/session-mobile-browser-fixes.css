@@ -1,5 +1,17 @@
 /* Deleted model composer state.
    Old chat rooms linked to a deleted model remain readable, but message input is blocked. */
+.shared-readonly-box--deleted-model {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  border-color: color-mix(in srgb, #f59e0b 36%, var(--prompt-border));
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, #f59e0b 10%, var(--surface-muted)),
+    var(--surface-muted)
+  );
+}
 
 .shared-readonly-icon {
   width: 34px;
@@ -61,73 +73,73 @@ body.mobile-mode .shared-readonly-icon svg {
    - Feedback dialog follows the visual viewport when the mobile keyboard is open. */
 .conversation-title-wrap,
 .model-trigger--assistant {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
+  border-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .conversation-title-wrap {
-  padding-left: 0;
-  padding-right: 0;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
 .model-trigger--assistant:hover,
 .model-trigger--assistant:focus-visible {
-  background: var(--control-hover);
+  background: var(--control-hover) !important;
 }
 
 body.desktop-mode .message--user {
-    grid-template-columns: 38px minmax(0, 1fr);
+    grid-template-columns: 38px minmax(0, 1fr) !important;
   }
 
 body.desktop-mode .message--user .avatar {
-    display: none;
+    display: none !important;
   }
 
 body.desktop-mode .message--user .bubble {
-    grid-column: 2;
-    justify-self: end;
-    max-width: min(780px, 100%);
+    grid-column: 2 !important;
+    justify-self: end !important;
+    max-width: min(780px, 100%) !important;
   }
 
 body.mobile-mode .message--user .bubble {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 
 body.mobile-mode .bottom-sheet-option--row {
-    justify-content: flex-start;
+    justify-content: flex-start !important;
   }
 
 body.mobile-mode .bottom-sheet-option--row span {
-    flex: 0 0 auto;
-    width: 24px;
-    text-align: center;
+    flex: 0 0 auto !important;
+    width: 24px !important;
+    text-align: center !important;
   }
 
 body.mobile-mode .bottom-sheet-option--row strong {
-    flex: 0 1 auto;
-    display: inline;
-    min-width: 0;
-    margin: 0;
+    flex: 0 1 auto !important;
+    display: inline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
   }
 
 body.mobile-mode .feedback-dialog-backdrop {
-    align-items: flex-start;
-    padding: calc(12px + env(safe-area-inset-top)) 12px 12px;
-    overflow-y: auto;
+    align-items: flex-start !important;
+    padding: calc(12px + env(safe-area-inset-top)) 12px 12px !important;
+    overflow-y: auto !important;
     -webkit-overflow-scrolling: touch;
   }
 
 body.mobile-mode .feedback-dialog {
-    width: 100%;
+    width: 100% !important;
     max-height: calc(
       var(--app-height, 100dvh) - 24px - env(safe-area-inset-top)
-    );
+    ) !important;
   }
 
 body.mobile-mode .feedback-dialog-body textarea {
-    min-height: 118px;
-    max-height: calc(var(--app-height, 100dvh) - 280px);
+    min-height: 118px !important;
+    max-height: calc(var(--app-height, 100dvh) - 280px) !important;
   }
 
 body.mobile-mode .empty-stage--mobile-main {
@@ -150,6 +162,11 @@ body.mobile-mode .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--f
   grid-template-columns: var(--layout-sidebar-collapsed-width) minmax(0, 1fr);
 }
 
+.chat-container-root--mode-chat,
+.chat-container-root--mode-shared {
+  height: var(--app-height, 100dvh);
+}
+
 .chat-container-root--mode-main.chat-container-root--keyboard-open {
   height: var(--layout-viewport-height, 100dvh);
 }
@@ -170,17 +187,17 @@ body.mobile-mode .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--f
 }
 
 .message--user {
-  grid-template-columns: var(--layout-message-avatar-width) minmax(0, 1fr);
+  grid-template-columns: var(--layout-message-avatar-width) minmax(0, 1fr) !important;
 }
 
 .message--user .avatar {
-  display: none;
+  display: none !important;
 }
 
 .message--user .bubble {
-  grid-column: 2;
-  max-width: min(780px, 100%);
-  justify-self: end;
+  grid-column: 2 !important;
+  max-width: min(780px, 100%) !important;
+  justify-self: end !important;
 }
 
 .message--assistant .bubble {
@@ -219,7 +236,7 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
-    bottom: 0;
+    bottom: 0 !important;
   }
 
 body.mobile-mode .message-list {
@@ -228,22 +245,22 @@ body.mobile-mode .message-list {
 
 body.mobile-mode .message,body.mobile-mode 
   .message--user {
-    width: 100%;
-    display: block;
+    width: 100% !important;
+    display: block !important;
   }
 
 body.mobile-mode .message--user .bubble,body.mobile-mode 
   .message--assistant .bubble {
-    max-width: 100%;
+    max-width: 100% !important;
   }
 
 body.mobile-mode .sidebar-content--mobile {
-    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
   }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
-    margin-bottom: max(10px, env(safe-area-inset-bottom));
-    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+    margin-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
   }
 
 .chevron--selector,
@@ -276,7 +293,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 .mobile-settings-item-arrow {
-  font-size: 0;
+  font-size: 0 !important;
   width: 20px;
   height: 20px;
   position: relative;
@@ -293,59 +310,59 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 .bottom-sheet-option--row {
-  display: inline-flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 12px;
-  text-align: left;
+  display: inline-flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+  text-align: left !important;
 }
 
 .bottom-sheet-option--row > span[aria-hidden="true"] {
-  width: 24px;
-  min-width: 24px;
-  flex: 0 0 24px;
-  text-align: center;
+  width: 24px !important;
+  min-width: 24px !important;
+  flex: 0 0 24px !important;
+  text-align: center !important;
 }
 
 .bottom-sheet-option--row > strong {
-  flex: 0 1 auto;
-  min-width: 0;
-  display: inline-block;
-  margin: 0;
-  text-align: left;
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  display: inline-block !important;
+  margin: 0 !important;
+  text-align: left !important;
 }
 
 .feedback-dialog-backdrop {
-  top: var(--visual-viewport-offset-top, 0px);
-  bottom: auto;
-  min-height: 0;
-  height: var(--app-height, 100dvh);
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: var(--overlay-backdrop);
-  overflow-y: auto;
+  top: var(--visual-viewport-offset-top, 0px) !important;
+  bottom: auto !important;
+  min-height: 0 !important;
+  height: var(--app-height, 100dvh) !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 20px !important;
+  background: var(--overlay-backdrop) !important;
+  overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
 }
 
 .feedback-dialog {
-  max-height: calc(var(--app-height, 100dvh) - 40px);
+  max-height: calc(var(--app-height, 100dvh) - 40px) !important;
 }
 
 body.mobile-mode .feedback-dialog-backdrop {
-    align-items: center;
-    justify-items: center;
-    padding: 12px;
+    align-items: center !important;
+    justify-items: center !important;
+    padding: 12px !important;
   }
 
 body.mobile-mode .feedback-dialog {
-    width: min(100%, 520px);
-    max-height: calc(var(--app-height, 100dvh) - 24px);
-    border-radius: 22px;
+    width: min(100%, 520px) !important;
+    max-height: calc(var(--app-height, 100dvh) - 24px) !important;
+    border-radius: 22px !important;
   }
 
 body.mobile-mode .feedback-dialog-body textarea {
-    max-height: max(110px, calc(var(--app-height, 100dvh) - 310px));
+    max-height: max(110px, calc(var(--app-height, 100dvh) - 310px)) !important;
   }
 
 /* =========================================================
@@ -369,16 +386,16 @@ body.mobile-mode .sidebar-content--mobile {
     min-height: 100%;
     padding-bottom: calc(
       var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
-    );
+    ) !important;
   }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .sidebar-user--mobile {
-    margin-top: auto;
+    margin-top: auto !important;
     margin-bottom: calc(
       var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
-    );
-    padding-bottom: var(--space-4);
+    ) !important;
+    padding-bottom: var(--space-4) !important;
   }
 
 body.mobile-mode .mobile-topbar .model-trigger--assistant,body.mobile-mode 
@@ -397,31 +414,31 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant span,body.mobile-mode
 
 body.mobile-mode .message--assistant .avatar,body.mobile-mode 
   .app-container--mobile .message--assistant .avatar {
-    display: none;
+    display: none !important;
   }
 
 body.mobile-mode .message--assistant,body.mobile-mode 
   .app-container--mobile .message--assistant {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 
 body.mobile-mode .message--assistant .bubble,body.mobile-mode 
   .app-container--mobile .message--assistant .bubble {
-    grid-column: 1;
+    grid-column: 1 !important;
   }
 
 .mobile-settings-item-arrow {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  font-size: 0;
+  width: 24px !important;
+  height: 24px !important;
+  font-size: 0 !important;
   color: var(--text-muted);
 }
 
 .mobile-settings-item-arrow::before {
-  content: none;
+  content: none !important;
 }
 
 .mobile-settings-item-arrow .chevron-right-icon {
@@ -470,39 +487,39 @@ body.mobile-mode .message--assistant .bubble,body.mobile-mode
    ========================================================= */
 body.mobile-mode .app-container--mobile .mobile-drawer,body.mobile-mode 
   .mobile-drawer {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
   }
 body.mobile-mode .app-container--mobile .sidebar-content--mobile,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile {
-    height: 100%;
+    height: 100% !important;
     padding-bottom: calc(
       24px + var(--layout-mobile-drawer-footer-gap) +
         env(safe-area-inset-bottom)
-    );
-    box-sizing: border-box;
+    ) !important;
+    box-sizing: border-box !important;
   }
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-history,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile .sidebar-history {
-    padding-bottom: 18px;
+    padding-bottom: 18px !important;
   }
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .app-container--mobile .sidebar-user--mobile,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .mobile-drawer .sidebar-user--mobile {
-    margin-top: auto;
+    margin-top: auto !important;
     margin-bottom: max(
       22px,
       calc(var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom))
-    );
-    padding-bottom: 18px;
-    flex: 0 0 auto;
+    ) !important;
+    padding-bottom: 18px !important;
+    flex: 0 0 auto !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open,body.mobile-mode 
   .chat-container-root--mode-main.chat-container-root--keyboard-open {
-    height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
@@ -514,30 +531,30 @@ body.mobile-mode .app-container--mobile
     .empty-stage--mobile-main,body.mobile-mode 
   .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-stage--mobile-main {
-    height: var(--layout-viewport-height, 100dvh);
-    min-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center,body.mobile-mode 
   .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center {
-    transform: none;
+    transform: none !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
-    bottom: 0;
-    transform: translate3d(0, var(--keyboard-height, 0px), 0);
+    bottom: 0 !important;
+    transform: translate3d(0, var(--keyboard-height, 0px), 0) !important;
   }
 body.mobile-mode .app-container--mobile
     .empty-stage--mobile-main
     .suggestion-row--between:empty,body.mobile-mode 
   .empty-stage--mobile-main .suggestion-row--between:empty {
-    display: none;
+    display: none !important;
   }
 
 /* =========================================================
@@ -578,19 +595,19 @@ body.mobile-mode .app-container--mobile
 
 body.mobile-mode .app-container--mobile .mobile-drawer,body.mobile-mode 
   .mobile-drawer {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 
 body.mobile-mode .app-container--mobile .sidebar-content--mobile,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile {
-    height: 100%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding-bottom: 0;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
   }
 
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-top,body.mobile-mode 
@@ -599,41 +616,41 @@ body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-top,bo
   .mobile-drawer .sidebar-content--mobile .quick-menu,body.mobile-mode 
   .app-container--mobile .sidebar-content--mobile .section-label,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile .section-label {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
   }
 
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-history,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile .sidebar-history {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-bottom: 14px;
-    -webkit-overflow-scrolling: touch;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding-bottom: 14px !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 
 body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .app-container--mobile .sidebar-user--mobile,body.mobile-mode 
   .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .mobile-drawer .sidebar-user--mobile {
-    position: relative;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    flex: 0 0 auto;
-    margin-top: auto;
-    margin-bottom: 0;
-    padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom)));
-    border-top: 1px solid var(--control-border);
-    background: var(--sidebar-bg, var(--mobile-bg));
-    box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04);
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom))) !important;
+    border-top: 1px solid var(--control-border) !important;
+    background: var(--sidebar-bg, var(--mobile-bg)) !important;
+    box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04) !important;
   }
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open,body.mobile-mode 
   .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
   }
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open
@@ -641,9 +658,9 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
   .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
     .chat-workspace {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open
@@ -653,11 +670,11 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
     .empty-stage--mobile-main {
     height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
-    );
-    min-height: 0;
-    overflow: hidden;
-    padding-top: 78px;
-    padding-bottom: calc(150px + env(safe-area-inset-bottom));
+    ) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    padding-top: 78px !important;
+    padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important;
   }
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open
@@ -665,8 +682,8 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
   .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
     .empty-center {
-    transform: none;
-    margin-top: 0;
+    transform: none !important;
+    margin-top: 0 !important;
   }
 
 body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-open
@@ -674,8 +691,8 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
   .app-container--mobile
     .chat-container-root--mode-main.chat-container-root--keyboard-open
     .desktop-center-prompt.prompt-wrap--floating {
-    bottom: 0;
-    transform: none;
+    bottom: 0 !important;
+    transform: none !important;
   }
 
 /* =========================================================
@@ -688,57 +705,57 @@ body.mobile-mode .chat-container-root--mode-main.chat-container-root--keyboard-o
    ========================================================= */
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main,body.mobile-mode 
   .chat-container-root--mode-main {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main .chat-workspace,body.mobile-mode 
   .chat-container-root--mode-main .chat-workspace {
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main,body.mobile-mode 
   .empty-stage--mobile-main {
     height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
-    );
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 78px 16px calc(170px + env(safe-area-inset-bottom));
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
+    ) !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 78px 16px calc(170px + env(safe-area-inset-bottom)) !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center,body.mobile-mode 
   .empty-stage--mobile-main .empty-center {
-    min-height: auto;
-    transform: none;
-    margin-top: 0;
-    justify-content: flex-start;
-    align-items: stretch;
+    min-height: auto !important;
+    transform: none !important;
+    margin-top: 0 !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
   }
 body.mobile-mode .app-container--mobile
     .empty-stage--mobile-main
     .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating {
-    position: fixed;
-    left: 0;
-    right: 0;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
     bottom: max(
       var(--keyboard-height, 0px),
       env(safe-area-inset-bottom)
-    );
-    transform: translate3d(0, 0, 0);
-    width: 100%;
-    z-index: var(--z-prompt);
-    padding: 10px 14px 12px;
+    ) !important;
+    transform: translate3d(0, 0, 0) !important;
+    width: 100% !important;
+    z-index: var(--z-prompt) !important;
+    padding: 10px 14px 12px !important;
     background: linear-gradient(
       to top,
       var(--mobile-bg, var(--chat-bg)) 82%,
       transparent
-    );
-    will-change: bottom;
+    ) !important;
+    will-change: bottom !important;
   }
 body.mobile-mode .app-container--mobile
     .empty-stage--mobile-main
@@ -747,8 +764,8 @@ body.mobile-mode .app-container--mobile
   .empty-stage--mobile-main
     .desktop-center-prompt.prompt-wrap--floating
     .prompt-box {
-    margin: 0 auto;
-    max-width: min(100%, var(--layout-prompt-width, 760px));
+    margin: 0 auto !important;
+    max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
   }
 
 /* =========================================================
@@ -761,12 +778,18 @@ body.mobile-mode .app-container--mobile
    - If the composer overlaps examples or content, allow the main content area
      to scroll behind the fixed composer.
    ========================================================= */
+body.mobile-mode .app-container--mobile .chat-container-root--mode-main,body.mobile-mode 
+  .chat-container-root--mode-main {
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+  }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main .chat-workspace,body.mobile-mode 
   .chat-container-root--mode-main .chat-workspace {
-    position: relative;
-    height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -774,57 +797,57 @@ body.mobile-mode .app-container--mobile
   .chat-container-root--mode-main .empty-stage--mobile-main {
     height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
-    );
-    min-height: 0;
+    ) !important;
+    min-height: 0 !important;
     max-height: calc(
       var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
-    );
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding-top: 78px;
-    padding-right: 16px;
-    padding-left: 16px;
+    ) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    padding-top: 78px !important;
+    padding-right: 16px !important;
+    padding-left: 16px !important;
     padding-bottom: calc(
       var(--mobile-main-composer-space, 178px) + var(--keyboard-height, 0px) +
         env(safe-area-inset-bottom)
-    );
+    ) !important;
     scroll-padding-bottom: calc(
       var(--mobile-main-composer-space, 178px) + var(--keyboard-height, 0px) +
         env(safe-area-inset-bottom)
-    );
+    ) !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main .empty-center,body.mobile-mode 
   .chat-container-root--mode-main .empty-center {
-    min-height: auto;
-    width: 100%;
-    transform: none;
-    margin: 0;
-    justify-content: flex-start;
-    align-items: stretch;
+    min-height: auto !important;
+    width: 100% !important;
+    transform: none !important;
+    margin: 0 !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
-    position: fixed;
-    left: 0;
-    right: 0;
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
     bottom: max(
       var(--keyboard-height, 0px),
       env(safe-area-inset-bottom)
-    );
-    width: 100%;
-    z-index: var(--z-prompt);
-    transform: translate3d(0, 0, 0);
-    padding: 10px 14px 12px;
+    ) !important;
+    width: 100% !important;
+    z-index: var(--z-prompt) !important;
+    transform: translate3d(0, 0, 0) !important;
+    padding: 10px 14px 12px !important;
     background: linear-gradient(
       to top,
       var(--mobile-bg, var(--chat-bg)) 82%,
       color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 78%, transparent)
-    );
-    will-change: bottom;
+    ) !important;
+    will-change: bottom !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -833,8 +856,8 @@ body.mobile-mode .app-container--mobile
   .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating
     .prompt-box {
-    max-width: min(100%, var(--layout-prompt-width, 760px));
-    margin: 0 auto;
+    max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+    margin: 0 auto !important;
   }
 
 /* =========================================================
@@ -850,68 +873,68 @@ html:has(>body.mobile-mode),
   body.mobile-mode,body.mobile-mode 
   #app,body.mobile-mode 
   .app-container--mobile {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
-    overflow: hidden;
-    overscroll-behavior: none;
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main,body.mobile-mode 
   .chat-container-root--mode-main {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
-    overflow: hidden;
-    touch-action: pan-y;
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    overflow: hidden !important;
+    touch-action: pan-y !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main .chat-workspace,body.mobile-mode 
   .chat-container-root--mode-main .chat-workspace {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
-    min-height: 0;
-    overflow: hidden;
-    display: grid;
-    grid-template-rows: auto minmax(0, 1fr);
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: grid !important;
+    grid-template-rows: auto minmax(0, 1fr) !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .empty-stage--mobile-main,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main {
-    height: 100%;
-    max-height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: stretch;
-    align-items: stretch;
-    place-items: stretch;
-    align-content: stretch;
-    padding: 0;
-    background: var(--chat-bg);
-    overscroll-behavior: none;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: stretch !important;
+    align-items: stretch !important;
+    place-items: stretch !important;
+    align-content: stretch !important;
+    padding: 0 !important;
+    background: var(--chat-bg) !important;
+    overscroll-behavior: none !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .empty-stage--mobile-main
     .empty-center,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
-    flex: 1 1 auto;
-    min-height: 0;
-    width: 100%;
-    max-width: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    gap: 14px;
-    margin: 0;
-    transform: none;
-    padding: 24px 16px 16px;
-    scroll-padding-bottom: 24px;
-    touch-action: pan-y;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 14px !important;
+    margin: 0 !important;
+    transform: none !important;
+    padding: 24px 16px 16px !important;
+    scroll-padding-bottom: 24px !important;
+    touch-action: pan-y !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -919,8 +942,8 @@ body.mobile-mode .app-container--mobile
     .empty-center
     h1,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1 {
-    flex: 0 0 auto;
-    margin: 0 0 4px;
+    flex: 0 0 auto !important;
+    margin: 0 0 4px !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -929,7 +952,7 @@ body.mobile-mode .app-container--mobile
   .chat-container-root--mode-main
     .empty-stage--mobile-main
     .suggestion-row--between {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -939,44 +962,44 @@ body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
-    flex: 0 0 auto;
-    position: relative;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    width: 100%;
-    z-index: var(--z-content-raised);
-    transform: none;
-    padding: 10px 14px max(12px, env(safe-area-inset-bottom));
+    flex: 0 0 auto !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    z-index: var(--z-content-raised) !important;
+    transform: none !important;
+    padding: 10px 14px max(12px, env(safe-area-inset-bottom)) !important;
     background: linear-gradient(
       to top,
       var(--mobile-bg, var(--chat-bg)) 86%,
       color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
-    );
-    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06);
-    will-change: auto;
-    touch-action: manipulation;
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06) !important;
+    will-change: auto !important;
+    touch-action: manipulation !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
     .prompt-box,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
-    max-width: min(100%, var(--layout-prompt-width, 760px));
-    margin: 0 auto;
+    max-width: min(100%, var(--layout-prompt-width, 760px)) !important;
+    margin: 0 auto !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
     textarea,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt textarea {
-    overscroll-behavior: contain;
+    overscroll-behavior: contain !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
-    position: static;
-    bottom: auto;
-    transform: none;
+    position: static !important;
+    bottom: auto !important;
+    transform: none !important;
   }

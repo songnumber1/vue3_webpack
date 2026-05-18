@@ -12,7 +12,7 @@
 .responsive-panel .playground-button,
 .style-chip,
 .secondary-action {
-  border-radius: 5px;
+  border-radius: 5px !important;
 }
 
 /* Keep popup footer action buttons square as requested in the previous UI rule. */
@@ -20,7 +20,7 @@
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
 .responsive-panel .playground-button {
-  border-radius: 0;
+  border-radius: 0 !important;
 }
 
 /*
@@ -93,8 +93,8 @@ body.mobile-mode .app-container--mobile :where(
     .model-option,
     button
   ):is(:active, :focus, :focus-visible) {
-    outline: none;
-    box-shadow: none;
+    outline: none !important;
+    box-shadow: none !important;
   }
 /*
    * Mobile drawer controls that are not selected should not receive a temporary
@@ -114,8 +114,8 @@ body.mobile-mode .mobile-drawer :where(
     .sidebar-history-menu-button,
     .sidebar-round
   ):is(:hover, :active, :focus, :focus-visible) {
-    background: transparent;
-    transform: none;
+    background: transparent !important;
+    transform: none !important;
   }
 /*
    * Message/table action icons are icon-only controls. Keep their normal visual
@@ -128,8 +128,8 @@ body.mobile-mode .app-container--mobile :where(
     .feedback-dialog-close,
     .chat-image-preview-close
   ):is(:hover, :active, :focus, :focus-visible) {
-    background: transparent;
-    transform: none;
+    background: transparent !important;
+    transform: none !important;
   }
 /*
    * Sheet/list options should keep selected state, but plain tap should not
@@ -149,8 +149,8 @@ body.mobile-mode .app-container--mobile :where(
     .settings-language-option:not(.active),
     .language-option:not(.active)
   ):is(:hover, :active, :focus, :focus-visible) {
-    background: transparent;
-    transform: none;
+    background: transparent !important;
+    transform: none !important;
   }
 /*
    * Keep selected/active controls' existing colors stable while tapping.
@@ -165,6 +165,6 @@ body.mobile-mode .app-container--mobile :where(
     .settings-language-option.active,
     .language-option.active
   ):is(:active, :focus, :focus-visible) {
-    transform: none;
-    box-shadow: none;
+    transform: none !important;
+    box-shadow: none !important;
   }

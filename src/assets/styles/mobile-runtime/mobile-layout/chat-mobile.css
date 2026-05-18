@@ -22,128 +22,128 @@ html:has(>body.mobile-mode),
   body.mobile-mode,body.mobile-mode 
   #app,body.mobile-mode 
   .app-container--mobile {
-    height: var(--layout-viewport-height, 100dvh);
-    min-height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
-    overscroll-behavior: none;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main,body.mobile-mode 
   .chat-container-root--mode-main {
-    position: relative;
-    height: var(--layout-viewport-height, 100dvh);
-    min-height: var(--layout-viewport-height, 100dvh);
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
-    overscroll-behavior: none;
-    touch-action: none;
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: var(--layout-viewport-height, 100dvh) !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
   }
 body.mobile-mode .app-container--mobile .chat-container-root--mode-main .chat-workspace,body.mobile-mode 
   .chat-container-root--mode-main .chat-workspace {
-    position: relative;
-    height: var(--layout-viewport-height, 100dvh);
-    min-height: 0;
-    max-height: var(--layout-viewport-height, 100dvh);
-    overflow: hidden;
-    display: block;
-    overscroll-behavior: none;
-    touch-action: none;
+    position: relative !important;
+    height: var(--layout-viewport-height, 100dvh) !important;
+    min-height: 0 !important;
+    max-height: var(--layout-viewport-height, 100dvh) !important;
+    overflow: hidden !important;
+    display: block !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main {
-    position: relative;
-    display: block;
-    height: 100%;
-    min-height: 0;
-    max-height: 100%;
-    width: 100%;
-    overflow: hidden;
-    padding: 0;
-    background: var(--chat-bg);
-    overscroll-behavior: none;
-    touch-action: none;
+    position: relative !important;
+    display: block !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    max-height: 100% !important;
+    width: 100% !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    background: var(--chat-bg) !important;
+    overscroll-behavior: none !important;
+    touch-action: none !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
-    position: absolute;
-    top: var(--mobile-main-content-top);
-    right: 0;
+    position: absolute !important;
+    top: var(--mobile-main-content-top) !important;
+    right: 0 !important;
     bottom: calc(
       var(--mobile-main-composer-space) + var(--keyboard-height, 0px)
-    );
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    gap: var(--mobile-main-content-gap);
-    width: 100%;
-    max-width: none;
-    min-height: 0;
-    margin: 0;
+    ) !important;
+    left: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: stretch !important;
+    gap: var(--mobile-main-content-gap) !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    margin: 0 !important;
     padding: var(--space-6, 24px) var(--mobile-main-content-inline)
-      var(--space-4, 16px);
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    transform: none;
+      var(--space-4, 16px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important;
+    transform: none !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center h1,body.mobile-mode 
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1 {
-    flex: 0 0 auto;
-    margin: 0 0 var(--space-1, 4px);
+    flex: 0 0 auto !important;
+    margin: 0 0 var(--space-1, 4px) !important;
   }
 body.mobile-mode .app-container--mobile .empty-stage--mobile-main .suggestion-row--between,body.mobile-mode 
   .chat-container-root--mode-main
     .empty-stage--mobile-main
     .suggestion-row--between {
-    flex: 0 0 auto;
+    flex: 0 0 auto !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt,body.mobile-mode 
   .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
-    position: fixed;
-    top: auto;
-    right: 0;
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
     bottom: calc(
       var(--keyboard-height, 0px) + max(0px, env(safe-area-inset-bottom))
-    );
-    left: 0;
-    z-index: var(--mobile-main-composer-z);
-    width: 100%;
-    max-width: none;
-    margin: 0;
+    ) !important;
+    left: 0 !important;
+    z-index: var(--mobile-main-composer-z) !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
     padding: var(--space-3, 12px) var(--space-4, 16px)
-      max(var(--space-3, 12px), env(safe-area-inset-bottom));
-    transform: translate3d(0, 0, 0);
+      max(var(--space-3, 12px), env(safe-area-inset-bottom)) !important;
+    transform: translate3d(0, 0, 0) !important;
     background: linear-gradient(
       to top,
       var(--mobile-bg, var(--chat-bg)) 86%,
       color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
-    );
-    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
-    will-change: bottom;
-    touch-action: manipulation;
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08) !important;
+    will-change: bottom !important;
+    touch-action: manipulation !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
-    width: min(100%, var(--layout-prompt-width, 820px));
-    max-width: min(100%, var(--layout-prompt-width, 820px));
-    margin: 0 auto;
+    width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    margin: 0 auto !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt textarea {
-    overscroll-behavior: contain;
-    touch-action: manipulation;
+    overscroll-behavior: contain !important;
+    touch-action: manipulation !important;
   }
 body.mobile-mode .app-container--mobile .desktop-center-prompt.prompt-wrap--floating,body.mobile-mode 
   .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
-    position: static;
-    bottom: auto;
-    transform: none;
+    position: static !important;
+    bottom: auto !important;
+    transform: none !important;
   }
 
 /*
@@ -157,10 +157,10 @@ body.mobile-mode .app-container--mobile .chat-container-root--mode-main .empty-c
   .chat-container-root--mode-main .empty-stage--mobile-main .empty-center {
     bottom: calc(
       var(--mobile-main-composer-space) + var(--mobile-keyboard-inset, 0px)
-    );
+    ) !important;
     padding-bottom: calc(
       var(--space-4, 16px) + var(--mobile-keyboard-inset, 0px)
-    );
+    ) !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt,body.mobile-mode 
@@ -168,29 +168,29 @@ body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,body.mobile-mo
   .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap {
     bottom: calc(
       var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
-    );
+    ) !important;
     padding-bottom: max(
       var(--space-3, 12px),
       env(safe-area-inset-bottom, 0px)
-    );
+    ) !important;
     /* Fix: max-height 고정값 제거 - 첨부파일 추가 시 input이 밀리는 버그 방지.
        attachment-preview-row가 추가되면 자연스럽게 높이가 늘어나도록 auto로 변경 */
-    max-height: none;
-    height: auto;
-    overflow: visible;
-    overscroll-behavior: none;
-    touch-action: manipulation;
+    max-height: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box {
-    transform: translateZ(0);
+    transform: translateZ(0) !important;
   }
 body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt textarea,body.mobile-mode 
   .app-container--mobile .mobile-main-fixed-prompt .prompt-action-row,body.mobile-mode 
   .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-action-row {
-    overscroll-behavior: contain;
-    touch-action: manipulation;
+    overscroll-behavior: contain !important;
+    touch-action: manipulation !important;
   }
 
 /*
@@ -223,32 +223,32 @@ body.mobile-mode .app-container--mobile
   .mobile-browser-firefox
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt.prompt-wrap {
-    position: fixed;
-    top: auto;
-    right: 0;
+    position: fixed !important;
+    top: auto !important;
+    right: 0 !important;
     bottom: calc(
       var(--composer-keyboard-inset, 0px) +
         var(--mobile-browser-safe-bottom, 0px)
-    );
-    left: 0;
-    z-index: var(--mobile-main-composer-z, var(--z-prompt-floating));
-    flex: none;
-    width: 100%;
-    max-width: none;
-    margin: 0;
+    ) !important;
+    left: 0 !important;
+    z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
+    flex: none !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
     padding: var(--space-3, 12px) var(--space-4, 16px)
-      max(var(--space-3, 12px), var(--mobile-browser-safe-bottom, 0px));
-    transform: translate3d(0, 0, 0);
+      max(var(--space-3, 12px), var(--mobile-browser-safe-bottom, 0px)) !important;
+    transform: translate3d(0, 0, 0) !important;
     background: linear-gradient(
       to top,
       var(--mobile-bg, var(--chat-bg)) 86%,
       color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
-    );
-    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
-    overflow: visible;
-    overscroll-behavior: none;
-    touch-action: manipulation;
-    will-change: bottom;
+    ) !important;
+    box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08) !important;
+    overflow: visible !important;
+    overscroll-behavior: none !important;
+    touch-action: manipulation !important;
+    will-change: bottom !important;
   }
 body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
@@ -262,20 +262,20 @@ body.mobile-mode .app-container--mobile
     .chat-container-root--mode-main
     .mobile-main-fixed-prompt
     .prompt-box {
-    width: min(100%, var(--layout-prompt-width, 820px));
-    max-width: min(100%, var(--layout-prompt-width, 820px));
-    margin: 0 auto;
+    width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+    margin: 0 auto !important;
   }
 body.mobile-mode .mobile-browser-firefox .mobile-drawer,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox .mobile-drawer {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
   }
 body.mobile-mode .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile {
-    padding-bottom: 0;
+    padding-bottom: 0 !important;
   }
 body.mobile-mode .mobile-browser-firefox
     .mobile-drawer
@@ -285,14 +285,14 @@ body.mobile-mode .mobile-browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
     .sidebar-history {
-    padding-bottom: 12px;
+    padding-bottom: 12px !important;
   }
 body.mobile-mode .mobile-browser-firefox .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .mobile-drawer
     .sidebar-content--mobile
     .sidebar-user {
-    padding-bottom: 12px;
+    padding-bottom: 12px !important;
   }
 
 /* =========================================================
@@ -313,9 +313,9 @@ body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .prompt
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .prompt-wrap {
-    padding-top: var(--space-2, 8px);
-    padding-bottom: var(--space-2, 8px);
-    margin-bottom: 0;
+    padding-top: var(--space-2, 8px) !important;
+    padding-bottom: var(--space-2, 8px) !important;
+    margin-bottom: 0 !important;
   }
 body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-composer-slot,body.mobile-mode 
   .mobile-browser-firefox .chat-container-root--mode-shared .chat-composer-slot,body.mobile-mode 
@@ -325,9 +325,9 @@ body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-c
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .chat-composer-slot {
-    padding-bottom: 0;
-    margin-bottom: 0;
-    align-self: end;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    align-self: end !important;
   }
 body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-workspace,body.mobile-mode 
   .mobile-browser-firefox .chat-container-root--mode-shared .chat-workspace,body.mobile-mode 
@@ -337,8 +337,8 @@ body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .chat-w
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .chat-workspace {
-    grid-template-rows: auto minmax(0, 1fr) auto;
-    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr) auto !important;
+    min-height: 0 !important;
   }
 body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat,body.mobile-mode 
   .mobile-browser-firefox .chat-container-root--mode-shared,body.mobile-mode 
@@ -346,8 +346,8 @@ body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat,body.mo
     .chat-container-root--mode-chat,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
   }
 body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .message-list,body.mobile-mode 
   .mobile-browser-firefox .chat-container-root--mode-shared .message-list,body.mobile-mode 
@@ -357,28 +357,28 @@ body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat .messag
   .app-container--mobile.app-container--browser-firefox
     .chat-container-root--mode-shared
     .message-list {
-    padding-bottom: var(--space-3, 12px);
-    scroll-padding-bottom: var(--space-3, 12px);
+    padding-bottom: var(--space-3, 12px) !important;
+    scroll-padding-bottom: var(--space-3, 12px) !important;
   }
 body.mobile-mode .mobile-browser-samsung .mobile-drawer,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer {
-    height: var(--app-height, 100dvh);
-    max-height: var(--app-height, 100dvh);
-    min-height: 0;
-    overflow: hidden;
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
   }
 body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile,body.mobile-mode 
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-content--mobile {
-    height: 100%;
-    max-height: 100%;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding-bottom: 0;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
   }
 body.mobile-mode .mobile-browser-samsung
     .mobile-drawer
@@ -388,11 +388,11 @@ body.mobile-mode .mobile-browser-samsung
     .mobile-drawer
     .sidebar-content--mobile
     .sidebar-history {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: var(--space-4, 16px);
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: var(--space-4, 16px) !important;
   }
 body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile .sidebar-user,body.mobile-mode 
   .mobile-browser-samsung .mobile-drawer .sidebar-user--mobile,body.mobile-mode 
@@ -403,15 +403,15 @@ body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile
   .app-container--mobile.app-container--browser-samsung-internet
     .mobile-drawer
     .sidebar-user--mobile {
-    position: relative;
-    bottom: auto;
-    flex: 0 0 auto;
-    margin-top: auto;
+    position: relative !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
     padding-bottom: max(
       var(--space-4, 16px),
       env(safe-area-inset-bottom, 0px)
-    );
-    transform: none;
+    ) !important;
+    transform: none !important;
   }
 
 /* =========================================================
@@ -424,19 +424,19 @@ body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-content--mobile
 body.mobile-mode .mobile-browser-firefox .bottom-sheet,body.mobile-mode 
   .app-container--mobile.app-container--browser-firefox ~ .bottom-sheet,
   body.mobile-mode.mobile-browser-firefox .bottom-sheet {
-    min-height: 220px;
-    max-height: calc(var(--app-height, 100dvh) - 12px);
+    min-height: 220px !important;
+    max-height: calc(var(--app-height, 100dvh) - 12px) !important;
   }
 body.mobile-mode .mobile-browser-firefox .bottom-sheet-body,
   body.mobile-mode.mobile-browser-firefox .bottom-sheet-body {
-    flex: 1 1 auto;
-    min-height: 0;
-    padding-bottom: var(--space-2, 8px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding-bottom: var(--space-2, 8px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
   }
 body.mobile-mode .mobile-browser-firefox .bottom-sheet-option,
   body.mobile-mode.mobile-browser-firefox .bottom-sheet-option {
-    min-height: 56px;
-    flex: 0 0 auto;
+    min-height: 56px !important;
+    flex: 0 0 auto !important;
   }
