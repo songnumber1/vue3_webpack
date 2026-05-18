@@ -1,502 +1,168 @@
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {useEventListener, useMediaQuery} from "@vueuse/core";
+import {computed, nextTick, onMounted, toRef} from "vue";
 import {useI18n} from "vue-i18n";
-import {usePlatformStore} from "@/stores/platformStore";
-import {openNativeFilePicker} from "@/services/platformBridge";
-import {
-  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-  createBrowserAttachment,
-  createNativeAttachment,
-  hydrateImageAttachment,
-  revokeAttachmentUrl,
-} from "@/utils/attachment";
-import {useOutsideClick} from "@/composables/useOutsideClick";
-import {useSpeechRecognition} from "@/composables/useSpeechRecognition";
-import {logWarn} from "@/utils/logger";
-import {
-  ANDROID_TO_JS_EVENT,
-  ATTACH_MENU_OPTIONS,
-  DEFAULT_FALLBACK_MODEL,
-  FILE_PICKER_TYPE,
-  IMAGE_PREVIEW_EVENT,
-  NATIVE_FILE_SELECTED_TYPE,
-  PROMPT_MENU_TYPE,
-  PROMPT_SPEECH_LANGUAGE,
-  PROMPT_TEXTAREA_HEIGHT,
-  PROMPT_TOOL_DEFINITIONS,
-  PROMPT_VIEWPORT_QUERY,
-} from "@/constants/promptComposer";
+import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
+import {usePromptText} from "@/composables/prompt/usePromptText";
+import {usePromptAttachment} from "@/composables/prompt/usePromptAttachment";
+import {usePromptSpeech} from "@/composables/prompt/usePromptSpeech";
+import {usePromptModel} from "@/composables/prompt/usePromptModel";
+import {usePromptTool} from "@/composables/prompt/usePromptTool";
 
 /**
- * @description usePromptComposer 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} props - props 입력값입니다.
- * @param {*} emit - emit 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
+ * @description 프롬프트 입력 영역의 모든 기능을 조합하는 slim 조합기입니다.
+ * 세부 로직은 각 sub-composable에 위임하고, 이 함수는 조합과 제출 흐름만 담당합니다.
+ * @param {object} props - 컴포넌트 props
+ * @param {Function} emit - 컴포넌트 emit 함수
+ * @returns {object} 템플릿에 필요한 모든 상태와 핸들러
  */
 export function usePromptComposer(props, emit) {
   const {t} = useI18n();
-  const platformStore = usePlatformStore();
-  const text = ref("");
-  const textareaComponentRef = ref(null);
-  const toolbarRef = ref(null);
-  const fileInputRef = ref(null);
-  const attachments = ref([]);
-  const attachMenuOpen = ref(false);
-  const modelMenuOpen = ref(false);
-  const toolMenuOpen = ref(false);
-  const fileAccept = ref("");
-  const captureMode = ref(null);
-  const isMobileSheet = ref(false);
-  const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
-  const isPromptCompactViewport = useMediaQuery(PROMPT_VIEWPORT_QUERY);
-  let lastHeight = 0;
+  const disabled = toRef(props, "disabled");
 
-  const fallbackModels = computed(() => [
-    {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
-  ]);
-  const currentModels = computed(() =>
-    props.models.length ? props.models : fallbackModels.value
-  );
-  const currentModel = computed(
-    () =>
-      currentModels.value.find((model) => model.id === props.modelValue) ||
-      currentModels.value[0]
-  );
-  const tools = computed(() =>
-    PROMPT_TOOL_DEFINITIONS.map((tool) => ({
-      ...tool,
-      label: t(tool.labelKey),
-    }))
-  );
-  const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
-  const attachOptions = computed(() =>
-    ATTACH_MENU_OPTIONS.filter(
-      (option) => !option.requiresCamera || showCameraMenu.value
-    ).map((option) => ({
-      ...option,
-      label: t(option.labelKey),
-    }))
-  );
-  const hasPromptText = computed(() => text.value.trim().length > 0);
+  // ── 공유 레이어: 뷰포트 감지 + 메뉴 상태 ──────────────────────────────
+  const {
+    toolbarRef,
+    modelMenuOpen,
+    toolMenuOpen,
+    attachMenuOpen,
+    isMobileSheet,
+    syncViewportMode,
+    closeMenus,
+  } = usePromptMenu();
+
+  // ── 텍스트 입력 + 리사이즈 ────────────────────────────────────────────
+  const {
+    text,
+    textareaComponentRef,
+    hasPromptText,
+    resize,
+    handleFocus,
+    handlePaste: getRawPastedFiles,
+    getLastHeight,
+    focusTextarea,
+  } = usePromptText({isMobileSheet, emit});
+
+  // ── 첨부 파일 ─────────────────────────────────────────────────────────
+  const {
+    fileInputRef,
+    attachments,
+    fileAccept,
+    captureMode,
+    attachOptions,
+    openAttachSelector,
+    openFilePicker,
+    handleFileChange,
+    addFiles,
+    markPreviewError,
+    previewImage,
+    removeAttachment,
+    clearAttachments,
+  } = usePromptAttachment({
+    attachMenuOpen,
+    resize,
+    getLastHeight,
+    emit,
+    disabled,
+  });
+
+  // ── 음성 입력 ─────────────────────────────────────────────────────────
+  const {
+    isMicEnabled,
+    isVoiceListening,
+    hasVoiceStopped,
+    isSpeechSupported,
+    speech,
+    startVoiceInput,
+    stopVoiceInput,
+  } = usePromptSpeech({text, resize, closeMenus, disabled, focusTextarea});
+
+  // ── 모델 선택 ─────────────────────────────────────────────────────────
+  const {currentModels, currentModel, openModelSelector, selectModel} =
+    usePromptModel({props, modelMenuOpen, syncViewportMode, closeMenus, emit});
+
+  // ── 툴 선택 ───────────────────────────────────────────────────────────
+  const {tools, openToolSelector, applyTool} = usePromptTool({
+    props,
+    toolMenuOpen,
+    syncViewportMode,
+    closeMenus,
+    text,
+    resize,
+    focusTextarea,
+  });
+
+  // ── 제출 (text + attachments 둘 다 필요하므로 조합기에 위치) ──────────
   const canSubmit = computed(
     () => hasPromptText.value || attachments.value.length > 0
   );
-  const speech = useSpeechRecognition({
-    language: PROMPT_SPEECH_LANGUAGE,
-    onText: (nextText) => {
-      text.value = nextText;
-      nextTick(resize);
-    },
-  });
-  const textareaRef = computed(
-    () => textareaComponentRef.value?.textareaRef || null
-  );
 
-  /**
-   * @description getToolbarRoot 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} key - key 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function getToolbarRoot(key) {
-    const root = toolbarRef.value?.[key];
-    // 계산된 결과를 호출부로 반환합니다.
-    return root?.value || root || null;
-  }
-
-  /**
-   * @description syncViewportMode 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function syncViewportMode() {
-    isMobileSheet.value = Boolean(isPromptCompactViewport.value);
-  }
-
-  /**
-   * @description resize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function resize() {
-    const el = textareaRef.value;
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!el) return;
-    el.style.height = "auto";
-    const maxHeight = isMobileSheet.value
-      ? PROMPT_TEXTAREA_HEIGHT.mobileMax
-      : PROMPT_TEXTAREA_HEIGHT.desktopMax;
-    const nextHeight = Math.min(
-      Math.max(el.scrollHeight, PROMPT_TEXTAREA_HEIGHT.min),
-      maxHeight
-    );
-    el.style.height = `${nextHeight}px`;
-    el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (nextHeight !== lastHeight) {
-      lastHeight = nextHeight;
-      emit("height-change", nextHeight);
-    }
-  }
-
-  /**
-   * @description handleFocus 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function handleFocus() {
-    emit("focus");
-    nextTick(resize);
-  }
-
-  /**
-   * @description submit 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function submit() {
     const value = text.value.trim();
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if ((!value && attachments.value.length === 0) || props.disabled) return;
     emit("submit", {text: value, attachments: attachments.value});
     text.value = "";
-    attachments.value = [];
+    clearAttachments();
     speech.resetToMic();
     closeMenus();
     nextTick(resize);
   }
 
-  /**
-   * @description closeMenus 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} except - except 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function closeMenus(except = "") {
-    // 현재 열어야 하는 메뉴를 제외하고 나머지 메뉴 상태를 닫습니다.
-    if (except !== PROMPT_MENU_TYPE.model) modelMenuOpen.value = false;
-    if (except !== PROMPT_MENU_TYPE.tool) toolMenuOpen.value = false;
-    if (except !== PROMPT_MENU_TYPE.attach) attachMenuOpen.value = false;
-  }
-
-  /**
-   * @description openModelSelector 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function openModelSelector() {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled || props.modelReadonly) return;
-    syncViewportMode();
-    const next = !modelMenuOpen.value;
-    closeMenus(PROMPT_MENU_TYPE.model);
-    modelMenuOpen.value = next;
-  }
-
-  /**
-   * @description openToolSelector 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function openToolSelector() {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled) return;
-    syncViewportMode();
-    const next = !toolMenuOpen.value;
-    closeMenus(PROMPT_MENU_TYPE.tool);
-    toolMenuOpen.value = next;
-  }
-
-  /**
-   * @description openAttachSelector 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function openAttachSelector() {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled) return;
-    syncViewportMode();
-    const next = !attachMenuOpen.value;
-    closeMenus(PROMPT_MENU_TYPE.attach);
-    attachMenuOpen.value = next;
-  }
-
-  /**
-   * @description startVoiceInput 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function startVoiceInput() {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled || !isMicEnabled.value || !speech.isSupported.value)
-      return;
-    closeMenus();
-    speech.start(text.value);
-  }
-
-  /**
-   * @description stopVoiceInput 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function stopVoiceInput() {
-    speech.stopByUser();
-    nextTick(() => {
-      textareaRef.value?.focus();
-      resize();
-    });
-  }
-
-  /**
-   * @description selectModel 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} id - id 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function selectModel(id) {
-    emit("update:modelValue", id);
-    modelMenuOpen.value = false;
-  }
-
-  /**
-   * @description applyTool 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} tool - tool 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function applyTool(tool) {
-    text.value = text.value ? `${text.value}\n${tool.prompt}` : tool.prompt;
-    toolMenuOpen.value = false;
-    nextTick(() => {
-      textareaRef.value?.focus();
-      resize();
-    });
-  }
-
-  /**
-   * @description openFilePicker 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} type - type 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  async function openFilePicker(type = FILE_PICKER_TYPE.all) {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (props.disabled) return;
-    attachMenuOpen.value = false;
-
-    const option =
-      ATTACH_MENU_OPTIONS.find((item) => item.id === type) ||
-      ATTACH_MENU_OPTIONS.find((item) => item.id === FILE_PICKER_TYPE.all);
-
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (platformStore.info.isAndroidApp) {
-      // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
-      try {
-        await openNativeFilePicker({
-          source: option.nativeSource,
-          multiple: option.multiple,
-          accept: option.accept,
-        });
-        return;
-      } catch (error) {
-        logWarn(
-          "Android file picker failed. Falling back to web input.",
-          error
-        );
-      }
-    }
-
-    const input = fileInputRef.value;
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!input) return;
-
-    fileAccept.value = option.accept;
-    captureMode.value = option.capture;
-    input.setAttribute("accept", option.accept);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (option.capture) input.setAttribute("capture", option.capture);
-    else input.removeAttribute("capture");
-    input.value = "";
-    input.click();
-  }
-
-  /**
-   * @description handleNativeFileSelected 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} event - event 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function handleNativeFileSelected(event) {
-    const detail = event?.detail || {};
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
-    const nativeFiles = detail.payload?.files || [];
-    const mapped = nativeFiles.map(createNativeAttachment);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (mapped.length) attachments.value = [...attachments.value, ...mapped];
-  }
-
-  /**
-   * @description handleFileChange 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} event - event 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function handleFileChange(event) {
-    addFiles(event.target.files);
-    event.target.value = "";
-  }
-
-  /**
-   * @description handlePaste 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} event - event 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
+  // ── paste 핸들러 래핑 (파일이 있으면 addFiles 호출) ──────────────────
   function handlePaste(event) {
-    const files = Array.from(event.clipboardData?.files || []);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!files.length) return;
-    addFiles(files);
+    const files = getRawPastedFiles(event);
+    if (files && files.length) addFiles(files);
   }
 
-  /**
-   * @description addFiles 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} fileList - fileList 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function addFiles(fileList) {
-    const mapped = Array.from(fileList || []).map(createBrowserAttachment);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!mapped.length) return;
-
-    attachments.value = [...attachments.value, ...mapped];
-    mapped
-      .filter((file) => file.kind === "image")
-      .forEach((attachment) => {
-        hydrateImageAttachment(attachment, (dataUrl) => {
-          const target = attachments.value.find(
-            (file) => file.id === attachment.id
-          );
-          // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-          if (!target) return;
-          target.dataUrl = dataUrl;
-          target.previewUrl = dataUrl;
-          target.previewError = false;
-        });
-      });
-
-    nextTick(() => {
-      resize();
-      emit("height-change", lastHeight);
-    });
-  }
-
-  /**
-   * @description markPreviewError 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} file - file 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function markPreviewError(file) {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (file) file.previewError = true;
-  }
-
-  /**
-   * @description previewImage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} file - file 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function previewImage(file) {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
-    if (!file) return;
-    const previewUrl = file.dataUrl || file.previewUrl || file.url || "";
-    window.dispatchEvent(
-      new CustomEvent(IMAGE_PREVIEW_EVENT, {
-        detail: {...file, url: file.url || previewUrl, previewUrl},
-      })
-    );
-  }
-
-  /**
-   * @description removeAttachment 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} id - id 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
-  function removeAttachment(id) {
-    const target = attachments.value.find((file) => file.id === id);
-    revokeAttachmentUrl(target);
-    attachments.value = attachments.value.filter((file) => file.id !== id);
-    nextTick(resize);
-  }
-
-  useOutsideClick(
-    [
-      () => getToolbarRoot("modelRoot"),
-      () => getToolbarRoot("toolRoot"),
-      () => getToolbarRoot("attachRoot"),
-    ],
-    closeMenus,
-    {shouldIgnore: () => isMobileSheet.value}
-  );
-
-  watch(isPromptCompactViewport, syncViewportMode);
-  useEventListener(window, "resize", syncViewportMode, {passive: true});
-  useEventListener(window, "orientationchange", syncViewportMode, {passive: true});
-  if (typeof window !== "undefined" && window.visualViewport) {
-    useEventListener(window.visualViewport, "resize", syncViewportMode, {
-      passive: true,
-    });
-    useEventListener(window.visualViewport, "scroll", syncViewportMode, {
-      passive: true,
-    });
-  }
-  useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
-
-  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
+  // ── 마운트 시 초기 동기화 ─────────────────────────────────────────────
   onMounted(() => {
     syncViewportMode();
     resize();
   });
 
-  // Vue 반응형 실행 구간입니다. 상태 변경과 생명주기 흐름을 이 영역에서 연결합니다.
-  onBeforeUnmount(() => {
-    attachments.value.forEach((file) => {
-      revokeAttachmentUrl(file);
-    });
-  });
-
-  // 계산된 결과를 호출부로 반환합니다.
   return {
     t,
+    // text
     text,
     textareaComponentRef,
-    toolbarRef,
-    fileInputRef,
-    attachments,
-    attachMenuOpen,
-    modelMenuOpen,
-    toolMenuOpen,
-    fileAccept,
-    captureMode,
-    isMobileSheet,
-    isMicEnabled,
-    isVoiceListening: speech.isListening,
-    hasVoiceStopped: speech.hasManualStop,
-    isSpeechSupported: speech.isSupported,
-    currentModels,
-    currentModel,
-    tools,
-    attachOptions,
     hasPromptText,
-    canSubmit,
     resize,
     handleFocus,
-    submit,
-    openModelSelector,
-    openToolSelector,
+    handlePaste,
+    // attachment
+    fileInputRef,
+    attachments,
+    fileAccept,
+    captureMode,
+    attachOptions,
     openAttachSelector,
-    startVoiceInput,
-    stopVoiceInput,
-    selectModel,
-    applyTool,
     openFilePicker,
     handleFileChange,
-    handlePaste,
     markPreviewError,
     previewImage,
     removeAttachment,
+    // speech
+    isMicEnabled,
+    isVoiceListening,
+    hasVoiceStopped,
+    isSpeechSupported,
+    startVoiceInput,
+    stopVoiceInput,
+    // model
+    currentModels,
+    currentModel,
+    openModelSelector,
+    selectModel,
+    // tool
+    tools,
+    openToolSelector,
+    applyTool,
+    // menu / viewport
+    toolbarRef,
+    modelMenuOpen,
+    toolMenuOpen,
+    attachMenuOpen,
+    isMobileSheet,
+    // submit
+    canSubmit,
+    submit,
   };
 }
