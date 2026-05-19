@@ -66,7 +66,7 @@
             type="button"
             :class="{
               'prompt-tool-menu-parent': hasChildren(tool),
-              active: activeToolGroupId === tool.id || tool.active,
+              active: activeToolGroupId === tool.id,
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
             :aria-expanded="hasChildren(tool) ? activeToolGroupId === tool.id : undefined"
@@ -85,9 +85,15 @@
               v-if="hasChildren(tool) && isSwitchParent(tool)"
               class="prompt-tool-parent-switch"
               :class="{'is-active': tool.active}"
-              aria-hidden="true"
+              role="switch"
+              tabindex="0"
+              :aria-pressed="tool.active"
+              :aria-label="tool.label"
+              @click.stop="handleToolSwitchClick(tool)"
+              @keydown.enter.stop.prevent="handleToolSwitchClick(tool)"
+              @keydown.space.stop.prevent="handleToolSwitchClick(tool)"
             >
-              <span></span>
+              <span aria-hidden="true"></span>
             </span>
             <span v-if="hasChildren(tool)" class="prompt-submenu-arrow" aria-hidden="true">
               ›
@@ -377,6 +383,22 @@ async function handleToolClick(tool) {
   }
 
   activeToolGroupId.value = activeToolGroupId.value === tool.id ? "" : tool.id;
+
+  await nextTick();
+  await updateToolFloating?.();
+  resolveSubmenuPlacement();
+}
+
+
+async function handleToolSwitchClick(tool) {
+  if (!isSwitchParent(tool)) return;
+
+  const willEnable = !tool.active;
+  emit("apply-tool", tool);
+
+  activeToolGroupId.value = willEnable ? tool.id : "";
+  if (!willEnable) return;
+
   await nextTick();
   await updateToolFloating?.();
   resolveSubmenuPlacement();
@@ -508,6 +530,10 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 }
 
 .prompt-tool-parent-switch {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   position: relative;
   width: 34px !important;
   height: 20px;
@@ -573,6 +599,17 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   border-color: var(--accent);
   background: var(--accent);
   color: var(--surface);
+}
+
+.prompt-tool-parent-switch > span {
+  min-width: 14px !important;
+  flex: 0 0 14px !important;
+  text-align: initial !important;
+  font-size: 0 !important;
+}
+
+.prompt-tool-child-option--selectedRow.is-active {
+  background: var(--control-hover);
 }
 
 </style>

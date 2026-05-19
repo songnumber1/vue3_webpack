@@ -44,10 +44,14 @@ export function usePromptTool({
         : undefined;
       const activeCount = children?.filter((child) => child.active).length || 0;
 
+      const isSwitchParent = tool.parentControlType === "switch";
+      const isEnabledGroup =
+        tool.settingGroup === "webSearch" && settings.webSearchEnabled;
+
       return {
         ...tool,
         label: t(tool.labelKey),
-        active: activeCount > 0,
+        active: isSwitchParent ? isEnabledGroup : activeCount > 0,
         activeCount,
         parentControlType: tool.parentControlType || "",
         childControlType: tool.childControlType || "",
@@ -63,7 +67,16 @@ export function usePromptTool({
   }
 
   function applyTool(tool) {
+    if (tool?.settingGroup && tool?.parentControlType === "switch") {
+      chatStore.setPromptToolGroupEnabled(tool.settingGroup, !tool.active);
+      return;
+    }
+
     if (tool?.settingGroup) {
+      if (tool.settingGroup === "webSearch") {
+        chatStore.setPromptToolGroupEnabled(tool.settingGroup, true);
+      }
+
       chatStore.togglePromptToolOption(
         tool.settingGroup,
         tool.id,

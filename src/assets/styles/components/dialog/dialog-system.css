@@ -1142,15 +1142,14 @@ body.desktop-mode .mobile-topbar .model-trigger--assistant {
   padding: var(--dialog-body-padding);
 }
 
-@media (min-width: 901px) {
-  .responsive-overlay--desktop.responsive-overlay--mobile,
-  .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
+body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile,
+body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
     padding: 24px;
     place-items: center;
   }
 
-  .responsive-overlay--desktop.responsive-overlay--mobile .responsive-panel,
-  .responsive-overlay--desktop.responsive-overlay--mobile-dialog .responsive-panel {
+body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile .responsive-panel,
+body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile-dialog .responsive-panel {
     width: min(720px, 100%);
     height: auto;
     max-width: calc(100vw - 48px);
@@ -1158,7 +1157,6 @@ body.desktop-mode .mobile-topbar .model-trigger--assistant {
     border: 1px solid var(--dialog-panel-border);
     border-radius: var(--dialog-radius);
   }
-}
 
 /* Prompt nested bottom sheet header back action. */
 .bottom-sheet-back {

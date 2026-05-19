@@ -3,6 +3,7 @@ import {defineStore} from "pinia";
 const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
   knowledgeSearch: [],
   webSearch: null,
+  webSearchEnabled: false,
 });
 
 function clonePromptToolSettings(settings = {}) {
@@ -11,6 +12,7 @@ function clonePromptToolSettings(settings = {}) {
       ? [...settings.knowledgeSearch]
       : [],
     webSearch: settings.webSearch || null,
+    webSearchEnabled: Boolean(settings.webSearchEnabled),
   };
 }
 
@@ -78,6 +80,22 @@ export const useChatStore = defineStore("chat", {
         };
       }
       return chatId;
+    },
+    setPromptToolGroupEnabled(groupId, enabled) {
+      const chatId = this.ensurePromptToolSettings();
+      const current = clonePromptToolSettings(this.promptToolSettingsMap[chatId]);
+
+      if (groupId === "webSearch") {
+        current.webSearchEnabled = Boolean(enabled);
+        if (!enabled) {
+          current.webSearch = null;
+        }
+      }
+
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [chatId]: current,
+      };
     },
     togglePromptToolOption(groupId, optionId, selectionMode = "multiple") {
       const chatId = this.ensurePromptToolSettings();

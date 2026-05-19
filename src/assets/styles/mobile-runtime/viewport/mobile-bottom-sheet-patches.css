@@ -19,7 +19,7 @@ body.mobile-mode .bottom-sheet-option--row {
   justify-content: flex-start !important;
 }
 
-body.mobile-mode .bottom-sheet-option--row span {
+body.mobile-mode .bottom-sheet-option--row > span[aria-hidden="true"] {
   flex: 0 0 auto !important;
   width: 24px !important;
   text-align: center !important;
@@ -53,4 +53,18 @@ body.mobile-mode .bottom-sheet-option--row strong {
   display: inline-block !important;
   margin: 0 !important;
   text-align: left !important;
+}
+
+
+/* Keep prompt tool switch geometry intact on mobile bottom sheets. */
+body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch {
+  width: 38px !important;
+  min-width: 38px !important;
+  flex: 0 0 38px !important;
+}
+
+body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch > span {
+  width: 16px !important;
+  min-width: 16px !important;
+  flex: 0 0 16px !important;
 }

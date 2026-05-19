@@ -34,7 +34,6 @@
         v-for="tool in tools"
         :key="tool.id"
         class="bottom-sheet-option bottom-sheet-option--row"
-        :class="{'is-active': tool.active}"
         type="button"
         @click="handleToolClick(tool)"
       >
@@ -46,13 +45,28 @@
           {{ tool.label }}
         </strong>
 
+
+        <span
+          v-if="hasChildren(tool) && tool.activeCount > 0"
+          class="bottom-sheet-active-badge"
+          aria-hidden="true"
+        >
+          {{ tool.activeCount }}
+        </span>
+
         <span
           v-if="hasChildren(tool) && isSwitchParent(tool)"
           class="bottom-sheet-parent-switch"
           :class="{'is-active': tool.active}"
-          aria-hidden="true"
+          role="switch"
+          tabindex="0"
+          :aria-pressed="tool.active"
+          :aria-label="tool.label"
+          @click.stop="handleToolSwitchClick(tool)"
+          @keydown.enter.stop.prevent="handleToolSwitchClick(tool)"
+          @keydown.space.stop.prevent="handleToolSwitchClick(tool)"
         >
-          <span></span>
+          <span aria-hidden="true"></span>
         </span>
 
         <span
@@ -230,6 +244,13 @@ function handleToolClick(tool) {
   activeToolGroupId.value = tool.id;
 }
 
+function handleToolSwitchClick(tool) {
+  if (!isSwitchParent(tool)) return;
+  const willEnable = !tool.active;
+  emit("apply-tool", tool);
+  activeToolGroupId.value = willEnable ? tool.id : "";
+}
+
 function applyNestedTool(tool) {
   emit("apply-tool", tool);
 }
@@ -259,11 +280,39 @@ watch(
   line-height: 1;
 }
 
+
+.bottom-sheet-active-badge {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-width: 28px !important;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-size: 14px !important;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.bottom-sheet-active-badge + .bottom-sheet-parent-switch,
+.bottom-sheet-active-badge + .bottom-sheet-submenu-arrow {
+  margin-left: 8px;
+}
+
 .bottom-sheet-parent-switch {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
   position: relative;
-  width: 38px;
+  width: 38px !important;
   height: 22px;
-  min-width: 38px;
+  min-width: 38px !important;
+  flex: 0 0 38px !important;
   margin-left: auto;
   border-radius: 999px;
   background: var(--control-border);
@@ -274,8 +323,10 @@ watch(
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 16px;
+  width: 16px !important;
   height: 16px;
+  min-width: 16px !important;
+  flex: 0 0 16px !important;
   border-radius: 999px;
   background: var(--surface);
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
@@ -328,6 +379,49 @@ watch(
   border-color: var(--accent);
   background: var(--accent);
   color: var(--surface);
+}
+
+/* Prompt tool bottom sheet controls must not inherit generic row icon span sizing. */
+.bottom-sheet-option--row > .bottom-sheet-active-badge,
+.bottom-sheet-option--row > .bottom-sheet-parent-switch,
+.bottom-sheet-option--row > .bottom-sheet-submenu-arrow,
+.bottom-sheet-option--row > .bottom-sheet-checkbox {
+  box-sizing: border-box;
+}
+
+.bottom-sheet-option--row > .bottom-sheet-parent-switch {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 22px !important;
+  flex: 0 0 38px !important;
+}
+
+.bottom-sheet-option--row > .bottom-sheet-parent-switch > span {
+  width: 16px !important;
+  min-width: 16px !important;
+  height: 16px !important;
+  flex: 0 0 16px !important;
+  text-align: initial !important;
+  font-size: 0 !important;
+}
+
+.bottom-sheet-option--row > .bottom-sheet-checkbox {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  text-align: center !important;
+  font-size: var(--text-size-body) !important;
+}
+
+.bottom-sheet-option--row > .bottom-sheet-checkbox > span {
+  width: auto !important;
+  min-width: 0 !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+  text-align: center !important;
+  font-size: var(--text-size-body) !important;
+  line-height: 1 !important;
 }
 
 </style>
