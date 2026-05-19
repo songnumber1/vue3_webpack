@@ -150,7 +150,6 @@ import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
 import {copyClipboardByPlatform} from "@/services/platformBridge";
 import {logWarn} from "@/utils/logger";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const props = defineProps({
   role: {type: String, required: true},
   content: {type: String, default: ""},
@@ -176,76 +175,32 @@ const hasMoreReasons = computed(
   () =>
     !showAllReasons.value && HALLUCINATION_REASONS.length > defaultReasonCount
 );
-
-/**
- * @description setFeedback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function setFeedback(value) {
   feedback.value = feedback.value === value ? "" : value;
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (feedback.value !== FEEDBACK_ACTIONS.DISLIKE) {
     showAllReasons.value = false;
     selectedReasons.value = [];
   }
 }
-
-/**
- * @description openFeedbackDialog 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function openFeedbackDialog() {
   feedbackDialogOpen.value = true;
 }
-
-/**
- * @description closeFeedbackDialog 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function closeFeedbackDialog() {
   feedbackDialogOpen.value = false;
 }
-
-/**
- * @description submitFeedback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function submitFeedback() {
   feedbackText.value = "";
   closeFeedbackDialog();
 }
-
-/**
- * @description reasonLabel 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} reason - reason 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function reasonLabel(reason) {
   return locale.value === "ko" ? reason.ko : reason.en;
 }
-
-/**
- * @description toggleReason 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} id - id 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function toggleReason(id) {
   selectedReasons.value = selectedReasons.value.includes(id)
     ? selectedReasons.value.filter((item) => item !== id)
     : [...selectedReasons.value, id];
 }
-
-/**
- * @description copy 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 async function copy() {
-  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     await copyClipboardByPlatform(props.content || "");
   } catch (error) {

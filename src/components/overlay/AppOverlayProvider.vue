@@ -33,7 +33,6 @@
 <script setup>
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 defineProps({
   isMobile: {type: Boolean, default: false},
   noticeOpen: {type: Boolean, default: false},

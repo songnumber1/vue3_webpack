@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 export const useAssistantStore = defineStore("assistant", {
   state: () => ({
     assistants: [],
@@ -37,20 +36,16 @@ export const useAssistantStore = defineStore("assistant", {
       this.examplePromptMap = payload.examplePromptMap || {};
     },
     selectAssistant(id) {
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!this.assistantMap[id]) return;
       this.selectedAssistantId = id;
       const models = this.modelMapByAssistant[id] || [];
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!models.some((model) => model.id === this.selectedModelId)) {
         this.selectedModelId = models[0]?.id || "";
       }
     },
     selectModel(id) {
       const model = this.modelMap[id];
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!model) return;
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (model.assistId !== this.selectedAssistantId) return;
       this.selectedModelId = id;
     },

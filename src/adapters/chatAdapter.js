@@ -2,13 +2,6 @@ import {CHAT_KEYS, MESSAGE_KEYS} from "@/constants/apiKeys";
 import {MESSAGE_ROLES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
-/**
- * @description adaptChatHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} raw - raw 입력값입니다.
- * @param {*} context - context 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function adaptChatHistory(raw = {}, context = {}) {
   const modelId = raw[CHAT_KEYS.MODEL_ID] || raw[CHAT_KEYS.LEGACY_MODEL_ID];
   const model = context.modelMap?.[modelId] || null;
@@ -29,19 +22,11 @@ export function adaptChatHistory(raw = {}, context = {}) {
     raw,
   };
 }
-
-/**
- * @description adaptChatHistoryList 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} rawItems - rawItems 입력값입니다.
- * @param {*} context - context 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function adaptChatHistoryList(rawItems = [], context = {}) {
   return rawItems
     .map((item) => adaptChatHistory(item, context))
     .filter((item) => item.id)
     .sort((a, b) => {
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
 
       return (
@@ -49,12 +34,6 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
       );
     });
 }
-
-/**
- * @description adaptMessage 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} raw - raw 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function adaptMessage(raw = {}) {
   return {
     id: raw[MESSAGE_KEYS.ID],
@@ -79,12 +58,6 @@ export function adaptMessage(raw = {}) {
     raw,
   };
 }
-
-/**
- * @description adaptMessageList 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} rawItems - rawItems 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function adaptMessageList(rawItems = []) {
   return rawItems
     .map(adaptMessage)

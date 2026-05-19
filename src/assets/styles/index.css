@@ -1,30 +1,33 @@
+/* 01 foundations */
 @import "./foundations/themes/themes.css";
 @import "./foundations/reset/base.css";
 
+/* 02 base layout and core components */
 @import "./layouts/chat/core.css";
 @import "./components/markdown/markdown.css";
 @import "./components/bottom-sheet/bottom-sheet-composer.css";
 @import "./pages/playground/playground-feedback.css";
 @import "./components/attachment/attachment-preview-tokens.css";
 
+/* 03 mobile runtime and freeze overrides */
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
-@import "./mobile-runtime/viewport/session-mobile-browser-fixes.css";
+@import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
-@import "./utilities/overrides/layout-overrides.css";
+@import "./utilities/overrides/layout-freeze-overrides.css";
 @import "./states/reasoning/reasoning.css";
 @import "./components/message/message-bubbles.css";
+@import "./mobile-runtime/gestures/mobile-tap-button-radius-patch.css";
+@import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
+@import "./utilities/overrides/prompt-box-border-freeze-patch.css";
 
+/* 04 states, sidebar, assistant binding */
 @import "./states/error/exception.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/assistant/assistant-icon-binding.css";
+@import "./states/interaction/ui-shape-interaction-patches.css";
 
-@import "./states/interaction/ui-shape-interaction-fixes.css";
-@import "./mobile-runtime/gestures/mobile-tap-and-button-radius-final.css";
-
+/* 05 targeted polish and browser patches */
 @import "./layouts/header/chat-header-assistant-icon.css";
 @import "./pages/chat/targeted-chat-polish.css";
-@import "./mobile-runtime/mobile-layout/mobile-composer-targeted-fixes.css";
-@import "./browser-patches/firefox/firefox-mobile-main-composer.css";
-
-@import "./layouts/responsive/desktop-main-feedback-fix.css";
-@import "./utilities/overrides/prompt-box-border-safety.css";
+@import "./browser-patches/firefox/firefox-mobile-main-composer-patch.css";
+@import "./layouts/responsive/desktop-main-feedback-patch.css";

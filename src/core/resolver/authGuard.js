@@ -1,6 +1,5 @@
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
-  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   AUTH_FAILURE_REASONS,
   AUTH_MOCK_SCENARIOS,
   AUTH_MOCK_SCENARIO_STORAGE_KEY,
@@ -12,12 +11,6 @@ import {
 import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
-
-/**
- * @description createAccessPayload 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} to - to 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function createAccessPayload(to) {
   return {
     language: "ko",
@@ -28,30 +21,15 @@ function createAccessPayload(to) {
     studioId: to?.query?.studioId || null,
   };
 }
-
-/**
- * @description isTruthyFlag 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function isTruthyFlag(value) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (value === true) return true;
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof value === "string") {
     return ["true", "y", "yes", "1"].includes(value.toLowerCase());
   }
 
   return value === 1;
 }
-
-/**
- * @description getStoredMockScenario 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function getStoredMockScenario() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") {
     return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
   }
@@ -62,36 +40,17 @@ function getStoredMockScenario() {
     null
   );
 }
-
-/**
- * @description shouldUseMockAuth 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function shouldUseMockAuth() {
   return (
     USE_MOCK_AUTH ||
     (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
   );
 }
-
-/**
- * @description debugAuthGuard 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} args - args 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function debugAuthGuard(...args) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (ENABLE_AUTH_GUARD_DEBUG) {
     logInfo("[auth-guard]", ...args);
   }
 }
-
-/**
- * @description isLoginRequired 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} accessInfo - accessInfo 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function isLoginRequired(accessInfo = {}) {
   const valid = accessInfo.valid;
   const status = String(
@@ -107,12 +66,6 @@ function isLoginRequired(accessInfo = {}) {
     !accessInfo.user
   );
 }
-
-/**
- * @description isAccessDenied 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} accessInfo - accessInfo 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function isAccessDenied(accessInfo = {}) {
   const status = String(
     accessInfo.status || accessInfo.result || ""
@@ -127,12 +80,6 @@ function isAccessDenied(accessInfo = {}) {
     isTruthyFlag(accessInfo.AccessDeny)
   );
 }
-
-/**
- * @description isUserAgreementRequired 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} accessInfo - accessInfo 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function isUserAgreementRequired(accessInfo = {}) {
   const status = String(
     accessInfo.status || accessInfo.result || ""
@@ -147,13 +94,6 @@ function isUserAgreementRequired(accessInfo = {}) {
     isTruthyFlag(accessInfo.userAgreementRequired)
   );
 }
-
-/**
- * @description requestAccessInfo 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} authAxios - authAxios 입력값입니다.
- * @param {*} payload - payload 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 async function requestAccessInfo(authAxios, payload) {
   const useMock = shouldUseMockAuth();
   const scenario = getStoredMockScenario() || AUTH_MOCK_SCENARIOS.AUTHENTICATED;
@@ -165,12 +105,10 @@ async function requestAccessInfo(authAxios, payload) {
     payload,
   });
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (useMock) {
     return accessApiMock.getAccessInfo(payload, {scenario});
   }
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!authAxios) {
     throw new Error("[authGuard] Auth axios instance is not initialized.");
   }
@@ -179,14 +117,7 @@ async function requestAccessInfo(authAxios, payload) {
 
   return response?.data || {};
 }
-
-/**
- * @description normalizeAccessResult 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} accessInfo - accessInfo 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function normalizeAccessResult(accessInfo = {}) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isAccessDenied(accessInfo)) {
     return {
       authenticated: false,
@@ -195,7 +126,6 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isUserAgreementRequired(accessInfo)) {
     return {
       authenticated: false,
@@ -204,7 +134,6 @@ function normalizeAccessResult(accessInfo = {}) {
     };
   }
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (isLoginRequired(accessInfo)) {
     return {
       authenticated: false,
@@ -219,16 +148,9 @@ function normalizeAccessResult(accessInfo = {}) {
     accessInfo,
   };
 }
-
-/**
- * @description ensureRouteAuthenticated 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   const authStore = useAuthStore();
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (
     ENABLE_AUTH_GUARD_CACHE &&
     !force &&
@@ -247,14 +169,12 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
 
   const payload = createAccessPayload(to);
 
-  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     const accessInfo = await requestAccessInfo(authAxios, payload);
     const result = normalizeAccessResult(accessInfo);
 
     debugAuthGuard("access/info.do normalized result", result);
 
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (result.authenticated) {
       authStore.setAuthenticatedAccessInfo(result.accessInfo);
     } else {

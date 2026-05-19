@@ -63,7 +63,6 @@ import {useI18n} from "vue-i18n";
 import Icon from "@/components/navigation/SidebarIcon.vue";
 import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList.vue";
 
-// 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
 const {t} = useI18n();
 
 defineProps({

@@ -1,5 +1,4 @@
 import {
-  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   OpenAPIRegistry,
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
@@ -36,13 +35,6 @@ const CATEGORY_OPTIONS = [
     description: "Android가 WebView 내부 JS 이벤트 핸들러를 호출하는 contract",
   },
 ];
-
-/**
- * @description createErrorResponse 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} description - description 입력값입니다.
- * @param {*} schema - schema 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function createErrorResponse(description, schema) {
   return {
     description,
@@ -53,60 +45,27 @@ function createErrorResponse(description, schema) {
     },
   };
 }
-
-/**
- * @description getCategoryPath 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} category - category 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function getCategoryPath(category) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.JS_TO_ANDROID) return JS_TO_ANDROID_PATH;
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (category === BRIDGE_CATEGORY.ANDROID_TO_JS) return ANDROID_TO_JS_PATH;
 
   return WEB_API_PATH;
 }
-
-/**
- * @description getCategoryDescription 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} category - category 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function getCategoryDescription(category) {
   return (
     CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
     "Bridge contract"
   );
 }
-
-/**
- * @description shouldIncludeContract 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} selectedCategory - selectedCategory 입력값입니다.
- * @param {*} contract - contract 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function shouldIncludeContract(selectedCategory, contract) {
   return (
     selectedCategory === BRIDGE_CATEGORY.ALL ||
     contract.category === selectedCategory
   );
 }
-
-/**
- * @description getOpenApiCategoryOptions 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function getOpenApiCategoryOptions() {
   return CATEGORY_OPTIONS;
 }
-
-/**
- * @description generateOpenApi 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} selectedCategory - selectedCategory 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function generateOpenApi(selectedCategory = BRIDGE_CATEGORY.ALL) {
   const registry = new OpenAPIRegistry();
   const allContracts = getContractsByCategory(BRIDGE_CATEGORY.ALL);

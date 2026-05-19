@@ -3,7 +3,6 @@ import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {
-  // 모듈 의존성을 모두 불러온 뒤, 아래에서 화면 상태와 실행 로직을 구성합니다.
   bootstrapChatRuntime,
   deleteChatHistory,
   loadChatHistoryList,
@@ -16,12 +15,6 @@ import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
-
-/**
- * @description createLocalHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} value - value 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`;
 
@@ -42,16 +35,7 @@ function createLocalHistory({text, assistant, model}) {
     raw: null,
   };
 }
-
-/**
- * @description createSessionFromHistory 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {*} history - history 입력값입니다.
- * @param {*} modelMap - modelMap 입력값입니다.
- * @param {*} assistantMap - assistantMap 입력값입니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!history) return null;
   const model = modelMap[history.modelId] || null;
   const assistant =
@@ -87,12 +71,6 @@ function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
     readonlyModel: true,
   };
 }
-
-/**
- * @description useChatRuntime 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function useChatRuntime() {
   const appRuntimeStore = useAppRuntimeStore();
   const authStore = useAuthStore();
@@ -118,7 +96,6 @@ export function useChatRuntime() {
     Boolean(chatStore.activeSession?.isModelUnavailable)
   );
   const models = computed(() => {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!chatStore.isModelLocked) return assistantStore.currentModels;
 
     return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(
@@ -128,29 +105,19 @@ export function useChatRuntime() {
   const selectedModel = computed({
     get: () => chatStore.activeSession?.modelId || selectedModelId.value,
     set: (id) => {
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (chatStore.isModelLocked) return;
       assistantStore.selectModel(id);
     },
   });
   const isModelLocked = computed(() => chatStore.isModelLocked);
   const conversations = computed(() => chatStore.messageMap);
-
-  /**
-   * @description initialize 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   async function initialize() {
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (appRuntimeStore.initialized || appRuntimeStore.loading) return;
     appRuntimeStore.startLoading();
-    // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
     try {
       const data = await bootstrapChatRuntime({
         accessInfoOverride: authStore.accessInfo || null,
       });
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (data.accessInfo?.user) {
         authStore.setAuthenticatedAccessInfo(data.accessInfo);
       } else {
@@ -219,12 +186,6 @@ export function useChatRuntime() {
       throw error;
     }
   }
-
-  /**
-   * @description preloadExamplePrompts 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} assistantId - assistantId 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   async function preloadExamplePrompts(assistantId) {
     if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
     try {
@@ -257,15 +218,8 @@ export function useChatRuntime() {
   function getHistory(id) {
     return chatStore.getHistory(id);
   }
-
-  /**
-   * @description ensureConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} historyId - historyId 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   async function ensureConversation(historyId) {
     const history = getHistory(historyId);
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!history) return [];
 
     const session = createSessionFromHistory(
@@ -284,7 +238,6 @@ export function useChatRuntime() {
       ? fallbackAssistant
       : assistantStore.assistantMap[session.assistantId] || fallbackAssistant;
 
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (displayAssistant?.id) {
       assistantStore.selectAssistant(displayAssistant.id);
       session.displayAssistantId = displayAssistant.id;
@@ -293,7 +246,6 @@ export function useChatRuntime() {
 
     chatStore.setActiveSession(session);
 
-    // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
     if (!chatStore.messageMap[history.id]) {
       const messages = await loadChatMessages({
         chatId: history.id,
@@ -306,22 +258,9 @@ export function useChatRuntime() {
 
     return chatStore.messageMap[history.id] || [];
   }
-
-  /**
-   * @description setConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} historyId - historyId 입력값입니다.
-   * @param {*} messages - messages 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function setConversation(historyId, messages) {
     chatStore.setMessages(historyId, messages);
   }
-
-  /**
-   * @description createLocalConversation 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} value - value 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function createLocalConversation({text} = {}) {
     const history = createLocalHistory({
       text,
@@ -340,38 +279,17 @@ export function useChatRuntime() {
 
     return history;
   }
-
-  /**
-   * @description clearCurrentChatSelection 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function clearCurrentChatSelection() {
     chatStore.clearActiveSession();
   }
-
-  /**
-   * @description revokeMessageAttachments 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} items - items 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function revokeMessageAttachments(items = []) {
     items.forEach((message) => {
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!Array.isArray(message.attachments)) return;
       message.attachments.forEach((file) => {
-        // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
         if (file?.url?.startsWith?.("blob:")) URL.revokeObjectURL(file.url);
       });
     });
   }
-
-  /**
-   * @description appendUserAndAssistantMessages 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
-   * @param {*} chatId - chatId 입력값입니다.
-   * @param {*} normalized - normalized 입력값입니다.
-   * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
-   */
   function appendUserAndAssistantMessages(chatId, normalized) {
     const currentMessages = chatStore.messageMap[chatId] || [];
     const userMessage = {

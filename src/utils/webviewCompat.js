@@ -1,29 +1,15 @@
 let resizeObserverId = 0;
 let viewportCssVarsInstalled = false;
-
-/**
- * @description getCryptoObject 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function getCryptoObject() {
   return globalThis.crypto || globalThis.msCrypto || null;
 }
-
-/**
- * @description createUuidV4Fallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function createUuidV4Fallback() {
   const cryptoObj = getCryptoObject();
   const bytes = new Uint8Array(16);
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (cryptoObj?.getRandomValues) {
     cryptoObj.getRandomValues(bytes);
   } else {
-    // 목록 또는 결과 집합을 순회하면서 필요한 값만 선별합니다.
     for (let i = 0; i < bytes.length; i += 1) {
       bytes[i] = Math.floor(Math.random() * 256);
     }
@@ -35,14 +21,7 @@ function createUuidV4Fallback() {
 
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
-
-/**
- * @description installGlobalThisFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function installGlobalThisFallback() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof globalThis !== "undefined") return;
 
   Object.defineProperty(Object.prototype, "__magic_global_this__", {
@@ -56,18 +35,10 @@ function installGlobalThisFallback() {
   root.globalThis = root;
   delete Object.prototype.__magic_global_this__;
 }
-
-/**
- * @description installCryptoRandomUuidFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function installCryptoRandomUuidFallback() {
   const cryptoObj = getCryptoObject();
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (!cryptoObj || typeof cryptoObj.randomUUID === "function") return;
 
-  // 브라우저/API 실행 중 발생할 수 있는 예외를 안전하게 처리합니다.
   try {
     Object.defineProperty(cryptoObj, "randomUUID", {
       value: createUuidV4Fallback,
@@ -77,14 +48,7 @@ function installCryptoRandomUuidFallback() {
     void error;
   }
 }
-
-/**
- * @description installIdleCallbackFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function installIdleCallbackFallback() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.requestIdleCallback !== "function") {
     window.requestIdleCallback = (callback) =>
       window.setTimeout(() => {
@@ -92,19 +56,11 @@ function installIdleCallbackFallback() {
       }, 1);
   }
 
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.cancelIdleCallback !== "function") {
     window.cancelIdleCallback = (id) => window.clearTimeout(id);
   }
 }
-
-/**
- * @description installResizeObserverFallback 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function installResizeObserverFallback() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window.ResizeObserver === "function") return;
 
   window.ResizeObserver = class ResizeObserverFallback {
@@ -117,7 +73,6 @@ function installResizeObserverFallback() {
     }
 
     observe(target) {
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (!target) return;
       this.targets.add(target);
       this.flush();
@@ -137,19 +92,11 @@ function installResizeObserverFallback() {
         target,
         contentRect: target.getBoundingClientRect(),
       }));
-      // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
       if (entries.length) this.callback(entries, this);
     }
   };
 }
-
-/**
- * @description updateViewportCssVars 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function updateViewportCssVars() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined" || typeof document === "undefined") return;
   const viewport = window.visualViewport;
   const height = Math.max(
@@ -164,12 +111,6 @@ function updateViewportCssVars() {
   document.documentElement.style.setProperty("--app-width", `${width}px`);
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 }
-
-/**
- * @description installViewportCssVars 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 function installViewportCssVars() {
   updateViewportCssVars();
 
@@ -183,14 +124,7 @@ function installViewportCssVars() {
     passive: true,
   });
 }
-
-/**
- * @description installWebViewCompat 함수의 입력값, 상태값, 이벤트 흐름을 처리합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {*} 함수 실행 결과를 반환하며, 반환값이 없는 경우 undefined를 반환합니다.
- */
 export function installWebViewCompat() {
-  // 조건을 먼저 검증하여 불필요한 후속 처리를 방지합니다.
   if (typeof window === "undefined") return;
 
   installGlobalThisFallback();
