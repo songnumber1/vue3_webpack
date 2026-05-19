@@ -180,7 +180,7 @@ body.mobile-mode .attach-menu{
 }
 
 .attach-menu-wrap,
-.app-container--mobile .attach-menu-wrap{
+body.mobile-mode .attach-menu-wrap{
   flex: 0 0 auto;
   display: flex;
   align-items: flex-end;
@@ -189,11 +189,11 @@ body.mobile-mode .attach-menu{
 
 /* =========================================================
    FINAL ANDROID DRAWER + IMAGE PREVIEW FIX
-   - Android WebView can keep desktop breakpoint while using app-container--mobile.
+   - Android WebView follows the unified body.mobile-mode branch.
    - Force mobile drawer content to be visible, scrollable and readable.
    - Image preview no longer depends on browser default image loading UI.
    ========================================================= */
-.app-container--mobile .mobile-drawer-backdrop,
+body.mobile-mode .mobile-drawer-backdrop,
 .mobile-drawer-backdrop{
   position: fixed !important;
   inset: 0 !important;
@@ -202,7 +202,7 @@ body.mobile-mode .attach-menu{
   z-index: var(--z-drawer-backdrop) !important;
 }
 
-.app-container--mobile .mobile-drawer,
+body.mobile-mode .mobile-drawer,
 .mobile-drawer{
   position: fixed !important;
   top: 0 !important;
@@ -220,7 +220,7 @@ body.mobile-mode .attach-menu{
   transform: translate3d(0, 0, 0);
 }
 
-.app-container--mobile .sidebar-content--mobile,
+body.mobile-mode .sidebar-content--mobile,
 .mobile-drawer .sidebar-content--mobile{
   position: relative !important;
   display: flex !important;
@@ -241,14 +241,14 @@ body.mobile-mode .attach-menu{
   visibility: visible;
 }
 
-.app-container--mobile .sidebar-content--mobile > *,
+body.mobile-mode .sidebar-content--mobile > *,
 .mobile-drawer .sidebar-content--mobile > *{
   opacity: 1;
   visibility: visible;
   color: inherit;
 }
 
-.app-container--mobile .sidebar-content--mobile .sidebar-top,
+body.mobile-mode .sidebar-content--mobile .sidebar-top,
 .mobile-drawer .sidebar-content--mobile .sidebar-top{
   position: sticky !important;
   top: 0 !important;
@@ -262,7 +262,7 @@ body.mobile-mode .attach-menu{
   background: var(--sidebar-bg, #ffffff);
 }
 
-.app-container--mobile .sidebar-content--mobile .sidebar-title,
+body.mobile-mode .sidebar-content--mobile .sidebar-title,
 .mobile-drawer .sidebar-content--mobile .sidebar-title{
   display: block !important;
   color: var(--sidebar-text, #202123);
@@ -271,7 +271,7 @@ body.mobile-mode .attach-menu{
   line-height: 1.2;
 }
 
-.app-container--mobile .sidebar-content--mobile .sidebar-round,
+body.mobile-mode .sidebar-content--mobile .sidebar-round,
 .mobile-drawer .sidebar-content--mobile .sidebar-round{
   flex: 0 0 auto !important;
   width: 40px !important;
@@ -280,9 +280,9 @@ body.mobile-mode .attach-menu{
   background: var(--control-bg, #ffffff);
 }
 
-.app-container--mobile .sidebar-content--mobile .quick-menu,
-.app-container--mobile .sidebar-content--mobile .project-list,
-.app-container--mobile .sidebar-content--mobile .sidebar-history,
+body.mobile-mode .sidebar-content--mobile .quick-menu,
+body.mobile-mode .sidebar-content--mobile .project-list,
+body.mobile-mode .sidebar-content--mobile .sidebar-history,
 .mobile-drawer .sidebar-content--mobile .quick-menu,
 .mobile-drawer .sidebar-content--mobile .project-list,
 .mobile-drawer .sidebar-content--mobile .sidebar-history{
@@ -296,7 +296,7 @@ body.mobile-mode .attach-menu{
   color: var(--sidebar-text, #202123);
 }
 
-.app-container--mobile .sidebar-content--mobile .sidebar-history,
+body.mobile-mode .sidebar-content--mobile .sidebar-history,
 .mobile-drawer .sidebar-content--mobile .sidebar-history{
   flex: 1 1 auto !important;
   min-height: 120px !important;
@@ -304,9 +304,9 @@ body.mobile-mode .attach-menu{
   padding-bottom: 76px;
 }
 
-.app-container--mobile .sidebar-content--mobile .quick-item,
-.app-container--mobile .sidebar-content--mobile .project-item,
-.app-container--mobile .sidebar-content--mobile .sidebar-history-item,
+body.mobile-mode .sidebar-content--mobile .quick-item,
+body.mobile-mode .sidebar-content--mobile .project-item,
+body.mobile-mode .sidebar-content--mobile .sidebar-history-item,
 .mobile-drawer .sidebar-content--mobile .quick-item,
 .mobile-drawer .sidebar-content--mobile .project-item,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item{
@@ -327,11 +327,11 @@ body.mobile-mode .attach-menu{
   text-overflow: ellipsis !important;
 }
 
-.app-container--mobile .sidebar-content--mobile .quick-item:hover,
-.app-container--mobile .sidebar-content--mobile .project-item:hover,
-.app-container--mobile .sidebar-content--mobile .sidebar-history-item:hover,
-.app-container--mobile .sidebar-content--mobile .quick-item.active,
-.app-container--mobile .sidebar-content--mobile .project-item.selected,
+body.mobile-mode .sidebar-content--mobile .quick-item:hover,
+body.mobile-mode .sidebar-content--mobile .project-item:hover,
+body.mobile-mode .sidebar-content--mobile .sidebar-history-item:hover,
+body.mobile-mode .sidebar-content--mobile .quick-item.active,
+body.mobile-mode .sidebar-content--mobile .project-item.selected,
 .mobile-drawer .sidebar-content--mobile .quick-item:hover,
 .mobile-drawer .sidebar-content--mobile .project-item:hover,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
@@ -340,8 +340,8 @@ body.mobile-mode .attach-menu{
   background: var(--sidebar-hover, #ececf1);
 }
 
-.app-container--mobile .sidebar-content--mobile .quick-item span,
-.app-container--mobile .sidebar-content--mobile .project-item span,
+body.mobile-mode .sidebar-content--mobile .quick-item span,
+body.mobile-mode .sidebar-content--mobile .project-item span,
 .mobile-drawer .sidebar-content--mobile .quick-item span,
 .mobile-drawer .sidebar-content--mobile .project-item span{
   flex: 0 0 22px !important;
@@ -349,7 +349,7 @@ body.mobile-mode .attach-menu{
   color: var(--sidebar-icon, #4b5563);
 }
 
-.app-container--mobile .sidebar-content--mobile .section-label,
+body.mobile-mode .sidebar-content--mobile .section-label,
 .mobile-drawer .sidebar-content--mobile .section-label{
   display: block !important;
   flex: 0 0 auto !important;
@@ -359,7 +359,7 @@ body.mobile-mode .attach-menu{
   font-weight: 800;
 }
 
-.app-container--mobile .mobile-new-chat-fab,
+body.mobile-mode .mobile-new-chat-fab,
 .mobile-drawer .mobile-new-chat-fab{
   position: sticky !important;
   align-self: flex-end !important;
@@ -378,7 +378,7 @@ body.mobile-mode .attach-menu{
   font-weight: 800;
 }
 
-.app-container--mobile .sidebar-content--mobile .sidebar-user,
+body.mobile-mode .sidebar-content--mobile .sidebar-user,
 .mobile-drawer .sidebar-content--mobile .sidebar-user{
   flex: 0 0 auto !important;
   margin-top: 0;

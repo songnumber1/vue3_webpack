@@ -142,5 +142,26 @@ const showDesktopConversationTitle = computed(
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+/* Compact mobile header sizing is local to ChatHeader. */
+:global(body.mobile-mode) .mobile-topbar {
+  height: 44px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+:global(body.mobile-mode) .mobile-topbar .round-icon {
+  width: 34px;
+  height: 34px;
+}
+
+:global(body.mobile-mode) .mobile-topbar .model-trigger,
+:global(body.mobile-mode) .mobile-topbar .model-trigger--assistant {
+  height: 34px;
+  min-width: 100px;
+  font-size: 15px;
+  gap: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 </style>
+

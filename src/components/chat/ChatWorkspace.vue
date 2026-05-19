@@ -196,5 +196,54 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+/* Mobile main/chat composer geometry is owned by ChatWorkspace because this
+   component decides whether PromptInput is rendered as main, chat or shared. */
+:global(body.mobile-mode) .mobile-chat-prompt,
+:global(body.mobile-mode) .mobile-main-fixed-prompt {
+  width: 100%;
+  max-width: none;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt,
+:global(body.mobile-mode) .mobile-main-fixed-prompt.prompt-wrap {
+  background: transparent;
+  box-shadow: none;
+}
+
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-box--gemini),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-box--gemini) {
+  align-items: stretch;
+}
+
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-action-row),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-action-row) {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-left-actions),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-left-actions) {
+  display: flex;
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+}
+
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.send-button),
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.voice-button),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.send-button),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.voice-button) {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
 </style>
+
