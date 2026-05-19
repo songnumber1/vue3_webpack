@@ -21,42 +21,42 @@ body.mobile-mode {
 body.mobile-mode,
 body.mobile-mode #app {
   height: var(--layout-viewport-height, 100dvh) !important;
-  min-height: var(--layout-viewport-height, 100dvh) !important;
+  min-height: var(--layout-viewport-height, 100dvh);
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
   overscroll-behavior: none !important;
 }body.mobile-mode .chat-container-root--mode-main {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
-  min-height: var(--layout-viewport-height, 100dvh) !important;
+  min-height: var(--layout-viewport-height, 100dvh);
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
   overscroll-behavior: none !important;
-  touch-action: none !important;
+  touch-action: none;
 }body.mobile-mode .chat-container-root--mode-main
   .chat-workspace {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
-  min-height: 0 !important;
+  min-height: 0;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
   display: block;
   overscroll-behavior: none !important;
-  touch-action: none !important;
+  touch-action: none;
 }
 body.mobile-mode .empty-stage--mobile-main,
 body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   position: relative !important;
   display: block;
   height: 100% !important;
-  min-height: 0 !important;
+  min-height: 0;
   max-height: 100% !important;
   width: 100%;
   overflow: hidden !important;
   padding: 0;
   background: var(--chat-bg);
   overscroll-behavior: none !important;
-  touch-action: none !important;
+  touch-action: none;
 }
 body.mobile-mode .empty-stage--mobile-main .empty-center,
 body.mobile-mode
@@ -71,13 +71,13 @@ body.mobile-mode
   ) !important;
   left: 0 !important;
   display: flex;
-  flex-direction: column !important;
+  flex-direction: column;
   justify-content: flex-start;
   align-items: stretch;
   gap: var(--mobile-main-content-gap);
   width: 100%;
   max-width: none;
-  min-height: 0 !important;
+  min-height: 0;
   margin: 0;
   padding: var(--space-6, 24px) var(--mobile-main-content-inline)
     var(--space-4, 16px);
@@ -85,8 +85,8 @@ body.mobile-mode
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
-  touch-action: pan-y !important;
-  transform: none !important;
+  touch-action: pan-y;
+  transform: none;
 }
 body.mobile-mode .empty-stage--mobile-main
   .empty-center
@@ -96,7 +96,7 @@ body.mobile-mode
   .empty-stage--mobile-main
   .empty-center
   h1 {
-  flex: 0 0 auto !important;
+  flex: 0 0 auto;
   margin: 0 0 var(--space-1, 4px);
 }
 body.mobile-mode .empty-stage--mobile-main
@@ -105,7 +105,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .suggestion-row--between {
-  flex: 0 0 auto !important;
+  flex: 0 0 auto;
 }
 body.mobile-mode .mobile-main-fixed-prompt,
 body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
@@ -125,15 +125,15 @@ body.mobile-mode
   max-width: none;
   margin: 0;
   padding: var(--space-3, 12px) var(--space-4, 16px)
-    max(var(--space-3, 12px), env(safe-area-inset-bottom)) !important;
-  transform: translate3d(0, 0, 0) !important;
+    max(var(--space-3, 12px), env(safe-area-inset-bottom));
+  transform: translate3d(0, 0, 0);
   background: linear-gradient(
     to top,
     var(--mobile-bg, var(--chat-bg)) 86%,
     color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
   );
   box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
-  will-change: bottom !important;
+  will-change: bottom;
   touch-action: manipulation ;
 }
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
@@ -151,7 +151,7 @@ body.mobile-mode
   .mobile-main-fixed-prompt
   textarea {
   overscroll-behavior: contain !important;
-  touch-action: manipulation !important;
+  touch-action: manipulation;
 }
 body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
 body.mobile-mode
@@ -159,7 +159,7 @@ body.mobile-mode
   .desktop-center-prompt.prompt-wrap--floating {
   position: static !important;
   bottom: auto !important;
-  transform: none !important;
+  transform: none;
 }
 
 /*
@@ -194,21 +194,21 @@ body.mobile-mode
   padding-bottom: max(
     var(--space-3, 12px),
     env(safe-area-inset-bottom, 0px)
-  ) !important;
+  );
   /* Fix: max-height 고정값 제거 - 첨부파일 추가 시 input이 밀리는 버그 방지.
        attachment-preview-row가 추가되면 자연스럽게 높이가 늘어나도록 auto로 변경 */
   max-height: none !important;
   height: auto !important;
   overflow: visible !important;
   overscroll-behavior: none !important;
-  touch-action: manipulation !important;
+  touch-action: manipulation;
 }
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  transform: translateZ(0) !important;
+  transform: translateZ(0);
 }
 body.mobile-mode .mobile-main-fixed-prompt textarea,
 body.mobile-mode
@@ -222,5 +222,5 @@ body.mobile-mode
   .mobile-main-fixed-prompt
   .prompt-action-row {
   overscroll-behavior: contain !important;
-  touch-action: manipulation !important;
+  touch-action: manipulation;
 }

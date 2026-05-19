@@ -51,8 +51,4 @@ defineEmits(["close-notice", "close-privacy", "close-personalization"]);
 
 <style scoped>
 /* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-:where(*) {
-  box-sizing: border-box;
-  min-width: 0;
-}
 </style>

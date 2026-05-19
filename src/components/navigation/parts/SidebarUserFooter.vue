@@ -68,8 +68,15 @@ const userInitial = computed(() => {
 
 <style scoped>
 /* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-:where(*) {
-  box-sizing: border-box;
+.sidebar-user--mobile,
+.sidebar-user-profile,
+.sidebar-user-main,
+.sidebar-user-actions {
   min-width: 0;
+  box-sizing: border-box;
+}
+
+.sidebar-user--mobile {
+  min-height: 0;
 }
 </style>

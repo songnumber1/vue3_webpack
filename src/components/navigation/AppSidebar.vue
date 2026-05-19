@@ -158,7 +158,7 @@
 </template>
 
 <script setup>
-import {computed, inject, ref, watch} from "vue";
+import {computed, inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useEventListener, useWindowSize} from "@vueuse/core";
@@ -296,8 +296,32 @@ useOutsideClick(
 );
 
 syncViewportMode();
-watch(isCompactViewport, syncViewportMode);
-useEventListener(window, "resize", syncViewportMode, {passive: true});
+
+async function handleViewportModeChange(isCompact) {
+  syncViewportMode();
+  if (isCompact) return;
+
+  // PC 브라우저에서 모바일 폭으로 열려 있던 drawer가 웹 폭으로 전환될 때
+  // 전역 .mobile-drawer fallback CSS가 남아 보이지 않도록 즉시 상태를 닫는다.
+  setDrawerOpen(false);
+  assistantMenuOpen.value = false;
+  closeHistoryMenu();
+  await nextTick();
+  syncViewportMode();
+}
+
+watch(isCompactViewport, handleViewportModeChange, {flush: "post"});
+useEventListener(
+  window,
+  "resize",
+  () => {
+    syncViewportMode();
+    if (!isCompactViewport.value && drawerOpen.value) {
+      setDrawerOpen(false);
+    }
+  },
+  {passive: true}
+);
 </script>
 
 <style scoped>
