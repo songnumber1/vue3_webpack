@@ -95,6 +95,7 @@
         @personalization="chatActions.openPersonalization()"
         @language="chatActions.openLanguage()"
         @playground="chatActions.openPlayground()"
+        @logout="chatActions.logout()"
       />
     </div>
   </header>

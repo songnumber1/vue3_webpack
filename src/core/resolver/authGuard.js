@@ -186,6 +186,18 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     return result;
   } catch (error) {
     debugAuthGuard("access/info.do error", error);
+
+    const status = error?.response?.status;
+    if (status === 401 || status === 403) {
+      authStore.setAuthFailure(AUTH_FAILURE_REASONS.LOGIN_REQUIRED);
+
+      return {
+        authenticated: false,
+        reason: AUTH_FAILURE_REASONS.LOGIN_REQUIRED,
+        error,
+      };
+    }
+
     authStore.setAuthError(error);
 
     return {

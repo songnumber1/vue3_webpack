@@ -58,6 +58,15 @@
           <strong>{{ t("common.playground") }}</strong>
           <small>{{ t("menu.playgroundSummary") }}</small>
         </button>
+        <button
+          class="user-menu-item user-menu-item--danger"
+          type="button"
+          role="menuitem"
+          @click="select('logout')"
+        >
+          <strong>{{ t("common.logout") }}</strong>
+          <small>{{ t("menu.logoutSummary") }}</small>
+        </button>
 
         <div
           class="user-menu-language"
@@ -114,6 +123,7 @@ const emit = defineEmits([
   "terms",
   "personalization",
   "playground",
+  "logout",
 ]);
 const {t, locale} = useI18n();
 const authStore = useAuthStore();

@@ -12,7 +12,7 @@ function readBooleanEnv(value, fallback = false) {
  */
 export const isServerAPI = readBooleanEnv(
   process.env.VUE_APP_IS_SERVER_API,
-  false
+  true
 );
 
 /**

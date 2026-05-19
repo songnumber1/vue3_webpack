@@ -88,7 +88,8 @@ const legalRoutes = [
 ];
 const authRoutes = [
   {
-    path: "/login-required",
+    path: "/login",
+    alias: "/login-required",
     name: LOGIN_REQUIRED_ROUTE_NAME,
     component: LoginRequiredPage,
     meta: {

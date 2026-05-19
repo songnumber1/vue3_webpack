@@ -194,6 +194,7 @@ const {
   openPersonalization,
   openLanguage,
   openAssistantFromHeader,
+  logout,
   submitIfWritable,
   handlePromptFocus,
   handlePromptResize,
@@ -214,6 +215,7 @@ provide(CHAT_ACTIONS_KEY, {
   openPersonalization,
   openLanguage,
   openPlayground,
+  logout,
 });
 
 provide(WORKSPACE_ACTIONS_KEY, {

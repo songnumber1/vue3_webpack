@@ -6,7 +6,7 @@ function readBooleanEnv(value, fallback) {
 
 export const ENABLE_AUTH_GUARD = readBooleanEnv(
   process.env.VUE_APP_ENABLE_AUTH_GUARD,
-  false
+  true
 );
 
 export const USE_MOCK_AUTH = readBooleanEnv(

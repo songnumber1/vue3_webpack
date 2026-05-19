@@ -10,30 +10,91 @@
       </div>
       <h1 id="auth-required-title">{{ t("loginRequired.title") }}</h1>
       <p>{{ message }}</p>
-      <button type="button" class="auth-required-button" @click="goHome">
-        {{ t("loginRequired.goHome") }}
+
+      <p v-if="errorMessage" class="auth-required-error">
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="button"
+        class="auth-required-button"
+        :disabled="loading"
+        @click="tempLogin"
+      >
+        {{ loading ? t("loginRequired.loggingIn") : t("loginRequired.tempLogin") }}
+      </button>
+
+      <button
+        type="button"
+        class="auth-required-secondary-button"
+        :disabled="loading"
+        @click="checkLogin"
+      >
+        {{ t("loginRequired.retrySessionCheck") }}
       </button>
     </section>
   </main>
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
+import {authApiLive} from "@/api/live/authApi.live";
+import {useAuthStore} from "@/stores/authStore";
 
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
+const authStore = useAuthStore();
+
+const loading = ref(false);
+const errorMessage = ref("");
 
 const message = computed(() => {
   const key = `loginRequired.reasons.${route.query.reason}`;
   return t(key, t("loginRequired.reasons.LOGIN_REQUIRED"));
 });
 
-function goHome() {
-  router.replace({path: "/"});
+const redirectPath = computed(() => {
+  const redirect = route.query.redirect;
+  return typeof redirect === "string" && redirect ? redirect : "/";
+});
+
+async function moveAfterAuthenticated() {
+  authStore.resetAuth();
+  await router.replace(redirectPath.value || "/");
 }
+
+async function checkLogin() {
+  errorMessage.value = "";
+
+  try {
+    const result = await authApiLive.checkLogin();
+
+    if (!result?.path) {
+      await moveAfterAuthenticated();
+    }
+  } catch (error) {
+    errorMessage.value = t("loginRequired.checkFailed");
+  }
+}
+
+async function tempLogin() {
+  loading.value = true;
+  errorMessage.value = "";
+
+  try {
+    await authApiLive.tempLogin({userId: "temp-user", userName: "임시 사용자"});
+    await moveAfterAuthenticated();
+  } catch (error) {
+    errorMessage.value = t("loginRequired.loginFailed");
+  } finally {
+    loading.value = false;
+  }
+}
+
+onMounted(checkLogin);
 </script>
 
 <style scoped>
@@ -85,18 +146,39 @@ function goHome() {
   line-height: 1.6;
   color: var(--text-secondary, #6b7280);
 }
-.auth-required-button {
+.auth-required-error {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.08);
+  color: #b91c1c !important;
+}
+.auth-required-button,
+.auth-required-secondary-button {
   width: 100%;
   min-height: 46px;
-  border: 0;
   border-radius: 14px;
-  background: #111827;
-  color: #ffffff;
   font-size: 15px;
   font-weight: 700;
   cursor: pointer;
 }
-.auth-required-button:active {
+.auth-required-button {
+  border: 0;
+  background: #111827;
+  color: #ffffff;
+}
+.auth-required-secondary-button {
+  margin-top: 10px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  background: transparent;
+  color: #111827;
+}
+.auth-required-button:disabled,
+.auth-required-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+.auth-required-button:active,
+.auth-required-secondary-button:active {
   transform: translateY(1px);
 }
 </style>

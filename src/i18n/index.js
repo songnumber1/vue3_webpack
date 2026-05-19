@@ -23,6 +23,7 @@ export const messages = {
       english: "영어",
       user: "사용자",
       plus: "Plus",
+      logout: "로그아웃",
       theme: "테마",
       swagger: "Swagger 문서",
       settings: "설정",
@@ -153,6 +154,7 @@ export const messages = {
       personalizationSummary: "응답 방식과 화면 취향을 조정하세요.",
       languageSummary: "한국어 또는 영어로 화면 언어를 변경합니다.",
       playgroundSummary: "공통 UI와 플랫폼별 화면을 독립적으로 테스트합니다.",
+      logoutSummary: "현재 세션을 종료하고 로그인 화면으로 이동합니다.",
     },
     notice: {
       title: "공지 사항",
@@ -268,8 +270,13 @@ export const messages = {
       },
     },
     loginRequired: {
-      title: "로그인이 필요합니다.",
+      title: "임시 로그인",
       goHome: "홈페이지로 이동",
+      tempLogin: "임시 로그인",
+      loggingIn: "로그인 중...",
+      retrySessionCheck: "세션 다시 확인",
+      checkFailed: "세션 확인에 실패했습니다.",
+      loginFailed: "임시 로그인에 실패했습니다.",
       reasons: {
         ACCESS_DENIED: "현재 계정으로는 해당 페이지에 접근할 수 없습니다.",
         USER_AGREE_REQUIRED: "서비스 이용 동의가 필요합니다.",
@@ -330,6 +337,7 @@ export const messages = {
       english: "English",
       user: "User",
       plus: "Plus",
+      logout: "Logout",
       theme: "Theme",
       swagger: "Swagger Docs",
       settings: "Settings",
@@ -461,6 +469,7 @@ export const messages = {
       languageSummary: "Switch the UI between Korean and English.",
       playgroundSummary:
         "Test shared UI and platform-specific screens independently.",
+      logoutSummary: "End the current session and go to the login screen.",
     },
     notice: {
       title: "Notices",
@@ -574,8 +583,13 @@ export const messages = {
       },
     },
     loginRequired: {
-      title: "Login required.",
+      title: "Temporary login",
       goHome: "Go to home",
+      tempLogin: "Temporary login",
+      loggingIn: "Signing in...",
+      retrySessionCheck: "Check session again",
+      checkFailed: "Failed to check the session.",
+      loginFailed: "Temporary login failed.",
       reasons: {
         ACCESS_DENIED: "Your account does not have access to this page.",
         USER_AGREE_REQUIRED: "You must agree to the terms of service.",

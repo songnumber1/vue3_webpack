@@ -268,6 +268,7 @@ export function useChatContainerController(props) {
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,
+    logout,
   } = useChatNavigationActions({
     router,
     theme,
@@ -376,6 +377,7 @@ export function useChatContainerController(props) {
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,
+    logout,
     submitIfWritable,
     handlePromptFocus,
     handlePromptResize,

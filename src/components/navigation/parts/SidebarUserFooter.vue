@@ -38,6 +38,15 @@
       >
         <SwaggerDocIcon />
       </button>
+      <button
+        class="sidebar-user-action sidebar-user-action--logout"
+        type="button"
+        :aria-label="t('common.logout')"
+        :title="t('common.logout')"
+        @click="actions.logout()"
+      >
+        <span class="logout-glyph">⏻</span>
+      </button>
     </div>
   </div>
 </template>

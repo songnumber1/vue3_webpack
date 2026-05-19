@@ -15,6 +15,7 @@ export function createEmptyChatActions() {
     openPersonalization: () => {},
     openLanguage: () => {},
     openPlayground: () => {},
+    logout: () => {},
   };
 }
 

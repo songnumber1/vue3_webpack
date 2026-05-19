@@ -1,6 +1,8 @@
 import {nextTick} from "vue";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
+import {authApiLive} from "@/api/live/authApi.live";
+import {useAuthStore} from "@/stores/authStore";
 
 export function useChatNavigationActions({
   router,
@@ -126,6 +128,18 @@ export function useChatNavigationActions({
     languageSheetOpen.value = true;
   }
 
+  async function logout() {
+    try {
+      await authApiLive.logout();
+    } catch (error) {
+      logWarn("[useChatNavigationActions] logout 오류:", error);
+    } finally {
+      useAuthStore().resetAuth();
+      navigationStore.setDrawerOpen(false);
+      await router.replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}}).catch(() => {});
+    }
+  }
+
   function openAssistantFromHeader() {
     assistantSheetOpen.value = true;
   }
@@ -146,5 +160,6 @@ export function useChatNavigationActions({
     openPersonalization,
     openLanguage,
     openAssistantFromHeader,
+    logout,
   };
 }
