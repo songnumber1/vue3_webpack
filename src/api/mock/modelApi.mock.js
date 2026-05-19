@@ -1,5 +1,5 @@
-import {MODELS_RAW} from "@/data/raw/models.raw";
-import {STUDIO_MODELS_RAW} from "@/data/raw/studioModels.raw";
+import {MODELS_RAW} from "@/api/mock/data/models.raw";
+import {STUDIO_MODELS_RAW} from "@/api/mock/data/studioModels.raw";
 import {resolveMock} from "./mockUtils";
 
 export const modelApiMock = {

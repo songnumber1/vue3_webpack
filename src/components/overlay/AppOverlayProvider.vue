@@ -48,7 +48,3 @@ defineProps({
 
 defineEmits(["close-notice", "close-privacy", "close-personalization"]);
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

@@ -19,7 +19,3 @@ import {useI18n} from "vue-i18n";
 const {tm} = useI18n();
 const items = computed(() => tm("notice.items"));
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

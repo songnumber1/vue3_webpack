@@ -87,7 +87,3 @@ const rootAttrs = computed(() =>
     : {class: "icon-wrap"}
 );
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

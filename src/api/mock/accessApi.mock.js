@@ -1,5 +1,5 @@
 import {AUTH_MOCK_SCENARIOS} from "@/constants/auth";
-import {ACCESS_INFO_RAW} from "@/data/raw/accessInfo.raw";
+import {ACCESS_INFO_RAW} from "@/api/mock/data/accessInfo.raw";
 import {resolveMock} from "./mockUtils";
 
 function createAccessInfoResponse(payload = {}, options = {}) {

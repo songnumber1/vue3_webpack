@@ -1,6 +1,6 @@
 import {CHAT_KEYS} from "@/constants/apiKeys";
-import {CHAT_HISTORY_LIST_RAW} from "@/data/raw/chatHistoryList.raw";
-import {CHAT_MESSAGES_RAW} from "@/data/raw/chatMessages.raw";
+import {CHAT_HISTORY_LIST_RAW} from "@/api/mock/data/chatHistoryList.raw";
+import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
 import {resolveMock} from "./mockUtils";
 
 const historyStore = CHAT_HISTORY_LIST_RAW.map((item) => ({...item}));

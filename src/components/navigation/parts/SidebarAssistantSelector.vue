@@ -60,7 +60,3 @@ const currentAssistant = computed(
 
 defineExpose({rootRef});
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

@@ -290,7 +290,3 @@ onMounted(() => {
 
 onBeforeUnmount(() => window.removeEventListener("resize", syncMobile));
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

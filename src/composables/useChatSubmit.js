@@ -1,5 +1,5 @@
 import {nextTick, ref} from "vue";
-import {streamText} from "@/utils/fakeStream";
+import {streamText} from "@/api/mock/fakeStream";
 import {logWarn} from "@/utils/logger";
 
 function normalizePromptPayload(payload) {

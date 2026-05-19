@@ -28,7 +28,3 @@ import {useI18n} from "vue-i18n";
 const {t, tm} = useI18n();
 const sections = computed(() => tm("guide.sections"));
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

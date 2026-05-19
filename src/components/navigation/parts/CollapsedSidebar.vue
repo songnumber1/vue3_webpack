@@ -73,7 +73,3 @@ defineProps({
 
 defineEmits(["expand", "new-chat", "set-recent-open", "select-history"]);
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

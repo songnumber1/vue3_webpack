@@ -1,4 +1,4 @@
-import {EXAMPLE_PROMPTS_RAW} from "@/data/raw/examplePrompts.raw";
+import {EXAMPLE_PROMPTS_RAW} from "@/api/mock/data/examplePrompts.raw";
 import {resolveMock} from "./mockUtils";
 
 export const examplePromptApiMock = {

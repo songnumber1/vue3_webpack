@@ -38,7 +38,3 @@ import {usePlatformStore} from "@/stores/platformStore";
 const {t} = useI18n();
 const platformStore = usePlatformStore();
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

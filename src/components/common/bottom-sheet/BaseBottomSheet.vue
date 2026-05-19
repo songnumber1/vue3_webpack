@@ -61,7 +61,7 @@
 
 <script setup>
 import {useI18n} from "vue-i18n";
-import {useBottomSheetSizing} from "@/composables/useBottomSheetSizing";
+import {useBottomSheetSizing} from "@/composables/bottom-sheet/useBottomSheetSizing";
 
 const {t} = useI18n();
 
@@ -87,7 +87,3 @@ const {
   collapse,
 } = useBottomSheetSizing(props, emit);
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

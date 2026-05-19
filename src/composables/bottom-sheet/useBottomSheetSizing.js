@@ -1,12 +1,12 @@
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
 import {useScrollLock} from "@vueuse/core";
-import {createBottomSheetDrag} from "./bottom-sheet/useBottomSheetDrag";
-import {createBottomSheetSnap} from "./bottom-sheet/useBottomSheetSnap";
+import {createBottomSheetDrag} from "./useBottomSheetDrag";
+import {createBottomSheetSnap} from "./useBottomSheetSnap";
 import {
   createBottomSheetViewport,
   createBottomSheetViewportListeners,
   createBottomSheetViewportScheduler,
-} from "./bottom-sheet/useBottomSheetViewport";
+} from "./useBottomSheetViewport";
 
 /**
  * @description 바텀시트 크기, snap, drag, viewport listener를 조합합니다.

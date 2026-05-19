@@ -1,5 +1,5 @@
-import {ASSISTANTS_RAW} from "@/data/raw/assistants.raw";
-import {STUDIOS_RAW} from "@/data/raw/studios.raw";
+import {ASSISTANTS_RAW} from "@/api/mock/data/assistants.raw";
+import {STUDIOS_RAW} from "@/api/mock/data/studios.raw";
 import {resolveMock} from "./mockUtils";
 
 export const assistantApiMock = {

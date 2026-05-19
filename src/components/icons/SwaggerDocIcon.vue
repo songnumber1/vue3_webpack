@@ -12,7 +12,3 @@
     <path d="M8.5 15.5h7" />
   </svg>
 </template>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>

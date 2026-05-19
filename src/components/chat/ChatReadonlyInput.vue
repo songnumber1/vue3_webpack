@@ -71,7 +71,3 @@ const descriptionText = computed(() => {
   return t("chat.readonlyInput.sharedDesc");
 });
 </script>
-
-<style scoped>
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-</style>
