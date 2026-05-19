@@ -31,7 +31,6 @@
  * while tapping.
  */
 body.mobile-mode
-  .app-container--mobile
   :where(
     button,
     a,
@@ -65,7 +64,6 @@ body.mobile-mode .bottom-sheet-panel :where(button, a, [role="button"]) {
   touch-action: manipulation;
 }
 body.mobile-mode
-  .app-container--mobile
   :where(
     .sidebar-round,
     .quick-item,
@@ -119,7 +117,6 @@ body.mobile-mode
     .sidebar-round
   ):is(:hover, :active, :focus, :focus-visible),
 body.mobile-mode
-  .app-container--mobile
   .mobile-drawer
   :where(
     .quick-item:not(.active),
@@ -136,7 +133,6 @@ body.mobile-mode
    * state while removing the transient touch fill from mobile browsers.
    */
 body.mobile-mode
-  .app-container--mobile
   :where(
     .message-action-icon:not(.active),
     .message-action-text-button,
@@ -152,7 +148,6 @@ body.mobile-mode
    * flash another fill color.
    */
 body.mobile-mode
-  .app-container--mobile
   :where(
     .bottom-sheet-option:not(.active),
     .assistant-option:not(.active),
@@ -176,7 +171,6 @@ body.mobile-mode
    * Keep selected/active controls' existing colors stable while tapping.
    */
 body.mobile-mode
-  .app-container--mobile
   :where(
     .quick-item.active,
     .sidebar-history-row.selected .sidebar-history-item,

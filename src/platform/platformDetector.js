@@ -21,7 +21,6 @@ function getBrowserName(ua) {
   if (/OPR\//i.test(ua)) return "opera";
   if (/SamsungBrowser\//i.test(ua)) return "samsung-internet";
   if (/CriOS|Chrome\//i.test(ua)) return "chrome";
-  if (/FxiOS|Firefox\//i.test(ua)) return "firefox";
   if (/Safari\//i.test(ua)) return "safari";
 
   return "unknown";
@@ -31,8 +30,6 @@ function getBrowserVersion(ua, browserName) {
   if (browserName === "chrome")
     return parseVersion(ua, /(?:Chrome|CriOS)\/([\d.]+)/i);
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
-  if (browserName === "firefox")
-    return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
   if (browserName === "samsung-internet")
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
 
@@ -85,8 +82,6 @@ function isSupportedMobileMicBrowser({
 }) {
   // Android 모바일 브라우저가 아니면 PC와 동일하게 전송 버튼 fallback을 사용합니다.
   if (!isAndroid || !isMobileBrowser) return false;
-
-  // Firefox Android는 SpeechRecognition 런타임 지원이 없어 마이크 버튼 대상에서 제외합니다.
   return browserName === "chrome" || browserName === "samsung-internet";
 }
 export function resolveDetailedPlatform(baseAppInfo = {}) {

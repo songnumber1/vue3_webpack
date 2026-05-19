@@ -280,7 +280,7 @@ body.mobile-mode .suggestion-row--between {
 }
 
 body.mobile-mode .suggestion-chip,
-body.mobile-mode .app-container--mobile .suggestion-chip {
+body.mobile-mode .suggestion-chip {
   width: 100%;
   max-width: none;
   justify-content: center;
@@ -367,7 +367,7 @@ body.desktop-mode .suggestion-chip {
 }
 
 body.mobile-mode .suggestion-row--between,
-body.mobile-mode .app-container--mobile .suggestion-row--between {
+body.mobile-mode .suggestion-row--between {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
@@ -375,7 +375,7 @@ body.mobile-mode .app-container--mobile .suggestion-row--between {
 }
 
 body.mobile-mode .suggestion-chip,
-body.mobile-mode .app-container--mobile .suggestion-chip {
+body.mobile-mode .suggestion-chip {
   min-width: 0;
   padding-inline: 10px;
 }
@@ -770,7 +770,7 @@ body.mobile-mode .message-action-icon {
 }
 
 body.mobile-mode .empty-stage--mobile-main,
-body.mobile-mode .app-container--mobile .empty-stage--mobile-main {
+body.mobile-mode .empty-stage--mobile-main {
   place-items: start center !important;
   align-content: start !important;
   padding: 78px 16px calc(150px + env(safe-area-inset-bottom)) !important;
@@ -779,7 +779,6 @@ body.mobile-mode .app-container--mobile .empty-stage--mobile-main {
 
 body.mobile-mode .empty-stage--mobile-main .empty-center,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .empty-center {
   width: 100% !important;
@@ -791,7 +790,6 @@ body.mobile-mode
 
 body.mobile-mode .empty-stage--mobile-main .empty-center h1,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .empty-center
   h1 {
@@ -802,7 +800,6 @@ body.mobile-mode
 
 body.mobile-mode .empty-stage--mobile-main .suggestion-row--between,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-row--between {
   display: grid !important;
@@ -814,7 +811,6 @@ body.mobile-mode
 
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip {
   width: 100% !important;
@@ -826,7 +822,6 @@ body.mobile-mode
 
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip-text,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip-text {
   white-space: nowrap;
@@ -836,7 +831,6 @@ body.mobile-mode
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating {
   display: block !important;

@@ -1960,14 +1960,14 @@ body.mobile-mode .sidebar-content--mobile
 }
 
 body.mobile-mode .prompt-model-trigger,
-body.mobile-mode .app-container--mobile .prompt-model-trigger {
+body.mobile-mode .prompt-model-trigger {
   max-width: 112px;
 }
 
 body.mobile-mode .prompt-icon-action,
 body.mobile-mode .prompt-box--gemini .send-button,
-body.mobile-mode .app-container--mobile .prompt-icon-action,
-body.mobile-mode .app-container--mobile .prompt-box--gemini .send-button {
+body.mobile-mode .prompt-icon-action,
+body.mobile-mode .prompt-box--gemini .send-button {
   width: 34px;
   height: 34px;
   min-width: 34px;

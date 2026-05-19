@@ -472,19 +472,19 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   max-width: none;
   width: 100%;
 }
-body.mobile-mode .app-container--mobile .mobile-topbar,
+body.mobile-mode .mobile-topbar,
 body.mobile-mode .mobile-topbar {
   height: 52px;
   padding: calc(6px + env(safe-area-inset-top)) 12px 6px;
 }
-body.mobile-mode .app-container--mobile .round-icon,
+body.mobile-mode .round-icon,
 body.mobile-mode .round-icon {
   width: 38px;
   height: 38px;
   font-size: 17px;
   box-shadow: var(--shadow-control);
 }
-body.mobile-mode .app-container--mobile .model-trigger,
+body.mobile-mode .model-trigger,
 body.mobile-mode .model-trigger {
   height: 38px;
   min-width: 108px;
@@ -493,106 +493,106 @@ body.mobile-mode .model-trigger {
   font-size: 17px;
   letter-spacing: -0.035em;
 }
-body.mobile-mode .app-container--mobile .chevron,
+body.mobile-mode .chevron,
 body.mobile-mode .chevron {
   width: 13px;
   height: 13px;
 }
-body.mobile-mode .app-container--mobile .model-menu,
+body.mobile-mode .model-menu,
 body.mobile-mode .model-menu {
   width: min(270px, calc(100vw - 24px));
   border-radius: 16px;
   padding: 7px;
 }
-body.mobile-mode .app-container--mobile .model-option,
+body.mobile-mode .model-option,
 body.mobile-mode .model-option {
   padding: 10px;
   border-radius: 12px;
 }
-body.mobile-mode .app-container--mobile .model-option strong,
+body.mobile-mode .model-option strong,
 body.mobile-mode .model-option strong {
   font-size: 13.5px;
 }
-body.mobile-mode .app-container--mobile .model-option small,
+body.mobile-mode .model-option small,
 body.mobile-mode .model-option small {
   font-size: 11.5px;
 }
-body.mobile-mode .app-container--mobile .empty-stage,
+body.mobile-mode .empty-stage,
 body.mobile-mode .empty-stage {
   padding: 12px 16px 86px;
 }
-body.mobile-mode .app-container--mobile .project-title,
+body.mobile-mode .project-title,
 body.mobile-mode .project-title {
   margin-top: 4px;
   gap: 8px;
 }
-body.mobile-mode .app-container--mobile .project-title h1,
+body.mobile-mode .project-title h1,
 body.mobile-mode .project-title h1 {
   font-size: 23px;
   line-height: 1.22;
   letter-spacing: -0.04em;
 }
-body.mobile-mode .app-container--mobile .folder-icon,
+body.mobile-mode .folder-icon,
 body.mobile-mode .folder-icon {
   font-size: 22px;
 }
-body.mobile-mode .app-container--mobile .source-chip,
+body.mobile-mode .source-chip,
 body.mobile-mode .source-chip {
   margin-top: 12px;
   height: 34px;
   padding: 0 14px;
   font-size: 13.5px;
 }
-body.mobile-mode .app-container--mobile .mobile-recent-list,
+body.mobile-mode .mobile-recent-list,
 body.mobile-mode .mobile-recent-list {
   margin-top: 22px;
   gap: 15px;
 }
-body.mobile-mode .app-container--mobile .mobile-recent-card strong,
+body.mobile-mode .mobile-recent-card strong,
 body.mobile-mode .mobile-recent-card strong {
   font-size: 16.5px;
   margin-bottom: 3px;
 }
-body.mobile-mode .app-container--mobile .mobile-recent-card span,
+body.mobile-mode .mobile-recent-card span,
 body.mobile-mode .mobile-recent-card span {
   font-size: 13.5px;
   line-height: 1.35;
 }
-body.mobile-mode .app-container--mobile .message-list,
+body.mobile-mode .message-list,
 body.mobile-mode .message-list {
   padding: 10px 14px 84px;
 }
-body.mobile-mode .app-container--mobile .message,
+body.mobile-mode .message,
 body.mobile-mode .message {
   margin-bottom: 15px;
 }
-body.mobile-mode .app-container--mobile .message--user .bubble,
+body.mobile-mode .message--user .bubble,
 body.mobile-mode .message--user .bubble {
   border-radius: 16px;
   padding: 9px 12px;
   max-width: 82%;
 }
-body.mobile-mode .app-container--mobile .bubble-content,
+body.mobile-mode .bubble-content,
 body.mobile-mode .bubble-content {
   font-size: 14px;
   line-height: 1.58;
 }
-body.mobile-mode .app-container--mobile .bubble-tools button,
+body.mobile-mode .bubble-tools button,
 body.mobile-mode .bubble-tools button {
   padding: 4px 9px;
   font-size: 12px;
 }
-body.mobile-mode .app-container--mobile .prompt-wrap,
+body.mobile-mode .prompt-wrap,
 body.mobile-mode .prompt-wrap {
   padding: 7px 12px calc(8px + env(safe-area-inset-bottom));
 }
-body.mobile-mode .app-container--mobile .prompt-box,
+body.mobile-mode .prompt-box,
 body.mobile-mode .prompt-box {
   grid-template-columns: 30px minmax(0, 1fr) 38px;
   border-radius: 24px;
   padding: 6px;
 }
-body.mobile-mode .app-container--mobile .prompt-box textarea,
+body.mobile-mode .prompt-box textarea,
 body.mobile-mode .prompt-box textarea {
   min-height: 31px;
   max-height: 120px;
@@ -600,65 +600,63 @@ body.mobile-mode .prompt-box textarea {
   font-size: 14px;
   line-height: 1.35;
 }
-body.mobile-mode .app-container--mobile .attach-button,
-body.mobile-mode .app-container--mobile .send-button,
+body.mobile-mode .attach-button,
+body.mobile-mode .send-button,
 body.mobile-mode .attach-button,
 body.mobile-mode .send-button {
   width: 30px;
   height: 30px;
   font-size: 18px;
 }
-body.mobile-mode .app-container--mobile .send-button,
+body.mobile-mode .send-button,
 body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
   font-size: 20px;
 }
-body.mobile-mode .app-container--mobile .mobile-drawer,
+body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer {
   width: min(86vw, 360px);
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile,
+body.mobile-mode .sidebar-content--mobile,
 body.mobile-mode .sidebar-content--mobile {
   padding: calc(10px + env(safe-area-inset-top)) 0
     calc(8px + env(safe-area-inset-bottom));
   gap: 6px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-top,
+body.mobile-mode .sidebar-content--mobile .sidebar-top,
 body.mobile-mode .sidebar-content--mobile .sidebar-top {
   padding: 0 16px 7px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-title,
+body.mobile-mode .sidebar-content--mobile .sidebar-title,
 body.mobile-mode .sidebar-content--mobile .sidebar-title {
   font-size: 22px;
   letter-spacing: -0.045em;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-round,
+body.mobile-mode .sidebar-content--mobile .sidebar-round,
 body.mobile-mode .sidebar-content--mobile .sidebar-round {
   width: 36px;
   height: 36px;
   font-size: 21px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .quick-menu,
+body.mobile-mode .sidebar-content--mobile .quick-menu,
 body.mobile-mode .sidebar-content--mobile .quick-menu {
   max-height: 170px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .project-list,
+body.mobile-mode .sidebar-content--mobile .project-list,
 body.mobile-mode .sidebar-content--mobile .project-list {
   max-height: 220px;
 }
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .sidebar-history,
 body.mobile-mode .sidebar-content--mobile .sidebar-history {
   min-height: 80px;
   padding-bottom: 64px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .quick-item,
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .project-item,
+body.mobile-mode .sidebar-content--mobile .quick-item,
+body.mobile-mode .sidebar-content--mobile .project-item,
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .sidebar-history-item,
 body.mobile-mode .sidebar-content--mobile .quick-item,
@@ -670,12 +668,10 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   gap: 11px;
 }
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .quick-item
   span,
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .project-item
   span,
@@ -684,12 +680,12 @@ body.mobile-mode .sidebar-content--mobile .project-item span {
   width: 23px;
   font-size: 18px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .section-label,
+body.mobile-mode .sidebar-content--mobile .section-label,
 body.mobile-mode .sidebar-content--mobile .section-label {
   padding: 10px 17px 2px;
   font-size: 13px;
 }
-body.mobile-mode .app-container--mobile .mobile-new-chat-fab,
+body.mobile-mode .mobile-new-chat-fab,
 body.mobile-mode .mobile-new-chat-fab {
   right: 20px;
   bottom: calc(64px + env(safe-area-inset-bottom));
@@ -698,18 +694,17 @@ body.mobile-mode .mobile-new-chat-fab {
   gap: 8px;
   font-size: 16px;
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,
+body.mobile-mode .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
   padding: 8px 17px calc(7px + env(safe-area-inset-bottom));
 }
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .user-avatar,
+body.mobile-mode .sidebar-content--mobile .user-avatar,
 body.mobile-mode .sidebar-content--mobile .user-avatar {
   width: 30px;
   height: 30px;
   font-size: 11px;
 }
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .sidebar-user
   strong,
@@ -717,7 +712,6 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
   font-size: 14px;
 }
 body.mobile-mode
-  .app-container--mobile
   .sidebar-content--mobile
   .sidebar-user
   small,
@@ -782,7 +776,7 @@ body,
 }
 
 body.mobile-mode .app-container--mobile,
-body.mobile-mode .app-container--mobile .chat-container-root,
+body.mobile-mode .chat-container-root,
 body.mobile-mode .chat-container-root,
 body.mobile-mode .chat-workspace,
 body.mobile-mode .empty-stage {
@@ -1000,14 +994,14 @@ body.mobile-mode .mobile-recent-card span {
 }
 
 body.mobile-mode .message-list,
-body.mobile-mode .app-container--mobile .message-list {
+body.mobile-mode .message-list {
   width: 100%;
   max-width: 100%;
   padding: 12px clamp(14px, 4vw, 28px) calc(88px + env(safe-area-inset-bottom));
 }
 
 body.mobile-mode .message,
-body.mobile-mode .app-container--mobile .message {
+body.mobile-mode .message {
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -1020,12 +1014,12 @@ body.mobile-mode .app-container--mobile .message {
 }
 
 body.mobile-mode .message--user,
-body.mobile-mode .app-container--mobile .message--user {
+body.mobile-mode .message--user {
   grid-template-columns: minmax(0, 1fr) 30px;
 }
 
 body.mobile-mode .avatar,
-body.mobile-mode .app-container--mobile .avatar {
+body.mobile-mode .avatar {
   display: grid;
   width: 30px;
   height: 30px;
@@ -1034,7 +1028,7 @@ body.mobile-mode .app-container--mobile .avatar {
 }
 
 body.mobile-mode .bubble,
-body.mobile-mode .app-container--mobile .bubble {
+body.mobile-mode .bubble {
   grid-column: 2;
   width: auto;
   max-width: 100%;
@@ -1047,14 +1041,14 @@ body.mobile-mode .app-container--mobile .bubble {
 }
 
 body.mobile-mode .message--user .avatar,
-body.mobile-mode .app-container--mobile .message--user .avatar {
+body.mobile-mode .message--user .avatar {
   grid-column: 2;
   background: var(--primary);
   color: #fff;
 }
 
 body.mobile-mode .message--user .bubble,
-body.mobile-mode .app-container--mobile .message--user .bubble {
+body.mobile-mode .message--user .bubble {
   grid-column: 1;
   grid-row: 1;
   justify-self: end;
@@ -1068,7 +1062,7 @@ body.mobile-mode .app-container--mobile .message--user .bubble {
 }
 
 body.mobile-mode .bubble-meta,
-body.mobile-mode .app-container--mobile .bubble-meta {
+body.mobile-mode .bubble-meta {
   display: block;
   font-size: 10.5px;
   margin-bottom: 5px;
@@ -1076,7 +1070,7 @@ body.mobile-mode .app-container--mobile .bubble-meta {
 }
 
 body.mobile-mode .bubble-content,
-body.mobile-mode .app-container--mobile .bubble-content {
+body.mobile-mode .bubble-content {
   font-size: 14px;
   line-height: 1.58;
 }
@@ -1114,14 +1108,14 @@ body.mobile-mode .app-container--mobile .bubble-content {
 }
 
 body.mobile-mode .chat-container-root,
-body.mobile-mode .app-container--mobile .chat-container-root {
+body.mobile-mode .chat-container-root {
   grid-template-columns: 1fr;
   height: var(--app-height);
   max-height: var(--app-height);
 }
 
 body.mobile-mode .chat-workspace,
-body.mobile-mode .app-container--mobile .chat-workspace {
+body.mobile-mode .chat-workspace {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: var(--app-height);
@@ -1130,23 +1124,23 @@ body.mobile-mode .app-container--mobile .chat-workspace {
 }
 
 body.mobile-mode .message-list,
-body.mobile-mode .app-container--mobile .message-list {
+body.mobile-mode .message-list {
   padding-bottom: 16px;
   overflow-y: auto;
 }
 
 body.mobile-mode .empty-stage,
-body.mobile-mode .app-container--mobile .empty-stage {
+body.mobile-mode .empty-stage {
   overflow-y: auto;
   padding-bottom: 16px;
 }
 
 body.mobile-mode .prompt-wrap,
-body.mobile-mode .app-container--mobile .prompt-wrap,
+body.mobile-mode .prompt-wrap,
 body.mobile-mode .prompt-wrap--floating,
-body.mobile-mode .app-container--mobile .prompt-wrap--floating,
+body.mobile-mode .prompt-wrap--floating,
 body.mobile-mode .mobile-bottom-prompt,
-body.mobile-mode .app-container--mobile .mobile-bottom-prompt {
+body.mobile-mode .mobile-bottom-prompt {
   position: relative !important;
   left: auto !important;
   right: auto !important;
@@ -1157,13 +1151,12 @@ body.mobile-mode .app-container--mobile .mobile-bottom-prompt {
 }
 
 body.mobile-mode .desktop-center-prompt,
-body.mobile-mode .app-container--mobile .desktop-center-prompt {
+body.mobile-mode .desktop-center-prompt {
   display: none !important;
 }
 
 body.mobile-mode .chat-container-root--keyboard-open .mobile-topbar,
 body.mobile-mode
-  .app-container--mobile
   .chat-container-root--keyboard-open
   .mobile-topbar {
   height: 44px;
@@ -1173,7 +1166,6 @@ body.mobile-mode
 
 body.mobile-mode .chat-container-root--keyboard-open .round-icon,
 body.mobile-mode
-  .app-container--mobile
   .chat-container-root--keyboard-open
   .round-icon {
   width: 34px;
@@ -1182,7 +1174,6 @@ body.mobile-mode
 
 body.mobile-mode .chat-container-root--keyboard-open .model-trigger,
 body.mobile-mode
-  .app-container--mobile
   .chat-container-root--keyboard-open
   .model-trigger {
   height: 34px;

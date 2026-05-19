@@ -5,30 +5,12 @@ const AUTO_RESTART_DELAY = 250;
 const DUPLICATE_NORMALIZE_PATTERN = /\s+/g;
 
 /**
- * @description 현재 브라우저가 Android Firefox인지 확인합니다.
- * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {boolean} Android Firefox 환경이면 true를 반환합니다.
- */
-function isAndroidFirefoxBrowser() {
-  // SSR 또는 테스트 환경에서는 브라우저 정보가 없으므로 미지원 브라우저로 판단하지 않습니다.
-  if (typeof navigator === "undefined") return false;
-
-  const userAgent = navigator.userAgent || "";
-
-  // Firefox Android는 Web Speech API의 SpeechRecognition 구현이 없어 마이크 시작을 방어합니다.
-  return /Android/i.test(userAgent) && /Firefox/i.test(userAgent);
-}
-
-/**
  * @description 현재 런타임에서 SpeechRecognition을 안전하게 실행할 수 있는지 확인합니다.
  * @param {void} voidParam - 별도 입력값 없이 실행됩니다.
- * @returns {boolean} SpeechRecognition 생성자가 있고 Android Firefox가 아니면 true를 반환합니다.
+ * @returns {boolean} SpeechRecognition 생성자가 있으면 true를 반환합니다.
  */
 function isSpeechRecognitionRuntimeSupported() {
-  // 브라우저 생성자 지원 여부와 Firefox Android 제외 정책을 함께 확인합니다.
-  return (
-    Boolean(getSpeechRecognitionConstructor()) && !isAndroidFirefoxBrowser()
-  );
+  return Boolean(getSpeechRecognitionConstructor());
 }
 function getSpeechRecognitionConstructor() {
   if (typeof window === "undefined") return null;

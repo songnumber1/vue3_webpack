@@ -464,7 +464,7 @@ body.mobile-mode .chat-container-root--mode-main
 
 body.mobile-mode .prompt-box,
 body.mobile-mode .prompt-box--gemini,
-body.mobile-mode .app-container--mobile .prompt-box,
-body.mobile-mode .app-container--mobile .prompt-box--gemini {
+body.mobile-mode .prompt-box,
+body.mobile-mode .prompt-box--gemini {
   border: 1px solid var(--prompt-border);
 }

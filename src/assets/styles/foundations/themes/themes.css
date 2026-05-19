@@ -7,7 +7,7 @@
   --radius-lg: 24px;
   --duration-fast: 160ms;
 
-  /* Layout / responsive tokens. CSS custom properties cannot be used directly in @media queries,
+  /* Layout / responsive tokens. CSS custom properties cannot be used directly in viewport queries,
      so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
   --breakpoint-mobile: 768px;
   --layout-sidebar-width: 260px;

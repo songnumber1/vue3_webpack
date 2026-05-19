@@ -125,9 +125,7 @@ export function createBottomSheetViewport(options) {
     const minimumSheetHeight = getMinimumSheetHeight();
     const contentHeight = getContentHeight();
     const contentSnapRatio =
-      isMobileViewport() && getMobileBrowserFamily() === "firefox"
-        ? BOTTOM_SHEET_SNAP_RATIO.contentFirefox
-        : BOTTOM_SHEET_SNAP_RATIO.contentDefault;
+      BOTTOM_SHEET_SNAP_RATIO.contentDefault;
 
     return Math.max(
       minimumSheetHeight,

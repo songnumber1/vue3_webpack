@@ -1,34 +1,8 @@
-/*
- * Firefox/Samsung/Chrome Android final mobile composer fallback.
- * Keep this block at the end of the mobile stylesheet because legacy chat.css
- * still contains high-specificity mobile-main-fixed-prompt rules.
- */
 body.mobile-mode {
   --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
-}
-body.mobile-mode .mobile-browser-firefox {
-  --mobile-browser-safe-bottom: 0px;
-  --mobile-main-composer-space: 150px;
-}
-body.mobile-mode .chat-container-root--mode-main
+}body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt,
 body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt.prompt-wrap,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt.prompt-wrap,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
   position: fixed !important;
   top: auto !important;
@@ -55,168 +29,15 @@ body.mobile-mode
   overscroll-behavior: none !important;
   touch-action: manipulation !important;
   will-change: bottom !important;
-}
-body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .prompt-box,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .prompt-box,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-main
+}body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
   width: min(100%, var(--layout-prompt-width, 820px)) !important;
   max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
   margin: 0 auto !important;
 }
-body.mobile-mode .mobile-browser-firefox .mobile-drawer,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .mobile-drawer {
-  height: var(--app-height, 100dvh) !important;
-  max-height: var(--app-height, 100dvh) !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile {
-  padding-bottom: 0 !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile
-  .sidebar-history,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile
-  .sidebar-history {
-  padding-bottom: 12px !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile
-  .sidebar-user,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .mobile-drawer
-  .sidebar-content--mobile
-  .sidebar-user {
-  padding-bottom: 12px !important;
-}
-
-/* =========================================================
-   Mobile browser final drawer/chat composer corrections
-   ---------------------------------------------------------
-   Firefox Android reports safe-area and viewport height differently from
-   Chromium-based browsers. Keep chat-room composer close to the visible
-   bottom while preserving Chrome/Samsung behavior. Samsung Internet can keep
-   stale keyboard values when opening the drawer, so the drawer footer is laid
-   out as a flex footer inside the visible drawer instead of relying on sticky
-   bottom offsets.
-   ========================================================= */
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-chat
-  .prompt-wrap,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-shared
-  .prompt-wrap,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-chat
-  .prompt-wrap,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-shared
-  .prompt-wrap {
-  padding-top: var(--space-2, 8px) !important;
-  padding-bottom: var(--space-2, 8px) !important;
-  margin-bottom: 0 !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-chat
-  .chat-composer-slot,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-shared
-  .chat-composer-slot,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-chat
-  .chat-composer-slot,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-shared
-  .chat-composer-slot {
-  padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-  align-self: end !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-chat
-  .chat-workspace,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-shared
-  .chat-workspace,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-chat
-  .chat-workspace,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-shared
-  .chat-workspace {
-  grid-template-rows: auto minmax(0, 1fr) auto !important;
-  min-height: 0 !important;
-}
-body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-chat,
-body.mobile-mode .mobile-browser-firefox .chat-container-root--mode-shared,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-chat,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-shared {
-  height: var(--app-height, 100dvh) !important;
-  max-height: var(--app-height, 100dvh) !important;
-}
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-chat
-  .message-list,
-body.mobile-mode
-  .mobile-browser-firefox
-  .chat-container-root--mode-shared
-  .message-list,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-chat
-  .message-list,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  .chat-container-root--mode-shared
-  .message-list {
-  padding-bottom: var(--space-3, 12px) !important;
-  scroll-padding-bottom: var(--space-3, 12px) !important;
-}
 body.mobile-mode .mobile-browser-samsung .mobile-drawer,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-samsung-internet
+body.mobile-mode.app-container--browser-samsung-internet
   .mobile-drawer {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
@@ -227,8 +48,7 @@ body.mobile-mode
   .mobile-browser-samsung
   .mobile-drawer
   .sidebar-content--mobile,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-samsung-internet
+body.mobile-mode.app-container--browser-samsung-internet
   .mobile-drawer
   .sidebar-content--mobile {
   height: 100% !important;
@@ -244,8 +64,7 @@ body.mobile-mode
   .mobile-drawer
   .sidebar-content--mobile
   .sidebar-history,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-samsung-internet
+body.mobile-mode.app-container--browser-samsung-internet
   .mobile-drawer
   .sidebar-content--mobile
   .sidebar-history {
@@ -261,13 +80,11 @@ body.mobile-mode
   .sidebar-content--mobile
   .sidebar-user,
 body.mobile-mode .mobile-browser-samsung .mobile-drawer .sidebar-user--mobile,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-samsung-internet
+body.mobile-mode.app-container--browser-samsung-internet
   .mobile-drawer
   .sidebar-content--mobile
   .sidebar-user,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-samsung-internet
+body.mobile-mode.app-container--browser-samsung-internet
   .mobile-drawer
   .sidebar-user--mobile {
   position: relative !important;
@@ -279,33 +96,4 @@ body.mobile-mode
     env(safe-area-inset-bottom, 0px)
   ) !important;
   transform: none !important;
-}
-
-/* =========================================================
-   Firefox Android bottom sheet visible row stabilization
-   ---------------------------------------------------------
-   Firefox can report a smaller scrollable body during the initial sheet
-   transition. Reserve enough sheet/body height so three action rows are visible
-   like Chrome and Samsung Internet.
-   ========================================================= */
-body.mobile-mode .mobile-browser-firefox .bottom-sheet,
-body.mobile-mode
-  .app-container--mobile.app-container--browser-firefox
-  ~ .bottom-sheet,
-body.mobile-mode.mobile-browser-firefox .bottom-sheet {
-  min-height: 220px !important;
-  max-height: calc(var(--app-height, 100dvh) - 12px) !important;
-}
-body.mobile-mode .mobile-browser-firefox .bottom-sheet-body,
-body.mobile-mode.mobile-browser-firefox .bottom-sheet-body {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  padding-bottom: var(--space-2, 8px) !important;
-  overflow-y: auto !important;
-  overscroll-behavior: contain !important;
-}
-body.mobile-mode .mobile-browser-firefox .bottom-sheet-option,
-body.mobile-mode.mobile-browser-firefox .bottom-sheet-option {
-  min-height: 56px !important;
-  flex: 0 0 auto !important;
 }

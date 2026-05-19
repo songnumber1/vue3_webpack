@@ -29,5 +29,4 @@
 /* 05 targeted polish and browser patches */
 @import "./layouts/header/chat-header-assistant-icon.css";
 @import "./pages/chat/targeted-chat-polish.css";
-@import "./browser-patches/firefox/firefox-mobile-main-composer-patch.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";

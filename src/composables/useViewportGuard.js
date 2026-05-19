@@ -14,7 +14,6 @@ function applyBrowserViewportClass(browserFamily) {
   const classes = [
     "mobile-browser-default",
     "mobile-browser-chrome",
-    "mobile-browser-firefox",
     "mobile-browser-samsung",
   ];
   root.classList.remove(...classes);
@@ -56,7 +55,7 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     ? Math.max(candidateFromLayout, candidateFromBaseline)
     : 0;
   const composerInset = hasTextFocus
-    ? browserFamily === "samsung" || browserFamily === "firefox"
+    ? browserFamily === "samsung"
       ? Math.max(candidateFromLayout, candidateFromBaseline)
       : candidateFromLayout
     : 0;
@@ -74,7 +73,7 @@ function setCssViewportVars(size, baselineHeight = 0) {
   const browserFamily = getMobileBrowserFamily();
   const {layoutHeight, keyboardHeight, composerInset, offsetTop} =
     getKeyboardMetrics(size, baselineHeight);
-  const browserSafeBottom = browserFamily === "firefox" ? 0 : null;
+  const browserSafeBottom = null;
 
   applyBrowserViewportClass(browserFamily);
 
@@ -96,16 +95,6 @@ function setCssViewportVars(size, baselineHeight = 0) {
     "--composer-keyboard-inset",
     `${composerInset}px`
   );
-  if (browserFamily === "firefox") {
-    document.documentElement.style.setProperty(
-      "--firefox-main-composer-bottom",
-      `${composerInset}px`
-    );
-  } else {
-    document.documentElement.style.removeProperty(
-      "--firefox-main-composer-bottom"
-    );
-  }
   document.documentElement.style.setProperty(
     "--visual-viewport-offset-top",
     `${offsetTop}px`

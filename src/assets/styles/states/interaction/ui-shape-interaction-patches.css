@@ -64,21 +64,19 @@
 /* 4. Mobile-only tap flash prevention for requested controls. */
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
-body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle,
+body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 body.mobile-mode .mobile-topbar .menu-toggle,
-body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle {
+body.mobile-mode .mobile-topbar .menu-toggle {
   border-color: transparent !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -87,11 +85,10 @@ body.mobile-mode .mobile-topbar .menu-toggle:hover,
 body.mobile-mode .mobile-topbar .menu-toggle:active,
 body.mobile-mode .mobile-topbar .menu-toggle:focus,
 body.mobile-mode .mobile-topbar .menu-toggle:focus-visible,
-body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle:hover,
-body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle:active,
-body.mobile-mode .app-container--mobile .mobile-topbar .menu-toggle:focus,
+body.mobile-mode .mobile-topbar .menu-toggle:hover,
+body.mobile-mode .mobile-topbar .menu-toggle:active,
+body.mobile-mode .mobile-topbar .menu-toggle:focus,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .menu-toggle:focus-visible,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:hover,
@@ -99,19 +96,15 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant:active,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:focus,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:focus-visible,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant:hover,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant:active,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant:focus,
 body.mobile-mode
-  .app-container--mobile
   .mobile-topbar
   .model-trigger--assistant:focus-visible {
   border-color: transparent !important;
@@ -124,15 +117,12 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip:active,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip:focus,
 body.mobile-mode
-  .app-container--mobile
   .empty-stage--mobile-main
   .suggestion-chip:focus-visible {
   background: transparent !important;

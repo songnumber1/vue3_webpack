@@ -21,7 +21,7 @@ body.mobile-mode {
 html:has(> body.mobile-mode),
 body.mobile-mode,
 body.mobile-mode #app,
-body.mobile-mode .app-container--mobile {
+body.mobile-mode {
   height: var(--layout-viewport-height, 100dvh) !important;
   min-height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
@@ -170,7 +170,7 @@ body.mobile-mode
 
 /*
  * Cross-browser mobile composer stabilization.
- * Chrome, Samsung Internet and Firefox Android expose different viewport values
+ * Chrome and Samsung Internet expose different viewport values
  * when the software keyboard opens. The JS viewport guard provides two vars:
  * - --mobile-keyboard-inset: content scroll reserve
  * - --composer-keyboard-inset: fixed composer bottom offset
