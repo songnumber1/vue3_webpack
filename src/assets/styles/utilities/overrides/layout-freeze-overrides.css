@@ -51,24 +51,24 @@
 }
 
 body.mobile-mode .message:not(.message--user),
-body.mobile-mode .app-container--mobile .message:not(.message--user) {
+body.mobile-mode .message:not(.message--user) {
   grid-template-columns: 30px minmax(0, 1fr);
 }
 
 body.mobile-mode .prompt-box,
-body.mobile-mode .app-container--mobile .prompt-box {
+body.mobile-mode .prompt-box {
   grid-template-columns: 34px minmax(0, 1fr) 38px;
   align-items: center;
 }
 
 body.mobile-mode .attach-button,
-body.mobile-mode .app-container--mobile .attach-button {
+body.mobile-mode .attach-button {
   width: 34px;
   height: 34px;
 }
 
 body.mobile-mode .send-button,
-body.mobile-mode .app-container--mobile .send-button {
+body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
 }
@@ -759,22 +759,22 @@ body.mobile-mode .image-preview-large {
 }
 
 body.mobile-mode .empty-stage,
-body.mobile-mode .app-container--mobile .empty-stage {
+body.mobile-mode .empty-stage {
   padding-bottom: calc(116px + env(safe-area-inset-bottom));
 }
 
 body.mobile-mode .message-list,
-body.mobile-mode .app-container--mobile .message-list {
+body.mobile-mode .message-list {
   padding-bottom: calc(116px + env(safe-area-inset-bottom));
 }
 
 body.mobile-mode .prompt-wrap,
-body.mobile-mode .app-container--mobile .prompt-wrap {
+body.mobile-mode .prompt-wrap {
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
 }
 
 body.mobile-mode .prompt-box,
-body.mobile-mode .app-container--mobile .prompt-box {
+body.mobile-mode .prompt-box {
   width: 100%;
   max-width: none;
   border-radius: 26px;
@@ -782,12 +782,12 @@ body.mobile-mode .app-container--mobile .prompt-box {
 }
 
 body.mobile-mode .prompt-input-row,
-body.mobile-mode .app-container--mobile .prompt-input-row {
+body.mobile-mode .prompt-input-row {
   gap: 7px;
 }
 
 body.mobile-mode .prompt-box textarea,
-body.mobile-mode .app-container--mobile .prompt-box textarea {
+body.mobile-mode .prompt-box textarea {
   min-height: 38px;
   height: 38px;
   max-height: 136px;
@@ -798,8 +798,8 @@ body.mobile-mode .app-container--mobile .prompt-box textarea {
 
 body.mobile-mode .attach-button,
 body.mobile-mode .send-button,
-body.mobile-mode .app-container--mobile .attach-button,
-body.mobile-mode .app-container--mobile .send-button {
+body.mobile-mode .attach-button,
+body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
   min-width: 38px;
@@ -808,14 +808,10 @@ body.mobile-mode .app-container--mobile .send-button {
 }
 
 body.mobile-mode .chat-container-root--keyboard-open .empty-stage,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--keyboard-open
+body.mobile-mode .chat-container-root--keyboard-open
   .empty-stage,
 body.mobile-mode .chat-container-root--keyboard-open .message-list,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--keyboard-open
+body.mobile-mode .chat-container-root--keyboard-open
   .message-list {
   padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
@@ -1144,7 +1140,7 @@ body.mobile-mode .image-preview-large {
 }
 
 body.mobile-mode .attachment-preview-row,
-body.mobile-mode .app-container--mobile .attachment-preview-row {
+body.mobile-mode .attachment-preview-row {
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: visible;
@@ -1154,33 +1150,29 @@ body.mobile-mode .app-container--mobile .attachment-preview-row {
 }
 
 body.mobile-mode .attachment-preview-row::-webkit-scrollbar,
-body.mobile-mode
-  .app-container--mobile
-  .attachment-preview-row::-webkit-scrollbar {
+body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
   display: none;
 }
 
 body.mobile-mode .attachment-preview-card,
-body.mobile-mode .app-container--mobile .attachment-preview-card,
+body.mobile-mode .attachment-preview-card,
 body.mobile-mode .attachment-preview-card--image,
-body.mobile-mode .app-container--mobile .attachment-preview-card--image {
+body.mobile-mode .attachment-preview-card--image {
   flex: 0 0 96px;
   width: 96px;
   min-height: 108px;
 }
 
 body.mobile-mode .attachment-preview-thumb,
-body.mobile-mode .app-container--mobile .attachment-preview-thumb {
+body.mobile-mode .attachment-preview-thumb {
   height: 60px;
   min-height: 60px;
 }
 
 body.mobile-mode .attachment-preview-remove,
-body.mobile-mode .app-container--mobile .attachment-preview-remove,
+body.mobile-mode .attachment-preview-remove,
 body.mobile-mode .attachment-preview-card--image .attachment-preview-remove,
-body.mobile-mode
-  .app-container--mobile
-  .attachment-preview-card--image
+body.mobile-mode .attachment-preview-card--image
   .attachment-preview-remove {
   top: -16px;
   right: -16px;
@@ -1848,14 +1840,14 @@ body.desktop-mode .bottom-sheet-backdrop {
 }
 
 body.mobile-mode .mobile-project-home,
-body.mobile-mode .app-container--mobile .mobile-project-home,
+body.mobile-mode .mobile-project-home,
 body.mobile-mode .mobile-bottom-prompt,
-body.mobile-mode .app-container--mobile .mobile-bottom-prompt {
+body.mobile-mode .mobile-bottom-prompt {
   display: none !important;
 }
 
 body.mobile-mode .empty-stage,
-body.mobile-mode .app-container--mobile .empty-stage {
+body.mobile-mode .empty-stage {
   display: grid !important;
   place-items: center !important;
   padding: 18px 16px calc(18px + env(safe-area-inset-bottom)) !important;
@@ -1863,7 +1855,7 @@ body.mobile-mode .app-container--mobile .empty-stage {
 }
 
 body.mobile-mode .empty-center,
-body.mobile-mode .app-container--mobile .empty-center {
+body.mobile-mode .empty-center {
   display: flex !important;
   width: min(100%, 760px);
   transform: none !important;
@@ -1871,40 +1863,40 @@ body.mobile-mode .app-container--mobile .empty-center {
 }
 
 body.mobile-mode .empty-center h1,
-body.mobile-mode .app-container--mobile .empty-center h1 {
+body.mobile-mode .empty-center h1 {
   font-size: 24px;
   text-align: center;
   margin: 0 !important;
 }
 
 body.mobile-mode .desktop-center-prompt,
-body.mobile-mode .app-container--mobile .desktop-center-prompt {
+body.mobile-mode .desktop-center-prompt {
   display: block !important;
   width: 100% !important;
 }
 
 body.mobile-mode .suggestion-row,
-body.mobile-mode .app-container--mobile .suggestion-row {
+body.mobile-mode .suggestion-row {
   width: 100%;
   gap: 8px;
   justify-content: center;
 }
 
 body.mobile-mode .suggestion-chip,
-body.mobile-mode .app-container--mobile .suggestion-chip {
+body.mobile-mode .suggestion-chip {
   min-height: 34px;
   padding: 0 12px;
   font-size: 13px;
 }
 
 body.mobile-mode .prompt-wrap,
-body.mobile-mode .app-container--mobile .prompt-wrap {
+body.mobile-mode .prompt-wrap {
   background: var(--mobile-bg, var(--chat-bg));
   padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
 }
 
 body.mobile-mode .prompt-box--gemini,
-body.mobile-mode .app-container--mobile .prompt-box--gemini {
+body.mobile-mode .prompt-box--gemini {
   width: 100%;
   max-width: none;
   border-radius: 28px;
@@ -1913,7 +1905,7 @@ body.mobile-mode .app-container--mobile .prompt-box--gemini {
 }
 
 body.mobile-mode .prompt-box--gemini textarea,
-body.mobile-mode .app-container--mobile .prompt-box--gemini textarea {
+body.mobile-mode .prompt-box--gemini textarea {
   min-height: 40px;
   height: 40px;
   max-height: 136px;
@@ -1921,17 +1913,17 @@ body.mobile-mode .app-container--mobile .prompt-box--gemini textarea {
 }
 
 body.mobile-mode .prompt-action-row,
-body.mobile-mode .app-container--mobile .prompt-action-row {
+body.mobile-mode .prompt-action-row {
   gap: 8px;
 }
 
 body.mobile-mode .prompt-left-actions,
-body.mobile-mode .app-container--mobile .prompt-left-actions {
+body.mobile-mode .prompt-left-actions {
   gap: 5px;
 }
 
 body.mobile-mode .prompt-model-trigger,
-body.mobile-mode .app-container--mobile .prompt-model-trigger {
+body.mobile-mode .prompt-model-trigger {
   height: 36px;
   max-width: 132px;
   padding: 0 10px;
@@ -1940,8 +1932,8 @@ body.mobile-mode .app-container--mobile .prompt-model-trigger {
 
 body.mobile-mode .prompt-icon-action,
 body.mobile-mode .prompt-box--gemini .send-button,
-body.mobile-mode .app-container--mobile .prompt-icon-action,
-body.mobile-mode .app-container--mobile .prompt-box--gemini .send-button {
+body.mobile-mode .prompt-icon-action,
+body.mobile-mode .prompt-box--gemini .send-button {
   width: 36px;
   height: 36px;
   min-width: 36px;
@@ -1949,9 +1941,7 @@ body.mobile-mode .app-container--mobile .prompt-box--gemini .send-button {
 }
 
 body.mobile-mode .sidebar-content--mobile .assistant-trigger,
-body.mobile-mode
-  .app-container--mobile
-  .sidebar-content--mobile
+body.mobile-mode .sidebar-content--mobile
   .assistant-trigger {
   height: 40px;
   max-width: 210px;
@@ -1960,14 +1950,12 @@ body.mobile-mode
 }
 
 body.mobile-mode .sidebar-content--mobile .project-list,
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .project-list {
+body.mobile-mode .sidebar-content--mobile .project-list {
   display: none !important;
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-history,
-body.mobile-mode
-  .app-container--mobile
-  .sidebar-content--mobile
+body.mobile-mode .sidebar-content--mobile
   .sidebar-history {
   flex: 1 1 auto !important;
   min-height: 160px !important;

@@ -35,12 +35,12 @@ body.mobile-mode .bottom-sheet-body > *:last-child {
   font-size: 13px;
 }
 body.mobile-mode .shared-readonly-wrap,
-body.mobile-mode .app-container--mobile .shared-readonly-wrap {
+body.mobile-mode .shared-readonly-wrap {
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
   background: var(--mobile-bg);
 }
 body.mobile-mode .shared-readonly-box,
-body.mobile-mode .app-container--mobile .shared-readonly-box {
+body.mobile-mode .shared-readonly-box {
   max-width: none;
   min-height: 52px;
   border-radius: 20px;
@@ -90,9 +90,7 @@ body.mobile-mode {
 }
 
 body.mobile-mode .chat-container-root--keyboard-open .message-list,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--keyboard-open
+body.mobile-mode .chat-container-root--keyboard-open
   .message-list {
   padding-bottom: 12px !important;
   scroll-padding-bottom: 12px;
@@ -139,7 +137,7 @@ body.mobile-mode {
 }
 
 body.mobile-mode .scroll-bottom-button,
-body.mobile-mode .app-container--mobile .scroll-bottom-button {
+body.mobile-mode .scroll-bottom-button {
   left: 50% !important;
   right: auto !important;
   bottom: calc(
@@ -635,7 +633,7 @@ body.mobile-mode .sidebar-content--mobile {
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user {
+body.mobile-mode .sidebar-content--mobile .sidebar-user {
   position: sticky !important;
   bottom: 0 !important;
   margin-top: auto !important;
@@ -832,9 +830,7 @@ body.mobile-mode .md-table-action {
 body.mobile-mode
   .mobile-drawer
   .quick-menu--assistant.quick-menu--mobile-search,
-body.mobile-mode
-  .app-container--mobile
-  .quick-menu--assistant.quick-menu--mobile-search {
+body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search {
   gap: 0 !important;
   padding: 4px 12px 2px !important;
 }
@@ -843,9 +839,7 @@ body.mobile-mode
   .mobile-drawer
   .quick-menu--assistant.quick-menu--mobile-search
   .quick-item,
-body.mobile-mode
-  .app-container--mobile
-  .quick-menu--assistant.quick-menu--mobile-search
+body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search
   .quick-item {
   font-size: 14px !important;
   font-weight: 750 !important;
@@ -854,18 +848,18 @@ body.mobile-mode
 }
 
 body.mobile-mode .mobile-drawer .service-menu.settings-menu,
-body.mobile-mode .app-container--mobile .service-menu.settings-menu {
+body.mobile-mode .service-menu.settings-menu {
   margin: 0 12px 8px !important;
   border-color: var(--sidebar-border) !important;
 }
 
 body.mobile-mode .mobile-drawer .mobile-new-chat-fab,
-body.mobile-mode .app-container--mobile .mobile-new-chat-fab {
+body.mobile-mode .mobile-new-chat-fab {
   display: none !important;
 }
 
 body.mobile-mode .mobile-drawer .sidebar-history--main,
-body.mobile-mode .app-container--mobile .sidebar-history--main {
+body.mobile-mode .sidebar-history--main {
   flex: 1 1 auto;
 }
 

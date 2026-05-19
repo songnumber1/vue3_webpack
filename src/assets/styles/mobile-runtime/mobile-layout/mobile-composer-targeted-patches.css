@@ -12,14 +12,10 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-box--gemini,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .prompt-box--gemini,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-box--gemini {
   align-items: stretch !important;
@@ -33,14 +29,10 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-action-row,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .prompt-action-row,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-action-row {
   width: 100% !important;
@@ -56,14 +48,10 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-left-actions,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .prompt-left-actions,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-left-actions {
   flex: 1 1 auto !important;
@@ -88,24 +76,16 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .chat-composer-slot
   .voice-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .send-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .voice-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .send-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .voice-button {
   flex: 0 0 auto !important;
@@ -113,7 +93,7 @@ body.mobile-mode
 }
 
 body.mobile-mode .attachment-preview-row,
-body.mobile-mode .app-container--mobile .attachment-preview-row,
+body.mobile-mode .attachment-preview-row,
 body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
@@ -137,16 +117,14 @@ body.mobile-mode
 }
 
 body.mobile-mode .attachment-preview-row::-webkit-scrollbar,
-body.mobile-mode
-  .app-container--mobile
-  .attachment-preview-row::-webkit-scrollbar {
+body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
   display: none !important;
 }
 
 body.mobile-mode .attachment-preview-card,
 body.mobile-mode .attachment-preview-card--image,
-body.mobile-mode .app-container--mobile .attachment-preview-card,
-body.mobile-mode .app-container--mobile .attachment-preview-card--image {
+body.mobile-mode .attachment-preview-card,
+body.mobile-mode .attachment-preview-card--image {
   flex: 0 0 var(--attachment-mobile-size) !important;
   width: var(--attachment-mobile-size) !important;
   height: var(--attachment-mobile-size) !important;
@@ -163,8 +141,8 @@ body.mobile-mode .app-container--mobile .attachment-preview-card--image {
 
 body.mobile-mode .attachment-preview-thumb,
 body.mobile-mode .attachment-preview-file,
-body.mobile-mode .app-container--mobile .attachment-preview-thumb,
-body.mobile-mode .app-container--mobile .attachment-preview-file {
+body.mobile-mode .attachment-preview-thumb,
+body.mobile-mode .attachment-preview-file {
   width: 100% !important;
   height: 100% !important;
   min-width: 0 !important;
@@ -175,7 +153,7 @@ body.mobile-mode .app-container--mobile .attachment-preview-file {
 }
 
 body.mobile-mode .attachment-preview-thumb img,
-body.mobile-mode .app-container--mobile .attachment-preview-thumb img {
+body.mobile-mode .attachment-preview-thumb img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
@@ -183,7 +161,7 @@ body.mobile-mode .app-container--mobile .attachment-preview-thumb img {
 }
 
 body.mobile-mode .attachment-preview-file,
-body.mobile-mode .app-container--mobile .attachment-preview-file {
+body.mobile-mode .attachment-preview-file {
   font-size: 28px !important;
   line-height: 1 !important;
   background: var(--surface, #f8fafc) !important;
@@ -193,22 +171,18 @@ body.mobile-mode .attachment-preview-info,
 body.mobile-mode .attachment-preview-info strong,
 body.mobile-mode .attachment-preview-info span,
 body.mobile-mode .attachment-preview-card--image .attachment-preview-info,
-body.mobile-mode .app-container--mobile .attachment-preview-info,
-body.mobile-mode .app-container--mobile .attachment-preview-info strong,
-body.mobile-mode .app-container--mobile .attachment-preview-info span,
-body.mobile-mode
-  .app-container--mobile
-  .attachment-preview-card--image
+body.mobile-mode .attachment-preview-info,
+body.mobile-mode .attachment-preview-info strong,
+body.mobile-mode .attachment-preview-info span,
+body.mobile-mode .attachment-preview-card--image
   .attachment-preview-info {
   display: none !important;
 }
 
 body.mobile-mode .attachment-preview-remove,
 body.mobile-mode .attachment-preview-card--image .attachment-preview-remove,
-body.mobile-mode .app-container--mobile .attachment-preview-remove,
-body.mobile-mode
-  .app-container--mobile
-  .attachment-preview-card--image
+body.mobile-mode .attachment-preview-remove,
+body.mobile-mode .attachment-preview-card--image
   .attachment-preview-remove {
   top: var(--attachment-mobile-remove-offset) !important;
   right: var(--attachment-mobile-remove-offset) !important;
@@ -223,37 +197,29 @@ body.mobile-mode
 }
 
 body.mobile-mode .attachment-preview-remove::before,
-body.mobile-mode .app-container--mobile .attachment-preview-remove::before {
+body.mobile-mode .attachment-preview-remove::before {
   inset: -8px !important;
 }
 
 /* Align the mobile main header with the compact chat-room header spacing. */
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-topbar {
   height: 44px !important;
   padding-top: 4px !important;
   padding-bottom: 4px !important;
 }
 
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-topbar
   .round-icon {
   width: 34px !important;
   height: 34px !important;
 }
 
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-topbar
   .model-trigger,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-topbar
   .model-trigger--assistant {
   height: 34px !important;
@@ -279,14 +245,10 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt {
   width: 100% !important;
@@ -303,15 +265,11 @@ body.mobile-mode
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-box--gemini,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-box--gemini,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-box--gemini {
@@ -328,15 +286,11 @@ body.mobile-mode
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-action-row,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-action-row,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-action-row {
@@ -359,15 +313,11 @@ body.mobile-mode
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-left-actions,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-left-actions,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-left-actions {
@@ -401,27 +351,19 @@ body.mobile-mode
   .chat-composer-slot
   .mobile-chat-prompt
   .voice-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .send-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-chat
+body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .voice-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .send-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-shared
+body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .voice-button {
@@ -441,13 +383,9 @@ body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
   background: transparent !important;
   box-shadow: none !important;
@@ -457,9 +395,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box--gemini,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box--gemini {
   align-items: stretch !important;
@@ -469,9 +405,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-action-row,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-action-row {
   display: flex !important;
@@ -487,9 +421,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-left-actions,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-left-actions {
   display: flex !important;
@@ -510,14 +442,10 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .voice-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .send-button,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .voice-button {
   flex: 0 0 auto !important;

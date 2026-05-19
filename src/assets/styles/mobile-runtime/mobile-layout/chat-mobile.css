@@ -28,7 +28,7 @@ body.mobile-mode .app-container--mobile {
   overflow: hidden !important;
   overscroll-behavior: none !important;
 }
-body.mobile-mode .app-container--mobile .chat-container-root--mode-main,
+body.mobile-mode .chat-container-root--mode-main,
 body.mobile-mode .chat-container-root--mode-main {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
@@ -38,9 +38,7 @@ body.mobile-mode .chat-container-root--mode-main {
   overscroll-behavior: none !important;
   touch-action: none !important;
 }
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .chat-workspace,
 body.mobile-mode .chat-container-root--mode-main .chat-workspace {
   position: relative !important;
@@ -52,7 +50,7 @@ body.mobile-mode .chat-container-root--mode-main .chat-workspace {
   overscroll-behavior: none !important;
   touch-action: none !important;
 }
-body.mobile-mode .app-container--mobile .empty-stage--mobile-main,
+body.mobile-mode .empty-stage--mobile-main,
 body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   position: relative !important;
   display: block !important;
@@ -66,7 +64,7 @@ body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   overscroll-behavior: none !important;
   touch-action: none !important;
 }
-body.mobile-mode .app-container--mobile .empty-stage--mobile-main .empty-center,
+body.mobile-mode .empty-stage--mobile-main .empty-center,
 body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
@@ -96,9 +94,7 @@ body.mobile-mode
   touch-action: pan-y !important;
   transform: none !important;
 }
-body.mobile-mode
-  .app-container--mobile
-  .empty-stage--mobile-main
+body.mobile-mode .empty-stage--mobile-main
   .empty-center
   h1,
 body.mobile-mode
@@ -109,9 +105,7 @@ body.mobile-mode
   flex: 0 0 auto !important;
   margin: 0 0 var(--space-1, 4px) !important;
 }
-body.mobile-mode
-  .app-container--mobile
-  .empty-stage--mobile-main
+body.mobile-mode .empty-stage--mobile-main
   .suggestion-row--between,
 body.mobile-mode
   .chat-container-root--mode-main
@@ -119,9 +113,9 @@ body.mobile-mode
   .suggestion-row--between {
   flex: 0 0 auto !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,
+body.mobile-mode .mobile-main-fixed-prompt,
 body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
@@ -148,7 +142,7 @@ body.mobile-mode
   will-change: bottom !important;
   touch-action: manipulation !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
@@ -157,7 +151,7 @@ body.mobile-mode
   max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
   margin: 0 auto !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,
+body.mobile-mode .mobile-main-fixed-prompt textarea,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
@@ -165,9 +159,7 @@ body.mobile-mode
   overscroll-behavior: contain !important;
   touch-action: manipulation !important;
 }
-body.mobile-mode
-  .app-container--mobile
-  .desktop-center-prompt.prompt-wrap--floating,
+body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
 body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating {
@@ -183,9 +175,7 @@ body.mobile-mode
  * - --mobile-keyboard-inset: content scroll reserve
  * - --composer-keyboard-inset: fixed composer bottom offset
  */
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .empty-center,
 body.mobile-mode
   .chat-container-root--mode-main
@@ -198,9 +188,9 @@ body.mobile-mode
     var(--space-4, 16px) + var(--mobile-keyboard-inset, 0px)
   ) !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt,
+body.mobile-mode .mobile-main-fixed-prompt,
 body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
@@ -219,21 +209,19 @@ body.mobile-mode
   overscroll-behavior: none !important;
   touch-action: manipulation !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
   transform: translateZ(0) !important;
 }
-body.mobile-mode .app-container--mobile .mobile-main-fixed-prompt textarea,
+body.mobile-mode .mobile-main-fixed-prompt textarea,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   textarea,
-body.mobile-mode
-  .app-container--mobile
-  .mobile-main-fixed-prompt
+body.mobile-mode .mobile-main-fixed-prompt
   .prompt-action-row,
 body.mobile-mode
   .chat-container-root--mode-main
@@ -255,13 +243,9 @@ body.mobile-mode .mobile-browser-firefox {
   --mobile-browser-safe-bottom: 0px;
   --mobile-main-composer-space: 150px;
 }
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt,
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap,
 body.mobile-mode
   .app-container--mobile.app-container--browser-firefox
@@ -305,9 +289,7 @@ body.mobile-mode
   touch-action: manipulation !important;
   will-change: bottom !important;
 }
-body.mobile-mode
-  .app-container--mobile
-  .chat-container-root--mode-main
+body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box,
 body.mobile-mode

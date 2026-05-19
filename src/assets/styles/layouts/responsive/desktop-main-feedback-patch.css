@@ -32,6 +32,6 @@ body.desktop-mode
 }
 
 body.mobile-mode .feedback-dialog,
-body.mobile-mode .app-container--mobile .feedback-dialog {
+body.mobile-mode .feedback-dialog {
   border-radius: 5px !important;
 }
