@@ -1,5 +1,7 @@
 import {defineStore} from "pinia";
 
+const DRAFT_PROMPT_TOOL_SETTINGS_KEY = "__draft__";
+
 const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
   knowledgeSearch: [],
   webSearch: null,
@@ -33,7 +35,7 @@ export const useChatStore = defineStore("chat", {
       state.selectedChatId ? state.messageMap[state.selectedChatId] || [] : [],
     isModelLocked: (state) => Boolean(state.activeSession?.readonlyModel),
     activePromptToolSettings: (state) => {
-      const chatId = state.selectedChatId || "__draft__";
+      const chatId = state.selectedChatId || DRAFT_PROMPT_TOOL_SETTINGS_KEY;
       return clonePromptToolSettings(
         state.promptToolSettingsMap[chatId] || DEFAULT_PROMPT_TOOL_SETTINGS
       );
@@ -51,10 +53,12 @@ export const useChatStore = defineStore("chat", {
     setActiveSession(session = null) {
       this.activeSession = session;
       this.selectedChatId = session?.chatId || null;
+      this.resetActivePromptToolSettings();
     },
     clearActiveSession() {
       this.activeSession = null;
       this.selectedChatId = null;
+      this.resetActivePromptToolSettings();
     },
     setMessages(chatId, messages = []) {
       this.messageMap = {
@@ -69,7 +73,14 @@ export const useChatStore = defineStore("chat", {
       ];
     },
     getPromptToolSettingsKey() {
-      return this.selectedChatId || "__draft__";
+      return this.selectedChatId || DRAFT_PROMPT_TOOL_SETTINGS_KEY;
+    },
+    resetActivePromptToolSettings() {
+      const chatId = this.getPromptToolSettingsKey();
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [chatId]: clonePromptToolSettings(DEFAULT_PROMPT_TOOL_SETTINGS),
+      };
     },
     ensurePromptToolSettings() {
       const chatId = this.getPromptToolSettingsKey();
@@ -103,6 +114,10 @@ export const useChatStore = defineStore("chat", {
 
       if (selectionMode === "single") {
         current[groupId] = current[groupId] === optionId ? null : optionId;
+
+        if (groupId === "webSearch") {
+          current.webSearchEnabled = Boolean(current.webSearch);
+        }
       } else {
         const values = Array.isArray(current[groupId]) ? current[groupId] : [];
         current[groupId] = values.includes(optionId)

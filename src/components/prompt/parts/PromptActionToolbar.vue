@@ -382,7 +382,13 @@ async function handleToolClick(tool) {
     return;
   }
 
-  activeToolGroupId.value = activeToolGroupId.value === tool.id ? "" : tool.id;
+  if (activeToolGroupId.value === tool.id) {
+    closeActiveToolGroup();
+    return;
+  }
+
+  closeActiveToolGroup();
+  activeToolGroupId.value = tool.id;
 
   await nextTick();
   await updateToolFloating?.();
@@ -404,6 +410,14 @@ async function handleToolSwitchClick(tool) {
   resolveSubmenuPlacement();
 }
 
+function closeActiveToolGroup() {
+  const group = activeToolGroup.value;
+  if (isSwitchParent(group) && group.active && group.activeCount === 0) {
+    emit("apply-tool", group);
+  }
+  activeToolGroupId.value = "";
+}
+
 function applyNestedTool(tool) {
   emit("apply-tool", tool);
 }
@@ -413,7 +427,7 @@ watch(
   async (open) => {
     toolPositionReady.value = false;
     if (!open) {
-      activeToolGroupId.value = "";
+      closeActiveToolGroup();
       return;
     }
 
@@ -440,7 +454,7 @@ watch(
 watch(
   () => props.isMobileSheet,
   () => {
-    activeToolGroupId.value = "";
+    closeActiveToolGroup();
   }
 );
 

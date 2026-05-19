@@ -26,7 +26,7 @@
     :title="resolvedToolTitle"
     :show-back="Boolean(activeToolGroup)"
     :back-label="t('common.back')"
-    @back="activeToolGroupId = ''"
+    @back="closeActiveToolGroup"
     @close="closeToolSheet"
   >
     <template v-if="!activeToolGroup">
@@ -251,19 +251,27 @@ function handleToolSwitchClick(tool) {
   activeToolGroupId.value = willEnable ? tool.id : "";
 }
 
+function closeActiveToolGroup() {
+  const group = activeToolGroup.value;
+  if (isSwitchParent(group) && group.active && group.activeCount === 0) {
+    emit("apply-tool", group);
+  }
+  activeToolGroupId.value = "";
+}
+
 function applyNestedTool(tool) {
   emit("apply-tool", tool);
 }
 
 function closeToolSheet() {
-  activeToolGroupId.value = "";
+  closeActiveToolGroup();
   emit("close-tool");
 }
 
 watch(
   () => props.toolOpen,
   (open) => {
-    if (!open) activeToolGroupId.value = "";
+    if (!open) closeActiveToolGroup();
   }
 );
 </script>
