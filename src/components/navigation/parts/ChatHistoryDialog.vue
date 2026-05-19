@@ -14,8 +14,15 @@
           v-model="draftTitle"
           class="chat-history-dialog__input"
           type="text"
+          name="chat-title-edit"
           maxlength="80"
-          autocomplete="off"
+          autocomplete="new-password"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="done"
+          data-lpignore="true"
+          data-form-type="other"
           @keyup.enter="confirm"
         />
       </label>

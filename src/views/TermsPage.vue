@@ -62,21 +62,25 @@ function confirmTerms() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   background: var(--app-bg, #f7f7f8);
   color: var(--text-primary, #111827);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow: hidden;
   overscroll-behavior: contain;
 }
 .legal-card {
   width: min(100%, 860px);
+  max-height: 100%;
+  min-height: 0;
   margin-block: auto;
-  padding: 28px;
+  padding: 28px 28px 0;
+  display: flex;
+  flex-direction: column;
   border: 1px solid rgba(17, 24, 39, 0.08);
   border-radius: 24px;
   background: var(--surface-primary, #ffffff);
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
 }
 .legal-eyebrow {
   margin: 0 0 8px;
@@ -98,10 +102,19 @@ function confirmTerms() {
   font-size: var(--text-size-body-strong);
   line-height: 1.7;
 }
+.legal-header {
+  flex: 0 0 auto;
+}
 .legal-content {
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   gap: 18px;
   margin-top: 28px;
+  padding-bottom: 28px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .legal-section {
   padding: 18px;
@@ -121,13 +134,14 @@ function confirmTerms() {
   line-height: 1.75;
 }
 .terms-agreement {
-  position: sticky;
-  bottom: 0;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin: 28px -28px -28px;
+  margin: 0 -28px;
   padding: 18px 28px;
   border-top: 1px solid rgba(17, 24, 39, 0.08);
   border-radius: 0 0 24px 24px;
@@ -166,19 +180,22 @@ function confirmTerms() {
 }
 @media (max-width: 720px) {
   .legal-page {
-    align-items: flex-start;
+    align-items: stretch;
+    justify-content: flex-start;
     padding: max(18px, env(safe-area-inset-top)) 14px
       max(18px, env(safe-area-inset-bottom));
   }
   .legal-card {
+    width: 100%;
+    max-height: 100%;
     margin-block: 0;
-    padding: 22px 16px;
+    padding: 22px 16px 0;
     border-radius: 20px;
   }
   .terms-agreement {
     align-items: stretch;
     flex-direction: column;
-    margin: 24px -16px -22px;
+    margin: 0 -16px;
     padding: 16px;
     border-radius: 0 0 20px 20px;
   }
