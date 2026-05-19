@@ -80,7 +80,7 @@ function confirmTerms() {
 }
 .legal-eyebrow {
   margin: 0 0 8px;
-  font-size: 12px;
+  font-size: var(--text-size-caption);
   font-weight: 800;
   letter-spacing: 0.08em;
   color: var(--accent-primary, #10a37f);
@@ -88,14 +88,14 @@ function confirmTerms() {
 }
 .legal-header h1 {
   margin: 0;
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: var(--text-size-page-title);
   line-height: 1.25;
   font-weight: 800;
 }
 .legal-description {
   margin: 12px 0 0;
   color: var(--text-secondary, #6b7280);
-  font-size: 15px;
+  font-size: var(--text-size-body-strong);
   line-height: 1.7;
 }
 .legal-content {
@@ -111,13 +111,13 @@ function confirmTerms() {
 }
 .legal-section h2 {
   margin: 0 0 8px;
-  font-size: 17px;
+  font-size: var(--text-size-title);
   line-height: 1.35;
 }
 .legal-section p {
   margin: 0;
   color: var(--text-secondary, #4b5563);
-  font-size: 14px;
+  font-size: var(--text-size-body);
   line-height: 1.75;
 }
 .terms-agreement {
@@ -139,7 +139,7 @@ function confirmTerms() {
   align-items: center;
   gap: 10px;
   color: var(--text-primary, #111827);
-  font-size: 14px;
+  font-size: var(--text-size-body);
   font-weight: 700;
   cursor: pointer;
 }
@@ -155,7 +155,7 @@ function confirmTerms() {
   border-radius: 14px;
   background: #111827;
   color: #ffffff;
-  font-size: 14px;
+  font-size: var(--text-size-body);
   font-weight: 800;
   cursor: pointer;
 }

@@ -167,13 +167,13 @@ onBeforeUnmount(() => {
 .swagger-toolbar strong {
   display: block;
   margin-bottom: 4px;
-  font-size: 15px;
+  font-size: var(--text-size-body-strong);
   color: #111827;
 }
 
 .swagger-toolbar p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-size-helper);
   color: #6b7280;
 }
 
@@ -196,7 +196,7 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: #ffffff;
   color: #111827;
-  font-size: 13px;
+  font-size: var(--text-size-helper);
   font-weight: 800;
   text-decoration: none;
   transition:
@@ -229,7 +229,7 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   background: #ffffff;
   color: #111827;
-  font-size: 14px;
+  font-size: var(--text-size-body);
 }
 
 .swagger-root {

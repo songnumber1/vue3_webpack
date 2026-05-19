@@ -1,13 +1,19 @@
 <template>
   <teleport to="body">
     <transition :name="isMobile ? 'mobile-page' : 'modal-fade'">
-      <div v-if="open" class="responsive-overlay" :class="overlayClasses">
+      <div
+          v-if="open"
+          class="responsive-overlay"
+          :class="overlayClasses"
+          :data-overlay-mode="overlayMode"
+        >
         <div
           v-if="!isMobile"
           class="responsive-overlay-backdrop app-dialog-backdrop"
           @click="$emit('close')"
         ></div>
         <section
+          :key="panelRenderKey"
           class="responsive-panel app-dialog-panel"
           role="dialog"
           aria-modal="true"
@@ -46,7 +52,7 @@
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, watch} from "vue";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
@@ -72,11 +78,30 @@ const isMobileDialog = computed(
   () => props.isMobile && props.mobileMode === "dialog"
 );
 
+const overlayMode = computed(() => {
+  if (isMobileFullscreen.value) return "mobile-fullscreen";
+  if (isMobileDialog.value) return "mobile-dialog";
+
+  return "desktop-dialog";
+});
+
 const overlayClasses = computed(() => ({
+  "responsive-overlay--desktop": !props.isMobile,
   "responsive-overlay--mobile": isMobileFullscreen.value,
   "responsive-overlay--mobile-dialog": isMobileDialog.value,
 }));
 
+const panelRenderKey = computed(() => overlayMode.value);
+
 const showMobileBackButton = computed(() => isMobileFullscreen.value);
 const showCloseButton = computed(() => !isMobileFullscreen.value);
+
+watch(
+  () => [props.open, props.isMobile, props.mobileMode],
+  () => {
+    if (typeof document === "undefined" || !props.open) return;
+    document.body.dataset.responsiveOverlayMode = overlayMode.value;
+  },
+  {immediate: true}
+);
 </script>

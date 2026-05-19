@@ -38,3 +38,6 @@
 @import "./components/dialog/dialog-system.css";
 
 /* 07 final UI normalization fixes absorbed into dialog-system.css. */
+
+/* 08 responsive typography and control normalization */
+@import "./foundations/typography/responsive-typography.css";

@@ -75,7 +75,9 @@
 
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
+      :is-mobile="isMobile"
       @close="mobileSettingsOpen = false"
+      @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
     <ChatHistoryDialog
@@ -201,6 +203,21 @@ const {
   handleMessageContentRendered,
   scrollBottom,
 } = useChatContainerController(props);
+
+function handleMobileSettingsDesktopOpen(target) {
+  mobileSettingsOpen.value = false;
+  if (target === "notice") {
+    noticeOpen.value = true;
+    return;
+  }
+  if (target === "privacy") {
+    privacyOpen.value = true;
+    return;
+  }
+  if (target === "personalization") {
+    personalizationOpen.value = true;
+  }
+}
 
 provide(CHAT_ACTIONS_KEY, {
   openDrawer: openMobileDrawer,

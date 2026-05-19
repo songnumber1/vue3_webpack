@@ -116,8 +116,11 @@ import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
 
-const props = defineProps({open: {type: Boolean, default: false}});
-const emit = defineEmits(["close"]);
+const props = defineProps({
+  open: {type: Boolean, default: false},
+  isMobile: {type: Boolean, default: true},
+});
+const emit = defineEmits(["close", "desktop-open"]);
 const {t, tm, locale} = useI18n();
 const router = useRouter();
 const activeMenu = ref("");
@@ -207,6 +210,15 @@ watch(
   () => props.open,
   (value) => {
     if (!value) activeMenu.value = "";
+  }
+);
+
+watch(
+  () => [props.open, props.isMobile],
+  ([open, isMobile]) => {
+    if (!open || isMobile) return;
+    emit("desktop-open", activeMenu.value || "personalization");
+    activeMenu.value = "";
   }
 );
 </script>

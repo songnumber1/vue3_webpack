@@ -129,7 +129,7 @@ function emitPreview(file) {
 }
 
 :global(body.mobile-mode) .attachment-preview-file {
-  font-size: 28px;
+  font-size: var(--text-size-icon-lg);
   line-height: 1;
   background: var(--surface, #f8fafc);
 }
@@ -154,7 +154,7 @@ function emitPreview(file) {
   min-width: var(--attachment-mobile-remove-size);
   min-height: var(--attachment-mobile-remove-size);
   padding: 0 0 2px;
-  font-size: 22px;
+  font-size: var(--text-size-icon);
   line-height: 1;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14);
 }

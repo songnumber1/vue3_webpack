@@ -42,21 +42,21 @@ const privacySections = computed(() => tm("legal.privacy.sections") || []);
 .privacy-policy-eyebrow {
   margin: 0;
   color: var(--accent-primary, #10a37f);
-  font-size: 12px;
+  font-size: var(--text-size-caption);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .privacy-policy-header h2 {
   margin: 0;
-  font-size: clamp(22px, 3vw, 30px);
+  font-size: var(--text-size-page-title);
   line-height: 1.25;
   font-weight: 850;
 }
 .privacy-policy-header p:last-child {
   margin: 0;
   color: var(--text-secondary, #6b7280);
-  font-size: 14px;
+  font-size: var(--text-size-body);
   line-height: 1.7;
 }
 .privacy-policy-sections {
@@ -71,19 +71,19 @@ const privacySections = computed(() => tm("legal.privacy.sections") || []);
 }
 .privacy-policy-card h3 {
   margin: 0 0 8px;
-  font-size: 16px;
+  font-size: var(--text-size-title);
   line-height: 1.35;
 }
 .privacy-policy-card p {
   margin: 0;
   color: var(--text-secondary, #4b5563);
-  font-size: 13px;
+  font-size: var(--text-size-helper);
   line-height: 1.75;
 }
 .privacy-policy-updated {
   margin: 2px 0 0;
   color: var(--text-muted, #9ca3af);
-  font-size: 13px;
+  font-size: var(--text-size-helper);
 }
 @media (max-width: 720px) {
   .privacy-policy-view {

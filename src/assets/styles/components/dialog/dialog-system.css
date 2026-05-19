@@ -1043,3 +1043,119 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.desktop-mode .mobile-topbar .model-trigger--assistant {
   border-radius: 5px !important;
 }
+
+/* User menu and settings overlays share the same compact dialog typography. */
+.user-menu-panel,
+.user-menu-panel button,
+.mobile-settings-page,
+.mobile-settings-page button,
+.responsive-panel .notice-view,
+.responsive-panel .personalization-view,
+.responsive-panel .privacy-policy-view {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.user-menu-item strong,
+.user-menu-language-option span,
+.mobile-settings-item strong,
+.notice-card h3,
+.personal-card h3,
+.guide-card h2,
+.responsive-panel .privacy-policy-card h3,
+.responsive-panel .privacy-policy-header h2,
+.settings-placeholder-card h3 {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-title-line-height);
+  letter-spacing: normal;
+}
+
+.user-menu-item small,
+.mobile-settings-item small,
+.notice-card span,
+.personal-eyebrow,
+.guide-card span,
+.responsive-panel .privacy-policy-eyebrow,
+.responsive-panel .privacy-policy-updated {
+  font-size: var(--dialog-caption-font-size);
+  line-height: var(--dialog-caption-line-height);
+  letter-spacing: normal;
+}
+
+.notice-card p,
+.personal-card p,
+.guide-card p,
+.responsive-panel .privacy-policy-header p:last-child,
+.responsive-panel .privacy-policy-card p,
+.settings-placeholder-card p,
+.settings-placeholder-card li {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.user-menu-item,
+.user-menu-language-option,
+.mobile-settings-item {
+  font-weight: var(--dialog-title-font-weight);
+}
+
+.user-menu-panel {
+  border-radius: var(--dialog-radius);
+}
+
+.user-menu-item,
+.user-menu-language-options,
+.user-menu-language-option,
+.notice-card,
+.personal-card,
+.guide-card,
+.responsive-panel .privacy-policy-card,
+.settings-placeholder-card,
+.settings-language-card,
+.settings-language-option {
+  border-radius: var(--dialog-option-radius);
+}
+
+/* Explicit desktop overlay mode prevents a fullscreen mobile panel from
+   lingering when a user resizes from mobile width to desktop width while one
+   of the user-menu overlays is already open. */
+.responsive-overlay--desktop {
+  padding: 24px;
+  place-items: center;
+}
+
+.responsive-overlay--desktop .responsive-panel {
+  width: min(720px, 100%);
+  height: auto;
+  max-width: calc(100vw - 48px);
+  max-height: min(760px, calc(100vh - 56px));
+  border: 1px solid var(--dialog-panel-border);
+  border-radius: var(--dialog-radius);
+}
+
+.responsive-overlay--desktop .responsive-panel-header {
+  min-height: var(--dialog-header-min-height);
+  padding: var(--dialog-header-padding);
+}
+
+.responsive-overlay--desktop .responsive-panel-body {
+  padding: var(--dialog-body-padding);
+}
+
+@media (min-width: 901px) {
+  .responsive-overlay--desktop.responsive-overlay--mobile,
+  .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
+    padding: 24px;
+    place-items: center;
+  }
+
+  .responsive-overlay--desktop.responsive-overlay--mobile .responsive-panel,
+  .responsive-overlay--desktop.responsive-overlay--mobile-dialog .responsive-panel {
+    width: min(720px, 100%);
+    height: auto;
+    max-width: calc(100vw - 48px);
+    max-height: min(760px, calc(100vh - 56px));
+    border: 1px solid var(--dialog-panel-border);
+    border-radius: var(--dialog-radius);
+  }
+}

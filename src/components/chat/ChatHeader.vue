@@ -159,7 +159,7 @@ const showDesktopConversationTitle = computed(
 :global(body.mobile-mode) .mobile-topbar .model-trigger--assistant {
   height: 34px;
   min-width: 100px;
-  font-size: 15px;
+  font-size: var(--text-size-title-sm);
   gap: 6px;
   padding-left: 10px;
   padding-right: 10px;

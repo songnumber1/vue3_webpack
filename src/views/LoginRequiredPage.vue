@@ -136,13 +136,13 @@ onMounted(checkLogin);
 }
 .auth-required-card h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: var(--text-size-page-title);
   line-height: 1.3;
   font-weight: 700;
 }
 .auth-required-card p {
   margin: 12px 0 24px;
-  font-size: 15px;
+  font-size: var(--text-size-body-strong);
   line-height: 1.6;
   color: var(--text-secondary, #6b7280);
 }
@@ -157,7 +157,7 @@ onMounted(checkLogin);
   width: 100%;
   min-height: 46px;
   border-radius: 14px;
-  font-size: 15px;
+  font-size: var(--text-size-body-strong);
   font-weight: 700;
   cursor: pointer;
 }
