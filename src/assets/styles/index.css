@@ -7,7 +7,6 @@
 @import "./components/markdown/markdown.css";
 @import "./components/bottom-sheet/bottom-sheet-composer.css";
 @import "./pages/playground/playground-feedback.css";
-@import "./components/attachment/attachment-preview-tokens.css";
 
 /* 03 mobile runtime and freeze overrides */
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
@@ -16,24 +15,22 @@
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
 @import "./browser-patches/mobile/mobile-browser-layout-patches.css";
 
-/* 03-1 override split patches */
+/* 03-1 absorbed feature patches and remaining split patches */
 @import "./utilities/overrides/composer-layout-patches.css";
-@import "./utilities/overrides/message-layout-patches.css";
-@import "./utilities/overrides/sidebar-layout-patches.css";
-@import "./utilities/overrides/attachment-layout-patches.css";
+@import "./components/message/message-bubbles.css";
+@import "./layouts/sidebar/sidebar-assistant-polish.css";
+@import "./components/attachment/attachment-preview-tokens.css";
 @import "./utilities/overrides/android-webview-layout-patches.css";
 
 /* 03-2 residual overrides */
 @import "./utilities/overrides/layout-freeze-overrides.css";
 
 @import "./states/reasoning/reasoning.css";
-@import "./components/message/message-bubbles.css";
 @import "./mobile-runtime/gestures/mobile-tap-button-radius-patch.css";
 @import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
 
 /* 04 states, sidebar, assistant binding */
 @import "./states/error/exception.css";
-@import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/assistant/assistant-icon-binding.css";
 @import "./states/interaction/ui-shape-interaction-patches.css";
 

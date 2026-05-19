@@ -63,3 +63,595 @@ body.desktop-mode .desktop-sidebar .assistant-menu {
 body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
   margin-right: 2px;
 }
+
+/* absorbed from utilities/overrides/sidebar-layout-patches.css */
+
+/* extracted from layout-freeze-overrides.css */
+
+/* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
+.chat-container-root--sidebar-collapsed{
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+.desktop-sidebar--collapsed{
+  position: relative;
+  display: block;
+  overflow: visible;
+  z-index: var(--z-sidebar-collapsed);
+}
+
+.collapsed-sidebar{
+  position: relative;
+  width: 48px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 6px;
+  border-right: 1px solid var(--sidebar-border);
+  background: var(--sidebar-bg);
+}
+
+.collapsed-sidebar-actions{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.collapsed-recent-popover{
+  position: absolute;
+  left: calc(100% - 12px);
+  top: 122px;
+  width: 268px;
+  max-height: min(70dvh, 520px);
+  overflow-y: auto;
+  padding: 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-menu);
+  z-index: var(--z-popover);
+}
+
+body.mobile-mode .chat-container-root--sidebar-collapsed{
+  grid-template-columns: 1fr;
+}
+
+body.mobile-mode .desktop-sidebar--collapsed,
+body.mobile-mode .collapsed-sidebar{
+  display: none;
+}
+
+.attach-menu-wrap{
+  position: relative;
+  display: grid;
+  place-items: end center;
+}
+
+.attach-menu{
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 10px);
+  width: 236px;
+  padding: 7px;
+  border: 1px solid var(--control-border);
+  border-radius: 16px;
+  background: var(--menu-bg);
+  box-shadow: var(--shadow-menu);
+  z-index: var(--z-popover);
+}
+
+.attach-menu button{
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 11px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.attach-menu button:hover{
+  background: var(--control-hover);
+}
+
+.attach-menu span{
+  width: 22px;
+  text-align: center;
+}
+
+.attach-menu strong{
+  font-size: 14px;
+  font-weight: 700;
+}
+
+body.mobile-mode .attach-menu{
+  width: min(248px, calc(100vw - 36px));
+  bottom: calc(100% + 12px);
+}
+
+.attach-menu-wrap,
+.app-container--mobile .attach-menu-wrap{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* =========================================================
+   FINAL ANDROID DRAWER + IMAGE PREVIEW FIX
+   - Android WebView can keep desktop breakpoint while using app-container--mobile.
+   - Force mobile drawer content to be visible, scrollable and readable.
+   - Image preview no longer depends on browser default image loading UI.
+   ========================================================= */
+.app-container--mobile .mobile-drawer-backdrop,
+.mobile-drawer-backdrop{
+  position: fixed !important;
+  inset: 0 !important;
+  display: block !important;
+  background: rgba(0, 0, 0, 0.45) !important;
+  z-index: var(--z-drawer-backdrop) !important;
+}
+
+.app-container--mobile .mobile-drawer,
+.mobile-drawer{
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  display: block !important;
+  width: min(88vw, 420px) !important;
+  height: var(--app-height, 100vh) !important;
+  max-height: var(--app-height, 100vh) !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+  color: var(--sidebar-text, #202123) !important;
+  z-index: var(--z-drawer) !important;
+  overflow: hidden !important;
+  box-shadow: 22px 0 54px rgba(15, 23, 42, 0.32) !important;
+  transform: translate3d(0, 0, 0);
+}
+
+.app-container--mobile .sidebar-content--mobile,
+.mobile-drawer .sidebar-content--mobile{
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  padding: calc(12px + env(safe-area-inset-top)) 0
+    calc(12px + env(safe-area-inset-bottom)) !important;
+  gap: 6px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+  color: var(--sidebar-text, #202123) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.app-container--mobile .sidebar-content--mobile > *,
+.mobile-drawer .sidebar-content--mobile > *{
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: inherit;
+}
+
+.app-container--mobile .sidebar-content--mobile .sidebar-top,
+.mobile-drawer .sidebar-content--mobile .sidebar-top{
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 2 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex: 0 0 auto !important;
+  min-height: 48px !important;
+  padding: 4px 16px 8px !important;
+  background: var(--sidebar-bg, #ffffff) !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .sidebar-title,
+.mobile-drawer .sidebar-content--mobile .sidebar-title{
+  display: block !important;
+  color: var(--sidebar-text, #202123) !important;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .sidebar-round,
+.mobile-drawer .sidebar-content--mobile .sidebar-round{
+  flex: 0 0 auto !important;
+  width: 40px !important;
+  height: 40px !important;
+  color: var(--sidebar-text, #202123) !important;
+  background: var(--control-bg, #ffffff) !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .quick-menu,
+.app-container--mobile .sidebar-content--mobile .project-list,
+.app-container--mobile .sidebar-content--mobile .sidebar-history,
+.mobile-drawer .sidebar-content--mobile .quick-menu,
+.mobile-drawer .sidebar-content--mobile .project-list,
+.mobile-drawer .sidebar-content--mobile .sidebar-history{
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 0 0 auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+  gap: 2px !important;
+  padding: 0 !important;
+  color: var(--sidebar-text, #202123) !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .sidebar-history,
+.mobile-drawer .sidebar-content--mobile .sidebar-history{
+  flex: 1 1 auto !important;
+  min-height: 120px !important;
+  overflow-y: auto !important;
+  padding-bottom: 76px !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .quick-item,
+.app-container--mobile .sidebar-content--mobile .project-item,
+.app-container--mobile .sidebar-content--mobile .sidebar-history-item,
+.mobile-drawer .sidebar-content--mobile .quick-item,
+.mobile-drawer .sidebar-content--mobile .project-item,
+.mobile-drawer .sidebar-content--mobile .sidebar-history-item{
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 8px 18px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: var(--sidebar-text, #202123) !important;
+  font-size: 15px !important;
+  line-height: 1.25 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .quick-item:hover,
+.app-container--mobile .sidebar-content--mobile .project-item:hover,
+.app-container--mobile .sidebar-content--mobile .sidebar-history-item:hover,
+.app-container--mobile .sidebar-content--mobile .quick-item.active,
+.app-container--mobile .sidebar-content--mobile .project-item.selected,
+.mobile-drawer .sidebar-content--mobile .quick-item:hover,
+.mobile-drawer .sidebar-content--mobile .project-item:hover,
+.mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
+.mobile-drawer .sidebar-content--mobile .quick-item.active,
+.mobile-drawer .sidebar-content--mobile .project-item.selected{
+  background: var(--sidebar-hover, #ececf1) !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .quick-item span,
+.app-container--mobile .sidebar-content--mobile .project-item span,
+.mobile-drawer .sidebar-content--mobile .quick-item span,
+.mobile-drawer .sidebar-content--mobile .project-item span{
+  flex: 0 0 22px !important;
+  width: 22px !important;
+  color: var(--sidebar-icon, #4b5563) !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .section-label,
+.mobile-drawer .sidebar-content--mobile .section-label{
+  display: block !important;
+  flex: 0 0 auto !important;
+  padding: 12px 18px 4px !important;
+  color: var(--sidebar-section, #6b7280) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.app-container--mobile .mobile-new-chat-fab,
+.mobile-drawer .mobile-new-chat-fab{
+  position: sticky !important;
+  align-self: flex-end !important;
+  right: auto !important;
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  z-index: 3 !important;
+  flex: 0 0 auto !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 8px 18px 8px auto !important;
+  padding: 0 20px !important;
+  border-radius: 999px !important;
+  background: var(--fab-bg, #111827) !important;
+  color: var(--fab-text, #ffffff) !important;
+  font-size: 16px !important;
+  font-weight: 800 !important;
+}
+
+.app-container--mobile .sidebar-content--mobile .sidebar-user,
+.mobile-drawer .sidebar-content--mobile .sidebar-user{
+  flex: 0 0 auto !important;
+  margin-top: 0 !important;
+  padding: 10px 18px 0 !important;
+  color: var(--sidebar-text, #202123) !important;
+}
+
+.assistant-menu{
+  top: calc(100% + 8px);
+}
+
+.quick-menu--assistant{
+  flex: 0 0 auto;
+}
+
+.sidebar-history--main{
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sidebar-content--assistant .project-list{
+  display: none !important;
+}
+
+.bottom-sheet{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-bottom-sheet);
+  width: 100%;
+  height: var(--bottom-sheet-height, min(calc(var(--vh, 1vh) * 78), 520px));
+  max-height: calc(var(--app-height, 100vh) - env(safe-area-inset-top));
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 26px 26px 0 0;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.28);
+  padding: 0 12px calc(14px + env(safe-area-inset-bottom));
+  overflow: hidden;
+  will-change: height, transform;
+}
+
+body.mobile-mode .sidebar-content--mobile .assistant-trigger,
+body.mobile-mode .sidebar-content--mobile
+  .assistant-trigger{
+  height: 40px;
+  max-width: 210px;
+  font-size: 18px;
+  box-shadow: none;
+}
+
+body.mobile-mode .sidebar-content--mobile .project-list,
+body.mobile-mode .sidebar-content--mobile .project-list{
+  display: none !important;
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-history,
+body.mobile-mode .sidebar-content--mobile
+  .sidebar-history{
+  flex: 1 1 auto !important;
+  min-height: 160px !important;
+}
+
+.sidebar-history-item,
+.collapsed-recent-item{
+  min-width: 0;
+}
+
+.sidebar-history-item span,
+.collapsed-recent-item span{
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.sidebar-history-item.selected{
+  background: var(--sidebar-hover);
+  font-weight: 800;
+}
+
+.sidebar-content--mobile .sidebar-history-item{
+  max-width: 100%;
+  height: 48px;
+}
+
+.sidebar-content--mobile .sidebar-history-item span{
+  width: 100%;
+}
+
+body.mobile-mode .desktop-sidebar{
+  display: none;
+}
+
+body.mobile-mode .mobile-topbar{
+  height: 68px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+body.mobile-mode .menu-toggle{
+  display: grid !important;
+}
+
+body.mobile-mode .sidebar-content--mobile{
+  width: 100%;
+  max-width: 100vw;
+}
+
+body.mobile-mode .mobile-drawer{
+  width: min(430px, 100vw);
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+body.mobile-mode .sidebar-history--main{
+  overflow-x: hidden;
+}
+
+/* Chat history action menu */
+.sidebar-history-row{
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-radius: 12px;
+}
+
+.sidebar-history-row.selected{
+  background: var(--sidebar-item-active-bg, rgba(127, 127, 127, 0.14));
+}
+
+.sidebar-history-title-button{
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 8px !important;
+}
+
+.sidebar-history-actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  padding-right: 4px;
+  opacity: 0.72;
+}
+
+.sidebar-history-row:hover .sidebar-history-actions,
+.sidebar-history-row:focus-within .sidebar-history-actions,
+.sidebar-history-row.selected .sidebar-history-actions{
+  opacity: 1;
+}
+
+.sidebar-history-pin{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.sidebar-history-menu-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.sidebar-history-menu-button:hover,
+.sidebar-history-menu-button:focus-visible{
+  background: var(--sidebar-item-hover-bg, rgba(127, 127, 127, 0.16));
+  outline: none;
+}
+
+.context-menu-fade-enter-active,
+.context-menu-fade-leave-active{
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+}
+
+.context-menu-fade-enter-from,
+.context-menu-fade-leave-to{
+  opacity: 0;
+  transform: translateY(-3px) scale(0.98);
+}
+
+.chat-history-context-menu-shell{
+  z-index: var(--z-chat-history-menu);
+  isolation: isolate;
+}
+
+/* Keep the chat history action popup above every app surface on desktop and mobile. */
+.chat-history-menu-overlay.bottom-sheet-backdrop{
+  z-index: var(--z-chat-history-menu-backdrop) !important;
+}
+
+.chat-history-menu-overlay.bottom-sheet{
+  z-index: var(--z-chat-history-menu) !important;
+}
+
+.chat-history-context-menu{
+  min-width: 192px;
+  padding: 8px;
+  border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));
+  border-radius: 14px;
+  background: var(--panel-bg, var(--color-bg, #fff));
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+}
+
+.chat-history-context-menu__item,
+.chat-history-action-option{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.chat-history-context-menu__item{
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.chat-history-context-menu__item:hover,
+.chat-history-context-menu__item:focus-visible{
+  background: var(--sidebar-item-hover-bg, rgba(127, 127, 127, 0.14));
+  outline: none;
+}
+
+.chat-history-context-menu__item--danger,
+.chat-history-action-option--danger{
+  color: #d92d20;
+}
+
+/* Ensure every confirmation/notice popup opened from the mobile drawer is above the drawer and any bottom sheet.
+   The drawer intentionally remains mounted while history actions run, so dialog overlays must own
+   the top application layer instead of inheriting the base responsive overlay z-index. */
+.responsive-overlay.responsive-overlay--mobile-dialog{
+  z-index: var(--z-app-dialog-front) !important;
+  isolation: isolate;
+}
+
+/* Desktop dialogs should also stay above transient menus without changing their layout. */
+.responsive-overlay:not(.responsive-overlay--mobile):not(
+    .responsive-overlay--mobile-dialog
+  ){
+  z-index: var(--z-app-dialog) !important;
+}
+
+.sidebar-content--mobile .sidebar-history-row{
+  min-height: 44px;
+}
+
+.sidebar-content--mobile .sidebar-history-actions{
+  opacity: 1;
+}

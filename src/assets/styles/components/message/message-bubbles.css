@@ -51,3 +51,204 @@ body.mobile-mode .bubble-content--plain {
   font-size: var(--message-plain-mobile-font-size);
   line-height: 1.62;
 }
+
+/* absorbed from utilities/overrides/message-layout-patches.css */
+
+/* extracted from layout-freeze-overrides.css */
+
+.message-list,
+.app-container--mobile .message-list{
+  width: 100%;
+  max-width: 100%;
+}
+
+.message:not(.message--user),
+.app-container--mobile .message:not(.message--user){
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  grid-template-columns: 38px minmax(0, 1fr);
+}
+
+.message:not(.message--user) .bubble,
+.app-container--mobile .message:not(.message--user) .bubble{
+  width: 100%;
+  max-width: 100%;
+  justify-self: stretch;
+}
+
+body.mobile-mode .message:not(.message--user),
+body.mobile-mode .message:not(.message--user){
+  grid-template-columns: 30px minmax(0, 1fr);
+}
+
+.attachment-preview-info strong,
+.message-file-card strong{
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.attachment-preview-info span,
+.message-file-card small{
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.message-attachments{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.message-attachments--user{
+  justify-content: flex-end;
+}
+
+.message-image-card{
+  width: min(320px, 72vw);
+  max-height: 320px;
+  padding: 0;
+  border: 1px solid var(--message-border);
+  border-radius: 18px;
+  background: var(--control-bg);
+  overflow: hidden;
+}
+
+.message-image-card img{
+  width: 100%;
+  max-height: 320px;
+  display: block;
+  object-fit: cover;
+}
+
+.message-file-card{
+  width: min(320px, 72vw);
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--message-border);
+  border-radius: 16px;
+  background: var(--control-bg);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.message-file-icon{
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 11px;
+  background: var(--control-hover);
+}
+
+body.mobile-mode .message-image-card{
+  width: min(78vw, 360px);
+  max-height: 360px;
+}
+
+body.mobile-mode .message-image-card img{
+  max-height: 360px;
+}
+
+.message-image-card{
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(148, 163, 184, 0.12) 75%),
+    var(--surface);
+  background-size: 20px 20px;
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+}
+
+.message-image-card img{
+  height: auto;
+  padding: 8px;
+  object-fit: contain;
+}
+
+body.mobile-mode .message-list,
+body.mobile-mode .message-list{
+  padding-bottom: calc(116px + env(safe-area-inset-bottom));
+}
+
+body.mobile-mode .chat-container-root--keyboard-open .empty-stage,
+body.mobile-mode .chat-container-root--keyboard-open
+  .empty-stage,
+body.mobile-mode .chat-container-root--keyboard-open .message-list,
+body.mobile-mode .chat-container-root--keyboard-open
+  .message-list{
+  padding-bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+.attachment-preview-thumb,
+.message-image-card{
+  cursor: zoom-in;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-thumb img,
+.message-image-card img,
+.image-preview-large{
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.message-actions{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.message-actions--user{
+  justify-content: flex-end;
+}
+
+.message-actions button{
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.message-actions button:hover,
+.message-actions button.active{
+  border-color: var(--control-border);
+  background: var(--control-hover);
+  color: var(--text);
+}
+
+body.mobile-mode .message-actions button{
+  font-size: 11px;
+  padding: 5px 7px;
+}
+
+.chat-history-dialog__message{
+  margin: 0;
+  color: var(--text-color, inherit);
+  line-height: 1.5;
+}
