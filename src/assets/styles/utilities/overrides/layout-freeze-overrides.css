@@ -89,15 +89,13 @@ body.mobile-mode .test-toggle svg {
   height: 19px;
 }
 
-@media (max-width: 520px) {
-  .topbar-actions {
-    gap: 4px;
-  }
+body.mobile-mode .topbar-actions {
+  gap: 4px;
+}
 
-  .topbar-actions .round-icon {
-    width: 40px;
-    height: 40px;
-  }
+body.mobile-mode .topbar-actions .round-icon {
+  width: 40px;
+  height: 40px;
 }
 
 /* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
@@ -1961,20 +1959,19 @@ body.mobile-mode .sidebar-content--mobile
   min-height: 160px !important;
 }
 
-@media (max-width: 420px) {
-  .prompt-model-trigger,
-  .app-container--mobile .prompt-model-trigger {
-    max-width: 112px;
-  }
-  .prompt-icon-action,
-  .prompt-box--gemini .send-button,
-  .app-container--mobile .prompt-icon-action,
-  .app-container--mobile .prompt-box--gemini .send-button {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    min-height: 34px;
-  }
+body.mobile-mode .prompt-model-trigger,
+body.mobile-mode .app-container--mobile .prompt-model-trigger {
+  max-width: 112px;
+}
+
+body.mobile-mode .prompt-icon-action,
+body.mobile-mode .prompt-box--gemini .send-button,
+body.mobile-mode .app-container--mobile .prompt-icon-action,
+body.mobile-mode .app-container--mobile .prompt-box--gemini .send-button {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
 }
 
 /* Gemini/Assistant routing refactor overrides */

@@ -18,7 +18,6 @@
 @import "./components/message/message-bubbles.css";
 @import "./mobile-runtime/gestures/mobile-tap-button-radius-patch.css";
 @import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
-@import "./utilities/overrides/prompt-box-border-freeze-patch.css";
 
 /* 04 states, sidebar, assistant binding */
 @import "./states/error/exception.css";

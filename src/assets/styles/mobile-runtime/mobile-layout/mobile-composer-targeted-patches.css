@@ -451,3 +451,20 @@ body.mobile-mode .chat-container-root--mode-main
   flex: 0 0 auto !important;
   margin-left: auto !important;
 }
+
+/* Prompt box border freeze rules absorbed from utilities/overrides/prompt-box-border-freeze-patch.css.
+ * Keep this at the end of mobile composer patches to preserve the previous cascade position.
+ */
+.prompt-box,
+.prompt-box--gemini,
+.app-container--mobile .prompt-box,
+.app-container--mobile .prompt-box--gemini {
+  border: 1px solid var(--prompt-border);
+}
+
+body.mobile-mode .prompt-box,
+body.mobile-mode .prompt-box--gemini,
+body.mobile-mode .app-container--mobile .prompt-box,
+body.mobile-mode .app-container--mobile .prompt-box--gemini {
+  border: 1px solid var(--prompt-border);
+}

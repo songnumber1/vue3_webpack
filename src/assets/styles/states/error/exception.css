@@ -158,19 +158,17 @@
   background: var(--surface-muted);
 }
 
-@media (max-width: 480px) {
-  .exception-page {
-    padding: 18px;
-  }
+body.mobile-mode .exception-page {
+  padding: 18px;
+}
 
-  .exception-card {
-    padding: 28px 20px;
-    border-radius: 20px;
-  }
+body.mobile-mode .exception-card {
+  padding: 28px 20px;
+  border-radius: 20px;
+}
 
-  .exception-title {
-    font-size: 22px;
-  }
+body.mobile-mode .exception-title {
+  font-size: 22px;
 }
 
 .access-denied-page {
