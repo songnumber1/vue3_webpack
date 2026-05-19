@@ -11,6 +11,7 @@
 
 /* 03 mobile runtime and freeze overrides */
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
+/* mobile session/browser patch aggregator */
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
 @import "./browser-patches/mobile/mobile-browser-layout-patches.css";

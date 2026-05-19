@@ -1,0 +1,171 @@
+/* Keyboard/viewport patches extracted from mobile-session-browser-patches.css.
+   Selectors, declarations, !important, fixed/overflow/z-index ownership are preserved. */
+
+body.mobile-mode .feedback-dialog {
+  width: 100% !important;
+  max-height: calc(
+    var(--app-height, 100dvh) - 24px - env(safe-area-inset-top)
+  ) !important;
+}
+
+/* =========================================================
+   FINAL RESPONSIVE / KEYBOARD / TOKEN POLISH
+   ========================================================= */
+.chat-container-root {
+  grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
+  height: var(--layout-viewport-height, 100dvh);
+}
+
+.chat-container-root--mode-chat,
+.chat-container-root--mode-shared {
+  height: var(--app-height, 100dvh);
+}
+
+.chat-container-root--mode-main.chat-container-root--keyboard-open {
+  height: var(--layout-viewport-height, 100dvh);
+}
+
+body.mobile-mode .chat-container-root,
+body.mobile-mode .chat-container-root--mode-chat,
+body.mobile-mode .chat-container-root--mode-shared {
+  height: var(--app-height, 100dvh);
+}
+
+body.mobile-mode .chat-container-root--mode-main,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open {
+  height: var(--layout-viewport-height, 100dvh);
+}
+
+body.mobile-mode
+  .chat-container-root--mode-chat.chat-container-root--keyboard-open
+  .chat-workspace,
+body.mobile-mode
+  .chat-container-root--mode-shared.chat-container-root--keyboard-open
+  .chat-workspace {
+  height: var(--app-height, 100dvh);
+}
+
+.feedback-dialog-backdrop {
+  top: var(--visual-viewport-offset-top, 0px) !important;
+  bottom: auto !important;
+  min-height: 0 !important;
+  height: var(--app-height, 100dvh) !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: 20px !important;
+  background: var(--overlay-backdrop) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.feedback-dialog {
+  max-height: calc(var(--app-height, 100dvh) - 40px) !important;
+}
+
+body.mobile-mode .feedback-dialog {
+  width: min(100%, 520px) !important;
+  max-height: calc(var(--app-height, 100dvh) - 24px) !important;
+  border-radius: 22px !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .empty-center,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .empty-center {
+  transform: none !important;
+}
+
+.chat-bootstrap-loading__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.42;
+  animation: bootstrapPulse 1s ease-in-out infinite;
+}
+
+body.mobile-mode .mobile-drawer,
+body.mobile-mode .mobile-drawer {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .chat-workspace,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .chat-workspace {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .empty-center,
+body.mobile-mode
+  .chat-container-root--mode-main.chat-container-root--keyboard-open
+  .empty-center {
+  transform: none !important;
+  margin-top: 0 !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main
+  .chat-workspace,
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main
+  .chat-workspace,
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
+  position: relative !important;
+  height: var(--layout-viewport-height, 100dvh) !important;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-main,
+body.mobile-mode .chat-container-root--mode-main {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  overflow: hidden !important;
+  touch-action: pan-y !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main
+  .chat-workspace,
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) !important;
+}
