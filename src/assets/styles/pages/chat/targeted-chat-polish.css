@@ -39,38 +39,20 @@ body.desktop-mode .desktop-sidebar .assistant-option-main small {
 }
 body.desktop-mode .desktop-sidebar .option-selected-indicator {
   flex: 0 0 auto;
-}
-
-body.mobile-mode .message--user .bubble,
-body.mobile-mode .message--user .bubble {
+}body.mobile-mode .message--user .bubble {
   padding-bottom: 8px;
-}
-
-body.mobile-mode .message--user .bubble-content--plain,
-body.mobile-mode .message--user .bubble-content--plain {
+}body.mobile-mode .message--user .bubble-content--plain {
   line-height: 1.5;
-}
-
-body.mobile-mode .message--user .message-actions-wrap,
-body.mobile-mode .message--user .message-actions-wrap {
+}body.mobile-mode .message--user .message-actions-wrap {
   margin-top: 2px;
   gap: 0;
-}
-
-body.mobile-mode .message--user .message-actions,
-body.mobile-mode .message--user .message-actions {
+}body.mobile-mode .message--user .message-actions {
   margin-top: 0;
   gap: 0;
-}
-
-body.mobile-mode .message--user .message-action-icon,
-body.mobile-mode .message--user .message-action-icon {
+}body.mobile-mode .message--user .message-action-icon {
   width: 28px;
   height: 28px;
-}
-
-body.mobile-mode .message--user .message-action-icon svg,
-body.mobile-mode .message--user .message-action-icon svg {
+}body.mobile-mode .message--user .message-action-icon svg {
   width: 18px;
   height: 18px;
 }

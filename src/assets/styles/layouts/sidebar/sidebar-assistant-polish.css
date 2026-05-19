@@ -422,25 +422,14 @@ body.mobile-mode .attach-menu{
   padding: 0 12px calc(14px + env(safe-area-inset-bottom));
   overflow: hidden;
   will-change: height, transform;
-}
-
-body.mobile-mode .sidebar-content--mobile .assistant-trigger,
-body.mobile-mode .sidebar-content--mobile
-  .assistant-trigger{
+}body.mobile-mode .sidebar-content--mobile .assistant-trigger{
   height: 40px;
   max-width: 210px;
   font-size: 18px;
   box-shadow: none;
-}
-
-body.mobile-mode .sidebar-content--mobile .project-list,
-body.mobile-mode .sidebar-content--mobile .project-list{
+}body.mobile-mode .sidebar-content--mobile .project-list{
   display: none !important;
-}
-
-body.mobile-mode .sidebar-content--mobile .sidebar-history,
-body.mobile-mode .sidebar-content--mobile
-  .sidebar-history{
+}body.mobile-mode .sidebar-content--mobile .sidebar-history{
   flex: 1 1 auto !important;
   min-height: 160px !important;
 }

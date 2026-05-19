@@ -202,7 +202,7 @@ body.mobile-mode .md-table-wrapper table {
 }
 :root[data-theme="dark"] .md-mermaid svg,
 :root[data-theme="dark"] .md-mermaid svg * {
-  color: #f4f4f4 !important;
+  color: #f4f4f4;
 }
 :root[data-theme="dark"] .md-mermaid .node rect,
 :root[data-theme="dark"] .md-mermaid .node circle,
@@ -234,7 +234,7 @@ body.mobile-mode .md-table-wrapper table {
 :root[data-theme="dark"] .md-mermaid .actor,
 :root[data-theme="dark"] .md-mermaid .messageText {
   fill: #f4f4f4 !important;
-  color: #f4f4f4 !important;
+  color: #f4f4f4;
 }
 :root[data-theme="dark"] .md-mermaid .edgeLabel,
 :root[data-theme="dark"] .md-mermaid .labelBkg,

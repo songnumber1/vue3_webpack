@@ -35,19 +35,13 @@
   font-size: var(--message-plain-font-size);
   line-height: var(--message-plain-line-height);
   letter-spacing: -0.012em;
-}
-
-body.mobile-mode .message--user .bubble,
-body.mobile-mode .message--user .bubble {
+}body.mobile-mode .message--user .bubble {
   max-width: var(--message-user-mobile-max);
   padding: var(--message-user-mobile-padding);
   border-radius: calc(var(--message-user-radius) - 4px);
   background: var(--message-user-bg);
   color: var(--message-user-text);
-}
-
-body.mobile-mode .bubble-content--plain,
-body.mobile-mode .bubble-content--plain {
+}body.mobile-mode .bubble-content--plain {
   font-size: var(--message-plain-mobile-font-size);
   line-height: 1.62;
 }
@@ -76,10 +70,7 @@ body.mobile-mode .bubble-content--plain {
   width: 100%;
   max-width: 100%;
   justify-self: stretch;
-}
-
-body.mobile-mode .message:not(.message--user),
-body.mobile-mode .message:not(.message--user){
+}body.mobile-mode .message:not(.message--user){
   grid-template-columns: 30px minmax(0, 1fr);
 }
 
@@ -183,19 +174,10 @@ body.mobile-mode .message-image-card img{
   height: auto;
   padding: 8px;
   object-fit: contain;
-}
-
-body.mobile-mode .message-list,
-body.mobile-mode .message-list{
+}body.mobile-mode .message-list{
   padding-bottom: calc(116px + env(safe-area-inset-bottom));
-}
-
-body.mobile-mode .chat-container-root--keyboard-open .empty-stage,
-body.mobile-mode .chat-container-root--keyboard-open
-  .empty-stage,
-body.mobile-mode .chat-container-root--keyboard-open .message-list,
-body.mobile-mode .chat-container-root--keyboard-open
-  .message-list{
+}body.mobile-mode .chat-container-root--keyboard-open .empty-stage,
+body.mobile-mode .chat-container-root--keyboard-open .message-list{
   padding-bottom: calc(96px + env(safe-area-inset-bottom));
 }
 

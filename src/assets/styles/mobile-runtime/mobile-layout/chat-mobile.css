@@ -17,19 +17,15 @@ body.mobile-mode {
   --mobile-main-content-inline: var(--space-4, 16px);
   --mobile-main-content-gap: var(--space-4, 16px);
   --mobile-main-composer-z: var(--z-prompt-floating);
-}
-html:has(> body.mobile-mode),
+}html:has(> body.mobile-mode),
 body.mobile-mode,
-body.mobile-mode #app,
-body.mobile-mode {
+body.mobile-mode #app {
   height: var(--layout-viewport-height, 100dvh) !important;
   min-height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
   overscroll-behavior: none !important;
-}
-body.mobile-mode .chat-container-root--mode-main,
-body.mobile-mode .chat-container-root--mode-main {
+}body.mobile-mode .chat-container-root--mode-main {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
   min-height: var(--layout-viewport-height, 100dvh) !important;
@@ -37,10 +33,8 @@ body.mobile-mode .chat-container-root--mode-main {
   overflow: hidden !important;
   overscroll-behavior: none !important;
   touch-action: none !important;
-}
-body.mobile-mode .chat-container-root--mode-main
-  .chat-workspace,
-body.mobile-mode .chat-container-root--mode-main .chat-workspace {
+}body.mobile-mode .chat-container-root--mode-main
+  .chat-workspace {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
   min-height: 0 !important;

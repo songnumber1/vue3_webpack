@@ -14,53 +14,32 @@ body.mobile-mode
   .prompt-box--gemini,
 body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
-  .prompt-box--gemini,
-body.mobile-mode .chat-container-root--mode-shared
-  .chat-composer-slot
   .prompt-box--gemini {
   align-items: stretch !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .prompt-action-row,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .prompt-action-row,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .prompt-action-row,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-action-row {
   width: 100% !important;
   justify-content: space-between !important;
   align-items: center !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .prompt-left-actions,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .prompt-left-actions,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .prompt-left-actions,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .prompt-left-actions {
   flex: 1 1 auto !important;
   min-width: 0 !important;
   justify-content: flex-start !important;
   margin-right: auto !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .send-button,
@@ -74,26 +53,11 @@ body.mobile-mode
   .send-button,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .voice-button,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .send-button,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .voice-button,
-body.mobile-mode .chat-container-root--mode-shared
-  .chat-composer-slot
-  .send-button,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .voice-button {
   flex: 0 0 auto !important;
   margin-left: auto !important;
-}
-
-body.mobile-mode .attachment-preview-row,
-body.mobile-mode .attachment-preview-row,
+}body.mobile-mode .attachment-preview-row,
 body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
@@ -114,16 +78,9 @@ body.mobile-mode
   overflow-y: visible !important;
   scrollbar-width: none !important;
   -webkit-overflow-scrolling: touch !important;
-}
-
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar,
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
+}body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
   display: none !important;
-}
-
-body.mobile-mode .attachment-preview-card,
-body.mobile-mode .attachment-preview-card--image,
-body.mobile-mode .attachment-preview-card,
+}body.mobile-mode .attachment-preview-card,
 body.mobile-mode .attachment-preview-card--image {
   flex: 0 0 var(--attachment-mobile-size) !important;
   width: var(--attachment-mobile-size) !important;
@@ -137,11 +94,7 @@ body.mobile-mode .attachment-preview-card--image {
   padding: 6px !important;
   border-radius: var(--attachment-mobile-radius) !important;
   overflow: visible !important;
-}
-
-body.mobile-mode .attachment-preview-thumb,
-body.mobile-mode .attachment-preview-file,
-body.mobile-mode .attachment-preview-thumb,
+}body.mobile-mode .attachment-preview-thumb,
 body.mobile-mode .attachment-preview-file {
   width: 100% !important;
   height: 100% !important;
@@ -150,40 +103,22 @@ body.mobile-mode .attachment-preview-file {
   display: grid !important;
   place-items: center !important;
   border-radius: var(--attachment-mobile-thumb-radius) !important;
-}
-
-body.mobile-mode .attachment-preview-thumb img,
-body.mobile-mode .attachment-preview-thumb img {
+}body.mobile-mode .attachment-preview-thumb img {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
   border-radius: var(--attachment-mobile-thumb-radius) !important;
-}
-
-body.mobile-mode .attachment-preview-file,
-body.mobile-mode .attachment-preview-file {
+}body.mobile-mode .attachment-preview-file {
   font-size: 28px !important;
   line-height: 1 !important;
   background: var(--surface, #f8fafc) !important;
-}
-
-body.mobile-mode .attachment-preview-info,
+}body.mobile-mode .attachment-preview-info,
 body.mobile-mode .attachment-preview-info strong,
 body.mobile-mode .attachment-preview-info span,
-body.mobile-mode .attachment-preview-card--image .attachment-preview-info,
-body.mobile-mode .attachment-preview-info,
-body.mobile-mode .attachment-preview-info strong,
-body.mobile-mode .attachment-preview-info span,
-body.mobile-mode .attachment-preview-card--image
-  .attachment-preview-info {
+body.mobile-mode .attachment-preview-card--image .attachment-preview-info {
   display: none !important;
-}
-
-body.mobile-mode .attachment-preview-remove,
-body.mobile-mode .attachment-preview-card--image .attachment-preview-remove,
-body.mobile-mode .attachment-preview-remove,
-body.mobile-mode .attachment-preview-card--image
-  .attachment-preview-remove {
+}body.mobile-mode .attachment-preview-remove,
+body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   top: var(--attachment-mobile-remove-offset) !important;
   right: var(--attachment-mobile-remove-offset) !important;
   width: var(--attachment-mobile-remove-size) !important;
@@ -194,10 +129,7 @@ body.mobile-mode .attachment-preview-card--image
   font-size: 22px !important;
   line-height: 1 !important;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
-}
-
-body.mobile-mode .attachment-preview-remove::before,
-body.mobile-mode .attachment-preview-remove::before {
+}body.mobile-mode .attachment-preview-remove::before {
   inset: -8px !important;
 }
 
@@ -228,12 +160,10 @@ body.mobile-mode .chat-container-root--mode-main
   gap: 6px !important;
   padding-left: 10px !important;
   padding-right: 10px !important;
-}
-
-/*
+}/*
  * Final mobile chat composer alignment override.
  * The main screen composer receives a dedicated mobile-main-fixed-prompt class,
- * while chat rooms previously relied on generic mobile rules.  Keep this scoped
+* while chat rooms previously relied on generic mobile rules.  Keep this scoped
  * to mobile chat/shared rooms and the explicit mobile-chat-prompt marker so the
  * desktop composer and full-width web layout are not affected.
  */
@@ -247,50 +177,27 @@ body.mobile-mode
   .mobile-chat-prompt,
 body.mobile-mode .chat-container-root--mode-chat
   .chat-composer-slot
-  .mobile-chat-prompt,
-body.mobile-mode .chat-container-root--mode-shared
-  .chat-composer-slot
   .mobile-chat-prompt {
   width: 100% !important;
   max-width: none !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-box--gemini,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-box--gemini,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-box--gemini,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-box--gemini {
   align-items: stretch !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-action-row,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-action-row,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-action-row,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-action-row {
@@ -301,23 +208,13 @@ body.mobile-mode .chat-container-root--mode-shared
   align-items: center !important;
   justify-content: space-between !important;
   gap: 8px !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-left-actions,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-left-actions,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .prompt-left-actions,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .prompt-left-actions {
@@ -329,9 +226,7 @@ body.mobile-mode .chat-container-root--mode-shared
   justify-content: flex-start !important;
   gap: 8px !important;
   margin: 0 !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-chat
   .chat-composer-slot
   .mobile-chat-prompt
@@ -348,30 +243,12 @@ body.mobile-mode
   .send-button,
 body.mobile-mode
   .chat-container-root--mode-shared
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .voice-button,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .send-button,
-body.mobile-mode .chat-container-root--mode-chat
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .voice-button,
-body.mobile-mode .chat-container-root--mode-shared
-  .chat-composer-slot
-  .mobile-chat-prompt
-  .send-button,
-body.mobile-mode .chat-container-root--mode-shared
   .chat-composer-slot
   .mobile-chat-prompt
   .voice-button {
   flex: 0 0 auto !important;
   margin-left: auto !important;
-}
-
-/*
+}/*
  * Final mobile main composer parity override.
  * Keep this scoped to the explicit main-screen fixed composer so PC/web desktop
  * layouts are untouched. The mobile main input now uses the same action-row
@@ -384,28 +261,16 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap,
 body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt,
-body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt.prompt-wrap {
+  .mobile-main-fixed-prompt {
   background: transparent !important;
   box-shadow: none !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .prompt-box--gemini,
-body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box--gemini {
   align-items: stretch !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .prompt-action-row,
-body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-action-row {
   display: flex !important;
@@ -415,13 +280,8 @@ body.mobile-mode .chat-container-root--mode-main
   align-items: center !important;
   justify-content: space-between !important;
   gap: 8px !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .prompt-left-actions,
-body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-left-actions {
   display: flex !important;
@@ -432,20 +292,12 @@ body.mobile-mode .chat-container-root--mode-main
   justify-content: flex-start !important;
   gap: 8px !important;
   margin: 0 !important;
-}
-
-body.mobile-mode
+}body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .send-button,
 body.mobile-mode
   .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .voice-button,
-body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt
-  .send-button,
-body.mobile-mode .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .voice-button {
   flex: 0 0 auto !important;
@@ -460,11 +312,7 @@ body.mobile-mode .chat-container-root--mode-main
 .app-container--mobile .prompt-box,
 .app-container--mobile .prompt-box--gemini {
   border: 1px solid var(--prompt-border);
-}
-
-body.mobile-mode .prompt-box,
-body.mobile-mode .prompt-box--gemini,
-body.mobile-mode .prompt-box,
+}body.mobile-mode .prompt-box,
 body.mobile-mode .prompt-box--gemini {
   border: 1px solid var(--prompt-border);
 }

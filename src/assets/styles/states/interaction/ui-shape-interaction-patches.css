@@ -7,12 +7,12 @@
 /* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
 .suggestion-chip,
 .app-container--mobile .suggestion-chip {
-  border-radius: 5px !important;
+  border-radius: 5px;
 }
 
 /* 2. Assistant feedback text button: reduce excessive pill radius. */
 .message-action-text-button {
-  border-radius: 5px !important;
+  border-radius: 5px;
 }
 
 /* 3. Shared popup panels: reduce panel radius without changing layout. */
@@ -20,7 +20,7 @@
 .feedback-dialog,
 .responsive-overlay--mobile-dialog .responsive-panel,
 .responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
-  border-radius: 5px !important;
+  border-radius: 5px;
 }
 
 /* 3.1 Popup footer/action buttons should be rectangular. */
@@ -28,7 +28,7 @@
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
 .responsive-panel .playground-button {
-  border-radius: 0 !important;
+  border-radius: 0;
 }
 
 /* 3.2 Positive/destructive confirmation actions use the primary color. */
@@ -40,7 +40,7 @@
 .responsive-panel .playground-button:not(.playground-button--secondary) {
   border-color: var(--primary) !important;
   background: var(--primary) !important;
-  color: #ffffff !important;
+  color: #ffffff;
 }
 
 .feedback-dialog-footer button:first-child:hover,
@@ -58,73 +58,34 @@
   .playground-button:not(.playground-button--secondary):focus-visible {
   border-color: var(--primary-strong, var(--primary)) !important;
   background: var(--primary-strong, var(--primary)) !important;
-  color: #ffffff !important;
-}
-
-/* 4. Mobile-only tap flash prevention for requested controls. */
+  color: #ffffff;
+}/* 4. Mobile-only tap flash prevention for requested controls. */
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.mobile-mode .mobile-topbar .menu-toggle,
-body.mobile-mode
-  .mobile-topbar
-  .model-trigger--assistant,
-body.mobile-mode .empty-stage--mobile-main .suggestion-chip,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip {
+body.mobile-mode .empty-stage--mobile-main .suggestion-chip {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}
-body.mobile-mode .mobile-topbar .menu-toggle,
-body.mobile-mode .mobile-topbar .menu-toggle {
+}body.mobile-mode .mobile-topbar .menu-toggle {
   border-color: transparent !important;
   background: transparent !important;
   box-shadow: none !important;
-}
-body.mobile-mode .mobile-topbar .menu-toggle:hover,
+}body.mobile-mode .mobile-topbar .menu-toggle:hover,
 body.mobile-mode .mobile-topbar .menu-toggle:active,
 body.mobile-mode .mobile-topbar .menu-toggle:focus,
 body.mobile-mode .mobile-topbar .menu-toggle:focus-visible,
-body.mobile-mode .mobile-topbar .menu-toggle:hover,
-body.mobile-mode .mobile-topbar .menu-toggle:active,
-body.mobile-mode .mobile-topbar .menu-toggle:focus,
-body.mobile-mode
-  .mobile-topbar
-  .menu-toggle:focus-visible,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:hover,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:active,
 body.mobile-mode .mobile-topbar .model-trigger--assistant:focus,
-body.mobile-mode .mobile-topbar .model-trigger--assistant:focus-visible,
-body.mobile-mode
-  .mobile-topbar
-  .model-trigger--assistant:hover,
-body.mobile-mode
-  .mobile-topbar
-  .model-trigger--assistant:active,
-body.mobile-mode
-  .mobile-topbar
-  .model-trigger--assistant:focus,
-body.mobile-mode
-  .mobile-topbar
-  .model-trigger--assistant:focus-visible {
+body.mobile-mode .mobile-topbar .model-trigger--assistant:focus-visible {
   border-color: transparent !important;
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
   outline: none !important;
-}
-body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
+}body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus,
-body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip:active,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip:focus,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip:focus-visible {
+body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
   background: transparent !important;
   box-shadow: none !important;
   outline: none !important;

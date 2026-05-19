@@ -10,10 +10,7 @@
 .prompt-box textarea,
 .app-container--mobile .prompt-box textarea{
   align-self: center;
-}
-
-body.mobile-mode .prompt-box,
-body.mobile-mode .prompt-box{
+}body.mobile-mode .prompt-box{
   grid-template-columns: 34px minmax(0, 1fr) 38px;
   align-items: center;
 }
@@ -151,28 +148,16 @@ body.mobile-mode .prompt-input-row{
   min-width: var(--prompt-action-size);
   min-height: var(--prompt-action-size);
   padding: 0;
-}
-
-body.mobile-mode .prompt-wrap,
-body.mobile-mode .prompt-wrap{
+}body.mobile-mode .prompt-wrap{
   padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-}
-
-body.mobile-mode .prompt-box,
-body.mobile-mode .prompt-box{
+}body.mobile-mode .prompt-box{
   width: 100%;
   max-width: none;
   border-radius: 26px;
   padding: 7px;
-}
-
-body.mobile-mode .prompt-input-row,
-body.mobile-mode .prompt-input-row{
+}body.mobile-mode .prompt-input-row{
   gap: 7px;
-}
-
-body.mobile-mode .prompt-box textarea,
-body.mobile-mode .prompt-box textarea{
+}body.mobile-mode .prompt-box textarea{
   min-height: 38px;
   height: 38px;
   max-height: 136px;
@@ -463,80 +448,44 @@ body.mobile-mode .prompt-box textarea{
   margin: 0;
   font-size: 14px;
   font-weight: 700;
-}
-
-body.mobile-mode .mobile-project-home,
-body.mobile-mode .mobile-project-home,
-body.mobile-mode .mobile-bottom-prompt,
+}body.mobile-mode .mobile-project-home,
 body.mobile-mode .mobile-bottom-prompt{
   display: none !important;
-}
-
-body.mobile-mode .desktop-center-prompt,
-body.mobile-mode .desktop-center-prompt{
+}body.mobile-mode .desktop-center-prompt{
   display: block !important;
   width: 100% !important;
-}
-
-body.mobile-mode .prompt-wrap,
-body.mobile-mode .prompt-wrap{
+}body.mobile-mode .prompt-wrap{
   background: var(--mobile-bg, var(--chat-bg));
   padding: 8px 12px calc(10px + env(safe-area-inset-bottom));
-}
-
-body.mobile-mode .prompt-box--gemini,
-body.mobile-mode .prompt-box--gemini{
+}body.mobile-mode .prompt-box--gemini{
   width: 100%;
   max-width: none;
   border-radius: 28px;
   padding: 12px 14px 10px;
   gap: 8px;
-}
-
-body.mobile-mode .prompt-box--gemini textarea,
-body.mobile-mode .prompt-box--gemini textarea{
+}body.mobile-mode .prompt-box--gemini textarea{
   min-height: 40px;
   height: 40px;
   max-height: 136px;
   font-size: 16px;
-}
-
-body.mobile-mode .prompt-action-row,
-body.mobile-mode .prompt-action-row{
+}body.mobile-mode .prompt-action-row{
   gap: 8px;
-}
-
-body.mobile-mode .prompt-left-actions,
-body.mobile-mode .prompt-left-actions{
+}body.mobile-mode .prompt-left-actions{
   gap: 5px;
-}
-
-body.mobile-mode .prompt-model-trigger,
-body.mobile-mode .prompt-model-trigger{
+}body.mobile-mode .prompt-model-trigger{
   height: 36px;
   max-width: 132px;
   padding: 0 10px;
   font-size: 13px;
-}
-
-body.mobile-mode .prompt-icon-action,
-body.mobile-mode .prompt-box--gemini .send-button,
-body.mobile-mode .prompt-icon-action,
+}body.mobile-mode .prompt-icon-action,
 body.mobile-mode .prompt-box--gemini .send-button{
   width: 36px;
   height: 36px;
   min-width: 36px;
   min-height: 36px;
-}
-
-body.mobile-mode .prompt-model-trigger,
-body.mobile-mode .prompt-model-trigger{
+}body.mobile-mode .prompt-model-trigger{
   max-width: 112px;
-}
-
-body.mobile-mode .prompt-icon-action,
-body.mobile-mode .prompt-box--gemini .send-button,
-body.mobile-mode .prompt-icon-action,
+}body.mobile-mode .prompt-icon-action,
 body.mobile-mode .prompt-box--gemini .send-button{
   width: 34px;
   height: 34px;

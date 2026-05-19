@@ -277,10 +277,7 @@ body.mobile-mode .suggestion-row--between {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-}
-
-body.mobile-mode .suggestion-chip,
-body.mobile-mode .suggestion-chip {
+}body.mobile-mode .suggestion-chip {
   width: 100%;
   max-width: none;
   justify-content: center;
@@ -364,18 +361,12 @@ body.desktop-mode .suggestion-chip {
   width: 100%;
   max-width: none;
   justify-content: center;
-}
-
-body.mobile-mode .suggestion-row--between,
-body.mobile-mode .suggestion-row--between {
+}body.mobile-mode .suggestion-row--between {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
   width: 100%;
-}
-
-body.mobile-mode .suggestion-chip,
-body.mobile-mode .suggestion-chip {
+}body.mobile-mode .suggestion-chip {
   min-width: 0;
   padding-inline: 10px;
 }
@@ -767,70 +758,36 @@ body.mobile-mode .message-action-icon {
 .feedback-dialog-footer button:first-child {
   border-color: var(--primary);
   color: var(--primary-strong, var(--primary));
-}
-
-body.mobile-mode .empty-stage--mobile-main,
-body.mobile-mode .empty-stage--mobile-main {
+}body.mobile-mode .empty-stage--mobile-main {
   place-items: start center !important;
   align-content: start !important;
   padding: 78px 16px calc(150px + env(safe-area-inset-bottom)) !important;
   overflow-y: auto !important;
-}
-
-body.mobile-mode .empty-stage--mobile-main .empty-center,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .empty-center {
+}body.mobile-mode .empty-stage--mobile-main .empty-center {
   width: 100% !important;
   min-height: auto;
   align-items: stretch !important;
   justify-content: flex-start !important;
   gap: 14px !important;
-}
-
-body.mobile-mode .empty-stage--mobile-main .empty-center h1,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .empty-center
-  h1 {
+}body.mobile-mode .empty-stage--mobile-main .empty-center h1 {
   text-align: left !important;
   font-size: 24px;
   line-height: 1.25;
-}
-
-body.mobile-mode .empty-stage--mobile-main .suggestion-row--between,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-row--between {
+}body.mobile-mode .empty-stage--mobile-main .suggestion-row--between {
   display: grid !important;
   grid-template-columns: 1fr !important;
   gap: 10px !important;
   width: 100% !important;
   margin: 0 !important;
-}
-
-body.mobile-mode .empty-stage--mobile-main .suggestion-chip,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip {
+}body.mobile-mode .empty-stage--mobile-main .suggestion-chip {
   width: 100% !important;
   min-height: 46px;
   justify-content: flex-start !important;
   padding: 0 16px !important;
   text-align: left;
-}
-
-body.mobile-mode .empty-stage--mobile-main .suggestion-chip-text,
-body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-chip-text {
+}body.mobile-mode .empty-stage--mobile-main .suggestion-chip-text {
   white-space: nowrap;
-}
-
-body.mobile-mode
-  .empty-stage--mobile-main
-  .desktop-center-prompt.prompt-wrap--floating,
-body.mobile-mode
+}body.mobile-mode
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating {
   display: block !important;

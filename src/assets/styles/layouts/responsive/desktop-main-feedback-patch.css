@@ -29,9 +29,6 @@ body.desktop-mode
   .prompt-box--gemini {
   width: 100% !important;
   max-width: var(--layout-prompt-width, 820px) !important;
-}
-
-body.mobile-mode .feedback-dialog,
-body.mobile-mode .feedback-dialog {
-  border-radius: 5px !important;
+}body.mobile-mode .feedback-dialog {
+  border-radius: 5px;
 }

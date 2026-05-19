@@ -462,43 +462,25 @@ body.mobile-mode .image-preview-large{
 .attachment-preview-remove:active,
 .app-container--mobile .attachment-preview-remove:active{
   transform: scale(0.96);
-}
-
-body.mobile-mode .attachment-preview-row,
-body.mobile-mode .attachment-preview-row{
+}body.mobile-mode .attachment-preview-row{
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: visible;
   padding: 18px 18px 12px 4px;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
-}
-
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar,
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar{
+}body.mobile-mode .attachment-preview-row::-webkit-scrollbar{
   display: none;
-}
-
-body.mobile-mode .attachment-preview-card,
-body.mobile-mode .attachment-preview-card,
-body.mobile-mode .attachment-preview-card--image,
+}body.mobile-mode .attachment-preview-card,
 body.mobile-mode .attachment-preview-card--image{
   flex: 0 0 96px;
   width: 96px;
   min-height: 108px;
-}
-
-body.mobile-mode .attachment-preview-thumb,
-body.mobile-mode .attachment-preview-thumb{
+}body.mobile-mode .attachment-preview-thumb{
   height: 60px;
   min-height: 60px;
-}
-
-body.mobile-mode .attachment-preview-remove,
-body.mobile-mode .attachment-preview-remove,
-body.mobile-mode .attachment-preview-card--image .attachment-preview-remove,
-body.mobile-mode .attachment-preview-card--image
-  .attachment-preview-remove{
+}body.mobile-mode .attachment-preview-remove,
+body.mobile-mode .attachment-preview-card--image .attachment-preview-remove{
   top: -16px;
   right: -16px;
 }
@@ -511,7 +493,7 @@ body.mobile-mode .attachment-preview-card--image
   padding: calc(18px + env(safe-area-inset-top))
     calc(14px + env(safe-area-inset-right))
     calc(18px + env(safe-area-inset-bottom))
-    calc(14px + env(safe-area-inset-left)) !important;
+    calc(14px + env(safe-area-inset-left));
   background: rgba(0, 0, 0, 0.82) !important;
 }
 
@@ -525,8 +507,8 @@ body.mobile-mode .attachment-preview-card--image
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  padding: 0 !important;
-  border-radius: 16px !important;
+  padding: 0;
+  border-radius: 16px;
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -538,7 +520,7 @@ body.mobile-mode .attachment-preview-card--image
   max-width: 100% !important;
   max-height: calc(var(--app-height, 100vh) - 88px) !important;
   object-fit: contain !important;
-  border-radius: 12px !important;
+  border-radius: 12px;
   background: #ffffff !important;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.36) !important;
 }
@@ -589,7 +571,7 @@ body.mobile-mode .attachment-preview-card--image
   height: 56px !important;
   top: calc(16px + env(safe-area-inset-top)) !important;
   right: calc(16px + env(safe-area-inset-right)) !important;
-  font-size: 34px !important;
+  font-size: 34px;
   font-weight: 500 !important;
 }
 
@@ -608,8 +590,8 @@ body.mobile-mode .attachment-preview-card--image
   max-height: var(--attachment-mobile-size) !important;
   display: grid !important;
   place-items: center !important;
-  padding: 6px !important;
-  border-radius: var(--attachment-mobile-radius) !important;
+  padding: 6px;
+  border-radius: var(--attachment-mobile-radius);
   overflow: visible !important;
 }
 
@@ -621,18 +603,18 @@ body.mobile-mode .attachment-preview-card--image
   min-height: 0 !important;
   display: grid !important;
   place-items: center !important;
-  border-radius: var(--attachment-mobile-thumb-radius) !important;
+  border-radius: var(--attachment-mobile-thumb-radius);
 }
 
 .app-container--mobile .attachment-preview-thumb img{
   width: 100% !important;
   height: 100% !important;
   object-fit: cover !important;
-  border-radius: var(--attachment-mobile-thumb-radius) !important;
+  border-radius: var(--attachment-mobile-thumb-radius);
 }
 
 .app-container--mobile .attachment-preview-file{
-  font-size: 28px !important;
+  font-size: 28px;
   line-height: 1 !important;
   background: var(--surface, #f8fafc) !important;
 }
@@ -656,8 +638,8 @@ body.mobile-mode .attachment-preview-card--image
   height: var(--attachment-mobile-remove-size) !important;
   min-width: var(--attachment-mobile-remove-size) !important;
   min-height: var(--attachment-mobile-remove-size) !important;
-  padding: 0 0 2px !important;
-  font-size: 22px !important;
+  padding: 0 0 2px;
+  font-size: 22px;
   line-height: 1 !important;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
 }
