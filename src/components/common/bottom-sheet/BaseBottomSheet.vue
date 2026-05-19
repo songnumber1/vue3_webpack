@@ -40,6 +40,15 @@
         </div>
 
         <header class="bottom-sheet-header app-dialog-header">
+          <button
+            v-if="showBack"
+            type="button"
+            class="bottom-sheet-back app-dialog-back"
+            :aria-label="backLabel || t('common.back')"
+            @click="emit('back')"
+          >
+            ‹
+          </button>
           <h2>{{ title || t("common.select") }}</h2>
           <button
             type="button"
@@ -72,9 +81,11 @@ const props = defineProps({
   minHeight: {type: Number, default: 260},
   maxRatio: {type: Number, default: 0.92},
   overlayClass: {type: String, default: ""},
+  showBack: {type: Boolean, default: false},
+  backLabel: {type: String, default: ""},
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "back"]);
 
 const {
   sheetRef,

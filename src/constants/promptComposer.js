@@ -55,6 +55,31 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
     labelKey: "chat.suggestions.search",
     prompt: "프로젝트에서 빠진 항목을 찾아줘",
   },
+  {
+    id: "knowledge-search",
+    icon: "⌕",
+    labelKey: "chat.suggestions.knowledgeSearch",
+    children: [
+      {
+        id: "knowledge-paper",
+        icon: "◫",
+        labelKey: "chat.suggestions.knowledge.paper",
+        prompt: "논문 자료를 기준으로 관련 내용을 찾아 정리해줘",
+      },
+      {
+        id: "knowledge-confluence",
+        icon: "◆",
+        labelKey: "chat.suggestions.knowledge.confluence",
+        prompt: "Confluence 문서를 기준으로 관련 내용을 찾아 정리해줘",
+      },
+      {
+        id: "knowledge-jira",
+        icon: "◇",
+        labelKey: "chat.suggestions.knowledge.jira",
+        prompt: "Jira 이슈를 기준으로 관련 내용을 찾아 정리해줘",
+      },
+    ],
+  },
 ]);
 
 export const ATTACH_MENU_OPTIONS = Object.freeze([

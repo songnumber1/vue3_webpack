@@ -56,17 +56,45 @@
         </button>
         <div
           v-if="toolMenuOpen && !isMobileSheet"
+          ref="toolMenuRef"
           class="prompt-popover prompt-tool-menu"
         >
           <button
             v-for="tool in tools"
             :key="tool.id"
             type="button"
-            @click="$emit('apply-tool', tool)"
+            :class="{
+              'prompt-tool-menu-parent': hasChildren(tool),
+              active: activeToolGroupId === tool.id,
+            }"
+            :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
+            :aria-expanded="hasChildren(tool) ? activeToolGroupId === tool.id : undefined"
+            @click="handleToolClick(tool)"
           >
             <span aria-hidden="true">{{ tool.icon }}</span>
             <p>{{ tool.label }}</p>
+            <span v-if="hasChildren(tool)" class="prompt-submenu-arrow" aria-hidden="true">
+              ›
+            </span>
           </button>
+
+          <div
+            v-if="activeToolGroup"
+            class="prompt-popover prompt-tool-submenu"
+            :class="`prompt-tool-submenu--${submenuPlacement}`"
+            role="menu"
+          >
+            <button
+              v-for="child in activeToolGroup.children"
+              :key="child.id"
+              type="button"
+              role="menuitem"
+              @click="applyNestedTool(child)"
+            >
+              <span aria-hidden="true">{{ child.icon }}</span>
+              <p>{{ child.label }}</p>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -165,15 +193,18 @@
 </template>
 
 <script setup>
+import {computed, nextTick, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const {t} = useI18n();
-import {computed, ref} from "vue";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const modelRoot = ref(null);
 const toolRoot = ref(null);
 const attachRoot = ref(null);
+const toolMenuRef = ref(null);
+const activeToolGroupId = ref("");
+const submenuPlacement = ref("right");
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
@@ -201,11 +232,7 @@ const props = defineProps({
   readonlyTitle: {type: String, default: ""},
 });
 
-const resolvedReadonlyTitle = computed(
-  () => props.readonlyTitle || t("prompt.modelReadonly")
-);
-
-defineEmits([
+const emit = defineEmits([
   "open-model",
   "open-tool",
   "open-attach",
@@ -216,6 +243,10 @@ defineEmits([
   "stop-voice",
 ]);
 
+const resolvedReadonlyTitle = computed(
+  () => props.readonlyTitle || t("prompt.modelReadonly")
+);
+
 const showVoiceStartButton = computed(
   () =>
     props.isMicEnabled &&
@@ -225,6 +256,58 @@ const showVoiceStartButton = computed(
 );
 const showVoiceStopButton = computed(
   () => props.isMicEnabled && props.isVoiceListening
+);
+
+const activeToolGroup = computed(() => {
+  return props.tools.find((tool) => tool.id === activeToolGroupId.value) || null;
+});
+
+function hasChildren(tool) {
+  return Array.isArray(tool?.children) && tool.children.length > 0;
+}
+
+function resolveSubmenuPlacement() {
+  const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
+  if (!menuRect) {
+    submenuPlacement.value = "right";
+    return;
+  }
+
+  const submenuWidth = 248;
+  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const rightSpace = viewportWidth - menuRect.right;
+  const leftSpace = menuRect.left;
+  submenuPlacement.value = rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
+}
+
+async function handleToolClick(tool) {
+  if (!hasChildren(tool)) {
+    emit("apply-tool", tool);
+    return;
+  }
+
+  activeToolGroupId.value = activeToolGroupId.value === tool.id ? "" : tool.id;
+  await nextTick();
+  resolveSubmenuPlacement();
+}
+
+function applyNestedTool(tool) {
+  emit("apply-tool", tool);
+  activeToolGroupId.value = "";
+}
+
+watch(
+  () => props.toolMenuOpen,
+  (open) => {
+    if (!open) activeToolGroupId.value = "";
+  }
+);
+
+watch(
+  () => props.isMobileSheet,
+  () => {
+    activeToolGroupId.value = "";
+  }
 );
 
 defineExpose({modelRoot, toolRoot, attachRoot});
@@ -250,5 +333,37 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 
 .prompt-popover {
   box-sizing: border-box;
+}
+
+.prompt-tool-menu-parent {
+  position: relative;
+}
+
+.prompt-tool-menu-parent.active {
+  background: var(--control-hover);
+}
+
+.prompt-submenu-arrow {
+  margin-left: auto;
+  width: auto !important;
+  color: var(--muted);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.prompt-tool-submenu {
+  top: 0;
+  bottom: auto;
+  min-width: 220px;
+}
+
+.prompt-tool-submenu--right {
+  left: calc(100% + 8px);
+  right: auto;
+}
+
+.prompt-tool-submenu--left {
+  right: calc(100% + 8px);
+  left: auto;
 }
 </style>

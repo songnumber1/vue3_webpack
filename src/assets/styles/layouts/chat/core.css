@@ -1360,3 +1360,16 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   cursor: not-allowed;
   box-shadow: none;
 }
+
+/* Prompt 2-depth tool menu typography and spacing. */
+.prompt-tool-menu .prompt-submenu-arrow,
+.prompt-tool-submenu .prompt-submenu-arrow,
+.bottom-sheet-submenu-arrow {
+  font-family: var(--app-font-family, inherit);
+}
+
+.prompt-tool-submenu p,
+.prompt-tool-menu .prompt-tool-menu-parent p {
+  font-size: var(--text-size-body-sm, 14px);
+  line-height: var(--text-line-height-compact, 1.35);
+}

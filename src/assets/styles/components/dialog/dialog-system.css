@@ -1159,3 +1159,29 @@ body.desktop-mode .mobile-topbar .model-trigger--assistant {
     border-radius: var(--dialog-radius);
   }
 }
+
+/* Prompt nested bottom sheet header back action. */
+.bottom-sheet-back {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bottom-sheet-back:hover {
+  background: var(--control-hover);
+}
+
+.bottom-sheet-header .bottom-sheet-back + h2 {
+  flex: 1 1 auto;
+}

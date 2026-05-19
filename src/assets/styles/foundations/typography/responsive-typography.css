@@ -119,6 +119,7 @@ body.mobile-mode {
 .responsive-back-button,
 .feedback-dialog-close,
 .bottom-sheet-close,
+.bottom-sheet-back,
 .mobile-settings-close,
 .image-preview-close,
 .chat-image-preview-close {
@@ -139,6 +140,7 @@ body.mobile-mode .responsive-close-button,
 body.mobile-mode .responsive-back-button,
 body.mobile-mode .feedback-dialog-close,
 body.mobile-mode .bottom-sheet-close,
+body.mobile-mode .bottom-sheet-back,
 body.mobile-mode .mobile-settings-close,
 body.mobile-mode .image-preview-close,
 body.mobile-mode .chat-image-preview-close {
@@ -154,6 +156,7 @@ body.mobile-mode .chat-image-preview-close {
 .responsive-back-button svg,
 .feedback-dialog-close svg,
 .bottom-sheet-close svg,
+.bottom-sheet-back svg,
 .mobile-settings-close svg,
 .image-preview-close svg,
 .chat-image-preview-close svg {

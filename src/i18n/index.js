@@ -94,6 +94,12 @@ export const messages = {
         image: "이미지 만들기",
         writing: "글쓰기 또는 편집",
         search: "필요한 항목 찾기",
+        knowledgeSearch: "지식 검색",
+        knowledge: {
+          paper: "논문",
+          confluence: "Confluence",
+          jira: "Jira",
+        },
       },
       historyMenu: {
         title: "대화방 메뉴",
@@ -408,6 +414,12 @@ export const messages = {
         image: "Create image",
         writing: "Write or edit",
         search: "Find what you need",
+        knowledgeSearch: "Knowledge search",
+        knowledge: {
+          paper: "Papers",
+          confluence: "Confluence",
+          jira: "Jira",
+        },
       },
       historyMenu: {
         title: "Chat menu",

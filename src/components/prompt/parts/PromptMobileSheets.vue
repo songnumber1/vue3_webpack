@@ -23,24 +23,55 @@
 
   <BaseBottomSheet
     :open="toolOpen"
-    :title="toolTitle"
-    @close="$emit('close-tool')"
+    :title="resolvedToolTitle"
+    :show-back="Boolean(activeToolGroup)"
+    :back-label="t('common.back')"
+    @back="activeToolGroupId = ''"
+    @close="closeToolSheet"
   >
-    <button
-      v-for="tool in tools"
-      :key="tool.id"
-      class="bottom-sheet-option bottom-sheet-option--row"
-      type="button"
-      @click="$emit('apply-tool', tool)"
-    >
-      <span aria-hidden="true">
-        {{ tool.icon }}
-      </span>
+    <template v-if="!activeToolGroup">
+      <button
+        v-for="tool in tools"
+        :key="tool.id"
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="handleToolClick(tool)"
+      >
+        <span aria-hidden="true">
+          {{ tool.icon }}
+        </span>
 
-      <strong>
-        {{ tool.label }}
-      </strong>
-    </button>
+        <strong>
+          {{ tool.label }}
+        </strong>
+
+        <span
+          v-if="hasChildren(tool)"
+          class="bottom-sheet-submenu-arrow"
+          aria-hidden="true"
+        >
+          ›
+        </span>
+      </button>
+    </template>
+
+    <template v-else>
+      <button
+        v-for="child in activeToolGroup.children"
+        :key="child.id"
+        class="bottom-sheet-option bottom-sheet-option--row"
+        type="button"
+        @click="applyNestedTool(child)"
+      >
+        <span aria-hidden="true">
+          {{ child.icon }}
+        </span>
+
+        <strong>
+          {{ child.label }}
+        </strong>
+      </button>
+    </template>
   </BaseBottomSheet>
 
   <BaseBottomSheet
@@ -67,7 +98,7 @@
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
@@ -127,7 +158,7 @@ const props = defineProps({
   },
 });
 
-defineEmits([
+const emit = defineEmits([
   "close-model",
   "close-tool",
   "close-attach",
@@ -136,6 +167,12 @@ defineEmits([
   "open-file-picker",
 ]);
 
+const activeToolGroupId = ref("");
+
+const activeToolGroup = computed(() => {
+  return props.tools.find((tool) => tool.id === activeToolGroupId.value) || null;
+});
+
 const resolvedModelTitle = computed(() => {
   return props.modelTitle || t("prompt.modelSelect");
 });
@@ -143,10 +180,51 @@ const resolvedModelTitle = computed(() => {
 const resolvedAttachTitle = computed(() => {
   return props.attachTitle || t("prompt.attach");
 });
+
+const resolvedToolTitle = computed(() => {
+  return activeToolGroup.value?.label || props.toolTitle;
+});
+
+function hasChildren(tool) {
+  return Array.isArray(tool?.children) && tool.children.length > 0;
+}
+
+function handleToolClick(tool) {
+  if (!hasChildren(tool)) {
+    emit("apply-tool", tool);
+    return;
+  }
+
+  activeToolGroupId.value = tool.id;
+}
+
+function applyNestedTool(tool) {
+  emit("apply-tool", tool);
+  activeToolGroupId.value = "";
+}
+
+function closeToolSheet() {
+  activeToolGroupId.value = "";
+  emit("close-tool");
+}
+
+watch(
+  () => props.toolOpen,
+  (open) => {
+    if (!open) activeToolGroupId.value = "";
+  }
+);
 </script>
 
 <style scoped>
 .bottom-sheet-option-main {
   min-width: 0;
+}
+
+.bottom-sheet-submenu-arrow {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: var(--font-size-lg);
+  line-height: 1;
 }
 </style>

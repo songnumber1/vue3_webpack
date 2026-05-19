@@ -26,6 +26,12 @@ export function usePromptTool({
     PROMPT_TOOL_DEFINITIONS.map((tool) => ({
       ...tool,
       label: t(tool.labelKey),
+      children: Array.isArray(tool.children)
+        ? tool.children.map((child) => ({
+            ...child,
+            label: t(child.labelKey),
+          }))
+        : undefined,
     }))
   );
 
