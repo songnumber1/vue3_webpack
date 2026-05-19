@@ -302,7 +302,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 }
 
 .mobile-settings-item-arrow {
-  font-size: 0 !important;
+  font-size: 0 ;
   width: 20px;
   height: 20px;
   position: relative;
@@ -518,13 +518,13 @@ body.mobile-mode .app-container--mobile .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .app-container--mobile .sidebar-user--mobile,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  margin-top: auto !important;
+  margin-top: auto ;
   margin-bottom: max(
     22px,
     calc(var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom))
   ) !important;
   padding-bottom: 18px !important;
-  flex: 0 0 auto !important;
+  flex: 0 0 auto ;
 }
 body.mobile-mode
   .app-container--mobile

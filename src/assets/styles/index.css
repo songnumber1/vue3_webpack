@@ -13,6 +13,7 @@
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
+@import "./browser-patches/mobile/mobile-browser-layout-patches.css";
 @import "./utilities/overrides/layout-freeze-overrides.css";
 @import "./states/reasoning/reasoning.css";
 @import "./components/message/message-bubbles.css";
