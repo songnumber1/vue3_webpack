@@ -31,11 +31,16 @@ export function createBottomSheetDrag(options) {
   let stopPointerCancel = null;
 
   function startDrag(event) {
-    if (!event.isPrimary && event.pointerType !== "mouse") return;
+    if (event.pointerType !== "mouse" && event.isPrimary === false) return;
+    event.preventDefault?.();
     dragging.value = true;
     dragStartY = event.clientY;
     dragStartHeight = currentHeight.value;
-    event.currentTarget?.setPointerCapture?.(event.pointerId);
+    try {
+      event.currentTarget?.setPointerCapture?.(event.pointerId);
+    } catch (error) {
+      void error;
+    }
     stopPointerMove = useEventListener(window, "pointermove", handleDrag, {
       passive: false,
     });

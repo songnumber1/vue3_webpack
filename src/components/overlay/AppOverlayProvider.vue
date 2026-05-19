@@ -48,3 +48,7 @@ defineProps({
 
 defineEmits(["close-notice", "close-privacy", "close-personalization"]);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

@@ -39,3 +39,7 @@ function handleInput(event) {
 
 defineExpose({textareaRef});
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

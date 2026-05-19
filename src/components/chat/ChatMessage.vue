@@ -13,3 +13,7 @@ import AssistantMessage from "./AssistantMessage.vue";
 defineProps({message: {type: Object, required: true}});
 defineEmits(["rendered"]);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

@@ -198,7 +198,7 @@ body.mobile-mode .attach-menu{
   position: fixed !important;
   inset: 0 !important;
   display: block !important;
-  background: rgba(0, 0, 0, 0.45) !important;
+  background: rgba(0, 0, 0, 0.45);
   z-index: var(--z-drawer-backdrop) !important;
 }
 
@@ -212,11 +212,11 @@ body.mobile-mode .attach-menu{
   width: min(88vw, 420px) !important;
   height: var(--app-height, 100vh) !important;
   max-height: var(--app-height, 100vh) !important;
-  background: var(--sidebar-bg, #ffffff) !important;
-  color: var(--sidebar-text, #202123) !important;
+  background: var(--sidebar-bg, #ffffff);
+  color: var(--sidebar-text, #202123);
   z-index: var(--z-drawer) !important;
   overflow: hidden !important;
-  box-shadow: 22px 0 54px rgba(15, 23, 42, 0.32) !important;
+  box-shadow: 22px 0 54px rgba(15, 23, 42, 0.32);
   transform: translate3d(0, 0, 0);
 }
 
@@ -231,20 +231,20 @@ body.mobile-mode .attach-menu{
   min-height: 0 !important;
   padding: calc(12px + env(safe-area-inset-top)) 0
     calc(12px + env(safe-area-inset-bottom)) !important;
-  gap: 6px !important;
+  gap: 6px;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   -webkit-overflow-scrolling: touch !important;
-  background: var(--sidebar-bg, #ffffff) !important;
-  color: var(--sidebar-text, #202123) !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  background: var(--sidebar-bg, #ffffff);
+  color: var(--sidebar-text, #202123);
+  opacity: 1;
+  visibility: visible;
 }
 
 .app-container--mobile .sidebar-content--mobile > *,
 .mobile-drawer .sidebar-content--mobile > *{
-  opacity: 1 !important;
-  visibility: visible !important;
+  opacity: 1;
+  visibility: visible;
   color: inherit;
 }
 
@@ -254,21 +254,21 @@ body.mobile-mode .attach-menu{
   top: 0 !important;
   z-index: 2 !important;
   display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
+  align-items: center;
+  justify-content: space-between;
   flex: 0 0 auto !important;
   min-height: 48px !important;
-  padding: 4px 16px 8px !important;
-  background: var(--sidebar-bg, #ffffff) !important;
+  padding: 4px 16px 8px;
+  background: var(--sidebar-bg, #ffffff);
 }
 
 .app-container--mobile .sidebar-content--mobile .sidebar-title,
 .mobile-drawer .sidebar-content--mobile .sidebar-title{
   display: block !important;
-  color: var(--sidebar-text, #202123) !important;
-  font-size: 22px !important;
-  font-weight: 800 !important;
-  line-height: 1.2 !important;
+  color: var(--sidebar-text, #202123);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.2;
 }
 
 .app-container--mobile .sidebar-content--mobile .sidebar-round,
@@ -276,8 +276,8 @@ body.mobile-mode .attach-menu{
   flex: 0 0 auto !important;
   width: 40px !important;
   height: 40px !important;
-  color: var(--sidebar-text, #202123) !important;
-  background: var(--control-bg, #ffffff) !important;
+  color: var(--sidebar-text, #202123);
+  background: var(--control-bg, #ffffff);
 }
 
 .app-container--mobile .sidebar-content--mobile .quick-menu,
@@ -291,9 +291,9 @@ body.mobile-mode .attach-menu{
   flex: 0 0 auto !important;
   max-height: none !important;
   overflow: visible !important;
-  gap: 2px !important;
-  padding: 0 !important;
-  color: var(--sidebar-text, #202123) !important;
+  gap: 2px;
+  padding: 0;
+  color: var(--sidebar-text, #202123);
 }
 
 .app-container--mobile .sidebar-content--mobile .sidebar-history,
@@ -301,7 +301,7 @@ body.mobile-mode .attach-menu{
   flex: 1 1 auto !important;
   min-height: 120px !important;
   overflow-y: auto !important;
-  padding-bottom: 76px !important;
+  padding-bottom: 76px;
 }
 
 .app-container--mobile .sidebar-content--mobile .quick-item,
@@ -311,16 +311,16 @@ body.mobile-mode .attach-menu{
 .mobile-drawer .sidebar-content--mobile .project-item,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item{
   display: flex !important;
-  align-items: center !important;
+  align-items: center;
   width: 100% !important;
   min-height: 42px !important;
-  padding: 8px 18px !important;
+  padding: 8px 18px;
   border: 0 !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: var(--sidebar-text, #202123) !important;
-  font-size: 15px !important;
-  line-height: 1.25 !important;
+  border-radius: 0;
+  background: transparent;
+  color: var(--sidebar-text, #202123);
+  font-size: 15px;
+  line-height: 1.25;
   text-align: left !important;
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -337,7 +337,7 @@ body.mobile-mode .attach-menu{
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
 .mobile-drawer .sidebar-content--mobile .quick-item.active,
 .mobile-drawer .sidebar-content--mobile .project-item.selected{
-  background: var(--sidebar-hover, #ececf1) !important;
+  background: var(--sidebar-hover, #ececf1);
 }
 
 .app-container--mobile .sidebar-content--mobile .quick-item span,
@@ -346,17 +346,17 @@ body.mobile-mode .attach-menu{
 .mobile-drawer .sidebar-content--mobile .project-item span{
   flex: 0 0 22px !important;
   width: 22px !important;
-  color: var(--sidebar-icon, #4b5563) !important;
+  color: var(--sidebar-icon, #4b5563);
 }
 
 .app-container--mobile .sidebar-content--mobile .section-label,
 .mobile-drawer .sidebar-content--mobile .section-label{
   display: block !important;
   flex: 0 0 auto !important;
-  padding: 12px 18px 4px !important;
-  color: var(--sidebar-section, #6b7280) !important;
-  font-size: 12px !important;
-  font-weight: 800 !important;
+  padding: 12px 18px 4px;
+  color: var(--sidebar-section, #6b7280);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .app-container--mobile .mobile-new-chat-fab,
@@ -369,21 +369,21 @@ body.mobile-mode .attach-menu{
   flex: 0 0 auto !important;
   height: 52px !important;
   min-height: 52px !important;
-  margin: 8px 18px 8px auto !important;
-  padding: 0 20px !important;
-  border-radius: 999px !important;
-  background: var(--fab-bg, #111827) !important;
-  color: var(--fab-text, #ffffff) !important;
-  font-size: 16px !important;
-  font-weight: 800 !important;
+  margin: 8px 18px 8px auto;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--fab-bg, #111827);
+  color: var(--fab-text, #ffffff);
+  font-size: 16px;
+  font-weight: 800;
 }
 
 .app-container--mobile .sidebar-content--mobile .sidebar-user,
 .mobile-drawer .sidebar-content--mobile .sidebar-user{
   flex: 0 0 auto !important;
-  margin-top: 0 !important;
-  padding: 10px 18px 0 !important;
-  color: var(--sidebar-text, #202123) !important;
+  margin-top: 0;
+  padding: 10px 18px 0;
+  color: var(--sidebar-text, #202123);
 }
 
 .assistant-menu{
@@ -507,7 +507,7 @@ body.mobile-mode .sidebar-history--main{
 .sidebar-history-title-button{
   flex: 1 1 auto;
   min-width: 0;
-  padding-right: 8px !important;
+  padding-right: 8px;
 }
 
 .sidebar-history-actions{

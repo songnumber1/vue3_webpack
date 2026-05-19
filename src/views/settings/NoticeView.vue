@@ -19,3 +19,7 @@ import {useI18n} from "vue-i18n";
 const {tm} = useI18n();
 const items = computed(() => tm("notice.items"));
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

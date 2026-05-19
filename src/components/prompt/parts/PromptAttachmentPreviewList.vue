@@ -72,3 +72,7 @@ function emitPreview(file) {
   emit("preview", file);
 }
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

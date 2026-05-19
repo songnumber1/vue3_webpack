@@ -60,3 +60,7 @@ const currentAssistant = computed(
 
 defineExpose({rootRef});
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

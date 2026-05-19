@@ -11,3 +11,7 @@ defineProps({
   isMobile: {type: Boolean, default: false},
 });
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

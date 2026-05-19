@@ -12,3 +12,7 @@
     <path d="M8.5 15.5h7" />
   </svg>
 </template>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

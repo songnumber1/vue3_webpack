@@ -229,3 +229,7 @@ const showVoiceStopButton = computed(
 
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

@@ -319,76 +319,76 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   padding: 10px 20px calc(8px + env(safe-area-inset-bottom));
 }
 
-.app-container--mobile .chat-container-root {
+body.mobile-mode .chat-container-root {
   grid-template-columns: 1fr;
   background: var(--mobile-bg);
 }
-.app-container--mobile .desktop-sidebar {
+body.mobile-mode .desktop-sidebar {
   display: none;
 }
-.app-container--mobile .chat-workspace {
+body.mobile-mode .chat-workspace {
   background: var(--mobile-bg);
 }
-.app-container--mobile .mobile-topbar {
+body.mobile-mode .mobile-topbar {
   height: 58px;
   padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
 }
-.app-container--mobile .round-icon {
+body.mobile-mode .round-icon {
   width: 44px;
   height: 44px;
   font-size: 20px;
 }
-.app-container--mobile .model-trigger {
+body.mobile-mode .model-trigger {
   height: 44px;
   min-width: 124px;
   padding: 0 16px;
   font-size: 20px;
 }
-.app-container--mobile .desktop-empty-actions,
-.app-container--mobile .empty-center {
+body.mobile-mode .desktop-empty-actions,
+body.mobile-mode .empty-center {
   display: none;
 }
-.app-container--mobile .empty-stage {
+body.mobile-mode .empty-stage {
   display: block;
   overflow: auto;
   padding: 16px 20px 96px;
 }
-.app-container--mobile .mobile-project-home {
+body.mobile-mode .mobile-project-home {
   display: block;
 }
-.app-container--mobile .project-title h1 {
+body.mobile-mode .project-title h1 {
   font-size: 28px;
 }
-.app-container--mobile .folder-icon {
+body.mobile-mode .folder-icon {
   font-size: 26px;
 }
-.app-container--mobile .source-chip {
+body.mobile-mode .source-chip {
   height: 38px;
   font-size: 15px;
   margin-top: 14px;
 }
-.app-container--mobile .mobile-recent-list {
+body.mobile-mode .mobile-recent-list {
   margin-top: 28px;
   gap: 20px;
 }
-.app-container--mobile .mobile-recent-card strong {
+body.mobile-mode .mobile-recent-card strong {
   font-size: 19px;
 }
-.app-container--mobile .mobile-recent-card span {
+body.mobile-mode .mobile-recent-card span {
   font-size: 15px;
 }
-.app-container--mobile .message-list {
+body.mobile-mode .message-list {
   padding: 12px 16px 94px;
 }
-.app-container--mobile .message {
+body.mobile-mode .message {
   display: block;
   margin-bottom: 18px;
 }
-.app-container--mobile .avatar,
-.app-container--mobile .bubble-meta {
+body.mobile-mode .avatar,
+body.mobile-mode .bubble-meta {
   display: none;
 }
-.app-container--mobile .bubble {
+body.mobile-mode .bubble {
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -396,7 +396,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   padding: 0;
   max-width: 100%;
 }
-.app-container--mobile .message--user .bubble {
+body.mobile-mode .message--user .bubble {
   background: var(--mobile-user-bubble);
   color: var(--text);
   border-radius: 18px;
@@ -404,16 +404,16 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   max-width: 82%;
   margin-left: auto;
 }
-.app-container--mobile .bubble-content {
+body.mobile-mode .bubble-content {
   font-size: 15px;
   line-height: 1.62;
 }
-.app-container--mobile .prompt-wrap {
+body.mobile-mode .prompt-wrap {
   padding: 8px 14px calc(10px + env(safe-area-inset-bottom));
   background: linear-gradient(to top, var(--mobile-bg) 72%, transparent);
 }
-.app-container--mobile .prompt-wrap--floating,
-.app-container--mobile .mobile-bottom-prompt {
+body.mobile-mode .prompt-wrap--floating,
+body.mobile-mode .mobile-bottom-prompt {
   display: block;
   position: fixed;
   left: 0;
@@ -421,38 +421,38 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   bottom: 0;
   z-index: var(--z-content-raised);
 }
-.app-container--mobile .prompt-box {
+body.mobile-mode .prompt-box {
   max-width: none;
   grid-template-columns: 34px minmax(0, 1fr) 42px;
   border-radius: 26px;
   padding: 7px;
   background: var(--mobile-prompt-bg);
 }
-.app-container--mobile .prompt-box textarea {
+body.mobile-mode .prompt-box textarea {
   min-height: 34px;
   max-height: 140px;
   padding: 7px 4px;
   font-size: 15px;
 }
-.app-container--mobile .attach-button,
-.app-container--mobile .send-button {
+body.mobile-mode .attach-button,
+body.mobile-mode .send-button {
   width: 34px;
   height: 34px;
   font-size: 20px;
 }
-.app-container--mobile .send-button {
+body.mobile-mode .send-button {
   width: 42px;
   height: 42px;
   font-size: 22px;
 }
-.app-container--mobile .mobile-drawer-backdrop {
+body.mobile-mode .mobile-drawer-backdrop {
   display: block;
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.45);
   z-index: var(--z-drawer-backdrop);
 }
-.app-container--mobile .mobile-drawer {
+body.mobile-mode .mobile-drawer {
   display: block;
   position: fixed;
   inset: 0 auto 0 0;
@@ -468,7 +468,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   font-weight: 800;
   line-height: 1;
 }
-.app-container--mobile {
+body.mobile-mode .app-container {
   max-width: none;
   width: 100%;
 }body.mobile-mode .mobile-topbar {
@@ -636,11 +636,11 @@ html,
 body,
 #app,
 .app-container,
-.app-container--mobile,
+body.mobile-mode .app-container,
 .chat-container-root {
   width: 100%;
 }
-.app-container--mobile {
+body.mobile-mode .app-container {
   max-width: none !important;
   margin: 0 !important;
   border-radius: 0 !important;
@@ -685,7 +685,7 @@ body,
   width: 100%;
   max-width: none;
   margin: 0;
-}body.mobile-mode .app-container--mobile,
+}body.mobile-mode .app-container,
 body.mobile-mode .chat-container-root,
 body.mobile-mode .chat-workspace,
 body.mobile-mode .empty-stage {
@@ -779,34 +779,34 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
 
 /* When the Android/mobile layout is selected, keep the project home fluid
    even if the browser viewport is wider than the CSS breakpoint. */
-.app-container--mobile .empty-stage {
+body.mobile-mode .empty-stage {
   width: 100%;
   max-width: none;
 }
 
-.app-container--mobile .mobile-project-home,
-.app-container--mobile .mobile-recent-list,
-.app-container--mobile .mobile-recent-card {
+body.mobile-mode .mobile-project-home,
+body.mobile-mode .mobile-recent-list,
+body.mobile-mode .mobile-recent-card {
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
-.app-container--mobile .mobile-recent-card strong,
-.app-container--mobile .mobile-recent-card span {
+body.mobile-mode .mobile-recent-card strong,
+body.mobile-mode .mobile-recent-card span {
   width: 100%;
   max-width: 100%;
   min-width: 0;
 }
 
 /* Desktop-like message cards for mobile layout. */
-.app-container--mobile .message-list {
+body.mobile-mode .message-list {
   width: 100%;
   max-width: 100%;
   padding: 12px clamp(14px, 4vw, 36px) calc(92px + env(safe-area-inset-bottom));
 }
 
-.app-container--mobile .message {
+body.mobile-mode .message {
   width: 100%;
   max-width: 980px;
   min-width: 0;
@@ -818,11 +818,11 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   margin-bottom: 18px;
 }
 
-.app-container--mobile .message--user {
+body.mobile-mode .message--user {
   grid-template-columns: minmax(0, 1fr) 32px;
 }
 
-.app-container--mobile .avatar {
+body.mobile-mode .avatar {
   display: grid;
   width: 32px;
   height: 32px;
@@ -830,13 +830,13 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   font-size: 11px;
 }
 
-.app-container--mobile .message--user .avatar {
+body.mobile-mode .message--user .avatar {
   grid-column: 2;
   background: var(--primary);
   color: #fff;
 }
 
-.app-container--mobile .bubble {
+body.mobile-mode .bubble {
   grid-column: 2;
   width: auto;
   max-width: min(100%, 900px);
@@ -848,7 +848,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   box-shadow: var(--shadow-card);
 }
 
-.app-container--mobile .message--user .bubble {
+body.mobile-mode .message--user .bubble {
   grid-column: 1;
   grid-row: 1;
   justify-self: end;
@@ -861,7 +861,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   margin-left: 0;
 }
 
-.app-container--mobile .bubble-meta {
+body.mobile-mode .bubble-meta {
   display: block;
   font-size: 11px;
   color: var(--text-muted);
@@ -869,11 +869,11 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   font-weight: 800;
 }
 
-.app-container--mobile .message--user .bubble-meta {
+body.mobile-mode .message--user .bubble-meta {
   color: var(--text-muted);
 }
 
-.app-container--mobile .bubble-content {
+body.mobile-mode .bubble-content {
   font-size: 14.5px;
   line-height: 1.62;
 }

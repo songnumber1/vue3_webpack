@@ -38,3 +38,7 @@ import {usePlatformStore} from "@/stores/platformStore";
 const {t} = useI18n();
 const platformStore = usePlatformStore();
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

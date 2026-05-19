@@ -228,3 +228,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
     scrollBottom({force: true, behavior: "smooth", stable: true}),
 });
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

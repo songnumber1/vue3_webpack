@@ -140,3 +140,7 @@ const showDesktopConversationTitle = computed(
   () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile
 );
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

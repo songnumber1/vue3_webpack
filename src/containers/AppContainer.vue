@@ -38,3 +38,7 @@ const containerClasses = computed(() => ({
   [`app-container--device-${deviceName.value}`]: true,
 }));
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

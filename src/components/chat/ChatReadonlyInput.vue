@@ -71,3 +71,7 @@ const descriptionText = computed(() => {
   return t("chat.readonlyInput.sharedDesc");
 });
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

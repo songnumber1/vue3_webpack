@@ -52,3 +52,7 @@ const styleOptions = computed(() => [
   {value: "technical", label: t("personalization.technical")},
 ]);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

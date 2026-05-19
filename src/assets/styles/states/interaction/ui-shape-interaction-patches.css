@@ -279,3 +279,17 @@ body.mobile-mode
   transform: none !important;
   box-shadow: none !important;
 }
+
+
+/*
+ * Bottom sheet resize handle must keep native dragging behavior.
+ * This rule is intentionally placed after generic mobile tap normalization
+ * because the drag area uses role="button" for keyboard accessibility.
+ */
+body.mobile-mode .bottom-sheet-drag-area,
+.bottom-sheet-drag-area {
+  touch-action: none !important;
+  pointer-events: auto;
+  cursor: ns-resize;
+  user-select: none;
+}

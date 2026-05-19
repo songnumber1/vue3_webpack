@@ -65,3 +65,7 @@ watch(
   {immediate: true}
 );
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

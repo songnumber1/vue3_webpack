@@ -65,3 +65,7 @@ const userInitial = computed(() => {
   return name ? name.charAt(0) : "U";
 });
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

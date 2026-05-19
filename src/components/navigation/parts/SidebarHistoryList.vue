@@ -55,3 +55,7 @@ defineProps({
 
 defineEmits(["select", "open-menu"]);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

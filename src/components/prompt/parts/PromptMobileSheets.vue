@@ -144,3 +144,7 @@ const resolvedAttachTitle = computed(() => {
   return props.attachTitle || t("prompt.attach");
 });
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

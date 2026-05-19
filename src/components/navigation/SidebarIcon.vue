@@ -87,3 +87,7 @@ const rootAttrs = computed(() =>
     : {class: "icon-wrap"}
 );
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

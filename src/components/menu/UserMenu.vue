@@ -163,3 +163,7 @@ useOutsideClick(
   }
 );
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

@@ -80,3 +80,7 @@ const overlayClasses = computed(() => ({
 const showMobileBackButton = computed(() => isMobileFullscreen.value);
 const showCloseButton = computed(() => !isMobileFullscreen.value);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

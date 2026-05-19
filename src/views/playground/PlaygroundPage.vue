@@ -290,3 +290,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => window.removeEventListener("resize", syncMobile));
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

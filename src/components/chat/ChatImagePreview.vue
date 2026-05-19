@@ -47,3 +47,7 @@ defineProps({
 
 defineEmits(["close", "load", "error"]);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

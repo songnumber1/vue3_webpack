@@ -299,3 +299,7 @@ syncViewportMode();
 watch(isCompactViewport, syncViewportMode);
 useEventListener(window, "resize", syncViewportMode, {passive: true});
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>

@@ -86,3 +86,7 @@ const {
   collapse,
 } = useBottomSheetSizing(props, emit);
 </script>
+
+<style scoped>
+/* Component-local styles should stay scoped. */
+</style>
