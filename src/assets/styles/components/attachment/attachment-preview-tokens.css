@@ -647,3 +647,124 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove{
 .app-container--mobile .attachment-preview-remove::before{
   inset: -8px !important;
 }
+
+/* absorbed from utilities/overrides/composer-layout-patches.css (attachment) */
+
+.visually-hidden-file-input{
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.attachment-preview-remove{
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--prompt-bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Attachment image polish: keep transparent PNGs readable and center close controls. */
+.attachment-preview-card--image{
+  background: var(--prompt-bg);
+}
+
+.attachment-preview-remove{
+  top: -8px;
+  right: -8px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0 2px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: var(--prompt-bg, #fff);
+  color: var(--text, #111827);
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+  font-size: 24px;
+  z-index: 5;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-card,
+.app-container--mobile .attachment-preview-card{
+  position: relative;
+  box-sizing: border-box;
+  width: 136px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 16px;
+  background: var(--prompt-bg, #fff);
+  color: var(--text);
+  overflow: visible;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.attachment-preview-remove,
+.app-container--mobile .attachment-preview-remove,
+.attachment-preview-card--image .attachment-preview-remove,
+.app-container--mobile
+  .attachment-preview-card--image
+  .attachment-preview-remove{
+  position: absolute;
+  top: -18px;
+  right: -18px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 2px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: var(--prompt-bg, #fff);
+  color: var(--text, #111827);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  z-index: var(--z-content-raised);
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   FINAL MOBILE-ONLY ATTACHMENT PREVIEW COMPACT OVERRIDE
+   - Applies only when AppContainer detects mobile mode.
+   - Keeps desktop/web attachment card UI unchanged.
+   - Mobile previews use one fixed square size for both image and file items.
+   - File name and size are hidden on mobile to prevent the composer from
+     becoming too tall when the software keyboard is open.
+   ========================================================= */
+.app-container--mobile .attachment-preview-row{
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 10px 38px 8px 2px !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  scrollbar-width: none !important;
+  -webkit-overflow-scrolling: touch !important;
+}

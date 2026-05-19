@@ -644,3 +644,23 @@ body.mobile-mode .sidebar-history--main{
 .sidebar-content--mobile .sidebar-history-actions{
   opacity: 1;
 }
+
+/* absorbed from utilities/overrides/composer-layout-patches.css (sidebar) */
+
+.collapsed-icon-button .nav-icon{
+  width: var(--prompt-action-icon-size);
+  height: var(--prompt-action-icon-size);
+}
+
+/* =========================================================
+   Gemini style UX refactor
+   - Assistant selector in sidebar
+   - Conversation-only sidebar menu
+   - Prompt composer with textarea + bottom action row
+   - Mobile selectors use bottom sheet instead of dropdowns
+   ========================================================= */
+.assistant-selector{
+  position: relative;
+  min-width: 0;
+  flex: 1 1 auto;
+}

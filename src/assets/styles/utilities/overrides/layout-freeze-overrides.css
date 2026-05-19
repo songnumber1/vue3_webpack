@@ -1,9 +1,7 @@
 /* residual misc rules from previous layout-freeze-overrides.css */
 
 .attach-button,
-.send-button,
-.app-container--mobile .attach-button,
-.app-container--mobile .send-button{
+.send-button{
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -12,8 +10,7 @@
   vertical-align: middle;
 }
 
-.send-button,
-.app-container--mobile .send-button{
+.send-button{
   width: 38px;
   height: 38px;
 }body.mobile-mode .attach-button{
@@ -490,4 +487,23 @@ body.mobile-mode .scroll-bottom-button{
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+}
+
+/* absorbed from utilities/overrides/composer-layout-patches.css (layout_freeze) */
+
+.chat-history-dialog__input{
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color, rgba(127, 127, 127, 0.28));
+  border-radius: 12px;
+  background: var(--input-bg, transparent);
+  color: inherit;
+  font: inherit;
+}
+
+.chat-history-dialog__input:focus{
+  border-color: var(--accent-color, #2563eb);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
