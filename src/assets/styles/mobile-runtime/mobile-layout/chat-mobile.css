@@ -40,18 +40,18 @@ body.mobile-mode #app {
   min-height: 0 !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-  display: block !important;
+  display: block;
   overscroll-behavior: none !important;
   touch-action: none !important;
 }
 body.mobile-mode .empty-stage--mobile-main,
 body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   position: relative !important;
-  display: block !important;
+  display: block;
   height: 100% !important;
   min-height: 0 !important;
   max-height: 100% !important;
-  width: 100% !important;
+  width: 100%;
   overflow: hidden !important;
   padding: 0;
   background: var(--chat-bg);
@@ -70,13 +70,13 @@ body.mobile-mode
     var(--mobile-main-composer-space) + var(--keyboard-height, 0px)
   ) !important;
   left: 0 !important;
-  display: flex !important;
+  display: flex;
   flex-direction: column !important;
   justify-content: flex-start;
   align-items: stretch;
   gap: var(--mobile-main-content-gap);
-  width: 100% !important;
-  max-width: none !important;
+  width: 100%;
+  max-width: none;
   min-height: 0 !important;
   margin: 0;
   padding: var(--space-6, 24px) var(--mobile-main-content-inline)
@@ -121,8 +121,8 @@ body.mobile-mode
   ) !important;
   left: 0 !important;
   z-index: var(--mobile-main-composer-z) !important;
-  width: 100% !important;
-  max-width: none !important;
+  width: 100%;
+  max-width: none;
   margin: 0;
   padding: var(--space-3, 12px) var(--space-4, 16px)
     max(var(--space-3, 12px), env(safe-area-inset-bottom)) !important;
@@ -141,8 +141,8 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  width: min(100%, var(--layout-prompt-width, 820px)) !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  width: min(100%, var(--layout-prompt-width, 820px));
+  max-width: min(100%, var(--layout-prompt-width, 820px));
   margin: 0 auto;
 }
 body.mobile-mode .mobile-main-fixed-prompt textarea,

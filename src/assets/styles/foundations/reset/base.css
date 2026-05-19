@@ -32,7 +32,7 @@ button:disabled {
   height: 100%;
   width: 100%;
 }
-.app-container--mobile {
+body.mobile-mode .app-container {
   max-width: none;
   margin: 0;
   background: var(--surface);

@@ -40,5 +40,9 @@ const platformStore = usePlatformStore();
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
+:where(*) {
+  box-sizing: border-box;
+  min-width: 0;
+}
 </style>

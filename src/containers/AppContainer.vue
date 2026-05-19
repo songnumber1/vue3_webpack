@@ -31,8 +31,8 @@ const isMobileContainer = computed(
 
 const containerClasses = computed(() => ({
   "app-container--web": !isMobileContainer.value,
-  "app-container--mobile": isMobileContainer.value,
-  "app-container--mobile-browser": Boolean(platformInfo.value.isMobileBrowser),
+  "app-container--compact": isMobileContainer.value,
+  "app-container--compact-browser": Boolean(platformInfo.value.isMobileBrowser),
   [`app-container--${platformName.value}`]: true,
   [`app-container--browser-${browserName.value}`]: true,
   [`app-container--device-${deviceName.value}`]: true,
@@ -40,5 +40,9 @@ const containerClasses = computed(() => ({
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
+:where(*) {
+  box-sizing: border-box;
+  min-width: 0;
+}
 </style>

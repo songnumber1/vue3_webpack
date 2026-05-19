@@ -19,8 +19,7 @@
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/attachment/attachment-preview-tokens.css";
-/* 03-2 residual overrides */
-@import "./utilities/overrides/layout-freeze-overrides.css";
+/* 03-2 residual overrides absorbed into final UI normalization fixes. */
 
 @import "./states/reasoning/reasoning.css";
 @import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";

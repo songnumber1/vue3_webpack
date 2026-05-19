@@ -5,6 +5,7 @@ export function getMobileBrowserFamily() {
   const userAgent =
     typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
   if (/SamsungBrowser/i.test(userAgent)) return "samsung";
+  if (/Firefox|FxiOS/i.test(userAgent)) return "firefox";
   if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
 
   return "default";
@@ -54,7 +55,7 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
   ].filter((height) => Number.isFinite(height) && height >= minHeight);
 
   if (!candidates.length) return fallback;
-if (isMobileViewport() && visualHeight > 0) {
+  if (isMobileViewport() && visualHeight > 0) {
     return Math.max(visualHeight, minHeight);
   }
 

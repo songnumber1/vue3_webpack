@@ -216,7 +216,7 @@ function syncViewportMode() {
     platformInfo.isMobileBrowser ||
     platformInfo.isAndroidApp ||
     platformInfo.isIosApp ||
-    document.querySelector(".app-container--mobile")
+    document.body.classList.contains("mobile-mode")
   );
 }
 

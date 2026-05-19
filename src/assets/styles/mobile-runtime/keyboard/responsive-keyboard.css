@@ -641,18 +641,18 @@ body.mobile-mode .app-container,
   width: 100%;
 }
 body.mobile-mode .app-container {
-  max-width: none !important;
-  margin: 0 !important;
-  border-radius: 0 !important;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
 }
 .chat-container-root {
   height: 100dvh;
 }
 .icon-wrap {
-  display: inline-flex !important;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px !important;
+  width: 22px;
   height: 22px;
   flex: 0 0 22px;
   color: var(--sidebar-icon);
@@ -689,18 +689,18 @@ body.mobile-mode .app-container {
 body.mobile-mode .chat-container-root,
 body.mobile-mode .chat-workspace,
 body.mobile-mode .empty-stage {
-  width: 100vw !important;
-  max-width: none !important;
+  width: 100vw;
+  max-width: none;
 }
 
 body.mobile-mode .empty-stage {
-  padding-left: clamp(14px, 4vw, 22px) !important;
-  padding-right: clamp(14px, 4vw, 22px) !important;
+  padding-left: clamp(14px, 4vw, 22px);
+  padding-right: clamp(14px, 4vw, 22px);
 }
 
 body.mobile-mode .mobile-project-home {
-  width: 100% !important;
-  max-width: none !important;
+  width: 100%;
+  max-width: none;
 }
 
 body.mobile-mode .project-title {
@@ -724,7 +724,7 @@ body.mobile-mode .folder-icon.nav-icon {
 }
 
 body.mobile-mode .icon-wrap {
-  width: 20px !important;
+  width: 20px;
   height: 20px;
   flex-basis: 20px;
 }
@@ -886,20 +886,20 @@ body.mobile-mode .empty-stage {
 body.mobile-mode .mobile-project-home,
 body.mobile-mode .mobile-recent-list,
 body.mobile-mode .mobile-recent-card {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 body.mobile-mode .mobile-recent-card {
-  display: block !important;
+  display: block;
 }
 
 body.mobile-mode .mobile-recent-card strong,
 body.mobile-mode .mobile-recent-card span {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }body.mobile-mode .message-list {
   width: 100%;
   max-width: 100%;
@@ -1007,14 +1007,14 @@ body.mobile-mode .mobile-recent-card span {
 body.mobile-mode .prompt-wrap--floating,
 body.mobile-mode .mobile-bottom-prompt {
   position: relative !important;
-  left: auto !important;
-  right: auto !important;
+  left: auto;
+  right: auto;
   bottom: auto !important;
   display: block;
   width: 100%;
   background: var(--mobile-bg);
 }body.mobile-mode .desktop-center-prompt {
-  display: none !important;
+  display: none;
 }body.mobile-mode .chat-container-root--keyboard-open .mobile-topbar {
   height: 44px;
   padding-top: 4px;

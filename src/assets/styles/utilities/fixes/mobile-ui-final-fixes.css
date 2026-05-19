@@ -13,7 +13,6 @@
 body.mobile-mode,
 body.mobile-mode #app,
 body.mobile-mode .app-container,
-body.mobile-mode .app-container--mobile,
 body.mobile-mode .chat-container-root,
 body.mobile-mode .chat-workspace,
 body.mobile-mode .empty-stage,
@@ -99,4 +98,516 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
 .prompt-box--gemini {
   background: var(--prompt-bg) !important;
   background-clip: padding-box !important;
+}
+
+
+/* Absorbed from layout-freeze-overrides.css. Kept at the final import layer to preserve UI freeze cascade. */
+/* residual misc rules from previous layout-freeze-overrides.css */
+
+.attach-button,
+.send-button{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.send-button{
+  width: 38px;
+  height: 38px;
+}body.mobile-mode .attach-button{
+  width: 34px;
+  height: 34px;
+}body.mobile-mode .send-button{
+  width: 38px;
+  height: 38px;
+}
+
+body.mobile-mode .topbar-actions{
+  gap: 6px;
+}
+
+body.mobile-mode .topbar-actions .round-icon{
+  width: 46px;
+  height: 46px;
+  font-size: 20px;
+}
+
+body.mobile-mode .document-toggle svg,
+body.mobile-mode .test-toggle svg{
+  width: 19px;
+  height: 19px;
+}
+
+body.mobile-mode .topbar-actions{
+  gap: 4px;
+}
+
+body.mobile-mode .topbar-actions .round-icon{
+  width: 40px;
+  height: 40px;
+}
+
+.collapsed-icon-button,
+.collapsed-user-button{
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--duration-fast),
+    color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.collapsed-icon-button:hover,
+.collapsed-icon-button--active,
+.collapsed-user-button:hover{
+  background: var(--control-hover);
+}
+
+.collapsed-user-button{
+  margin-bottom: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.collapsed-recent-popover h2{
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.collapsed-recent-item{
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.35;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collapsed-recent-item:hover{
+  color: var(--primary);
+}
+
+.collapsed-popover-fade-enter-active,
+.collapsed-popover-fade-leave-active{
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.collapsed-popover-fade-enter-from,
+.collapsed-popover-fade-leave-to{
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+/* Header action patch: keep theme, document and test buttons aligned together. */
+.mobile-topbar .topbar-actions{
+  margin-left: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.mobile-topbar .theme-toggle,
+.mobile-topbar .document-toggle,
+.mobile-topbar .test-toggle{
+  position: static !important;
+  inset: auto !important;
+}
+
+.attach-button--active{
+  background: var(--control-hover);
+}body.mobile-mode .empty-stage{
+  padding-bottom: calc(116px + env(safe-area-inset-bottom));
+}body.mobile-mode .attach-button,
+body.mobile-mode .send-button{
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  min-height: 38px;
+  font-size: 22px;
+}
+
+.assistant-trigger{
+  width: auto;
+  max-width: 176px;
+  font-size: 18px;
+}
+
+.assistant-option,
+.bottom-sheet-option{
+  width: 100%;
+  border: 0;
+  border-radius: var(--dialog-option-radius);
+  background: transparent;
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.assistant-option:hover,
+.assistant-option.active,
+.bottom-sheet-option:hover,
+.bottom-sheet-option.active{
+  background: var(--control-hover);
+}
+
+.assistant-option strong,
+.bottom-sheet-option strong{
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.assistant-option small,
+.bottom-sheet-option small{
+  display: block;
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.empty-center{
+  gap: 20px;
+}
+
+.empty-center h1{
+  margin-bottom: 2px !important;
+}
+
+.suggestion-row--between{
+  width: min(760px, 100%);
+  margin: 0 auto 4px;
+  order: 2;
+}
+
+.bottom-sheet-backdrop{
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-bottom-sheet-backdrop);
+  background: rgba(0, 0, 0, 0.45);
+  touch-action: none;
+}
+
+.bottom-sheet--dragging{
+  transition: none !important;
+  user-select: none;
+}
+
+.bottom-sheet--fullscreen{
+  border-radius: var(--dialog-sheet-radius);
+}
+
+.bottom-sheet-drag-area{
+  flex: 0 0 auto;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  cursor: ns-resize;
+}
+
+.bottom-sheet-handle{
+  width: 46px;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--control-border);
+  margin: 0 auto;
+}
+
+.bottom-sheet-header{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px 10px;
+}
+
+.bottom-sheet-header h2{
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.bottom-sheet-close{
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--control-hover);
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1;
+}
+
+.bottom-sheet-body{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px 0 0;
+  -webkit-overflow-scrolling: touch;
+}
+
+.bottom-sheet-option--row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bottom-sheet-option--row span{
+  width: 28px;
+  text-align: center;
+  font-size: 20px;
+}
+
+.sheet-fade-enter-active,
+.sheet-fade-leave-active{
+  transition: opacity 160ms ease;
+}
+
+.sheet-fade-enter-from,
+.sheet-fade-leave-to{
+  opacity: 0;
+}
+
+.sheet-slide-enter-active,
+.sheet-slide-leave-active{
+  transition: transform 210ms ease;
+}
+
+.sheet-slide-enter-from,
+.sheet-slide-leave-to{
+  transform: translateY(105%);
+}
+
+body.desktop-mode .bottom-sheet,
+body.desktop-mode .bottom-sheet-backdrop{
+  display: none !important;
+}body.mobile-mode .empty-stage{
+  display: grid !important;
+  place-items: center !important;
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom)) !important;
+  overflow-y: auto !important;
+}body.mobile-mode .empty-center{
+  display: flex !important;
+  width: min(100%, 760px);
+  transform: none !important;
+  gap: 16px;
+}body.mobile-mode .empty-center h1{
+  font-size: 24px;
+  text-align: center;
+  margin: 0 !important;
+}body.mobile-mode .suggestion-row{
+  width: 100%;
+  gap: 8px;
+  justify-content: center;
+}body.mobile-mode .suggestion-chip{
+  min-height: 34px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+/* Gemini/Assistant routing refactor overrides */
+.topbar-left{
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-topbar--desktop-main .topbar-left{
+  flex: 1 1 auto;
+}
+
+.mobile-topbar--desktop-main .model-trigger--assistant{
+  display: none;
+}
+
+.conversation-title-wrap{
+  min-width: 0;
+  max-width: min(720px, 62vw);
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  box-shadow: var(--shadow-control);
+}
+
+.conversation-title-wrap strong{
+  flex: 0 0 auto;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.conversation-title-wrap span{
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.empty-stage--main{
+  min-height: 0;
+}
+
+.scroll-bottom-button{
+  position: absolute;
+  right: 32px;
+  bottom: 116px;
+  z-index: var(--z-content-raised);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-control);
+  font-size: 22px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.scroll-bottom-button:hover{
+  background: var(--control-hover);
+}
+
+.assistant-trigger{
+  max-width: 100%;
+}
+
+body.desktop-mode .settings-toggle{
+  display: none;
+}
+
+body.desktop-mode .chat-workspace > .mobile-topbar{
+  border-bottom: 0;
+}
+
+body.mobile-mode .chat-container-root{
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.mobile-mode .topbar-left{
+  flex: 1 1 auto;
+  gap: 8px;
+}
+
+body.mobile-mode .model-trigger--assistant{
+  min-width: 0;
+  max-width: 190px;
+  height: 42px;
+  font-size: 18px;
+  padding: 0 14px;
+}
+
+body.mobile-mode .topbar-actions{
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+body.mobile-mode .topbar-actions .round-icon{
+  width: 42px;
+  height: 42px;
+}
+
+body.mobile-mode .scroll-bottom-button{
+  right: 18px;
+  bottom: 112px;
+}
+
+.chat-history-sheet-options{
+  display: grid;
+  gap: 8px;
+}
+
+.chat-history-action-option{
+  justify-content: flex-start;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog
+  .responsive-overlay-backdrop{
+  z-index: 0;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel{
+  z-index: 1;
+}
+
+.chat-history-dialog{
+  display: grid;
+  gap: 18px;
+}
+
+.chat-history-dialog__field{
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.chat-history-dialog__actions{
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* absorbed from utilities/overrides/composer-layout-patches.css (layout_freeze) */
+
+.chat-history-dialog__input{
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color, rgba(127, 127, 127, 0.28));
+  border-radius: var(--dialog-input-radius);
+  background: var(--input-bg, transparent);
+  color: inherit;
+  font: inherit;
+}
+
+.chat-history-dialog__input:focus{
+  border-color: var(--accent-color, #2563eb);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
