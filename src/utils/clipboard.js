@@ -1,4 +1,3 @@
-
 export async function copyText(text) {
   const value = String(text ?? "");
 

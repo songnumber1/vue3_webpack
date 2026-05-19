@@ -1,4 +1,3 @@
-
 export function adaptExamplePrompt(raw = {}) {
   return {
     id: raw.question_id,

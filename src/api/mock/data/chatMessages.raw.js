@@ -1,4 +1,3 @@
-
 const user = (id, content, sendTime) => ({
   role: "user",
   content,

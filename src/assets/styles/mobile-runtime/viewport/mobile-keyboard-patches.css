@@ -67,11 +67,13 @@ body.mobile-mode .feedback-dialog {
   width: min(100%, 520px) !important;
   max-height: calc(var(--app-height, 100dvh) - 24px) !important;
   border-radius: var(--dialog-radius) !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open {
   height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .empty-center {
   transform: none !important;
@@ -84,46 +86,48 @@ body.mobile-mode .feedback-dialog {
   background: currentColor;
   opacity: 0.42;
   animation: bootstrapPulse 1s ease-in-out infinite;
-}body.mobile-mode .mobile-drawer {
+}
+body.mobile-mode .mobile-drawer {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .chat-workspace {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .empty-center {
   transform: none !important;
   margin-top: 0 !important;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .chat-workspace {
+}
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .chat-workspace {
+}
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
   position: relative !important;
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode .chat-container-root--mode-main {
+}
+body.mobile-mode .chat-container-root--mode-main {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   overflow: hidden !important;
   touch-action: pan-y !important;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .chat-workspace {
+}
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   min-height: 0 !important;

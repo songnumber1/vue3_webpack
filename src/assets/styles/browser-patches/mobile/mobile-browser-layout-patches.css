@@ -1,8 +1,9 @@
 body.mobile-mode {
   --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
-}body.mobile-mode .chat-container-root--mode-main
-  .mobile-main-fixed-prompt,
-body.mobile-mode .chat-container-root--mode-main
+}
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode
+  .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
   position: fixed !important;
   top: auto !important;
@@ -29,7 +30,9 @@ body.mobile-mode .chat-container-root--mode-main
   overscroll-behavior: none !important;
   touch-action: manipulation !important;
   will-change: bottom !important;
-}body.mobile-mode .chat-container-root--mode-main
+}
+body.mobile-mode
+  .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
   width: min(100%, var(--layout-prompt-width, 820px)) !important;
@@ -37,8 +40,7 @@ body.mobile-mode .chat-container-root--mode-main
   margin: 0 auto !important;
 }
 body.mobile-mode .mobile-browser-samsung .mobile-drawer,
-body.mobile-mode.app-container--browser-samsung-internet
-  .mobile-drawer {
+body.mobile-mode.app-container--browser-samsung-internet .mobile-drawer {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   min-height: 0 !important;

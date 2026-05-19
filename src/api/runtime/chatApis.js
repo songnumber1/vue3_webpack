@@ -8,9 +8,10 @@ import {assistantApiLive} from "@/api/live/assistantApi.live";
 import {modelApiLive} from "@/api/live/modelApi.live";
 import {examplePromptApiLive} from "@/api/live/examplePromptApi.live";
 import {chatHistoryApiLive} from "@/api/live/chatHistoryApi.live";
+import {shouldUseFrontendMockApi} from "@/constants/apiMode";
 
 export function shouldUseMockChatApi() {
-  return process.env.VUE_APP_USE_MOCK_API !== "false";
+  return shouldUseFrontendMockApi();
 }
 export function resolveChatApis() {
   if (shouldUseMockChatApi()) {

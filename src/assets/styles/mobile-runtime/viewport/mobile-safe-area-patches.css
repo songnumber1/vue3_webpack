@@ -39,13 +39,13 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .sidebar-user--mobile,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  margin-top: auto ;
+  margin-top: auto;
   margin-bottom: max(
     22px,
     calc(var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom))
   ) !important;
   padding-bottom: 18px !important;
-  flex: 0 0 auto ;
+  flex: 0 0 auto;
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,

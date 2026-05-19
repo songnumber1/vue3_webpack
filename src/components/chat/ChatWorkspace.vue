@@ -227,7 +227,9 @@ defineExpose({
 }
 
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-left-actions),
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-left-actions) {
+:global(body.mobile-mode)
+  .mobile-main-fixed-prompt
+  :deep(.prompt-left-actions) {
   display: flex;
   flex: 0 1 auto;
   width: auto;
@@ -246,4 +248,3 @@ defineExpose({
   margin-left: auto;
 }
 </style>
-

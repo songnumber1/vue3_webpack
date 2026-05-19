@@ -1,5 +1,6 @@
 import axios from "axios";
 import {isAndroidApp, isIosApp} from "@/core/config";
+import {SERVER_API_BASE_URL} from "@/constants/apiMode";
 
 const AUTH_TIMEOUT = 10000;
 function resolveAuthHeaders(appInfo = {}) {
@@ -19,7 +20,7 @@ function resolveAuthHeaders(appInfo = {}) {
 }
 export function resolveAuthAxios(appInfo = {}) {
   return axios.create({
-    baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
+    baseURL: SERVER_API_BASE_URL,
     timeout: Number(process.env.VUE_APP_AUTH_TIMEOUT || AUTH_TIMEOUT),
     withCredentials: true,
     headers: resolveAuthHeaders(appInfo),

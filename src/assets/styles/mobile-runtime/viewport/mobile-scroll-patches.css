@@ -19,9 +19,7 @@ body.mobile-mode .message-list {
   --message-row-width: 100%;
 }
 
-body.mobile-mode
-  .sidebar-content--mobile
-  .sidebar-history,
+body.mobile-mode .sidebar-content--mobile .sidebar-history,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
   flex: 1 1 auto !important;
   min-height: 0 !important;

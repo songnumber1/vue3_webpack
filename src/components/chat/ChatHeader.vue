@@ -164,4 +164,3 @@ const showDesktopConversationTitle = computed(
   padding-right: 10px;
 }
 </style>
-

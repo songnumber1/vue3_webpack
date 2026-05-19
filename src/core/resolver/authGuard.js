@@ -8,6 +8,7 @@ import {
   ENABLE_AUTH_GUARD_DEBUG,
   ENABLE_AUTH_GUARD_CACHE,
 } from "@/constants/auth";
+import {shouldUseFrontendMockApi} from "@/constants/apiMode";
 import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
@@ -42,6 +43,7 @@ function getStoredMockScenario() {
 }
 function shouldUseMockAuth() {
   return (
+    shouldUseFrontendMockApi() ||
     USE_MOCK_AUTH ||
     (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
   );

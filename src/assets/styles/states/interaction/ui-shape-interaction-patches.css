@@ -59,18 +59,20 @@ body.mobile-mode .suggestion-chip {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #ffffff;
-}/* 4. Mobile-only tap flash prevention for requested controls. */
+} /* 4. Mobile-only tap flash prevention for requested controls. */
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}body.mobile-mode .mobile-topbar .menu-toggle {
+}
+body.mobile-mode .mobile-topbar .menu-toggle {
   border-color: transparent;
   background: transparent;
   box-shadow: none;
-}body.mobile-mode .mobile-topbar .menu-toggle:hover,
+}
+body.mobile-mode .mobile-topbar .menu-toggle:hover,
 body.mobile-mode .mobile-topbar .menu-toggle:active,
 body.mobile-mode .mobile-topbar .menu-toggle:focus,
 body.mobile-mode .mobile-topbar .menu-toggle:focus-visible,
@@ -83,7 +85,8 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant:focus-visible {
   box-shadow: none;
   transform: none;
   outline: none;
-}body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
+}
+body.mobile-mode .empty-stage--mobile-main .suggestion-chip:active,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus,
 body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
   background: transparent;
@@ -279,7 +282,6 @@ body.mobile-mode
   transform: none;
   box-shadow: none;
 }
-
 
 /*
  * Bottom sheet resize handle must keep native dragging behavior.

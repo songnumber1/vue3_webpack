@@ -284,7 +284,10 @@ body.mobile-mode .feedback-dialog {
    Imported after legacy patches so dialog text is not controlled by scattered
    playground/bottom-sheet CSS. */
 .responsive-panel .responsive-panel-header strong,
-.responsive-overlay--mobile-dialog .responsive-panel .responsive-panel-header strong,
+.responsive-overlay--mobile-dialog
+  .responsive-panel
+  .responsive-panel-header
+  strong,
 .feedback-dialog .feedback-dialog-header strong,
 .bottom-sheet .bottom-sheet-header h2 {
   margin: 0;
@@ -296,7 +299,10 @@ body.mobile-mode .feedback-dialog {
 }
 
 .responsive-panel .responsive-panel-header small,
-.responsive-overlay--mobile-dialog .responsive-panel .responsive-panel-header small,
+.responsive-overlay--mobile-dialog
+  .responsive-panel
+  .responsive-panel-header
+  small,
 .bottom-sheet .bottom-sheet-option-main small,
 .bottom-sheet .assistant-sheet-option-main small {
   color: var(--text-muted);
@@ -376,7 +382,10 @@ body.mobile-mode .mobile-drawer-backdrop {
 body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
   height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
-  max-height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
+  max-height: var(
+    --layout-viewport-height,
+    var(--app-height, 100dvh)
+  ) !important;
   overflow: hidden !important;
 }
 
@@ -414,8 +423,12 @@ body.mobile-mode .mobile-chat-prompt,
 body.mobile-mode .mobile-main-fixed-prompt,
 body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
 body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
-body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap,
-body.mobile-mode .empty-stage--mobile-main .desktop-center-prompt.prompt-wrap--floating {
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode
+  .empty-stage--mobile-main
+  .desktop-center-prompt.prompt-wrap--floating {
   background: transparent;
   box-shadow: none;
 }
@@ -448,12 +461,11 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
   background-clip: padding-box;
 }
 
-
 /* Absorbed from layout-freeze-overrides.css. Kept at the final import layer to preserve UI freeze cascade. */
 /* residual misc rules from previous layout-freeze-overrides.css */
 
 .attach-button,
-.send-button{
+.send-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -462,44 +474,46 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
   vertical-align: middle;
 }
 
-.send-button{
+.send-button {
   width: 38px;
   height: 38px;
-}body.mobile-mode .attach-button{
+}
+body.mobile-mode .attach-button {
   width: 34px;
   height: 34px;
-}body.mobile-mode .send-button{
+}
+body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
 }
 
-body.mobile-mode .topbar-actions{
+body.mobile-mode .topbar-actions {
   gap: 6px;
 }
 
-body.mobile-mode .topbar-actions .round-icon{
+body.mobile-mode .topbar-actions .round-icon {
   width: 46px;
   height: 46px;
   font-size: 20px;
 }
 
 body.mobile-mode .document-toggle svg,
-body.mobile-mode .test-toggle svg{
+body.mobile-mode .test-toggle svg {
   width: 19px;
   height: 19px;
 }
 
-body.mobile-mode .topbar-actions{
+body.mobile-mode .topbar-actions {
   gap: 4px;
 }
 
-body.mobile-mode .topbar-actions .round-icon{
+body.mobile-mode .topbar-actions .round-icon {
   width: 40px;
   height: 40px;
 }
 
 .collapsed-icon-button,
-.collapsed-user-button{
+.collapsed-user-button {
   width: 36px;
   height: 36px;
   border: 0;
@@ -518,11 +532,11 @@ body.mobile-mode .topbar-actions .round-icon{
 
 .collapsed-icon-button:hover,
 .collapsed-icon-button--active,
-.collapsed-user-button:hover{
+.collapsed-user-button:hover {
   background: var(--control-hover);
 }
 
-.collapsed-user-button{
+.collapsed-user-button {
   margin-bottom: 2px;
   border-radius: 999px;
   background: var(--primary);
@@ -531,7 +545,7 @@ body.mobile-mode .topbar-actions .round-icon{
   font-weight: 900;
 }
 
-.collapsed-recent-popover h2{
+.collapsed-recent-popover h2 {
   margin: 0 0 12px;
   color: var(--text);
   font-size: 15px;
@@ -539,7 +553,7 @@ body.mobile-mode .topbar-actions .round-icon{
   letter-spacing: -0.02em;
 }
 
-.collapsed-recent-item{
+.collapsed-recent-item {
   display: block;
   width: 100%;
   min-width: 0;
@@ -557,25 +571,25 @@ body.mobile-mode .topbar-actions .round-icon{
   text-overflow: ellipsis;
 }
 
-.collapsed-recent-item:hover{
+.collapsed-recent-item:hover {
   color: var(--primary);
 }
 
 .collapsed-popover-fade-enter-active,
-.collapsed-popover-fade-leave-active{
+.collapsed-popover-fade-leave-active {
   transition:
     opacity 140ms ease,
     transform 140ms ease;
 }
 
 .collapsed-popover-fade-enter-from,
-.collapsed-popover-fade-leave-to{
+.collapsed-popover-fade-leave-to {
   opacity: 0;
   transform: translateX(-6px);
 }
 
 /* Header action patch: keep theme, document and test buttons aligned together. */
-.mobile-topbar .topbar-actions{
+.mobile-topbar .topbar-actions {
   margin-left: auto;
   position: relative;
   z-index: 2;
@@ -583,17 +597,19 @@ body.mobile-mode .topbar-actions .round-icon{
 
 .mobile-topbar .theme-toggle,
 .mobile-topbar .document-toggle,
-.mobile-topbar .test-toggle{
+.mobile-topbar .test-toggle {
   position: static !important;
   inset: auto !important;
 }
 
-.attach-button--active{
+.attach-button--active {
   background: var(--control-hover);
-}body.mobile-mode .empty-stage{
+}
+body.mobile-mode .empty-stage {
   padding-bottom: calc(116px + env(safe-area-inset-bottom));
-}body.mobile-mode .attach-button,
-body.mobile-mode .send-button{
+}
+body.mobile-mode .attach-button,
+body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
   min-width: 38px;
@@ -601,14 +617,14 @@ body.mobile-mode .send-button{
   font-size: 22px;
 }
 
-.assistant-trigger{
+.assistant-trigger {
   width: auto;
   max-width: 176px;
   font-size: 18px;
 }
 
 .assistant-option,
-.bottom-sheet-option{
+.bottom-sheet-option {
   width: 100%;
   border: 0;
   border-radius: var(--dialog-option-radius);
@@ -622,19 +638,19 @@ body.mobile-mode .send-button{
 .assistant-option:hover,
 .assistant-option.active,
 .bottom-sheet-option:hover,
-.bottom-sheet-option.active{
+.bottom-sheet-option.active {
   background: var(--control-hover);
 }
 
 .assistant-option strong,
-.bottom-sheet-option strong{
+.bottom-sheet-option strong {
   display: block;
   font-size: 15px;
   font-weight: 800;
 }
 
 .assistant-option small,
-.bottom-sheet-option small{
+.bottom-sheet-option small {
   display: block;
   margin-top: 3px;
   color: var(--text-muted);
@@ -642,21 +658,21 @@ body.mobile-mode .send-button{
   line-height: 1.35;
 }
 
-.empty-center{
+.empty-center {
   gap: 20px;
 }
 
-.empty-center h1{
+.empty-center h1 {
   margin-bottom: 2px;
 }
 
-.suggestion-row--between{
+.suggestion-row--between {
   width: min(760px, 100%);
   margin: 0 auto 4px;
   order: 2;
 }
 
-.bottom-sheet-backdrop{
+.bottom-sheet-backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--z-bottom-sheet-backdrop);
@@ -664,16 +680,16 @@ body.mobile-mode .send-button{
   touch-action: none;
 }
 
-.bottom-sheet--dragging{
+.bottom-sheet--dragging {
   transition: none !important;
   user-select: none;
 }
 
-.bottom-sheet--fullscreen{
+.bottom-sheet--fullscreen {
   border-radius: var(--dialog-sheet-radius);
 }
 
-.bottom-sheet-drag-area{
+.bottom-sheet-drag-area {
   flex: 0 0 auto;
   min-height: 28px;
   display: flex;
@@ -683,7 +699,7 @@ body.mobile-mode .send-button{
   cursor: ns-resize;
 }
 
-.bottom-sheet-handle{
+.bottom-sheet-handle {
   width: 46px;
   height: 5px;
   border-radius: 999px;
@@ -691,7 +707,7 @@ body.mobile-mode .send-button{
   margin: 0 auto;
 }
 
-.bottom-sheet-header{
+.bottom-sheet-header {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -700,7 +716,7 @@ body.mobile-mode .send-button{
   padding: 0 4px 10px;
 }
 
-.bottom-sheet-header h2{
+.bottom-sheet-header h2 {
   min-width: 0;
   margin: 0;
   overflow: hidden;
@@ -711,7 +727,7 @@ body.mobile-mode .send-button{
   letter-spacing: -0.03em;
 }
 
-.bottom-sheet-close{
+.bottom-sheet-close {
   flex: 0 0 auto;
   width: 38px;
   height: 38px;
@@ -723,7 +739,7 @@ body.mobile-mode .send-button{
   line-height: 1;
 }
 
-.bottom-sheet-body{
+.bottom-sheet-body {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -732,82 +748,87 @@ body.mobile-mode .send-button{
   -webkit-overflow-scrolling: touch;
 }
 
-.bottom-sheet-option--row{
+.bottom-sheet-option--row {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.bottom-sheet-option--row span{
+.bottom-sheet-option--row span {
   width: 28px;
   text-align: center;
   font-size: 20px;
 }
 
 .sheet-fade-enter-active,
-.sheet-fade-leave-active{
+.sheet-fade-leave-active {
   transition: opacity 160ms ease;
 }
 
 .sheet-fade-enter-from,
-.sheet-fade-leave-to{
+.sheet-fade-leave-to {
   opacity: 0;
 }
 
 .sheet-slide-enter-active,
-.sheet-slide-leave-active{
+.sheet-slide-leave-active {
   transition: transform 210ms ease;
 }
 
 .sheet-slide-enter-from,
-.sheet-slide-leave-to{
+.sheet-slide-leave-to {
   transform: translateY(105%);
 }
 
 body.desktop-mode .bottom-sheet,
-body.desktop-mode .bottom-sheet-backdrop{
+body.desktop-mode .bottom-sheet-backdrop {
   display: none;
-}body.mobile-mode .empty-stage{
+}
+body.mobile-mode .empty-stage {
   display: grid;
   place-items: center;
   padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
   overflow-y: auto !important;
-}body.mobile-mode .empty-center{
+}
+body.mobile-mode .empty-center {
   display: flex;
   width: min(100%, 760px);
   transform: none;
   gap: 16px;
-}body.mobile-mode .empty-center h1{
+}
+body.mobile-mode .empty-center h1 {
   font-size: 24px;
   text-align: center;
   margin: 0;
-}body.mobile-mode .suggestion-row{
+}
+body.mobile-mode .suggestion-row {
   width: 100%;
   gap: 8px;
   justify-content: center;
-}body.mobile-mode .suggestion-chip{
+}
+body.mobile-mode .suggestion-chip {
   min-height: 34px;
   padding: 0 12px;
   font-size: 13px;
 }
 
 /* Gemini/Assistant routing refactor overrides */
-.topbar-left{
+.topbar-left {
   min-width: 0;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.mobile-topbar--desktop-main .topbar-left{
+.mobile-topbar--desktop-main .topbar-left {
   flex: 1 1 auto;
 }
 
-.mobile-topbar--desktop-main .model-trigger--assistant{
+.mobile-topbar--desktop-main .model-trigger--assistant {
   display: none;
 }
 
-.conversation-title-wrap{
+.conversation-title-wrap {
   min-width: 0;
   max-width: min(720px, 62vw);
   height: 42px;
@@ -821,14 +842,14 @@ body.desktop-mode .bottom-sheet-backdrop{
   box-shadow: var(--shadow-control);
 }
 
-.conversation-title-wrap strong{
+.conversation-title-wrap strong {
   flex: 0 0 auto;
   font-size: 16px;
   font-weight: 900;
   letter-spacing: -0.04em;
 }
 
-.conversation-title-wrap span{
+.conversation-title-wrap span {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
@@ -837,11 +858,11 @@ body.desktop-mode .bottom-sheet-backdrop{
   font-size: 14px;
 }
 
-.empty-stage--main{
+.empty-stage--main {
   min-height: 0;
 }
 
-.scroll-bottom-button{
+.scroll-bottom-button {
   position: absolute;
   right: 32px;
   bottom: 116px;
@@ -858,32 +879,32 @@ body.desktop-mode .bottom-sheet-backdrop{
   cursor: pointer;
 }
 
-.scroll-bottom-button:hover{
+.scroll-bottom-button:hover {
   background: var(--control-hover);
 }
 
-.assistant-trigger{
+.assistant-trigger {
   max-width: 100%;
 }
 
-body.desktop-mode .settings-toggle{
+body.desktop-mode .settings-toggle {
   display: none;
 }
 
-body.desktop-mode .chat-workspace > .mobile-topbar{
+body.desktop-mode .chat-workspace > .mobile-topbar {
   border-bottom: 0;
 }
 
-body.mobile-mode .chat-container-root{
+body.mobile-mode .chat-container-root {
   grid-template-columns: minmax(0, 1fr);
 }
 
-body.mobile-mode .topbar-left{
+body.mobile-mode .topbar-left {
   flex: 1 1 auto;
   gap: 8px;
 }
 
-body.mobile-mode .model-trigger--assistant{
+body.mobile-mode .model-trigger--assistant {
   min-width: 0;
   max-width: 190px;
   height: 42px;
@@ -891,51 +912,51 @@ body.mobile-mode .model-trigger--assistant{
   padding: 0 14px;
 }
 
-body.mobile-mode .topbar-actions{
+body.mobile-mode .topbar-actions {
   flex: 0 0 auto;
   gap: 6px;
 }
 
-body.mobile-mode .topbar-actions .round-icon{
+body.mobile-mode .topbar-actions .round-icon {
   width: 42px;
   height: 42px;
 }
 
-body.mobile-mode .scroll-bottom-button{
+body.mobile-mode .scroll-bottom-button {
   right: 18px;
   bottom: 112px;
 }
 
-.chat-history-sheet-options{
+.chat-history-sheet-options {
   display: grid;
   gap: 8px;
 }
 
-.chat-history-action-option{
+.chat-history-action-option {
   justify-content: flex-start;
 }
 
 .responsive-overlay.responsive-overlay--mobile-dialog
-  .responsive-overlay-backdrop{
+  .responsive-overlay-backdrop {
   z-index: 0;
 }
 
-.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel{
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
   z-index: 1;
 }
 
-.chat-history-dialog{
+.chat-history-dialog {
   display: grid;
   gap: 18px;
 }
 
-.chat-history-dialog__field{
+.chat-history-dialog__field {
   display: grid;
   gap: 8px;
   font-size: 14px;
 }
 
-.chat-history-dialog__actions{
+.chat-history-dialog__actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
@@ -943,7 +964,7 @@ body.mobile-mode .scroll-bottom-button{
 
 /* absorbed from utilities/overrides/composer-layout-patches.css (layout_freeze) */
 
-.chat-history-dialog__input{
+.chat-history-dialog__input {
   width: 100%;
   min-height: 44px;
   padding: 0 12px;
@@ -954,7 +975,7 @@ body.mobile-mode .scroll-bottom-button{
   font: inherit;
 }
 
-.chat-history-dialog__input:focus{
+.chat-history-dialog__input:focus {
   border-color: var(--accent-color, #2563eb);
   outline: none;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
@@ -1022,4 +1043,3 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.desktop-mode .mobile-topbar .model-trigger--assistant {
   border-radius: 5px !important;
 }
-

@@ -1,4 +1,3 @@
-
 function normalizeVersion(version) {
   return String(version || "0")
     .split(".")

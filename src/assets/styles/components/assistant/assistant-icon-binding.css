@@ -32,7 +32,7 @@
 /* absorbed from utilities/overrides/composer-layout-patches.css (assistant) */
 
 .assistant-trigger,
-.prompt-model-trigger{
+.prompt-model-trigger {
   min-width: 0;
   max-width: 100%;
   height: 42px;
@@ -52,7 +52,7 @@
 }
 
 .assistant-trigger span,
-.prompt-model-trigger span{
+.prompt-model-trigger span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -60,7 +60,7 @@
 }
 
 .assistant-trigger svg,
-.prompt-model-trigger svg{
+.prompt-model-trigger svg {
   width: 15px;
   height: 15px;
   flex: 0 0 auto;
@@ -69,7 +69,7 @@
 
 .prompt-model-trigger span,
 .model-trigger span,
-.assistant-trigger span{
+.assistant-trigger span {
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;

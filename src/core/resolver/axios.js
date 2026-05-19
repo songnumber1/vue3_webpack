@@ -1,12 +1,14 @@
 import axios from "axios";
 import {isAndroidApp, isIosApp} from "@/core/config";
+import {SERVER_API_BASE_URL} from "@/constants/apiMode";
 
 const baseConfig = {
-  baseURL: process.env.VUE_APP_API_BASE_URL || "/api",
+  baseURL: SERVER_API_BASE_URL,
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true,
 };
 
 const androidOverride = {

@@ -169,4 +169,3 @@ const {
   border: 1px solid var(--prompt-border);
 }
 </style>
-

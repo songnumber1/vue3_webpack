@@ -143,7 +143,8 @@ body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .chat-workspace,
 body.mobile-mode
@@ -152,14 +153,14 @@ body.mobile-mode
   height: var(--layout-viewport-height, 100dvh) !important;
   min-height: var(--layout-viewport-height, 100dvh);
   overflow: hidden !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .desktop-center-prompt.prompt-wrap--floating {
   bottom: 0 !important;
   transform: translate3d(0, var(--keyboard-height, 0px), 0);
-}body.mobile-mode
-  .empty-stage--mobile-main
-  .suggestion-row--between:empty {
+}
+body.mobile-mode .empty-stage--mobile-main .suggestion-row--between:empty {
   display: none;
 }
 
@@ -176,7 +177,8 @@ body.mobile-mode
   place-items: center;
   background: var(--chat-bg);
   color: var(--text-muted);
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .empty-stage--mobile-main {
   height: calc(
@@ -186,7 +188,8 @@ body.mobile-mode
   overflow: hidden !important;
   padding-top: 78px;
   padding-bottom: calc(150px + env(safe-area-inset-bottom));
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
   .desktop-center-prompt.prompt-wrap--floating {
   bottom: 0 !important;
@@ -206,7 +209,8 @@ body.mobile-mode .chat-container-root--mode-main {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode .empty-stage--mobile-main {
+}
+body.mobile-mode .empty-stage--mobile-main {
   height: calc(
     var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
   ) !important;
@@ -216,13 +220,15 @@ body.mobile-mode .chat-container-root--mode-main {
   padding: 78px 16px calc(170px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain !important;
-}body.mobile-mode .empty-stage--mobile-main .empty-center {
+}
+body.mobile-mode .empty-stage--mobile-main .empty-center {
   min-height: auto;
   transform: none;
   margin-top: 0;
   justify-content: flex-start;
   align-items: stretch;
-}body.mobile-mode
+}
+body.mobile-mode
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating {
   position: fixed !important;
@@ -242,7 +248,8 @@ body.mobile-mode .chat-container-root--mode-main {
     transparent
   );
   will-change: bottom;
-}body.mobile-mode
+}
+body.mobile-mode
   .empty-stage--mobile-main
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
@@ -265,9 +272,8 @@ body.mobile-mode .chat-container-root--mode-main {
   height: var(--layout-viewport-height, 100dvh) !important;
   max-height: var(--layout-viewport-height, 100dvh) !important;
   overflow: hidden !important;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .empty-stage--mobile-main {
+}
+body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   height: calc(
     var(--layout-viewport-height, 100dvh) - var(--mobile-header-height, 76px)
   ) !important;
@@ -290,7 +296,8 @@ body.mobile-mode .chat-container-root--mode-main {
     var(--mobile-main-composer-space, 178px) + var(--keyboard-height, 0px) +
       env(safe-area-inset-bottom)
   );
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating {
   position: fixed !important;
@@ -310,13 +317,14 @@ body.mobile-mode .chat-container-root--mode-main {
     color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 78%, transparent)
   );
   will-change: bottom;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
   max-width: min(100%, var(--layout-prompt-width, 760px));
   margin: 0 auto;
-}/* =========================================================
+} /* =========================================================
    MOBILE MAIN STABLE COMPOSER LAYOUT
    ---------------------------------------------------------
    The main landing page uses a different mobile keyboard policy than chat rooms.
@@ -333,9 +341,8 @@ body.mobile-mode #app {
   max-height: var(--app-height, 100dvh) !important;
   overflow: hidden !important;
   overscroll-behavior: none !important;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .empty-stage--mobile-main {
+}
+body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   height: 100% !important;
   max-height: 100% !important;
   min-height: 0;
@@ -349,7 +356,8 @@ body.mobile-mode #app {
   padding: 0;
   background: var(--chat-bg);
   overscroll-behavior: none !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .empty-center {
@@ -371,21 +379,22 @@ body.mobile-mode #app {
   padding: 24px 16px 16px;
   scroll-padding-bottom: 24px;
   touch-action: pan-y;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .empty-center
   h1 {
   flex: 0 0 auto;
   margin: 0 0 4px;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .suggestion-row--between {
   flex: 0 0 auto;
-}body.mobile-mode
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt,
+}
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
@@ -406,18 +415,21 @@ body.mobile-mode
   box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.06);
   will-change: auto;
   touch-action: manipulation;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
   max-width: min(100%, var(--layout-prompt-width, 760px));
   margin: 0 auto;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   textarea {
   overscroll-behavior: contain !important;
-}body.mobile-mode
+}
+body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating {
   position: static !important;

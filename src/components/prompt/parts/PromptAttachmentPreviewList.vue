@@ -137,12 +137,16 @@ function emitPreview(file) {
 :global(body.mobile-mode) .attachment-preview-info,
 :global(body.mobile-mode) .attachment-preview-info strong,
 :global(body.mobile-mode) .attachment-preview-info span,
-:global(body.mobile-mode) .attachment-preview-card--image .attachment-preview-info {
+:global(body.mobile-mode)
+  .attachment-preview-card--image
+  .attachment-preview-info {
   display: none;
 }
 
 :global(body.mobile-mode) .attachment-preview-remove,
-:global(body.mobile-mode) .attachment-preview-card--image .attachment-preview-remove {
+:global(body.mobile-mode)
+  .attachment-preview-card--image
+  .attachment-preview-remove {
   top: var(--attachment-mobile-remove-offset);
   right: var(--attachment-mobile-remove-offset);
   width: var(--attachment-mobile-remove-size);
@@ -159,4 +163,3 @@ function emitPreview(file) {
   inset: -8px;
 }
 </style>
-

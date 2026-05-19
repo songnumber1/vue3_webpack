@@ -1,4 +1,3 @@
-
 export function streamText(text, onChunk, options = {}) {
   const delay = options.delay ?? 14;
   let index = 0;

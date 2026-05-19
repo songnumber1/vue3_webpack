@@ -69,18 +69,18 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
 /* extracted from layout-freeze-overrides.css */
 
 /* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
-.chat-container-root--sidebar-collapsed{
+.chat-container-root--sidebar-collapsed {
   grid-template-columns: 48px minmax(0, 1fr);
 }
 
-.desktop-sidebar--collapsed{
+.desktop-sidebar--collapsed {
   position: relative;
   display: block;
   overflow: visible;
   z-index: var(--z-sidebar-collapsed);
 }
 
-.collapsed-sidebar{
+.collapsed-sidebar {
   position: relative;
   width: 48px;
   height: 100%;
@@ -94,7 +94,7 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
   background: var(--sidebar-bg);
 }
 
-.collapsed-sidebar-actions{
+.collapsed-sidebar-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -102,7 +102,7 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
   width: 100%;
 }
 
-.collapsed-recent-popover{
+.collapsed-recent-popover {
   position: absolute;
   left: calc(100% - 12px);
   top: 122px;
@@ -118,22 +118,22 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
   z-index: var(--z-popover);
 }
 
-body.mobile-mode .chat-container-root--sidebar-collapsed{
+body.mobile-mode .chat-container-root--sidebar-collapsed {
   grid-template-columns: 1fr;
 }
 
 body.mobile-mode .desktop-sidebar--collapsed,
-body.mobile-mode .collapsed-sidebar{
+body.mobile-mode .collapsed-sidebar {
   display: none;
 }
 
-.attach-menu-wrap{
+.attach-menu-wrap {
   position: relative;
   display: grid;
   place-items: end center;
 }
 
-.attach-menu{
+.attach-menu {
   position: absolute;
   left: 0;
   bottom: calc(100% + 10px);
@@ -146,7 +146,7 @@ body.mobile-mode .collapsed-sidebar{
   z-index: var(--z-popover);
 }
 
-.attach-menu button{
+.attach-menu button {
   width: 100%;
   min-height: 42px;
   display: flex;
@@ -160,27 +160,27 @@ body.mobile-mode .collapsed-sidebar{
   text-align: left;
 }
 
-.attach-menu button:hover{
+.attach-menu button:hover {
   background: var(--control-hover);
 }
 
-.attach-menu span{
+.attach-menu span {
   width: 22px;
   text-align: center;
 }
 
-.attach-menu strong{
+.attach-menu strong {
   font-size: 14px;
   font-weight: 700;
 }
 
-body.mobile-mode .attach-menu{
+body.mobile-mode .attach-menu {
   width: min(248px, calc(100vw - 36px));
   bottom: calc(100% + 12px);
 }
 
 .attach-menu-wrap,
-body.mobile-mode .attach-menu-wrap{
+body.mobile-mode .attach-menu-wrap {
   flex: 0 0 auto;
   display: flex;
   align-items: flex-end;
@@ -194,7 +194,7 @@ body.mobile-mode .attach-menu-wrap{
    - Image preview no longer depends on browser default image loading UI.
    ========================================================= */
 body.mobile-mode .mobile-drawer-backdrop,
-.mobile-drawer-backdrop{
+.mobile-drawer-backdrop {
   position: fixed !important;
   inset: 0 !important;
   display: block !important;
@@ -203,7 +203,7 @@ body.mobile-mode .mobile-drawer-backdrop,
 }
 
 body.mobile-mode .mobile-drawer,
-.mobile-drawer{
+.mobile-drawer {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -221,7 +221,7 @@ body.mobile-mode .mobile-drawer,
 }
 
 body.mobile-mode .sidebar-content--mobile,
-.mobile-drawer .sidebar-content--mobile{
+.mobile-drawer .sidebar-content--mobile {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -242,14 +242,14 @@ body.mobile-mode .sidebar-content--mobile,
 }
 
 body.mobile-mode .sidebar-content--mobile > *,
-.mobile-drawer .sidebar-content--mobile > *{
+.mobile-drawer .sidebar-content--mobile > * {
   opacity: 1;
   visibility: visible;
   color: inherit;
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-top,
-.mobile-drawer .sidebar-content--mobile .sidebar-top{
+.mobile-drawer .sidebar-content--mobile .sidebar-top {
   position: sticky;
   top: 0;
   z-index: 2;
@@ -263,7 +263,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-top,
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-title,
-.mobile-drawer .sidebar-content--mobile .sidebar-title{
+.mobile-drawer .sidebar-content--mobile .sidebar-title {
   display: block;
   color: var(--sidebar-text, #202123);
   font-size: 22px;
@@ -272,7 +272,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-title,
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-round,
-.mobile-drawer .sidebar-content--mobile .sidebar-round{
+.mobile-drawer .sidebar-content--mobile .sidebar-round {
   flex: 0 0 auto;
   width: 40px;
   height: 40px;
@@ -285,7 +285,7 @@ body.mobile-mode .sidebar-content--mobile .project-list,
 body.mobile-mode .sidebar-content--mobile .sidebar-history,
 .mobile-drawer .sidebar-content--mobile .quick-menu,
 .mobile-drawer .sidebar-content--mobile .project-list,
-.mobile-drawer .sidebar-content--mobile .sidebar-history{
+.mobile-drawer .sidebar-content--mobile .sidebar-history {
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
@@ -297,7 +297,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history,
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-history,
-.mobile-drawer .sidebar-content--mobile .sidebar-history{
+.mobile-drawer .sidebar-content--mobile .sidebar-history {
   flex: 1 1 auto;
   min-height: 120px;
   overflow-y: auto;
@@ -309,7 +309,7 @@ body.mobile-mode .sidebar-content--mobile .project-item,
 body.mobile-mode .sidebar-content--mobile .sidebar-history-item,
 .mobile-drawer .sidebar-content--mobile .quick-item,
 .mobile-drawer .sidebar-content--mobile .project-item,
-.mobile-drawer .sidebar-content--mobile .sidebar-history-item{
+.mobile-drawer .sidebar-content--mobile .sidebar-history-item {
   display: flex;
   align-items: center;
   width: 100%;
@@ -336,21 +336,21 @@ body.mobile-mode .sidebar-content--mobile .project-item.selected,
 .mobile-drawer .sidebar-content--mobile .project-item:hover,
 .mobile-drawer .sidebar-content--mobile .sidebar-history-item:hover,
 .mobile-drawer .sidebar-content--mobile .quick-item.active,
-.mobile-drawer .sidebar-content--mobile .project-item.selected{
+.mobile-drawer .sidebar-content--mobile .project-item.selected {
   background: var(--sidebar-hover, #ececf1);
 }
 
 body.mobile-mode .sidebar-content--mobile .quick-item span,
 body.mobile-mode .sidebar-content--mobile .project-item span,
 .mobile-drawer .sidebar-content--mobile .quick-item span,
-.mobile-drawer .sidebar-content--mobile .project-item span{
+.mobile-drawer .sidebar-content--mobile .project-item span {
   flex: 0 0 22px;
   width: 22px;
   color: var(--sidebar-icon, #4b5563);
 }
 
 body.mobile-mode .sidebar-content--mobile .section-label,
-.mobile-drawer .sidebar-content--mobile .section-label{
+.mobile-drawer .sidebar-content--mobile .section-label {
   display: block;
   flex: 0 0 auto;
   padding: 12px 18px 4px;
@@ -360,7 +360,7 @@ body.mobile-mode .sidebar-content--mobile .section-label,
 }
 
 body.mobile-mode .mobile-new-chat-fab,
-.mobile-drawer .mobile-new-chat-fab{
+.mobile-drawer .mobile-new-chat-fab {
   position: sticky;
   align-self: flex-end;
   right: auto;
@@ -379,31 +379,31 @@ body.mobile-mode .mobile-new-chat-fab,
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,
-.mobile-drawer .sidebar-content--mobile .sidebar-user{
+.mobile-drawer .sidebar-content--mobile .sidebar-user {
   flex: 0 0 auto;
   margin-top: 0;
   padding: 10px 18px 0;
   color: var(--sidebar-text, #202123);
 }
 
-.assistant-menu{
+.assistant-menu {
   top: calc(100% + 8px);
 }
 
-.quick-menu--assistant{
+.quick-menu--assistant {
   flex: 0 0 auto;
 }
 
-.sidebar-history--main{
+.sidebar-history--main {
   flex: 1 1 auto;
   min-height: 0;
 }
 
-.sidebar-content--assistant .project-list{
+.sidebar-content--assistant .project-list {
   display: none;
 }
 
-.bottom-sheet{
+.bottom-sheet {
   position: fixed;
   left: 0;
   right: 0;
@@ -422,25 +422,28 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user,
   padding: 0 12px calc(14px + env(safe-area-inset-bottom));
   overflow: hidden;
   will-change: height, transform;
-}body.mobile-mode .sidebar-content--mobile .assistant-trigger{
+}
+body.mobile-mode .sidebar-content--mobile .assistant-trigger {
   height: 40px;
   max-width: 210px;
   font-size: 18px;
   box-shadow: none;
-}body.mobile-mode .sidebar-content--mobile .project-list{
+}
+body.mobile-mode .sidebar-content--mobile .project-list {
   display: none;
-}body.mobile-mode .sidebar-content--mobile .sidebar-history{
+}
+body.mobile-mode .sidebar-content--mobile .sidebar-history {
   flex: 1 1 auto;
   min-height: 160px;
 }
 
 .sidebar-history-item,
-.collapsed-recent-item{
+.collapsed-recent-item {
   min-width: 0;
 }
 
 .sidebar-history-item span,
-.collapsed-recent-item span{
+.collapsed-recent-item span {
   display: block;
   min-width: 0;
   overflow: hidden;
@@ -448,51 +451,51 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user,
   text-overflow: ellipsis;
 }
 
-.sidebar-history-item.selected{
+.sidebar-history-item.selected {
   background: var(--sidebar-hover);
   font-weight: 800;
 }
 
-.sidebar-content--mobile .sidebar-history-item{
+.sidebar-content--mobile .sidebar-history-item {
   max-width: 100%;
   height: 48px;
 }
 
-.sidebar-content--mobile .sidebar-history-item span{
+.sidebar-content--mobile .sidebar-history-item span {
   width: 100%;
 }
 
-body.mobile-mode .desktop-sidebar{
+body.mobile-mode .desktop-sidebar {
   display: none;
 }
 
-body.mobile-mode .mobile-topbar{
+body.mobile-mode .mobile-topbar {
   height: 68px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--sidebar-border);
 }
 
-body.mobile-mode .menu-toggle{
+body.mobile-mode .menu-toggle {
   display: grid;
 }
 
-body.mobile-mode .sidebar-content--mobile{
+body.mobile-mode .sidebar-content--mobile {
   width: 100%;
   max-width: 100vw;
 }
 
-body.mobile-mode .mobile-drawer{
+body.mobile-mode .mobile-drawer {
   width: min(430px, 100vw);
   max-width: 100vw;
   overflow: hidden;
 }
 
-body.mobile-mode .sidebar-history--main{
+body.mobile-mode .sidebar-history--main {
   overflow-x: hidden;
 }
 
 /* Chat history action menu */
-.sidebar-history-row{
+.sidebar-history-row {
   position: relative;
   display: flex;
   align-items: center;
@@ -500,17 +503,17 @@ body.mobile-mode .sidebar-history--main{
   border-radius: 12px;
 }
 
-.sidebar-history-row.selected{
+.sidebar-history-row.selected {
   background: var(--sidebar-item-active-bg, rgba(127, 127, 127, 0.14));
 }
 
-.sidebar-history-title-button{
+.sidebar-history-title-button {
   flex: 1 1 auto;
   min-width: 0;
   padding-right: 8px;
 }
 
-.sidebar-history-actions{
+.sidebar-history-actions {
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -521,11 +524,11 @@ body.mobile-mode .sidebar-history--main{
 
 .sidebar-history-row:hover .sidebar-history-actions,
 .sidebar-history-row:focus-within .sidebar-history-actions,
-.sidebar-history-row.selected .sidebar-history-actions{
+.sidebar-history-row.selected .sidebar-history-actions {
   opacity: 1;
 }
 
-.sidebar-history-pin{
+.sidebar-history-pin {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -535,7 +538,7 @@ body.mobile-mode .sidebar-history--main{
   line-height: 1;
 }
 
-.sidebar-history-menu-button{
+.sidebar-history-menu-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -551,39 +554,39 @@ body.mobile-mode .sidebar-history--main{
 }
 
 .sidebar-history-menu-button:hover,
-.sidebar-history-menu-button:focus-visible{
+.sidebar-history-menu-button:focus-visible {
   background: var(--sidebar-item-hover-bg, rgba(127, 127, 127, 0.16));
   outline: none;
 }
 
 .context-menu-fade-enter-active,
-.context-menu-fade-leave-active{
+.context-menu-fade-leave-active {
   transition:
     opacity 120ms ease,
     transform 120ms ease;
 }
 
 .context-menu-fade-enter-from,
-.context-menu-fade-leave-to{
+.context-menu-fade-leave-to {
   opacity: 0;
   transform: translateY(-3px) scale(0.98);
 }
 
-.chat-history-context-menu-shell{
+.chat-history-context-menu-shell {
   z-index: var(--z-chat-history-menu);
   isolation: isolate;
 }
 
 /* Keep the chat history action popup above every app surface on desktop and mobile. */
-.chat-history-menu-overlay.bottom-sheet-backdrop{
+.chat-history-menu-overlay.bottom-sheet-backdrop {
   z-index: var(--z-chat-history-menu-backdrop) !important;
 }
 
-.chat-history-menu-overlay.bottom-sheet{
+.chat-history-menu-overlay.bottom-sheet {
   z-index: var(--z-chat-history-menu) !important;
 }
 
-.chat-history-context-menu{
+.chat-history-context-menu {
   min-width: 192px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));
@@ -593,7 +596,7 @@ body.mobile-mode .sidebar-history--main{
 }
 
 .chat-history-context-menu__item,
-.chat-history-action-option{
+.chat-history-action-option {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -605,27 +608,27 @@ body.mobile-mode .sidebar-history--main{
   text-align: left;
 }
 
-.chat-history-context-menu__item{
+.chat-history-context-menu__item {
   padding: 10px 12px;
   border-radius: var(--dialog-option-radius);
   font-size: 14px;
 }
 
 .chat-history-context-menu__item:hover,
-.chat-history-context-menu__item:focus-visible{
+.chat-history-context-menu__item:focus-visible {
   background: var(--sidebar-item-hover-bg, rgba(127, 127, 127, 0.14));
   outline: none;
 }
 
 .chat-history-context-menu__item--danger,
-.chat-history-action-option--danger{
+.chat-history-action-option--danger {
   color: #d92d20;
 }
 
 /* Ensure every confirmation/notice popup opened from the mobile drawer is above the drawer and any bottom sheet.
    The drawer intentionally remains mounted while history actions run, so dialog overlays must own
    the top application layer instead of inheriting the base responsive overlay z-index. */
-.responsive-overlay.responsive-overlay--mobile-dialog{
+.responsive-overlay.responsive-overlay--mobile-dialog {
   z-index: var(--z-app-dialog-front) !important;
   isolation: isolate;
 }
@@ -633,21 +636,21 @@ body.mobile-mode .sidebar-history--main{
 /* Desktop dialogs should also stay above transient menus without changing their layout. */
 .responsive-overlay:not(.responsive-overlay--mobile):not(
     .responsive-overlay--mobile-dialog
-  ){
+  ) {
   z-index: var(--z-app-dialog) !important;
 }
 
-.sidebar-content--mobile .sidebar-history-row{
+.sidebar-content--mobile .sidebar-history-row {
   min-height: 44px;
 }
 
-.sidebar-content--mobile .sidebar-history-actions{
+.sidebar-content--mobile .sidebar-history-actions {
   opacity: 1;
 }
 
 /* absorbed from utilities/overrides/composer-layout-patches.css (sidebar) */
 
-.collapsed-icon-button .nav-icon{
+.collapsed-icon-button .nav-icon {
   width: var(--prompt-action-icon-size);
   height: var(--prompt-action-icon-size);
 }
@@ -659,7 +662,7 @@ body.mobile-mode .sidebar-history--main{
    - Prompt composer with textarea + bottom action row
    - Mobile selectors use bottom sheet instead of dropdowns
    ========================================================= */
-.assistant-selector{
+.assistant-selector {
   position: relative;
   min-width: 0;
   flex: 1 1 auto;

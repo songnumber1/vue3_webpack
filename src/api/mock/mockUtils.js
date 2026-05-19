@@ -1,4 +1,3 @@
-
 export function cloneMockData(value) {
   if (typeof structuredClone === "function") return structuredClone(value);
 

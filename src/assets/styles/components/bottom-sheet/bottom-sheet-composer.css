@@ -33,10 +33,12 @@ body.mobile-mode .bottom-sheet-body > *:last-child {
 .shared-readonly-box span {
   color: var(--text-muted);
   font-size: 13px;
-}body.mobile-mode .shared-readonly-wrap {
+}
+body.mobile-mode .shared-readonly-wrap {
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
   background: var(--mobile-bg);
-}body.mobile-mode .shared-readonly-box {
+}
+body.mobile-mode .shared-readonly-box {
   max-width: none;
   min-height: 52px;
   border-radius: 20px;
@@ -83,7 +85,8 @@ body.mobile-mode .message-list {
 body.mobile-mode {
   --chat-message-bottom-gap: 14px;
   --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
-}body.mobile-mode .chat-container-root--keyboard-open .message-list {
+}
+body.mobile-mode .chat-container-root--keyboard-open .message-list {
   padding-bottom: 12px !important;
   scroll-padding-bottom: 12px;
 }
@@ -126,7 +129,8 @@ body.mobile-mode .scroll-bottom-button {
 
 body.mobile-mode {
   --chat-scroll-button-gap: 10px;
-}body.mobile-mode .scroll-bottom-button {
+}
+body.mobile-mode .scroll-bottom-button {
   left: 50% !important;
   right: auto !important;
   bottom: calc(
@@ -619,7 +623,8 @@ body.mobile-mode .service-menu {
 
 body.mobile-mode .sidebar-content--mobile {
   padding-bottom: 0 !important;
-}body.mobile-mode .sidebar-content--mobile .sidebar-user {
+}
+body.mobile-mode .sidebar-content--mobile .sidebar-user {
   position: sticky !important;
   bottom: 0 !important;
   margin-top: auto !important;
@@ -825,8 +830,7 @@ body.mobile-mode
   .mobile-drawer
   .quick-menu--assistant.quick-menu--mobile-search
   .quick-item,
-body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search
-  .quick-item {
+body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search .quick-item {
   font-size: 14px !important;
   font-weight: 750 !important;
   min-height: 40px !important;

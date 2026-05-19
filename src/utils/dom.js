@@ -1,4 +1,3 @@
-
 export function runAfterPaint(callback) {
   if (
     typeof window !== "undefined" &&
