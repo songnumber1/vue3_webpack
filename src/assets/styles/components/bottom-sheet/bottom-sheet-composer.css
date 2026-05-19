@@ -1162,3 +1162,8 @@ body.mobile-mode .playground-header {
 body.mobile-mode .playground-grid {
   grid-template-columns: 1fr;
 }
+
+
+html.is-prompt-menu-open .scroll-bottom-button {
+  display: none !important;
+}

@@ -36,6 +36,22 @@ export const DEFAULT_FALLBACK_MODEL = Object.freeze({
   description: "현재 선택된 모델",
 });
 
+export const PROMPT_TOOL_SETTING_GROUP = Object.freeze({
+  knowledge: "knowledgeSearch",
+  web: "webSearch",
+});
+
+export const PROMPT_TOOL_SELECTION_MODE = Object.freeze({
+  multiple: "multiple",
+  single: "single",
+});
+
+export const PROMPT_TOOL_CONTROL_TYPE = Object.freeze({
+  checkbox: "checkbox",
+  selectedRow: "selectedRow",
+  switch: "switch",
+});
+
 export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
   {
     id: "image",
@@ -59,24 +75,76 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
     id: "knowledge-search",
     icon: "⌕",
     labelKey: "chat.suggestions.knowledgeSearch",
+    settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
+    selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
+    childControlType: PROMPT_TOOL_CONTROL_TYPE.checkbox,
     children: [
       {
         id: "knowledge-paper",
         icon: "◫",
         labelKey: "chat.suggestions.knowledge.paper",
-        prompt: "논문 자료를 기준으로 관련 내용을 찾아 정리해줘",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.checkbox,
       },
       {
         id: "knowledge-confluence",
         icon: "◆",
         labelKey: "chat.suggestions.knowledge.confluence",
-        prompt: "Confluence 문서를 기준으로 관련 내용을 찾아 정리해줘",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.checkbox,
       },
       {
         id: "knowledge-jira",
         icon: "◇",
         labelKey: "chat.suggestions.knowledge.jira",
-        prompt: "Jira 이슈를 기준으로 관련 내용을 찾아 정리해줘",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.checkbox,
+      },
+    ],
+  },
+  {
+    id: "web-search",
+    icon: "◉",
+    labelKey: "chat.suggestions.webSearch",
+    settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
+    selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
+    parentControlType: PROMPT_TOOL_CONTROL_TYPE.switch,
+    childControlType: PROMPT_TOOL_CONTROL_TYPE.selectedRow,
+    children: [
+      {
+        id: "web-perplexity",
+        icon: "P",
+        labelKey: "chat.suggestions.web.perplexity",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.selectedRow,
+      },
+      {
+        id: "web-google-ai-overviews",
+        icon: "G",
+        labelKey: "chat.suggestions.web.googleAiOverviews",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.selectedRow,
+      },
+      {
+        id: "web-chatgpt-search",
+        icon: "O",
+        labelKey: "chat.suggestions.web.chatgptSearch",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.selectedRow,
+      },
+      {
+        id: "web-microsoft-copilot",
+        icon: "M",
+        labelKey: "chat.suggestions.web.microsoftCopilot",
+        settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
+        selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
+        controlType: PROMPT_TOOL_CONTROL_TYPE.selectedRow,
       },
     ],
   },

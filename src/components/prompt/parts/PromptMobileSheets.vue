@@ -34,6 +34,7 @@
         v-for="tool in tools"
         :key="tool.id"
         class="bottom-sheet-option bottom-sheet-option--row"
+        :class="{'is-active': tool.active}"
         type="button"
         @click="handleToolClick(tool)"
       >
@@ -44,6 +45,15 @@
         <strong>
           {{ tool.label }}
         </strong>
+
+        <span
+          v-if="hasChildren(tool) && isSwitchParent(tool)"
+          class="bottom-sheet-parent-switch"
+          :class="{'is-active': tool.active}"
+          aria-hidden="true"
+        >
+          <span></span>
+        </span>
 
         <span
           v-if="hasChildren(tool)"
@@ -59,12 +69,22 @@
       <button
         v-for="child in activeToolGroup.children"
         :key="child.id"
-        class="bottom-sheet-option bottom-sheet-option--row"
+        class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice"
+        :class="[
+          `bottom-sheet-option--${child.controlType || activeToolGroup.childControlType || 'default'}`,
+          {'is-active': child.active},
+        ]"
         type="button"
+        :role="getChildRole(child)"
+        :aria-checked="child.active"
         @click="applyNestedTool(child)"
       >
-        <span aria-hidden="true">
-          {{ child.icon }}
+        <span
+          v-if="isCheckboxChild(child)"
+          class="bottom-sheet-checkbox"
+          aria-hidden="true"
+        >
+          <span v-if="child.active">✓</span>
         </span>
 
         <strong>
@@ -189,6 +209,18 @@ function hasChildren(tool) {
   return Array.isArray(tool?.children) && tool.children.length > 0;
 }
 
+function isSwitchParent(tool) {
+  return tool?.parentControlType === "switch";
+}
+
+function isCheckboxChild(tool) {
+  return tool?.controlType === "checkbox";
+}
+
+function getChildRole(tool) {
+  return tool?.selectionMode === "single" ? "menuitemradio" : "menuitemcheckbox";
+}
+
 function handleToolClick(tool) {
   if (!hasChildren(tool)) {
     emit("apply-tool", tool);
@@ -200,7 +232,6 @@ function handleToolClick(tool) {
 
 function applyNestedTool(tool) {
   emit("apply-tool", tool);
-  activeToolGroupId.value = "";
 }
 
 function closeToolSheet() {
@@ -227,4 +258,76 @@ watch(
   font-size: var(--font-size-lg);
   line-height: 1;
 }
+
+.bottom-sheet-parent-switch {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  min-width: 38px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--control-border);
+  transition: background 0.18s ease;
+}
+
+.bottom-sheet-parent-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
+  transition: transform 0.18s ease;
+}
+
+.bottom-sheet-parent-switch.is-active {
+  background: var(--accent);
+}
+
+.bottom-sheet-parent-switch.is-active span {
+  transform: translateX(16px);
+}
+
+.bottom-sheet-parent-switch + .bottom-sheet-submenu-arrow {
+  margin-left: 6px;
+}
+
+.bottom-sheet-option--choice {
+  gap: 12px;
+}
+
+.bottom-sheet-option--choice strong {
+  flex: 1;
+  min-width: 0;
+}
+
+.bottom-sheet-option--selectedRow.is-active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--control-hover));
+  color: var(--text);
+}
+
+.bottom-sheet-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.bottom-sheet-option.is-active .bottom-sheet-checkbox {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--surface);
+}
+
 </style>

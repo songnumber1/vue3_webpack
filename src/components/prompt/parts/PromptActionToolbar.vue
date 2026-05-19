@@ -57,7 +57,8 @@
         <div
           v-if="toolMenuOpen && !isMobileSheet"
           ref="toolMenuRef"
-          class="prompt-popover prompt-tool-menu"
+          class="prompt-popover prompt-tool-menu prompt-floating-menu"
+          :style="toolMenuStyle"
         >
           <button
             v-for="tool in tools"
@@ -65,7 +66,7 @@
             type="button"
             :class="{
               'prompt-tool-menu-parent': hasChildren(tool),
-              active: activeToolGroupId === tool.id,
+              active: activeToolGroupId === tool.id || tool.active,
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
             :aria-expanded="hasChildren(tool) ? activeToolGroupId === tool.id : undefined"
@@ -73,6 +74,21 @@
           >
             <span aria-hidden="true">{{ tool.icon }}</span>
             <p>{{ tool.label }}</p>
+            <span
+              v-if="hasChildren(tool) && tool.active && !isSwitchParent(tool)"
+              class="prompt-menu-active-badge"
+              aria-hidden="true"
+            >
+              {{ tool.activeCount }}
+            </span>
+            <span
+              v-if="hasChildren(tool) && isSwitchParent(tool)"
+              class="prompt-tool-parent-switch"
+              :class="{'is-active': tool.active}"
+              aria-hidden="true"
+            >
+              <span></span>
+            </span>
             <span v-if="hasChildren(tool)" class="prompt-submenu-arrow" aria-hidden="true">
               ›
             </span>
@@ -87,11 +103,23 @@
             <button
               v-for="child in activeToolGroup.children"
               :key="child.id"
+              class="prompt-tool-child-option"
+              :class="[
+                `prompt-tool-child-option--${child.controlType || activeToolGroup.childControlType || 'default'}`,
+                {'is-active': child.active},
+              ]"
               type="button"
-              role="menuitem"
+              :role="getChildRole(child)"
+              :aria-checked="child.active"
               @click="applyNestedTool(child)"
             >
-              <span aria-hidden="true">{{ child.icon }}</span>
+              <span
+                v-if="isCheckboxChild(child)"
+                class="prompt-tool-checkbox"
+                aria-hidden="true"
+              >
+                <span v-if="child.active">✓</span>
+              </span>
               <p>{{ child.label }}</p>
             </button>
           </div>
@@ -121,7 +149,9 @@
         </button>
         <div
           v-if="attachMenuOpen && !isMobileSheet"
-          class="prompt-popover attach-menu"
+          ref="attachMenuRef"
+          class="prompt-popover attach-menu prompt-floating-menu"
+          :style="attachMenuStyle"
           role="menu"
         >
           <button
@@ -194,6 +224,7 @@
 
 <script setup>
 import {computed, nextTick, ref, watch} from "vue";
+import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 
@@ -203,8 +234,55 @@ const modelRoot = ref(null);
 const toolRoot = ref(null);
 const attachRoot = ref(null);
 const toolMenuRef = ref(null);
+const attachMenuRef = ref(null);
+const toolPositionReady = ref(false);
+const attachPositionReady = ref(false);
 const activeToolGroupId = ref("");
 const submenuPlacement = ref("right");
+
+const toolReferenceRef = computed(() => toolRoot.value || null);
+const attachReferenceRef = computed(() => attachRoot.value || null);
+
+const {
+  floatingStyles: toolFloatingStyles,
+  update: updateToolFloating,
+} = useFloating(toolReferenceRef, toolMenuRef, {
+  placement: "top-start",
+  strategy: "absolute",
+  transform: false,
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    offset(10),
+    flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
+    shift({padding: 12}),
+  ],
+});
+
+const {
+  floatingStyles: attachFloatingStyles,
+  update: updateAttachFloating,
+} = useFloating(attachReferenceRef, attachMenuRef, {
+  placement: "top-start",
+  strategy: "absolute",
+  transform: false,
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    offset(10),
+    flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
+    shift({padding: 12}),
+  ],
+});
+
+const toolMenuStyle = computed(() => ({
+  ...toolFloatingStyles.value,
+  visibility: toolPositionReady.value ? "visible" : "hidden",
+}));
+
+const attachMenuStyle = computed(() => ({
+  ...attachFloatingStyles.value,
+  visibility: attachPositionReady.value ? "visible" : "hidden",
+}));
+
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
@@ -266,6 +344,18 @@ function hasChildren(tool) {
   return Array.isArray(tool?.children) && tool.children.length > 0;
 }
 
+function isSwitchParent(tool) {
+  return tool?.parentControlType === "switch";
+}
+
+function isCheckboxChild(tool) {
+  return tool?.controlType === "checkbox";
+}
+
+function getChildRole(tool) {
+  return tool?.selectionMode === "single" ? "menuitemradio" : "menuitemcheckbox";
+}
+
 function resolveSubmenuPlacement() {
   const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
   if (!menuRect) {
@@ -288,19 +378,41 @@ async function handleToolClick(tool) {
 
   activeToolGroupId.value = activeToolGroupId.value === tool.id ? "" : tool.id;
   await nextTick();
+  await updateToolFloating?.();
   resolveSubmenuPlacement();
 }
 
 function applyNestedTool(tool) {
   emit("apply-tool", tool);
-  activeToolGroupId.value = "";
 }
 
 watch(
   () => props.toolMenuOpen,
-  (open) => {
-    if (!open) activeToolGroupId.value = "";
-  }
+  async (open) => {
+    toolPositionReady.value = false;
+    if (!open) {
+      activeToolGroupId.value = "";
+      return;
+    }
+
+    await nextTick();
+    await updateToolFloating?.();
+    toolPositionReady.value = true;
+  },
+  {flush: "post"}
+);
+
+watch(
+  () => props.attachMenuOpen,
+  async (open) => {
+    attachPositionReady.value = false;
+    if (!open) return;
+
+    await nextTick();
+    await updateAttachFloating?.();
+    attachPositionReady.value = true;
+  },
+  {flush: "post"}
 );
 
 watch(
@@ -366,4 +478,101 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   right: calc(100% + 8px);
   left: auto;
 }
+
+.prompt-floating-menu {
+  top: auto;
+  right: auto;
+  bottom: auto !important;
+  left: auto;
+  z-index: var(--z-popover);
+}
+
+.prompt-menu-active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px !important;
+  height: 20px;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.prompt-menu-active-badge + .prompt-submenu-arrow,
+.prompt-tool-parent-switch + .prompt-submenu-arrow {
+  margin-left: 6px;
+}
+
+.prompt-tool-parent-switch {
+  position: relative;
+  width: 34px !important;
+  height: 20px;
+  min-width: 34px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--control-border);
+  transition: background 0.18s ease;
+}
+
+.prompt-tool-parent-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px !important;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.16);
+  transition: transform 0.18s ease;
+}
+
+.prompt-tool-parent-switch.is-active {
+  background: var(--accent);
+}
+
+.prompt-tool-parent-switch.is-active span {
+  transform: translateX(14px);
+}
+
+.prompt-tool-child-option {
+  gap: 12px;
+  min-height: 44px;
+}
+
+.prompt-tool-child-option p {
+  flex: 1;
+  min-width: 0;
+}
+
+.prompt-tool-child-option--selectedRow.is-active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--control-hover));
+  color: var(--text);
+}
+
+.prompt-tool-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px !important;
+  height: 18px;
+  min-width: 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--surface);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prompt-tool-child-option.is-active .prompt-tool-checkbox {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--surface);
+}
+
 </style>

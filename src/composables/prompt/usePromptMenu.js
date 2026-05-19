@@ -1,4 +1,4 @@
-import {computed, ref, watch} from "vue";
+import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useEventListener, useMediaQuery} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/useOutsideClick";
 import {
@@ -31,6 +31,15 @@ export function usePromptMenu() {
   const attachMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.attach);
   const isMobileSheet = ref(false);
   const isPromptCompactViewport = useMediaQuery(PROMPT_VIEWPORT_QUERY);
+
+  function syncPromptMenuClass() {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle(
+      "is-prompt-menu-open",
+      Boolean(activeMenu.value)
+    );
+  }
+
 
   function syncViewportMode() {
     isMobileSheet.value = Boolean(isPromptCompactViewport.value);
@@ -67,6 +76,13 @@ export function usePromptMenu() {
     closeMenus,
     {shouldIgnore: () => isMobileSheet.value}
   );
+
+  watch(activeMenu, syncPromptMenuClass, {immediate: true});
+  onBeforeUnmount(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.remove("is-prompt-menu-open");
+    }
+  });
 
   watch(isPromptCompactViewport, syncViewportMode);
   useEventListener(window, "resize", syncViewportMode, {passive: true});

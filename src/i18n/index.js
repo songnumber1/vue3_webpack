@@ -100,6 +100,13 @@ export const messages = {
           confluence: "Confluence",
           jira: "Jira",
         },
+        webSearch: "웹 검색",
+        web: {
+          perplexity: "퍼블렉시티",
+          googleAiOverviews: "구글 AI 오버뷰",
+          chatgptSearch: "오픈 AI 챗 GP",
+          microsoftCopilot: "마이크로소프트 코파일럿",
+        },
       },
       historyMenu: {
         title: "대화방 메뉴",
@@ -419,6 +426,13 @@ export const messages = {
           paper: "Papers",
           confluence: "Confluence",
           jira: "Jira",
+        },
+        webSearch: "Web search",
+        web: {
+          perplexity: "Perplexity",
+          googleAiOverviews: "Google AI Overviews",
+          chatgptSearch: "ChatGPT Search",
+          microsoftCopilot: "Microsoft Copilot",
         },
       },
       historyMenu: {
