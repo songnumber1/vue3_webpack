@@ -14,7 +14,17 @@
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
 @import "./browser-patches/mobile/mobile-browser-layout-patches.css";
+
+/* 03-1 override split patches */
+@import "./utilities/overrides/composer-layout-patches.css";
+@import "./utilities/overrides/message-layout-patches.css";
+@import "./utilities/overrides/sidebar-layout-patches.css";
+@import "./utilities/overrides/attachment-layout-patches.css";
+@import "./utilities/overrides/android-webview-layout-patches.css";
+
+/* 03-2 residual overrides */
 @import "./utilities/overrides/layout-freeze-overrides.css";
+
 @import "./states/reasoning/reasoning.css";
 @import "./components/message/message-bubbles.css";
 @import "./mobile-runtime/gestures/mobile-tap-button-radius-patch.css";
@@ -26,7 +36,7 @@
 @import "./components/assistant/assistant-icon-binding.css";
 @import "./states/interaction/ui-shape-interaction-patches.css";
 
-/* 05 targeted polish and browser patches */
+/* 05 targeted polish and desktop patches */
 @import "./layouts/header/chat-header-assistant-icon.css";
 @import "./pages/chat/targeted-chat-polish.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";
