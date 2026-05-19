@@ -76,7 +76,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
 .playground-popup-icon {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: var(--dialog-radius);
   display: grid;
   place-items: center;
   background: var(--control-bg);
@@ -109,7 +109,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   margin: 18px 0 0;
   padding: 14px;
   border: 1px solid var(--control-border);
-  border-radius: 16px;
+  border-radius: var(--dialog-radius);
   background: var(--control-bg);
   color: var(--text-muted);
   font-size: 13px;
@@ -147,7 +147,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
     var(--app-height, 100vh) - 32px - env(safe-area-inset-top) -
       env(safe-area-inset-bottom)
   );
-  border-radius: 22px;
+  border-radius: var(--dialog-radius);
   overflow: hidden;
 }
 
@@ -461,7 +461,7 @@ body.mobile-mode .markdown-body img {
   width: 100%;
   min-height: 64px;
   border: 0;
-  border-radius: 16px;
+  border-radius: var(--dialog-radius);
   background: var(--control-bg);
   color: var(--text);
   display: grid;
@@ -564,7 +564,7 @@ body.mobile-mode .markdown-body img {
 .feedback-send-panel {
   width: min(100%, 560px);
   border: 1px solid var(--control-border);
-  border-radius: 16px;
+  border-radius: var(--dialog-radius);
   background: var(--surface);
   padding: 12px;
   display: grid;
@@ -677,7 +677,7 @@ body.mobile-mode .message-action-icon {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--control-border);
-  border-radius: 22px;
+  border-radius: var(--dialog-radius);
   background: var(--surface);
   color: var(--text);
   box-shadow: var(--shadow-panel, 0 22px 80px rgba(15, 23, 42, 0.2));
@@ -731,7 +731,7 @@ body.mobile-mode .message-action-icon {
   width: 100%;
   min-height: 150px;
   border: 1px solid var(--control-border);
-  border-radius: 16px;
+  border-radius: var(--dialog-radius);
   background: var(--control-bg);
   color: var(--text);
   padding: 12px;
@@ -813,5 +813,5 @@ body.mobile-mode .feedback-dialog-backdrop {
 body.mobile-mode .feedback-dialog {
   width: 100%;
   max-height: calc(100dvh - 24px);
-  border-radius: 22px;
+  border-radius: var(--dialog-radius);
 }

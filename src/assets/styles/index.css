@@ -34,3 +34,6 @@
 @import "./layouts/header/chat-header-assistant-icon.css";
 @import "./pages/chat/targeted-chat-polish.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";
+
+/* 06 canonical dialog/overlay shape system */
+@import "./components/dialog/dialog-system.css";

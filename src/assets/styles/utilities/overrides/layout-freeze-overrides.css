@@ -159,7 +159,7 @@ body.mobile-mode .send-button{
 .bottom-sheet-option{
   width: 100%;
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--dialog-option-radius);
   background: transparent;
   color: var(--text);
   padding: 12px;
@@ -218,7 +218,7 @@ body.mobile-mode .send-button{
 }
 
 .bottom-sheet--fullscreen{
-  border-radius: 18px 18px 0 0;
+  border-radius: var(--dialog-sheet-radius);
 }
 
 .bottom-sheet-drag-area{
@@ -496,7 +496,7 @@ body.mobile-mode .scroll-bottom-button{
   min-height: 44px;
   padding: 0 12px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.28));
-  border-radius: 12px;
+  border-radius: var(--dialog-input-radius);
   background: var(--input-bg, transparent);
   color: inherit;
   font: inherit;

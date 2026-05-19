@@ -67,7 +67,7 @@ defineEmits(["close", "select"]);
   height: 20px;
   flex: 0 0 20px;
   display: block;
-  border-radius: 6px;
+  border-radius: var(--dialog-radius);
   object-fit: cover;
 }
 

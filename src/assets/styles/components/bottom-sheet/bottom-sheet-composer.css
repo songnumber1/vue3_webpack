@@ -313,7 +313,7 @@ body.mobile-mode {
   max-height: min(760px, calc(100vh - 56px));
   overflow: hidden;
   border: 1px solid var(--control-border);
-  border-radius: 26px;
+  border-radius: var(--dialog-radius);
   background: var(--menu-bg);
   color: var(--text);
   box-shadow: var(--shadow-menu);

@@ -101,35 +101,35 @@
     <teleport to="body">
       <div
         v-if="feedbackDialogOpen"
-        class="feedback-dialog-backdrop"
+        class="feedback-dialog-backdrop app-dialog-backdrop"
         role="presentation"
         @click.self="closeFeedbackDialog"
       >
         <section
-          class="feedback-dialog"
+          class="feedback-dialog app-dialog-panel"
           role="dialog"
           aria-modal="true"
           :aria-label="t('feedback.send')"
         >
-          <header class="feedback-dialog-header">
+          <header class="feedback-dialog-header app-dialog-header">
             <strong>{{ t("feedback.send") }}</strong>
             <button
               type="button"
-              class="feedback-dialog-close"
+              class="feedback-dialog-close app-dialog-close"
               :aria-label="t('common.close')"
               @click="closeFeedbackDialog"
             >
               ×
             </button>
           </header>
-          <div class="feedback-dialog-body">
+          <div class="feedback-dialog-body app-dialog-body">
             <p>{{ t("feedback.sendDescription") }}</p>
             <textarea
               v-model="feedbackText"
               :placeholder="t('feedback.placeholder')"
             />
           </div>
-          <footer class="feedback-dialog-footer">
+          <footer class="feedback-dialog-footer app-dialog-footer">
             <button type="button" @click="submitFeedback">
               {{ t("common.confirm") }}
             </button>

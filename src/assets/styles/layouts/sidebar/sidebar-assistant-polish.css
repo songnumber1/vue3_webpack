@@ -415,7 +415,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user,
   min-height: 220px;
   display: flex;
   flex-direction: column;
-  border-radius: 26px 26px 0 0;
+  border-radius: var(--dialog-sheet-radius);
   background: var(--menu-bg);
   color: var(--text);
   box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.28);
@@ -587,7 +587,7 @@ body.mobile-mode .sidebar-history--main{
   min-width: 192px;
   padding: 8px;
   border: 1px solid var(--border-color, rgba(127, 127, 127, 0.22));
-  border-radius: 14px;
+  border-radius: var(--dialog-radius);
   background: var(--panel-bg, var(--color-bg, #fff));
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
 }
@@ -607,7 +607,7 @@ body.mobile-mode .sidebar-history--main{
 
 .chat-history-context-menu__item{
   padding: 10px 12px;
-  border-radius: 10px;
+  border-radius: var(--dialog-option-radius);
   font-size: 14px;
 }
 

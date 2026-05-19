@@ -3,7 +3,7 @@
     <transition name="sheet-fade">
       <div
         v-if="open"
-        :class="['bottom-sheet-backdrop', overlayClass]"
+        :class="['bottom-sheet-backdrop', 'app-dialog-backdrop', overlayClass]"
         @click="emit('close')"
       ></div>
     </transition>
@@ -14,6 +14,7 @@
         ref="sheetRef"
         :class="[
           'bottom-sheet',
+          'app-bottom-sheet-panel',
           overlayClass,
           {
             'bottom-sheet--dragging': dragging,
@@ -38,11 +39,11 @@
           <div class="bottom-sheet-handle" aria-hidden="true"></div>
         </div>
 
-        <header class="bottom-sheet-header">
+        <header class="bottom-sheet-header app-dialog-header">
           <h2>{{ title || t("common.select") }}</h2>
           <button
             type="button"
-            class="bottom-sheet-close"
+            class="bottom-sheet-close app-dialog-close"
             :aria-label="t('common.close')"
             @click="emit('close')"
           >
@@ -50,7 +51,7 @@
           </button>
         </header>
 
-        <div ref="bodyRef" class="bottom-sheet-body">
+        <div ref="bodyRef" class="bottom-sheet-body app-dialog-body">
           <slot />
         </div>
       </section>

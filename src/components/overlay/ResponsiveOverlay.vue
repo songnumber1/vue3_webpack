@@ -4,19 +4,19 @@
       <div v-if="open" class="responsive-overlay" :class="overlayClasses">
         <div
           v-if="!isMobile"
-          class="responsive-overlay-backdrop"
+          class="responsive-overlay-backdrop app-dialog-backdrop"
           @click="$emit('close')"
         ></div>
         <section
-          class="responsive-panel"
+          class="responsive-panel app-dialog-panel"
           role="dialog"
           aria-modal="true"
           :aria-label="title"
         >
-          <header class="responsive-panel-header">
+          <header class="responsive-panel-header app-dialog-header">
             <button
               v-if="showMobileBackButton"
-              class="responsive-back-button"
+              class="responsive-back-button app-dialog-close"
               type="button"
               @click="$emit('close')"
             >
@@ -29,14 +29,14 @@
             </div>
             <button
               v-if="showCloseButton"
-              class="responsive-close-button"
+              class="responsive-close-button app-dialog-close"
               type="button"
               @click="$emit('close')"
             >
               ×
             </button>
           </header>
-          <div class="responsive-panel-body">
+          <div class="responsive-panel-body app-dialog-body">
             <slot />
           </div>
         </section>

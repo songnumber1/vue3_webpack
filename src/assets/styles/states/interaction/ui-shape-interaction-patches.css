@@ -7,12 +7,12 @@
 /* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
 .suggestion-chip,
 .app-container--mobile .suggestion-chip {
-  border-radius: 5px;
+  border-radius: var(--dialog-radius);
 }
 
 /* 2. Assistant feedback text button: reduce excessive pill radius. */
 .message-action-text-button {
-  border-radius: 5px;
+  border-radius: var(--dialog-radius);
 }
 
 /* 3. Shared popup panels: reduce panel radius without changing layout. */
@@ -20,7 +20,7 @@
 .feedback-dialog,
 .responsive-overlay--mobile-dialog .responsive-panel,
 .responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
-  border-radius: 5px;
+  border-radius: var(--dialog-radius);
 }
 
 /* 3.1 Popup footer/action buttons should be rectangular. */
@@ -28,7 +28,7 @@
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
 .responsive-panel .playground-button {
-  border-radius: 0;
+  border-radius: var(--dialog-action-square-radius);
 }
 
 /* 3.2 Positive/destructive confirmation actions use the primary color. */
@@ -107,7 +107,7 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
 .responsive-panel .playground-button,
 .style-chip,
 .secondary-action {
-  border-radius: 5px;
+  border-radius: var(--dialog-radius);
 }
 
 /* Keep popup footer action buttons square as requested in the previous UI rule. */
@@ -115,7 +115,7 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
 .responsive-panel .playground-button {
-  border-radius: 0;
+  border-radius: var(--dialog-action-square-radius);
 }
 
 /*

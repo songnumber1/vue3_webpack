@@ -66,7 +66,7 @@ body.mobile-mode
 body.mobile-mode .feedback-dialog {
   width: min(100%, 520px) !important;
   max-height: calc(var(--app-height, 100dvh) - 24px) !important;
-  border-radius: 22px !important;
+  border-radius: var(--dialog-radius) !important;
 }body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open {
   height: var(--layout-viewport-height, 100dvh) !important;
