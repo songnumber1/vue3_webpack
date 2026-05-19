@@ -230,5 +230,8 @@ provide(WORKSPACE_ACTIONS_KEY, {
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.chat-container-root {
+  min-width: 0;
+  min-height: 0;
+}
 </style>

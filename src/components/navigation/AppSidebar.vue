@@ -301,5 +301,36 @@ useEventListener(window, "resize", syncViewportMode, {passive: true});
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+/*
+ * AppSidebar local guard styles.
+ * Shared mobile drawer/browser fallback rules stay in global CSS because they
+ * intentionally target teleported/viewport-level states.
+ */
+.desktop-sidebar {
+  min-width: 0;
+}
+
+.sidebar-content--assistant {
+  min-width: 0;
+}
+
+.sidebar-top {
+  min-width: 0;
+}
+
+.quick-menu--assistant {
+  min-width: 0;
+}
+
+.mobile-drawer {
+  box-sizing: border-box;
+}
+
+.mobile-drawer .sidebar-content--assistant {
+  min-width: 0;
+}
+
+.bottom-sheet-option-main {
+  min-width: 0;
+}
 </style>

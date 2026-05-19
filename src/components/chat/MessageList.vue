@@ -115,5 +115,18 @@ defineExpose({
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.message-list {
+  min-width: 0;
+  min-height: 0;
+}
+
+.message-list-anchor {
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+
+.typing-row {
+  flex: 0 0 auto;
+}
 </style>

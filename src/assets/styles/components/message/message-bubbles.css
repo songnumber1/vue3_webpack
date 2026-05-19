@@ -51,13 +51,13 @@
 /* extracted from layout-freeze-overrides.css */
 
 .message-list,
-.app-container--mobile .message-list{
+body.mobile-mode .message-list{
   width: 100%;
   max-width: 100%;
 }
 
 .message:not(.message--user),
-.app-container--mobile .message:not(.message--user){
+body.mobile-mode .message:not(.message--user){
   width: 100%;
   max-width: 100%;
   margin-left: 0;
@@ -66,7 +66,7 @@
 }
 
 .message:not(.message--user) .bubble,
-.app-container--mobile .message:not(.message--user) .bubble{
+body.mobile-mode .message:not(.message--user) .bubble{
   width: 100%;
   max-width: 100%;
   justify-self: stretch;

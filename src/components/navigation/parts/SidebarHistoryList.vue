@@ -57,5 +57,11 @@ defineEmits(["select", "open-menu"]);
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.sidebar-history {
+  min-width: 0;
+}
+
+.sidebar-history-item {
+  min-width: 0;
+}
 </style>

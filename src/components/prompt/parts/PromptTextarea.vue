@@ -41,5 +41,7 @@ defineExpose({textareaRef});
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.prompt-textarea {
+  min-width: 0;
+}
 </style>

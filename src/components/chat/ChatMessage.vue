@@ -15,5 +15,11 @@ defineEmits(["rendered"]);
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.message {
+  min-width: 0;
+}
+
+.bubble {
+  min-width: 0;
+}
 </style>

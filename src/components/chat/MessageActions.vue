@@ -210,5 +210,12 @@ async function copy() {
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.message-actions {
+  min-width: 0;
+}
+
+.feedback-button,
+.copy-button {
+  box-sizing: border-box;
+}
 </style>

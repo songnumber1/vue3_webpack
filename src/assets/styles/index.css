@@ -37,3 +37,6 @@
 
 /* 06 canonical dialog/overlay shape system */
 @import "./components/dialog/dialog-system.css";
+
+/* 07 final UI normalization fixes */
+@import "./utilities/fixes/mobile-ui-final-fixes.css";

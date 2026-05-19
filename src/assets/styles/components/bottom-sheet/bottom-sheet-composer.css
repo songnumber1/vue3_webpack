@@ -60,7 +60,7 @@ body.mobile-mode .shared-readonly-box span {
 }
 
 .message-list,
-.app-container--mobile .message-list {
+body.mobile-mode .message-list {
   padding-bottom: var(--chat-message-bottom-gap) !important;
   scroll-padding-bottom: var(--chat-message-bottom-gap);
 }
@@ -902,7 +902,7 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 
 /* Mobile drawer setting menu should visually match the chat list, not a card. */
 .mobile-drawer .settings-menu,
-.app-container--mobile .settings-menu {
+body.mobile-mode .settings-menu {
   margin: 4px 0 10px;
   border: 0;
   border-radius: 0;
@@ -910,7 +910,7 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .mobile-drawer .settings-menu-summary,
-.app-container--mobile .settings-menu-summary {
+body.mobile-mode .settings-menu-summary {
   min-height: 42px;
   padding: 8px 10px !important;
   border-radius: 10px;
@@ -919,50 +919,50 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .mobile-drawer .settings-menu-summary::-webkit-details-marker,
-.app-container--mobile .settings-menu-summary::-webkit-details-marker {
+body.mobile-mode .settings-menu-summary::-webkit-details-marker {
   display: none;
 }
 
 .mobile-drawer .settings-menu-summary:hover,
-.app-container--mobile .settings-menu-summary:hover {
+body.mobile-mode .settings-menu-summary:hover {
   background: var(--sidebar-hover);
 }
 
 .mobile-drawer .settings-menu-summary-text,
-.app-container--mobile .settings-menu-summary-text {
+body.mobile-mode .settings-menu-summary-text {
   display: flex !important;
   align-items: center;
   gap: 8px;
 }
 
 .mobile-drawer .settings-menu-summary-text strong,
-.app-container--mobile .settings-menu-summary-text strong {
+body.mobile-mode .settings-menu-summary-text strong {
   font-size: 14px !important;
   line-height: 1.35;
   font-weight: 700;
 }
 
 .mobile-drawer .settings-menu-summary-text small,
-.app-container--mobile .settings-menu-summary-text small {
+body.mobile-mode .settings-menu-summary-text small {
   display: none;
 }
 
 .mobile-drawer .settings-menu .app-icon--chevron,
-.app-container--mobile .settings-menu .app-icon--chevron {
+body.mobile-mode .settings-menu .app-icon--chevron {
   width: 18px;
   height: 18px;
   color: var(--text-muted);
 }
 
 .mobile-drawer .settings-menu .service-menu-list,
-.app-container--mobile .settings-menu .service-menu-list {
+body.mobile-mode .settings-menu .service-menu-list {
   padding: 2px 0 2px 12px;
   display: grid;
   gap: 2px;
 }
 
 .mobile-drawer .settings-menu .service-menu-item,
-.app-container--mobile .settings-menu .service-menu-item {
+body.mobile-mode .settings-menu .service-menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -977,12 +977,12 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .mobile-drawer .settings-menu .service-menu-item:hover,
-.app-container--mobile .settings-menu .service-menu-item:hover {
+body.mobile-mode .settings-menu .service-menu-item:hover {
   background: var(--sidebar-hover);
 }
 
 .mobile-drawer .settings-menu .service-menu-item strong,
-.app-container--mobile .settings-menu .service-menu-item strong {
+body.mobile-mode .settings-menu .service-menu-item strong {
   display: block;
   font-size: 14px !important;
   line-height: 1.35;
@@ -990,12 +990,12 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .mobile-drawer .settings-menu .service-menu-item small,
-.app-container--mobile .settings-menu .service-menu-item small {
+body.mobile-mode .settings-menu .service-menu-item small {
   display: none;
 }
 
 .mobile-drawer .settings-menu .service-menu-item .app-icon,
-.app-container--mobile .settings-menu .service-menu-item .app-icon {
+body.mobile-mode .settings-menu .service-menu-item .app-icon {
   width: 18px;
   height: 18px;
   flex: 0 0 18px;
@@ -1003,14 +1003,14 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .mobile-drawer .quick-menu--mobile-search,
-.app-container--mobile .quick-menu--mobile-search {
+body.mobile-mode .quick-menu--mobile-search {
   display: grid;
   gap: 4px;
   margin-bottom: 8px;
 }
 
 .mobile-drawer .quick-menu--mobile-search .quick-item,
-.app-container--mobile .quick-menu--mobile-search .quick-item {
+body.mobile-mode .quick-menu--mobile-search .quick-item {
   min-height: 42px;
   font-size: 14px;
   border-radius: 10px;

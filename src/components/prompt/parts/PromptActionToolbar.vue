@@ -231,5 +231,24 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.prompt-action-row {
+  min-width: 0;
+}
+
+.prompt-left-actions {
+  min-width: 0;
+}
+
+.prompt-selector-wrap {
+  min-width: 0;
+}
+
+.prompt-model-trigger span,
+.model-option-main {
+  min-width: 0;
+}
+
+.prompt-popover {
+  box-sizing: border-box;
+}
 </style>

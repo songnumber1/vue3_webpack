@@ -114,5 +114,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.message-content {
+  min-width: 0;
+}
 </style>

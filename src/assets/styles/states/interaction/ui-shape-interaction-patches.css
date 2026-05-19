@@ -6,7 +6,7 @@
 
 /* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
 .suggestion-chip,
-.app-container--mobile .suggestion-chip {
+body.mobile-mode .suggestion-chip {
   border-radius: var(--dialog-radius);
 }
 

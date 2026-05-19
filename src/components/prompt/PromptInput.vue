@@ -13,5 +13,7 @@ defineProps({
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.prompt-input {
+  min-width: 0;
+}
 </style>

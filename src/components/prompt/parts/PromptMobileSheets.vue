@@ -146,5 +146,7 @@ const resolvedAttachTitle = computed(() => {
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.bottom-sheet-option-main {
+  min-width: 0;
+}
 </style>

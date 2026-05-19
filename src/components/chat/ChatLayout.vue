@@ -42,5 +42,8 @@ defineEmits([
 </script>
 
 <style scoped>
-/* Component-local styles should stay scoped. */
+.chat-layout {
+  min-width: 0;
+  min-height: 0;
+}
 </style>
