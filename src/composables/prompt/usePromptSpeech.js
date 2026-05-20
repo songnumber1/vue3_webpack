@@ -1,5 +1,6 @@
 import {computed, nextTick} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useSpeechRecognition} from "@/composables/useSpeechRecognition";
 import {PROMPT_SPEECH_LANGUAGE} from "@/constants/promptComposer";
 
@@ -16,8 +17,11 @@ export function usePromptSpeech({
   focusTextarea,
 }) {
   const platformStore = usePlatformStore();
+  const systemSettingsStore = useSystemSettingsStore();
 
-  const isMicEnabled = computed(() => Boolean(platformStore.info.isMic));
+  const isMicEnabled = computed(
+    () => systemSettingsStore.useMicrophone && Boolean(platformStore.info.isMic)
+  );
 
   const speech = useSpeechRecognition({
     language: PROMPT_SPEECH_LANGUAGE,

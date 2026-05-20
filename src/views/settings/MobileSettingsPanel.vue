@@ -68,6 +68,10 @@
             <NoticeView v-else-if="activeMenu === 'notice'" />
             <PrivacyPolicyView v-else-if="activeMenu === 'privacy'" />
             <PersonalizationView v-else-if="activeMenu === 'personalization'" />
+            <SystemSettingsView
+              v-else-if="activeMenu === 'system'"
+              @close="closePanel"
+            />
 
             <section
               v-else-if="activeMenu === 'chatManagement'"
@@ -113,6 +117,9 @@ import {setAppLocale} from "@/i18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
 
@@ -123,52 +130,70 @@ const props = defineProps({
 const emit = defineEmits(["close", "desktop-open"]);
 const {t, tm, locale} = useI18n();
 const router = useRouter();
+const systemSettingsStore = useSystemSettingsStore();
+const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const activeMenu = ref("");
 
-const menuItems = computed(() => [
-  {
-    key: "guide",
-    icon: "?",
-    label: t("common.guide"),
-    description: t("guide.subtitle"),
-  },
-  {
-    key: "notice",
-    icon: "!",
-    label: t("common.notice"),
-    description: t("menu.noticeSummary"),
-  },
-  {
-    key: "privacy",
-    icon: "P",
-    label: t("common.privacy"),
-    description: t("menu.privacySummary"),
-  },
-  {
-    key: "terms",
-    icon: "T",
-    label: t("common.terms"),
-    description: t("menu.termsSummary"),
-  },
-  {
-    key: "personalization",
-    icon: "★",
-    label: t("common.personalization"),
-    description: t("menu.personalizationSummary"),
-  },
-  {
-    key: "chatManagement",
-    icon: "#",
-    label: t("settings.chatManagement"),
-    description: t("settings.chatManagementSummary"),
-  },
-  {
-    key: "language",
-    icon: "A",
-    label: t("common.language"),
-    description: t("menu.languageSummary"),
-  },
-]);
+const menuItems = computed(() =>
+  [
+    {
+      key: "guide",
+      icon: "?",
+      label: t("common.guide"),
+      description: t("guide.subtitle"),
+      visible: systemSettings.value.showGuideButton,
+    },
+    {
+      key: "notice",
+      icon: "!",
+      label: t("common.notice"),
+      description: t("menu.noticeSummary"),
+      visible: systemSettings.value.showNoticeMenu,
+    },
+    {
+      key: "privacy",
+      icon: "P",
+      label: t("common.privacy"),
+      description: t("menu.privacySummary"),
+      visible: systemSettings.value.showPrivacyMenu,
+    },
+    {
+      key: "terms",
+      icon: "T",
+      label: t("common.terms"),
+      description: t("menu.termsSummary"),
+      visible: systemSettings.value.showTermsMenu,
+    },
+    {
+      key: "personalization",
+      icon: "★",
+      label: t("common.personalization"),
+      description: t("menu.personalizationSummary"),
+      visible: systemSettings.value.showPersonalizationMenu,
+    },
+    {
+      key: "system",
+      icon: "⚙",
+      label: "시스템",
+      description: "앱 동작과 화면 노출 설정을 관리합니다.",
+      visible: true,
+    },
+    {
+      key: "chatManagement",
+      icon: "#",
+      label: t("settings.chatManagement"),
+      description: t("settings.chatManagementSummary"),
+      visible: true,
+    },
+    {
+      key: "language",
+      icon: "A",
+      label: t("common.language"),
+      description: t("menu.languageSummary"),
+      visible: true,
+    },
+  ].filter((item) => item.visible)
+);
 const currentMenu = computed(() =>
   menuItems.value.find((item) => item.key === activeMenu.value)
 );

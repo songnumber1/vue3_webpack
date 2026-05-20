@@ -1,4 +1,4 @@
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 
 const VIEWPORT_MODE_CLASSES = Object.freeze({
   mobile: "mobile-mode",
@@ -29,7 +29,7 @@ function getViewportModeWidth() {
  * @param {number} breakpoint - 모바일 전환 기준 너비입니다.
  * @returns {boolean} 모바일 모드 여부입니다.
  */
-export function syncViewportModeClass(breakpoint = MOBILE_BREAKPOINT_PX) {
+export function syncViewportModeClass(breakpoint = getRuntimeSystemSettings().mobileBreakpoint) {
   if (typeof document === "undefined") return false;
   const width = getViewportModeWidth();
   const isMobile = width > 0 && width <= breakpoint;
@@ -49,7 +49,7 @@ export function syncViewportModeClass(breakpoint = MOBILE_BREAKPOINT_PX) {
  * @param {number} breakpoint - 모바일 전환 기준 너비입니다.
  * @returns {Function} 이벤트 리스너 해제 함수입니다.
  */
-export function installViewportModeClass(breakpoint = MOBILE_BREAKPOINT_PX) {
+export function installViewportModeClass(breakpoint = null) {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return () => {};
   }
@@ -58,7 +58,7 @@ export function installViewportModeClass(breakpoint = MOBILE_BREAKPOINT_PX) {
     cleanupViewportModeListeners();
   }
 
-  const sync = () => syncViewportModeClass(breakpoint);
+  const sync = () => syncViewportModeClass(breakpoint || getRuntimeSystemSettings().mobileBreakpoint);
   sync();
 
   window.addEventListener("resize", sync, {passive: true});

@@ -13,6 +13,7 @@ export function createEmptyChatActions() {
     openPrivacy: () => {},
     openTerms: () => {},
     openPersonalization: () => {},
+    openSystem: () => {},
     openLanguage: () => {},
     openPlayground: () => {},
     logout: () => {},

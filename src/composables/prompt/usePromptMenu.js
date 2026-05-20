@@ -1,10 +1,8 @@
 import {computed, onBeforeUnmount, ref, watch} from "vue";
-import {useEventListener, useMediaQuery} from "@vueuse/core";
+import {useEventListener, useWindowSize} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/useOutsideClick";
-import {
-  PROMPT_MENU_TYPE,
-  PROMPT_VIEWPORT_QUERY,
-} from "@/constants/promptComposer";
+import {PROMPT_MENU_TYPE} from "@/constants/promptComposer";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 function createMenuOpenRef(activeMenu, menuType) {
   return computed({
@@ -30,7 +28,11 @@ export function usePromptMenu() {
   const toolMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.tool);
   const attachMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.attach);
   const isMobileSheet = ref(false);
-  const isPromptCompactViewport = useMediaQuery(PROMPT_VIEWPORT_QUERY);
+  const systemSettingsStore = useSystemSettingsStore();
+  const {width} = useWindowSize();
+  const isPromptCompactViewport = computed(
+    () => width.value <= systemSettingsStore.mobileBreakpoint
+  );
 
   function syncPromptMenuClass() {
     if (typeof document === "undefined") return;

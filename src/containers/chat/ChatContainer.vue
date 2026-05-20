@@ -68,6 +68,20 @@
       </template>
     </AppOverlayProvider>
 
+    <ResponsiveOverlay
+      :open="systemOpen"
+      :is-mobile="isMobile"
+      title="시스템"
+      subtitle="앱 동작과 화면 노출 설정"
+      mobile-mode="dialog"
+      @close="systemOpen = false"
+    >
+      <SystemSettingsView
+        @close="systemOpen = false"
+        @applied="handleSystemSettingsApplied"
+      />
+    </ResponsiveOverlay>
+
     <LanguageSheet
       :open="languageSheetOpen"
       @close="languageSheetOpen = false"
@@ -134,6 +148,7 @@ import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
@@ -157,6 +172,7 @@ const {
   noticeOpen,
   privacyOpen,
   personalizationOpen,
+  systemOpen,
   languageSheetOpen,
   mobileSettingsOpen,
   historyDialogOpen,
@@ -194,6 +210,7 @@ const {
   openPrivacy,
   openTerms,
   openPersonalization,
+  openSystem,
   openLanguage,
   openAssistantFromHeader,
   logout,
@@ -202,6 +219,7 @@ const {
   handlePromptResize,
   handleMessageContentRendered,
   scrollBottom,
+  handleSystemSettingsApplied,
 } = useChatContainerController(props);
 
 function handleMobileSettingsDesktopOpen(target) {
@@ -216,6 +234,10 @@ function handleMobileSettingsDesktopOpen(target) {
   }
   if (target === "personalization") {
     personalizationOpen.value = true;
+    return;
+  }
+  if (target === "system") {
+    systemOpen.value = true;
   }
 }
 
@@ -230,6 +252,7 @@ provide(CHAT_ACTIONS_KEY, {
   openPrivacy,
   openTerms,
   openPersonalization,
+  openSystem,
   openLanguage,
   openPlayground,
   logout,

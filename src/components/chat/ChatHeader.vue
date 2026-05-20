@@ -60,6 +60,7 @@
 
     <div v-if="!isMobile" class="topbar-actions topbar-actions--desktop">
       <button
+        v-if="systemSettings.showGuideButton"
         class="round-icon guide-link guide-link--icon"
         type="button"
         :aria-label="t('common.guide')"
@@ -69,6 +70,7 @@
         <GuideIcon />
       </button>
       <button
+        v-if="systemSettings.showThemeButton"
         class="round-icon theme-toggle"
         type="button"
         :aria-label="t('common.theme')"
@@ -80,6 +82,7 @@
         ></span>
       </button>
       <button
+        v-if="systemSettings.showSwaggerButton"
         class="round-icon document-toggle"
         type="button"
         :aria-label="t('common.swagger')"
@@ -103,12 +106,14 @@
 
 <script setup>
 import {computed, inject} from "vue";
+import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   CHAT_ACTIONS_KEY,
   createEmptyChatActions,
@@ -125,6 +130,8 @@ const props = defineProps({
 
 const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const systemSettingsStore = useSystemSettingsStore();
+const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const desktopAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 48)
 );

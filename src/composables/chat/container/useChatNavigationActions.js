@@ -14,6 +14,7 @@ export function useChatNavigationActions({
   noticeOpen,
   privacyOpen,
   personalizationOpen,
+  systemOpen,
   languageSheetOpen,
   mobileSettingsOpen,
   navigationStore,
@@ -124,6 +125,11 @@ export function useChatNavigationActions({
     personalizationOpen.value = true;
   }
 
+  function openSystem() {
+    navigationStore.setDrawerOpen(false);
+    systemOpen.value = true;
+  }
+
   function openLanguage() {
     languageSheetOpen.value = true;
   }
@@ -158,6 +164,7 @@ export function useChatNavigationActions({
     openPrivacy,
     openTerms,
     openPersonalization,
+    openSystem,
     openLanguage,
     openAssistantFromHeader,
     logout,

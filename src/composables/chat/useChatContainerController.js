@@ -1,5 +1,5 @@
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {useEventListener, useMediaQuery} from "@vueuse/core";
+import {useEventListener, useWindowSize} from "@vueuse/core";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useAppContext} from "@/composables/useAppContext";
@@ -12,9 +12,10 @@ import {useViewportGuard} from "@/composables/useViewportGuard";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {syncViewportModeClass} from "@/utils/viewportMode";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
@@ -29,6 +30,7 @@ export function useChatContainerController(props) {
   const runtime = useChatRuntime();
   const navigationStore = useNavigationStore();
   const platformStore = usePlatformStore();
+  const systemSettingsStore = useSystemSettingsStore();
   const {scrollToBottom} = useAutoScroll({value: null});
 
   const workspaceRef = ref(null);
@@ -38,6 +40,7 @@ export function useChatContainerController(props) {
   const noticeOpen = ref(false);
   const privacyOpen = ref(false);
   const personalizationOpen = ref(false);
+  const systemOpen = ref(false);
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
   const runtimeReady = ref(false);
@@ -73,8 +76,9 @@ export function useChatContainerController(props) {
     handlePreviewError,
   } = useImagePreview();
 
-  const isCompactScreen = useMediaQuery(
-    `(max-width: ${MOBILE_BREAKPOINT_PX}px)`
+  const {width: windowWidth} = useWindowSize();
+  const isCompactScreen = computed(
+    () => windowWidth.value <= systemSettingsStore.mobileBreakpoint
   );
   const platformInfo = computed(() => platformStore.info || {});
   const {isMobile, updateMobileState} = useChatMobileState({
@@ -266,6 +270,7 @@ export function useChatContainerController(props) {
     openPrivacy,
     openTerms,
     openPersonalization,
+    openSystem,
     openLanguage,
     openAssistantFromHeader,
     logout,
@@ -279,6 +284,7 @@ export function useChatContainerController(props) {
     noticeOpen,
     privacyOpen,
     personalizationOpen,
+    systemOpen,
     languageSheetOpen,
     mobileSettingsOpen,
     navigationStore,
@@ -316,6 +322,13 @@ export function useChatContainerController(props) {
     runtimeReady.value = true;
   });
 
+  function handleSystemSettingsApplied() {
+    syncViewportModeClass(systemSettingsStore.mobileBreakpoint);
+    refreshViewport();
+    updateMobileState();
+    scrollBottom({stable: true});
+  }
+
   onBeforeUnmount(() => {
     cleanupScrollController();
     revokeMessageAttachments(messages.value);
@@ -338,6 +351,7 @@ export function useChatContainerController(props) {
     noticeOpen,
     privacyOpen,
     personalizationOpen,
+    systemOpen,
     languageSheetOpen,
     mobileSettingsOpen,
     historyDialogOpen,
@@ -375,6 +389,7 @@ export function useChatContainerController(props) {
     openPrivacy,
     openTerms,
     openPersonalization,
+    openSystem,
     openLanguage,
     openAssistantFromHeader,
     logout,
@@ -383,5 +398,6 @@ export function useChatContainerController(props) {
     handlePromptResize,
     handleMessageContentRendered,
     scrollBottom,
+    handleSystemSettingsApplied,
   };
 }

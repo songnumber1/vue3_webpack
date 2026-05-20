@@ -1,3 +1,5 @@
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+
 function readBooleanEnv(value, fallback = false) {
   if (value === undefined || value === null || value === "") {
     return fallback;
@@ -26,7 +28,7 @@ export const isServerAPI = readBooleanEnv(
 export const SERVER_API_BASE_URL = process.env.VUE_APP_API_BASE_URL || "/api";
 
 export function shouldUseServerApi() {
-  return isServerAPI === true;
+  return getRuntimeSystemSettings().useRealApi === true;
 }
 
 export function shouldUseFrontendMockApi() {

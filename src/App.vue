@@ -34,7 +34,10 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
+const systemSettingsStore = useSystemSettingsStore();
+systemSettingsStore.hydrate();
 </script>

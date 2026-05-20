@@ -14,6 +14,7 @@
     </button>
     <div class="sidebar-user-actions">
       <button
+        v-if="systemSettings.showThemeButton"
         class="sidebar-user-action"
         type="button"
         :aria-label="t('common.theme')"
@@ -22,6 +23,7 @@
         <span class="theme-glyph"></span>
       </button>
       <button
+        v-if="systemSettings.showPlaygroundMenu"
         class="sidebar-user-action"
         type="button"
         :aria-label="t('common.playground')"
@@ -31,6 +33,7 @@
         <span class="playground-glyph">▦</span>
       </button>
       <button
+        v-if="systemSettings.showSwaggerButton"
         class="sidebar-user-action"
         type="button"
         :aria-label="t('common.swagger')"
@@ -39,6 +42,7 @@
         <SwaggerDocIcon />
       </button>
       <button
+        v-if="systemSettings.showLogoutButton"
         class="sidebar-user-action sidebar-user-action--logout"
         type="button"
         :aria-label="t('common.logout')"
@@ -57,6 +61,7 @@ import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   CHAT_ACTIONS_KEY,
   createEmptyChatActions,
@@ -64,7 +69,9 @@ import {
 
 const {t} = useI18n();
 const authStore = useAuthStore();
+const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
+const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
 const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 

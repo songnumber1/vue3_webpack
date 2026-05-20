@@ -14,6 +14,7 @@
     <transition name="menu-pop">
       <section v-if="open" class="user-menu-panel" role="menu">
         <button
+          v-if="systemSettings.showNoticeMenu"
           class="user-menu-item"
           type="button"
           role="menuitem"
@@ -23,6 +24,7 @@
           <small>{{ t("menu.noticeSummary") }}</small>
         </button>
         <button
+          v-if="systemSettings.showPrivacyMenu"
           class="user-menu-item"
           type="button"
           role="menuitem"
@@ -32,6 +34,7 @@
           <small>{{ t("menu.privacySummary") }}</small>
         </button>
         <button
+          v-if="systemSettings.showTermsMenu"
           class="user-menu-item"
           type="button"
           role="menuitem"
@@ -41,6 +44,7 @@
           <small>{{ t("menu.termsSummary") }}</small>
         </button>
         <button
+          v-if="systemSettings.showPersonalizationMenu"
           class="user-menu-item"
           type="button"
           role="menuitem"
@@ -53,12 +57,23 @@
           class="user-menu-item"
           type="button"
           role="menuitem"
+          @click="select('system')"
+        >
+          <strong>시스템</strong>
+          <small>앱 동작과 화면 노출 설정을 관리합니다.</small>
+        </button>
+        <button
+          v-if="systemSettings.showPlaygroundMenu"
+          class="user-menu-item"
+          type="button"
+          role="menuitem"
           @click="select('playground')"
         >
           <strong>{{ t("common.playground") }}</strong>
           <small>{{ t("menu.playgroundSummary") }}</small>
         </button>
         <button
+          v-if="systemSettings.showLogoutButton"
           class="user-menu-item user-menu-item--danger"
           type="button"
           role="menuitem"
@@ -116,18 +131,22 @@ import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {setAppLocale} from "@/i18n";
 import {useOutsideClick} from "@/composables/useOutsideClick";
 import {useAuthStore} from "@/stores/authStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const emit = defineEmits([
   "notice",
   "privacy",
   "terms",
   "personalization",
+  "system",
   "playground",
   "logout",
 ]);
 const {t, locale} = useI18n();
 const authStore = useAuthStore();
+const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
+const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
 const open = ref(false);
 const languageOpen = ref(false);

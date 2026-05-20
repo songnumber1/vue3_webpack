@@ -3,9 +3,9 @@ import {useEventListener} from "@vueuse/core";
 import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
-  MOBILE_BREAKPOINT_PX,
   VIEWPORT_GUARD_DELAY_MS,
 } from "@/constants/uiTokens";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
@@ -115,6 +115,7 @@ function setCssViewportVars(size, baselineHeight = 0) {
 }
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
+  const systemSettingsStore = useSystemSettingsStore();
   const viewportHeight = ref(0);
   const viewportWidth = ref(0);
   const keyboardOpen = ref(false);
@@ -123,7 +124,9 @@ export function useViewportGuard(options = {}) {
   let resizeFrame = null;
 
   const isCompact = computed(
-    () => viewportWidth.value > 0 && viewportWidth.value <= MOBILE_BREAKPOINT_PX
+    () =>
+      viewportWidth.value > 0 &&
+      viewportWidth.value <= systemSettingsStore.mobileBreakpoint
   );
   function apply() {
     const size = getViewportSize();
@@ -145,7 +148,9 @@ export function useViewportGuard(options = {}) {
     const metrics = setCssViewportVars(size, baselineHeight.value);
 
     keyboardOpen.value =
-      isCompact.value && metrics.keyboardHeight > KEYBOARD_THRESHOLD_PX;
+      systemSettingsStore.useVirtualKeyboard &&
+      isCompact.value &&
+      metrics.keyboardHeight > KEYBOARD_THRESHOLD_PX;
     onChange({
       ...size,
       keyboardOpen: keyboardOpen.value,

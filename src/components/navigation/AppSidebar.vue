@@ -162,7 +162,7 @@ import {computed, inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useEventListener, useWindowSize} from "@vueuse/core";
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import Icon from "@/components/navigation/SidebarIcon.vue";
@@ -194,6 +194,7 @@ const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
 const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const platformStore = usePlatformStore();
+const systemSettingsStore = useSystemSettingsStore();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
@@ -207,7 +208,7 @@ const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuReferenceEl = ref(null);
 const {width} = useWindowSize();
-const isCompactViewport = computed(() => width.value <= MOBILE_BREAKPOINT_PX);
+const isCompactViewport = computed(() => width.value <= systemSettingsStore.mobileBreakpoint);
 
 function syncViewportMode() {
   const platformInfo = platformStore.info || {};
