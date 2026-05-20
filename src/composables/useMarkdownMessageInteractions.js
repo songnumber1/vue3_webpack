@@ -25,16 +25,19 @@ function tableToCsv(table) {
     )
     .join("\n");
 }
-function downloadCsv(csv) {
-  const blob = new Blob([`\ufeff${csv}`], {type: "text/csv;charset=utf-8"});
+function downloadText(content, filename, type = "text/plain;charset=utf-8") {
+  const blob = new Blob([content], {type});
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `table-${Date.now()}.csv`;
+  link.download = filename;
   document.body.appendChild(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
+}
+function downloadCsv(csv) {
+  downloadText(`\ufeff${csv}`, `table-${Date.now()}.csv`, "text/csv;charset=utf-8");
 }
 async function handleTableAction(button) {
   const card = button.closest(".md-table-card");
@@ -50,6 +53,39 @@ async function handleTableAction(button) {
     downloadCsv(tableToCsv(table));
   }
 }
+function resolveMermaidSource(card) {
+  const mermaid = card?.querySelector(".md-mermaid");
+  return mermaid?.getAttribute("data-mermaid-source") || mermaid?.textContent || "";
+}
+function resolveMermaidSvg(card) {
+  const svg = card?.querySelector(".md-mermaid svg");
+  if (!svg) return "";
+  const clone = svg.cloneNode(true);
+  if (!clone.getAttribute("xmlns")) {
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  }
+  return new XMLSerializer().serializeToString(clone);
+}
+function handleMermaidAction(button) {
+  const card = button.closest(".md-mermaid-card");
+  if (!card) return;
+
+  const action = button.dataset.mdMermaidAction;
+  if (action === "code") {
+    const source = resolveMermaidSource(card);
+    if (source) {
+      downloadText(source, `mermaid-${Date.now()}.mmd`);
+    }
+    return;
+  }
+
+  if (action === "svg") {
+    const svg = resolveMermaidSvg(card);
+    if (svg) {
+      downloadText(svg, `mermaid-${Date.now()}.svg`, "image/svg+xml;charset=utf-8");
+    }
+  }
+}
 export function useMarkdownMessageInteractions(contentRef) {
   const platformStore = usePlatformStore();
   async function handleMarkdownClick(event) {
@@ -60,6 +96,16 @@ export function useMarkdownMessageInteractions(contentRef) {
       event.preventDefault();
       event.stopPropagation();
       await handleTableAction(tableActionButton);
+      return;
+    }
+
+    const mermaidActionButton = event.target?.closest?.(
+      "button[data-md-mermaid-action]"
+    );
+    if (mermaidActionButton && contentRef.value?.contains(mermaidActionButton)) {
+      event.preventDefault();
+      event.stopPropagation();
+      handleMermaidAction(mermaidActionButton);
       return;
     }
 

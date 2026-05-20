@@ -4,6 +4,7 @@ import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {
   bootstrapChatRuntime,
+  createChatHistory,
   deleteChatHistory,
   loadChatHistoryList,
   loadChatMessages,
@@ -15,6 +16,7 @@ import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
+import {adaptChatHistory} from "@/adapters/chatAdapter";
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`;
 
@@ -261,6 +263,36 @@ export function useChatRuntime() {
   function setConversation(historyId, messages) {
     chatStore.setMessages(historyId, messages);
   }
+  async function createRemoteConversation({text, assistantId, modelId} = {}) {
+    const rawHistory = await createChatHistory({
+      assistantId,
+      assistId: assistantId,
+      modelId,
+      input: text,
+      chatTitle: text,
+    });
+    const history = adaptChatHistory(rawHistory, {
+      assistantMap: assistantStore.assistantMap,
+      modelMap: assistantStore.modelMap,
+    });
+
+    if (!history?.id) {
+      throw new Error("new.do response does not contain chatId.");
+    }
+
+    chatStore.addHistory(history);
+    chatStore.setMessages(history.id, []);
+    chatStore.setActiveSession(
+      createSessionFromHistory(
+        history,
+        assistantStore.modelMap,
+        assistantStore.assistantMap
+      )
+    );
+
+    return history;
+  }
+
   function createLocalConversation({text} = {}) {
     const history = createLocalHistory({
       text,
@@ -337,6 +369,7 @@ export function useChatRuntime() {
     getHistory,
     ensureConversation,
     setConversation,
+    createRemoteConversation,
     createLocalConversation,
     clearCurrentChatSelection,
     appendUserAndAssistantMessages,

@@ -4,6 +4,13 @@ import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
 import {resolveMock} from "./mockUtils";
 
 const historyStore = CHAT_HISTORY_LIST_RAW.map((item) => ({...item}));
+const messageStore = {...CHAT_MESSAGES_RAW};
+
+function createChatTitle(input) {
+  const value = String(input || "").trim();
+  if (!value) return "새 대화";
+  return value.length > 28 ? `${value.slice(0, 28)}...` : value;
+}
 
 const SAMPLE_REASONING_CONTENTS = [
   `요청 내용을 먼저 Markdown 렌더링 기준으로 분해했습니다.
@@ -45,9 +52,26 @@ export const chatHistoryApiMock = {
   getChatHistoryList() {
     return resolveMock(historyStore, 210);
   },
+  createChat({assistantId, modelId, input} = {}) {
+    const chatId = `chat-new-${Date.now()}`;
+    const history = {
+      chatTitle: createChatTitle(input),
+      chatId,
+      modeId: modelId || "",
+      modelId: modelId || "",
+      assistId: assistantId || "",
+      bookmarkYN: false,
+      dayGroup: 0,
+      chatEndDt: new Date().toISOString(),
+      userId: "user-1234",
+    };
+    historyStore.unshift(history);
+    messageStore[chatId] = [];
+    return resolveMock(history, 160);
+  },
   getChatHistoryDetail({chatId} = {}) {
     return resolveMock(
-      attachMockReasoning(CHAT_MESSAGES_RAW[chatId] || []),
+      attachMockReasoning(messageStore[chatId] || []),
       180
     );
   },

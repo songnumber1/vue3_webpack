@@ -52,6 +52,39 @@ function tableActionButton(action, label) {
     ],
   };
 }
+
+function mermaidActionButton(action, label) {
+  return {
+    type: "element",
+    tagName: "button",
+    properties: {
+      type: "button",
+      className: ["md-mermaid-action", `md-mermaid-action--${action}`],
+      dataMdMermaidAction: action,
+      ariaLabel: label,
+      title: label,
+    },
+    children: [
+      {
+        type: "element",
+        tagName: "span",
+        properties: {
+          className: [
+            "md-mermaid-action-icon",
+            `md-mermaid-action-icon--${action}`,
+          ],
+        },
+        children: [],
+      },
+      {
+        type: "element",
+        tagName: "span",
+        properties: {className: ["sr-only"]},
+        children: [{type: "text", value: label}],
+      },
+    ],
+  };
+}
 function rehypeTableWrapper() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -108,34 +141,77 @@ function rehypeMermaidBlock() {
         codeNode?.tagName === "code" && classNames.includes("language-mermaid");
       if (!isMermaid) return;
 
+      const source = textContent(codeNode);
       parent.children[index] = {
         type: "element",
         tagName: "div",
-        properties: {
-          className: ["mermaid", "md-mermaid"],
-          "data-mermaid-pending": "true",
-        },
-        children: [{type: "text", value: textContent(codeNode)}],
+        properties: {className: ["md-mermaid-card"]},
+        children: [
+          {
+            type: "element",
+            tagName: "div",
+            properties: {className: ["md-mermaid-toolbar"]},
+            children: [
+              {
+                type: "element",
+                tagName: "strong",
+                properties: {className: ["md-mermaid-title"]},
+                children: [{type: "text", value: "Mermaid"}],
+              },
+              {
+                type: "element",
+                tagName: "div",
+                properties: {className: ["md-mermaid-actions"]},
+                children: [
+                  mermaidActionButton("svg", "SVG 저장"),
+                  mermaidActionButton("code", "코드 내보내기"),
+                ],
+              },
+            ],
+          },
+          {
+            type: "element",
+            tagName: "div",
+            properties: {
+              className: ["mermaid", "md-mermaid"],
+              "data-mermaid-pending": "true",
+              "data-mermaid-source": source,
+            },
+            children: [{type: "text", value: source}],
+          },
+        ],
       };
     });
   };
 }
 
-const processor = unified()
-  .use(remarkParse)
-  .use(remarkGfm)
-  .use(remarkMath)
-  .use(remarkRehype)
-  .use(rehypeKatex, {throwOnError: false, strict: false})
-  .use(rehypeHighlight, {ignoreMissing: true, detect: false})
-  .use(rehypeTableWrapper)
-  .use(rehypeMermaidBlock)
-  .use(rehypeExternalLinks, {
-    target: "_blank",
-    rel: ["nofollow", "noopener", "noreferrer"],
-  })
-  .use(rehypeStringify);
-export async function renderMarkdown(text) {
+function createProcessor({renderMermaid = true} = {}) {
+  const nextProcessor = unified()
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(remarkMath)
+    .use(remarkRehype)
+    .use(rehypeKatex, {throwOnError: false, strict: false})
+    .use(rehypeHighlight, {ignoreMissing: true, detect: false})
+    .use(rehypeTableWrapper);
+
+  if (renderMermaid) {
+    nextProcessor.use(rehypeMermaidBlock);
+  }
+
+  return nextProcessor
+    .use(rehypeExternalLinks, {
+      target: "_blank",
+      rel: ["nofollow", "noopener", "noreferrer"],
+    })
+    .use(rehypeStringify);
+}
+
+const defaultProcessor = createProcessor({renderMermaid: true});
+const streamingProcessor = createProcessor({renderMermaid: false});
+
+export async function renderMarkdown(text, options = {}) {
+  const processor = options.renderMermaid === false ? streamingProcessor : defaultProcessor;
   const file = await processor.process(String(text ?? ""));
   const html = String(file).trim();
 

@@ -10,6 +10,7 @@ export const API_ENDPOINTS = Object.freeze({
   CHAT_HISTORY_BOOKMARK: "/chat-history/bookmark.do",
   CHAT_HISTORY_RENAME: "/chat-history/title.do",
   CHAT_HISTORY_DELETE: "/chat-history/delete.do",
+  CHAT_HISTORY_NEW: "/new.do",
   EXAMPLE_PROMPTS: "/example-prompts/list.do",
   GENERATION: "/generation.do",
 });

@@ -65,6 +65,7 @@ export function useChatContainerController(props) {
     activeSession,
     ensureConversation,
     setConversation,
+    createRemoteConversation,
     createLocalConversation,
     clearCurrentChatSelection,
     appendUserAndAssistantMessages,
@@ -262,7 +263,19 @@ export function useChatContainerController(props) {
     route,
     histories,
     messages,
-    createLocalConversation,
+    createRemoteConversation,
+    createConversation: async (normalized, context = {}) => {
+      try {
+        return await createRemoteConversation({
+          text: normalized.text,
+          assistantId: context.assistantId,
+          modelId: context.modelId,
+        });
+      } catch (error) {
+        logWarn("[useChatContainerController] new.do 호출 실패, local conversation으로 대체:", error);
+        return createLocalConversation(normalized);
+      }
+    },
     appendUserAndAssistantMessages,
     setConversation,
     selectedAssistantId,

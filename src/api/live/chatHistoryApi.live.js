@@ -6,6 +6,14 @@ async function getChatHistoryList() {
   return response?.data || [];
 }
 
+async function createChat(payload = {}) {
+  const response = await httpClient.post(
+    API_ENDPOINTS.CHAT_HISTORY_NEW,
+    payload
+  );
+  return response?.data?.data || response?.data || {};
+}
+
 async function getChatHistoryDetail(payload = {}) {
   const response = await httpClient.post(
     API_ENDPOINTS.CHAT_HISTORY_DETAIL,
@@ -40,6 +48,7 @@ async function deleteChat(payload = {}) {
 
 export const chatHistoryApiLive = {
   getChatHistoryList,
+  createChat,
   getChatHistoryDetail,
   updateBookmark,
   renameChat,

@@ -88,8 +88,13 @@ export function useChatSubmit(options) {
       return;
 
     let targetHistoryId = String(options.route.params.id || "");
-    if (options.route.name === "main" || !targetHistoryId) {
-      const history = options.createLocalConversation(normalized);
+    if (options.route.name === "main" || options.route.name === "chat-entry" || !targetHistoryId) {
+      const assistantId = options.selectedAssistantId?.value || "";
+      const modelId = options.selectedModel?.value || "";
+      const history = await options.createConversation(normalized, {
+        assistantId,
+        modelId,
+      });
       targetHistoryId = history.id;
       await options.router
         .push({name: "chat", params: {id: targetHistoryId}})
@@ -134,6 +139,7 @@ export function useChatSubmit(options) {
           assistantId: options.selectedAssistantId?.value || "",
           modelId: options.selectedModel?.value || "",
           input: normalized.text,
+          chatId: targetHistoryId,
         },
         {
           onChunk: async (content) => {

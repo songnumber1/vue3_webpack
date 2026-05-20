@@ -135,6 +135,11 @@ export async function bootstrapChatRuntime(options = {}) {
     initialModelId: initialModel?.id || "",
   };
 }
+export async function createChatHistory(payload = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  return chatHistoryApi.createChat(payload);
+}
+
 export async function loadChatHistoryList(context = {}) {
   const {chatHistoryApi} = resolveChatApis();
   const rawHistories = await chatHistoryApi.getChatHistoryList();

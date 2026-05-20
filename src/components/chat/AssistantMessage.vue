@@ -75,6 +75,8 @@ const showMessageActions = computed(() =>
   !props.interactionBlocked &&
     (!props.message.status || props.message.status === "complete")
 );
+const isMessageComplete = computed(() => !props.message.status || props.message.status === "complete");
+
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"
     ? t("chat.reasoning.thinking")
@@ -85,12 +87,16 @@ async function renderContent() {
   const currentVersion = ++renderVersion;
   const {renderMarkdown} = await import("@/utils/markdown");
   const rendered = props.message.content
-    ? await renderMarkdown(props.message.content)
+    ? await renderMarkdown(props.message.content, {
+        renderMermaid: isMessageComplete.value,
+      })
     : "";
   if (currentVersion !== renderVersion) return;
   html.value = rendered;
   await nextTick();
-  await renderMermaidInElement(contentRef.value);
+  if (isMessageComplete.value) {
+    await renderMermaidInElement(contentRef.value);
+  }
   emit("rendered");
 }
 
@@ -107,7 +113,7 @@ async function renderReasoningContent() {
   emit("rendered");
 }
 
-watch(() => props.message.content, renderContent, {immediate: true});
+watch(() => [props.message.content, props.message.status], renderContent, {immediate: true});
 watch(() => props.message.reasoningContent, renderReasoningContent, {
   immediate: true,
 });
