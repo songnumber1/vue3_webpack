@@ -45,7 +45,11 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     const response = await fetch(resolveGenerationUrl(), {
       method: "POST",
       credentials: "include",
-      headers: {"Content-Type": "application/json"},
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "text/event-stream",
+        "Cache-Control": "no-cache",
+      },
       body: JSON.stringify(payload),
       signal: controller?.signal,
     });
@@ -66,7 +70,12 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     while (!done) {
       const result = await reader.read();
       done = result.done;
-      buffer += decoder.decode(result.value || new Uint8Array(), {stream: !done});
+      if (result.value) {
+        buffer += decoder.decode(result.value, {stream: true});
+      }
+      if (done) {
+        buffer += decoder.decode();
+      }
       const parsed = parseSseBuffer(buffer);
       buffer = parsed.rest;
 
