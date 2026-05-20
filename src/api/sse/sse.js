@@ -27,8 +27,8 @@ export async function streamGeneration(payload = {}, handlers = {}) {
 
   if (!shouldUseServerApi()) {
     const text = pickGenerationSample(payload.input);
-    await streamText(text, (chunk) => onChunk?.(chunk), {delay: 8});
-    onComplete?.();
+    await streamText(text, (chunk) => onChunk?.(chunk), {delay: 18});
+    await onComplete?.();
     return;
   }
 
@@ -86,11 +86,11 @@ export async function streamGeneration(payload = {}, handlers = {}) {
           break;
         }
         accumulated += data.content;
-        onChunk?.(accumulated);
+        await onChunk?.(accumulated);
       }
     }
 
-    onComplete?.();
+    await onComplete?.();
   } finally {
     apiRequestStore.unregisterController(requestKey);
     if (overlay) apiRequestStore.stopOverlay();
