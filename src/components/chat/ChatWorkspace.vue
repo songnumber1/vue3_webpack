@@ -28,13 +28,14 @@
           type="button"
           :title="item.title || item.prompt"
           :disabled="interactionBlocked"
-          @click="workspaceActions.submit(item.prompt)"
+          @click="handleSuggestionClick(item)"
         >
           <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
       <ChatPromptInput
+        ref="mainPromptInputRef"
         :is-mobile="isMobile"
         :class="mainPromptClass"
         :floating="false"
@@ -116,6 +117,7 @@ import {getAssistantImageBySize} from "@/constants/assistantImages";
 const {t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
+const mainPromptInputRef = ref(null);
 let composerResizeObserver = null;
 
 const workspaceActions = inject(
@@ -181,6 +183,13 @@ const mainAssistantIcon = computed(() =>
 const mainPromptClass = computed(() =>
   props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
 );
+
+function handleSuggestionClick(item) {
+  if (props.interactionBlocked) return;
+  const prompt = item?.prompt || item?.title || item?.text || "";
+  mainPromptInputRef.value?.setText(prompt, {focus: true});
+}
+
 
 watch(
   () => [

@@ -1,5 +1,6 @@
 <template>
   <PromptInput
+    ref="promptInputRef"
     :is-mobile="isMobile"
     :floating="floating"
     :model-value="selectedModel"
@@ -15,6 +16,7 @@
 </template>
 
 <script setup>
+import {ref} from "vue";
 import PromptInput from "@/components/prompt/PromptInput.vue";
 
 defineProps({
@@ -33,4 +35,14 @@ const emit = defineEmits([
   "focus",
   "height-change",
 ]);
+
+const promptInputRef = ref(null);
+
+function setText(value, options) {
+  promptInputRef.value?.setText(value, options);
+}
+
+defineExpose({
+  setText,
+});
 </script>

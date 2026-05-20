@@ -125,6 +125,15 @@ body.mobile-mode .message-action-text-button {
   border-radius: var(--dialog-radius);
 }
 
+/* Keep chat feedback trigger rectangular 5px even if legacy feedback styles
+   still define a pill radius earlier in the cascade. */
+.message-action-text-button,
+.message-action-text-button:hover,
+.message-action-text-button:focus-visible,
+body.mobile-mode .message-action-text-button {
+  border-radius: 5px;
+}
+
 /* Shared backdrop/panel foundation. */
 .responsive-overlay,
 .feedback-dialog-backdrop {

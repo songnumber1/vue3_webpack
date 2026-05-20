@@ -98,6 +98,14 @@ export function usePromptComposer(props, emit) {
     () => hasPromptText.value || attachments.value.length > 0
   );
 
+  function setText(value, {focus = true} = {}) {
+    text.value = String(value || "");
+    nextTick(() => {
+      resize();
+      if (focus) focusTextarea();
+    });
+  }
+
   function submit() {
     const value = text.value.trim();
     if ((!value && attachments.value.length === 0) || props.disabled) return;
@@ -167,5 +175,6 @@ export function usePromptComposer(props, emit) {
     // submit
     canSubmit,
     submit,
+    setText,
   };
 }

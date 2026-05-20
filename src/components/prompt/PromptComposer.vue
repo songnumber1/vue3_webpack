@@ -154,7 +154,12 @@ const {
   markPreviewError,
   previewImage,
   removeAttachment,
+  setText,
 } = usePromptComposer(props, emit);
+
+defineExpose({
+  setText,
+});
 </script>
 
 <style scoped>

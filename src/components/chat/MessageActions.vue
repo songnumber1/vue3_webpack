@@ -218,4 +218,12 @@ async function copy() {
 .copy-button {
   box-sizing: border-box;
 }
+
+.message-action-text-button,
+.message-action-text-button:hover,
+.message-action-text-button:focus,
+.message-action-text-button:focus-visible,
+.message-action-text-button:active {
+  border-radius: 5px;
+}
 </style>
