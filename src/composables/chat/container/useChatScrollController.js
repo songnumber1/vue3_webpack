@@ -4,6 +4,7 @@ export function useChatScrollController({
   isConversationPage,
   workspaceRef,
   scrollToBottom,
+  autoScrollEnabled = {value: true},
 }) {
   const showScrollBottom = ref(false);
   let bottomStateTimer = 0;
@@ -25,10 +26,14 @@ export function useChatScrollController({
   }
 
   function shouldKeepForceBottom() {
-    return Date.now() <= forceBottomUntil;
+    return Boolean(autoScrollEnabled?.value) && Date.now() <= forceBottomUntil;
   }
 
   async function scrollBottom(options = {}) {
+    if (options.autoAnswer && !autoScrollEnabled?.value) {
+      updateScrollBottomButton();
+      return;
+    }
     const list = getMessageListRef();
     if (list?.scrollToBottom) {
       list.scrollToBottom(options);
@@ -50,7 +55,7 @@ export function useChatScrollController({
   }
 
   function handleMessageContentRendered() {
-    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true});
+    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true, autoAnswer: true});
     scheduleBottomStateCheck();
   }
 

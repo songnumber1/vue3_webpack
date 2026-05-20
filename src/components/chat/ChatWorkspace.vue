@@ -58,6 +58,7 @@
       :messages="messages"
       :loading="isGenerating"
       :interaction-blocked="interactionBlocked"
+      :auto-scroll-on-answer="autoScrollOnAnswer"
       @content-rendered="workspaceActions.handleMessageContentRendered()"
     />
     <button
@@ -172,6 +173,7 @@ const props = defineProps({
   interactionBlocked: {type: Boolean, default: false},
   messages: {type: Array, default: () => []},
   showScrollBottom: {type: Boolean, default: false},
+  autoScrollOnAnswer: {type: Boolean, default: false},
 });
 
 const isMainPage = computed(() => props.mode === "main");

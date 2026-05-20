@@ -26,6 +26,7 @@
       :interaction-blocked="isInteractionBlocked"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
+      :auto-scroll-on-answer="autoScrollOnAnswer"
     />
 
     <ChatImagePreview
@@ -205,6 +206,7 @@ const {
   suggestions,
   isGenerating,
   isInteractionBlocked,
+  autoScrollOnAnswer,
   closeImagePreview,
   handlePreviewLoad,
   handlePreviewError,

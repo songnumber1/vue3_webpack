@@ -125,7 +125,7 @@ export function useChatSubmit(options) {
 
     commitAssistantMessage();
     await nextTick();
-    await options.scrollBottom({force: true, stable: true});
+    await options.scrollBottom({force: true, stable: true, autoAnswer: true});
 
     isGenerating.value = true;
     chatStreamStore.start();
@@ -145,7 +145,7 @@ export function useChatSubmit(options) {
           onChunk: async (content) => {
             typewriter.update(content);
             await nextTick();
-            await options.scrollBottom({force: true, stable: true});
+            await options.scrollBottom({force: true, stable: true, autoAnswer: true});
           },
           onComplete: async () => {
             await typewriter.flush();

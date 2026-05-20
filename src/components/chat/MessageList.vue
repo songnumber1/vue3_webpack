@@ -26,10 +26,11 @@ import ChatMessage from "./ChatMessage.vue";
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 
-defineProps({
+const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
   interactionBlocked: {type: Boolean, default: false},
+  autoScrollOnAnswer: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(["content-rendered"]);
@@ -99,7 +100,9 @@ async function handleMessageRendered() {
   emit("content-rendered");
 
   await nextTick();
-  scrollToBottom({stable: true});
+  if (props.autoScrollOnAnswer) {
+    scrollToBottom({stable: true});
+  }
 }
 
 onBeforeUnmount(clearStableTimers);

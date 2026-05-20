@@ -127,6 +127,18 @@ const groups = computed(() => [
     ],
   },
   {
+    kicker: "CHAT",
+    title: "채팅방",
+    items: [
+      {
+        key: "autoScrollOnAnswer",
+        type: "switch",
+        label: "자동 스크롤",
+        description: "답변 시 스크롤 자동 이동 여부입니다.",
+      },
+    ],
+  },
+  {
     kicker: "ACTION",
     title: "사용자 액션",
     items: [

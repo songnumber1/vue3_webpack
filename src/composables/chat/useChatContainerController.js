@@ -46,6 +46,7 @@ export function useChatContainerController(props) {
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
   const runtimeReady = ref(false);
+  const autoScrollOnAnswer = computed(() => systemSettingsStore.autoScrollOnAnswer);
   const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
   const currentMode = computed(() => props.mode);
   const isMainPage = computed(() => currentMode.value === "main");
@@ -107,6 +108,7 @@ export function useChatContainerController(props) {
     isConversationPage,
     workspaceRef,
     scrollToBottom,
+    autoScrollEnabled: autoScrollOnAnswer,
   });
 
   const {keyboardOpen, refreshViewport} = useViewportGuard({
@@ -252,7 +254,9 @@ export function useChatContainerController(props) {
       await renderMermaidInElement(document.querySelector(".message-list"), {
         force: true,
       });
-      scrollBottom({force: true, stable: true});
+      if (autoScrollOnAnswer.value) {
+        scrollBottom({force: true, stable: true, autoAnswer: true});
+      }
     } catch (error) {
       logWarn("[useChatContainerController] renderAfterStream 오류:", error);
     }
@@ -280,8 +284,9 @@ export function useChatContainerController(props) {
     setConversation,
     selectedAssistantId,
     selectedModel,
-    scrollBottom: async (options) => {
-      markForceBottom(2500);
+    scrollBottom: async (options = {}) => {
+      if (options.autoAnswer && !autoScrollOnAnswer.value) return;
+      if (options.autoAnswer) markForceBottom(2500);
       await scrollBottom(options);
     },
     renderAfterStream,
@@ -347,6 +352,19 @@ export function useChatContainerController(props) {
     }
   );
 
+  watch(
+    () => {
+      if (!isChatPage.value || !activeHistoryId.value) return null;
+      return runtime.conversations.value?.[activeHistoryId.value] || null;
+    },
+    (nextMessages) => {
+      if (!Array.isArray(nextMessages)) return;
+      if (messages.value === nextMessages) return;
+      messages.value = nextMessages;
+    },
+    {deep: true}
+  );
+
   onMounted(async () => {
     updateMobileState();
     try {
@@ -407,6 +425,7 @@ export function useChatContainerController(props) {
     suggestions,
     isGenerating,
     isInteractionBlocked,
+    autoScrollOnAnswer,
     closeImagePreview,
     handlePreviewLoad,
     handlePreviewError,
