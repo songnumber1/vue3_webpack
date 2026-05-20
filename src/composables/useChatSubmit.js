@@ -88,7 +88,7 @@ export function useChatSubmit(options) {
       return;
 
     let targetHistoryId = String(options.route.params.id || "");
-    if (options.route.name === "main") {
+    if (options.route.name === "main" || !targetHistoryId) {
       const history = options.createLocalConversation(normalized);
       targetHistoryId = history.id;
       await options.router

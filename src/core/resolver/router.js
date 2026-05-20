@@ -38,7 +38,19 @@ const baseRoutes = [
     component: AssistantRoot,
     meta: {requireAuth: true},
     children: [
-      {path: "", name: "main", component: MainPage, meta: {title: "Assistant"}},
+      {
+        path: "",
+        alias: "main",
+        name: "main",
+        component: MainPage,
+        meta: {title: "Assistant"},
+      },
+      {
+        path: "chat",
+        name: "chat-entry",
+        component: ChatPage,
+        meta: {title: "Chat"},
+      },
       {
         path: "chat/:id",
         name: "chat",

@@ -2,7 +2,7 @@
   <ChatLayout
     v-if="runtimeReady"
     :keyboard-open="layoutKeyboardOpen"
-    :mode="mode"
+    :mode="routeMode"
     @select-assistant="startNewChatWithAssistant"
     @new-chat="startNewChat"
     @select-history="openHistory"
@@ -10,7 +10,7 @@
   >
     <ChatWorkspace
       ref="workspaceRef"
-      :mode="mode"
+      :mode="routeMode"
       :readonly="isReadOnly"
       :is-mobile="isMobile"
       :assistant-label="workspaceAssistantLabel"
@@ -23,6 +23,7 @@
       :model-readonly="isModelLocked"
       :is-active-model-unavailable="isActiveModelUnavailable"
       :is-generating="isGenerating"
+      :interaction-blocked="isInteractionBlocked"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
     />
@@ -134,7 +135,8 @@
 </template>
 
 <script setup>
-import {provide} from "vue";
+import {computed, provide} from "vue";
+import {useRoute} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {
   CHAT_ACTIONS_KEY,
@@ -154,7 +156,17 @@ import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
-const props = defineProps({mode: {type: String, default: "main"}});
+const route = useRoute();
+const routeMode = computed(() => {
+  if (route.name === "shared") return "shared";
+  if (route.name === "chat" || route.name === "chat-entry") return "chat";
+  return "main";
+});
+const controllerProps = {
+  get mode() {
+    return routeMode.value;
+  },
+};
 
 const {
   t,
@@ -192,6 +204,7 @@ const {
   workspaceAssistantLabel,
   suggestions,
   isGenerating,
+  isInteractionBlocked,
   closeImagePreview,
   handlePreviewLoad,
   handlePreviewError,
@@ -221,7 +234,7 @@ const {
   handleMessageContentRendered,
   scrollBottom,
   handleSystemSettingsApplied,
-} = useChatContainerController(props);
+} = useChatContainerController(controllerProps);
 
 function handleMobileSettingsDesktopOpen(target) {
   mobileSettingsOpen.value = false;

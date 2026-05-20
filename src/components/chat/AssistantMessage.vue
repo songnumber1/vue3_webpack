@@ -53,7 +53,10 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {useMarkdownMessageInteractions} from "@/composables/useMarkdownMessageInteractions";
 import MessageActions from "./MessageActions.vue";
 
-const props = defineProps({message: {type: Object, required: true}});
+const props = defineProps({
+  message: {type: Object, required: true},
+  interactionBlocked: {type: Boolean, default: false},
+});
 const {locale, t} = useI18n();
 const emit = defineEmits(["rendered"]);
 const html = ref("<p></p>");
@@ -69,7 +72,8 @@ let reasoningRenderVersion = 0;
 
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
 const showMessageActions = computed(() =>
-  !props.message.status || props.message.status === "complete"
+  !props.interactionBlocked &&
+    (!props.message.status || props.message.status === "complete")
 );
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"

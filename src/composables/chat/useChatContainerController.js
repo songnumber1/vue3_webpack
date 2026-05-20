@@ -16,6 +16,7 @@ import {syncViewportModeClass} from "@/utils/viewportMode";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
@@ -31,6 +32,7 @@ export function useChatContainerController(props) {
   const navigationStore = useNavigationStore();
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
+  const chatStreamStore = useChatStreamStore();
   const {scrollToBottom} = useAutoScroll({value: null});
 
   const workspaceRef = ref(null);
@@ -44,6 +46,12 @@ export function useChatContainerController(props) {
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
   const runtimeReady = ref(false);
+  const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
+  const currentMode = computed(() => props.mode);
+  const isMainPage = computed(() => currentMode.value === "main");
+  const isChatPage = computed(() => currentMode.value === "chat");
+  const isSharedPage = computed(() => currentMode.value === "shared");
+  const isConversationPage = computed(() => !isMainPage.value);
 
   const {
     assistants,
@@ -94,28 +102,32 @@ export function useChatContainerController(props) {
     scheduleBottomStateCheck,
     handleMessageContentRendered,
     cleanupScrollController,
-  } = useChatScrollController({props, workspaceRef, scrollToBottom});
+  } = useChatScrollController({
+    isConversationPage,
+    workspaceRef,
+    scrollToBottom,
+  });
 
   const {keyboardOpen, refreshViewport} = useViewportGuard({
     onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
-      if (props.mode !== "main" && isCompact && isKeyboardOpen) {
+      if (!isMainPage.value && isCompact && isKeyboardOpen) {
         scrollBottom({stable: true});
       }
     },
   });
 
   const layoutKeyboardOpen = computed(
-    () => props.mode !== "main" && keyboardOpen.value
+    () => !isMainPage.value && keyboardOpen.value
   );
-  const isReadOnly = computed(() => props.mode === "shared");
+  const isReadOnly = computed(() => isSharedPage.value);
   const activeHistoryId = computed(() => {
-    if (props.mode === "chat") return route.params.id;
-    if (props.mode === "shared") return route.params.shareId;
+    if (isChatPage.value) return route.params.id;
+    if (isSharedPage.value) return route.params.shareId;
     return null;
   });
   const activeHistory = computed(() => getHistory(activeHistoryId.value));
   const activeConversationTitle = computed(() => {
-    if (props.mode === "shared") {
+    if (isSharedPage.value) {
       return t("chat.sharedConversationTitle", {
         id: activeHistoryId.value || "",
       }).trim();
@@ -183,7 +195,7 @@ export function useChatContainerController(props) {
   });
 
   const {handlePromptFocus, handlePromptResize} = useChatPromptActions({
-    props,
+    isMainPage,
     isReadOnly,
     isActiveModelUnavailable,
     isMobile,
@@ -192,15 +204,24 @@ export function useChatContainerController(props) {
   });
 
   async function loadRouteConversation() {
-    if (props.mode === "main") {
+    if (isMainPage.value) {
       messages.value = [];
       clearCurrentChatSelection();
       return;
     }
 
     try {
-      if (props.mode === "shared") {
+      if (isSharedPage.value) {
         messages.value = await loadSharedConversation(activeHistoryId.value);
+        markForceBottom();
+        await nextTick();
+        await scrollBottom({behavior: "auto", force: true, stable: true});
+        return;
+      }
+
+      if (!activeHistoryId.value) {
+        messages.value = [];
+        clearCurrentChatSelection();
         markForceBottom();
         await nextTick();
         await scrollBottom({behavior: "auto", force: true, stable: true});
@@ -209,7 +230,7 @@ export function useChatContainerController(props) {
 
       const history = getHistory(activeHistoryId.value);
       if (!history) {
-        await router.replace("/").catch(() => {});
+        await router.replace({name: "main"}).catch(() => {});
         return;
       }
       messages.value = await ensureConversation(history.id);
@@ -307,7 +328,7 @@ export function useChatContainerController(props) {
   });
 
   watch(
-    () => [route.params.id, route.params.shareId, props.mode],
+    () => [route.params.id, route.params.shareId, currentMode.value],
     () => {
       if (runtimeReady.value) loadRouteConversation();
     }
@@ -372,6 +393,7 @@ export function useChatContainerController(props) {
     workspaceAssistantLabel,
     suggestions,
     isGenerating,
+    isInteractionBlocked,
     closeImagePreview,
     handlePreviewLoad,
     handlePreviewError,

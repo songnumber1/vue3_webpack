@@ -9,6 +9,7 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
+      :interaction-blocked="interactionBlocked"
       @rendered="handleMessageRendered"
     />
     <div v-if="loading" class="typing-row">
@@ -28,6 +29,7 @@ const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
+  interactionBlocked: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(["content-rendered"]);

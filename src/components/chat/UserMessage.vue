@@ -38,7 +38,11 @@
       <div v-if="message.content" class="bubble-content bubble-content--plain">
         {{ message.content }}
       </div>
-      <MessageActions role="user" :content="message.content" />
+      <MessageActions
+        v-if="showMessageActions"
+        role="user"
+        :content="message.content"
+      />
     </div>
   </article>
 </template>
@@ -51,8 +55,12 @@ import {computed} from "vue";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
-const props = defineProps({message: {type: Object, required: true}});
+const props = defineProps({
+  message: {type: Object, required: true},
+  interactionBlocked: {type: Boolean, default: false},
+});
 defineEmits(["rendered"]);
+const showMessageActions = computed(() => !props.interactionBlocked);
 const hasAttachments = computed(
   () =>
     Array.isArray(props.message.attachments) &&

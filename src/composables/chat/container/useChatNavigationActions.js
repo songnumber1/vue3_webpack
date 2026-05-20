@@ -51,7 +51,7 @@ export function useChatNavigationActions({
     }
     navigationStore.closeTransientPanels();
     clearForceBottom();
-    await router.push("/").catch(() => {});
+    await router.push({name: "main"}).catch(() => {});
   }
 
   function startNewChat() {

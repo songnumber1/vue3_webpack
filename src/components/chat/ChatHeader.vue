@@ -143,7 +143,8 @@ const headerAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 20)
 );
 
-const isDesktopMain = computed(() => props.mode === "main" && !props.isMobile);
+const isMainPage = computed(() => props.mode === "main");
+const isDesktopMain = computed(() => isMainPage.value && !props.isMobile);
 const showMobileAssistant = computed(() => props.isMobile);
 const showDesktopConversationTitle = computed(
   () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile

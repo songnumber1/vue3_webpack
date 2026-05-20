@@ -1,6 +1,10 @@
 import {ref} from "vue";
 
-export function useChatScrollController({props, workspaceRef, scrollToBottom}) {
+export function useChatScrollController({
+  isConversationPage,
+  workspaceRef,
+  scrollToBottom,
+}) {
   const showScrollBottom = ref(false);
   let bottomStateTimer = 0;
   let forceBottomUntil = 0;
@@ -37,8 +41,7 @@ export function useChatScrollController({props, workspaceRef, scrollToBottom}) {
   function updateScrollBottomButton() {
     const list = getMessageListRef();
     showScrollBottom.value =
-      (props.mode === "chat" || props.mode === "shared") &&
-      Boolean(list && !list.isAtBottom?.());
+      Boolean(isConversationPage?.value) && Boolean(list && !list.isAtBottom?.());
   }
 
   function scheduleBottomStateCheck() {

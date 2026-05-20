@@ -1,5 +1,5 @@
 <template>
-  <ChatContainer mode="main" />
+  <ChatContainer />
 </template>
 
 <script setup>

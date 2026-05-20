@@ -9,7 +9,7 @@
   />
 
   <section
-    v-if="mode === 'main'"
+    v-if="isMainPage"
     class="empty-stage empty-stage--main"
     :class="{'empty-stage--mobile-main': isMobile}"
   >
@@ -27,6 +27,7 @@
           class="suggestion-chip"
           type="button"
           :title="item.title || item.prompt"
+          :disabled="interactionBlocked"
           @click="workspaceActions.submit(item.prompt)"
         >
           <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
@@ -39,7 +40,7 @@
         :floating="false"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating"
+        :disabled="isGenerating || interactionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
         @update:selected-model="workspaceActions.updateSelectedModel($event)"
@@ -55,10 +56,11 @@
       ref="listRef"
       :messages="messages"
       :loading="isGenerating"
+      :interaction-blocked="interactionBlocked"
       @content-rendered="workspaceActions.handleMessageContentRendered()"
     />
     <button
-      v-if="showScrollBottom"
+      v-if="showScrollBottom && !interactionBlocked"
       class="scroll-bottom-button"
       type="button"
       :aria-label="t('chat.scrollBottom')"
@@ -78,7 +80,7 @@
         :is-mobile="isMobile"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating"
+        :disabled="isGenerating || interactionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
         @update:selected-model="workspaceActions.updateSelectedModel($event)"
@@ -165,9 +167,12 @@ const props = defineProps({
   isActiveModelDeleted: {type: Boolean, default: false},
   isActiveModelUnavailable: {type: Boolean, default: false},
   isGenerating: {type: Boolean, default: false},
+  interactionBlocked: {type: Boolean, default: false},
   messages: {type: Array, default: () => []},
   showScrollBottom: {type: Boolean, default: false},
 });
+
+const isMainPage = computed(() => props.mode === "main");
 
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 48)

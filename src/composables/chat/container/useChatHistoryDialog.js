@@ -1,5 +1,6 @@
 import {computed, ref} from "vue";
 import {logWarn} from "@/utils/logger";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 export function useChatHistoryDialog({
   t,
@@ -10,6 +11,7 @@ export function useChatHistoryDialog({
   renameHistory,
   removeHistory,
 }) {
+  const chatStreamStore = useChatStreamStore();
   const historyDialogOpen = ref(false);
   const historyDialogMode = ref("rename");
   const historyDialogTarget = ref(null);
@@ -37,6 +39,7 @@ export function useChatHistoryDialog({
   }
 
   async function confirmHistoryDialog(value) {
+    if (chatStreamStore.isStreaming) return;
     const target = historyDialogTarget.value;
     if (!target) {
       closeHistoryDialog();
@@ -51,7 +54,7 @@ export function useChatHistoryDialog({
         await removeHistory(target);
         if (String(activeHistoryId.value) === String(target.id)) {
           messages.value = [];
-          await router.replace("/").catch(() => {});
+          await router.replace({name: "main"}).catch(() => {});
         }
       }
     } catch (error) {
@@ -62,6 +65,7 @@ export function useChatHistoryDialog({
   }
 
   async function handleHistoryMenuAction({action, history} = {}) {
+    if (chatStreamStore.isStreaming) return;
     if (!history || !action) return;
     if (action === "pin" || action === "unpin") {
       try {

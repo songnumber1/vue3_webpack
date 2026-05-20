@@ -1,5 +1,5 @@
 export function useChatPromptActions({
-  props,
+  isMainPage,
   isReadOnly,
   isActiveModelUnavailable,
   isMobile,
@@ -9,7 +9,7 @@ export function useChatPromptActions({
   function scrollAfterPromptInteraction({refresh = false} = {}) {
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
     if (refresh) refreshViewport();
-    if (props.mode === "main") return;
+    if (isMainPage.value) return;
     scrollBottom({stable: true, force: isMobile.value});
   }
 
