@@ -28,6 +28,7 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   keyboardMode: "keyboardMode",
   useVirtualKeyboard: "useVirtualKeyboard",
   showVirtualKeyboardDebug: "showVirtualKeyboardDebug",
+  virtualKeyboardHeight: "virtualKeyboardHeight",
   useMicrophone: "useMicrophone",
   showGuideButton: "showGuideButton",
   showThemeButton: "showThemeButton",
@@ -48,6 +49,7 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.keyboardMode]: KEYBOARD_MODES.adjustResize,
   [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
   [SYSTEM_SETTING_KEYS.showVirtualKeyboardDebug]: false,
+  [SYSTEM_SETTING_KEYS.virtualKeyboardHeight]: 340,
   [SYSTEM_SETTING_KEYS.useMicrophone]: false,
   [SYSTEM_SETTING_KEYS.showGuideButton]: false,
   [SYSTEM_SETTING_KEYS.showThemeButton]: false,
@@ -83,6 +85,13 @@ export function normalizeSystemSettings(value = {}) {
     }
     if (key === SYSTEM_SETTING_KEYS.keyboardMode) {
       next[key] = normalizeKeyboardMode(source[key]);
+      return;
+    }
+    if (key === SYSTEM_SETTING_KEYS.virtualKeyboardHeight) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(Math.max(Math.round(numeric), 180), 600)
+        : DEFAULT_SYSTEM_SETTINGS[key];
       return;
     }
     next[key] = Boolean(source[key]);

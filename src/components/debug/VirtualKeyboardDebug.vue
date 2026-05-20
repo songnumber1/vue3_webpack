@@ -15,6 +15,7 @@
       id="virtual-keyboard-debug-panel"
       ref="panelRef"
       class="virtual-keyboard-debug__panel"
+      :style="panelStyle"
       role="note"
     >
       <strong>{{ modeTitle }}</strong>
@@ -39,9 +40,20 @@ const props = defineProps({
 });
 
 const systemSettingsStore = useSystemSettingsStore();
-const {keyboardMode} = storeToRefs(systemSettingsStore);
+const {keyboardMode, virtualKeyboardHeight} = storeToRefs(systemSettingsStore);
 const panelOpen = ref(false);
 const panelRef = ref(null);
+
+const panelHeight = computed(() => {
+  const height = Number(virtualKeyboardHeight.value);
+  return Number.isFinite(height)
+    ? Math.min(Math.max(Math.round(height), 180), 600)
+    : 340;
+});
+
+const panelStyle = computed(() => ({
+  height: `${panelHeight.value}px`,
+}));
 
 const modeTitle = computed(() => {
   if (keyboardMode.value === KEYBOARD_MODES.adjustNothing) {
@@ -64,8 +76,7 @@ const modeDescription = computed(() => {
 });
 
 function getPanelHeight() {
-  const height = panelRef.value?.getBoundingClientRect?.().height || 0;
-  return Math.max(0, Math.round(height));
+  return panelHeight.value;
 }
 
 function setRootProperty(name, value) {
@@ -150,7 +161,7 @@ watch(panelOpen, (nextOpen) => {
   clearVirtualKeyboardVars();
 });
 
-watch(keyboardMode, () => {
+watch([keyboardMode, virtualKeyboardHeight], () => {
   if (panelOpen.value) applyVirtualKeyboardMode();
 });
 

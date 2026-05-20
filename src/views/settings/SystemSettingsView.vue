@@ -37,9 +37,9 @@
             v-model.number="draft[item.key]"
             class="system-settings-number"
             type="number"
-            min="320"
-            max="1440"
-            step="1"
+            :min="item.min || 0"
+            :max="item.max || 9999"
+            :step="item.step || 1"
           />
           <select
             v-else-if="item.type === 'select'"
@@ -144,6 +144,16 @@ const groups = computed(() => [
         label: "가상 키보드 디버그",
         description:
           "모바일 모드에서만 테스트용 가상 키보드 버튼을 노출합니다.",
+      },
+      {
+        key: "virtualKeyboardHeight",
+        type: "number",
+        label: "가상 키보드 높이",
+        description:
+          "디버그용 가상 키보드 영역 높이(px)입니다. 기본값은 Android Chrome 확인용 340px입니다.",
+        min: 180,
+        max: 600,
+        step: 1,
       },
       {
         key: "useMicrophone",

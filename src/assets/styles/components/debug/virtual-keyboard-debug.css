@@ -28,7 +28,8 @@ body.mobile-mode .virtual-keyboard-debug {
   right: 0;
   bottom: 0;
   z-index: 2147482999;
-  min-height: min(42vh, 320px);
+  min-height: 0;
+  box-sizing: border-box;
   padding: 28px 24px calc(28px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.35));
   background: repeating-linear-gradient(
