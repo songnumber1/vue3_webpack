@@ -1,4 +1,22 @@
 /* Refinement patch: single theme control, cleaner model selector, compact mobile UI */
+
+:root {
+  --keyboard-font-size-2xs: var(--font-size-2xs);
+  --keyboard-font-size-xs: var(--font-size-xs);
+  --keyboard-font-size-sm: var(--font-size-sm);
+  --keyboard-font-size-md: var(--font-size-md);
+  --keyboard-font-size-base: var(--font-size-base);
+  --keyboard-font-size-lg: var(--font-size-lg);
+  --keyboard-font-size-xl: var(--font-size-xl);
+  --keyboard-font-size-2xl: var(--font-size-2xl);
+  --keyboard-font-size-3xl: var(--font-size-3xl);
+  --keyboard-font-size-11-5: calc(var(--font-size-xs) + 0.5px);
+  --keyboard-font-size-13-5: calc(var(--font-size-md) + 0.5px);
+  --keyboard-font-size-14-5: calc(var(--font-size-base) + 0.5px);
+  --keyboard-font-size-16-5: calc(var(--font-size-lg) + 1.5px);
+  --keyboard-font-size-26: calc(var(--font-size-3xl) + 2px);
+  --keyboard-font-size-28: calc(var(--font-size-3xl) + 4px);
+}
 .message--user .avatar {
   background: var(--primary);
   color: #fff;
@@ -90,7 +108,7 @@ body.desktop-mode .mobile-topbar .theme-toggle {
 body.desktop-mode .model-trigger {
   height: 42px;
   min-width: 124px;
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
   padding: 0 18px;
 }
 
@@ -102,14 +120,14 @@ body.mobile-mode .mobile-topbar {
 body.mobile-mode .round-icon {
   width: 44px;
   height: 44px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 
 body.mobile-mode .model-trigger {
   height: 44px;
   min-width: 124px;
   padding: 0 16px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 
 body.mobile-mode .chevron {
@@ -127,11 +145,11 @@ body.mobile-mode .model-option {
 }
 
 body.mobile-mode .model-option strong {
-  font-size: 14px;
+  font-size: var(--keyboard-font-size-base);
 }
 
 body.mobile-mode .model-option small {
-  font-size: 12px;
+  font-size: var(--keyboard-font-size-sm);
 }
 
 body.mobile-mode .empty-stage {
@@ -144,18 +162,18 @@ body.mobile-mode .project-title {
 }
 
 body.mobile-mode .project-title h1 {
-  font-size: 28px;
+  font-size: var(--keyboard-font-size-28);
 }
 
 body.mobile-mode .folder-icon {
-  font-size: 26px;
+  font-size: var(--keyboard-font-size-26);
 }
 
 body.mobile-mode .source-chip {
   margin-top: 14px;
   height: 38px;
   padding: 0 16px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 
 body.mobile-mode .mobile-recent-list {
@@ -164,12 +182,12 @@ body.mobile-mode .mobile-recent-list {
 }
 
 body.mobile-mode .mobile-recent-card strong {
-  font-size: 19px;
+  font-size: var(--keyboard-font-size-xl);
   margin-bottom: 4px;
 }
 
 body.mobile-mode .mobile-recent-card span {
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 
 body.mobile-mode .message-list {
@@ -187,13 +205,13 @@ body.mobile-mode .message--user .bubble {
 }
 
 body.mobile-mode .bubble-content {
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
   line-height: 1.62;
 }
 
 body.mobile-mode .bubble-tools button {
   padding: 5px 10px;
-  font-size: 13px;
+  font-size: var(--keyboard-font-size-md);
 }
 
 body.mobile-mode .prompt-wrap {
@@ -210,20 +228,20 @@ body.mobile-mode .prompt-box textarea {
   min-height: 34px;
   max-height: 140px;
   padding: 7px 4px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 
 body.mobile-mode .attach-button,
 body.mobile-mode .send-button {
   width: 34px;
   height: 34px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 
 body.mobile-mode .send-button {
   width: 42px;
   height: 42px;
-  font-size: 22px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 
 body.mobile-mode .mobile-drawer {
@@ -244,13 +262,13 @@ body.mobile-mode .sidebar-content--mobile .sidebar-top {
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-title {
-  font-size: 24px;
+  font-size: var(--keyboard-font-size-3xl);
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-round {
   width: 40px;
   height: 40px;
-  font-size: 24px;
+  font-size: var(--keyboard-font-size-3xl);
 }
 
 body.mobile-mode .sidebar-content--mobile .quick-menu,
@@ -287,7 +305,7 @@ body.mobile-mode .sidebar-content--mobile .project-item,
 body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   min-height: 44px;
   padding: 9px 20px;
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
   gap: 14px;
   border-radius: 0;
 }
@@ -295,12 +313,12 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
 body.mobile-mode .sidebar-content--mobile .quick-item span,
 body.mobile-mode .sidebar-content--mobile .project-item span {
   width: 28px;
-  font-size: 21px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 
 body.mobile-mode .sidebar-content--mobile .section-label {
   padding: 12px 20px 2px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 
 body.mobile-mode .mobile-new-chat-fab {
@@ -309,7 +327,7 @@ body.mobile-mode .mobile-new-chat-fab {
   height: 56px;
   padding: 0 22px;
   gap: 10px;
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
@@ -336,13 +354,13 @@ body.mobile-mode .mobile-topbar {
 body.mobile-mode .round-icon {
   width: 44px;
   height: 44px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .model-trigger {
   height: 44px;
   min-width: 124px;
   padding: 0 16px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .desktop-empty-actions,
 body.mobile-mode .empty-center {
@@ -357,14 +375,14 @@ body.mobile-mode .mobile-project-home {
   display: block;
 }
 body.mobile-mode .project-title h1 {
-  font-size: 28px;
+  font-size: var(--keyboard-font-size-28);
 }
 body.mobile-mode .folder-icon {
-  font-size: 26px;
+  font-size: var(--keyboard-font-size-26);
 }
 body.mobile-mode .source-chip {
   height: 38px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
   margin-top: 14px;
 }
 body.mobile-mode .mobile-recent-list {
@@ -372,10 +390,10 @@ body.mobile-mode .mobile-recent-list {
   gap: 20px;
 }
 body.mobile-mode .mobile-recent-card strong {
-  font-size: 19px;
+  font-size: var(--keyboard-font-size-xl);
 }
 body.mobile-mode .mobile-recent-card span {
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 body.mobile-mode .message-list {
   padding: 12px 16px 94px;
@@ -405,7 +423,7 @@ body.mobile-mode .message--user .bubble {
   margin-left: auto;
 }
 body.mobile-mode .bubble-content {
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
   line-height: 1.62;
 }
 body.mobile-mode .prompt-wrap {
@@ -432,18 +450,18 @@ body.mobile-mode .prompt-box textarea {
   min-height: 34px;
   max-height: 140px;
   padding: 7px 4px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }
 body.mobile-mode .attach-button,
 body.mobile-mode .send-button {
   width: 34px;
   height: 34px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .send-button {
   width: 42px;
   height: 42px;
-  font-size: 22px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .mobile-drawer-backdrop {
   display: block;
@@ -464,7 +482,7 @@ body.mobile-mode .mobile-drawer {
 
 /* Final mobile polish: compact Android/WebView scale and simple project icon */
 .project-item.new-project span {
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
   font-weight: 800;
   line-height: 1;
 }
@@ -479,7 +497,7 @@ body.mobile-mode .mobile-topbar {
 body.mobile-mode .round-icon {
   width: 38px;
   height: 38px;
-  font-size: 17px;
+  font-size: var(--keyboard-font-size-xl);
   box-shadow: var(--shadow-control);
 }
 body.mobile-mode .model-trigger {
@@ -487,7 +505,7 @@ body.mobile-mode .model-trigger {
   min-width: 108px;
   padding: 0 13px;
   gap: 6px;
-  font-size: 17px;
+  font-size: var(--keyboard-font-size-xl);
   letter-spacing: -0.035em;
 }
 body.mobile-mode .chevron {
@@ -504,10 +522,10 @@ body.mobile-mode .model-option {
   border-radius: 12px;
 }
 body.mobile-mode .model-option strong {
-  font-size: 13.5px;
+  font-size: var(--keyboard-font-size-13-5);
 }
 body.mobile-mode .model-option small {
-  font-size: 11.5px;
+  font-size: var(--keyboard-font-size-11-5);
 }
 body.mobile-mode .empty-stage {
   padding: 12px 16px 86px;
@@ -517,29 +535,29 @@ body.mobile-mode .project-title {
   gap: 8px;
 }
 body.mobile-mode .project-title h1 {
-  font-size: 23px;
+  font-size: var(--keyboard-font-size-3xl);
   line-height: 1.22;
   letter-spacing: -0.04em;
 }
 body.mobile-mode .folder-icon {
-  font-size: 22px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .source-chip {
   margin-top: 12px;
   height: 34px;
   padding: 0 14px;
-  font-size: 13.5px;
+  font-size: var(--keyboard-font-size-13-5);
 }
 body.mobile-mode .mobile-recent-list {
   margin-top: 22px;
   gap: 15px;
 }
 body.mobile-mode .mobile-recent-card strong {
-  font-size: 16.5px;
+  font-size: var(--keyboard-font-size-16-5);
   margin-bottom: 3px;
 }
 body.mobile-mode .mobile-recent-card span {
-  font-size: 13.5px;
+  font-size: var(--keyboard-font-size-13-5);
   line-height: 1.35;
 }
 body.mobile-mode .message-list {
@@ -554,12 +572,12 @@ body.mobile-mode .message--user .bubble {
   max-width: 82%;
 }
 body.mobile-mode .bubble-content {
-  font-size: 14px;
+  font-size: var(--keyboard-font-size-base);
   line-height: 1.58;
 }
 body.mobile-mode .bubble-tools button {
   padding: 4px 9px;
-  font-size: 12px;
+  font-size: var(--keyboard-font-size-sm);
 }
 body.mobile-mode .prompt-wrap {
   padding: 7px 12px calc(8px + env(safe-area-inset-bottom));
@@ -573,19 +591,19 @@ body.mobile-mode .prompt-box textarea {
   min-height: 31px;
   max-height: 120px;
   padding: 6px 3px;
-  font-size: 14px;
+  font-size: var(--keyboard-font-size-base);
   line-height: 1.35;
 }
 body.mobile-mode .attach-button,
 body.mobile-mode .send-button {
   width: 30px;
   height: 30px;
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
 }
 body.mobile-mode .send-button {
   width: 38px;
   height: 38px;
-  font-size: 20px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .mobile-drawer {
   width: min(86vw, 360px);
@@ -599,13 +617,13 @@ body.mobile-mode .sidebar-content--mobile .sidebar-top {
   padding: 0 16px 7px;
 }
 body.mobile-mode .sidebar-content--mobile .sidebar-title {
-  font-size: 22px;
+  font-size: var(--keyboard-font-size-2xl);
   letter-spacing: -0.045em;
 }
 body.mobile-mode .sidebar-content--mobile .sidebar-round {
   width: 36px;
   height: 36px;
-  font-size: 21px;
+  font-size: var(--keyboard-font-size-2xl);
 }
 body.mobile-mode .sidebar-content--mobile .quick-menu {
   max-height: 170px;
@@ -622,17 +640,17 @@ body.mobile-mode .sidebar-content--mobile .project-item,
 body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   min-height: 39px;
   padding: 8px 17px;
-  font-size: 16px;
+  font-size: var(--keyboard-font-size-lg);
   gap: 11px;
 }
 body.mobile-mode .sidebar-content--mobile .quick-item span,
 body.mobile-mode .sidebar-content--mobile .project-item span {
   width: 23px;
-  font-size: 18px;
+  font-size: var(--keyboard-font-size-xl);
 }
 body.mobile-mode .sidebar-content--mobile .section-label {
   padding: 10px 17px 2px;
-  font-size: 13px;
+  font-size: var(--keyboard-font-size-md);
 }
 body.mobile-mode .mobile-new-chat-fab {
   right: 20px;
@@ -640,7 +658,7 @@ body.mobile-mode .mobile-new-chat-fab {
   height: 50px;
   padding: 0 19px;
   gap: 8px;
-  font-size: 16px;
+  font-size: var(--keyboard-font-size-lg);
 }
 body.mobile-mode .sidebar-content--mobile .sidebar-user {
   padding: 8px 17px calc(7px + env(safe-area-inset-bottom));
@@ -648,13 +666,13 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
 body.mobile-mode .sidebar-content--mobile .user-avatar {
   width: 30px;
   height: 30px;
-  font-size: 11px;
+  font-size: var(--keyboard-font-size-xs);
 }
 body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
-  font-size: 14px;
+  font-size: var(--keyboard-font-size-base);
 }
 body.mobile-mode .sidebar-content--mobile .sidebar-user small {
-  font-size: 10.5px;
+  font-size: var(--keyboard-font-size-2xs);
 }
 
 /* Final responsive polish: full-width mobile canvas, refined project icons, and drawer reset-safe layout */
@@ -854,7 +872,7 @@ body.mobile-mode .avatar {
   width: 32px;
   height: 32px;
   border-radius: 12px;
-  font-size: 11px;
+  font-size: var(--keyboard-font-size-xs);
 }
 
 body.mobile-mode .message--user .avatar {
@@ -890,7 +908,7 @@ body.mobile-mode .message--user .bubble {
 
 body.mobile-mode .bubble-meta {
   display: block;
-  font-size: 11px;
+  font-size: var(--keyboard-font-size-xs);
   color: var(--text-muted);
   margin-bottom: 6px;
   font-weight: 800;
@@ -901,7 +919,7 @@ body.mobile-mode .message--user .bubble-meta {
 }
 
 body.mobile-mode .bubble-content {
-  font-size: 14.5px;
+  font-size: var(--keyboard-font-size-14-5);
   line-height: 1.62;
 }
 
@@ -952,7 +970,7 @@ body.mobile-mode .avatar {
   width: 30px;
   height: 30px;
   border-radius: 11px;
-  font-size: 10.5px;
+  font-size: var(--keyboard-font-size-2xs);
 }
 body.mobile-mode .bubble {
   grid-column: 2;
@@ -984,12 +1002,12 @@ body.mobile-mode .message--user .bubble {
 }
 body.mobile-mode .bubble-meta {
   display: block;
-  font-size: 10.5px;
+  font-size: var(--keyboard-font-size-2xs);
   margin-bottom: 5px;
   color: var(--text-muted);
 }
 body.mobile-mode .bubble-content {
-  font-size: 14px;
+  font-size: var(--keyboard-font-size-base);
   line-height: 1.58;
 }
 
@@ -1070,5 +1088,5 @@ body.mobile-mode .chat-container-root--keyboard-open .round-icon {
 body.mobile-mode .chat-container-root--keyboard-open .model-trigger {
   height: 34px;
   min-width: 100px;
-  font-size: 15px;
+  font-size: var(--keyboard-font-size-lg);
 }

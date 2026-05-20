@@ -12,6 +12,7 @@ import {shouldUseFrontendMockApi} from "@/constants/apiMode";
 import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
+import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
 function createAccessPayload(to) {
   return {
     language: "ko",
@@ -22,14 +23,7 @@ function createAccessPayload(to) {
     studioId: to?.query?.studioId || null,
   };
 }
-function isTruthyFlag(value) {
-  if (value === true) return true;
-  if (typeof value === "string") {
-    return ["true", "y", "yes", "1"].includes(value.toLowerCase());
-  }
 
-  return value === 1;
-}
 function getStoredMockScenario() {
   if (typeof window === "undefined") {
     return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
@@ -41,6 +35,7 @@ function getStoredMockScenario() {
     null
   );
 }
+
 function shouldUseMockAuth() {
   return (
     shouldUseFrontendMockApi() ||
@@ -48,53 +43,11 @@ function shouldUseMockAuth() {
     (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
   );
 }
+
 function debugAuthGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
     logInfo("[auth-guard]", ...args);
   }
-}
-function isLoginRequired(accessInfo = {}) {
-  const valid = accessInfo.valid;
-  const status = String(
-    accessInfo.status || accessInfo.result || ""
-  ).toLowerCase();
-
-  return (
-    valid === false ||
-    status === "login" ||
-    status === "login_required" ||
-    isTruthyFlag(accessInfo.loginRequired) ||
-    isTruthyFlag(accessInfo.Login) ||
-    !accessInfo.user
-  );
-}
-function isAccessDenied(accessInfo = {}) {
-  const status = String(
-    accessInfo.status || accessInfo.result || ""
-  ).toLowerCase();
-
-  return (
-    status === "accessdeny" ||
-    status === "access_denied" ||
-    status === "access-denied" ||
-    isTruthyFlag(accessInfo.accessDeny) ||
-    isTruthyFlag(accessInfo.accessDenied) ||
-    isTruthyFlag(accessInfo.AccessDeny)
-  );
-}
-function isUserAgreementRequired(accessInfo = {}) {
-  const status = String(
-    accessInfo.status || accessInfo.result || ""
-  ).toLowerCase();
-
-  return (
-    status === "useragree" ||
-    status === "user_agree" ||
-    status === "user-agree" ||
-    isTruthyFlag(accessInfo.userAgree) ||
-    isTruthyFlag(accessInfo.UserAgree) ||
-    isTruthyFlag(accessInfo.userAgreementRequired)
-  );
 }
 async function requestAccessInfo(authAxios, payload) {
   const useMock = shouldUseMockAuth();
@@ -120,35 +73,7 @@ async function requestAccessInfo(authAxios, payload) {
   return response?.data || {};
 }
 function normalizeAccessResult(accessInfo = {}) {
-  if (isAccessDenied(accessInfo)) {
-    return {
-      authenticated: false,
-      reason: AUTH_FAILURE_REASONS.ACCESS_DENIED,
-      accessInfo,
-    };
-  }
-
-  if (isUserAgreementRequired(accessInfo)) {
-    return {
-      authenticated: false,
-      reason: AUTH_FAILURE_REASONS.USER_AGREE_REQUIRED,
-      accessInfo,
-    };
-  }
-
-  if (isLoginRequired(accessInfo)) {
-    return {
-      authenticated: false,
-      reason: AUTH_FAILURE_REASONS.LOGIN_REQUIRED,
-      accessInfo,
-    };
-  }
-
-  return {
-    authenticated: true,
-    reason: AUTH_FAILURE_REASONS.AUTHENTICATED,
-    accessInfo,
-  };
+  return resolveAuthAccessResult(accessInfo);
 }
 export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   const authStore = useAuthStore();
