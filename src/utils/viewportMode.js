@@ -23,6 +23,12 @@ function getViewportModeWidth() {
   return candidates.length ? Math.min(...candidates) : 0;
 }
 
+
+export function isMobileLikeViewport(breakpoint = getRuntimeSystemSettings().mobileBreakpoint) {
+  const width = getViewportModeWidth();
+  return width > 0 && width <= breakpoint;
+}
+
 /**
  * @description body에 mobile-mode/desktop-mode 클래스를 반영합니다.
  * CSS는 이 클래스를 기준으로 모바일/웹 분기를 적용합니다.

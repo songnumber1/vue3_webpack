@@ -4,6 +4,7 @@ import MainPage from "@/views/MainPage.vue";
 import {isAndroidApp, isIosApp} from "@/core/config";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {
   ENABLE_AUTH_GUARD,
@@ -172,7 +173,12 @@ function registerRouteGuard(router, appInfo, context = {}) {
 
   router.beforeEach(async (to) => {
     const platformStore = usePlatformStore();
+    const chatStreamStore = useChatStreamStore();
     platformStore.refresh(appInfo);
+
+    if (chatStreamStore.isStreaming) {
+      return false;
+    }
 
     const requiresAuth = shouldCheckAuth(to);
     debugRouteGuard("navigation", {

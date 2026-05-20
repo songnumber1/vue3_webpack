@@ -37,7 +37,11 @@
         @click.capture="handleMarkdownClick"
         v-html="html"
       ></div>
-      <MessageActions role="assistant" :content="message.content" />
+      <MessageActions
+        v-if="showMessageActions"
+        role="assistant"
+        :content="message.content"
+      />
     </div>
   </article>
 </template>
@@ -64,6 +68,9 @@ let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
+const showMessageActions = computed(() =>
+  !props.message.status || props.message.status === "complete"
+);
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"
     ? t("chat.reasoning.thinking")

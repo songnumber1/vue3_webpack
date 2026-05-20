@@ -305,6 +305,7 @@ export function useChatRuntime() {
       content: "",
       reasoningContent: "",
       reasoningStatus: "thinking",
+      status: "streaming",
       createdAt: new Date().toISOString(),
     };
     const nextMessages = [...currentMessages, userMessage, assistantMessage];

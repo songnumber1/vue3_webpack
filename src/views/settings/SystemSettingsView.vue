@@ -118,6 +118,12 @@ const groups = computed(() => [
         label: "마이크 사용",
         description: "프롬프트 입력 영역의 음성 버튼 노출 여부입니다.",
       },
+      {
+        key: "showMobileApiProgress",
+        type: "switch",
+        label: "API 진행 표시",
+        description: "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다.",
+      },
     ],
   },
   {

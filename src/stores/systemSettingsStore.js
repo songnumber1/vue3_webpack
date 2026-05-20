@@ -23,6 +23,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showPersonalizationMenu: (state) => state.settings.showPersonalizationMenu,
     showPlaygroundMenu: (state) => state.settings.showPlaygroundMenu,
     showLogoutButton: (state) => state.settings.showLogoutButton,
+    showMobileApiProgress: (state) => state.settings.showMobileApiProgress,
   },
   actions: {
     hydrate() {

@@ -244,6 +244,8 @@ export function useChatContainerController(props) {
     createLocalConversation,
     appendUserAndAssistantMessages,
     setConversation,
+    selectedAssistantId,
+    selectedModel,
     scrollBottom: async (options) => {
       markForceBottom(2500);
       await scrollBottom(options);

@@ -1,6 +1,7 @@
 import {nextTick, ref} from "vue";
-import {streamText} from "@/api/mock/fakeStream";
+import {streamGeneration} from "@/api/sse/sse";
 import {logWarn} from "@/utils/logger";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 function normalizePromptPayload(payload) {
   if (typeof payload === "string")
@@ -13,11 +14,7 @@ function normalizePromptPayload(payload) {
 
 function buildMockReasoningContent(normalized) {
   const target = normalized.text || "첨부 기반 요청";
-  return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.
-
-- 요청: ${target}
-- 현재는 실제 API가 없으므로 mock reasoningContent로 추론 영역을 검증합니다.
-- 최종 답변과 구분되도록 더 작은 글자 크기와 다른 배경 스타일로 표시합니다.`;
+  return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.\n\n- 요청: ${target}\n- Assistant/Model payload를 생성했습니다.\n- 스트림 응답이 완료되기 전까지 메시지 액션은 숨김 처리됩니다.`;
 }
 
 export function updateAssistantReasoningTitle(message, status = "completed") {
@@ -25,17 +22,9 @@ export function updateAssistantReasoningTitle(message, status = "completed") {
   message.reasoningStatus = status;
 }
 
-function buildAssistantResponse(normalized) {
-  const fileSummary = normalized.attachments.length
-    ? `\n\n첨부 파일 ${normalized.attachments.length}개를 함께 받았습니다. 이미지/파일 미리보기와 메시지 액션 영역도 유지됩니다.`
-    : "";
-  return `요청하신 내용을 현재 선택된 Assistant/Model 세션 기준으로 정리하겠습니다.\n\n- 입력: ${
-    normalized.text || "첨부 기반 요청"
-  }\n- 새 대화에서는 Assistant와 모델을 변경할 수 있습니다.\n- 기존 대화방에 진입하면 해당 대화의 모델 세션이 고정되어 모델 변경이 차단됩니다.\n- 현재 응답은 실제 API 호출 구조를 모사한 mock data + adapter + business + Pinia cache 흐름으로 동작합니다.${fileSummary}`;
-}
-
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
+  const chatStreamStore = useChatStreamStore();
 
   async function handleSubmit(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -63,31 +52,45 @@ export function useChatSubmit(options) {
     await nextTick();
     await options.scrollBottom({force: true, stable: true});
 
+    assistantMessage.status = "streaming";
     assistantMessage.reasoningContent = buildMockReasoningContent(normalized);
     updateAssistantReasoningTitle(assistantMessage, "thinking");
 
     isGenerating.value = true;
+    chatStreamStore.start();
     try {
-      await streamText(
-        buildAssistantResponse(normalized),
-        (chunk) => {
-          assistantMessage.content = chunk;
-          options.setConversation(targetHistoryId, messages);
+      await streamGeneration(
+        {
+          assistantId: options.selectedAssistantId?.value || "",
+          modelId: options.selectedModel?.value || "",
+          input: normalized.text,
         },
-        {delay: 9}
+        {
+          onChunk: (content) => {
+            assistantMessage.content = content;
+            assistantMessage.status = "streaming";
+            options.setConversation(targetHistoryId, messages);
+          },
+          onComplete: () => {
+            assistantMessage.status = "complete";
+          },
+        }
       );
       updateAssistantReasoningTitle(assistantMessage, "completed");
+      assistantMessage.status = "complete";
       options.setConversation(targetHistoryId, messages);
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
       logWarn("[useChatSubmit] 스트리밍 오류:", error);
       updateAssistantReasoningTitle(assistantMessage, "completed");
+      assistantMessage.status = "error";
       assistantMessage.content =
         assistantMessage.content || "(응답 생성 중 오류가 발생했습니다.)";
       options.setConversation(targetHistoryId, messages);
     } finally {
       isGenerating.value = false;
+      chatStreamStore.finish();
     }
   }
 

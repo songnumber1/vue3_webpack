@@ -12,6 +12,7 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showPersonalizationMenu: "showPersonalizationMenu",
   showPlaygroundMenu: "showPlaygroundMenu",
   showLogoutButton: "showLogoutButton",
+  showMobileApiProgress: "showMobileApiProgress",
 });
 
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
@@ -28,6 +29,7 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.showPersonalizationMenu]: true,
   [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: false,
   [SYSTEM_SETTING_KEYS.showLogoutButton]: false,
+  [SYSTEM_SETTING_KEYS.showMobileApiProgress]: true,
 });
 
 export function normalizeSystemSettings(value = {}) {

@@ -3,6 +3,7 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 export function useChatNavigationActions({
   router,
@@ -25,7 +26,14 @@ export function useChatNavigationActions({
   clearForceBottom,
   scrollBottom,
 }) {
+  const chatStreamStore = useChatStreamStore();
+
+  function isBlockedByStream() {
+    return chatStreamStore.isStreaming;
+  }
+
   async function resetChatState({assistantId = null} = {}) {
+    if (isBlockedByStream()) return;
     revokeMessageAttachments(messages.value);
     messages.value = [];
     if (assistantId) {
@@ -55,11 +63,13 @@ export function useChatNavigationActions({
   }
 
   async function openHistory(item) {
+    if (isBlockedByStream()) return;
     navigationStore.closeTransientPanels();
     await router.push({name: "chat", params: {id: item.id}}).catch(() => {});
   }
 
   async function toggleTheme() {
+    if (isBlockedByStream()) return;
     try {
       theme.toggle();
       themeName.value = theme.current;
@@ -74,15 +84,18 @@ export function useChatNavigationActions({
   }
 
   function openSwagger() {
+    if (isBlockedByStream()) return;
     router.push("/swagger").catch(() => {});
   }
 
   function openPlayground() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     router.push({name: "playground"}).catch(() => {});
   }
 
   function openMobileDrawer() {
+    if (isBlockedByStream()) return;
     const activeElement =
       typeof document !== "undefined" ? document.activeElement : null;
     if (activeElement?.blur) activeElement.blur();
@@ -92,6 +105,7 @@ export function useChatNavigationActions({
   }
 
   function openSettings() {
+    if (isBlockedByStream()) return;
     if (isMobile.value) {
       navigationStore.setDrawerOpen(false);
       mobileSettingsOpen.value = true;
@@ -101,40 +115,48 @@ export function useChatNavigationActions({
   }
 
   function openGuide() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     router.push({name: "guide"}).catch(() => {});
   }
 
   function openNotice() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     noticeOpen.value = true;
   }
 
   function openPrivacy() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     privacyOpen.value = true;
   }
 
   function openTerms() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     router.push({name: "terms"}).catch(() => {});
   }
 
   function openPersonalization() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     personalizationOpen.value = true;
   }
 
   function openSystem() {
+    if (isBlockedByStream()) return;
     navigationStore.setDrawerOpen(false);
     systemOpen.value = true;
   }
 
   function openLanguage() {
+    if (isBlockedByStream()) return;
     languageSheetOpen.value = true;
   }
 
   async function logout() {
+    if (isBlockedByStream()) return;
     try {
       await authApiLive.logout();
     } catch (error) {
@@ -147,6 +169,7 @@ export function useChatNavigationActions({
   }
 
   function openAssistantFromHeader() {
+    if (isBlockedByStream()) return;
     assistantSheetOpen.value = true;
   }
 
