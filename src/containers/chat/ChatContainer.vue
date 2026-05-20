@@ -97,6 +97,10 @@
       @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
+    <VirtualKeyboardDebug
+      :visible="showVirtualKeyboardDebugButton"
+    />
+
     <ChatHistoryDialog
       :open="historyDialogOpen"
       :is-mobile="isMobile"
@@ -137,6 +141,7 @@
 
 <script setup>
 import {computed, provide} from "vue";
+import {storeToRefs} from "pinia";
 import {useRoute} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {
@@ -156,8 +161,12 @@ import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
+import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const route = useRoute();
+const systemSettingsStore = useSystemSettingsStore();
+const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
@@ -237,6 +246,10 @@ const {
   scrollBottom,
   handleSystemSettingsApplied,
 } = useChatContainerController(controllerProps);
+
+const showVirtualKeyboardDebugButton = computed(
+  () => isMobile.value && showVirtualKeyboardDebug.value
+);
 
 function handleMobileSettingsDesktopOpen(target) {
   mobileSettingsOpen.value = false;

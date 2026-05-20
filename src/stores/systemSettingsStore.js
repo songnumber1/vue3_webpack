@@ -12,7 +12,10 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
   getters: {
     useRealApi: (state) => state.settings.useRealApi,
     mobileBreakpoint: (state) => state.settings.mobileBreakpoint,
+    keyboardMode: (state) => state.settings.keyboardMode,
     useVirtualKeyboard: (state) => state.settings.useVirtualKeyboard,
+    showVirtualKeyboardDebug: (state) =>
+      state.settings.showVirtualKeyboardDebug,
     useMicrophone: (state) => state.settings.useMicrophone,
     showGuideButton: (state) => state.settings.showGuideButton,
     showThemeButton: (state) => state.settings.showThemeButton,

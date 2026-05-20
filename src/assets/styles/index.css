@@ -19,6 +19,7 @@
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/attachment/attachment-preview-tokens.css";
+@import "./components/debug/virtual-keyboard-debug.css";
 /* 03-2 residual overrides absorbed into final UI normalization fixes. */
 
 @import "./states/reasoning/reasoning.css";

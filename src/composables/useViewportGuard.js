@@ -1,10 +1,11 @@
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   VIEWPORT_GUARD_DELAY_MS,
 } from "@/constants/uiTokens";
+import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
 function applyBrowserViewportClass(browserFamily) {
@@ -67,16 +68,22 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     offsetTop,
   };
 }
-function setCssViewportVars(size, baselineHeight = 0) {
+function setCssViewportVars(size, baselineHeight = 0, keyboardMode, resizeEnabled) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
   const browserFamily = getMobileBrowserFamily();
-  const {layoutHeight, keyboardHeight, composerInset, offsetTop} =
-    getKeyboardMetrics(size, baselineHeight);
+  const rawMetrics = getKeyboardMetrics(size, baselineHeight);
+  const isResizeMode =
+    keyboardMode === KEYBOARD_MODES.adjustResize && resizeEnabled;
+  const layoutHeight = rawMetrics.layoutHeight;
+  const keyboardHeight = isResizeMode ? rawMetrics.keyboardHeight : 0;
+  const composerInset = isResizeMode ? rawMetrics.composerInset : 0;
+  const offsetTop = rawMetrics.offsetTop;
   const browserSafeBottom = null;
 
   applyBrowserViewportClass(browserFamily);
 
+  document.documentElement.dataset.keyboardMode = keyboardMode;
   document.documentElement.style.setProperty("--app-height", `${height}px`);
   document.documentElement.style.setProperty("--app-width", `${width}px`);
   document.documentElement.style.setProperty(
@@ -111,8 +118,30 @@ function setCssViewportVars(size, baselineHeight = 0) {
   }
   document.documentElement.style.setProperty("--vh", `${height * 0.01}px`);
 
-  return {keyboardHeight, layoutHeight};
+  return {
+    keyboardHeight,
+    layoutHeight,
+    rawKeyboardHeight: rawMetrics.keyboardHeight,
+  };
 }
+function panFocusedElementIntoView() {
+  if (typeof document === "undefined") return;
+  const activeElement = document.activeElement;
+  if (!isTextEditingElement(activeElement)) return;
+
+  window.requestAnimationFrame(() => {
+    activeElement.scrollIntoView?.({
+      block: "center",
+      inline: "nearest",
+      behavior: "smooth",
+    });
+  });
+}
+function removeKeyboardModeVars() {
+  if (typeof document === "undefined") return;
+  document.documentElement.removeAttribute("data-keyboard-mode");
+}
+
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
   const systemSettingsStore = useSystemSettingsStore();
@@ -145,9 +174,20 @@ export function useViewportGuard(options = {}) {
     if (!baselineHeight.value)
       baselineHeight.value = stableHeight || size.height;
 
-    const metrics = setCssViewportVars(size, baselineHeight.value);
+    const keyboardMode = systemSettingsStore.keyboardMode;
+    const metrics = setCssViewportVars(
+      size,
+      baselineHeight.value,
+      keyboardMode,
+      systemSettingsStore.useVirtualKeyboard
+    );
+
+    if (keyboardMode === KEYBOARD_MODES.adjustPan && isCompact.value) {
+      panFocusedElementIntoView();
+    }
 
     keyboardOpen.value =
+      keyboardMode === KEYBOARD_MODES.adjustResize &&
       systemSettingsStore.useVirtualKeyboard &&
       isCompact.value &&
       metrics.keyboardHeight > KEYBOARD_THRESHOLD_PX;
@@ -156,6 +196,7 @@ export function useViewportGuard(options = {}) {
       keyboardOpen: keyboardOpen.value,
       isCompact: isCompact.value,
     });
+    window.dispatchEvent(new CustomEvent("viewportguard:applied"));
   }
   function scheduleApply() {
     window.clearTimeout(resizeTimer);
@@ -176,6 +217,9 @@ export function useViewportGuard(options = {}) {
 
   useEventListener(window, "resize", scheduleApply, {passive: true});
   useEventListener(window, "orientationchange", scheduleApply, {passive: true});
+  useEventListener(window, "virtual-keyboard-debug:changed", scheduleApply, {
+    passive: true,
+  });
   if (typeof window !== "undefined" && window.visualViewport) {
     useEventListener(window.visualViewport, "resize", scheduleApply, {
       passive: true,
@@ -187,6 +231,16 @@ export function useViewportGuard(options = {}) {
   useEventListener(document, "focusin", scheduleApply, {passive: true});
   useEventListener(document, "focusout", scheduleApply, {passive: true});
 
+  watch(
+    () => [
+      systemSettingsStore.keyboardMode,
+      systemSettingsStore.useVirtualKeyboard,
+      systemSettingsStore.mobileBreakpoint,
+    ],
+    scheduleApply,
+    {flush: "post"}
+  );
+
   onMounted(() => {
     apply();
   });
@@ -195,6 +249,7 @@ export function useViewportGuard(options = {}) {
     window.clearTimeout(resizeTimer);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
     resizeFrame = null;
+    removeKeyboardModeVars();
   });
 
   return {

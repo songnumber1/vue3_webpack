@@ -41,6 +41,20 @@
             max="1440"
             step="1"
           />
+          <select
+            v-else-if="item.type === 'select'"
+            :id="`system-setting-${item.key}`"
+            v-model="draft[item.key]"
+            class="system-settings-select"
+          >
+            <option
+              v-for="option in item.options"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
           <span v-else class="system-settings-switch">
             <input
               :id="`system-setting-${item.key}`"
@@ -75,7 +89,10 @@
 import {computed, reactive, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {DEFAULT_SYSTEM_SETTINGS} from "@/constants/systemSettings";
+import {
+  DEFAULT_SYSTEM_SETTINGS,
+  KEYBOARD_MODE_OPTIONS,
+} from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
 const systemSettingsStore = useSystemSettingsStore();
@@ -107,10 +124,26 @@ const groups = computed(() => [
         description: "모바일 모드로 전환할 기준 너비(px)입니다.",
       },
       {
+        key: "keyboardMode",
+        type: "select",
+        label: "키보드 모드",
+        description:
+          "메인/채팅 화면에서 키보드가 올라올 때 적용할 보정 정책입니다.",
+        options: KEYBOARD_MODE_OPTIONS,
+      },
+      {
         key: "useVirtualKeyboard",
         type: "switch",
-        label: "가상 키보드 사용",
-        description: "모바일 키보드 보정 로직 사용 여부입니다.",
+        label: "키보드 보정 사용",
+        description:
+          "adjustResize 모드에서 visualViewport 기반 CSS 보정 로직을 사용합니다.",
+      },
+      {
+        key: "showVirtualKeyboardDebug",
+        type: "switch",
+        label: "가상 키보드 디버그",
+        description:
+          "모바일 모드에서만 테스트용 가상 키보드 버튼을 노출합니다.",
       },
       {
         key: "useMicrophone",
