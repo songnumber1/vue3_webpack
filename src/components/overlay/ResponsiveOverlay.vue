@@ -15,6 +15,7 @@
         <section
           :key="panelRenderKey"
           class="responsive-panel app-dialog-panel"
+          :class="panelClass"
           role="dialog"
           aria-modal="true"
           :aria-label="title"
@@ -67,6 +68,7 @@ const props = defineProps({
     default: "fullscreen",
     validator: (value) => ["fullscreen", "dialog"].includes(value),
   },
+  panelClass: {type: [String, Array, Object], default: ""},
 });
 
 defineEmits(["close"]);

@@ -1,5 +1,3 @@
-export const SYSTEM_SETTINGS_STORAGE_KEY = "ds-assistant-system-settings";
-
 export const SYSTEM_SETTING_KEYS = Object.freeze({
   useRealApi: "useRealApi",
   mobileBreakpoint: "mobileBreakpoint",
@@ -17,19 +15,19 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
 });
 
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
-  [SYSTEM_SETTING_KEYS.useRealApi]: true,
+  [SYSTEM_SETTING_KEYS.useRealApi]: false,
   [SYSTEM_SETTING_KEYS.mobileBreakpoint]: 768,
-  [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
-  [SYSTEM_SETTING_KEYS.useMicrophone]: true,
-  [SYSTEM_SETTING_KEYS.showGuideButton]: true,
-  [SYSTEM_SETTING_KEYS.showThemeButton]: true,
-  [SYSTEM_SETTING_KEYS.showSwaggerButton]: true,
+  [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: false,
+  [SYSTEM_SETTING_KEYS.useMicrophone]: false,
+  [SYSTEM_SETTING_KEYS.showGuideButton]: false,
+  [SYSTEM_SETTING_KEYS.showThemeButton]: false,
+  [SYSTEM_SETTING_KEYS.showSwaggerButton]: false,
   [SYSTEM_SETTING_KEYS.showNoticeMenu]: true,
   [SYSTEM_SETTING_KEYS.showPrivacyMenu]: true,
   [SYSTEM_SETTING_KEYS.showTermsMenu]: true,
   [SYSTEM_SETTING_KEYS.showPersonalizationMenu]: true,
-  [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: true,
-  [SYSTEM_SETTING_KEYS.showLogoutButton]: true,
+  [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: false,
+  [SYSTEM_SETTING_KEYS.showLogoutButton]: false,
 });
 
 export function normalizeSystemSettings(value = {}) {
@@ -49,22 +47,4 @@ export function normalizeSystemSettings(value = {}) {
   });
 
   return next;
-}
-
-export function readStoredSystemSettings() {
-  if (typeof window === "undefined") return {...DEFAULT_SYSTEM_SETTINGS};
-  try {
-    const raw = window.localStorage.getItem(SYSTEM_SETTINGS_STORAGE_KEY);
-    return normalizeSystemSettings(raw ? JSON.parse(raw) : {});
-  } catch (error) {
-    return {...DEFAULT_SYSTEM_SETTINGS};
-  }
-}
-
-export function writeStoredSystemSettings(settings) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(
-    SYSTEM_SETTINGS_STORAGE_KEY,
-    JSON.stringify(normalizeSystemSettings(settings))
-  );
 }

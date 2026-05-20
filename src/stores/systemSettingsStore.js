@@ -2,8 +2,6 @@ import {defineStore} from "pinia";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   normalizeSystemSettings,
-  readStoredSystemSettings,
-  writeStoredSystemSettings,
 } from "@/constants/systemSettings";
 
 export const useSystemSettingsStore = defineStore("systemSettings", {
@@ -28,12 +26,11 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
   },
   actions: {
     hydrate() {
-      this.settings = readStoredSystemSettings();
+      this.settings = normalizeSystemSettings(this.settings);
       this.hydrated = true;
     },
     applySettings(nextSettings) {
       this.settings = normalizeSystemSettings(nextSettings);
-      writeStoredSystemSettings(this.settings);
       this.hydrated = true;
     },
   },

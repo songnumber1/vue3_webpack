@@ -23,7 +23,10 @@
           </button>
         </header>
 
-        <main class="mobile-settings-body">
+        <main
+          class="mobile-settings-body"
+          :class="{'mobile-settings-body--system': activeMenu === 'system'}"
+        >
           <nav
             v-if="!activeMenu"
             class="mobile-settings-list"
@@ -49,7 +52,11 @@
             </button>
           </nav>
 
-          <section v-else class="mobile-settings-detail">
+          <section
+            v-else
+            class="mobile-settings-detail"
+            :class="{'mobile-settings-detail--system': activeMenu === 'system'}"
+          >
             <div
               v-if="activeMenu === 'guide'"
               class="guide-grid guide-grid--settings"

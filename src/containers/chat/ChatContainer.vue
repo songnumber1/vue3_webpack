@@ -74,6 +74,7 @@
       title="시스템"
       subtitle="앱 동작과 화면 노출 설정"
       mobile-mode="dialog"
+      panel-class="responsive-panel--system-settings"
       @close="systemOpen = false"
     >
       <SystemSettingsView

@@ -1435,3 +1435,125 @@ body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .model-trigger
   font-size: var(--text-size-title-sm) !important;
   line-height: 1.2;
 }
+
+/* System settings dialog should have only the inner content scroll area.
+   This prevents the resized mobile -> desktop dialog from showing both a panel
+   scrollbar and a content scrollbar. */
+.responsive-panel--system-settings {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.responsive-panel--system-settings .responsive-panel-body {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.responsive-panel--system-settings .system-settings-view {
+  width: 100%;
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+}
+
+.responsive-panel--system-settings .system-settings-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-overlay--desktop .responsive-panel--system-settings {
+  height: min(760px, calc(100vh - 56px));
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel--system-settings {
+  height: min(760px, calc(var(--app-height, 100vh) - 48px));
+  max-height: calc(var(--app-height, 100vh) - 48px) !important;
+}
+
+/* System settings footer/action refinements.
+   Keep the mobile settings page from becoming the scroll container when the
+   System panel is open; only the settings content area should scroll while the
+   footer stays fixed at the visible bottom. */
+.mobile-settings-body.mobile-settings-body--system {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-view {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 26px 20px !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-footer {
+  position: sticky !important;
+  bottom: 0 !important;
+  flex: 0 0 auto !important;
+  z-index: 5 !important;
+  padding: 12px 26px calc(12px + env(safe-area-inset-bottom)) !important;
+  background: var(--surface-elevated, var(--surface, #fff)) !important;
+  box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.system-settings-footer .playground-button {
+  min-width: 86px;
+  min-height: 44px;
+  border-radius: var(--dialog-action-square-radius, 5px);
+  font-family: var(--font-family);
+  font-size: var(--dialog-action-font-size);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.system-settings-footer .playground-button--primary,
+.system-settings-footer .system-settings-apply-button {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.system-settings-footer .playground-button--primary:hover,
+.system-settings-footer .playground-button--primary:focus-visible,
+.system-settings-footer .system-settings-apply-button:hover,
+.system-settings-footer .system-settings-apply-button:focus-visible {
+  border-color: var(--primary-strong, var(--primary)) !important;
+  background: var(--primary-strong, var(--primary)) !important;
+  color: #fff !important;
+}
+
+body.mobile-mode .system-settings-footer .playground-button {
+  min-width: 96px;
+  min-height: 48px;
+  font-size: var(--text-size-body, 15px);
+  font-weight: 900;
+}

@@ -1,10 +1,8 @@
-import {
-  DEFAULT_SYSTEM_SETTINGS,
-  readStoredSystemSettings,
-} from "@/constants/systemSettings";
+import {getActivePinia} from "pinia";
+import {DEFAULT_SYSTEM_SETTINGS} from "@/constants/systemSettings";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 export function getRuntimeSystemSettings() {
-  return typeof window === "undefined"
-    ? {...DEFAULT_SYSTEM_SETTINGS}
-    : readStoredSystemSettings();
+  if (!getActivePinia()) return {...DEFAULT_SYSTEM_SETTINGS};
+  return {...useSystemSettingsStore().settings};
 }

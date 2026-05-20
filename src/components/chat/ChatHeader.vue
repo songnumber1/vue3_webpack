@@ -96,6 +96,7 @@
         @privacy="chatActions.openPrivacy()"
         @terms="chatActions.openTerms()"
         @personalization="chatActions.openPersonalization()"
+        @system="chatActions.openSystem()"
         @language="chatActions.openLanguage()"
         @playground="chatActions.openPlayground()"
         @logout="chatActions.logout()"

@@ -61,7 +61,12 @@
       >
         닫기
       </button>
-      <button class="playground-button" type="submit">적용</button>
+      <button
+        class="playground-button playground-button--primary system-settings-apply-button"
+        type="submit"
+      >
+        적용
+      </button>
     </footer>
   </form>
 </template>
@@ -86,7 +91,7 @@ const groups = computed(() => [
       {
         key: "useRealApi",
         type: "switch",
-        label: "실제 api 통신 여부",
+        label: "실제 api 통신",
         description: "끄면 프론트엔드 mock 데이터를 사용합니다.",
       },
     ],
@@ -104,13 +109,13 @@ const groups = computed(() => [
       {
         key: "useVirtualKeyboard",
         type: "switch",
-        label: "가상 키보드 사용 여부",
+        label: "가상 키보드 사용",
         description: "모바일 키보드 보정 로직 사용 여부입니다.",
       },
       {
         key: "useMicrophone",
         type: "switch",
-        label: "마이크 사용 여부",
+        label: "마이크 사용",
         description: "프롬프트 입력 영역의 음성 버튼 노출 여부입니다.",
       },
     ],
@@ -122,19 +127,19 @@ const groups = computed(() => [
       {
         key: "showGuideButton",
         type: "switch",
-        label: "가이드 버튼 화면 출력 여부",
+        label: "가이드 버튼 화면 출력",
         description: "헤더와 모바일 설정의 가이드 진입 버튼을 제어합니다.",
       },
       {
         key: "showThemeButton",
         type: "switch",
-        label: "테마 버튼 출력 여부",
+        label: "테마 버튼 출력",
         description: "테마 전환 버튼 노출 여부입니다.",
       },
       {
         key: "showSwaggerButton",
         type: "switch",
-        label: "swagger 버튼 출력 여부",
+        label: "swagger 버튼 출력",
         description: "Swagger 문서 버튼 노출 여부입니다.",
       },
     ],
@@ -146,37 +151,37 @@ const groups = computed(() => [
       {
         key: "showNoticeMenu",
         type: "switch",
-        label: "공지 사항 출력 여부",
+        label: "공지 사항 출력",
         description: "사용자 메뉴와 모바일 설정의 공지 사항 노출 여부입니다.",
       },
       {
         key: "showPrivacyMenu",
         type: "switch",
-        label: "개인정보 처리 방침 출력 여부",
+        label: "개인정보 처리 방침 출력",
         description: "개인정보 처리 방침 메뉴 노출 여부입니다.",
       },
       {
         key: "showTermsMenu",
         type: "switch",
-        label: "이용 약관 출력 여부",
+        label: "이용 약관 출력",
         description: "이용 약관 메뉴 노출 여부입니다.",
       },
       {
         key: "showPersonalizationMenu",
         type: "switch",
-        label: "개인화 출력 여부",
+        label: "개인화 출력",
         description: "기존 개인화 메뉴 노출 여부입니다.",
       },
       {
         key: "showPlaygroundMenu",
         type: "switch",
-        label: "플레이 그라운드 출력 여부",
+        label: "플레이 그라운드 출력",
         description: "Playground 진입 버튼과 메뉴 노출 여부입니다.",
       },
       {
         key: "showLogoutButton",
         type: "switch",
-        label: "로그아웃 버튼 출력 여부",
+        label: "로그아웃 버튼 출력",
         description: "로그아웃 버튼 노출 여부입니다.",
       },
     ],
