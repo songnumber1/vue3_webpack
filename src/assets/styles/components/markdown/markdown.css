@@ -274,6 +274,10 @@ body.mobile-mode .md-table-wrapper table {
   gap: 6px;
   flex: 0 0 auto;
 }
+.md-mermaid-card:not([data-mermaid-rendered="true"]) .md-mermaid-action--svg {
+  display: none;
+}
+
 .md-mermaid-action {
   display: inline-flex;
   align-items: center;

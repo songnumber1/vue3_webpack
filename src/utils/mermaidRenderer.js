@@ -111,6 +111,27 @@ async function ensureMermaid() {
 
   return mermaid;
 }
+function resolveMermaidCard(target) {
+  return target?.closest?.(".md-mermaid-card") || null;
+}
+
+function markMermaidCardState(target, state) {
+  const card = resolveMermaidCard(target);
+  if (!card) return;
+
+  card.removeAttribute("data-mermaid-rendered");
+  card.removeAttribute("data-mermaid-error");
+
+  if (state === "rendered") {
+    card.setAttribute("data-mermaid-rendered", "true");
+    return;
+  }
+
+  if (state === "error") {
+    card.setAttribute("data-mermaid-error", "true");
+  }
+}
+
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
     root.querySelectorAll(".md-mermaid[data-processed]")
@@ -122,6 +143,7 @@ function resetRenderedMermaid(root) {
 
     target.removeAttribute("data-processed");
     target.setAttribute("data-mermaid-pending", "true");
+    markMermaidCardState(target, "pending");
     target.textContent = source;
   });
 }
@@ -149,16 +171,22 @@ export async function renderMermaidInElement(root, options = {}) {
   targets.forEach((target) => {
     target.removeAttribute("data-mermaid-pending");
     target.removeAttribute("data-mermaid-error");
+    markMermaidCardState(target, "pending");
   });
 
   try {
     await mermaid.run({nodes: targets});
+    targets.forEach((target) => {
+      const hasRenderedSvg = Boolean(target.querySelector("svg"));
+      markMermaidCardState(target, hasRenderedSvg ? "rendered" : "error");
+    });
   } catch (error) {
     logWarn("Mermaid rendering failed.", error);
     targets.forEach((target) => {
       const source =
         target.getAttribute("data-mermaid-source") || target.textContent || "";
       target.setAttribute("data-mermaid-error", "true");
+      markMermaidCardState(target, "error");
       target.textContent = source;
     });
   }
