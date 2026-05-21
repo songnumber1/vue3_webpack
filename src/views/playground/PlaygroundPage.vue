@@ -160,7 +160,7 @@
     >
       <div class="playground-popup-content">
         <div class="playground-popup-icon" aria-hidden="true">
-          {{ activePopup.icon }}
+          <img :src="activePopup.iconSrc" alt="" />
         </div>
         <p class="playground-popup-message">
           {{ activePopup.message }}
@@ -223,6 +223,9 @@ import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import infoIcon from "@/assets/img/icons/info.svg";
+import questionIcon from "@/assets/img/icons/question.svg";
+import warningIcon from "@/assets/img/icons/warning.svg";
 
 const {t} = useI18n();
 const {appInfo} = useAppContext();
@@ -241,7 +244,7 @@ const sheetItems = ["옵션 A", "옵션 B", "옵션 C"];
 const popupSamples = {
   alert: {
     type: "alert",
-    icon: "i",
+    iconSrc: infoIcon,
     title: "알림 팝업",
     subtitle: "일반 안내 메시지",
     message: "저장이 완료되었습니다.",
@@ -250,7 +253,7 @@ const popupSamples = {
   },
   warning: {
     type: "warning",
-    icon: "!",
+    iconSrc: warningIcon,
     title: "경고 팝업",
     subtitle: "주의가 필요한 작업",
     message: "입력값을 다시 확인해 주세요.",
@@ -259,7 +262,7 @@ const popupSamples = {
   },
   confirm: {
     type: "confirm",
-    icon: "?",
+    iconSrc: questionIcon,
     title: "확인 팝업",
     subtitle: "사용자 선택 필요",
     message: "선택한 대화를 삭제하시겠습니까?",

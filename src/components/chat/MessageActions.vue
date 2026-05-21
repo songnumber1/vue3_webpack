@@ -10,16 +10,7 @@
           :title="t('feedback.like')"
           @click="setFeedback(FEEDBACK_ACTIONS.LIKE)"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M7.8 21H5.3A2.3 2.3 0 0 1 3 18.7v-7.1a2.3 2.3 0 0 1 2.3-2.3h2.5m0 11.7V9.3m0 11.7h8.5a2.4 2.4 0 0 0 2.3-1.8l1.5-6.3a2.2 2.2 0 0 0-2.1-2.7h-4.3l.7-3.1a3 3 0 0 0-.8-2.8l-.4-.4a1.3 1.3 0 0 0-2 .2L7.8 9.3"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.9"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <img class="message-action-img" :src="likeIcon" alt="" aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -29,16 +20,7 @@
           :title="t('feedback.dislike')"
           @click="setFeedback(FEEDBACK_ACTIONS.DISLIKE)"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M16.2 3h2.5A2.3 2.3 0 0 1 21 5.3v7.1a2.3 2.3 0 0 1-2.3 2.3h-2.5m0-11.7v11.7m0-11.7H7.7a2.4 2.4 0 0 0-2.3 1.8L3.9 11.1a2.2 2.2 0 0 0 2.1 2.7h4.3l-.7 3.1a3 3 0 0 0 .8 2.8l.4.4a1.3 1.3 0 0 0 2-.2l3.4-5.2"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.9"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <img class="message-action-img" :src="dislikeIcon" alt="" aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -63,21 +45,7 @@
         :title="t('feedback.copy')"
         @click="copy"
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M8 8.5A2.5 2.5 0 0 1 10.5 6h7A2.5 2.5 0 0 1 20 8.5v9A2.5 2.5 0 0 1 17.5 20h-7A2.5 2.5 0 0 1 8 17.5v-9Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.9"
-          />
-          <path
-            d="M5 15.5H4.8A2.8 2.8 0 0 1 2 12.7V4.8A2.8 2.8 0 0 1 4.8 2h7.9A2.8 2.8 0 0 1 15.5 4.8V5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.9"
-            stroke-linecap="round"
-          />
-        </svg>
+        <img class="message-action-img" :src="copyIcon" alt="" aria-hidden="true" />
       </button>
     </div>
 
@@ -154,6 +122,9 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
+import copyIcon from "@/assets/img/icons/copy.svg";
+import dislikeIcon from "@/assets/img/icons/dislike.svg";
+import likeIcon from "@/assets/img/icons/like.svg";
 import {copyClipboardByPlatform} from "@/services/platformBridge";
 import {logWarn} from "@/utils/logger";
 

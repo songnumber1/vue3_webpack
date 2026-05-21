@@ -1234,3 +1234,31 @@ html.is-prompt-menu-open .scroll-bottom-button {
   border-radius: 0;
   border: 0;
 }
+
+/* Asset-based icon rendering */
+.app-icon,
+.nav-icon,
+.prompt-button-icon,
+.prompt-menu-icon,
+.bottom-sheet-option-icon,
+.mobile-settings-item-icon,
+.chat-history-action-icon,
+.message-action-img,
+.shared-readonly-icon img,
+.auth-required-icon img,
+.toolbar-link img,
+.playground-popup-icon img {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
+.prompt-menu-icon,
+.bottom-sheet-option-icon,
+.mobile-settings-item-icon,
+.chat-history-action-icon {
+  margin-right: 0;
+}

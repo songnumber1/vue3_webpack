@@ -1,65 +1,21 @@
 <template>
-  <component :is="bare ? 'svg' : 'span'" v-bind="rootAttrs">
-    <svg
-      v-if="!bare"
-      class="nav-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-      v-html="pathMarkup"
-    />
-    <template v-else>
-      <path v-for="(path, index) in paths" :key="index" v-bind="path" />
-      <circle
-        v-for="(circle, index) in circles"
-        :key="`circle-${index}`"
-        v-bind="circle"
-      />
-      <rect
-        v-for="(rect, index) in rects"
-        :key="`rect-${index}`"
-        v-bind="rect"
-      />
-    </template>
+  <component :is="bare ? 'img' : 'span'" v-bind="rootAttrs">
+    <img v-if="!bare" class="nav-icon" :src="iconSrc" alt="" aria-hidden="true" />
   </component>
 </template>
 
 <script setup>
 import {computed} from "vue";
+import navChatIcon from "@/assets/img/icons/nav-chat.svg";
+import navPanelIcon from "@/assets/img/icons/nav-panel.svg";
+import navPencilIcon from "@/assets/img/icons/nav-pencil.svg";
+import navSearchIcon from "@/assets/img/icons/nav-search.svg";
 
 const ICONS = {
-  pencil: {
-    markup:
-      '<path d="M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"/><path d="M13.4 7.1 16.9 10.6"/>',
-    paths: [
-      {d: "M4 16.5V20h3.5L18.1 9.4 14.6 5.9 4 16.5Z"},
-      {d: "M13.4 7.1 16.9 10.6"},
-    ],
-  },
-  search: {
-    markup: '<circle cx="10.5" cy="10.5" r="5.8"/><path d="M15 15 20 20"/>',
-    circles: [{cx: "10.5", cy: "10.5", r: "5.8"}],
-    paths: [{d: "M15 15 20 20"}],
-  },
-  panel: {
-    markup:
-      '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 4v16"/>',
-    rects: [{x: "4", y: "4", width: "16", height: "16", rx: "3"}],
-    paths: [{d: "M9 4v16"}],
-  },
-  chat: {
-    markup:
-      '<path d="M5 6.8A4 4 0 0 1 9 3h6a4 4 0 0 1 4 4v4.3a4 4 0 0 1-4 4H9.3L5 20v-4.7a4 4 0 0 1-1-2.7V6.8Z"/>',
-    paths: [
-      {
-        d: "M5 6.8A4 4 0 0 1 9 3h6a4 4 0 0 1 4 4v4.3a4 4 0 0 1-4 4H9.3L5 20v-4.7a4 4 0 0 1-1-2.7V6.8Z",
-      },
-    ],
-  },
+  pencil: navPencilIcon,
+  search: navSearchIcon,
+  panel: navPanelIcon,
+  chat: navChatIcon,
 };
 
 const props = defineProps({
@@ -67,23 +23,10 @@ const props = defineProps({
   bare: {type: Boolean, default: false},
 });
 
-const icon = computed(() => ICONS[props.name] || ICONS.chat);
-const pathMarkup = computed(() => icon.value.markup);
-const paths = computed(() => icon.value.paths || []);
-const circles = computed(() => icon.value.circles || []);
-const rects = computed(() => icon.value.rects || []);
+const iconSrc = computed(() => ICONS[props.name] || ICONS.chat);
 const rootAttrs = computed(() =>
   props.bare
-    ? {
-        class: "nav-icon",
-        viewBox: "0 0 24 24",
-        fill: "none",
-        stroke: "currentColor",
-        "stroke-width": "2",
-        "stroke-linecap": "round",
-        "stroke-linejoin": "round",
-        "aria-hidden": "true",
-      }
+    ? {class: "nav-icon", src: iconSrc.value, alt: "", "aria-hidden": "true"}
     : {class: "icon-wrap"}
 );
 </script>

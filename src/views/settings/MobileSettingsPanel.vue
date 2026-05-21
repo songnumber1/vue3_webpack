@@ -39,9 +39,7 @@
               type="button"
               @click="selectMenuItem(item.key)"
             >
-              <span class="mobile-settings-item-icon" aria-hidden="true">{{
-                item.icon
-              }}</span>
+              <img class="mobile-settings-item-icon" :src="item.iconSrc" alt="" aria-hidden="true" />
               <span>
                 <strong>{{ item.label }}</strong>
                 <small>{{ item.description }}</small>
@@ -129,6 +127,14 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
+import chatManagementIcon from "@/assets/img/icons/chat-management.svg";
+import guideIcon from "@/assets/img/icons/question.svg";
+import languageIcon from "@/assets/img/icons/language.svg";
+import noticeIcon from "@/assets/img/icons/info.svg";
+import personalizationIcon from "@/assets/img/icons/personalization.svg";
+import privacyIcon from "@/assets/img/icons/privacy.svg";
+import settingsIcon from "@/assets/img/icons/settings.svg";
+import termsIcon from "@/assets/img/icons/terms.svg";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -145,56 +151,56 @@ const menuItems = computed(() =>
   [
     {
       key: "guide",
-      icon: "?",
+      iconSrc: guideIcon,
       label: t("common.guide"),
       description: t("guide.subtitle"),
       visible: systemSettings.value.showGuideButton,
     },
     {
       key: "notice",
-      icon: "!",
+      iconSrc: noticeIcon,
       label: t("common.notice"),
       description: t("menu.noticeSummary"),
       visible: systemSettings.value.showNoticeMenu,
     },
     {
       key: "privacy",
-      icon: "P",
+      iconSrc: privacyIcon,
       label: t("common.privacy"),
       description: t("menu.privacySummary"),
       visible: systemSettings.value.showPrivacyMenu,
     },
     {
       key: "terms",
-      icon: "T",
+      iconSrc: termsIcon,
       label: t("common.terms"),
       description: t("menu.termsSummary"),
       visible: systemSettings.value.showTermsMenu,
     },
     {
       key: "personalization",
-      icon: "★",
+      iconSrc: personalizationIcon,
       label: t("common.personalization"),
       description: t("menu.personalizationSummary"),
       visible: systemSettings.value.showPersonalizationMenu,
     },
     {
       key: "system",
-      icon: "⚙",
+      iconSrc: settingsIcon,
       label: "시스템",
       description: "앱 동작과 화면 노출 설정을 관리합니다.",
       visible: true,
     },
     {
       key: "chatManagement",
-      icon: "#",
+      iconSrc: chatManagementIcon,
       label: t("settings.chatManagement"),
       description: t("settings.chatManagementSummary"),
       visible: true,
     },
     {
       key: "language",
-      icon: "A",
+      iconSrc: languageIcon,
       label: t("common.language"),
       description: t("menu.languageSummary"),
       visible: true,

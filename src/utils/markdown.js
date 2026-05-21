@@ -9,6 +9,9 @@ import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
+import copyIcon from "@/assets/img/icons/copy.svg";
+import mermaidCodeIcon from "@/assets/img/icons/mermaid-code.svg";
+import mermaidSvgIcon from "@/assets/img/icons/mermaid-svg.svg";
 
 function textContent(node) {
   if (!node) return "";
@@ -53,81 +56,25 @@ function tableActionButton(action, label) {
   };
 }
 
-function svgElement(children) {
+function mermaidIcon(action) {
+  const iconSrc = {
+    copy: copyIcon,
+    svg: mermaidSvgIcon,
+    code: mermaidCodeIcon,
+  }[action] || copyIcon;
+
   return {
     type: "element",
-    tagName: "svg",
+    tagName: "img",
     properties: {
-      className: ["md-mermaid-action-icon"],
-      viewBox: "0 0 24 24",
-      fill: "none",
-      stroke: "currentColor",
-      strokeWidth: "1.7",
-      strokeLinecap: "round",
-      strokeLinejoin: "round",
+      className: ["md-mermaid-action-icon", `md-mermaid-action-icon--${action}`],
+      src: iconSrc,
+      alt: "",
       ariaHidden: "true",
       focusable: "false",
     },
-    children,
-  };
-}
-
-function svgPath(d) {
-  return {
-    type: "element",
-    tagName: "path",
-    properties: {d},
     children: [],
   };
-}
-
-function svgLine(x1, y1, x2, y2) {
-  return {
-    type: "element",
-    tagName: "line",
-    properties: {x1, y1, x2, y2},
-    children: [],
-  };
-}
-
-function svgPolyline(points) {
-  return {
-    type: "element",
-    tagName: "polyline",
-    properties: {points},
-    children: [],
-  };
-}
-
-function svgRect(x, y, width, height, rx = "2") {
-  return {
-    type: "element",
-    tagName: "rect",
-    properties: {x, y, width, height, rx, ry: rx},
-    children: [],
-  };
-}
-
-function mermaidIcon(action) {
-  const icons = {
-    copy: svgElement([
-      svgRect("9", "9", "13", "13", "2"),
-      svgPath("M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"),
-    ]),
-    svg: svgElement([
-      svgPath("M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"),
-      svgPolyline("14 2 14 8 20 8"),
-      svgPath("M12 18v-6"),
-      svgPolyline("9 15 12 18 15 15"),
-    ]),
-    code: svgElement([
-      svgPolyline("8 17 3 12 8 7"),
-      svgPolyline("16 7 21 12 16 17"),
-      svgLine("14", "4", "10", "20"),
-    ]),
-  };
-
-  return icons[action] || icons.copy;
 }
 
 function mermaidActionButton(action, label) {

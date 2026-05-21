@@ -30,7 +30,6 @@
           :disabled="interactionBlocked"
           @click="handleSuggestionClick(item)"
         >
-          <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>

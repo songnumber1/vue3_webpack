@@ -16,7 +16,7 @@
         type="button"
         @click="$emit('select', action.key)"
       >
-        <span aria-hidden="true">{{ action.icon }}</span>
+        <img class="chat-history-action-icon" :src="action.iconSrc" alt="" aria-hidden="true" />
         <strong>{{ action.label }}</strong>
       </button>
     </div>
@@ -44,7 +44,7 @@
             role="menuitem"
             @click="$emit('select', action.key)"
           >
-            <span aria-hidden="true">{{ action.icon }}</span>
+            <img class="chat-history-action-icon" :src="action.iconSrc" alt="" aria-hidden="true" />
             <span>{{ action.label }}</span>
           </button>
         </div>
@@ -58,6 +58,10 @@ import {computed, nextTick, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import deleteIcon from "@/assets/img/icons/history-delete.svg";
+import pinIcon from "@/assets/img/icons/history-pin.svg";
+import renameIcon from "@/assets/img/icons/history-rename.svg";
+import shareIcon from "@/assets/img/icons/history-share.svg";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -104,16 +108,16 @@ const targetTitle = computed(
 );
 const actions = computed(() => {
   const pinAction = props.target?.isPinned
-    ? {key: "unpin", label: t("chat.historyMenu.unpin"), icon: "☆"}
-    : {key: "pin", label: t("chat.historyMenu.pin"), icon: "★"};
+    ? {key: "unpin", label: t("chat.historyMenu.unpin"), iconSrc: pinIcon}
+    : {key: "pin", label: t("chat.historyMenu.pin"), iconSrc: pinIcon};
   return [
     pinAction,
-    {key: "rename", label: t("chat.historyMenu.rename"), icon: "✎"},
-    {key: "share", label: t("chat.historyMenu.share"), icon: "↗"},
+    {key: "rename", label: t("chat.historyMenu.rename"), iconSrc: renameIcon},
+    {key: "share", label: t("chat.historyMenu.share"), iconSrc: shareIcon},
     {
       key: "delete",
       label: t("chat.historyMenu.delete"),
-      icon: "🗑",
+      iconSrc: deleteIcon,
       danger: true,
     },
   ];

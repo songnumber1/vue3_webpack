@@ -11,14 +11,7 @@
           :aria-expanded="reasoningOpen"
           @click="reasoningOpen = !reasoningOpen"
         >
-          <svg
-            class="reasoning-chevron"
-            aria-hidden="true"
-            viewBox="0 0 16 16"
-            focusable="false"
-          >
-            <path d="M6 4l4 4-4 4" />
-          </svg>
+          <img class="reasoning-chevron" :src="chevronRightIcon" alt="" aria-hidden="true" />
           <span>{{ reasoningTitle }}</span>
         </button>
         <div
@@ -53,6 +46,7 @@ import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {useMarkdownMessageInteractions} from "@/composables/useMarkdownMessageInteractions";
 import MessageActions from "./MessageActions.vue";
+import chevronRightIcon from "@/assets/img/icons/chevron-right.svg";
 
 const props = defineProps({
   message: {type: Object, required: true},

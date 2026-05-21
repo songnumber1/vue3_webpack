@@ -361,3 +361,13 @@ body.mobile-mode .md-table-wrapper table {
 .md-mermaid-action-icon polyline {
   vector-effect: non-scaling-stroke;
 }
+
+/* Markdown toolbar icons are loaded from assets/img. */
+.md-mermaid-action-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+  flex: 0 0 15px;
+  pointer-events: none;
+}

@@ -11,16 +11,7 @@
           @click="$emit('open-model')"
         >
           <span>{{ currentModel.label }}</span>
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path
-              d="M5.5 7.5 10 12l4.5-4.5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <img class="prompt-button-icon" :src="chevronDownIcon" alt="" aria-hidden="true" />
         </button>
         <div
           v-if="modelMenuOpen && !isMobileSheet"
@@ -74,7 +65,7 @@
             "
             @click="handleToolClick(tool)"
           >
-            <span aria-hidden="true">{{ tool.icon }}</span>
+            <img v-if="tool.iconSrc" class="prompt-menu-icon" :src="tool.iconSrc" alt="" aria-hidden="true" />
             <p>{{ tool.label }}</p>
             <span
               v-if="hasChildren(tool) && tool.active && !isSwitchParent(tool)"
@@ -148,16 +139,7 @@
           :disabled="disabled"
           @click="$emit('open-attach')"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M21.4 11.6 12.1 20.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4.1 4.1 0 0 1 5.8 5.8l-9.4 9.4a2.2 2.2 0 1 1-3.1-3.1l8.6-8.6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+          <img class="prompt-button-icon" :src="paperclipIcon" alt="" aria-hidden="true" />
         </button>
         <div
           v-if="attachMenuOpen && !isMobileSheet"
@@ -173,7 +155,7 @@
             role="menuitem"
             @click="$emit('open-file-picker', option.id)"
           >
-            <span aria-hidden="true">{{ option.icon }}</span>
+            <img v-if="option.iconSrc" class="prompt-menu-icon" :src="option.iconSrc" alt="" aria-hidden="true" />
             <p>{{ option.label }}</p>
           </button>
         </div>
@@ -189,24 +171,7 @@
       :aria-label="voiceStartLabel"
       @click="$emit('start-voice')"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
+      <img class="prompt-button-icon" :src="micIcon" alt="" aria-hidden="true" />
     </button>
 
     <button
@@ -239,6 +204,9 @@ import {computed, nextTick, ref, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
+import chevronDownIcon from "@/assets/img/icons/chevron-down.svg";
+import micIcon from "@/assets/img/icons/mic.svg";
+import paperclipIcon from "@/assets/img/icons/paperclip.svg";
 
 const {t} = useI18n();
 

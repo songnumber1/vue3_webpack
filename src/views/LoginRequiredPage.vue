@@ -2,11 +2,7 @@
   <main class="auth-required-page" role="main">
     <section class="auth-required-card" aria-labelledby="auth-required-title">
       <div class="auth-required-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" focusable="false">
-          <path
-            d="M12 2.75a5.25 5.25 0 0 0-5.25 5.25v2.25H6A2.25 2.25 0 0 0 3.75 12.5v6.25A2.25 2.25 0 0 0 6 21h12a2.25 2.25 0 0 0 2.25-2.25V12.5A2.25 2.25 0 0 0 18 10.25h-.75V8A5.25 5.25 0 0 0 12 2.75Zm3.75 7.5h-7.5V8a3.75 3.75 0 1 1 7.5 0v2.25ZM12 14a1.25 1.25 0 0 1 .75 2.25v1a.75.75 0 0 1-1.5 0v-1A1.25 1.25 0 0 1 12 14Z"
-          />
-        </svg>
+        <img :src="authLockIcon" alt="" />
       </div>
       <h1 id="auth-required-title">{{ t("loginRequired.title") }}</h1>
       <p>{{ message }}</p>
@@ -44,6 +40,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
+import authLockIcon from "@/assets/img/icons/auth-lock.svg";
 
 const route = useRoute();
 const router = useRouter();

@@ -1,4 +1,13 @@
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import cameraIcon from "@/assets/img/icons/camera.svg";
+import fileIcon from "@/assets/img/icons/file.svg";
+import imageFileIcon from "@/assets/img/icons/image.svg";
+import knowledgeIcon from "@/assets/img/icons/knowledge.svg";
+import promptFindIcon from "@/assets/img/icons/prompt-find.svg";
+import promptImageIcon from "@/assets/img/icons/prompt-image.svg";
+import promptWriteIcon from "@/assets/img/icons/prompt-write.svg";
+import webSearchIcon from "@/assets/img/icons/web-search.svg";
+
 
 export const PROMPT_VIEWPORT_QUERY = `(max-width: ${MOBILE_BREAKPOINT_PX}px)`;
 export const PROMPT_MENU_TYPE = Object.freeze({
@@ -55,25 +64,25 @@ export const PROMPT_TOOL_CONTROL_TYPE = Object.freeze({
 export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
   {
     id: "image",
-    icon: "▧",
+    iconSrc: promptImageIcon,
     labelKey: "chat.suggestions.image",
     prompt: "이미지 생성 프롬프트를 만들어줘",
   },
   {
     id: "write",
-    icon: "✎",
+    iconSrc: promptWriteIcon,
     labelKey: "chat.suggestions.writing",
     prompt: "아래 내용을 더 자연스럽게 다듬어줘",
   },
   {
     id: "find",
-    icon: "◎",
+    iconSrc: promptFindIcon,
     labelKey: "chat.suggestions.search",
     prompt: "프로젝트에서 빠진 항목을 찾아줘",
   },
   {
     id: "knowledge-search",
-    icon: "⌕",
+    iconSrc: knowledgeIcon,
     labelKey: "chat.suggestions.knowledgeSearch",
     settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
     selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
@@ -81,7 +90,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
     children: [
       {
         id: "knowledge-paper",
-        icon: "◫",
+        iconSrc: fileIcon,
         labelKey: "chat.suggestions.knowledge.paper",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
@@ -89,7 +98,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
       },
       {
         id: "knowledge-confluence",
-        icon: "◆",
+        iconSrc: knowledgeIcon,
         labelKey: "chat.suggestions.knowledge.confluence",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
@@ -97,7 +106,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
       },
       {
         id: "knowledge-jira",
-        icon: "◇",
+        iconSrc: knowledgeIcon,
         labelKey: "chat.suggestions.knowledge.jira",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.knowledge,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.multiple,
@@ -107,7 +116,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
   },
   {
     id: "web-search",
-    icon: "◉",
+    iconSrc: webSearchIcon,
     labelKey: "chat.suggestions.webSearch",
     settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
     selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
@@ -116,7 +125,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
     children: [
       {
         id: "web-perplexity",
-        icon: "P",
+        iconSrc: webSearchIcon,
         labelKey: "chat.suggestions.web.perplexity",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
@@ -124,7 +133,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
       },
       {
         id: "web-google-ai-overviews",
-        icon: "G",
+        iconSrc: webSearchIcon,
         labelKey: "chat.suggestions.web.googleAiOverviews",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
@@ -132,7 +141,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
       },
       {
         id: "web-chatgpt-search",
-        icon: "O",
+        iconSrc: webSearchIcon,
         labelKey: "chat.suggestions.web.chatgptSearch",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
@@ -140,7 +149,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
       },
       {
         id: "web-microsoft-copilot",
-        icon: "M",
+        iconSrc: webSearchIcon,
         labelKey: "chat.suggestions.web.microsoftCopilot",
         settingGroup: PROMPT_TOOL_SETTING_GROUP.web,
         selectionMode: PROMPT_TOOL_SELECTION_MODE.single,
@@ -153,7 +162,7 @@ export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
 export const ATTACH_MENU_OPTIONS = Object.freeze([
   {
     id: FILE_PICKER_TYPE.camera,
-    icon: "📷",
+    iconSrc: cameraIcon,
     labelKey: "chat.attachOptions.camera",
     nativeSource: FILE_PICKER_TYPE.camera,
     accept: FILE_ACCEPT.image,
@@ -163,7 +172,7 @@ export const ATTACH_MENU_OPTIONS = Object.freeze([
   },
   {
     id: FILE_PICKER_TYPE.image,
-    icon: "🖼️",
+    iconSrc: imageFileIcon,
     labelKey: "chat.attachOptions.image",
     nativeSource: FILE_PICKER_TYPE.image,
     accept: FILE_ACCEPT.image,
@@ -173,7 +182,7 @@ export const ATTACH_MENU_OPTIONS = Object.freeze([
   },
   {
     id: FILE_PICKER_TYPE.all,
-    icon: "📎",
+    iconSrc: fileIcon,
     labelKey: "chat.attachOptions.file",
     nativeSource: FILE_PICKER_TYPE.all,
     accept: FILE_ACCEPT.all,
