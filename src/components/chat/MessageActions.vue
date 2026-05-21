@@ -43,6 +43,13 @@
         <button
           type="button"
           class="message-action-text-button"
+          @click="$emit('regenerate')"
+        >
+          {{ t("markdown.regenerate") }}
+        </button>
+        <button
+          type="button"
+          class="message-action-text-button"
           @click="openFeedbackDialog"
         >
           {{ t("feedback.send") }}
@@ -149,6 +156,8 @@ import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
 import {copyClipboardByPlatform} from "@/services/platformBridge";
 import {logWarn} from "@/utils/logger";
+
+defineEmits(["regenerate"]);
 
 const props = defineProps({
   role: {type: String, required: true},

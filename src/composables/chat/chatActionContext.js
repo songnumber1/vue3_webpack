@@ -23,6 +23,7 @@ export function createEmptyChatActions() {
 export function createEmptyWorkspaceActions() {
   return {
     submit: () => {},
+    regenerate: () => {},
     updateSelectedModel: () => {},
     handlePromptFocus: () => {},
     handlePromptResize: () => {},

@@ -10,6 +10,7 @@
     :message="message"
     :interaction-blocked="interactionBlocked"
     @rendered="$emit('rendered')"
+    @regenerate="$emit('regenerate', $event)"
   />
 </template>
 
@@ -20,7 +21,7 @@ defineProps({
   message: {type: Object, required: true},
   interactionBlocked: {type: Boolean, default: false},
 });
-defineEmits(["rendered"]);
+defineEmits(["rendered", "regenerate"]);
 </script>
 
 <style scoped>

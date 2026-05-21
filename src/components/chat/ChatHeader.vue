@@ -58,7 +58,19 @@
       </div>
     </div>
 
-    <div v-if="!isMobile" class="topbar-actions topbar-actions--desktop">
+    <div v-if="isMobile" class="topbar-actions topbar-actions--mobile">
+      <button
+        class="round-icon mobile-header-future-action"
+        type="button"
+        :aria-label="t('common.settings')"
+        :title="t('common.settings')"
+        @click="chatActions.openSettings()"
+      >
+        <span aria-hidden="true">⋯</span>
+      </button>
+    </div>
+
+    <div v-else class="topbar-actions topbar-actions--desktop">
       <button
         v-if="systemSettings.showGuideButton"
         class="round-icon guide-link guide-link--icon"
@@ -172,5 +184,17 @@ const showDesktopConversationTitle = computed(
   gap: 6px;
   padding-left: 10px;
   padding-right: 10px;
+}
+
+:global(body.mobile-mode) .mobile-topbar .topbar-actions--mobile {
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+:global(body.mobile-mode) .mobile-topbar .mobile-header-future-action {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
 }
 </style>

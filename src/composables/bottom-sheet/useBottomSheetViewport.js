@@ -1,4 +1,5 @@
 import {useEventListener} from "@vueuse/core";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   BOTTOM_SHEET_SNAP_RATIO,
   BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
@@ -26,6 +27,18 @@ import {
  */
 export function createBottomSheetViewport(options) {
   const {props, sheetRef, bodyRef} = options;
+
+  function getSystemBottomSheetBounds() {
+    try {
+      const store = useSystemSettingsStore();
+      return {
+        minHeight: Number(store.bottomSheetMinHeight) || props.minHeight,
+        maxHeight: Number(store.bottomSheetMaxHeight) || 0,
+      };
+    } catch (_error) {
+      return {minHeight: props.minHeight, maxHeight: 0};
+    }
+  }
 
   function getViewportHeight() {
     return readViewportHeight();
@@ -92,9 +105,10 @@ export function createBottomSheetViewport(options) {
   }
 
   function getMinimumSheetHeight() {
+    const {minHeight} = getSystemBottomSheetBounds();
     if (!isMobileViewport()) return props.minHeight;
     return Math.max(
-      props.minHeight,
+      minHeight,
       getSheetChromeHeight() + getMinimumVisibleBodyHeight()
     );
   }
@@ -102,11 +116,13 @@ export function createBottomSheetViewport(options) {
   function clampHeight(height) {
     const viewportHeight = getViewportHeight();
     const preferredMinHeight = getMinimumSheetHeight();
-    const maxHeight = Math.max(
-      preferredMinHeight,
-      Math.floor(viewportHeight * props.maxRatio) -
-        readBottomSheetSafeAreaBottom()
-    );
+    const systemBounds = getSystemBottomSheetBounds();
+    const ratioMaxHeight =
+      Math.floor(viewportHeight * props.maxRatio) - readBottomSheetSafeAreaBottom();
+    const configuredMaxHeight = systemBounds.maxHeight
+      ? Math.min(systemBounds.maxHeight, ratioMaxHeight)
+      : ratioMaxHeight;
+    const maxHeight = Math.max(preferredMinHeight, configuredMaxHeight);
     const minHeight = Math.min(preferredMinHeight, maxHeight);
     return Math.min(Math.max(height, minHeight), maxHeight);
   }

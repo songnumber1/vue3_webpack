@@ -11,7 +11,7 @@
       <button
         v-for="action in actions"
         :key="action.key"
-        class="bottom-sheet-option chat-history-action-option"
+        class="bottom-sheet-option bottom-sheet-option--row chat-history-action-option"
         :class="{'chat-history-action-option--danger': action.danger}"
         type="button"
         @click="$emit('select', action.key)"

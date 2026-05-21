@@ -169,6 +169,31 @@ const groups = computed(() => [
       },
     ],
   },
+
+  {
+    kicker: "BOTTOM SHEET",
+    title: "Bottom Sheet",
+    items: [
+      {
+        key: "bottomSheetMinHeight",
+        type: "number",
+        label: "최소 높이",
+        description: "모바일 Bottom Sheet가 접혔을 때 유지할 최소 높이(px)입니다.",
+        min: 180,
+        max: 720,
+        step: 1,
+      },
+      {
+        key: "bottomSheetMaxHeight",
+        type: "number",
+        label: "최대 높이",
+        description: "모바일 Bottom Sheet가 확장될 때 넘지 않을 최대 높이(px)입니다.",
+        min: 320,
+        max: 960,
+        step: 1,
+      },
+    ],
+  },
   {
     kicker: "CHAT",
     title: "채팅방",

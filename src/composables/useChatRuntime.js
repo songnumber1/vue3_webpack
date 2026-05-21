@@ -264,7 +264,10 @@ export function useChatRuntime() {
     chatStore.setMessages(historyId, messages);
   }
   async function createRemoteConversation({text, assistantId, modelId} = {}) {
+    const requestId = createId("request");
     const rawHistory = await createChatHistory({
+      request_id: requestId,
+      requestId,
       assistantId,
       assistId: assistantId,
       modelId,

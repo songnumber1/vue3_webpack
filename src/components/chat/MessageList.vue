@@ -11,6 +11,7 @@
       :message="message"
       :interaction-blocked="interactionBlocked"
       @rendered="handleMessageRendered"
+      @regenerate="$emit('regenerate', $event)"
     />
     <div v-if="loading" class="typing-row">
       <span></span><span></span><span></span>
@@ -33,7 +34,7 @@ const props = defineProps({
   autoScrollOnAnswer: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(["content-rendered"]);
+const emit = defineEmits(["content-rendered", "regenerate"]);
 
 const scrollRef = ref(null);
 const bottomRef = ref(null);

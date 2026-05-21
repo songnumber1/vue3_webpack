@@ -17,6 +17,8 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showVirtualKeyboardDebug: (state) =>
       state.settings.showVirtualKeyboardDebug,
     virtualKeyboardHeight: (state) => state.settings.virtualKeyboardHeight,
+    bottomSheetMinHeight: (state) => state.settings.bottomSheetMinHeight,
+    bottomSheetMaxHeight: (state) => state.settings.bottomSheetMaxHeight,
     useMicrophone: (state) => state.settings.useMicrophone,
     showGuideButton: (state) => state.settings.showGuideButton,
     showThemeButton: (state) => state.settings.showThemeButton,

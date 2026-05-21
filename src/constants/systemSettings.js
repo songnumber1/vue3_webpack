@@ -29,6 +29,8 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   useVirtualKeyboard: "useVirtualKeyboard",
   showVirtualKeyboardDebug: "showVirtualKeyboardDebug",
   virtualKeyboardHeight: "virtualKeyboardHeight",
+  bottomSheetMinHeight: "bottomSheetMinHeight",
+  bottomSheetMaxHeight: "bottomSheetMaxHeight",
   useMicrophone: "useMicrophone",
   showGuideButton: "showGuideButton",
   showThemeButton: "showThemeButton",
@@ -50,6 +52,8 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
   [SYSTEM_SETTING_KEYS.showVirtualKeyboardDebug]: false,
   [SYSTEM_SETTING_KEYS.virtualKeyboardHeight]: 340,
+  [SYSTEM_SETTING_KEYS.bottomSheetMinHeight]: 260,
+  [SYSTEM_SETTING_KEYS.bottomSheetMaxHeight]: 720,
   [SYSTEM_SETTING_KEYS.useMicrophone]: false,
   [SYSTEM_SETTING_KEYS.showGuideButton]: false,
   [SYSTEM_SETTING_KEYS.showThemeButton]: false,
@@ -94,8 +98,26 @@ export function normalizeSystemSettings(value = {}) {
         : DEFAULT_SYSTEM_SETTINGS[key];
       return;
     }
+    if (key === SYSTEM_SETTING_KEYS.bottomSheetMinHeight) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(Math.max(Math.round(numeric), 180), 720)
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+    if (key === SYSTEM_SETTING_KEYS.bottomSheetMaxHeight) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(Math.max(Math.round(numeric), 320), 960)
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
     next[key] = Boolean(source[key]);
   });
+
+  if (next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] < next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight]) {
+    next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] = next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight];
+  }
 
   return next;
 }

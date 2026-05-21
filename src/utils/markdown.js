@@ -85,6 +85,37 @@ function mermaidActionButton(action, label) {
     ],
   };
 }
+
+function codeActionButton(action, label) {
+  return {
+    type: "element",
+    tagName: "button",
+    properties: {
+      type: "button",
+      className: ["md-code-action", `md-code-action--${action}`],
+      dataMdCodeAction: action,
+      ariaLabel: label,
+      title: label,
+    },
+    children: [
+      {
+        type: "element",
+        tagName: "span",
+        properties: {
+          className: ["md-code-action-icon", `md-code-action-icon--${action}`],
+        },
+        children: [],
+      },
+      {
+        type: "element",
+        tagName: "span",
+        properties: {className: ["sr-only"]},
+        children: [{type: "text", value: label}],
+      },
+    ],
+  };
+}
+
 function rehypeTableWrapper() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -163,6 +194,7 @@ function rehypeMermaidBlock() {
                 tagName: "div",
                 properties: {className: ["md-mermaid-actions"]},
                 children: [
+                  mermaidActionButton("copy", mdLabel("markdown.copyMermaid")),
                   mermaidActionButton("svg", "SVG 저장"),
                   mermaidActionButton("code", "코드 내보내기"),
                 ],
@@ -185,6 +217,63 @@ function rehypeMermaidBlock() {
   };
 }
 
+function detectCodeLanguage(codeNode) {
+  const classNames = codeNode?.properties?.className || [];
+  const languageClass = classNames.find((item) =>
+    String(item || "").startsWith("language-")
+  );
+  return languageClass ? languageClass.replace("language-", "") : "text";
+}
+
+function rehypeCodeBlockWrapper() {
+  return (tree) => {
+    visit(tree, "element", (node, index, parent) => {
+      if (!parent || typeof index !== "number") return;
+      if (node.tagName !== "pre") return;
+
+      const codeNode = node.children?.[0];
+      if (codeNode?.tagName !== "code") return;
+
+      const language = detectCodeLanguage(codeNode);
+      const source = textContent(codeNode);
+      parent.children[index] = {
+        type: "element",
+        tagName: "div",
+        properties: {className: ["md-code-card"], dataMdCodeLanguage: language},
+        children: [
+          {
+            type: "element",
+            tagName: "div",
+            properties: {className: ["md-code-toolbar"]},
+            children: [
+              {
+                type: "element",
+                tagName: "strong",
+                properties: {className: ["md-code-title"]},
+                children: [{type: "text", value: language || "text"}],
+              },
+              {
+                type: "element",
+                tagName: "div",
+                properties: {className: ["md-code-actions"]},
+                children: [codeActionButton("copy", mdLabel("markdown.copyCode"))],
+              },
+            ],
+          },
+          {
+            ...node,
+            properties: {
+              ...(node.properties || {}),
+              className: [...(node.properties?.className || []), "md-code-pre"],
+              dataMdCodeSource: source,
+            },
+          },
+        ],
+      };
+    });
+  };
+}
+
 function createProcessor({renderMermaid = true} = {}) {
   const nextProcessor = unified()
     .use(remarkParse)
@@ -198,6 +287,8 @@ function createProcessor({renderMermaid = true} = {}) {
   if (renderMermaid) {
     nextProcessor.use(rehypeMermaidBlock);
   }
+
+  nextProcessor.use(rehypeCodeBlockWrapper);
 
   return nextProcessor
     .use(rehypeExternalLinks, {

@@ -7,7 +7,11 @@
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "lint:fix": "eslint --ext .js,.vue src --fix",
-    "format": "prettier --write \"src/**/*.{js,vue,json,css,md}\""
+    "format": "prettier --write \"src/**/*.{js,vue,json,css,md}\"",
+    "serve:local": "vue-cli-service serve --mode local",
+    "serve:dev": "vue-cli-service serve --mode dev",
+    "build:dev": "vue-cli-service build --mode dev",
+    "build:prod": "vue-cli-service build --mode prod"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

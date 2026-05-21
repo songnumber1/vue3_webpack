@@ -2,6 +2,7 @@ import {nextTick, ref} from "vue";
 import {streamGeneration} from "@/api/sse/sse";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {createId} from "@/utils/id";
 
 function normalizePromptPayload(payload) {
   if (typeof payload === "string")
@@ -62,6 +63,15 @@ function createTypewriterRenderer(commit) {
     stop() {
       stopped = true;
     },
+  };
+}
+
+function createRequestPayload(base = {}) {
+  const requestId = createId("request");
+  return {
+    request_id: requestId,
+    requestId,
+    ...base,
   };
 }
 
@@ -135,12 +145,12 @@ export function useChatSubmit(options) {
 
     try {
       await streamGeneration(
-        {
+        createRequestPayload({
           assistantId: options.selectedAssistantId?.value || "",
           modelId: options.selectedModel?.value || "",
           input: normalized.text,
           chatId: targetHistoryId,
-        },
+        }),
         {
           onChunk: async (content) => {
             typewriter.update(content);
@@ -172,5 +182,103 @@ export function useChatSubmit(options) {
     }
   }
 
-  return {isGenerating, handleSubmit};
+
+
+  async function regenerateResponse(message = {}) {
+    if (isGenerating.value) return;
+    const targetHistoryId = String(options.route.params.id || "");
+    if (!targetHistoryId) return;
+
+    const currentMessages = Array.isArray(options.messages.value)
+      ? options.messages.value
+      : [];
+    const assistantIndex = currentMessages.findIndex(
+      (item) => item.id === message.id
+    );
+    if (assistantIndex <= 0) return;
+
+    const userMessage = [...currentMessages]
+      .slice(0, assistantIndex)
+      .reverse()
+      .find((item) => item.role === "user");
+    if (!userMessage) return;
+
+    const normalized = normalizePromptPayload({
+      text: userMessage.content,
+      attachments: userMessage.attachments || [],
+    });
+    const assistantMessage = {
+      id: createId("message"),
+      role: "assistant",
+      content: "",
+      reasoningContent: buildMockReasoningContent(normalized),
+      reasoningStatus: "thinking",
+      status: "streaming",
+      createdAt: new Date().toISOString(),
+    };
+    let liveMessages = [
+      ...currentMessages.slice(0, assistantIndex),
+      assistantMessage,
+    ];
+    let liveAssistantMessage = assistantMessage;
+
+    function commitAssistantMessage(patch = {}) {
+      liveAssistantMessage = {...liveAssistantMessage, ...patch};
+      liveMessages = liveMessages.map((item) =>
+        item.id === liveAssistantMessage.id ? liveAssistantMessage : item
+      );
+      options.messages.value = liveMessages;
+      options.setConversation(targetHistoryId, liveMessages);
+    }
+
+    commitAssistantMessage();
+    await nextTick();
+    await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+
+    isGenerating.value = true;
+    chatStreamStore.start();
+    const typewriter = createTypewriterRenderer((content) => {
+      commitAssistantMessage({content, status: "streaming"});
+    });
+
+    try {
+      await streamGeneration(
+        createRequestPayload({
+          assistantId: options.selectedAssistantId?.value || "",
+          modelId: options.selectedModel?.value || "",
+          input: normalized.text,
+          chatId: targetHistoryId,
+        }),
+        {
+          onChunk: async (content) => {
+            typewriter.update(content);
+            await nextTick();
+            await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+          },
+          onComplete: async () => {
+            await typewriter.flush();
+            commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+          },
+        }
+      );
+      await typewriter.flush();
+      commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+      await nextTick();
+      await options.renderAfterStream();
+    } catch (error) {
+      typewriter.stop();
+      logWarn("[useChatSubmit] 재생성 스트리밍 오류:", error);
+      commitAssistantMessage({
+        status: "error",
+        reasoningStatus: "completed",
+        content:
+          liveAssistantMessage.content || "(응답 재생성 중 오류가 발생했습니다.)",
+      });
+    } finally {
+      isGenerating.value = false;
+      chatStreamStore.finish();
+    }
+  }
+
+  return {isGenerating, handleSubmit, regenerateResponse};
 }

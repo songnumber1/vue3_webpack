@@ -41,6 +41,7 @@
         v-if="showMessageActions"
         role="assistant"
         :content="message.content"
+        @regenerate="emit('regenerate', message)"
       />
     </div>
   </article>
@@ -58,7 +59,7 @@ const props = defineProps({
   interactionBlocked: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
-const emit = defineEmits(["rendered"]);
+const emit = defineEmits(["rendered", "regenerate"]);
 const html = ref("<p></p>");
 const reasoningHtml = ref("<p></p>");
 const contentRef = ref(null);

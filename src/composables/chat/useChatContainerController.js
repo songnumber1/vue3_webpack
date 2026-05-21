@@ -262,7 +262,7 @@ export function useChatContainerController(props) {
     }
   }
 
-  const {isGenerating, handleSubmit} = useChatSubmit({
+  const {isGenerating, handleSubmit, regenerateResponse} = useChatSubmit({
     router,
     route,
     histories,
@@ -295,6 +295,11 @@ export function useChatContainerController(props) {
   function submitIfWritable(payload) {
     if (isReadOnly.value || isActiveModelUnavailable.value) return;
     handleSubmit(payload);
+  }
+
+  function regenerateIfWritable(message) {
+    if (isReadOnly.value || isActiveModelUnavailable.value) return;
+    regenerateResponse(message);
   }
 
   const {
@@ -450,6 +455,7 @@ export function useChatContainerController(props) {
     openAssistantFromHeader,
     logout,
     submitIfWritable,
+    regenerateIfWritable,
     handlePromptFocus,
     handlePromptResize,
     handleMessageContentRendered,

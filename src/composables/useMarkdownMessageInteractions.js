@@ -66,11 +66,19 @@ function resolveMermaidSvg(card) {
   }
   return new XMLSerializer().serializeToString(clone);
 }
-function handleMermaidAction(button) {
+async function handleMermaidAction(button) {
   const card = button.closest(".md-mermaid-card");
   if (!card) return;
 
   const action = button.dataset.mdMermaidAction;
+  if (action === "copy") {
+    const source = resolveMermaidSource(card);
+    if (source) {
+      await copyClipboardByPlatform(source);
+    }
+    return;
+  }
+
   if (action === "code") {
     const source = resolveMermaidSource(card);
     if (source) {
@@ -86,6 +94,17 @@ function handleMermaidAction(button) {
     }
   }
 }
+
+async function handleCodeAction(button) {
+  const card = button.closest(".md-code-card");
+  const pre = card?.querySelector("pre");
+  const code = pre?.getAttribute("data-md-code-source") || pre?.innerText || "";
+  const action = button.dataset.mdCodeAction;
+  if (action === "copy" && code) {
+    await copyClipboardByPlatform(code);
+  }
+}
+
 export function useMarkdownMessageInteractions(contentRef) {
   const platformStore = usePlatformStore();
   async function handleMarkdownClick(event) {
@@ -105,7 +124,17 @@ export function useMarkdownMessageInteractions(contentRef) {
     if (mermaidActionButton && contentRef.value?.contains(mermaidActionButton)) {
       event.preventDefault();
       event.stopPropagation();
-      handleMermaidAction(mermaidActionButton);
+      await handleMermaidAction(mermaidActionButton);
+      return;
+    }
+
+    const codeActionButton = event.target?.closest?.(
+      "button[data-md-code-action]"
+    );
+    if (codeActionButton && contentRef.value?.contains(codeActionButton)) {
+      event.preventDefault();
+      event.stopPropagation();
+      await handleCodeAction(codeActionButton);
       return;
     }
 

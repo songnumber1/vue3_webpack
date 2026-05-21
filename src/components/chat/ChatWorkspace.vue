@@ -60,6 +60,7 @@
       :interaction-blocked="interactionBlocked"
       :auto-scroll-on-answer="autoScrollOnAnswer"
       @content-rendered="workspaceActions.handleMessageContentRendered()"
+      @regenerate="workspaceActions.regenerate($event)"
     />
     <button
       v-if="showScrollBottom && !interactionBlocked"
