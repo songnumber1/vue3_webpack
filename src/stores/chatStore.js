@@ -61,10 +61,8 @@ export const useChatStore = defineStore("chat", {
       this.resetActivePromptToolSettings();
     },
     setMessages(chatId, messages = []) {
-      this.messageMap = {
-        ...this.messageMap,
-        [chatId]: messages,
-      };
+      if (!chatId) return;
+      this.messageMap[chatId] = Array.isArray(messages) ? messages : [];
     },
     addHistory(history) {
       this.histories = [

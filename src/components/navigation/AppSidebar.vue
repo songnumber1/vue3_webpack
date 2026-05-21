@@ -158,7 +158,7 @@
 </template>
 
 <script setup>
-import {computed, inject, nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useEventListener, useWindowSize} from "@vueuse/core";
@@ -176,10 +176,6 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/useOutsideClick";
-import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
 
 const emit = defineEmits([
   "new-chat",
@@ -192,7 +188,6 @@ const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
-const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const platformStore = usePlatformStore();
 const systemSettingsStore = useSystemSettingsStore();
 

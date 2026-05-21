@@ -175,3 +175,150 @@ onBeforeUnmount(() => {
   clearVirtualKeyboardVars();
 });
 </script>
+
+<style scoped>
+:global(.virtual-keyboard-debug) {
+  display: none;
+}
+
+:global(body.mobile-mode .virtual-keyboard-debug) {
+  display: block;
+}
+
+:global(.virtual-keyboard-debug__fab) {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right, 0px) + 16px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+  z-index: 2147483000;
+  min-width: 72px;
+  height: 40px;
+  border: 1px solid var(--color-border, rgba(148, 163, 184, 0.35));
+  border-radius: 999px;
+  background: var(--color-surface, #ffffff);
+  color: var(--color-text, #111827);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+:global(.virtual-keyboard-debug__panel) {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2147482999;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 28px 24px calc(28px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.35));
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(148, 163, 184, 0.08),
+      rgba(148, 163, 184, 0.08) 1px,
+      transparent 1px,
+      transparent 28px
+    ),
+    var(--color-surface, #ffffff);
+  color: var(--color-text, #111827);
+  box-shadow: 0 -16px 36px rgba(15, 23, 42, 0.18);
+  text-align: center;
+}
+
+:global(.virtual-keyboard-debug__panel strong) {
+  display: block;
+  margin: 0 0 8px;
+  font-size: var(--font-size-base);
+}
+
+:global(.virtual-keyboard-debug__panel p) {
+  max-width: 320px;
+  margin: 0 auto;
+  color: var(--color-text-muted, #64748b);
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+}
+
+:global(.virtual-keyboard-debug__panel small) {
+  display: block;
+  max-width: 360px;
+  margin: 10px auto 0;
+  color: var(--color-text-muted, #64748b);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .virtual-keyboard-debug__fab) {
+  bottom: calc(var(--virtual-keyboard-debug-height, 0px) + env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-workspace > :not(.virtual-keyboard-debug)) {
+  transform: translate3d(0, calc(var(--virtual-keyboard-pan-offset, 0px) * -1), 0);
+  transition: transform 180ms ease;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .virtual-keyboard-debug__fab),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustNothing"] body.mobile-mode .virtual-keyboard-debug__fab) {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-chat),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-shared) {
+  height: calc(var(--app-height, 100dvh) - var(--virtual-keyboard-debug-height, 0px)) !important;
+  max-height: calc(var(--app-height, 100dvh) - var(--virtual-keyboard-debug-height, 0px)) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-chat .chat-workspace),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-shared .chat-workspace) {
+  height: calc(var(--app-height, 100dvh) - var(--virtual-keyboard-debug-height, 0px)) !important;
+  max-height: calc(var(--app-height, 100dvh) - var(--virtual-keyboard-debug-height, 0px)) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-chat .message-list),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-shared .message-list) {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"] body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot) {
+  position: relative !important;
+  z-index: var(--z-content-raised, 20) !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap) {
+  bottom: calc(var(--virtual-keyboard-debug-height, 0px) + env(safe-area-inset-bottom, 0px) + 8px) !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-chat .chat-composer-slot),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-shared .chat-composer-slot) {
+  z-index: var(--z-prompt-floating, 90) !important;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt),
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap) {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: calc(var(--virtual-keyboard-debug-height, 0px) + env(safe-area-inset-bottom, 0px) + 8px) !important;
+  left: 0 !important;
+  z-index: var(--z-prompt-floating, 90) !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: translate3d(0, var(--virtual-keyboard-pan-offset, 0px), 0) !important;
+  will-change: transform, bottom;
+}
+
+:global(html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"] body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box) {
+  width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin: 0 auto !important;
+}
+</style>

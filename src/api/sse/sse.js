@@ -8,6 +8,12 @@ import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/utils/viewportMode";
 
+const GENERATION_REQUEST_KEY_PREFIX = "GENERATION";
+
+function createGenerationRequestKey() {
+  return `${GENERATION_REQUEST_KEY_PREFIX}-${Date.now()}-${Math.random()}`;
+}
+
 function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION}`;
@@ -23,12 +29,17 @@ function shouldUseOverlay(policy) {
 }
 
 export async function streamGeneration(payload = {}, handlers = {}) {
-  const {onChunk, onComplete} = handlers;
+  const {onChunk, onComplete, onError} = handlers;
 
   if (!shouldUseServerApi()) {
-    const text = pickGenerationSample(payload.input);
-    await streamText(text, (chunk) => onChunk?.(chunk), {delay: 18});
-    await onComplete?.();
+    try {
+      const text = pickGenerationSample(payload.input);
+      await streamText(text, (chunk) => onChunk?.(chunk), {delay: 18});
+      await onComplete?.();
+    } catch (error) {
+      await onError?.(error);
+      throw error;
+    }
     return;
   }
 
@@ -38,7 +49,7 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     policy.abort && typeof AbortController !== "undefined"
       ? new AbortController()
       : null;
-  const requestKey = `GENERATION-${Date.now()}-${Math.random()}`;
+  const requestKey = createGenerationRequestKey();
   const overlay = shouldUseOverlay(policy);
 
   if (controller) apiRequestStore.registerController(requestKey, controller);
@@ -94,6 +105,9 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     }
 
     await onComplete?.();
+  } catch (error) {
+    await onError?.(error);
+    throw error;
   } finally {
     apiRequestStore.unregisterController(requestKey);
     if (overlay) apiRequestStore.stopOverlay();

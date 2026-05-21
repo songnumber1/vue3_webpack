@@ -97,7 +97,10 @@
       @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
-    <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
+    <VirtualKeyboardDebug
+      v-if="isDev"
+      :visible="showVirtualKeyboardDebugButton"
+    />
 
     <ChatHistoryDialog
       :open="historyDialogOpen"
@@ -163,6 +166,7 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const route = useRoute();
+const isDev = process.env.NODE_ENV !== "production";
 const systemSettingsStore = useSystemSettingsStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const routeMode = computed(() => {
@@ -247,7 +251,7 @@ const {
 } = useChatContainerController(controllerProps);
 
 const showVirtualKeyboardDebugButton = computed(
-  () => isMobile.value && showVirtualKeyboardDebug.value
+  () => isDev && isMobile.value && showVirtualKeyboardDebug.value
 );
 
 function handleMobileSettingsDesktopOpen(target) {

@@ -2,13 +2,22 @@
 @import "./foundations/themes/themes.css";
 @import "./foundations/reset/base.css";
 
-/* 02 base layout and core components */
+/* 02 base layout and core components
+   CSS ownership:
+   - prompt/input: components/bottom-sheet + prompt scoped styles
+   - bottom sheet: components/bottom-sheet + mobile-runtime/viewport patches
+   - message bubble: components/message + layouts/chat core
+*/
 @import "./layouts/chat/core.css";
 @import "./components/markdown/markdown.css";
 @import "./components/bottom-sheet/bottom-sheet-composer.css";
 @import "./pages/playground/playground-feedback.css";
 
-/* 03 mobile runtime and freeze overrides */
+/* 03 mobile runtime and freeze overrides
+   CSS ownership:
+   - mobile keyboard: mobile-runtime/keyboard + viewport safe-area patches
+   - sidebar: layouts/sidebar
+*/
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
 /* mobile session/browser patch aggregator */
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
@@ -19,7 +28,6 @@
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/attachment/attachment-preview-tokens.css";
-@import "./components/debug/virtual-keyboard-debug.css";
 /* 03-2 residual overrides absorbed into final UI normalization fixes. */
 
 @import "./states/reasoning/reasoning.css";
@@ -35,7 +43,10 @@
 @import "./pages/chat/targeted-chat-polish.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";
 
-/* 06 canonical dialog/overlay shape system */
+/* 06 canonical dialog/overlay shape system
+   CSS ownership:
+   - dialog/overlay: components/dialog and overlay component scoped styles
+*/
 @import "./components/dialog/dialog-system.css";
 
 /* 07 final UI normalization fixes absorbed into dialog-system.css. */
