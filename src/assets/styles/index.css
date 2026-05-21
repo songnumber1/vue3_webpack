@@ -27,6 +27,7 @@
 /* 03-1 absorbed feature patches */
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
+@import "./layouts/sidebar/mobile-drawer-footer-stability.css";
 @import "./components/attachment/attachment-preview-tokens.css";
 /* 03-2 residual overrides absorbed into final UI normalization fixes. */
 

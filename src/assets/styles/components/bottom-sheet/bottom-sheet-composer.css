@@ -27,12 +27,12 @@ body.mobile-mode .bottom-sheet-body > *:last-child {
   box-shadow: var(--shadow-prompt);
 }
 .shared-readonly-box strong {
-  font-size: 15px;
+  font-size: var(--font-size-base);
   font-weight: 800;
 }
 .shared-readonly-box span {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 body.mobile-mode .shared-readonly-wrap {
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
@@ -45,10 +45,10 @@ body.mobile-mode .shared-readonly-box {
   padding: 10px 14px;
 }
 body.mobile-mode .shared-readonly-box strong {
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 body.mobile-mode .shared-readonly-box span {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
 }
 
 /* Final chat scroll/composer spacing stabilization.
@@ -272,7 +272,7 @@ body.mobile-mode .scroll-bottom-button {
 .service-menu-item small {
   margin-top: 3px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.35;
 }
 .sidebar-user--mobile {
@@ -341,7 +341,7 @@ body.mobile-mode .scroll-bottom-button {
   display: block;
 }
 .responsive-panel-header strong {
-  font-size: 20px;
+  font-size: var(--close-button-font-size);
   letter-spacing: -0.04em;
 }
 .responsive-panel-header small {
@@ -363,7 +363,7 @@ body.mobile-mode .scroll-bottom-button {
   color: var(--text);
   display: grid;
   place-items: center;
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
 }
 .responsive-back-button span[aria-hidden="true"] {
   font-size: 32px;
@@ -398,7 +398,7 @@ body.mobile-mode .scroll-bottom-button {
 .personal-eyebrow,
 .guide-card span {
   color: var(--primary-strong);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -407,7 +407,7 @@ body.mobile-mode .scroll-bottom-button {
 .personal-card h3,
 .guide-card h2 {
   margin: 8px 0 8px;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   letter-spacing: -0.035em;
 }
 .notice-card p,
@@ -497,7 +497,7 @@ body.mobile-mode .scroll-bottom-button {
 .guide-hero p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 18px;
+  font-size: var(--font-size-xl);
 }
 .guide-grid {
   width: min(960px, 100%);
@@ -548,7 +548,7 @@ body.mobile-mode .scroll-bottom-button {
   background: var(--surface-muted);
 }
 .md-table-title {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 900;
 }
 .md-table-actions {
@@ -562,7 +562,7 @@ body.mobile-mode .scroll-bottom-button {
   background: var(--control-bg);
   color: var(--text);
   padding: 0 10px;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 800;
 }
 .md-table-action:hover {
@@ -717,13 +717,13 @@ body.mobile-mode .md-table-action {
   gap: 2px;
 }
 .settings-menu-summary-text strong {
-  font-size: 14px;
+  font-size: var(--font-size-md);
   line-height: 1.25;
   font-weight: 800;
 }
 .settings-menu-summary-text small {
   margin: 0 !important;
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   line-height: 1.25;
 }
 .settings-menu .app-icon--chevron {
@@ -743,12 +743,12 @@ body.mobile-mode .md-table-action {
   border-radius: 10px;
 }
 .settings-menu .service-menu-item strong {
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   font-weight: 750;
   line-height: 1.25;
 }
 .settings-menu .service-menu-item small {
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
   line-height: 1.25;
 }
 .quick-menu--mobile-search {
@@ -756,7 +756,7 @@ body.mobile-mode .md-table-action {
 }
 .quick-menu--mobile-search .quick-item {
   min-height: 40px;
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 .md-table-actions {
@@ -1016,12 +1016,12 @@ body.mobile-mode .quick-menu--mobile-search {
 .mobile-drawer .quick-menu--mobile-search .quick-item,
 body.mobile-mode .quick-menu--mobile-search .quick-item {
   min-height: 42px;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   border-radius: 10px;
 }
 
 .playground-glyph {
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   font-weight: 900;
   line-height: 1;
 }
@@ -1048,7 +1048,7 @@ body.mobile-mode .quick-menu--mobile-search .quick-item {
 .playground-card-label {
   margin: 0 0 8px;
   color: var(--primary);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1089,7 +1089,7 @@ body.mobile-mode .quick-menu--mobile-search .quick-item {
   background: var(--control-bg);
   color: var(--text);
   font-weight: 800;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   text-decoration: none;
 }
 

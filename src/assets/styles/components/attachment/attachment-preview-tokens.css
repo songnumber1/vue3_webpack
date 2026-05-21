@@ -11,6 +11,9 @@
   --voice-stop-text: #fff;
   --voice-stop-ring: rgba(239, 68, 68, 0.14);
   --voice-stop-icon-size: 13px;
+  --attachment-close-font-size: 28px;
+  --attachment-close-font-size-sm: 26px;
+  --image-preview-close-font-size: 34px;
 }
 
 /* absorbed from utilities/overrides/attachment-layout-patches.css */
@@ -73,7 +76,7 @@
   place-items: center;
   border-radius: 12px;
   background: var(--control-hover);
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
 }
 
 .attachment-preview-info {
@@ -111,7 +114,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
   color: #111827;
-  font-size: 28px;
+  font-size: var(--attachment-close-font-size, 28px);
   line-height: 1;
   z-index: var(--z-image-preview-control);
 }
@@ -167,7 +170,7 @@ body.mobile-mode .image-preview-large {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   font-weight: 500;
   padding: 0;
 }
@@ -210,7 +213,7 @@ body.mobile-mode .image-preview-large {
   align-items: center;
   justify-content: center;
   padding: 0 0 2px;
-  font-size: 26px;
+  font-size: var(--attachment-close-font-size-sm, 26px);
   font-weight: 400;
 }
 
@@ -326,7 +329,7 @@ body.mobile-mode .attachment-preview-remove {
   height: 48px;
   min-width: 48px;
   min-height: 48px;
-  font-size: 26px;
+  font-size: var(--attachment-close-font-size-sm, 26px);
 }
 
 body.mobile-mode .image-preview-backdrop {
@@ -434,7 +437,7 @@ body.mobile-mode .attachment-preview-info strong {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.01em;
@@ -445,7 +448,7 @@ body.mobile-mode .attachment-preview-info span {
   display: block;
   margin-top: 4px;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-size-sm);
   line-height: 1.2;
 }
 
@@ -545,7 +548,7 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
   color: #111827;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 700;
   box-shadow: 0 14px 44px rgba(0, 0, 0, 0.28);
 }
@@ -573,7 +576,7 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   height: 56px !important;
   top: calc(16px + env(safe-area-inset-top)) !important;
   right: calc(16px + env(safe-area-inset-right)) !important;
-  font-size: 34px;
+  font-size: var(--image-preview-close-font-size, 34px);
   font-weight: 500 !important;
 }
 
@@ -616,7 +619,7 @@ body.mobile-mode .attachment-preview-thumb img {
 }
 
 body.mobile-mode .attachment-preview-file {
-  font-size: 28px;
+  font-size: var(--attachment-close-font-size, 28px);
   line-height: 1 !important;
   background: var(--surface, #f8fafc) !important;
 }
@@ -637,7 +640,7 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   min-width: var(--attachment-mobile-remove-size) !important;
   min-height: var(--attachment-mobile-remove-size) !important;
   padding: 0 0 2px;
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
   line-height: 1 !important;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14) !important;
 }
@@ -668,7 +671,7 @@ body.mobile-mode .attachment-preview-remove::before {
   border-radius: 999px;
   background: var(--prompt-bg);
   color: var(--text);
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   line-height: 1;
 }
 
@@ -689,7 +692,7 @@ body.mobile-mode .attachment-preview-remove::before {
   background: var(--prompt-bg, #fff);
   color: var(--text, #111827);
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
   z-index: 5;
   cursor: pointer;
   touch-action: manipulation;
@@ -735,7 +738,7 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   background: var(--prompt-bg, #fff);
   color: var(--text, #111827);
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16);
-  font-size: 28px;
+  font-size: var(--attachment-close-font-size, 28px);
   font-weight: 500;
   line-height: 1;
   cursor: pointer;
@@ -745,22 +748,4 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* =========================================================
-   FINAL MOBILE-ONLY ATTACHMENT PREVIEW COMPACT OVERRIDE
-   - Applies only when AppContainer detects mobile mode.
-   - Keeps desktop/web attachment card UI unchanged.
-   - Mobile previews use one fixed square size for both image and file items.
-   - File name and size are hidden on mobile to prevent the composer from
-     becoming too tall when the software keyboard is open.
-   ========================================================= */
-body.mobile-mode .attachment-preview-row {
-  display: flex !important;
-  flex-wrap: nowrap !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 10px 38px 8px 2px !important;
-  overflow-x: auto !important;
-  overflow-y: visible !important;
-  scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch !important;
-}
+/* Mobile compact attachment sizing is owned by PromptAttachmentPreviewList.vue scoped :global rules. */
