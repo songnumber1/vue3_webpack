@@ -2,7 +2,11 @@
   <main class="auth-required-page" role="main">
     <section class="auth-required-card" aria-labelledby="auth-required-title">
       <div class="auth-required-icon" aria-hidden="true">
-        <img :src="authLockIcon" alt="" />
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path
+            d="M12 2.75a5.25 5.25 0 0 0-5.25 5.25v2.25H6A2.25 2.25 0 0 0 3.75 12.5v6.25A2.25 2.25 0 0 0 6 21h12a2.25 2.25 0 0 0 2.25-2.25V12.5A2.25 2.25 0 0 0 18 10.25h-.75V8A5.25 5.25 0 0 0 12 2.75Zm3.75 7.5h-7.5V8a3.75 3.75 0 1 1 7.5 0v2.25ZM12 14a1.25 1.25 0 0 1 .75 2.25v1a.75.75 0 0 1-1.5 0v-1A1.25 1.25 0 0 1 12 14Z"
+          />
+        </svg>
       </div>
       <h1 id="auth-required-title">{{ t("loginRequired.title") }}</h1>
       <p>{{ message }}</p>
@@ -40,8 +44,6 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
-import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
-import authLockIcon from "@/assets/img/icons/auth-lock.svg";
 
 const route = useRoute();
 const router = useRouter();
@@ -50,7 +52,6 @@ const authStore = useAuthStore();
 
 const loading = ref(false);
 const errorMessage = ref("");
-const authFlowId = ref(0);
 
 const message = computed(() => {
   const key = `loginRequired.reasons.${route.query.reason}`;
@@ -62,96 +63,36 @@ const redirectPath = computed(() => {
   return typeof redirect === "string" && redirect ? redirect : "/";
 });
 
-function wait(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-function createAccessPayloadFromRedirect() {
-  const resolved = router.resolve(redirectPath.value || "/");
-  const chatId = resolved.name === "chat" ? resolved.params?.id || null : null;
-
-  return {
-    language: "ko",
-    entryType: chatId ? "chat" : "main",
-    shareId: resolved.params?.shareId || null,
-    chatId,
-    msgId: null,
-    studioId: resolved.query?.studioId || null,
-  };
-}
-
-async function verifyAuthenticatedSession(flowId) {
-  const payload = createAccessPayloadFromRedirect();
-  const delays = [0, 120, 300];
-
-  for (const delay of delays) {
-    if (flowId !== authFlowId.value) return false;
-    if (delay) await wait(delay);
-
-    const accessInfo = await authApiLive.getAccessInfo(payload);
-    const result = resolveAuthAccessResult(accessInfo);
-
-    if (result.authenticated) {
-      authStore.setAuthenticatedAccessInfo(result.accessInfo);
-      return true;
-    }
-  }
-
-  return false;
-}
-
 async function moveAfterAuthenticated() {
+  authStore.resetAuth();
   await router.replace(redirectPath.value || "/");
 }
 
 async function checkLogin() {
-  const flowId = ++authFlowId.value;
   errorMessage.value = "";
 
   try {
     const result = await authApiLive.checkLogin();
 
-    if (flowId !== authFlowId.value || loading.value) return;
-
     if (!result?.path) {
-      authStore.resetAuth();
       await moveAfterAuthenticated();
     }
   } catch (error) {
-    if (flowId === authFlowId.value && !loading.value) {
-      errorMessage.value = t("loginRequired.checkFailed");
-    }
+    errorMessage.value = t("loginRequired.checkFailed");
   }
 }
 
 async function tempLogin() {
-  if (loading.value) return;
-
-  const flowId = ++authFlowId.value;
   loading.value = true;
   errorMessage.value = "";
 
   try {
-    authStore.resetAuth();
     await authApiLive.tempLogin({userId: "temp-user", userName: "임시 사용자"});
-
-    const authenticated = await verifyAuthenticatedSession(flowId);
-    if (flowId !== authFlowId.value) return;
-
-    if (!authenticated) {
-      errorMessage.value = t("loginRequired.loginFailed");
-      return;
-    }
-
     await moveAfterAuthenticated();
   } catch (error) {
-    if (flowId === authFlowId.value) {
-      errorMessage.value = t("loginRequired.loginFailed");
-    }
+    errorMessage.value = t("loginRequired.loginFailed");
   } finally {
-    if (flowId === authFlowId.value) {
-      loading.value = false;
-    }
+    loading.value = false;
   }
 }
 

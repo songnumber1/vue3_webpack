@@ -11,7 +11,7 @@
       @click="selectLocale('ko')"
     >
       <strong>{{ t("common.korean") }}</strong>
-      <small>한국어 UI</small>
+      <small>{{ t("common.koreanUi") }}</small>
     </button>
     <button
       class="bottom-sheet-option"
@@ -20,7 +20,7 @@
       @click="selectLocale('en')"
     >
       <strong>{{ t("common.english") }}</strong>
-      <small>English UI</small>
+      <small>{{ t("common.englishUi") }}</small>
     </button>
   </BaseBottomSheet>
 </template>

@@ -73,9 +73,8 @@
     <ResponsiveOverlay
       :open="systemOpen"
       :is-mobile="isMobile"
-      title="시스템"
-      subtitle="앱 동작과 화면 노출 설정"
-      mobile-mode="dialog"
+      :title="t('common.system')"
+      :subtitle="t('menu.systemSummary')"
       panel-class="responsive-panel--system-settings"
       @close="systemOpen = false"
     >
@@ -93,15 +92,11 @@
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
       :is-mobile="isMobile"
-      :initial-menu="mobileSettingsInitialMenu"
-      @close="closeMobileSettings"
+      @close="mobileSettingsOpen = false"
       @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
-    <VirtualKeyboardDebug
-      v-if="isDev"
-      :visible="showVirtualKeyboardDebugButton"
-    />
+    <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
 
     <ChatHistoryDialog
       :open="historyDialogOpen"
@@ -142,7 +137,7 @@
 </template>
 
 <script setup>
-import {computed, nextTick, provide, ref, watch} from "vue";
+import {computed, provide} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
@@ -167,10 +162,8 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const route = useRoute();
-const isDev = process.env.NODE_ENV !== "production";
 const systemSettingsStore = useSystemSettingsStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
-const mobileSettingsInitialMenu = ref("");
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
@@ -253,21 +246,11 @@ const {
 } = useChatContainerController(controllerProps);
 
 const showVirtualKeyboardDebugButton = computed(
-  () => isDev && isMobile.value && showVirtualKeyboardDebug.value
+  () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
-function closeMobileSettings() {
-  mobileSettingsOpen.value = false;
-  mobileSettingsInitialMenu.value = "";
-}
-
-function openMobileSettingsDetail(target = "") {
-  mobileSettingsInitialMenu.value = target;
-  mobileSettingsOpen.value = true;
-}
-
 function handleMobileSettingsDesktopOpen(target) {
-  closeMobileSettings();
+  mobileSettingsOpen.value = false;
   if (target === "notice") {
     noticeOpen.value = true;
     return;
@@ -284,17 +267,6 @@ function handleMobileSettingsDesktopOpen(target) {
     systemOpen.value = true;
   }
 }
-
-watch(
-  () => [isMobile.value, systemOpen.value],
-  async ([mobile, open]) => {
-    if (!mobile || !open) return;
-    systemOpen.value = false;
-    await nextTick();
-    openMobileSettingsDetail("system");
-  },
-  {flush: "post"}
-);
 
 provide(CHAT_ACTIONS_KEY, {
   openDrawer: openMobileDrawer,

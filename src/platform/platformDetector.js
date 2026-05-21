@@ -5,6 +5,7 @@ import {
   hasIosBridge,
   hasExtensionRuntime,
 } from "@/core/config";
+import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
 function getNavigator() {
   return typeof window === "undefined" ? {} : window.navigator || {};
 }
@@ -115,6 +116,11 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
+  const visualWidth = typeof window === "undefined" ? 0 : Math.round(window.visualViewport?.width || 0);
+  const compactWidthCandidates = [visualWidth, width].filter((value) => Number.isFinite(value) && value > 0);
+  const compactWidth = compactWidthCandidates.length ? Math.min(...compactWidthCandidates) : 0;
+  const isCompactViewport = compactWidth > 0 && compactWidth <= MOBILE_BREAKPOINT_PX;
+  const isNativeRuntime = isNativeApp;
 
   return {
     env,
@@ -131,6 +137,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isAndroid,
     isIos,
     isNativeApp,
+    isNativeRuntime,
+    isCompactViewport,
     isAndroidApp,
     isIosApp,
     isMobile,

@@ -11,28 +11,21 @@
 <script setup>
 import {computed} from "vue";
 import {useAppContext} from "@/composables/useAppContext";
-import {usePlatformStore} from "@/stores/platformStore";
+import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
 
 const {appInfo} = useAppContext();
-const platformStore = usePlatformStore();
-
-const platformInfo = computed(() => platformStore.info || {});
+const {platformInfo, shouldUseMobileLayout, isMobileBrowser} = useRuntimeModeFlags();
 const platformName = computed(
   () => platformInfo.value.env || appInfo?.platform || "web"
 );
 const browserName = computed(() => platformInfo.value.browser || "unknown");
 const deviceName = computed(() => platformInfo.value.device || "unknown");
-const isMobileContainer = computed(
-  () =>
-    platformInfo.value.isMobileBrowser ||
-    platformInfo.value.isAndroidApp ||
-    platformInfo.value.isIosApp
-);
+const isMobileContainer = computed(() => shouldUseMobileLayout.value);
 
 const containerClasses = computed(() => ({
   "app-container--web": !isMobileContainer.value,
   "app-container--compact": isMobileContainer.value,
-  "app-container--compact-browser": Boolean(platformInfo.value.isMobileBrowser),
+  "app-container--compact-browser": isMobileBrowser.value,
   [`app-container--${platformName.value}`]: true,
   [`app-container--browser-${browserName.value}`]: true,
   [`app-container--device-${deviceName.value}`]: true,

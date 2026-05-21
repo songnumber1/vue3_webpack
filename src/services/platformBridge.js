@@ -2,14 +2,29 @@ import {callNative} from "@/bridge/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";
+import {i18n} from "@/i18n";
 
-function notifyWebClipboardCopied(message) {
+function notifyDesktopWebClipboardCopied(message) {
   if (typeof window === "undefined") return;
+  const info = getStore().info || {};
+  if (
+    info.isNativeRuntime ||
+    info.isNativeApp ||
+    info.isAndroidApp ||
+    info.isIosApp ||
+    info.isMobileBrowser
+  ) {
+    return;
+  }
   window.dispatchEvent(
     new CustomEvent("app:clipboard-copied", {
-      detail: {message},
+      detail: {message, channel: "desktop-note"},
     })
   );
+}
+
+function t(key, params) {
+  return i18n.global.t(key, params);
 }
 
 function getStore() {
@@ -18,7 +33,7 @@ function getStore() {
 function isAndroidApp() {
   return getStore().info.isAndroidApp;
 }
-function webSuccess(data = {}, message = "브라우저에서 처리되었습니다.") {
+function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
   return {
     requestId: `web_${Date.now()}_${Math.random().toString(36).slice(2)}`,
     requestDate: new Date().toISOString(),
@@ -31,11 +46,18 @@ function webSuccess(data = {}, message = "브라우저에서 처리되었습니�
   };
 }
 export async function copyClipboardByPlatform(text) {
-  if (isAndroidApp()) return callNative("COPY_CLIPBOARD", {text});
+  const successMessage = t("clipboardNote.message");
+  if (isAndroidApp()) {
+    return callNative("COPY_CLIPBOARD", {
+      text,
+      message: successMessage,
+      toastMessage: successMessage,
+    });
+  }
   const copied = await copyWebText(text);
 
-  const message = copied ? "브라우저 클립보드에 복사되었습니다." : "복사 실패";
-  if (copied) notifyWebClipboardCopied(message);
+  const message = copied ? successMessage : t("clipboardNote.fail");
+  if (copied) notifyDesktopWebClipboardCopied(message);
 
   return webSuccess({copied}, message);
 }
@@ -50,14 +72,14 @@ export async function openNativeFilePicker(options = {}) {
 
   return webSuccess(
     {opened: false, reason: "browser-file-input-required"},
-    "브라우저에서는 input[type=file]을 사용해야 합니다."
+    t("platformBridge.browserFileInputRequired")
   );
 }
 export async function getPushToken() {
   if (!isAndroidApp())
     return webSuccess(
       {token: ""},
-      "브라우저에서는 FCM 토큰을 Native Bridge에서 조회하지 않습니다."
+      t("platformBridge.browserFcmUnavailable")
     );
   const res = await callNative("GET_PUSH_TOKEN", {});
   getStore().setPushToken(res.data?.token);
@@ -78,7 +100,7 @@ export async function shareByPlatform(data) {
 
     return webSuccess({shared: true});
   }
-  throw new Error("현재 브라우저에서 공유 기능을 지원하지 않습니다.");
+  throw new Error(t("platformBridge.shareUnsupported"));
 }
 export async function checkNetworkByPlatform() {
   if (isAndroidApp()) return callNative("CHECK_NETWORK", {});

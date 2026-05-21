@@ -825,34 +825,9 @@ body.mobile-mode .feedback-dialog {
   max-height: calc(100dvh - 24px);
   border-radius: var(--dialog-radius);
 }
-
-/* Mobile settings menu icons use a soft tile wrapper plus a simple SVG image.
-   This avoids global asset-icon rules shrinking the setting menu image itself. */
-.mobile-settings-item .mobile-settings-item-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: var(--sidebar-hover, #f2f4f7);
-  flex: 0 0 34px;
-}
-
-.mobile-settings-item .mobile-settings-item-icon-image {
+.mobile-settings-item-icon img {
   display: block;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
-}
-
-.guide-glyph {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  border: 1.6px solid currentColor;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 900;
-  line-height: 1;
 }

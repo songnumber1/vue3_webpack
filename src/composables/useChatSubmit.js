@@ -171,9 +171,6 @@ export function useChatSubmit(options) {
               reasoningStatus: "completed",
             });
           },
-          onError: async (error) => {
-            logWarn("[useChatSubmit] SSE onError:", error);
-          },
         }
       );
       await typewriter.flush();
@@ -279,9 +276,6 @@ export function useChatSubmit(options) {
               status: "complete",
               reasoningStatus: "completed",
             });
-          },
-          onError: async (error) => {
-            logWarn("[useChatSubmit] regenerate SSE onError:", error);
           },
         }
       );

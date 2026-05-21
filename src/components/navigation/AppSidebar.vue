@@ -158,11 +158,10 @@
 </template>
 
 <script setup>
-import {computed, nextTick, ref, watch} from "vue";
+import {nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
-import {useEventListener, useWindowSize} from "@vueuse/core";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useEventListener} from "@vueuse/core";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import Icon from "@/components/navigation/SidebarIcon.vue";
@@ -172,7 +171,7 @@ import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList
 import ChatHistoryActionMenu from "@/components/navigation/parts/ChatHistoryActionMenu.vue";
 import SidebarUserFooter from "@/components/navigation/parts/SidebarUserFooter.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {usePlatformStore} from "@/stores/platformStore";
+import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/useOutsideClick";
@@ -188,8 +187,7 @@ const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
-const platformStore = usePlatformStore();
-const systemSettingsStore = useSystemSettingsStore();
+const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, selectedChatId} = storeToRefs(chatStore);
@@ -202,20 +200,8 @@ const historyMenuRef = ref(null);
 const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuReferenceEl = ref(null);
-const {width} = useWindowSize();
-const isCompactViewport = computed(
-  () => width.value <= systemSettingsStore.mobileBreakpoint
-);
-
 function syncViewportMode() {
-  const platformInfo = platformStore.info || {};
-  isMobileSheet.value = Boolean(
-    isCompactViewport.value ||
-    platformInfo.isMobileBrowser ||
-    platformInfo.isAndroidApp ||
-    platformInfo.isIosApp ||
-    document.body.classList.contains("mobile-mode")
-  );
+  isMobileSheet.value = shouldUseMobileLayout.value;
 }
 
 function openAssistantSelector() {

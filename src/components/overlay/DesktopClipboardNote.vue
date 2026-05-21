@@ -32,9 +32,15 @@ let remainingMs = NOTE_DURATION_MS;
 
 const title = computed(() => t("clipboardNote.title"));
 
-function isDesktopMode() {
-  if (!platformStore.info.isPc || platformStore.info.isNativeApp) return false;
-  return !document.body.classList.contains("mobile-mode");
+function shouldShowWebClipboardNote() {
+  const info = platformStore.info || {};
+  return !(
+    info.isNativeRuntime ||
+    info.isNativeApp ||
+    info.isAndroidApp ||
+    info.isIosApp ||
+    info.isMobileBrowser
+  );
 }
 
 function clearTimer() {
@@ -68,7 +74,7 @@ function resumeTimer() {
 }
 
 function showNote(event) {
-  if (!isDesktopMode()) return;
+  if (!shouldShowWebClipboardNote()) return;
   message.value = event.detail?.message || t("clipboardNote.message");
   visible.value = true;
   startTimer(NOTE_DURATION_MS);
@@ -129,6 +135,8 @@ onBeforeUnmount(() => {
 }
 
 :global(body.mobile-mode) .desktop-clipboard-note {
-  display: none;
+  top: calc(var(--mobile-header-height, 56px) + 12px);
+  right: 12px;
+  width: min(320px, calc(100vw - 24px));
 }
 </style>

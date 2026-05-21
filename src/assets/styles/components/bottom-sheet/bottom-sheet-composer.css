@@ -27,12 +27,12 @@ body.mobile-mode .bottom-sheet-body > *:last-child {
   box-shadow: var(--shadow-prompt);
 }
 .shared-readonly-box strong {
-  font-size: var(--font-size-base);
+  font-size: 15px;
   font-weight: 800;
 }
 .shared-readonly-box span {
   color: var(--text-muted);
-  font-size: var(--font-size-sm);
+  font-size: 13px;
 }
 body.mobile-mode .shared-readonly-wrap {
   padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
@@ -45,10 +45,10 @@ body.mobile-mode .shared-readonly-box {
   padding: 10px 14px;
 }
 body.mobile-mode .shared-readonly-box strong {
-  font-size: var(--font-size-md);
+  font-size: 14px;
 }
 body.mobile-mode .shared-readonly-box span {
-  font-size: var(--font-size-xs);
+  font-size: 12px;
 }
 
 /* Final chat scroll/composer spacing stabilization.
@@ -272,7 +272,7 @@ body.mobile-mode .scroll-bottom-button {
 .service-menu-item small {
   margin-top: 3px;
   color: var(--text-muted);
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   line-height: 1.35;
 }
 .sidebar-user--mobile {
@@ -341,7 +341,7 @@ body.mobile-mode .scroll-bottom-button {
   display: block;
 }
 .responsive-panel-header strong {
-  font-size: var(--close-button-font-size);
+  font-size: 20px;
   letter-spacing: -0.04em;
 }
 .responsive-panel-header small {
@@ -363,7 +363,7 @@ body.mobile-mode .scroll-bottom-button {
   color: var(--text);
   display: grid;
   place-items: center;
-  font-size: var(--font-size-3xl);
+  font-size: 24px;
 }
 .responsive-back-button span[aria-hidden="true"] {
   font-size: 32px;
@@ -398,7 +398,7 @@ body.mobile-mode .scroll-bottom-button {
 .personal-eyebrow,
 .guide-card span {
   color: var(--primary-strong);
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -407,7 +407,7 @@ body.mobile-mode .scroll-bottom-button {
 .personal-card h3,
 .guide-card h2 {
   margin: 8px 0 8px;
-  font-size: var(--font-size-xl);
+  font-size: 18px;
   letter-spacing: -0.035em;
 }
 .notice-card p,
@@ -497,7 +497,7 @@ body.mobile-mode .scroll-bottom-button {
 .guide-hero p {
   margin: 0;
   color: var(--text-muted);
-  font-size: var(--font-size-xl);
+  font-size: 18px;
 }
 .guide-grid {
   width: min(960px, 100%);
@@ -548,7 +548,7 @@ body.mobile-mode .scroll-bottom-button {
   background: var(--surface-muted);
 }
 .md-table-title {
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   font-weight: 900;
 }
 .md-table-actions {
@@ -562,7 +562,7 @@ body.mobile-mode .scroll-bottom-button {
   background: var(--control-bg);
   color: var(--text);
   padding: 0 10px;
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   font-weight: 800;
 }
 .md-table-action:hover {
@@ -717,13 +717,13 @@ body.mobile-mode .md-table-action {
   gap: 2px;
 }
 .settings-menu-summary-text strong {
-  font-size: var(--font-size-md);
+  font-size: 14px;
   line-height: 1.25;
   font-weight: 800;
 }
 .settings-menu-summary-text small {
   margin: 0 !important;
-  font-size: var(--font-size-2xs);
+  font-size: 11px;
   line-height: 1.25;
 }
 .settings-menu .app-icon--chevron {
@@ -743,12 +743,12 @@ body.mobile-mode .md-table-action {
   border-radius: 10px;
 }
 .settings-menu .service-menu-item strong {
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   font-weight: 750;
   line-height: 1.25;
 }
 .settings-menu .service-menu-item small {
-  font-size: var(--font-size-2xs);
+  font-size: 11px;
   line-height: 1.25;
 }
 .quick-menu--mobile-search {
@@ -756,7 +756,7 @@ body.mobile-mode .md-table-action {
 }
 .quick-menu--mobile-search .quick-item {
   min-height: 40px;
-  font-size: var(--font-size-md);
+  font-size: 14px;
 }
 
 .md-table-actions {
@@ -1016,12 +1016,12 @@ body.mobile-mode .quick-menu--mobile-search {
 .mobile-drawer .quick-menu--mobile-search .quick-item,
 body.mobile-mode .quick-menu--mobile-search .quick-item {
   min-height: 42px;
-  font-size: var(--font-size-md);
+  font-size: 14px;
   border-radius: 10px;
 }
 
 .playground-glyph {
-  font-size: var(--font-size-lg);
+  font-size: 16px;
   font-weight: 900;
   line-height: 1;
 }
@@ -1048,7 +1048,7 @@ body.mobile-mode .quick-menu--mobile-search .quick-item {
 .playground-card-label {
   margin: 0 0 8px;
   color: var(--primary);
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -1089,7 +1089,7 @@ body.mobile-mode .quick-menu--mobile-search .quick-item {
   background: var(--control-bg);
   color: var(--text);
   font-weight: 800;
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   text-decoration: none;
 }
 
@@ -1167,31 +1167,70 @@ html.is-prompt-menu-open .scroll-bottom-button {
   display: none !important;
 }
 
-
-/* Asset-based icon rendering */
-.app-icon,
-.nav-icon,
-.prompt-button-icon,
-.prompt-menu-icon,
-.bottom-sheet-option-icon,
-.mobile-settings-item-icon,
-.chat-history-action-icon,
-.message-action-img,
-.shared-readonly-icon img,
-.auth-required-icon img,
-.toolbar-link img,
-.playground-popup-icon img {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-  flex: 0 0 auto;
-  vertical-align: middle;
+.md-code-card,
+.md-mermaid-card {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 14px 0;
+  background: var(--surface);
 }
-
-.prompt-menu-icon,
-.bottom-sheet-option-icon,
-.mobile-settings-item-icon,
-.chat-history-action-icon {
-  margin-right: 0;
+.md-code-toolbar,
+.md-mermaid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+.md-code-title,
+.md-mermaid-title {
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.md-code-actions,
+.md-mermaid-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+.md-code-action,
+.md-mermaid-action {
+  min-height: 30px;
+  min-width: 34px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.md-code-action:hover,
+.md-mermaid-action:hover {
+  background: var(--control-hover);
+}
+.md-code-action-icon--copy::before,
+.md-mermaid-action-icon--copy::before {
+  content: "⧉";
+}
+.md-mermaid-action-icon--svg::before {
+  content: "◇";
+}
+.md-mermaid-action-icon--code::before {
+  content: "</>";
+  font-size: 10px;
+}
+.md-code-card .md-code-pre,
+.md-code-card pre {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
 }

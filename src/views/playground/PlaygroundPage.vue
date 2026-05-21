@@ -2,27 +2,27 @@
   <main class="playground-page">
     <header class="playground-header">
       <div>
-        <p class="playground-eyebrow">UI Playground</p>
-        <h1>공통 UI 테스트 공간</h1>
-        <p>
-          Web/Android 공통 컴포넌트, Overlay, Bottom Sheet, 알림/경고/확인
-          팝업을 실제 화면과 분리해서 확인합니다.
-        </p>
+        <p class="playground-eyebrow">{{ t("playground.eyebrow") }}</p>
+        <h1>{{ t("playground.title") }}</h1>
+        <p>{{ t("playground.description") }}</p>
       </div>
       <div class="playground-header-actions">
-        <RouterLink class="playground-link" to="/">홈</RouterLink>
-        <RouterLink class="playground-link" to="/swagger">Swagger</RouterLink>
+        <RouterLink class="playground-link" to="/">
+          {{ t("common.home") }}
+        </RouterLink>
+        <RouterLink class="playground-link" to="/swagger">
+          {{ t("common.swagger") }}
+        </RouterLink>
       </div>
     </header>
 
     <section class="playground-grid">
       <article class="playground-card">
-        <span class="playground-card-label">Container</span>
-        <h2>AppContainer 통합 확인</h2>
-        <p>
-          기존 WebLayout/AndroidLayout의 단순 slot wrapper를 AppContainer로
-          통합하고, platform class로 Web/Android 차이를 분리했습니다.
-        </p>
+        <span class="playground-card-label">
+          {{ t("playground.container.label") }}
+        </span>
+        <h2>{{ t("playground.container.title") }}</h2>
+        <p>{{ t("playground.container.description") }}</p>
         <dl class="playground-info-list">
           <div>
             <dt>platform</dt>
@@ -36,97 +36,126 @@
             <dt>container</dt>
             <dd>{{ containerMode }}</dd>
           </div>
+          <div>
+            <dt>compact</dt>
+            <dd>{{ isCompactViewport ? "true" : "false" }}</dd>
+          </div>
+          <div>
+            <dt>native</dt>
+            <dd>{{ isNativeRuntime ? "true" : "false" }}</dd>
+          </div>
+          <div>
+            <dt>android</dt>
+            <dd>{{ isAndroidRuntime ? "true" : "false" }}</dd>
+          </div>
+          <div>
+            <dt>mobile browser</dt>
+            <dd>{{ isMobileBrowser ? "true" : "false" }}</dd>
+          </div>
         </dl>
       </article>
 
       <article class="playground-card">
-        <span class="playground-card-label">Overlay</span>
-        <h2>Modal / Full Screen</h2>
-        <p>
-          공통 Overlay Provider를 통해 데스크톱에서는 모달, 모바일에서는 전체
-          화면 패널로 전환되는지 확인합니다.
-        </p>
+        <span class="playground-card-label">
+          {{ t("playground.overlay.label") }}
+        </span>
+        <h2>{{ t("playground.overlay.title") }}</h2>
+        <p>{{ t("playground.overlay.description") }}</p>
         <div class="playground-actions">
           <button
             class="playground-button"
             type="button"
             @click="noticeOpen = true"
           >
-            공지 Overlay 열기
+            {{ t("playground.overlay.openNotice") }}
           </button>
           <button
             class="playground-button playground-button--secondary"
             type="button"
             @click="personalizationOpen = true"
           >
-            개인화 Overlay 열기
+            {{ t("playground.overlay.openPersonalization") }}
           </button>
         </div>
       </article>
 
       <article class="playground-card">
-        <span class="playground-card-label">Popup</span>
-        <h2>알림 / 경고 / 확인 팝업</h2>
-        <p>
-          실제 서비스에서 공통으로 사용할 알림, 경고, 확인 팝업 샘플입니다.
-          내용은 slot으로 교체하고, 버튼 액션은 부모에서 제어합니다.
-        </p>
+        <span class="playground-card-label">
+          {{ t("playground.popup.label") }}
+        </span>
+        <h2>{{ t("playground.popup.title") }}</h2>
+        <p>{{ t("playground.popup.description") }}</p>
         <div class="playground-actions">
           <button
             class="playground-button"
             type="button"
             @click="openPopup('alert')"
           >
-            알림 팝업
+            {{ t("playground.popup.alertButton") }}
           </button>
           <button
             class="playground-button playground-button--secondary"
             type="button"
             @click="openPopup('warning')"
           >
-            경고 팝업
+            {{ t("playground.popup.warningButton") }}
           </button>
           <button
             class="playground-button playground-button--secondary"
             type="button"
             @click="openPopup('confirm')"
           >
-            확인 팝업
+            {{ t("playground.popup.confirmButton") }}
           </button>
         </div>
         <div class="playground-log-list">
-          <strong>마지막 팝업 결과</strong><br />
+          <strong>{{ t("playground.popup.lastResult") }}</strong><br />
           {{ popupResult }}
         </div>
       </article>
 
       <article class="playground-card">
-        <span class="playground-card-label">Bottom Sheet</span>
-        <h2>모바일 Sheet 테스트</h2>
-        <p>
-          동적 컨텐츠가 들어가는 UI는 slot 기반을 유지하고, 외부에서
-          open/close만 제어합니다.
-        </p>
+        <span class="playground-card-label">
+          {{ t("playground.clipboard.label") }}
+        </span>
+        <h2>{{ t("playground.clipboard.title") }}</h2>
+        <p>{{ t("playground.clipboard.description") }}</p>
+        <div class="playground-actions">
+          <button class="playground-button" type="button" @click="copySampleText">
+            {{ t("playground.clipboard.copyButton") }}
+          </button>
+        </div>
+        <div class="playground-log-list">
+          <strong>{{ t("playground.clipboard.feedbackTarget") }}</strong><br />
+          {{ clipboardFeedbackTarget }}
+        </div>
+      </article>
+
+      <article class="playground-card">
+        <span class="playground-card-label">
+          {{ t("playground.bottomSheet.label") }}
+        </span>
+        <h2>{{ t("playground.bottomSheet.title") }}</h2>
+        <p>{{ t("playground.bottomSheet.description") }}</p>
         <button
           class="playground-button"
           type="button"
           @click="sheetOpen = true"
         >
-          Bottom Sheet 열기
+          {{ t("playground.bottomSheet.open") }}
         </button>
       </article>
 
       <article class="playground-card playground-card--wide">
-        <span class="playground-card-label">Navigation</span>
-        <h2>진입 경로 확인</h2>
-        <p>
-          웹 모드에서는 헤더 사용자 메뉴의 하위 아이템, 모바일 모드에서는 좌측
-          메뉴 사용자 정보 우측 아이콘으로 이 화면에 접근합니다.
-        </p>
+        <span class="playground-card-label">
+          {{ t("playground.navigation.label") }}
+        </span>
+        <h2>{{ t("playground.navigation.title") }}</h2>
+        <p>{{ t("playground.navigation.description") }}</p>
         <div class="playground-route-row">
-          <RouterLink to="/guide">Guide route</RouterLink>
-          <RouterLink to="/shared/sample-share-id">Shared route</RouterLink>
-          <RouterLink to="/chat/1">Chat route</RouterLink>
+          <RouterLink to="/guide">{{ t("playground.navigation.guideRoute") }}</RouterLink>
+          <RouterLink to="/shared/sample-share-id">{{ t("playground.navigation.sharedRoute") }}</RouterLink>
+          <RouterLink to="/chat/1">{{ t("playground.navigation.chatRoute") }}</RouterLink>
         </div>
       </article>
     </section>
@@ -156,11 +185,11 @@
       mobile-mode="dialog"
       :title="activePopup.title"
       :subtitle="activePopup.subtitle"
-      @close="closePopup('닫기 버튼')"
+      @close="closePopup(t('common.close'))"
     >
       <div class="playground-popup-content">
         <div class="playground-popup-icon" aria-hidden="true">
-          <img :src="activePopup.iconSrc" alt="" />
+          {{ activePopup.icon }}
         </div>
         <p class="playground-popup-message">
           {{ activePopup.message }}
@@ -173,18 +202,22 @@
             v-if="activePopup.type === 'confirm'"
             class="playground-button playground-button--secondary"
             type="button"
-            @click="closePopup('취소')"
+            @click="closePopup(t('common.cancel'))"
           >
-            취소
+            {{ t("common.cancel") }}
           </button>
           <button
             class="playground-button"
             type="button"
             @click="
-              closePopup(activePopup.type === 'confirm' ? '확인' : '닫기')
+              closePopup(
+                activePopup.type === 'confirm'
+                  ? t('common.confirm')
+                  : t('common.close')
+              )
             "
           >
-            {{ activePopup.type === "confirm" ? "확인" : "닫기" }}
+            {{ activePopup.type === "confirm" ? t("common.confirm") : t("common.close") }}
           </button>
         </div>
       </div>
@@ -192,19 +225,19 @@
 
     <BaseBottomSheet
       :open="sheetOpen"
-      title="Playground Bottom Sheet"
+      :title="t('playground.bottomSheet.sheetTitle')"
       @close="sheetOpen = false"
     >
       <div class="playground-sheet-body">
         <button
           v-for="item in sheetItems"
-          :key="item"
+          :key="item.id"
           class="bottom-sheet-option"
           type="button"
           @click="sheetOpen = false"
         >
-          <strong>{{ item }}</strong>
-          <small>동적으로 변경 가능한 slot 컨텐츠입니다.</small>
+          <strong>{{ item.title }}</strong>
+          <small>{{ t("playground.bottomSheet.optionDescription") }}</small>
         </button>
       </div>
     </BaseBottomSheet>
@@ -212,84 +245,90 @@
 </template>
 
 <script setup>
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useAppContext} from "@/composables/useAppContext";
-import {isAndroidApp} from "@/core/config";
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
+import {copyClipboardByPlatform} from "@/services/platformBridge";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
-import infoIcon from "@/assets/img/icons/info.svg";
-import questionIcon from "@/assets/img/icons/question.svg";
-import warningIcon from "@/assets/img/icons/warning.svg";
 
 const {t} = useI18n();
 const {appInfo} = useAppContext();
+const {
+  isCompactViewport,
+  isNativeRuntime,
+  isAndroidApp: isAndroidRuntime,
+  isMobileBrowser,
+  shouldUseMobileLayout,
+} = useRuntimeModeFlags();
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
 const sheetOpen = ref(false);
 const popupOpen = ref(false);
 const activePopupType = ref("alert");
-const popupResult = ref("아직 선택된 팝업 액션이 없습니다.");
-const isMobile = ref(false);
-const containerMode = computed(() =>
-  isAndroidApp(appInfo) ? "mobile" : "web"
-);
-const sheetItems = ["옵션 A", "옵션 B", "옵션 C"];
+const popupResult = ref(t("playground.popup.emptyResult"));
 
-const popupSamples = {
+const isMobile = computed(() => shouldUseMobileLayout.value);
+const containerMode = computed(() =>
+  isAndroidRuntime.value ? "mobile" : "web"
+);
+const clipboardFeedbackTarget = computed(() => {
+  if (isAndroidRuntime.value) return t("playground.clipboard.androidTarget");
+  if (isMobileBrowser.value) return t("playground.clipboard.mobileTarget");
+
+  return t("playground.clipboard.webTarget");
+});
+const sheetItems = computed(() => [
+  {id: "a", title: t("playground.bottomSheet.optionA")},
+  {id: "b", title: t("playground.bottomSheet.optionB")},
+  {id: "c", title: t("playground.bottomSheet.optionC")},
+]);
+
+const popupSamples = computed(() => ({
   alert: {
     type: "alert",
-    iconSrc: infoIcon,
-    title: "알림 팝업",
-    subtitle: "일반 안내 메시지",
-    message: "저장이 완료되었습니다.",
-    detail:
-      "서비스 공지, 단순 완료 안내, 토스트보다 강조가 필요한 안내에 사용합니다.",
+    icon: "i",
+    title: t("playground.popup.alert.title"),
+    subtitle: t("playground.popup.alert.subtitle"),
+    message: t("playground.popup.alert.message"),
+    detail: t("playground.popup.alert.detail"),
   },
   warning: {
     type: "warning",
-    iconSrc: warningIcon,
-    title: "경고 팝업",
-    subtitle: "주의가 필요한 작업",
-    message: "입력값을 다시 확인해 주세요.",
-    detail:
-      "삭제 전 경고, 세션 만료, 네트워크 오류처럼 사용자의 주의가 필요한 상황에 사용합니다.",
+    icon: "!",
+    title: t("playground.popup.warning.title"),
+    subtitle: t("playground.popup.warning.subtitle"),
+    message: t("playground.popup.warning.message"),
+    detail: t("playground.popup.warning.detail"),
   },
   confirm: {
     type: "confirm",
-    iconSrc: questionIcon,
-    title: "확인 팝업",
-    subtitle: "사용자 선택 필요",
-    message: "선택한 대화를 삭제하시겠습니까?",
-    detail: "확인/취소처럼 사용자의 명시적인 선택이 필요한 작업에 사용합니다.",
+    icon: "?",
+    title: t("playground.popup.confirm.title"),
+    subtitle: t("playground.popup.confirm.subtitle"),
+    message: t("playground.popup.confirm.message"),
+    detail: t("playground.popup.confirm.detail"),
   },
-};
+}));
 
-const activePopup = computed(() => popupSamples[activePopupType.value]);
+const activePopup = computed(() => popupSamples.value[activePopupType.value]);
 function openPopup(type) {
   activePopupType.value = type;
   popupOpen.value = true;
 }
 function closePopup(action) {
   popupOpen.value = false;
-  popupResult.value = `${activePopup.value.title} - ${action}`;
+  popupResult.value = t("playground.popup.result", {
+    title: activePopup.value.title,
+    action,
+  });
 }
-function syncMobile() {
-  isMobile.value = Boolean(
-    window.matchMedia?.(`(max-width: ${MOBILE_BREAKPOINT_PX}px)`)?.matches ||
-    isAndroidApp(appInfo)
-  );
+async function copySampleText() {
+  await copyClipboardByPlatform(t("playground.clipboard.sampleText"));
 }
-
-onMounted(() => {
-  syncMobile();
-  window.addEventListener("resize", syncMobile, {passive: true});
-});
-
-onBeforeUnmount(() => window.removeEventListener("resize", syncMobile));
 </script>

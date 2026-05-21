@@ -40,7 +40,7 @@
               @click="selectMenuItem(item.key)"
             >
               <span class="mobile-settings-item-icon" aria-hidden="true">
-                <img class="mobile-settings-item-icon-image" :src="item.iconSrc" alt="" />
+                <img :src="item.icon" alt="" />
               </span>
               <span>
                 <strong>{{ item.label }}</strong>
@@ -129,19 +129,19 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
-import chatManagementIcon from "@/assets/img/icons/chat-management.svg";
-import guideIcon from "@/assets/img/icons/question.svg";
-import languageIcon from "@/assets/img/icons/language.svg";
-import noticeIcon from "@/assets/img/icons/info.svg";
-import personalizationIcon from "@/assets/img/icons/personalization.svg";
-import privacyIcon from "@/assets/img/icons/privacy.svg";
-import settingsIcon from "@/assets/img/icons/settings.svg";
-import termsIcon from "@/assets/img/icons/terms.svg";
+import guideIcon from "@/assets/img/settings/guide.svg";
+import noticeIcon from "@/assets/img/settings/notice.svg";
+import privacyIcon from "@/assets/img/settings/privacy.svg";
+import termsIcon from "@/assets/img/settings/terms.svg";
+import personalizationIcon from "@/assets/img/settings/personalization.svg";
+import systemIcon from "@/assets/img/settings/system.svg";
+import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
+import languageIcon from "@/assets/img/settings/language.svg";
+import playgroundIcon from "@/assets/img/settings/playground.svg";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: true},
-  initialMenu: {type: String, default: ""},
 });
 const emit = defineEmits(["close", "desktop-open"]);
 const {t, tm, locale} = useI18n();
@@ -154,56 +154,63 @@ const menuItems = computed(() =>
   [
     {
       key: "guide",
-      iconSrc: guideIcon,
+      icon: guideIcon,
       label: t("common.guide"),
       description: t("guide.subtitle"),
       visible: systemSettings.value.showGuideButton,
     },
     {
       key: "notice",
-      iconSrc: noticeIcon,
+      icon: noticeIcon,
       label: t("common.notice"),
       description: t("menu.noticeSummary"),
       visible: systemSettings.value.showNoticeMenu,
     },
     {
       key: "privacy",
-      iconSrc: privacyIcon,
+      icon: privacyIcon,
       label: t("common.privacy"),
       description: t("menu.privacySummary"),
       visible: systemSettings.value.showPrivacyMenu,
     },
     {
       key: "terms",
-      iconSrc: termsIcon,
+      icon: termsIcon,
       label: t("common.terms"),
       description: t("menu.termsSummary"),
       visible: systemSettings.value.showTermsMenu,
     },
     {
       key: "personalization",
-      iconSrc: personalizationIcon,
+      icon: personalizationIcon,
       label: t("common.personalization"),
       description: t("menu.personalizationSummary"),
       visible: systemSettings.value.showPersonalizationMenu,
     },
     {
       key: "system",
-      iconSrc: settingsIcon,
-      label: "시스템",
-      description: "앱 동작과 화면 노출 설정을 관리합니다.",
+      icon: systemIcon,
+      label: t("common.system"),
+      description: t("menu.systemSummary"),
       visible: true,
     },
     {
+      key: "playground",
+      icon: playgroundIcon,
+      label: t("common.playground"),
+      description: t("menu.playgroundSummary"),
+      visible: systemSettings.value.showPlaygroundMenu,
+    },
+    {
       key: "chatManagement",
-      iconSrc: chatManagementIcon,
+      icon: chatManagementIcon,
       label: t("settings.chatManagement"),
       description: t("settings.chatManagementSummary"),
       visible: true,
     },
     {
       key: "language",
-      iconSrc: languageIcon,
+      icon: languageIcon,
       label: t("common.language"),
       description: t("menu.languageSummary"),
       visible: true,
@@ -224,9 +231,9 @@ const languageOptions = computed(() => [
   {value: "en", label: t("common.english")},
 ]);
 function selectMenuItem(key) {
-  if (key === "terms") {
+  if (key === "terms" || key === "playground") {
     closePanel();
-    router.push({name: "terms"}).catch(() => {});
+    router.push(key === "terms" ? {name: "terms"} : {name: "playground"}).catch(() => {});
     return;
   }
   activeMenu.value = key;
@@ -250,21 +257,7 @@ function selectLocale(value) {
 watch(
   () => props.open,
   (value) => {
-    if (!value) {
-      activeMenu.value = "";
-      return;
-    }
-    if (props.initialMenu) {
-      activeMenu.value = props.initialMenu;
-    }
-  }
-);
-
-watch(
-  () => props.initialMenu,
-  (value) => {
-    if (!props.open || !value) return;
-    activeMenu.value = value;
+    if (!value) activeMenu.value = "";
   }
 );
 

@@ -37,7 +37,9 @@
         type="button"
         @click="handleToolClick(tool)"
       >
-        <img v-if="tool.iconSrc" class="bottom-sheet-option-icon" :src="tool.iconSrc" alt="" aria-hidden="true" />
+        <span aria-hidden="true">
+          {{ tool.icon }}
+        </span>
 
         <strong>
           {{ tool.label }}
@@ -117,7 +119,9 @@
       type="button"
       @click="$emit('open-file-picker', option.id)"
     >
-      <img v-if="option.iconSrc" class="bottom-sheet-option-icon" :src="option.iconSrc" alt="" aria-hidden="true" />
+      <span aria-hidden="true">
+        {{ option.icon }}
+      </span>
 
       <strong>
         {{ option.label }}

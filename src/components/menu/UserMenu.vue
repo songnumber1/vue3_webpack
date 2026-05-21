@@ -59,8 +59,8 @@
           role="menuitem"
           @click="select('system')"
         >
-          <strong>시스템</strong>
-          <small>앱 동작과 화면 노출 설정을 관리합니다.</small>
+          <strong>{{ t("common.system") }}</strong>
+          <small>{{ t("menu.systemSummary") }}</small>
         </button>
         <button
           v-if="systemSettings.showPlaygroundMenu"

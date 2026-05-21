@@ -7,19 +7,21 @@
       aria-live="polite"
     >
       <span class="mobile-api-progress-spinner" aria-hidden="true"></span>
-      <span class="sr-only">API 요청 처리 중입니다.</span>
+      <span class="sr-only">{{ t("overlayProgress.apiProcessing") }}</span>
     </div>
   </teleport>
 </template>
 
 <script setup>
 import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {isMobileLikeViewport} from "@/utils/viewportMode";
 
+const {t} = useI18n();
 const apiRequestStore = useApiRequestStore();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();

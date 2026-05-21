@@ -1,5 +1,5 @@
 <template>
-  <footer class="sidebar-user sidebar-user--mobile" role="contentinfo">
+  <div class="sidebar-user sidebar-user--mobile">
     <button
       class="sidebar-user-profile"
       type="button"
@@ -13,16 +13,6 @@
       </div>
     </button>
     <div class="sidebar-user-actions">
-      <button
-        v-if="systemSettings.showGuideButton"
-        class="sidebar-user-action"
-        type="button"
-        :aria-label="t('common.guide')"
-        :title="t('common.guide')"
-        @click="actions.openGuide()"
-      >
-        <span class="guide-glyph">?</span>
-      </button>
       <button
         v-if="systemSettings.showThemeButton"
         class="sidebar-user-action"
@@ -62,7 +52,7 @@
         <span class="logout-glyph">⏻</span>
       </button>
     </div>
-  </footer>
+  </div>
 </template>
 
 <script setup>
@@ -103,44 +93,6 @@ const userInitial = computed(() => {
 }
 
 .sidebar-user--mobile {
-  width: 100%;
   min-height: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sidebar-user-profile {
-  flex: 1 1 auto;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.sidebar-user-main {
-  flex: 1 1 auto;
-  overflow: hidden;
-}
-
-.sidebar-user-main strong,
-.sidebar-user-main small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sidebar-user-actions {
-  flex: 0 0 auto;
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
 }
 </style>

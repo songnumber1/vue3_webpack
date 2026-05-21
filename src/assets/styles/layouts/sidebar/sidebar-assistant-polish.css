@@ -170,7 +170,7 @@ body.mobile-mode .collapsed-sidebar {
 }
 
 .attach-menu strong {
-  font-size: var(--font-size-md);
+  font-size: 14px;
   font-weight: 700;
 }
 
@@ -266,7 +266,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-title,
 .mobile-drawer .sidebar-content--mobile .sidebar-title {
   display: block;
   color: var(--sidebar-text, #202123);
-  font-size: var(--font-size-2xl);
+  font-size: 22px;
   font-weight: 800;
   line-height: 1.2;
 }
@@ -319,7 +319,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item,
   border-radius: 0;
   background: transparent;
   color: var(--sidebar-text, #202123);
-  font-size: var(--font-size-base);
+  font-size: 15px;
   line-height: 1.25;
   text-align: left;
   white-space: nowrap;
@@ -355,7 +355,7 @@ body.mobile-mode .sidebar-content--mobile .section-label,
   flex: 0 0 auto;
   padding: 12px 18px 4px;
   color: var(--sidebar-section, #6b7280);
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -374,7 +374,7 @@ body.mobile-mode .mobile-new-chat-fab,
   border-radius: 999px;
   background: var(--fab-bg, #111827);
   color: var(--fab-text, #ffffff);
-  font-size: var(--font-size-lg);
+  font-size: 16px;
   font-weight: 800;
 }
 
@@ -426,7 +426,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .sidebar-content--mobile .assistant-trigger {
   height: 40px;
   max-width: 210px;
-  font-size: var(--font-size-xl);
+  font-size: 18px;
   box-shadow: none;
 }
 body.mobile-mode .sidebar-content--mobile .project-list {
@@ -534,7 +534,7 @@ body.mobile-mode .sidebar-history--main {
   justify-content: center;
   width: 24px;
   height: 24px;
-  font-size: var(--font-size-sm);
+  font-size: 13px;
   line-height: 1;
 }
 
@@ -549,7 +549,7 @@ body.mobile-mode .sidebar-history--main {
   background: transparent;
   color: inherit;
   cursor: pointer;
-  font-size: var(--font-size-xl);
+  font-size: 18px;
   line-height: 1;
 }
 
@@ -611,7 +611,7 @@ body.mobile-mode .sidebar-history--main {
 .chat-history-context-menu__item {
   padding: 10px 12px;
   border-radius: var(--dialog-option-radius);
-  font-size: var(--font-size-md);
+  font-size: 14px;
 }
 
 .chat-history-context-menu__item:hover,
@@ -697,4 +697,152 @@ body.mobile-mode .empty-stage--mobile-main,
 body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer-backdrop {
   border-radius: var(--mobile-root-radius);
+}
+
+/* Keep the mobile drawer footer attached to the visible bottom. Older safe-area
+   patches intentionally left a large browser-control gap; the current UI needs
+   only the actual safe-area inset. */
+body.mobile-mode .mobile-drawer,
+body.mobile-mode .mobile-drawer .sidebar-content--mobile {
+  height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
+  max-height: var(
+    --layout-viewport-height,
+    var(--app-height, 100dvh)
+  ) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile,
+body.mobile-mode .sidebar-content--mobile {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-history,
+body.mobile-mode .sidebar-content--mobile .sidebar-history {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-bottom: 8px;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-user--mobile,
+body.mobile-mode .sidebar-content--mobile .sidebar-user--mobile,
+body.mobile-mode .sidebar-content--mobile .sidebar-user {
+  flex: 0 0 auto;
+  margin-top: auto;
+  margin-bottom: 0;
+  padding: 12px 18px max(10px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--control-border);
+  background: var(--sidebar-bg, var(--mobile-bg));
+  box-shadow: none;
+}
+
+/* Composer background policy: remove the colored/gradient backing from the
+   mobile prompt area while preserving the actual input panel surface. */
+body.mobile-mode .prompt-wrap,
+body.mobile-mode .prompt-wrap--floating,
+body.mobile-mode .mobile-chat-prompt,
+body.mobile-mode .mobile-main-fixed-prompt,
+body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode
+  .empty-stage--mobile-main
+  .desktop-center-prompt.prompt-wrap--floating {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Prompt/Input panel radius is shared by desktop and mobile. */
+.prompt-box,
+.prompt-box--gemini,
+.mobile-main-fixed-prompt .prompt-box,
+.mobile-main-fixed-prompt .prompt-box--gemini,
+.mobile-chat-prompt .prompt-box,
+.mobile-chat-prompt .prompt-box--gemini,
+.desktop-center-prompt .prompt-box,
+.desktop-center-prompt .prompt-box--gemini,
+body.mobile-mode .prompt-box,
+body.mobile-mode .prompt-box--gemini,
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box--gemini,
+body.mobile-mode .mobile-chat-prompt .prompt-box,
+body.mobile-mode .mobile-chat-prompt .prompt-box--gemini,
+body.mobile-mode .desktop-center-prompt .prompt-box,
+body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
+  border-radius: var(--prompt-panel-radius);
+}
+
+/* The input panel itself keeps the theme surface; only its outer mobile backing
+   is transparent. */
+.prompt-box,
+.prompt-box--gemini {
+  background: var(--prompt-bg);
+  background-clip: padding-box;
+}
+
+/* =========================================================
+   MOBILE DRAWER RESIZE + FOOTER STABILITY PATCH
+   - Keep the mobile drawer footer attached to the visible drawer bottom.
+   - Avoid stale viewport height gaps after PC browser web <-> mobile resize.
+   - Normalize prompt model selector radius without changing icon buttons.
+   ========================================================= */
+body.mobile-mode .mobile-drawer {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile {
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  padding-bottom: 8px !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
+body.mobile-mode .mobile-drawer .sidebar-user--mobile {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding: 12px 18px max(10px, env(safe-area-inset-bottom, 0px)) !important;
+  align-items: center !important;
+  border-top: 1px solid var(--control-border) !important;
+  background: var(--sidebar-bg, var(--mobile-bg)) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.prompt-model-trigger,
+body.desktop-mode .prompt-model-trigger,
+body.mobile-mode .prompt-model-trigger {
+  border-radius: 5px !important;
+}
+
+body.mobile-mode .mobile-topbar .model-trigger--assistant,
+body.desktop-mode .mobile-topbar .model-trigger--assistant {
+  border-radius: 5px !important;
 }

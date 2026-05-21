@@ -1,6 +1,6 @@
 import {ref} from "vue";
 
-function isMobilePlatform(platformInfo = {}) {
+function shouldUseMobilePlatformLayout(platformInfo = {}) {
   return Boolean(
     platformInfo.isMobileBrowser ||
     platformInfo.isAndroidApp ||
@@ -21,7 +21,7 @@ export function useChatMobileState({isCompactScreen, platformInfo}) {
 
   function updateMobileState() {
     isMobile.value = Boolean(
-      isCompactScreen.value || isMobilePlatform(platformInfo.value)
+      isCompactScreen.value || shouldUseMobilePlatformLayout(platformInfo.value)
     );
   }
 

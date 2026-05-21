@@ -2,22 +2,13 @@
 @import "./foundations/themes/themes.css";
 @import "./foundations/reset/base.css";
 
-/* 02 base layout and core components
-   CSS ownership:
-   - prompt/input: components/bottom-sheet + prompt scoped styles
-   - bottom sheet: components/bottom-sheet + mobile-runtime/viewport patches
-   - message bubble: components/message + layouts/chat core
-*/
+/* 02 base layout and core components */
 @import "./layouts/chat/core.css";
 @import "./components/markdown/markdown.css";
 @import "./components/bottom-sheet/bottom-sheet-composer.css";
 @import "./pages/playground/playground-feedback.css";
 
-/* 03 mobile runtime and freeze overrides
-   CSS ownership:
-   - mobile keyboard: mobile-runtime/keyboard + viewport safe-area patches
-   - sidebar: layouts/sidebar
-*/
+/* 03 mobile runtime and freeze overrides */
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
 /* mobile session/browser patch aggregator */
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
@@ -27,8 +18,8 @@
 /* 03-1 absorbed feature patches */
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
-@import "./layouts/sidebar/mobile-drawer-footer-stability.css";
 @import "./components/attachment/attachment-preview-tokens.css";
+@import "./components/debug/virtual-keyboard-debug.css";
 /* 03-2 residual overrides absorbed into final UI normalization fixes. */
 
 @import "./states/reasoning/reasoning.css";
@@ -44,16 +35,10 @@
 @import "./pages/chat/targeted-chat-polish.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";
 
-/* 06 canonical dialog/overlay shape system
-   CSS ownership:
-   - dialog/overlay: components/dialog and overlay component scoped styles
-*/
+/* 06 canonical dialog/overlay shape system */
 @import "./components/dialog/dialog-system.css";
 
 /* 07 final UI normalization fixes absorbed into dialog-system.css. */
 
-/* 08 responsive typography and control/dialog normalization */
+/* 08 responsive typography and control normalization */
 @import "./foundations/typography/responsive-typography.css";
-@import "./components/dialog/dialog-control-normalization.css";
-@import "./components/dialog/dialog-viewport-policy.css";
-@import "./components/dialog/system-settings-dialog.css";

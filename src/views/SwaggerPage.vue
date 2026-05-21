@@ -16,7 +16,11 @@
           :title="t('swagger.goHome')"
           :aria-label="t('swagger.goHome')"
         >
-          <img :src="homeIcon" alt="" aria-hidden="true" />
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 10.5 12 4l8 6.5V20a.5.5 0 0 1-.5.5h-5v-6h-5v6h-5A.5.5 0 0 1 4 20v-9.5Z"
+            />
+          </svg>
           {{ t("swagger.home") }}
         </RouterLink>
         <select
@@ -46,7 +50,6 @@
 
 <script setup>
 import {useI18n} from "vue-i18n";
-import homeIcon from "@/assets/img/icons/home.svg";
 
 const {t} = useI18n();
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";

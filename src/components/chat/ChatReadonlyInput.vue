@@ -6,7 +6,32 @@
   >
     <div class="shared-readonly-box" :class="`shared-readonly-box--${variant}`">
       <span class="shared-readonly-icon" aria-hidden="true">
-        <img :src="readonlyIcon" alt="" />
+        <svg v-if="variant === 'deleted-model'" viewBox="0 0 24 24">
+          <path
+            d="M12 3.5 21 20H3L12 3.5Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M12 9v4.4M12 16.8h.01"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          />
+        </svg>
+        <svg v-else viewBox="0 0 24 24">
+          <path
+            d="M7 11.5V8a5 5 0 0 1 10 0v3.5M6.5 11.5h11A1.5 1.5 0 0 1 19 13v6a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19v-6a1.5 1.5 0 0 1 1.5-1.5Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </span>
       <span class="shared-readonly-text">
         <strong>{{ titleText }}</strong>
@@ -19,8 +44,6 @@
 <script setup>
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import alertIcon from "@/assets/img/icons/alert.svg";
-import lockIcon from "@/assets/img/icons/lock.svg";
 
 const props = defineProps({
   variant: {type: String, default: "shared"},
@@ -29,10 +52,6 @@ const props = defineProps({
 });
 
 const {t} = useI18n();
-
-const readonlyIcon = computed(() =>
-  props.variant === "deleted-model" ? alertIcon : lockIcon
-);
 
 const titleText = computed(() => {
   if (props.title) return props.title;
