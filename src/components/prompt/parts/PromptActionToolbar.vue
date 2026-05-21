@@ -499,7 +499,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 
 .prompt-submenu-arrow {
   margin-left: auto;
-  width: auto !important;
+  width: auto;
   color: var(--muted);
   font-size: var(--font-size-lg);
   line-height: 1;
@@ -524,7 +524,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 .prompt-floating-menu {
   top: auto;
   right: auto;
-  bottom: auto !important;
+  bottom: auto;
   left: auto;
   z-index: var(--z-popover);
 }
@@ -533,7 +533,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px !important;
+  min-width: 20px;
   height: 20px;
   margin-left: auto;
   padding: 0 6px;
@@ -555,7 +555,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   padding: 0;
   cursor: pointer;
   position: relative;
-  width: 34px !important;
+  width: 34px;
   height: 20px;
   min-width: 34px;
   margin-left: auto;
@@ -568,7 +568,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 14px !important;
+  width: 14px;
   height: 14px;
   border-radius: 999px;
   background: var(--surface);
@@ -603,7 +603,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px !important;
+  width: 18px;
   height: 18px;
   min-width: 18px;
   border: 1px solid var(--control-border);
@@ -622,10 +622,10 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 }
 
 .prompt-tool-parent-switch > span {
-  min-width: 14px !important;
-  flex: 0 0 14px !important;
-  text-align: initial !important;
-  font-size: 0 !important;
+  min-width: 14px;
+  flex: 0 0 14px;
+  text-align: initial;
+  font-size: 0;
 }
 
 .prompt-tool-child-option--selectedRow.is-active {

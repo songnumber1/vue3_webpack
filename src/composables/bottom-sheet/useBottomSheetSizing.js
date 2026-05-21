@@ -24,6 +24,7 @@ export function useBottomSheetSizing(props, emit) {
   const bodyScrollLocked =
     typeof document === "undefined" ? ref(false) : useScrollLock(document.body);
   let measureRaf = 0;
+  let bodyObserver = null;
 
   const sheetStyle = computed(() => ({
     "--bottom-sheet-height": `${Math.round(currentHeight.value)}px`,
@@ -77,6 +78,23 @@ export function useBottomSheetSizing(props, emit) {
     });
   }
 
+  function observeBodySize() {
+    bodyObserver?.disconnect?.();
+    if (typeof MutationObserver === "undefined" || !bodyRef.value) return;
+
+    bodyObserver = new MutationObserver(scheduleViewportRefresh);
+    bodyObserver.observe(bodyRef.value, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+
+  function disconnectBodyObserver() {
+    bodyObserver?.disconnect?.();
+    bodyObserver = null;
+  }
+
   function lockBodyScroll() {
     bodyScrollLocked.value = true;
   }
@@ -92,8 +110,10 @@ export function useBottomSheetSizing(props, emit) {
         lockBodyScroll();
         resetHeight();
         registerViewportListeners();
+        nextTick(observeBodySize);
       } else {
         unlockBodyScroll();
+        disconnectBodyObserver();
         unregisterViewportListeners();
       }
     },
@@ -105,6 +125,7 @@ export function useBottomSheetSizing(props, emit) {
     clearViewportRefresh();
     if (measureRaf) window.cancelAnimationFrame?.(measureRaf);
     cleanupDrag();
+    disconnectBodyObserver();
     unregisterViewportListeners();
   });
 

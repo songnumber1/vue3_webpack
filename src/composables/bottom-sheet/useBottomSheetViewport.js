@@ -1,5 +1,6 @@
 import {useEventListener} from "@vueuse/core";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {BOTTOM_SHEET_REFRESH_EVENTS} from "@/constants/viewportGuardConstants";
 import {
   BOTTOM_SHEET_SNAP_RATIO,
   BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
@@ -167,17 +168,16 @@ export function createBottomSheetViewport(options) {
  * @returns {object} register/unregister 함수입니다.
  */
 export function createBottomSheetViewportListeners(scheduleViewportRefresh) {
-  let stopViewportResize = null;
+  let stopWindowEvents = [];
   let stopVisualViewportResize = null;
   let stopVisualViewportScroll = null;
 
   function registerViewportListeners() {
-    if (stopViewportResize) return;
-    stopViewportResize = useEventListener(
-      window,
-      "resize",
-      scheduleViewportRefresh,
-      {passive: true}
+    if (stopWindowEvents.length) return;
+    stopWindowEvents = BOTTOM_SHEET_REFRESH_EVENTS.map((eventName) =>
+      useEventListener(window, eventName, scheduleViewportRefresh, {
+        passive: true,
+      })
     );
     if (window.visualViewport) {
       stopVisualViewportResize = useEventListener(
@@ -196,10 +196,10 @@ export function createBottomSheetViewportListeners(scheduleViewportRefresh) {
   }
 
   function unregisterViewportListeners() {
-    stopViewportResize?.();
+    stopWindowEvents.forEach((stop) => stop?.());
     stopVisualViewportResize?.();
     stopVisualViewportScroll?.();
-    stopViewportResize = null;
+    stopWindowEvents = [];
     stopVisualViewportResize = null;
     stopVisualViewportScroll = null;
   }
@@ -222,18 +222,35 @@ export function createBottomSheetViewportListeners(scheduleViewportRefresh) {
 export function createBottomSheetViewportScheduler(options) {
   const {props, currentHeight, currentSnap, setHeight} = options;
   let viewportTimer = null;
+  let viewportFrame = null;
+
+  function applyViewportRefresh() {
+    if (!props.open) return;
+    setHeight(currentHeight.value, currentSnap.value);
+  }
 
   function scheduleViewportRefresh() {
     window.clearTimeout(viewportTimer);
-    viewportTimer = window.setTimeout(() => {
-      if (!props.open) return;
-      setHeight(currentHeight.value, currentSnap.value);
-    }, BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS);
+    if (viewportFrame !== null) window.cancelAnimationFrame(viewportFrame);
+
+    if (window.requestAnimationFrame) {
+      viewportFrame = window.requestAnimationFrame(() => {
+        viewportFrame = null;
+        applyViewportRefresh();
+      });
+    }
+
+    viewportTimer = window.setTimeout(
+      applyViewportRefresh,
+      BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS
+    );
   }
 
   function clearViewportRefresh() {
     window.clearTimeout(viewportTimer);
     viewportTimer = null;
+    if (viewportFrame !== null) window.cancelAnimationFrame?.(viewportFrame);
+    viewportFrame = null;
   }
 
   return {

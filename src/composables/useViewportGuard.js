@@ -5,6 +5,11 @@ import {
   MIN_VIEWPORT_HEIGHT_PX,
   VIEWPORT_GUARD_DELAY_MS,
 } from "@/constants/uiTokens";
+import {
+  VIEWPORT_BROWSER_CLASSES,
+  VIEWPORT_GUARD_CUSTOM_EVENT,
+  VIEWPORT_GUARD_EVENTS,
+} from "@/constants/viewportGuardConstants";
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
@@ -12,14 +17,14 @@ function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   const body = document.body;
-  const classes = [
-    "mobile-browser-default",
-    "mobile-browser-chrome",
-    "mobile-browser-samsung",
-  ];
-  root.classList.remove(...classes);
-  body?.classList.remove(...classes);
-  const className = `mobile-browser-${browserFamily || "default"}`;
+  root.classList.remove(...VIEWPORT_BROWSER_CLASSES);
+  body?.classList.remove(...VIEWPORT_BROWSER_CLASSES);
+  const normalizedFamily = VIEWPORT_BROWSER_CLASSES.includes(
+    `mobile-browser-${browserFamily}`
+  )
+    ? browserFamily
+    : "default";
+  const className = `mobile-browser-${normalizedFamily}`;
   root.classList.add(className);
   body?.classList.add(className);
 }
@@ -156,6 +161,7 @@ export function useViewportGuard(options = {}) {
   const baselineHeight = ref(0);
   let resizeTimer = null;
   let resizeFrame = null;
+  let mounted = false;
 
   const isCompact = computed(
     () =>
@@ -163,6 +169,7 @@ export function useViewportGuard(options = {}) {
       viewportWidth.value <= systemSettingsStore.mobileBreakpoint
   );
   function apply() {
+    if (typeof window === "undefined" || typeof document === "undefined") return;
     const size = getViewportSize();
     viewportHeight.value = size.height;
     viewportWidth.value = size.width;
@@ -201,11 +208,18 @@ export function useViewportGuard(options = {}) {
       keyboardOpen: keyboardOpen.value,
       isCompact: isCompact.value,
     });
-    window.dispatchEvent(new CustomEvent("viewportguard:applied"));
+    window.dispatchEvent(new CustomEvent(VIEWPORT_GUARD_CUSTOM_EVENT));
   }
-  function scheduleApply() {
+  function clearScheduledApply() {
     window.clearTimeout(resizeTimer);
+    resizeTimer = null;
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+    resizeFrame = null;
+  }
+
+  function scheduleApply() {
+    if (!mounted || typeof window === "undefined") return;
+    clearScheduledApply();
 
     resizeFrame = window.requestAnimationFrame(() => {
       resizeFrame = null;
@@ -220,10 +234,12 @@ export function useViewportGuard(options = {}) {
     resizeTimer = window.setTimeout(apply, delay);
   }
 
-  useEventListener(window, "resize", scheduleApply, {passive: true});
-  useEventListener(window, "orientationchange", scheduleApply, {passive: true});
-  useEventListener(window, "virtual-keyboard-debug:changed", scheduleApply, {
-    passive: true,
+  function handleFocusOut() {
+    window.setTimeout(scheduleApply, VIEWPORT_GUARD_DELAY_MS.default);
+  }
+
+  VIEWPORT_GUARD_EVENTS.forEach((eventName) => {
+    useEventListener(window, eventName, scheduleApply, {passive: true});
   });
   if (typeof window !== "undefined" && window.visualViewport) {
     useEventListener(window.visualViewport, "resize", scheduleApply, {
@@ -234,7 +250,7 @@ export function useViewportGuard(options = {}) {
     });
   }
   useEventListener(document, "focusin", scheduleApply, {passive: true});
-  useEventListener(document, "focusout", scheduleApply, {passive: true});
+  useEventListener(document, "focusout", handleFocusOut, {passive: true});
 
   watch(
     () => [
@@ -247,13 +263,13 @@ export function useViewportGuard(options = {}) {
   );
 
   onMounted(() => {
+    mounted = true;
     apply();
   });
 
   onBeforeUnmount(() => {
-    window.clearTimeout(resizeTimer);
-    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
-    resizeFrame = null;
+    mounted = false;
+    clearScheduledApply();
     removeKeyboardModeVars();
   });
 
