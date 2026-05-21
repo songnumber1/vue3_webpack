@@ -1,5 +1,6 @@
 import {httpClient} from "@/api/clients/httpClient";
 import {API_KEYS} from "@/constants/apiConfig";
+import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 export const authApiLive = {
   async checkLogin() {
@@ -11,6 +12,13 @@ export const authApiLive = {
 
   async tempLogin(payload = {}) {
     const response = await httpClient.post("/temp-login.do", payload, {
+      apiKey: API_KEYS.LOGIN,
+    });
+    return response?.data || {};
+  },
+
+  async getAccessInfo(payload = {}) {
+    const response = await httpClient.post(API_ENDPOINTS.ACCESS_INFO, payload, {
       apiKey: API_KEYS.LOGIN,
     });
     return response?.data || {};

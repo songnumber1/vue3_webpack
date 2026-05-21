@@ -40,6 +40,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
+import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
 import authLockIcon from "@/assets/img/icons/auth-lock.svg";
 
 const route = useRoute();
@@ -49,6 +50,7 @@ const authStore = useAuthStore();
 
 const loading = ref(false);
 const errorMessage = ref("");
+const authFlowId = ref(0);
 
 const message = computed(() => {
   const key = `loginRequired.reasons.${route.query.reason}`;
@@ -60,36 +62,96 @@ const redirectPath = computed(() => {
   return typeof redirect === "string" && redirect ? redirect : "/";
 });
 
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function createAccessPayloadFromRedirect() {
+  const resolved = router.resolve(redirectPath.value || "/");
+  const chatId = resolved.name === "chat" ? resolved.params?.id || null : null;
+
+  return {
+    language: "ko",
+    entryType: chatId ? "chat" : "main",
+    shareId: resolved.params?.shareId || null,
+    chatId,
+    msgId: null,
+    studioId: resolved.query?.studioId || null,
+  };
+}
+
+async function verifyAuthenticatedSession(flowId) {
+  const payload = createAccessPayloadFromRedirect();
+  const delays = [0, 120, 300];
+
+  for (const delay of delays) {
+    if (flowId !== authFlowId.value) return false;
+    if (delay) await wait(delay);
+
+    const accessInfo = await authApiLive.getAccessInfo(payload);
+    const result = resolveAuthAccessResult(accessInfo);
+
+    if (result.authenticated) {
+      authStore.setAuthenticatedAccessInfo(result.accessInfo);
+      return true;
+    }
+  }
+
+  return false;
+}
+
 async function moveAfterAuthenticated() {
-  authStore.resetAuth();
   await router.replace(redirectPath.value || "/");
 }
 
 async function checkLogin() {
+  const flowId = ++authFlowId.value;
   errorMessage.value = "";
 
   try {
     const result = await authApiLive.checkLogin();
 
+    if (flowId !== authFlowId.value || loading.value) return;
+
     if (!result?.path) {
+      authStore.resetAuth();
       await moveAfterAuthenticated();
     }
   } catch (error) {
-    errorMessage.value = t("loginRequired.checkFailed");
+    if (flowId === authFlowId.value && !loading.value) {
+      errorMessage.value = t("loginRequired.checkFailed");
+    }
   }
 }
 
 async function tempLogin() {
+  if (loading.value) return;
+
+  const flowId = ++authFlowId.value;
   loading.value = true;
   errorMessage.value = "";
 
   try {
+    authStore.resetAuth();
     await authApiLive.tempLogin({userId: "temp-user", userName: "임시 사용자"});
+
+    const authenticated = await verifyAuthenticatedSession(flowId);
+    if (flowId !== authFlowId.value) return;
+
+    if (!authenticated) {
+      errorMessage.value = t("loginRequired.loginFailed");
+      return;
+    }
+
     await moveAfterAuthenticated();
   } catch (error) {
-    errorMessage.value = t("loginRequired.loginFailed");
+    if (flowId === authFlowId.value) {
+      errorMessage.value = t("loginRequired.loginFailed");
+    }
   } finally {
-    loading.value = false;
+    if (flowId === authFlowId.value) {
+      loading.value = false;
+    }
   }
 }
 
