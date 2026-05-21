@@ -46,7 +46,9 @@ export function useChatContainerController(props) {
   const languageSheetOpen = ref(false);
   const mobileSettingsOpen = ref(false);
   const runtimeReady = ref(false);
-  const autoScrollOnAnswer = computed(() => systemSettingsStore.autoScrollOnAnswer);
+  const autoScrollOnAnswer = computed(
+    () => systemSettingsStore.autoScrollOnAnswer
+  );
   const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
   const currentMode = computed(() => props.mode);
   const isMainPage = computed(() => currentMode.value === "main");
@@ -276,7 +278,10 @@ export function useChatContainerController(props) {
           modelId: context.modelId,
         });
       } catch (error) {
-        logWarn("[useChatContainerController] new.do 호출 실패, local conversation으로 대체:", error);
+        logWarn(
+          "[useChatContainerController] new.do 호출 실패, local conversation으로 대체:",
+          error
+        );
         return createLocalConversation(normalized);
       }
     },

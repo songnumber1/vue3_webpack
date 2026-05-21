@@ -72,11 +72,14 @@ let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
-const showMessageActions = computed(() =>
-  !props.interactionBlocked &&
+const showMessageActions = computed(
+  () =>
+    !props.interactionBlocked &&
     (!props.message.status || props.message.status === "complete")
 );
-const isMessageComplete = computed(() => !props.message.status || props.message.status === "complete");
+const isMessageComplete = computed(
+  () => !props.message.status || props.message.status === "complete"
+);
 
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"
@@ -114,7 +117,9 @@ async function renderReasoningContent() {
   emit("rendered");
 }
 
-watch(() => [props.message.content, props.message.status], renderContent, {immediate: true});
+watch(() => [props.message.content, props.message.status], renderContent, {
+  immediate: true,
+});
 watch(() => props.message.reasoningContent, renderReasoningContent, {
   immediate: true,
 });

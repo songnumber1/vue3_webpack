@@ -45,7 +45,6 @@
           {{ tool.label }}
         </strong>
 
-
         <span
           v-if="hasChildren(tool) && tool.activeCount > 0"
           class="bottom-sheet-active-badge"
@@ -204,7 +203,9 @@ const emit = defineEmits([
 const activeToolGroupId = ref("");
 
 const activeToolGroup = computed(() => {
-  return props.tools.find((tool) => tool.id === activeToolGroupId.value) || null;
+  return (
+    props.tools.find((tool) => tool.id === activeToolGroupId.value) || null
+  );
 });
 
 const resolvedModelTitle = computed(() => {
@@ -232,7 +233,9 @@ function isCheckboxChild(tool) {
 }
 
 function getChildRole(tool) {
-  return tool?.selectionMode === "single" ? "menuitemradio" : "menuitemcheckbox";
+  return tool?.selectionMode === "single"
+    ? "menuitemradio"
+    : "menuitemcheckbox";
 }
 
 function handleToolClick(tool) {
@@ -287,7 +290,6 @@ watch(
   font-size: var(--font-size-lg);
   line-height: 1;
 }
-
 
 .bottom-sheet-active-badge {
   display: inline-flex !important;
@@ -431,5 +433,4 @@ watch(
   font-size: var(--text-size-body) !important;
   line-height: 1 !important;
 }
-
 </style>

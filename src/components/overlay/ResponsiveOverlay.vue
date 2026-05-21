@@ -2,11 +2,11 @@
   <teleport to="body">
     <transition :name="isMobile ? 'mobile-page' : 'modal-fade'">
       <div
-          v-if="open"
-          class="responsive-overlay"
-          :class="overlayClasses"
-          :data-overlay-mode="overlayMode"
-        >
+        v-if="open"
+        class="responsive-overlay"
+        :class="overlayClasses"
+        :data-overlay-mode="overlayMode"
+      >
         <div
           v-if="!isMobile"
           class="responsive-overlay-backdrop app-dialog-backdrop"

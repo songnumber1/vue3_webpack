@@ -28,6 +28,8 @@ export function resolveApiPolicy(apiKey) {
         ? policy.overlay
         : DEFAULT_API_POLICY.overlay,
     abort:
-      typeof policy.abort === "boolean" ? policy.abort : DEFAULT_API_POLICY.abort,
+      typeof policy.abort === "boolean"
+        ? policy.abort
+        : DEFAULT_API_POLICY.abort,
   };
 }

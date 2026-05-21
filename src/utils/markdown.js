@@ -323,7 +323,9 @@ function rehypeCodeBlockWrapper() {
                 type: "element",
                 tagName: "div",
                 properties: {className: ["md-code-actions"]},
-                children: [codeActionButton("copy", mdLabel("markdown.copyCode"))],
+                children: [
+                  codeActionButton("copy", mdLabel("markdown.copyCode")),
+                ],
               },
             ],
           },
@@ -369,7 +371,8 @@ const defaultProcessor = createProcessor({renderMermaid: true});
 const streamingProcessor = createProcessor({renderMermaid: false});
 
 export async function renderMarkdown(text, options = {}) {
-  const processor = options.renderMermaid === false ? streamingProcessor : defaultProcessor;
+  const processor =
+    options.renderMermaid === false ? streamingProcessor : defaultProcessor;
   const file = await processor.process(String(text ?? ""));
   const html = String(file).trim();
 

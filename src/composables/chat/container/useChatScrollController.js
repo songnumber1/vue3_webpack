@@ -46,7 +46,8 @@ export function useChatScrollController({
   function updateScrollBottomButton() {
     const list = getMessageListRef();
     showScrollBottom.value =
-      Boolean(isConversationPage?.value) && Boolean(list && !list.isAtBottom?.());
+      Boolean(isConversationPage?.value) &&
+      Boolean(list && !list.isAtBottom?.());
   }
 
   function scheduleBottomStateCheck() {
@@ -55,7 +56,8 @@ export function useChatScrollController({
   }
 
   function handleMessageContentRendered() {
-    if (shouldKeepForceBottom()) scrollBottom({force: true, stable: true, autoAnswer: true});
+    if (shouldKeepForceBottom())
+      scrollBottom({force: true, stable: true, autoAnswer: true});
     scheduleBottomStateCheck();
   }
 

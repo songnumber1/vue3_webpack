@@ -117,7 +117,9 @@ onBeforeUnmount(() => {
 
 .desktop-clipboard-note-enter-active,
 .desktop-clipboard-note-leave-active {
-  transition: opacity 0.18s ease, transform 0.18s ease;
+  transition:
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .desktop-clipboard-note-enter-from,

@@ -118,7 +118,8 @@ export function createBottomSheetViewport(options) {
     const preferredMinHeight = getMinimumSheetHeight();
     const systemBounds = getSystemBottomSheetBounds();
     const ratioMaxHeight =
-      Math.floor(viewportHeight * props.maxRatio) - readBottomSheetSafeAreaBottom();
+      Math.floor(viewportHeight * props.maxRatio) -
+      readBottomSheetSafeAreaBottom();
     const configuredMaxHeight = systemBounds.maxHeight
       ? Math.min(systemBounds.maxHeight, ratioMaxHeight)
       : ratioMaxHeight;

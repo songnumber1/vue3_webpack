@@ -784,8 +784,6 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
   background-clip: padding-box;
 }
 
-
-
 /* =========================================================
    MOBILE DRAWER RESIZE + FOOTER STABILITY PATCH
    - Keep the mobile drawer footer attached to the visible drawer bottom.

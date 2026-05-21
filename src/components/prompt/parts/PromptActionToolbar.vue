@@ -69,7 +69,9 @@
               active: activeToolGroupId === tool.id,
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
-            :aria-expanded="hasChildren(tool) ? activeToolGroupId === tool.id : undefined"
+            :aria-expanded="
+              hasChildren(tool) ? activeToolGroupId === tool.id : undefined
+            "
             @click="handleToolClick(tool)"
           >
             <span aria-hidden="true">{{ tool.icon }}</span>
@@ -95,7 +97,11 @@
             >
               <span aria-hidden="true"></span>
             </span>
-            <span v-if="hasChildren(tool)" class="prompt-submenu-arrow" aria-hidden="true">
+            <span
+              v-if="hasChildren(tool)"
+              class="prompt-submenu-arrow"
+              aria-hidden="true"
+            >
               ›
             </span>
           </button>
@@ -249,35 +255,31 @@ const submenuPlacement = ref("right");
 const toolReferenceRef = computed(() => toolRoot.value || null);
 const attachReferenceRef = computed(() => attachRoot.value || null);
 
-const {
-  floatingStyles: toolFloatingStyles,
-  update: updateToolFloating,
-} = useFloating(toolReferenceRef, toolMenuRef, {
-  placement: "top-start",
-  strategy: "absolute",
-  transform: false,
-  whileElementsMounted: autoUpdate,
-  middleware: [
-    offset(10),
-    flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-    shift({padding: 12}),
-  ],
-});
+const {floatingStyles: toolFloatingStyles, update: updateToolFloating} =
+  useFloating(toolReferenceRef, toolMenuRef, {
+    placement: "top-start",
+    strategy: "absolute",
+    transform: false,
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      offset(10),
+      flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
+      shift({padding: 12}),
+    ],
+  });
 
-const {
-  floatingStyles: attachFloatingStyles,
-  update: updateAttachFloating,
-} = useFloating(attachReferenceRef, attachMenuRef, {
-  placement: "top-start",
-  strategy: "absolute",
-  transform: false,
-  whileElementsMounted: autoUpdate,
-  middleware: [
-    offset(10),
-    flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-    shift({padding: 12}),
-  ],
-});
+const {floatingStyles: attachFloatingStyles, update: updateAttachFloating} =
+  useFloating(attachReferenceRef, attachMenuRef, {
+    placement: "top-start",
+    strategy: "absolute",
+    transform: false,
+    whileElementsMounted: autoUpdate,
+    middleware: [
+      offset(10),
+      flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
+      shift({padding: 12}),
+    ],
+  });
 
 const toolMenuStyle = computed(() => ({
   ...toolFloatingStyles.value,
@@ -288,7 +290,6 @@ const attachMenuStyle = computed(() => ({
   ...attachFloatingStyles.value,
   visibility: attachPositionReady.value ? "visible" : "hidden",
 }));
-
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
@@ -343,7 +344,9 @@ const showVoiceStopButton = computed(
 );
 
 const activeToolGroup = computed(() => {
-  return props.tools.find((tool) => tool.id === activeToolGroupId.value) || null;
+  return (
+    props.tools.find((tool) => tool.id === activeToolGroupId.value) || null
+  );
 });
 
 function hasChildren(tool) {
@@ -359,7 +362,9 @@ function isCheckboxChild(tool) {
 }
 
 function getChildRole(tool) {
-  return tool?.selectionMode === "single" ? "menuitemradio" : "menuitemcheckbox";
+  return tool?.selectionMode === "single"
+    ? "menuitemradio"
+    : "menuitemcheckbox";
 }
 
 function resolveSubmenuPlacement() {
@@ -370,10 +375,12 @@ function resolveSubmenuPlacement() {
   }
 
   const submenuWidth = 248;
-  const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+  const viewportWidth =
+    window.innerWidth || document.documentElement.clientWidth;
   const rightSpace = viewportWidth - menuRect.right;
   const leftSpace = menuRect.left;
-  submenuPlacement.value = rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
+  submenuPlacement.value =
+    rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
 }
 
 async function handleToolClick(tool) {
@@ -394,7 +401,6 @@ async function handleToolClick(tool) {
   await updateToolFloating?.();
   resolveSubmenuPlacement();
 }
-
 
 async function handleToolSwitchClick(tool) {
   if (!isSwitchParent(tool)) return;
@@ -625,5 +631,4 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 .prompt-tool-child-option--selectedRow.is-active {
   background: var(--control-hover);
 }
-
 </style>

@@ -21,7 +21,9 @@
         :disabled="loading"
         @click="tempLogin"
       >
-        {{ loading ? t("loginRequired.loggingIn") : t("loginRequired.tempLogin") }}
+        {{
+          loading ? t("loginRequired.loggingIn") : t("loginRequired.tempLogin")
+        }}
       </button>
 
       <button

@@ -68,7 +68,12 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     offsetTop,
   };
 }
-function setCssViewportVars(size, baselineHeight = 0, keyboardMode, resizeEnabled) {
+function setCssViewportVars(
+  size,
+  baselineHeight = 0,
+  keyboardMode,
+  resizeEnabled
+) {
   const height = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const width = Math.max(size.width || 0, MIN_VIEWPORT_HEIGHT_PX);
   const browserFamily = getMobileBrowserFamily();

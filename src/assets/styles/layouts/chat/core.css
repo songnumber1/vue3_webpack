@@ -1726,8 +1726,6 @@ body.mobile-mode .suggestion-chip {
   font-size: 13px;
 }
 
-
-
 /* Gemini/Assistant routing refactor overrides */
 .topbar-left {
   min-width: 0;
@@ -1877,8 +1875,6 @@ body.mobile-mode .scroll-bottom-button {
   justify-content: flex-end;
   gap: 8px;
 }
-
-
 
 /* absorbed from utilities/overrides/composer-layout-patches.css (layout_freeze) */
 

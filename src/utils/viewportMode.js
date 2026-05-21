@@ -23,8 +23,9 @@ function getViewportModeWidth() {
   return candidates.length ? Math.min(...candidates) : 0;
 }
 
-
-export function isMobileLikeViewport(breakpoint = getRuntimeSystemSettings().mobileBreakpoint) {
+export function isMobileLikeViewport(
+  breakpoint = getRuntimeSystemSettings().mobileBreakpoint
+) {
   const width = getViewportModeWidth();
   return width > 0 && width <= breakpoint;
 }
@@ -35,7 +36,9 @@ export function isMobileLikeViewport(breakpoint = getRuntimeSystemSettings().mob
  * @param {number} breakpoint - 모바일 전환 기준 너비입니다.
  * @returns {boolean} 모바일 모드 여부입니다.
  */
-export function syncViewportModeClass(breakpoint = getRuntimeSystemSettings().mobileBreakpoint) {
+export function syncViewportModeClass(
+  breakpoint = getRuntimeSystemSettings().mobileBreakpoint
+) {
   if (typeof document === "undefined") return false;
   const width = getViewportModeWidth();
   const isMobile = width > 0 && width <= breakpoint;
@@ -64,7 +67,10 @@ export function installViewportModeClass(breakpoint = null) {
     cleanupViewportModeListeners();
   }
 
-  const sync = () => syncViewportModeClass(breakpoint || getRuntimeSystemSettings().mobileBreakpoint);
+  const sync = () =>
+    syncViewportModeClass(
+      breakpoint || getRuntimeSystemSettings().mobileBreakpoint
+    );
   sync();
 
   window.addEventListener("resize", sync, {passive: true});

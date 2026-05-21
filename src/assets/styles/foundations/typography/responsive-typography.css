@@ -8,8 +8,9 @@
 
 :root {
   /* Font family */
-  --font-family: "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  --font-family:
+    "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
 
   /* Responsive typography scale - desktop default */
   --font-size-2xs: 11px;
@@ -354,20 +355,25 @@ body .image-preview-close {
 }
 
 body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile,
-body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
-    padding: 24px;
-    place-items: center;
-  }
+body.desktop-mode
+  .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
+  padding: 24px;
+  place-items: center;
+}
 
-body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile .responsive-panel,
-body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile-dialog .responsive-panel {
-    width: min(720px, 100%);
-    height: auto;
-    max-width: calc(100vw - 48px);
-    max-height: min(760px, calc(100vh - 56px));
-    border: 1px solid var(--dialog-panel-border);
-    border-radius: var(--dialog-radius);
-  }
+body.desktop-mode
+  .responsive-overlay--desktop.responsive-overlay--mobile
+  .responsive-panel,
+body.desktop-mode
+  .responsive-overlay--desktop.responsive-overlay--mobile-dialog
+  .responsive-panel {
+  width: min(720px, 100%);
+  height: auto;
+  max-width: calc(100vw - 48px);
+  max-height: min(760px, calc(100vh - 56px));
+  border: 1px solid var(--dialog-panel-border);
+  border-radius: var(--dialog-radius);
+}
 
 /* Prompt nested bottom sheet header back action. */
 .bottom-sheet-back {
@@ -510,7 +516,8 @@ body.mobile-mode
   gap: 16px;
   min-height: 58px;
   padding: 12px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--control-border) 70%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--control-border) 70%, transparent);
 }
 
 .system-settings-copy {
@@ -648,9 +655,18 @@ body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .round-icon {
   height: 34px !important;
 }
 
-body.mobile-mode .chat-container-root--mode-main .mobile-topbar .model-trigger--assistant,
-body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .model-trigger--assistant,
-body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .model-trigger--assistant {
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-topbar
+  .model-trigger--assistant,
+body.mobile-mode
+  .chat-container-root--mode-chat
+  .mobile-topbar
+  .model-trigger--assistant,
+body.mobile-mode
+  .chat-container-root--mode-shared
+  .mobile-topbar
+  .model-trigger--assistant {
   height: 34px !important;
   min-width: 100px;
   gap: 6px;
@@ -804,5 +820,7 @@ body.mobile-mode .system-settings-footer .playground-button {
 }
 
 @keyframes mobile-api-progress-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

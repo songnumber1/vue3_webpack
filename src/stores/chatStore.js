@@ -94,7 +94,9 @@ export const useChatStore = defineStore("chat", {
     },
     setPromptToolGroupEnabled(groupId, enabled) {
       const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[chatId]);
+      const current = clonePromptToolSettings(
+        this.promptToolSettingsMap[chatId]
+      );
 
       if (groupId === "webSearch") {
         current.webSearchEnabled = Boolean(enabled);
@@ -110,7 +112,9 @@ export const useChatStore = defineStore("chat", {
     },
     togglePromptToolOption(groupId, optionId, selectionMode = "multiple") {
       const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[chatId]);
+      const current = clonePromptToolSettings(
+        this.promptToolSettingsMap[chatId]
+      );
 
       if (selectionMode === "single") {
         current[groupId] = current[groupId] === optionId ? null : optionId;

@@ -32,7 +32,8 @@ body.mobile-mode .virtual-keyboard-debug {
   box-sizing: border-box;
   padding: 28px 24px calc(28px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--color-border, rgba(148, 163, 184, 0.35));
-  background: repeating-linear-gradient(
+  background:
+    repeating-linear-gradient(
       0deg,
       rgba(148, 163, 184, 0.08),
       rgba(148, 163, 184, 0.08) 1px,
@@ -165,7 +166,6 @@ html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"]
   z-index: var(--z-content-raised, 20) !important;
 }
 
-
 /*
  * adjustPan debug composer visibility fix.
  * ---------------------------------------------------------
@@ -230,7 +230,11 @@ html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"]
   width: 100% !important;
   max-width: none !important;
   margin: 0 !important;
-  transform: translate3d(0, var(--virtual-keyboard-pan-offset, 0px), 0) !important;
+  transform: translate3d(
+    0,
+    var(--virtual-keyboard-pan-offset, 0px),
+    0
+  ) !important;
   will-change: transform, bottom;
 }
 

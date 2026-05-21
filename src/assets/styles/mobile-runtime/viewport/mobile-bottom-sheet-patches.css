@@ -55,7 +55,6 @@ body.mobile-mode .bottom-sheet-option--row strong {
   text-align: left !important;
 }
 
-
 /* Keep prompt tool switch geometry intact on mobile bottom sheets. */
 body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch {
   width: 38px !important;

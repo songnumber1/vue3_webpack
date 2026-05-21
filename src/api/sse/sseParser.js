@@ -21,7 +21,10 @@ export function readSseData(raw) {
   if (raw === SSE_DONE_TOKEN) return {done: true, content: ""};
   try {
     const parsed = JSON.parse(raw);
-    return {done: false, content: String(parsed?.data ?? parsed?.content ?? "")};
+    return {
+      done: false,
+      content: String(parsed?.data ?? parsed?.content ?? ""),
+    };
   } catch (_error) {
     return {done: false, content: String(raw || "")};
   }

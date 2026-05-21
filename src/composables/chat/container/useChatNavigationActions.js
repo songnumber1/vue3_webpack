@@ -164,7 +164,9 @@ export function useChatNavigationActions({
     } finally {
       useAuthStore().resetAuth();
       navigationStore.setDrawerOpen(false);
-      await router.replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}}).catch(() => {});
+      await router
+        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .catch(() => {});
     }
   }
 

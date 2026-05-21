@@ -70,10 +70,7 @@ export const chatHistoryApiMock = {
     return resolveMock(history, 160);
   },
   getChatHistoryDetail({chatId} = {}) {
-    return resolveMock(
-      attachMockReasoning(messageStore[chatId] || []),
-      180
-    );
+    return resolveMock(attachMockReasoning(messageStore[chatId] || []), 180);
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

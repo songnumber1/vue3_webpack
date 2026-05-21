@@ -31,7 +31,9 @@ export const useApiRequestStore = defineStore("apiRequest", {
         this.unregisterController(key);
         return;
       }
-      Object.values(this.controllers).forEach((controller) => controller?.abort?.());
+      Object.values(this.controllers).forEach((controller) =>
+        controller?.abort?.()
+      );
       this.controllers = {};
     },
   },

@@ -13,7 +13,6 @@ function normalizePromptPayload(payload) {
   };
 }
 
-
 const STREAM_TYPEWRITER_DELAY_MS = 28;
 
 function sleep(ms) {
@@ -98,7 +97,11 @@ export function useChatSubmit(options) {
       return;
 
     let targetHistoryId = String(options.route.params.id || "");
-    if (options.route.name === "main" || options.route.name === "chat-entry" || !targetHistoryId) {
+    if (
+      options.route.name === "main" ||
+      options.route.name === "chat-entry" ||
+      !targetHistoryId
+    ) {
       const assistantId = options.selectedAssistantId?.value || "";
       const modelId = options.selectedModel?.value || "";
       const history = await options.createConversation(normalized, {
@@ -155,16 +158,26 @@ export function useChatSubmit(options) {
           onChunk: async (content) => {
             typewriter.update(content);
             await nextTick();
-            await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+            await options.scrollBottom({
+              force: true,
+              stable: true,
+              autoAnswer: true,
+            });
           },
           onComplete: async () => {
             await typewriter.flush();
-            commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+            commitAssistantMessage({
+              status: "complete",
+              reasoningStatus: "completed",
+            });
           },
         }
       );
       await typewriter.flush();
-      commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+      commitAssistantMessage({
+        status: "complete",
+        reasoningStatus: "completed",
+      });
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
@@ -181,8 +194,6 @@ export function useChatSubmit(options) {
       chatStreamStore.finish();
     }
   }
-
-
 
   async function regenerateResponse(message = {}) {
     if (isGenerating.value) return;
@@ -253,16 +264,26 @@ export function useChatSubmit(options) {
           onChunk: async (content) => {
             typewriter.update(content);
             await nextTick();
-            await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+            await options.scrollBottom({
+              force: true,
+              stable: true,
+              autoAnswer: true,
+            });
           },
           onComplete: async () => {
             await typewriter.flush();
-            commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+            commitAssistantMessage({
+              status: "complete",
+              reasoningStatus: "completed",
+            });
           },
         }
       );
       await typewriter.flush();
-      commitAssistantMessage({status: "complete", reasoningStatus: "completed"});
+      commitAssistantMessage({
+        status: "complete",
+        reasoningStatus: "completed",
+      });
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
@@ -272,7 +293,8 @@ export function useChatSubmit(options) {
         status: "error",
         reasoningStatus: "completed",
         content:
-          liveAssistantMessage.content || "(응답 재생성 중 오류가 발생했습니다.)",
+          liveAssistantMessage.content ||
+          "(응답 재생성 중 오류가 발생했습니다.)",
       });
     } finally {
       isGenerating.value = false;

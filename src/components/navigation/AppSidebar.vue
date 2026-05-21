@@ -208,7 +208,9 @@ const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuReferenceEl = ref(null);
 const {width} = useWindowSize();
-const isCompactViewport = computed(() => width.value <= systemSettingsStore.mobileBreakpoint);
+const isCompactViewport = computed(
+  () => width.value <= systemSettingsStore.mobileBreakpoint
+);
 
 function syncViewportMode() {
   const platformInfo = platformStore.info || {};

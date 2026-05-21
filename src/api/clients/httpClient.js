@@ -18,8 +18,8 @@ function shouldShowMobileOverlay(policy) {
     const systemSettingsStore = useSystemSettingsStore();
     return Boolean(
       policy.overlay &&
-        systemSettingsStore.showMobileApiProgress &&
-        isMobileLikeViewport(systemSettingsStore.mobileBreakpoint)
+      systemSettingsStore.showMobileApiProgress &&
+      isMobileLikeViewport(systemSettingsStore.mobileBreakpoint)
     );
   } catch (_error) {
     return false;

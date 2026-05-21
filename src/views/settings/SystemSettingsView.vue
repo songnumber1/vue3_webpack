@@ -5,8 +5,8 @@
         <p class="system-settings-eyebrow">시스템</p>
         <h3>앱 동작 설정</h3>
         <p>
-          화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다.
-          적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.
+          화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을
+          누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.
         </p>
       </section>
 
@@ -165,7 +165,8 @@ const groups = computed(() => [
         key: "showMobileApiProgress",
         type: "switch",
         label: "API 진행 표시",
-        description: "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다.",
+        description:
+          "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다.",
       },
     ],
   },
@@ -178,7 +179,8 @@ const groups = computed(() => [
         key: "bottomSheetMinHeight",
         type: "number",
         label: "최소 높이",
-        description: "모바일 Bottom Sheet가 접혔을 때 유지할 최소 높이(px)입니다.",
+        description:
+          "모바일 Bottom Sheet가 접혔을 때 유지할 최소 높이(px)입니다.",
         min: 180,
         max: 720,
         step: 1,
@@ -187,7 +189,8 @@ const groups = computed(() => [
         key: "bottomSheetMaxHeight",
         type: "number",
         label: "최대 높이",
-        description: "모바일 Bottom Sheet가 확장될 때 넘지 않을 최대 높이(px)입니다.",
+        description:
+          "모바일 Bottom Sheet가 확장될 때 넘지 않을 최대 높이(px)입니다.",
         min: 320,
         max: 960,
         step: 1,

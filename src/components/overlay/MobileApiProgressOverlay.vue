@@ -1,6 +1,11 @@
 <template>
   <teleport to="body">
-    <div v-if="visible" class="mobile-api-progress-overlay" role="status" aria-live="polite">
+    <div
+      v-if="visible"
+      class="mobile-api-progress-overlay"
+      role="status"
+      aria-live="polite"
+    >
       <span class="mobile-api-progress-spinner" aria-hidden="true"></span>
       <span class="sr-only">API 요청 처리 중입니다.</span>
     </div>
@@ -21,7 +26,13 @@ const platformStore = usePlatformStore();
 const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
 const visible = computed(() => {
-  const isMobile = isMobileLikeViewport(systemSettingsStore.mobileBreakpoint) || platformStore.info?.isMobile;
-  return Boolean(isMobile && systemSettingsStore.showMobileApiProgress && isOverlayVisible.value);
+  const isMobile =
+    isMobileLikeViewport(systemSettingsStore.mobileBreakpoint) ||
+    platformStore.info?.isMobile;
+  return Boolean(
+    isMobile &&
+    systemSettingsStore.showMobileApiProgress &&
+    isOverlayVisible.value
+  );
 });
 </script>

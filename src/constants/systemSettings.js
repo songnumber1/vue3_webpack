@@ -13,7 +13,8 @@ export const KEYBOARD_MODE_OPTIONS = Object.freeze([
   {
     value: KEYBOARD_MODES.adjustPan,
     label: "adjustPan",
-    description: "CSS resize 보정 없이 포커스 입력 영역으로 스크롤 이동만 시도합니다.",
+    description:
+      "CSS resize 보정 없이 포커스 입력 영역으로 스크롤 이동만 시도합니다.",
   },
   {
     value: KEYBOARD_MODES.adjustNothing,
@@ -115,8 +116,12 @@ export function normalizeSystemSettings(value = {}) {
     next[key] = Boolean(source[key]);
   });
 
-  if (next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] < next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight]) {
-    next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] = next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight];
+  if (
+    next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] <
+    next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight]
+  ) {
+    next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] =
+      next[SYSTEM_SETTING_KEYS.bottomSheetMinHeight];
   }
 
   return next;

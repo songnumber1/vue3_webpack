@@ -17,8 +17,8 @@ function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
   return Boolean(
     policy.overlay &&
-      settings.showMobileApiProgress &&
-      isMobileLikeViewport(settings.mobileBreakpoint)
+    settings.showMobileApiProgress &&
+    isMobileLikeViewport(settings.mobileBreakpoint)
   );
 }
 
@@ -34,7 +34,10 @@ export async function streamGeneration(payload = {}, handlers = {}) {
 
   const policy = resolveApiPolicy(API_KEYS.GENERATION);
   const apiRequestStore = useApiRequestStore();
-  const controller = policy.abort && typeof AbortController !== "undefined" ? new AbortController() : null;
+  const controller =
+    policy.abort && typeof AbortController !== "undefined"
+      ? new AbortController()
+      : null;
   const requestKey = `GENERATION-${Date.now()}-${Math.random()}`;
   const overlay = shouldUseOverlay(policy);
 

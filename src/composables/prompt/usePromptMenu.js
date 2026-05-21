@@ -42,7 +42,6 @@ export function usePromptMenu() {
     );
   }
 
-
   function syncViewportMode() {
     isMobileSheet.value = Boolean(isPromptCompactViewport.value);
   }

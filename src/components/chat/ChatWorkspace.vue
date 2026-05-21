@@ -193,7 +193,6 @@ function handleSuggestionClick(item) {
   mainPromptInputRef.value?.setText(prompt, {focus: true});
 }
 
-
 watch(
   () => [
     props.readonly,

@@ -97,9 +97,7 @@
       @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
-    <VirtualKeyboardDebug
-      :visible="showVirtualKeyboardDebugButton"
-    />
+    <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
 
     <ChatHistoryDialog
       :open="historyDialogOpen"

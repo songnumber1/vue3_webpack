@@ -37,7 +37,11 @@ function downloadText(content, filename, type = "text/plain;charset=utf-8") {
   URL.revokeObjectURL(url);
 }
 function downloadCsv(csv) {
-  downloadText(`\ufeff${csv}`, `table-${Date.now()}.csv`, "text/csv;charset=utf-8");
+  downloadText(
+    `\ufeff${csv}`,
+    `table-${Date.now()}.csv`,
+    "text/csv;charset=utf-8"
+  );
 }
 async function handleTableAction(button) {
   const card = button.closest(".md-table-card");
@@ -55,7 +59,9 @@ async function handleTableAction(button) {
 }
 function resolveMermaidSource(card) {
   const mermaid = card?.querySelector(".md-mermaid");
-  return mermaid?.getAttribute("data-mermaid-source") || mermaid?.textContent || "";
+  return (
+    mermaid?.getAttribute("data-mermaid-source") || mermaid?.textContent || ""
+  );
 }
 function resolveMermaidSvg(card) {
   const svg = card?.querySelector(".md-mermaid svg");
@@ -90,7 +96,11 @@ async function handleMermaidAction(button) {
   if (action === "svg") {
     const svg = resolveMermaidSvg(card);
     if (svg) {
-      downloadText(svg, `mermaid-${Date.now()}.svg`, "image/svg+xml;charset=utf-8");
+      downloadText(
+        svg,
+        `mermaid-${Date.now()}.svg`,
+        "image/svg+xml;charset=utf-8"
+      );
     }
   }
 }
@@ -121,7 +131,10 @@ export function useMarkdownMessageInteractions(contentRef) {
     const mermaidActionButton = event.target?.closest?.(
       "button[data-md-mermaid-action]"
     );
-    if (mermaidActionButton && contentRef.value?.contains(mermaidActionButton)) {
+    if (
+      mermaidActionButton &&
+      contentRef.value?.contains(mermaidActionButton)
+    ) {
       event.preventDefault();
       event.stopPropagation();
       await handleMermaidAction(mermaidActionButton);
