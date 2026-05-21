@@ -64,7 +64,7 @@ body.mobile-mode .mobile-drawer .sidebar-content--mobile.sidebar-content--assist
   display: flex;
   flex-direction: column;
   overflow: hidden !important;
-  padding-bottom: 0;
+  padding-bottom: 0 !important;
 }
 
 body.mobile-mode
@@ -89,10 +89,10 @@ body.mobile-mode
   z-index: 5 !important;
   flex: 0 0 auto;
   width: 100%;
-  min-height: 58px;
+  min-height: 56px;
   margin-top: auto;
   margin-bottom: 0;
-  padding: 12px 18px max(12px, env(safe-area-inset-bottom, 0px));
+  padding: 12px 18px max(10px, env(safe-area-inset-bottom, 0px)) !important;
   display: flex;
   align-items: center;
   gap: 10px;
