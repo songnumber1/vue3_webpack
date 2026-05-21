@@ -1,44 +1,34 @@
-/* 01 foundations */
+
 @import "./foundations/themes/themes.css";
 @import "./foundations/reset/base.css";
 
-/* 02 base layout and core components */
 @import "./layouts/chat/core.css";
 @import "./components/markdown/markdown.css";
 @import "./components/bottom-sheet/bottom-sheet-composer.css";
 @import "./pages/playground/playground-feedback.css";
 
-/* 03 mobile runtime and freeze overrides */
 @import "./mobile-runtime/keyboard/responsive-keyboard.css";
-/* mobile session/browser patch aggregator */
+
 @import "./mobile-runtime/viewport/mobile-session-browser-patches.css";
 @import "./mobile-runtime/mobile-layout/chat-mobile.css";
 @import "./browser-patches/mobile/mobile-browser-layout-patches.css";
 
-/* 03-1 absorbed feature patches */
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
 @import "./components/attachment/attachment-preview-tokens.css";
 @import "./components/debug/virtual-keyboard-debug.css";
-/* 03-2 residual overrides absorbed into final UI normalization fixes. */
 
 @import "./states/reasoning/reasoning.css";
 @import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
 
-/* 04 states, sidebar, assistant binding */
 @import "./states/error/exception.css";
 @import "./components/assistant/assistant-icon-binding.css";
 @import "./states/interaction/ui-shape-interaction-patches.css";
 
-/* 05 targeted polish and desktop patches */
 @import "./layouts/header/chat-header-assistant-icon.css";
 @import "./pages/chat/targeted-chat-polish.css";
 @import "./layouts/responsive/desktop-main-feedback-patch.css";
 
-/* 06 canonical dialog/overlay shape system */
 @import "./components/dialog/dialog-system.css";
 
-/* 07 final UI normalization fixes absorbed into dialog-system.css. */
-
-/* 08 responsive typography and control normalization */
 @import "./foundations/typography/responsive-typography.css";

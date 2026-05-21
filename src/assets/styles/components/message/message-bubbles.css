@@ -1,9 +1,4 @@
-/*
- * Canonical chat message bubble rules.
- * Keep message/user bubble layout here instead of feature files such as reasoning.css.
- * Earlier legacy mobile/keyboard files may set defensive values; this file is imported late
- * to provide the final, theme-token based shape for desktop and mobile.
- */
+
 .message--user {
   grid-template-columns: minmax(0, 1fr);
   justify-content: stretch;
@@ -47,10 +42,6 @@ body.mobile-mode .bubble-content--plain {
   font-size: var(--message-plain-mobile-font-size);
   line-height: 1.62;
 }
-
-/* absorbed from utilities/overrides/message-layout-patches.css */
-
-/* extracted from layout-freeze-overrides.css */
 
 .message-list,
 body.mobile-mode .message-list {

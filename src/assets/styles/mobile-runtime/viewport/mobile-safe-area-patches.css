@@ -1,5 +1,4 @@
-/* Safe-area patches extracted from mobile-session-browser-patches.css.
-   Selectors, declarations, !important, fixed/overflow/z-index ownership are preserved. */
+
 
 body.mobile-mode .sidebar-content--mobile {
   padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;

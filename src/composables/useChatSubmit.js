@@ -79,10 +79,6 @@ function buildMockReasoningContent(normalized) {
   return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.\n\n- 요청: ${target}\n- Assistant/Model payload를 생성했습니다.\n- 스트림 응답이 완료되기 전까지 메시지 액션은 숨김 처리됩니다.`;
 }
 
-export function updateAssistantReasoningTitle(message, status = "completed") {
-  if (!message) return;
-  message.reasoningStatus = status;
-}
 
 export function useChatSubmit(options) {
   const isGenerating = ref(false);

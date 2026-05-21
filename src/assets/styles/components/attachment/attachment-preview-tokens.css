@@ -13,10 +13,6 @@
   --voice-stop-icon-size: 13px;
 }
 
-/* absorbed from utilities/overrides/attachment-layout-patches.css */
-
-/* extracted from layout-freeze-overrides.css */
-
 .attachment-preview-row {
   display: flex;
   flex-wrap: wrap;
@@ -225,7 +221,6 @@ body.mobile-mode .image-preview-large {
   max-height: calc(86vh - 24px);
 }
 
-/* Touch-safe attachment preview patch for Web, Android Chrome and Android WebView. */
 .attachment-preview-row {
   gap: 10px;
   padding-top: 8px;
@@ -346,10 +341,6 @@ body.mobile-mode .image-preview-large {
   max-height: calc(100dvh - 104px);
 }
 
-/* DSLLM-like attachment card final override.
-   The whole image card opens preview except the remove button. The remove
-   button is visually outside the thumbnail but has a large touch target, so
-   Android WebView/Chrome and desktop browsers behave the same. */
 .attachment-preview-row,
 body.mobile-mode .attachment-preview-row {
   display: flex;
@@ -646,8 +637,6 @@ body.mobile-mode .attachment-preview-remove::before {
   inset: -8px !important;
 }
 
-/* absorbed from utilities/overrides/composer-layout-patches.css (attachment) */
-
 .visually-hidden-file-input {
   position: fixed;
   width: 1px;
@@ -672,7 +661,6 @@ body.mobile-mode .attachment-preview-remove::before {
   line-height: 1;
 }
 
-/* Attachment image polish: keep transparent PNGs readable and center close controls. */
 .attachment-preview-card--image {
   background: var(--prompt-bg);
 }
@@ -745,14 +733,6 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* =========================================================
-   FINAL MOBILE-ONLY ATTACHMENT PREVIEW COMPACT OVERRIDE
-   - Applies only when AppContainer detects mobile mode.
-   - Keeps desktop/web attachment card UI unchanged.
-   - Mobile previews use one fixed square size for both image and file items.
-   - File name and size are hidden on mobile to prevent the composer from
-     becoming too tall when the software keyboard is open.
-   ========================================================= */
 body.mobile-mode .attachment-preview-row {
   display: flex !important;
   flex-wrap: nowrap !important;

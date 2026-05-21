@@ -1,8 +1,4 @@
-/*
- * Assistant selector and assistant icon binding refinements.
- * Kept isolated so global button, prompt, sidebar, and modal styles are not
- * changed unexpectedly.
- */
+
 .assistant-trigger {
   border-color: transparent !important;
   background: transparent !important;
@@ -28,8 +24,6 @@
 .empty-center h1 {
   margin-top: 0;
 }
-
-/* absorbed from utilities/overrides/composer-layout-patches.css (assistant) */
 
 .assistant-trigger,
 .prompt-model-trigger {

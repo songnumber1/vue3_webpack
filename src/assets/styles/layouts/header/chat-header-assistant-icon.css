@@ -1,8 +1,4 @@
-/*
- * Chat header assistant icon and mobile chat header spacing refinement.
- * Scoped to chat/shared header surfaces to avoid changing main screen layout,
- * drawer buttons, prompt buttons, or desktop sidebar controls.
- */
+
 
 .conversation-title-wrap--chat {
   gap: 8px;

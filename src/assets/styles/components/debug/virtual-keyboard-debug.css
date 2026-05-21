@@ -99,14 +99,6 @@ html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustNothing"]
   bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
 }
 
-/*
- * Chat/shared route virtual keyboard simulation.
- * ---------------------------------------------------------
- * The main landing page already owns a fixed composer policy that reacts to
- * --keyboard-height. Chat rooms are grid based (header / messages / composer),
- * so the debug keyboard must also shrink the route container height; otherwise
- * the fixed debug panel simply covers the composer and message area.
- */
 html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"]
   body.mobile-mode
   .chat-container-root--mode-chat,
@@ -166,14 +158,6 @@ html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustResize"]
   z-index: var(--z-content-raised, 20) !important;
 }
 
-/*
- * adjustPan debug composer visibility fix.
- * ---------------------------------------------------------
- * In pan mode the app does not resize the CSS viewport. The previous debug
- * simulation moved only part of the workspace, so the composer stayed behind
- * the virtual keyboard panel. Keep this scoped to the debug overlay and mobile
- * mode only so real resize/nothing modes and desktop UI remain unchanged.
- */
 html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"]
   body.mobile-mode
   .chat-container-root--mode-main
@@ -199,17 +183,6 @@ html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"]
   z-index: var(--z-prompt-floating, 90) !important;
 }
 
-/*
- * adjustPan main-page composer anchoring.
- * ---------------------------------------------------------
- * The main page composer normally participates in the mobile landing-page flow,
- * while the chat page composer lives in the chat composer slot. In debug pan
- * mode the landing section itself is translated upward to simulate the browser
- * pan behavior, so the main composer can end up visually detached from the
- * virtual keyboard area. Keep this fix scoped to mobile + debug + adjustPan
- * and compensate for the parent pan transform so the main composer lands in the
- * same visual position as the chat composer: directly above the debug keyboard.
- */
 html[data-virtual-keyboard-debug="open"][data-keyboard-mode="adjustPan"]
   body.mobile-mode
   .chat-container-root--mode-main

@@ -9,8 +9,7 @@
   --dialog-option-radius: 5px;
   --dialog-close-radius: 5px;
 
-  /* Layout / responsive tokens. CSS custom properties cannot be used directly in viewport queries,
-     so keep these values synchronized with src/constants/uiTokens.js and viewport composables. */
+  
   --breakpoint-mobile: 768px;
   --layout-sidebar-width: 260px;
   --layout-sidebar-collapsed-width: 68px;
@@ -25,9 +24,7 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
-  /* Z-index layer tokens.
-     Keep overlay order predictable across desktop, mobile browsers and Android WebView:
-     content < prompt < drawer < popover < bottom sheet < preview/modal < app dialogs. */
+  
   --z-content-raised: 20;
   --z-prompt: 70;
   --z-prompt-floating: 90;
@@ -111,7 +108,7 @@
   --shadow-menu: 0 18px 56px rgba(15, 23, 42, 0.16);
   --shadow-prompt: 0 8px 26px rgba(15, 23, 42, 0.1);
 
-  /* Message / reasoning semantic tokens. Keep bubble styling out of feature-specific CSS. */
+  
   --message-user-radius: 22px;
   --message-user-desktop-max: min(720px, 74%);
   --message-user-mobile-max: 88%;
@@ -184,7 +181,7 @@
   --shadow-menu: 0 18px 60px rgba(0, 0, 0, 0.48);
   --shadow-prompt: 0 8px 26px rgba(0, 0, 0, 0.34);
 
-  /* Message / reasoning semantic tokens. Keep bubble styling out of feature-specific CSS. */
+  
   --message-user-radius: 22px;
   --message-user-desktop-max: min(720px, 74%);
   --message-user-mobile-max: 88%;
@@ -199,7 +196,6 @@
   --reasoning-border: var(--message-border);
 }
 
-/* DSLLM responsive extension tokens. */
 :root {
   --layout-mobile-assistant-trigger-min: 190px;
   --layout-mobile-assistant-trigger-max: min(72vw, 320px);

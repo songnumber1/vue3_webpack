@@ -1,8 +1,5 @@
-/* Composer/prompt patches extracted from mobile-session-browser-patches.css.
-   Selectors, declarations, !important, fixed/overflow/z-index ownership are preserved. */
 
-/* Deleted model composer state.
-   Old chat rooms linked to a deleted model remain readable, but message input is blocked. */
+
 .shared-readonly-box--deleted-model {
   flex-direction: row;
   align-items: center;
@@ -80,17 +77,6 @@ body.mobile-mode .feedback-dialog-body textarea {
   max-height: max(110px, calc(var(--app-height, 100dvh) - 310px)) !important;
 }
 
-/* =========================================================
-   DSLLM final mobile/container polish
-   - Keep all legacy container names replaced with container names.
-   - Mobile drawer footer spacing is explicit so browser bottom bars do not
-     visually collide with the profile area.
-   - Mobile assistant selector width is wider than desktop while desktop keeps
-     the current compact width.
-   - AI avatar is hidden on mobile only.
-   - Settings arrows use SVG icons instead of text/pseudo arrows.
-   - Main prompt dark-mode outer corners inherit the page surface.
-   ========================================================= */
 .app-container {
   height: var(--app-height);
   width: 100%;
@@ -133,12 +119,6 @@ body.mobile-mode .sidebar-content--mobile .assistant-trigger span {
   box-shadow: var(--shadow-prompt);
 }
 
-/* =========================================================
-   FINAL MOBILE DRAWER / MAIN KEYBOARD / SUGGESTION STABILITY PATCH
-   - Mobile drawer user footer keeps a safe visual gap above browser controls.
-   - Main landing page does not reflow upward when the mobile keyboard opens.
-   - Prompt suggestions never flash generic fallback chips while assistant prompts load.
-   ========================================================= */
 body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer {
   height: var(--layout-viewport-height, 100dvh) !important;
@@ -164,12 +144,6 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-row--between:empty {
   display: none;
 }
 
-/* =========================================================
-   FINAL MOBILE DRAWER / MAIN KEYBOARD / BOOTSTRAP STABILITY FIX
-   - Keeps the mobile drawer footer attached to the bottom.
-   - Prevents main landing content from being scrolled away on keyboard focus.
-   - Hides initial assistant/prompt fallback flicker while runtime is bootstrapping.
-   ========================================================= */
 .chat-bootstrap-loading {
   width: 100%;
   height: var(--layout-viewport-height, 100dvh);
@@ -196,14 +170,6 @@ body.mobile-mode
   transform: none;
 }
 
-/* =========================================================
-   MOBILE MAIN COMPOSER KEYBOARD POLICY FIX
-   - Main landing keeps the composer fixed to the visual bottom.
-   - When the software keyboard opens, only the composer moves above the keyboard.
-   - Header/title/suggestions keep their normal layout and may be partially covered
-     by the composer, instead of being pushed out of the viewport.
-   - Chat/shared routes still use the keyboard-open layout class from ChatLayout.
-   ========================================================= */
 body.mobile-mode .chat-container-root--mode-main,
 body.mobile-mode .chat-container-root--mode-main {
   height: var(--layout-viewport-height, 100dvh) !important;
@@ -257,16 +223,6 @@ body.mobile-mode
   max-width: min(100%, var(--layout-prompt-width, 760px));
 }
 
-/* =========================================================
-   MOBILE MAIN FIXED COMPOSER + SCROLLABLE CONTENT OVERRIDE
-   ---------------------------------------------------------
-   Requirement:
-   - On mobile main screen, keep the composer fixed at the bottom.
-   - When the soft keyboard opens, move only the composer above the keyboard.
-   - Do not push the header/title/suggestions out of the viewport.
-   - If the composer overlaps examples or content, allow the main content area
-     to scroll behind the fixed composer.
-   ========================================================= */
 body.mobile-mode .chat-container-root--mode-main,
 body.mobile-mode .chat-container-root--mode-main {
   height: var(--layout-viewport-height, 100dvh) !important;
@@ -324,16 +280,7 @@ body.mobile-mode
   .prompt-box {
   max-width: min(100%, var(--layout-prompt-width, 760px));
   margin: 0 auto;
-} /* =========================================================
-   MOBILE MAIN STABLE COMPOSER LAYOUT
-   ---------------------------------------------------------
-   The main landing page uses a different mobile keyboard policy than chat rooms.
-   - Only the content area scrolls.
-   - The composer stays at the bottom of the visible viewport on every device.
-   - Keyboard resize is handled by --app-height from visualViewport.
-   - Body/app/container do not scroll,
-preventing blank overscroll below the composer.
-   ========================================================= */
+} 
 html:has(> body.mobile-mode),
 body.mobile-mode,
 body.mobile-mode #app {

@@ -1,5 +1,4 @@
-/* Mobile session/browser patch aggregator.
-   Keep this file imported from index.css to preserve the public dependency entry point. */
+
 @import "./mobile-runtime-browser-patches.css";
 @import "./mobile-safe-area-patches.css";
 @import "./mobile-keyboard-patches.css";

@@ -1,21 +1,14 @@
-/*
- * UI shape and mobile interaction refinements.
- * This file is intentionally imported last and scoped to the requested
- * surfaces so existing layout, prompt, drawer, and overlay behavior stays intact.
- */
 
-/* 1. Main prompt suggestion chips: keep existing sizing, only normalize radius. */
+
 .suggestion-chip,
 body.mobile-mode .suggestion-chip {
   border-radius: var(--dialog-radius);
 }
 
-/* 2. Assistant feedback text button: reduce excessive pill radius. */
 .message-action-text-button {
   border-radius: var(--dialog-radius);
 }
 
-/* 3. Shared popup panels: reduce panel radius without changing layout. */
 .responsive-panel,
 .feedback-dialog,
 .responsive-overlay--mobile-dialog .responsive-panel,
@@ -23,7 +16,6 @@ body.mobile-mode .suggestion-chip {
   border-radius: var(--dialog-radius);
 }
 
-/* 3.1 Popup footer/action buttons should be rectangular. */
 .feedback-dialog-footer button,
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
@@ -31,7 +23,6 @@ body.mobile-mode .suggestion-chip {
   border-radius: var(--dialog-action-square-radius);
 }
 
-/* 3.2 Positive/destructive confirmation actions use the primary color. */
 .feedback-dialog-footer button:first-child,
 .chat-history-dialog__actions
   .playground-button:not(.playground-button--secondary),
@@ -59,7 +50,7 @@ body.mobile-mode .suggestion-chip {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #ffffff;
-} /* 4. Mobile-only tap flash prevention for requested controls. */
+} 
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.mobile-mode .mobile-topbar .menu-toggle,
@@ -94,15 +85,6 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
   outline: none;
 }
 
-/* absorbed from mobile-runtime/gestures/mobile-tap-button-radius-patch.css */
-
-/*
- * Final scoped interaction/radius refinements.
- * - Mobile: remove transient tap highlight/focus flash without changing normal colors/borders.
- * - Web/Mobile: normalize Playground and Personalization button radius to 5px.
- */
-
-/* Playground and personalization button radius normalization. */
 .playground-button,
 .playground-link,
 .playground-route-row a,
@@ -113,7 +95,6 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
   border-radius: var(--dialog-radius);
 }
 
-/* Keep popup footer action buttons square as requested in the previous UI rule. */
 .feedback-dialog-footer button,
 .chat-history-dialog__actions .playground-button,
 .playground-dialog-actions .playground-button,
@@ -121,13 +102,6 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-chip:focus-visible {
   border-radius: var(--dialog-action-square-radius);
 }
 
-/*
- * Mobile tap flash prevention.
- * This intentionally avoids changing the normal border/color/background values.
- * It only removes platform tap highlight, transient focus ring, and accidental
- * hover/active background flashes on controls that should stay visually stable
- * while tapping.
- */
 body.mobile-mode
   :where(
     button,
@@ -201,10 +175,7 @@ body.mobile-mode
   outline: none;
   box-shadow: none;
 }
-/*
-   * Mobile drawer controls that are not selected should not receive a temporary
-   * hover/active fill. Selected/active rows keep their existing selected color.
-   */
+
 body.mobile-mode
   .mobile-drawer
   :where(
@@ -226,10 +197,7 @@ body.mobile-mode
   background: transparent;
   transform: none;
 }
-/*
-   * Message/table action icons are icon-only controls. Keep their normal visual
-   * state while removing the transient touch fill from mobile browsers.
-   */
+
 body.mobile-mode
   :where(
     .message-action-icon:not(.active),
@@ -241,10 +209,7 @@ body.mobile-mode
   background: transparent;
   transform: none;
 }
-/*
-   * Sheet/list options should keep selected state, but plain tap should not
-   * flash another fill color.
-   */
+
 body.mobile-mode
   :where(
     .bottom-sheet-option:not(.active),
@@ -265,9 +230,7 @@ body.mobile-mode
   background: transparent;
   transform: none;
 }
-/*
-   * Keep selected/active controls' existing colors stable while tapping.
-   */
+
 body.mobile-mode
   :where(
     .quick-item.active,
@@ -283,11 +246,6 @@ body.mobile-mode
   box-shadow: none;
 }
 
-/*
- * Bottom sheet resize handle must keep native dragging behavior.
- * This rule is intentionally placed after generic mobile tap normalization
- * because the drag area uses role="button" for keyboard accessibility.
- */
 body.mobile-mode .bottom-sheet-drag-area,
 .bottom-sheet-drag-area {
   touch-action: none !important;

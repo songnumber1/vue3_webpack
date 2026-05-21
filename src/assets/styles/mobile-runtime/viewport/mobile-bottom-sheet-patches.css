@@ -1,13 +1,5 @@
-/* Bottom-sheet patches extracted from mobile-session-browser-patches.css.
-   Selectors, declarations, !important, fixed/overflow/z-index ownership are preserved. */
 
-/* Chat route/session UI refinement patch.
-   - Chat histories restore their Assistant selector context.
-   - Deleted or missing model sessions keep the room readable but display the first Assistant as fallback.
-   - Header assistant/title controls are presented as plain text without pill borders.
-   - Message rows share the same right content boundary across user/assistant messages.
-   - Mobile bottom sheet menu rows keep icon and text grouped on the left.
-   - Feedback dialog follows the visual viewport when the mobile keyboard is open. */
+
 .conversation-title-wrap,
 .model-trigger--assistant {
   border-color: transparent !important;
@@ -55,7 +47,6 @@ body.mobile-mode .bottom-sheet-option--row strong {
   text-align: left !important;
 }
 
-/* Keep prompt tool switch geometry intact on mobile bottom sheets. */
 body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch {
   width: 38px !important;
   min-width: 38px !important;

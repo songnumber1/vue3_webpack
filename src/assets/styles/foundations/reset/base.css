@@ -39,7 +39,6 @@ body.mobile-mode .app-container {
   background: var(--surface);
 }
 
-/* Android Chrome/WebView safe viewport variables. Updated by useViewportGuard. */
 :root {
   --app-height: 100vh;
   --app-width: 100vw;

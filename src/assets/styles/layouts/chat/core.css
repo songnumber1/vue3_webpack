@@ -884,7 +884,6 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
   font-size: 16px;
 }
 
-/* Stable container/composer contract migrated from legacy wrapper CSS files. */
 .chat-container-root,
 .chat-container-root--mode-main,
 .chat-container-root--mode-chat,
@@ -911,11 +910,6 @@ body.mobile-mode .mobile-main-fixed-prompt {
   padding-bottom: var(--prompt-safe-bottom);
 }
 
-/* absorbed from utilities/overrides/composer-layout-patches.css (core) */
-
-/* extracted from layout-freeze-overrides.css */
-
-/* Final alignment/full-width patch: keep the file structure unchanged and override older responsive rules. */
 .prompt-box,
 body.mobile-mode .prompt-box {
   grid-template-columns: 38px minmax(0, 1fr) 38px;
@@ -932,7 +926,6 @@ body.mobile-mode .prompt-box {
   align-items: center;
 }
 
-/* Attachment composer and image preview */
 .prompt-box {
   grid-template-columns: 1fr;
   align-items: stretch;
@@ -949,10 +942,6 @@ body.mobile-mode .prompt-input-row {
   grid-template-columns: 42px minmax(0, 1fr) 48px;
 }
 
-/* Android/WebView composer stabilization patch.
-   Older responsive rules in this demo file intentionally override each other.
-   Keep the final composer rules simple and platform-neutral so the input does
-   not collapse into a narrow/tall column on real Android Chrome/WebView. */
 .prompt-wrap,
 body.mobile-mode .prompt-wrap {
   width: 100%;
@@ -1361,7 +1350,6 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   box-shadow: none;
 }
 
-/* Prompt 2-depth tool menu typography and spacing. */
 .prompt-tool-menu .prompt-submenu-arrow,
 .prompt-tool-submenu .prompt-submenu-arrow,
 .bottom-sheet-submenu-arrow {
@@ -1373,10 +1361,6 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   font-size: var(--text-size-body, 14px);
   line-height: var(--line-height-title, 1.35);
 }
-
-/* Migrated from dialog-system.css: layout/freeze and route-level UI overrides. */
-/* Absorbed from layout-freeze-overrides.css. Migrated to the layout owner file; selector specificity preserves the previous UI freeze behavior. */
-/* residual misc rules from previous layout-freeze-overrides.css */
 
 .attach-button,
 .send-button {
@@ -1502,7 +1486,6 @@ body.mobile-mode .topbar-actions .round-icon {
   transform: translateX(-6px);
 }
 
-/* Header action patch: keep theme, document and test buttons aligned together. */
 .mobile-topbar .topbar-actions {
   margin-left: auto;
   position: relative;
@@ -1726,7 +1709,6 @@ body.mobile-mode .suggestion-chip {
   font-size: 13px;
 }
 
-/* Gemini/Assistant routing refactor overrides */
 .topbar-left {
   min-width: 0;
   display: flex;
@@ -1875,8 +1857,6 @@ body.mobile-mode .scroll-bottom-button {
   justify-content: flex-end;
   gap: 8px;
 }
-
-/* absorbed from utilities/overrides/composer-layout-patches.css (layout_freeze) */
 
 .chat-history-dialog__input {
   width: 100%;

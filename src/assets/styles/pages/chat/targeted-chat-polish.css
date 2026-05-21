@@ -1,8 +1,4 @@
-/*
- * Targeted chat polish.
- * Scope: requested web user bubble alignment/text size, web assistant menu ellipsis,
- * mobile user copy spacing, and mobile drawer selected chat visibility only.
- */
+
 body.desktop-mode .message--user {
   width: 100%;
   max-width: 100%;

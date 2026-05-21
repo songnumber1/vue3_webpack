@@ -1,18 +1,12 @@
-/* =========================================================
-   Responsive typography / control-size system
-   ---------------------------------------------------------
-   Canonical owner for global font family, text scale, and
-   common close/action button sizes. Keep component-specific
-   layout exceptions in scoped styles or existing feature CSS.
-   ========================================================= */
+
 
 :root {
-  /* Font family */
+  
   --font-family:
     "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 
-  /* Responsive typography scale - desktop default */
+  
   --font-size-2xs: 11px;
   --font-size-xs: 12px;
   --font-size-sm: 13px;
@@ -29,7 +23,7 @@
   --line-height-body: 1.55;
   --line-height-relaxed: 1.65;
 
-  /* Semantic text roles */
+  
   --text-size-caption: var(--font-size-xs);
   --text-size-helper: var(--font-size-sm);
   --text-size-body: var(--font-size-md);
@@ -43,7 +37,7 @@
   --text-size-icon: var(--font-size-xl);
   --text-size-icon-lg: var(--font-size-2xl);
 
-  /* Common control sizes */
+  
   --control-size-xs: 28px;
   --control-size-sm: 32px;
   --control-size-md: 36px;
@@ -99,7 +93,6 @@ body {
   line-height: var(--line-height-body);
 }
 
-/* Keep dialog typography connected to the global responsive scale. */
 :root {
   --dialog-title-font-size: var(--text-size-title-sm);
   --dialog-body-font-size: var(--text-size-body);
@@ -114,7 +107,6 @@ body.mobile-mode {
   --dialog-action-font-size: var(--text-size-action);
 }
 
-/* Common app dialog/back/close buttons. */
 .app-dialog-close,
 .responsive-close-button,
 .responsive-back-button,
@@ -165,8 +157,6 @@ body.mobile-mode .chat-image-preview-close {
   height: var(--close-button-icon-size);
 }
 
-/* High-specificity normalization for legacy rules that set X buttons to
-   different visual sizes. This controls only the clickable close affordance. */
 body .image-preview-close {
   width: var(--mobile-close-button-size) !important;
   height: var(--mobile-close-button-size) !important;
@@ -177,7 +167,6 @@ body .image-preview-close {
   line-height: 1 !important;
 }
 
-/* Frequently repeated dialog/menu text roles. */
 .user-menu-panel,
 .user-menu-panel button,
 .mobile-settings-page,
@@ -227,7 +216,6 @@ body .image-preview-close {
   line-height: var(--line-height-body);
 }
 
-/* Page-level content that previously had independent fixed sizes. */
 .not-found-code,
 .android-update-eyebrow {
   font-size: var(--text-size-helper);
@@ -255,8 +243,6 @@ body .image-preview-close {
   line-height: var(--line-height-body);
 }
 
-/* Migrated from dialog-system.css: user menu/settings typography normalization. */
-/* User menu and settings overlays share the same compact dialog typography. */
 .user-menu-panel,
 .user-menu-panel button,
 .mobile-settings-page,
@@ -328,9 +314,6 @@ body .image-preview-close {
   border-radius: var(--dialog-option-radius);
 }
 
-/* Explicit desktop overlay mode prevents a fullscreen mobile panel from
-   lingering when a user resizes from mobile width to desktop width while one
-   of the user-menu overlays is already open. */
 .responsive-overlay--desktop {
   padding: 24px;
   place-items: center;
@@ -375,7 +358,6 @@ body.desktop-mode
   border-radius: var(--dialog-radius);
 }
 
-/* Prompt nested bottom sheet header back action. */
 .bottom-sheet-back {
   flex: 0 0 auto;
   width: 38px;
@@ -401,14 +383,6 @@ body.desktop-mode
   flex: 1 1 auto;
 }
 
-/* =========================================================
-   Mobile visual viewport dialog keyboard policy
-   ---------------------------------------------------------
-   ResponsiveOverlay mobile dialog mode is used by chat history rename/delete
-   and other small confirmation popups. When the software keyboard opens, keep
-   the app shell/sidebar fixed and recenter only the dialog overlay within the
-   current visual viewport.
-   ========================================================= */
 body.mobile-mode .responsive-overlay.responsive-overlay--mobile-dialog {
   position: fixed !important;
   inset: 0 auto auto 0 !important;
@@ -453,7 +427,6 @@ body.mobile-mode
   -webkit-overflow-scrolling: touch;
 }
 
-/* System settings overlay -------------------------------------------------- */
 .system-settings-view {
   display: flex;
   flex-direction: column;
@@ -640,7 +613,6 @@ body.mobile-mode
   padding: 0 0 16px;
 }
 
-/* Keep mobile main/chat headers visually identical. */
 body.mobile-mode .chat-container-root--mode-main .mobile-topbar,
 body.mobile-mode .chat-container-root--mode-chat .mobile-topbar,
 body.mobile-mode .chat-container-root--mode-shared .mobile-topbar {
@@ -675,9 +647,6 @@ body.mobile-mode
   line-height: 1.2;
 }
 
-/* System settings dialog should have only the inner content scroll area.
-   This prevents the resized mobile -> desktop dialog from showing both a panel
-   scrollbar and a content scrollbar. */
 .responsive-panel--system-settings {
   display: flex !important;
   flex-direction: column !important;
@@ -714,10 +683,6 @@ body.mobile-mode
   max-height: calc(var(--app-height, 100vh) - 48px) !important;
 }
 
-/* System settings footer/action refinements.
-   Keep the mobile settings page from becoming the scroll container when the
-   System panel is open; only the settings content area should scroll while the
-   footer stays fixed at the visible bottom. */
 .mobile-settings-body.mobile-settings-body--system {
   display: flex !important;
   flex-direction: column !important;

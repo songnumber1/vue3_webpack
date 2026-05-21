@@ -18,10 +18,13 @@
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
+import {
+  APP_CLIPBOARD_COPIED_EVENT,
+  APP_TOAST_REQUESTED_EVENT,
+  shouldUseMobileFeedbackChannel,
+} from "@/utils/appFeedback";
 
 const NOTE_DURATION_MS = 5000;
-const CLIPBOARD_EVENT_NAME = "app:clipboard-copied";
-const TOAST_EVENT_NAME = "app:toast-requested";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
@@ -35,14 +38,7 @@ let remainingMs = NOTE_DURATION_MS;
 const title = computed(() => noteTitle.value || t("clipboardNote.title"));
 
 function shouldShowWebClipboardNote() {
-  const info = platformStore.info || {};
-  return !(
-    info.isNativeRuntime ||
-    info.isNativeApp ||
-    info.isAndroidApp ||
-    info.isIosApp ||
-    info.isMobileBrowser
-  );
+  return !shouldUseMobileFeedbackChannel(platformStore.info || {});
 }
 
 function clearTimer() {
@@ -78,7 +74,7 @@ function resumeTimer() {
 function showNote(event) {
   if (!shouldShowWebClipboardNote()) return;
   noteTitle.value =
-    event.type === TOAST_EVENT_NAME
+    event.type === APP_TOAST_REQUESTED_EVENT
       ? event.detail?.title || t("toastNote.title")
       : t("clipboardNote.title");
   message.value = event.detail?.message || t("clipboardNote.message");
@@ -87,14 +83,14 @@ function showNote(event) {
 }
 
 onMounted(() => {
-  window.addEventListener(CLIPBOARD_EVENT_NAME, showNote);
-  window.addEventListener(TOAST_EVENT_NAME, showNote);
+  window.addEventListener(APP_CLIPBOARD_COPIED_EVENT, showNote);
+  window.addEventListener(APP_TOAST_REQUESTED_EVENT, showNote);
 });
 
 onBeforeUnmount(() => {
   clearTimer();
-  window.removeEventListener(CLIPBOARD_EVENT_NAME, showNote);
-  window.removeEventListener(TOAST_EVENT_NAME, showNote);
+  window.removeEventListener(APP_CLIPBOARD_COPIED_EVENT, showNote);
+  window.removeEventListener(APP_TOAST_REQUESTED_EVENT, showNote);
 });
 </script>
 

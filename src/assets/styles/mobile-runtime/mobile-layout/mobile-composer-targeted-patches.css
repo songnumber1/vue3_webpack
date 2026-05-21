@@ -1,10 +1,1 @@
-/*
- * Mobile composer targeted patches have been migrated to component scoped styles:
- * - ChatWorkspace.vue owns main/chat composer geometry.
- * - PromptAttachmentPreviewList.vue owns mobile attachment preview sizing.
- * - ChatHeader.vue owns compact mobile header sizing.
- * - PromptComposer.vue owns prompt border freeze rules.
- *
- * This file is intentionally kept as an empty compatibility import so the CSS
- * import order remains stable while the patch layer is dismantled safely.
- */
+

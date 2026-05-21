@@ -15,10 +15,13 @@
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
+import {
+  APP_CLIPBOARD_COPIED_EVENT,
+  APP_TOAST_REQUESTED_EVENT,
+  shouldUseMobileFeedbackChannel,
+} from "@/utils/appFeedback";
 
 const TOAST_DURATION_MS = 2200;
-const CLIPBOARD_EVENT_NAME = "app:clipboard-copied";
-const TOAST_EVENT_NAME = "app:toast-requested";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
@@ -33,15 +36,7 @@ function clearTimer() {
 }
 
 function shouldShowMobileToast() {
-  const info = platformStore.info || {};
-
-  return Boolean(
-    info.isMobileBrowser ||
-    info.isNativeRuntime ||
-    info.isNativeApp ||
-    info.isAndroidApp ||
-    info.isIosApp
-  );
+  return shouldUseMobileFeedbackChannel(platformStore.info || {});
 }
 
 function hideToast() {
@@ -61,14 +56,14 @@ function showToast(event) {
 }
 
 onMounted(() => {
-  window.addEventListener(CLIPBOARD_EVENT_NAME, showToast);
-  window.addEventListener(TOAST_EVENT_NAME, showToast);
+  window.addEventListener(APP_CLIPBOARD_COPIED_EVENT, showToast);
+  window.addEventListener(APP_TOAST_REQUESTED_EVENT, showToast);
 });
 
 onBeforeUnmount(() => {
   clearTimer();
-  window.removeEventListener(CLIPBOARD_EVENT_NAME, showToast);
-  window.removeEventListener(TOAST_EVENT_NAME, showToast);
+  window.removeEventListener(APP_CLIPBOARD_COPIED_EVENT, showToast);
+  window.removeEventListener(APP_TOAST_REQUESTED_EVENT, showToast);
 });
 </script>
 

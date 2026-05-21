@@ -1,7 +1,4 @@
-/**
- * Exception Pages
- * 404 / Update / Error
- */
+
 
 .exception-page {
   min-height: var(--app-height, 100vh);

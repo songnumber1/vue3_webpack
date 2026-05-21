@@ -1,5 +1,4 @@
-/* Keyboard/viewport patches extracted from mobile-session-browser-patches.css.
-   Selectors, declarations, !important, fixed/overflow/z-index ownership are preserved. */
+
 
 body.mobile-mode .feedback-dialog {
   width: 100% !important;
@@ -8,9 +7,6 @@ body.mobile-mode .feedback-dialog {
   ) !important;
 }
 
-/* =========================================================
-   FINAL RESPONSIVE / KEYBOARD / TOKEN POLISH
-   ========================================================= */
 .chat-container-root {
   grid-template-columns: var(--layout-sidebar-width) minmax(0, 1fr);
   height: var(--layout-viewport-height, 100dvh);

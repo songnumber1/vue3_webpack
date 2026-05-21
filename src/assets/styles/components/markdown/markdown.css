@@ -1,4 +1,4 @@
-/* Markdown/unified renderer styles. Kept at the end to override legacy bubble rules safely. */
+
 .markdown-body {
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -129,7 +129,6 @@ body.mobile-mode .md-table-wrapper table {
   min-width: 520px;
 }
 
-/* Markdown renderer additions */
 .markdown-body p,
 .markdown-body ul,
 .markdown-body ol,
@@ -243,7 +242,6 @@ body.mobile-mode .md-table-wrapper table {
   fill: #111827 !important;
 }
 
-/* Mermaid card toolbar mirrors table actions and renders only after stream completion. */
 .md-mermaid-card {
   width: 100%;
   max-width: 100%;
@@ -345,7 +343,6 @@ body.mobile-mode .md-table-wrapper table {
   white-space: pre-wrap;
 }
 
-/* Mermaid toolbar icons use inline SVG to avoid pseudo-element rendering issues on mobile browsers. */
 .md-mermaid-action-icon {
   display: block;
   width: 15px;

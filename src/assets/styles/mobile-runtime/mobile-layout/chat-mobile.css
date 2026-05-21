@@ -1,16 +1,4 @@
-/**
- * Mobile viewport and keyboard policy.
- *
- * Main page policy:
- * - The composer is always anchored to the bottom edge of the device viewport.
- * - When the software keyboard opens, only the composer moves above the keyboard.
- * - Header/title/example prompt content does not get pushed upward by the composer.
- * - If the composer covers content, only the main content area scrolls.
- * - Body/app/container scrolling is locked to prevent blank overscroll below the composer.
- *
- * Chat page policy:
- * - Chat/shared rooms keep using chat-container-root--keyboard-open from ChatLayout.
- */
+
 body.mobile-mode {
   --mobile-main-composer-space: 174px;
   --mobile-main-content-top: var(--mobile-header-height, 76px);
@@ -161,13 +149,6 @@ body.mobile-mode
   transform: none;
 }
 
-/*
- * Cross-browser mobile composer stabilization.
- * Chrome and Samsung Internet expose different viewport values
- * when the software keyboard opens. The JS viewport guard provides two vars:
- * - --mobile-keyboard-inset: content scroll reserve
- * - --composer-keyboard-inset: fixed composer bottom offset
- */
 body.mobile-mode .chat-container-root--mode-main .empty-center,
 body.mobile-mode
   .chat-container-root--mode-main
@@ -190,8 +171,7 @@ body.mobile-mode
     var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
   ) !important;
   padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 0px));
-  /* Fix: max-height 고정값 제거 - 첨부파일 추가 시 input이 밀리는 버그 방지.
-       attachment-preview-row가 추가되면 자연스럽게 높이가 늘어나도록 auto로 변경 */
+  
   max-height: none !important;
   height: auto !important;
   overflow: visible !important;

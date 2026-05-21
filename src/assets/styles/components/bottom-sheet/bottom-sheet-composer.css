@@ -1,4 +1,4 @@
-/* Android WebView/Chrome bottom sheet fallback: avoid dvh-only sizing bugs. */
+
 body.mobile-mode .bottom-sheet-option {
   min-height: 50px;
 }
@@ -6,7 +6,6 @@ body.mobile-mode .bottom-sheet-body > *:last-child {
   margin-bottom: 8px;
 }
 
-/* Shared read-only composer */
 .shared-readonly-wrap {
   padding: 14px 22px calc(14px + env(safe-area-inset-bottom));
   background: var(--chat-bg);
@@ -51,11 +50,6 @@ body.mobile-mode .shared-readonly-box span {
   font-size: 12px;
 }
 
-/* Final chat scroll/composer spacing stabilization.
-   The composer is already rendered as the last grid row, so the message list
-   must not reserve a second large virtual composer space. This keeps the last
-   message close to the input on both desktop and mobile and prevents the
-   scroll-to-bottom button from being clipped by the lower edge. */
 :root {
   --chat-message-bottom-gap: 18px;
   --chat-scroll-button-bottom: calc(92px + env(safe-area-inset-bottom));
@@ -97,10 +91,6 @@ body.mobile-mode .scroll-bottom-button {
   height: 44px;
 }
 
-/* Final floating scroll button stabilization.
-   The button is centered inside the chat workspace, not the whole viewport.
-   This keeps it aligned with the visible conversation area whether the left
-   sidebar is expanded, collapsed or hidden on mobile. */
 :root {
   --chat-composer-height: 96px;
   --chat-scroll-button-gap: 12px;
@@ -140,9 +130,6 @@ body.mobile-mode .scroll-bottom-button {
   transform: translateX(-50%) translateZ(0) !important;
 }
 
-/* =========================================================
-   i18n/menu/overlay refinement
-   ========================================================= */
 .topbar-actions--desktop {
   margin-left: auto;
 }
@@ -646,7 +633,6 @@ body.mobile-mode .md-table-action {
   flex: 1 1 auto;
 }
 
-/* Refined menu/i18n/table-action overrides */
 .app-icon {
   width: 18px;
   height: 18px;
@@ -867,9 +853,6 @@ body.mobile-mode .md-table-action {
   flex: 0 0 34px !important;
 }
 
-/* =========================================================
-   Header/menu final refinements
-   ========================================================= */
 body.desktop-mode .chat-workspace > .mobile-topbar,
 body.desktop-mode .mobile-topbar,
 body.desktop-mode .app-container--desktop .mobile-topbar {
@@ -904,7 +887,6 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
   transform: rotate(180deg);
 }
 
-/* Mobile drawer setting menu should visually match the chat list, not a card. */
 .mobile-drawer .settings-menu,
 body.mobile-mode .settings-menu {
   margin: 4px 0 10px;

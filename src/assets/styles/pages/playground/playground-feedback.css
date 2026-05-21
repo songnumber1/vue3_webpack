@@ -1,4 +1,4 @@
-/* Header overflow safety: keep desktop title from pushing action buttons. */
+
 .chat-workspace > .mobile-topbar {
   width: 100%;
   min-width: 0;
@@ -67,7 +67,6 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   max-width: 120px;
 }
 
-/* Playground popup samples */
 .playground-popup-content {
   display: grid;
   gap: 16px;
@@ -120,7 +119,6 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   color: var(--text);
 }
 
-/* Playground mobile scroll + mobile popup dialog policy */
 .playground-page {
   height: var(--app-height, 100vh);
   min-height: 0;
@@ -213,7 +211,6 @@ body.mobile-mode .playground-popup-detail {
   word-break: keep-all;
 }
 
-/* Assistant/model selection and markdown overflow safety patch. */
 .assistant-option,
 .model-option,
 .bottom-sheet-option {
@@ -296,7 +293,6 @@ body.mobile-mode .markdown-body img {
   text-overflow: ellipsis;
 }
 
-/* Assistant prompt and markdown responsive refinement. */
 .message,
 .bubble,
 .bubble-content,
@@ -382,9 +378,6 @@ body.mobile-mode .markdown-body img {
   max-width: 100% !important;
 }
 
-/* =========================================================
-   MOBILE SETTINGS NAVIGATOR + MESSAGE FEEDBACK REFACTOR
-   ========================================================= */
 .sidebar-user-profile {
   min-width: 0;
   flex: 1 1 auto;
@@ -619,7 +612,6 @@ body.mobile-mode .message-action-icon {
   height: 36px;
 }
 
-/* Final prompt/i18n/feedback refinement patch. */
 .message-action-icon--svg svg {
   width: 18px;
   height: 18px;
@@ -832,7 +824,6 @@ body.mobile-mode .feedback-dialog {
   object-fit: contain;
 }
 
-/* Playground SHOW_TOAST sample input */
 .playground-toast-field {
   display: grid;
   gap: 8px;

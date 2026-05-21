@@ -3,35 +3,27 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";
 import {i18n} from "@/i18n";
+import {
+  APP_CLIPBOARD_COPIED_EVENT,
+  APP_TOAST_REQUESTED_EVENT,
+  dispatchAppFeedbackEvent,
+  getFeedbackChannel as resolveFeedbackChannel,
+} from "@/utils/appFeedback";
 
 function getFeedbackChannel() {
-  const info = getStore().info || {};
-
-  return info.isNativeRuntime ||
-    info.isNativeApp ||
-    info.isAndroidApp ||
-    info.isIosApp ||
-    info.isMobileBrowser
-    ? "mobile-toast"
-    : "desktop-note";
+  return resolveFeedbackChannel(getStore().info || {});
 }
 
 function dispatchFeedbackEvent(name, detail) {
-  if (typeof window === "undefined") return;
-
-  window.dispatchEvent(
-    new CustomEvent(name, {
-      detail: {...detail, channel: getFeedbackChannel()},
-    })
-  );
+  dispatchAppFeedbackEvent(name, detail, getStore().info || {});
 }
 
 function notifyClipboardCopied(message, toastMessage = message) {
-  dispatchFeedbackEvent("app:clipboard-copied", {message, toastMessage});
+  dispatchFeedbackEvent(APP_CLIPBOARD_COPIED_EVENT, {message, toastMessage});
 }
 
 function notifyToastRequested(message, options = {}) {
-  dispatchFeedbackEvent("app:toast-requested", {
+  dispatchFeedbackEvent(APP_TOAST_REQUESTED_EVENT, {
     message,
     toastMessage: message,
     title: options.title || t("toastNote.title"),

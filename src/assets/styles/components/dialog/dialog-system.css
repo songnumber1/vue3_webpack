@@ -1,11 +1,4 @@
-/* =========================================================
-   Dialog / overlay design system
-   ---------------------------------------------------------
-   Canonical owner for dialog, responsive overlay, bottom sheet,
-   feedback dialog, and lightweight confirmation panel shapes.
-   Keep browser/keyboard/safe-area patches in mobile-runtime files;
-   keep component-only exceptions in each component's scoped style.
-   ========================================================= */
+
 
 :root {
   --dialog-radius: 5px;
@@ -25,9 +18,7 @@
   --dialog-option-radius: 5px;
   --dialog-close-radius: 5px;
 
-  /* Canonical dialog typography tokens.
-     Keep every dialog title/body/action size here so desktop and mobile can be
-     tuned without editing each component. */
+  
   --dialog-font-family: inherit;
   --dialog-title-font-size: 15px;
   --dialog-title-font-weight: 800;
@@ -50,10 +41,6 @@ body.mobile-mode {
   --dialog-action-font-size: 12px;
 }
 
-/* Shared dialog typography foundation.
-   These selectors intentionally target the common dialog classes added to
-   ResponsiveOverlay, BaseBottomSheet, and feedback dialog. Component-only
-   exceptions should remain in scoped styles. */
 .responsive-panel,
 .feedback-dialog,
 .bottom-sheet,
@@ -118,15 +105,11 @@ body.mobile-mode {
   line-height: 1.35;
 }
 
-/* Chat answer feedback trigger is dialog-related UI, so it follows the same
-   canonical radius on desktop and mobile. */
 .message-action-text-button,
 body.mobile-mode .message-action-text-button {
   border-radius: var(--dialog-radius);
 }
 
-/* Keep chat feedback trigger rectangular 5px even if legacy feedback styles
-   still define a pill radius earlier in the cascade. */
 .message-action-text-button,
 .message-action-text-button:hover,
 .message-action-text-button:focus-visible,
@@ -134,7 +117,6 @@ body.mobile-mode .message-action-text-button {
   border-radius: 5px;
 }
 
-/* Shared backdrop/panel foundation. */
 .responsive-overlay,
 .feedback-dialog-backdrop {
   position: fixed;
@@ -162,13 +144,11 @@ body.mobile-mode .message-action-text-button {
   overflow: hidden;
 }
 
-/* Bottom sheet is a dialog surface, but keeps only top corners rounded. */
 .bottom-sheet,
 .bottom-sheet--fullscreen {
   border-radius: var(--dialog-sheet-radius);
 }
 
-/* Shared header/body shape for responsive overlay and feedback modal. */
 .responsive-panel-header,
 .feedback-dialog-header,
 .feedback-dialog-footer {
@@ -196,7 +176,6 @@ body.mobile-mode .message-action-text-button {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Shared close/back button shape. */
 .responsive-close-button,
 .responsive-back-button,
 .feedback-dialog-close,
@@ -205,7 +184,6 @@ body.mobile-mode .message-action-text-button {
   border-radius: var(--dialog-close-radius);
 }
 
-/* Shared option/action shape. */
 .bottom-sheet-option,
 .assistant-option,
 .model-option,
@@ -228,7 +206,6 @@ body.mobile-mode .message-action-text-button {
   border-radius: var(--dialog-input-radius);
 }
 
-/* Mobile dialog mode should remain centered, not turn into a sheet. */
 .responsive-overlay--mobile-dialog {
   padding: max(16px, env(safe-area-inset-top)) 16px
     max(16px, env(safe-area-inset-bottom));
@@ -241,13 +218,10 @@ body.mobile-mode .message-action-text-button {
   border-radius: var(--dialog-radius);
 }
 
-/* Fullscreen mobile overlays intentionally use no radius. */
 body.mobile-mode .responsive-overlay--mobile .responsive-panel {
   border-radius: 0;
 }
 
-/* Feedback dialog is centered on both desktop and mobile; keyboard offsets are
-   still owned by mobile-runtime viewport patches. */
 .feedback-dialog {
   border-radius: var(--dialog-radius);
 }
@@ -256,15 +230,11 @@ body.mobile-mode .feedback-dialog {
   border-radius: var(--dialog-radius);
 }
 
-/* Playground popup content is dialog-local content, but follows the shared
-   dialog radius token so shape can be adjusted from one place. */
 .playground-popup-icon,
 .playground-popup-content {
   border-radius: var(--dialog-radius);
 }
 
-/* Semantic aliases used by Vue components. Existing legacy classes remain for
-   compatibility with older targeted patches. */
 .app-dialog-backdrop {
   background: var(--dialog-backdrop);
 }

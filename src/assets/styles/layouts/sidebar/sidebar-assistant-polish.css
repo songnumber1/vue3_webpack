@@ -1,8 +1,4 @@
-/*
- * Web-only sidebar assistant polish.
- * Kept separate from core/layout CSS to avoid changing mobile drawer, mobile
- * topbar, prompt buttons, or shared round icon styles.
- */
+
 body.desktop-mode .desktop-sidebar .sidebar-top {
   position: relative;
 }
@@ -32,7 +28,6 @@ body.desktop-mode .desktop-sidebar .assistant-menu {
   transform: translateX(-50%);
 }
 
-/* Main screen Assistant brand mark. */
 .conversation-title-wrap--main {
   align-items: center;
   gap: 12px;
@@ -64,11 +59,6 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
   margin-right: 2px;
 }
 
-/* absorbed from utilities/overrides/sidebar-layout-patches.css */
-
-/* extracted from layout-freeze-overrides.css */
-
-/* Collapsed sidebar patch: DSLLM-like rail with recent chat flyout. */
 .chat-container-root--sidebar-collapsed {
   grid-template-columns: 48px minmax(0, 1fr);
 }
@@ -187,12 +177,6 @@ body.mobile-mode .attach-menu-wrap {
   justify-content: center;
 }
 
-/* =========================================================
-   FINAL ANDROID DRAWER + IMAGE PREVIEW FIX
-   - Android WebView follows the unified body.mobile-mode branch.
-   - Force mobile drawer content to be visible, scrollable and readable.
-   - Image preview no longer depends on browser default image loading UI.
-   ========================================================= */
 body.mobile-mode .mobile-drawer-backdrop,
 .mobile-drawer-backdrop {
   position: fixed !important;
@@ -494,7 +478,6 @@ body.mobile-mode .sidebar-history--main {
   overflow-x: hidden;
 }
 
-/* Chat history action menu */
 .sidebar-history-row {
   position: relative;
   display: flex;
@@ -577,7 +560,6 @@ body.mobile-mode .sidebar-history--main {
   isolation: isolate;
 }
 
-/* Keep the chat history action popup above every app surface on desktop and mobile. */
 .chat-history-menu-overlay.bottom-sheet-backdrop {
   z-index: var(--z-chat-history-menu-backdrop) !important;
 }
@@ -625,15 +607,11 @@ body.mobile-mode .sidebar-history--main {
   color: #d92d20;
 }
 
-/* Ensure every confirmation/notice popup opened from the mobile drawer is above the drawer and any bottom sheet.
-   The drawer intentionally remains mounted while history actions run, so dialog overlays must own
-   the top application layer instead of inheriting the base responsive overlay z-index. */
 .responsive-overlay.responsive-overlay--mobile-dialog {
   z-index: var(--z-app-dialog-front) !important;
   isolation: isolate;
 }
 
-/* Desktop dialogs should also stay above transient menus without changing their layout. */
 .responsive-overlay:not(.responsive-overlay--mobile):not(
     .responsive-overlay--mobile-dialog
   ) {
@@ -648,45 +626,22 @@ body.mobile-mode .sidebar-history--main {
   opacity: 1;
 }
 
-/* absorbed from utilities/overrides/composer-layout-patches.css (sidebar) */
-
 .collapsed-icon-button .nav-icon {
   width: var(--prompt-action-icon-size);
   height: var(--prompt-action-icon-size);
 }
 
-/* =========================================================
-   Gemini style UX refactor
-   - Assistant selector in sidebar
-   - Conversation-only sidebar menu
-   - Prompt composer with textarea + bottom action row
-   - Mobile selectors use bottom sheet instead of dropdowns
-   ========================================================= */
 .assistant-selector {
   position: relative;
   min-width: 0;
   flex: 1 1 auto;
 }
 
-/* Migrated from dialog-system.css: mobile drawer stability rules. */
-/* =========================================================
-   Absorbed mobile UI normalization fixes.
-   Formerly utilities/fixes/mobile-ui-final-fixes.css.
-   Kept at the end of dialog-system.css to preserve cascade order while
-   removing the residual final-fixes import.
-   ========================================================= */
-/* Final mobile UI fixes.
-   This file intentionally sits at the end of the CSS import chain so it can
-   normalize cross-file residual overrides without touching browser-specific
-   keyboard patches. */
-
 :root {
   --prompt-panel-radius: 5px;
   --mobile-root-radius: 0;
 }
 
-/* Mobile root/shell must not inherit rounded corners from desktop cards or
-   device-preview experiments. The real mobile viewport should be edge-to-edge. */
 body.mobile-mode,
 body.mobile-mode #app,
 body.mobile-mode .app-container,
@@ -699,9 +654,6 @@ body.mobile-mode .mobile-drawer-backdrop {
   border-radius: var(--mobile-root-radius);
 }
 
-/* Keep the mobile drawer footer attached to the visible bottom. Older safe-area
-   patches intentionally left a large browser-control gap; the current UI needs
-   only the actual safe-area inset. */
 body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
   height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
@@ -738,8 +690,6 @@ body.mobile-mode .sidebar-content--mobile .sidebar-user {
   box-shadow: none;
 }
 
-/* Composer background policy: remove the colored/gradient backing from the
-   mobile prompt area while preserving the actual input panel surface. */
 body.mobile-mode .prompt-wrap,
 body.mobile-mode .prompt-wrap--floating,
 body.mobile-mode .mobile-chat-prompt,
@@ -756,7 +706,6 @@ body.mobile-mode
   box-shadow: none;
 }
 
-/* Prompt/Input panel radius is shared by desktop and mobile. */
 .prompt-box,
 .prompt-box--gemini,
 .mobile-main-fixed-prompt .prompt-box,
@@ -776,20 +725,12 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
   border-radius: var(--prompt-panel-radius);
 }
 
-/* The input panel itself keeps the theme surface; only its outer mobile backing
-   is transparent. */
 .prompt-box,
 .prompt-box--gemini {
   background: var(--prompt-bg);
   background-clip: padding-box;
 }
 
-/* =========================================================
-   MOBILE DRAWER RESIZE + FOOTER STABILITY PATCH
-   - Keep the mobile drawer footer attached to the visible drawer bottom.
-   - Avoid stale viewport height gaps after PC browser web <-> mobile resize.
-   - Normalize prompt model selector radius without changing icon buttons.
-   ========================================================= */
 body.mobile-mode .mobile-drawer {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;

@@ -1,13 +1,4 @@
-/*
- * Desktop main composer and mobile feedback dialog shape fixes.
- *
- * Scope:
- * - Desktop main screen only: keep the landing composer at the same practical
- *   width as the chat composer instead of letting the empty-center wrapper cap it.
- * - Mobile feedback dialog only: keep the panel corner radius identical to the
- *   desktop feedback dialog. This file is imported last to override older mobile
- *   dialog radius rules without touching bottom sheets, chat layout, or browsers.
- */
+
 
 body.desktop-mode .chat-container-root--mode-main .empty-center {
   width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
@@ -31,11 +22,6 @@ body.desktop-mode
   max-width: var(--layout-prompt-width, 820px) !important;
 }
 
-/*
- * Feedback dialog final positioning fix.
- * Keeps feedback modal centered on desktop/mobile and stable when the mobile
- * keyboard changes the visual viewport. Scoped only to feedback-dialog.
- */
 .feedback-dialog-backdrop {
   position: fixed !important;
   inset: 0 !important;
