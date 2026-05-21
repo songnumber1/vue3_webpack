@@ -873,3 +873,78 @@ body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user {
   margin-bottom: 0 !important;
   transform: none !important;
 }
+
+/* =========================================================
+   MOBILE DRAWER USER FOOTER ANCHOR PATCH
+   - Keep user profile/footer visible at the drawer bottom.
+   - Let history scroll above the footer instead of pushing it outside.
+   - Keep the system-configured action buttons aligned to the right.
+   ========================================================= */
+body.mobile-mode .mobile-drawer .sidebar-content--mobile.sidebar-content--assistant {
+  position: relative !important;
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding-bottom: 0 !important;
+}
+
+body.mobile-mode
+  .mobile-drawer
+  .sidebar-content--mobile.sidebar-content--assistant
+  .sidebar-history {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 12px !important;
+}
+
+body.mobile-mode
+  .mobile-drawer
+  .sidebar-content--mobile.sidebar-content--assistant
+  .sidebar-user.sidebar-user--mobile {
+  position: sticky !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 5 !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  min-height: 58px !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  padding: 12px 18px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border-top: 1px solid var(--control-border, var(--sidebar-border)) !important;
+  background: var(--sidebar-bg, var(--mobile-bg)) !important;
+  box-shadow: 0 -8px 18px rgba(15, 23, 42, 0.04) !important;
+  transform: none !important;
+}
+
+body.mobile-mode
+  .mobile-drawer
+  .sidebar-content--mobile.sidebar-content--assistant
+  .sidebar-user-profile {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+body.mobile-mode
+  .mobile-drawer
+  .sidebar-content--mobile.sidebar-content--assistant
+  .sidebar-user-actions {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+}

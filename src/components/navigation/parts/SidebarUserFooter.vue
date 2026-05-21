@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar-user sidebar-user--mobile">
+  <footer class="sidebar-user sidebar-user--mobile" role="contentinfo">
     <button
       class="sidebar-user-profile"
       type="button"
@@ -62,7 +62,7 @@
         <span class="logout-glyph">⏻</span>
       </button>
     </div>
-  </div>
+  </footer>
 </template>
 
 <script setup>
@@ -103,6 +103,44 @@ const userInitial = computed(() => {
 }
 
 .sidebar-user--mobile {
+  width: 100%;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-user-profile {
+  flex: 1 1 auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sidebar-user-main {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.sidebar-user-main strong,
+.sidebar-user-main small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-user-actions {
+  flex: 0 0 auto;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
 }
 </style>

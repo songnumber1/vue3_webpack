@@ -57,21 +57,17 @@ function tableActionButton(action, label) {
 }
 
 function mermaidIcon(action) {
-  const iconSrc =
-    {
-      copy: copyIcon,
-      svg: mermaidSvgIcon,
-      code: mermaidCodeIcon,
-    }[action] || copyIcon;
+  const iconSrc = {
+    copy: copyIcon,
+    svg: mermaidSvgIcon,
+    code: mermaidCodeIcon,
+  }[action] || copyIcon;
 
   return {
     type: "element",
     tagName: "img",
     properties: {
-      className: [
-        "md-mermaid-action-icon",
-        `md-mermaid-action-icon--${action}`,
-      ],
+      className: ["md-mermaid-action-icon", `md-mermaid-action-icon--${action}`],
       src: iconSrc,
       alt: "",
       ariaHidden: "true",
