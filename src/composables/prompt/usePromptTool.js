@@ -1,4 +1,4 @@
-import {computed, nextTick} from "vue";
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {useChatStore} from "@/stores/chatStore";
 import {
@@ -13,9 +13,9 @@ function isToolOptionActive(settings, tool) {
 }
 
 /**
- * @description 툴 목록 관리, 툴 선택 메뉴 열기/닫기, 툴 프롬프트 적용을 처리합니다.
- * @param {object} options - props, toolMenuOpen ref, syncViewportMode 함수, closeMenus 함수,
- *                           text ref, resize 함수, focusTextarea 함수
+ * @description 툴 목록 관리, 툴 선택 메뉴 열기/닫기, 설정형 툴 선택을 처리합니다.
+ *              일반 툴은 입력창에 프롬프트를 주입하지 않고 메뉴만 닫습니다.
+ * @param {object} options - props, toolMenuOpen ref, syncViewportMode 함수, toggleMenu 함수
  * @returns {object} 툴 관련 상태 및 핸들러
  */
 export function usePromptTool({
@@ -23,9 +23,6 @@ export function usePromptTool({
   toolMenuOpen,
   syncViewportMode,
   toggleMenu,
-  text,
-  resize,
-  focusTextarea,
 }) {
   const {t} = useI18n();
   const chatStore = useChatStore();
@@ -85,12 +82,7 @@ export function usePromptTool({
       return;
     }
 
-    text.value = text.value ? `${text.value}\n${tool.prompt}` : tool.prompt;
     toolMenuOpen.value = false;
-    nextTick(() => {
-      focusTextarea();
-      resize();
-    });
   }
 
   return {
