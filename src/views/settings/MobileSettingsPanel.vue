@@ -233,7 +233,9 @@ const languageOptions = computed(() => [
 function selectMenuItem(key) {
   if (key === "terms" || key === "playground") {
     closePanel();
-    router.push(key === "terms" ? {name: "terms"} : {name: "playground"}).catch(() => {});
+    router
+      .push(key === "terms" ? {name: "terms"} : {name: "playground"})
+      .catch(() => {});
     return;
   }
   activeMenu.value = key;
@@ -265,8 +267,12 @@ watch(
   () => [props.open, props.isMobile],
   ([open, isMobile]) => {
     if (!open || isMobile) return;
-    emit("desktop-open", activeMenu.value || "personalization");
-    activeMenu.value = "";
+    if (!activeMenu.value) {
+      closePanel();
+    } else {
+      emit("desktop-open", activeMenu.value || "personalization");
+      activeMenu.value = "";
+    }
   }
 );
 </script>
