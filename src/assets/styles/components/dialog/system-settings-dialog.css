@@ -1,0 +1,378 @@
+/* =========================================================
+   System settings dialog layout
+   ---------------------------------------------------------
+   Owns System panel scroll/footer behavior and mobile API
+   progress overlay.
+   ========================================================= */
+
+/* System settings overlay -------------------------------------------------- */
+.system-settings-view {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: min(72vh, 720px);
+  color: var(--text);
+}
+
+.system-settings-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.system-settings-hero {
+  padding: 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--surface) 92%, var(--accent) 8%);
+}
+
+.system-settings-eyebrow,
+.system-settings-group header span {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.system-settings-hero h3,
+.system-settings-group h4 {
+  margin: 0;
+  color: var(--text);
+  font-size: var(--font-size-lg);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.system-settings-hero p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.system-settings-group {
+  margin-top: 18px;
+}
+
+.system-settings-group header {
+  margin-bottom: 10px;
+}
+
+.system-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+  padding: 12px 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--control-border) 70%, transparent);
+}
+
+.system-settings-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.system-settings-copy strong {
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 750;
+}
+
+.system-settings-copy small {
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+}
+
+.system-settings-switch {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  flex: 0 0 44px;
+}
+
+.system-settings-switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.system-settings-switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--control-border);
+  transition: background 0.18s ease;
+}
+
+.system-settings-switch span::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.24);
+  transition: transform 0.18s ease;
+}
+
+.system-settings-switch input:checked + span {
+  background: var(--accent);
+}
+
+.system-settings-switch input:checked + span::after {
+  transform: translateX(18px);
+}
+
+.system-settings-number {
+  width: 96px;
+  height: 38px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-align: right;
+  padding: 0 10px;
+}
+
+.system-settings-select {
+  width: min(210px, 46vw);
+  height: 38px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  padding: 0 34px 0 10px;
+}
+
+.system-settings-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--control-border);
+  background: var(--surface-elevated, var(--surface));
+}
+
+.responsive-overlay--mobile-dialog .system-settings-view {
+  width: min(100%, 520px);
+  max-height: min(76vh, calc(var(--app-height, 100vh) - 48px));
+}
+
+.responsive-overlay--mobile-dialog .system-settings-scroll {
+  padding: 14px;
+}
+
+.responsive-overlay--mobile-dialog .system-settings-footer {
+  padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+}
+
+.mobile-settings-detail .system-settings-view {
+  max-height: none;
+  height: 100%;
+}
+
+.mobile-settings-detail .system-settings-scroll {
+  padding: 0 0 16px;
+}
+
+/* Keep mobile main/chat headers visually identical. */
+body.mobile-mode .chat-container-root--mode-main .mobile-topbar,
+body.mobile-mode .chat-container-root--mode-chat .mobile-topbar,
+body.mobile-mode .chat-container-root--mode-shared .mobile-topbar {
+  height: 44px !important;
+  padding: 4px 12px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-main .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .round-icon {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-topbar
+  .model-trigger--assistant,
+body.mobile-mode
+  .chat-container-root--mode-chat
+  .mobile-topbar
+  .model-trigger--assistant,
+body.mobile-mode
+  .chat-container-root--mode-shared
+  .mobile-topbar
+  .model-trigger--assistant {
+  height: 34px !important;
+  min-width: 100px;
+  gap: 6px;
+  padding: 0 10px !important;
+  font-size: var(--text-size-title-sm) !important;
+  line-height: 1.2;
+}
+
+/* System settings dialog should have only the inner content scroll area.
+   This prevents the resized mobile -> desktop dialog from showing both a panel
+   scrollbar and a content scrollbar. */
+.responsive-panel--system-settings {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.responsive-panel--system-settings .responsive-panel-body {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.responsive-panel--system-settings .system-settings-view {
+  width: 100%;
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+}
+
+.responsive-panel--system-settings .system-settings-scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.responsive-overlay--desktop .responsive-panel--system-settings {
+  height: min(760px, calc(100vh - 56px));
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel--system-settings {
+  height: min(760px, calc(var(--app-height, 100vh) - 48px));
+  max-height: calc(var(--app-height, 100vh) - 48px) !important;
+}
+
+/* System settings footer/action refinements.
+   Keep the mobile settings page from becoming the scroll container when the
+   System panel is open; only the settings content area should scroll while the
+   footer stays fixed at the visible bottom. */
+.mobile-settings-body.mobile-settings-body--system {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  gap: 0 !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-view {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+  overflow: hidden !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-scroll {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 26px 20px !important;
+}
+
+.mobile-settings-detail.mobile-settings-detail--system .system-settings-footer {
+  position: sticky !important;
+  bottom: 0 !important;
+  flex: 0 0 auto !important;
+  z-index: 5 !important;
+  padding: 12px 26px calc(12px + env(safe-area-inset-bottom)) !important;
+  background: var(--surface-elevated, var(--surface, #fff)) !important;
+  box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
+}
+
+.system-settings-footer .playground-button {
+  min-width: 86px;
+  min-height: 44px;
+  border-radius: var(--dialog-action-square-radius, 5px);
+  font-family: var(--font-family);
+  font-size: var(--dialog-action-font-size);
+  font-weight: 800;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.system-settings-footer .playground-button--primary,
+.system-settings-footer .system-settings-apply-button {
+  border-color: var(--primary) !important;
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+.system-settings-footer .playground-button--primary:hover,
+.system-settings-footer .playground-button--primary:focus-visible,
+.system-settings-footer .system-settings-apply-button:hover,
+.system-settings-footer .system-settings-apply-button:focus-visible {
+  border-color: var(--primary-strong, var(--primary)) !important;
+  background: var(--primary-strong, var(--primary)) !important;
+  color: #fff !important;
+}
+
+body.mobile-mode .system-settings-footer .playground-button {
+  min-width: 96px;
+  min-height: 48px;
+  font-size: var(--text-size-body, 15px);
+  font-weight: 900;
+}
+
+.mobile-api-progress-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(1px);
+  touch-action: none;
+  pointer-events: auto;
+}
+
+.mobile-api-progress-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(15, 23, 42, 0.18);
+  border-top-color: var(--primary-color, #10a37f);
+  border-radius: 999px;
+  animation: mobile-api-progress-spin 0.8s linear infinite;
+}
+
+@keyframes mobile-api-progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

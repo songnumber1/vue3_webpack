@@ -1,0 +1,96 @@
+/* =========================================================
+   Dialog/control size normalization
+   ---------------------------------------------------------
+   Owns shared close/back button sizing and prompt bottom-sheet
+   back-action affordance. Typography tokens remain in
+   foundations/typography/responsive-typography.css.
+   ========================================================= */
+
+/* Common app dialog/back/close buttons. */
+.app-dialog-close,
+.responsive-close-button,
+.responsive-back-button,
+.feedback-dialog-close,
+.bottom-sheet-close,
+.bottom-sheet-back,
+.mobile-settings-close,
+.image-preview-close,
+.chat-image-preview-close {
+  width: var(--close-button-size);
+  height: var(--close-button-size);
+  min-width: var(--close-button-size);
+  min-height: var(--close-button-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: var(--close-button-font-size);
+  line-height: 1;
+}
+
+body.mobile-mode .app-dialog-close,
+body.mobile-mode .responsive-close-button,
+body.mobile-mode .responsive-back-button,
+body.mobile-mode .feedback-dialog-close,
+body.mobile-mode .bottom-sheet-close,
+body.mobile-mode .bottom-sheet-back,
+body.mobile-mode .mobile-settings-close,
+body.mobile-mode .image-preview-close,
+body.mobile-mode .chat-image-preview-close {
+  width: var(--mobile-close-button-size);
+  height: var(--mobile-close-button-size);
+  min-width: var(--mobile-close-button-size);
+  min-height: var(--mobile-close-button-size);
+  font-size: var(--mobile-close-button-font-size);
+}
+
+.app-dialog-close svg,
+.responsive-close-button svg,
+.responsive-back-button svg,
+.feedback-dialog-close svg,
+.bottom-sheet-close svg,
+.bottom-sheet-back svg,
+.mobile-settings-close svg,
+.image-preview-close svg,
+.chat-image-preview-close svg {
+  width: var(--close-button-icon-size);
+  height: var(--close-button-icon-size);
+}
+
+/* High-specificity normalization for legacy rules that set X buttons to
+   different visual sizes. This controls only the clickable close affordance. */
+body .image-preview-close {
+  width: var(--mobile-close-button-size) !important;
+  height: var(--mobile-close-button-size) !important;
+  min-width: var(--mobile-close-button-size) !important;
+  min-height: var(--mobile-close-button-size) !important;
+  border-radius: var(--dialog-close-radius, 5px) !important;
+  font-size: var(--mobile-close-button-font-size) !important;
+  line-height: 1 !important;
+}
+
+/* Prompt nested bottom sheet header back action. */
+.bottom-sheet-back {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 30px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bottom-sheet-back:hover {
+  background: var(--control-hover);
+}
+
+.bottom-sheet-header .bottom-sheet-back + h2 {
+  flex: 1 1 auto;
+}

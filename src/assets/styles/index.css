@@ -51,5 +51,8 @@
 
 /* 07 final UI normalization fixes absorbed into dialog-system.css. */
 
-/* 08 responsive typography and control normalization */
+/* 08 responsive typography and control/dialog normalization */
 @import "./foundations/typography/responsive-typography.css";
+@import "./components/dialog/dialog-control-normalization.css";
+@import "./components/dialog/dialog-viewport-policy.css";
+@import "./components/dialog/system-settings-dialog.css";

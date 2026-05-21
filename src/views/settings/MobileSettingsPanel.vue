@@ -39,7 +39,9 @@
               type="button"
               @click="selectMenuItem(item.key)"
             >
-              <img class="mobile-settings-item-icon" :src="item.iconSrc" alt="" aria-hidden="true" />
+              <span class="mobile-settings-item-icon" aria-hidden="true">
+                <img class="mobile-settings-item-icon-image" :src="item.iconSrc" alt="" />
+              </span>
               <span>
                 <strong>{{ item.label }}</strong>
                 <small>{{ item.description }}</small>
@@ -139,6 +141,7 @@ import termsIcon from "@/assets/img/icons/terms.svg";
 const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: true},
+  initialMenu: {type: String, default: ""},
 });
 const emit = defineEmits(["close", "desktop-open"]);
 const {t, tm, locale} = useI18n();
@@ -247,7 +250,21 @@ function selectLocale(value) {
 watch(
   () => props.open,
   (value) => {
-    if (!value) activeMenu.value = "";
+    if (!value) {
+      activeMenu.value = "";
+      return;
+    }
+    if (props.initialMenu) {
+      activeMenu.value = props.initialMenu;
+    }
+  }
+);
+
+watch(
+  () => props.initialMenu,
+  (value) => {
+    if (!props.open || !value) return;
+    activeMenu.value = value;
   }
 );
 

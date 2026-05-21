@@ -93,7 +93,8 @@
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
       :is-mobile="isMobile"
-      @close="mobileSettingsOpen = false"
+      :initial-menu="mobileSettingsInitialMenu"
+      @close="closeMobileSettings"
       @desktop-open="handleMobileSettingsDesktopOpen"
     />
 
@@ -141,7 +142,7 @@
 </template>
 
 <script setup>
-import {computed, provide} from "vue";
+import {computed, nextTick, provide, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
@@ -169,6 +170,7 @@ const route = useRoute();
 const isDev = process.env.NODE_ENV !== "production";
 const systemSettingsStore = useSystemSettingsStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
+const mobileSettingsInitialMenu = ref("");
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
@@ -254,8 +256,18 @@ const showVirtualKeyboardDebugButton = computed(
   () => isDev && isMobile.value && showVirtualKeyboardDebug.value
 );
 
-function handleMobileSettingsDesktopOpen(target) {
+function closeMobileSettings() {
   mobileSettingsOpen.value = false;
+  mobileSettingsInitialMenu.value = "";
+}
+
+function openMobileSettingsDetail(target = "") {
+  mobileSettingsInitialMenu.value = target;
+  mobileSettingsOpen.value = true;
+}
+
+function handleMobileSettingsDesktopOpen(target) {
+  closeMobileSettings();
   if (target === "notice") {
     noticeOpen.value = true;
     return;
@@ -272,6 +284,17 @@ function handleMobileSettingsDesktopOpen(target) {
     systemOpen.value = true;
   }
 }
+
+watch(
+  () => [isMobile.value, systemOpen.value],
+  async ([mobile, open]) => {
+    if (!mobile || !open) return;
+    systemOpen.value = false;
+    await nextTick();
+    openMobileSettingsDetail("system");
+  },
+  {flush: "post"}
+);
 
 provide(CHAT_ACTIONS_KEY, {
   openDrawer: openMobileDrawer,

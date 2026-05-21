@@ -14,6 +14,16 @@
     </button>
     <div class="sidebar-user-actions">
       <button
+        v-if="systemSettings.showGuideButton"
+        class="sidebar-user-action"
+        type="button"
+        :aria-label="t('common.guide')"
+        :title="t('common.guide')"
+        @click="actions.openGuide()"
+      >
+        <span class="guide-glyph">?</span>
+      </button>
+      <button
         v-if="systemSettings.showThemeButton"
         class="sidebar-user-action"
         type="button"

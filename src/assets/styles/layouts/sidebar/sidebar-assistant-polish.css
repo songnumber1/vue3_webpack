@@ -793,41 +793,41 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
 body.mobile-mode .mobile-drawer {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
-  min-height: 0 !important;
+  min-height: 0;
   overflow: hidden !important;
 }
 
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
-  height: 100% !important;
-  max-height: 100% !important;
+  height: 100%;
+  max-height: 100%;
   min-height: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
   overflow: hidden !important;
-  padding-bottom: 0 !important;
+  padding-bottom: 0;
 }
 
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
-  flex: 1 1 auto !important;
+  flex: 1 1 auto;
   min-height: 0 !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
-  padding-bottom: 8px !important;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
 }
 
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
 body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  position: relative !important;
+  position: relative;
   left: auto !important;
   right: auto !important;
   bottom: auto !important;
-  flex: 0 0 auto !important;
-  width: 100% !important;
+  flex: 0 0 auto;
+  width: 100%;
   min-height: 0 !important;
-  height: auto !important;
+  height: auto;
   max-height: none !important;
   margin-top: auto !important;
-  margin-bottom: 0 !important;
+  margin-bottom: 0;
   padding: 12px 18px max(10px, env(safe-area-inset-bottom, 0px)) !important;
   align-items: center !important;
   border-top: 1px solid var(--control-border) !important;
@@ -845,4 +845,31 @@ body.mobile-mode .prompt-model-trigger {
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.desktop-mode .mobile-topbar .model-trigger--assistant {
   border-radius: 5px !important;
+}
+
+/* Mobile drawer user footer visibility guard.
+   Keeps the footer in normal flex flow after web <-> mobile resize and lets
+   system user-action toggles render without being pushed below the viewport. */
+body.mobile-mode .mobile-drawer .sidebar-content--mobile {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+}
+
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user--mobile,
+body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user {
+  display: flex !important;
+  position: relative !important;
+  inset: auto !important;
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  margin-top: auto !important;
+  margin-bottom: 0 !important;
+  transform: none !important;
 }
