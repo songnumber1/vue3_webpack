@@ -340,3 +340,24 @@ body.mobile-mode .md-table-wrapper table {
 .md-mermaid-card .md-mermaid[data-mermaid-error="true"] {
   white-space: pre-wrap;
 }
+
+/* Mermaid toolbar icons use inline SVG to avoid pseudo-element rendering issues on mobile browsers. */
+.md-mermaid-action-icon {
+  display: block;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  pointer-events: none;
+  stroke-width: 1.2;
+}
+.md-mermaid-action-icon::before,
+.md-mermaid-action-icon::after {
+  display: none !important;
+  content: none !important;
+}
+.md-mermaid-action-icon path,
+.md-mermaid-action-icon line,
+.md-mermaid-action-icon rect,
+.md-mermaid-action-icon polyline {
+  vector-effect: non-scaling-stroke;
+}
