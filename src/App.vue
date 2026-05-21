@@ -28,6 +28,7 @@
       </div>
     </section>
     <router-view v-else />
+    <DesktopClipboardNote />
     <MobileApiProgressOverlay />
   </AppLayout>
 </template>
@@ -37,6 +38,7 @@ import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import MobileApiProgressOverlay from "@/components/overlay/MobileApiProgressOverlay.vue";
+import DesktopClipboardNote from "@/components/overlay/DesktopClipboardNote.vue";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();

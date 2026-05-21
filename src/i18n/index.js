@@ -33,6 +33,10 @@ export const messages = {
       resize: "크기 조절",
       select: "선택",
     },
+    clipboardNote: {
+      title: "복사 완료",
+      message: "클립보드에 복사되었습니다.",
+    },
     feedback: {
       like: "좋아요",
       dislike: "싫어요",
@@ -362,6 +366,10 @@ export const messages = {
       terms: "Terms of Service",
       resize: "Resize",
       select: "Select",
+    },
+    clipboardNote: {
+      title: "Copied",
+      message: "Copied to clipboard.",
     },
     feedback: {
       like: "Like",

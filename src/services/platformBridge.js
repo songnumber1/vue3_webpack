@@ -3,6 +3,16 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";
 
+
+function notifyWebClipboardCopied(message) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent("app:clipboard-copied", {
+      detail: {message},
+    })
+  );
+}
+
 function getStore() {
   return usePlatformStore();
 }
@@ -25,10 +35,10 @@ export async function copyClipboardByPlatform(text) {
   if (isAndroidApp()) return callNative("COPY_CLIPBOARD", {text});
   const copied = await copyWebText(text);
 
-  return webSuccess(
-    {copied},
-    copied ? "브라우저 클립보드에 복사되었습니다." : "복사 실패"
-  );
+  const message = copied ? "브라우저 클립보드에 복사되었습니다." : "복사 실패";
+  if (copied) notifyWebClipboardCopied(message);
+
+  return webSuccess({copied}, message);
 }
 export async function openExternalBrowser(url) {
   if (isAndroidApp()) return callNative("OPEN_EXTERNAL_BROWSER", {url});
