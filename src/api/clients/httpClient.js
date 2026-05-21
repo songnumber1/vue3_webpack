@@ -83,3 +83,7 @@ export function createHttpClient() {
 }
 
 export const httpClient = createHttpClient();
+
+export function unwrapResponseData(response, fallback) {
+  return response?.data ?? fallback;
+}

@@ -1,6 +1,3 @@
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
-
-export const PROMPT_VIEWPORT_QUERY = `(max-width: ${MOBILE_BREAKPOINT_PX}px)`;
 export const PROMPT_MENU_TYPE = Object.freeze({
   model: "model",
   tool: "tool",

@@ -16,29 +16,26 @@ function getFeedbackChannel() {
     : "desktop-note";
 }
 
-function notifyClipboardCopied(message, toastMessage = message) {
+function dispatchFeedbackEvent(name, detail) {
   if (typeof window === "undefined") return;
 
   window.dispatchEvent(
-    new CustomEvent("app:clipboard-copied", {
-      detail: {message, toastMessage, channel: getFeedbackChannel()},
+    new CustomEvent(name, {
+      detail: {...detail, channel: getFeedbackChannel()},
     })
   );
 }
 
-function notifyToastRequested(message, options = {}) {
-  if (typeof window === "undefined") return;
+function notifyClipboardCopied(message, toastMessage = message) {
+  dispatchFeedbackEvent("app:clipboard-copied", {message, toastMessage});
+}
 
-  window.dispatchEvent(
-    new CustomEvent("app:toast-requested", {
-      detail: {
-        message,
-        toastMessage: message,
-        title: options.title || t("toastNote.title"),
-        channel: getFeedbackChannel(),
-      },
-    })
-  );
+function notifyToastRequested(message, options = {}) {
+  dispatchFeedbackEvent("app:toast-requested", {
+    message,
+    toastMessage: message,
+    title: options.title || t("toastNote.title"),
+  });
 }
 
 function t(key, params) {
@@ -178,9 +175,6 @@ export async function showToastByPlatform(message, options = {}) {
   return webSuccess({shown: true, channel: getFeedbackChannel()});
 }
 
-export async function showNativeToast(message) {
-  return showToastByPlatform(message);
-}
 export async function getDeviceInfo() {
   return isAndroidApp()
     ? callNative("GET_DEVICE_INFO", {})

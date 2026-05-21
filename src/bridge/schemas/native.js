@@ -2,11 +2,6 @@ import {z} from "../zod";
 import {BaseRequest, createResponseSchema} from "./base";
 
 export const EmptyNativeRequest = BaseRequest.extend({});
-export const BooleanAckData = z.object({
-  ok: z.boolean().openapi({description: "처리 성공 여부", example: true}),
-});
-export const BooleanAckResponse = createResponseSchema(BooleanAckData);
-
 export const OpenExternalBrowserRequest = BaseRequest.extend({
   url: z.string().url().openapi({
     description: "외부 브라우저로 열 URL",

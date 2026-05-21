@@ -17,6 +17,3 @@ export function logWarn(...args) {
 export function logError(...args) {
   if (shouldLog("error")) console.error(...args);
 }
-export function logDebug(...args) {
-  if (shouldLog("debug")) console.debug(...args);
-}

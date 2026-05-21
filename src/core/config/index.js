@@ -45,12 +45,6 @@ export function resolveAppConfig() {
 export function isNativeApp(appInfo) {
   return appInfo?.env === RUN_ENV.NATIVE;
 }
-export function isBrowserApp(appInfo) {
-  return appInfo?.env === RUN_ENV.BROWSER;
-}
-export function isExtensionApp(appInfo) {
-  return appInfo?.env === RUN_ENV.EXTENSION;
-}
 export function isAndroidApp(appInfo) {
   return isNativeApp(appInfo) && appInfo?.platform === PLATFORM.ANDROID;
 }

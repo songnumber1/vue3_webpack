@@ -1,4 +1,4 @@
-import {httpClient} from "@/api/clients/httpClient";
+import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 async function getExamplePrompts(params = {}) {
@@ -6,7 +6,7 @@ async function getExamplePrompts(params = {}) {
     params,
   });
 
-  return response?.data || {list: []};
+  return unwrapResponseData(response, {list: []});
 }
 
 export const examplePromptApiLive = {getExamplePrompts};

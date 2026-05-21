@@ -378,6 +378,3 @@ export async function renderMarkdown(text, options = {}) {
 
   return html || "<p></p>";
 }
-export function isMarkdownRenderable(value) {
-  return value !== undefined && value !== null;
-}

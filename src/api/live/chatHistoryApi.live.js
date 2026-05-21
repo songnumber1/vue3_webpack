@@ -1,9 +1,9 @@
-import {httpClient} from "@/api/clients/httpClient";
+import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 async function getChatHistoryList() {
   const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST);
-  return response?.data || [];
+  return unwrapResponseData(response, []);
 }
 
 async function createChat(payload = {}) {
@@ -19,7 +19,7 @@ async function getChatHistoryDetail(payload = {}) {
     API_ENDPOINTS.CHAT_HISTORY_DETAIL,
     payload
   );
-  return response?.data || [];
+  return unwrapResponseData(response, []);
 }
 
 async function updateBookmark(payload = {}) {
@@ -27,7 +27,7 @@ async function updateBookmark(payload = {}) {
     API_ENDPOINTS.CHAT_HISTORY_BOOKMARK,
     payload
   );
-  return response?.data || {};
+  return unwrapResponseData(response, {});
 }
 
 async function renameChat(payload = {}) {
@@ -35,7 +35,7 @@ async function renameChat(payload = {}) {
     API_ENDPOINTS.CHAT_HISTORY_RENAME,
     payload
   );
-  return response?.data || {};
+  return unwrapResponseData(response, {});
 }
 
 async function deleteChat(payload = {}) {
@@ -43,7 +43,7 @@ async function deleteChat(payload = {}) {
     API_ENDPOINTS.CHAT_HISTORY_DELETE,
     payload
   );
-  return response?.data || {};
+  return unwrapResponseData(response, {});
 }
 
 export const chatHistoryApiLive = {

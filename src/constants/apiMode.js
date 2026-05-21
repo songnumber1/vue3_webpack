@@ -1,13 +1,5 @@
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 
-function readBooleanEnv(value, fallback = false) {
-  if (value === undefined || value === null || value === "") {
-    return fallback;
-  }
-
-  return ["true", "1", "yes", "y"].includes(String(value).toLowerCase());
-}
-
 function normalizeLocalHttpUrl(value) {
   const raw = String(value || "").trim();
   if (!raw) return raw;
@@ -23,15 +15,6 @@ function normalizeLocalHttpUrl(value) {
     "http://$1$2"
   );
 }
-
-/**
- * true  : backend API 사용
- * false : frontend mock API 사용
- */
-export const isServerAPI = readBooleanEnv(
-  process.env.VUE_APP_IS_SERVER_API,
-  true
-);
 
 /**
  * 개발 기본값은 /api 입니다.
