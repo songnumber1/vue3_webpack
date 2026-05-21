@@ -43,7 +43,11 @@ export const messages = {
     clipboardNote: {
       title: "복사 완료",
       message: "클립보드에 복사되었습니다.",
+      toastMessage: "복사했습니다.",
       fail: "복사에 실패했습니다.",
+    },
+    toastNote: {
+      title: "알림",
     },
     overlayProgress: {
       apiProcessing: "API 요청 처리 중입니다.",
@@ -132,6 +136,21 @@ export const messages = {
         mobileTarget: "모바일 브라우저: 화면 하단 toast",
         androidTarget: "Android 앱웹: Native toast",
         sampleText: "Playground 클립보드 테스트 문구입니다.",
+      },
+      toast: {
+        label: "Toast",
+        title: "SHOW_TOAST 테스트",
+        description:
+          "입력한 메시지를 별도 SHOW_TOAST 액션으로 출력합니다. 모바일 기기에서는 toast, PC 웹에서는 note로 확인합니다.",
+        inputLabel: "토스트 메시지",
+        placeholder: "출력할 메시지를 입력하세요.",
+        showButton: "Show toast",
+        feedbackTarget: "피드백 출력 방식",
+        webTarget: "PC 웹: 화면 우측 상단 note",
+        mobileTarget: "모바일 브라우저: 화면 하단 toast",
+        androidTarget: "Android 앱웹: SHOW_TOAST Native toast",
+        noteTitle: "Playground 알림",
+        sampleText: "Playground toast 메시지입니다.",
       },
       bottomSheet: {
         label: "Bottom Sheet",
@@ -533,7 +552,11 @@ export const messages = {
     clipboardNote: {
       title: "Copied",
       message: "Copied to clipboard.",
+      toastMessage: "Copied!",
       fail: "Copy failed.",
+    },
+    toastNote: {
+      title: "Notice",
     },
     overlayProgress: {
       apiProcessing: "Processing API request.",
@@ -622,6 +645,21 @@ export const messages = {
         mobileTarget: "Mobile browser: bottom toast",
         androidTarget: "Android app webview: native toast",
         sampleText: "This is a Playground clipboard test message.",
+      },
+      toast: {
+        label: "Toast",
+        title: "SHOW_TOAST test",
+        description:
+          "Display the entered message through a separate SHOW_TOAST action. Mobile devices show a toast and PC web shows a note.",
+        inputLabel: "Toast message",
+        placeholder: "Enter a message to show.",
+        showButton: "Show toast",
+        feedbackTarget: "Feedback target",
+        webTarget: "PC web: top-right note",
+        mobileTarget: "Mobile browser: bottom toast",
+        androidTarget: "Android app webview: SHOW_TOAST native toast",
+        noteTitle: "Playground notice",
+        sampleText: "This is a Playground toast message.",
       },
       bottomSheet: {
         label: "Bottom Sheet",

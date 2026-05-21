@@ -133,6 +133,32 @@
 
       <article class="playground-card">
         <span class="playground-card-label">
+          {{ t("playground.toast.label") }}
+        </span>
+        <h2>{{ t("playground.toast.title") }}</h2>
+        <p>{{ t("playground.toast.description") }}</p>
+        <label class="playground-toast-field">
+          <span>{{ t("playground.toast.inputLabel") }}</span>
+          <input
+            v-model="toastMessage"
+            class="playground-toast-input"
+            type="text"
+            :placeholder="t('playground.toast.placeholder')"
+          />
+        </label>
+        <div class="playground-actions">
+          <button class="playground-button" type="button" @click="showToastMessage">
+            {{ t("playground.toast.showButton") }}
+          </button>
+        </div>
+        <div class="playground-log-list">
+          <strong>{{ t("playground.toast.feedbackTarget") }}</strong><br />
+          {{ toastFeedbackTarget }}
+        </div>
+      </article>
+
+      <article class="playground-card">
+        <span class="playground-card-label">
           {{ t("playground.bottomSheet.label") }}
         </span>
         <h2>{{ t("playground.bottomSheet.title") }}</h2>
@@ -250,7 +276,7 @@ import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useAppContext} from "@/composables/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
-import {copyClipboardByPlatform} from "@/services/platformBridge";
+import {copyClipboardByPlatform, showToastByPlatform} from "@/services/platformBridge";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
@@ -272,6 +298,7 @@ const sheetOpen = ref(false);
 const popupOpen = ref(false);
 const activePopupType = ref("alert");
 const popupResult = ref(t("playground.popup.emptyResult"));
+const toastMessage = ref(t("playground.toast.sampleText"));
 
 const isMobile = computed(() => shouldUseMobileLayout.value);
 const containerMode = computed(() =>
@@ -282,6 +309,12 @@ const clipboardFeedbackTarget = computed(() => {
   if (isMobileBrowser.value) return t("playground.clipboard.mobileTarget");
 
   return t("playground.clipboard.webTarget");
+});
+const toastFeedbackTarget = computed(() => {
+  if (isAndroidRuntime.value) return t("playground.toast.androidTarget");
+  if (isMobileBrowser.value) return t("playground.toast.mobileTarget");
+
+  return t("playground.toast.webTarget");
 });
 const sheetItems = computed(() => [
   {id: "a", title: t("playground.bottomSheet.optionA")},
@@ -330,5 +363,10 @@ function closePopup(action) {
 }
 async function copySampleText() {
   await copyClipboardByPlatform(t("playground.clipboard.sampleText"));
+}
+async function showToastMessage() {
+  await showToastByPlatform(toastMessage.value, {
+    title: t("playground.toast.noteTitle"),
+  });
 }
 </script>

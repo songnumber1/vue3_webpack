@@ -831,3 +831,29 @@ body.mobile-mode .feedback-dialog {
   height: 24px;
   object-fit: contain;
 }
+
+/* Playground SHOW_TOAST sample input */
+.playground-toast-field {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 12px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.playground-toast-input {
+  min-height: 40px;
+  width: 100%;
+  padding: 0 12px;
+  border: 1px solid var(--control-border);
+  border-radius: var(--dialog-radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  outline: none;
+}
+
+.playground-toast-input:focus {
+  border-color: var(--primary);
+}

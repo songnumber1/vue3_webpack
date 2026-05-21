@@ -21,16 +21,18 @@ import {usePlatformStore} from "@/stores/platformStore";
 
 const NOTE_DURATION_MS = 5000;
 const CLIPBOARD_EVENT_NAME = "app:clipboard-copied";
+const TOAST_EVENT_NAME = "app:toast-requested";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
 const visible = ref(false);
 const message = ref("");
+const noteTitle = ref("");
 let timerId = 0;
 let startedAt = 0;
 let remainingMs = NOTE_DURATION_MS;
 
-const title = computed(() => t("clipboardNote.title"));
+const title = computed(() => noteTitle.value || t("clipboardNote.title"));
 
 function shouldShowWebClipboardNote() {
   const info = platformStore.info || {};
@@ -75,6 +77,10 @@ function resumeTimer() {
 
 function showNote(event) {
   if (!shouldShowWebClipboardNote()) return;
+  noteTitle.value =
+    event.type === TOAST_EVENT_NAME
+      ? event.detail?.title || t("toastNote.title")
+      : t("clipboardNote.title");
   message.value = event.detail?.message || t("clipboardNote.message");
   visible.value = true;
   startTimer(NOTE_DURATION_MS);
@@ -82,11 +88,13 @@ function showNote(event) {
 
 onMounted(() => {
   window.addEventListener(CLIPBOARD_EVENT_NAME, showNote);
+  window.addEventListener(TOAST_EVENT_NAME, showNote);
 });
 
 onBeforeUnmount(() => {
   clearTimer();
   window.removeEventListener(CLIPBOARD_EVENT_NAME, showNote);
+  window.removeEventListener(TOAST_EVENT_NAME, showNote);
 });
 </script>
 

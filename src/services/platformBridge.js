@@ -4,21 +4,39 @@ import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";
 import {i18n} from "@/i18n";
 
-function notifyDesktopWebClipboardCopied(message) {
-  if (typeof window === "undefined") return;
+function getFeedbackChannel() {
   const info = getStore().info || {};
-  if (
-    info.isNativeRuntime ||
+
+  return info.isNativeRuntime ||
     info.isNativeApp ||
     info.isAndroidApp ||
     info.isIosApp ||
     info.isMobileBrowser
-  ) {
-    return;
-  }
+    ? "mobile-toast"
+    : "desktop-note";
+}
+
+function notifyClipboardCopied(message, toastMessage = message) {
+  if (typeof window === "undefined") return;
+
   window.dispatchEvent(
     new CustomEvent("app:clipboard-copied", {
-      detail: {message, channel: "desktop-note"},
+      detail: {message, toastMessage, channel: getFeedbackChannel()},
+    })
+  );
+}
+
+function notifyToastRequested(message, options = {}) {
+  if (typeof window === "undefined") return;
+
+  window.dispatchEvent(
+    new CustomEvent("app:toast-requested", {
+      detail: {
+        message,
+        toastMessage: message,
+        title: options.title || t("toastNote.title"),
+        channel: getFeedbackChannel(),
+      },
     })
   );
 }
@@ -47,17 +65,25 @@ function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
 }
 export async function copyClipboardByPlatform(text) {
   const successMessage = t("clipboardNote.message");
+  const toastMessage = t("clipboardNote.toastMessage");
+
   if (isAndroidApp()) {
-    return callNative("COPY_CLIPBOARD", {
+    const response = await callNative("COPY_CLIPBOARD", {
       text,
       message: successMessage,
-      toastMessage: successMessage,
     });
-  }
-  const copied = await copyWebText(text);
 
+    if (response?.isSuccess !== false) {
+      await showToastByPlatform(toastMessage, {title: t("clipboardNote.title")});
+    }
+
+    return response;
+  }
+
+  const copied = await copyWebText(text);
   const message = copied ? successMessage : t("clipboardNote.fail");
-  if (copied) notifyDesktopWebClipboardCopied(message);
+
+  if (copied) notifyClipboardCopied(message, toastMessage);
 
   return webSuccess({copied}, message);
 }
@@ -135,11 +161,25 @@ export async function setBackHandler(enable) {
     ? callNative("SET_BACK_HANDLER", {enable})
     : webSuccess({enabled: false});
 }
-export async function showNativeToast(message) {
-  if (isAndroidApp()) return callNative("SHOW_TOAST", {message});
-  logInfo("[toast]", message);
+export async function showToastByPlatform(message, options = {}) {
+  const normalizedMessage = String(message || "").trim();
 
-  return webSuccess({shown: true});
+  if (!normalizedMessage) {
+    return webSuccess({shown: false, reason: "empty-message"});
+  }
+
+  if (isAndroidApp()) {
+    return callNative("SHOW_TOAST", {message: normalizedMessage});
+  }
+
+  notifyToastRequested(normalizedMessage, options);
+  logInfo("[toast]", normalizedMessage);
+
+  return webSuccess({shown: true, channel: getFeedbackChannel()});
+}
+
+export async function showNativeToast(message) {
+  return showToastByPlatform(message);
 }
 export async function getDeviceInfo() {
   return isAndroidApp()

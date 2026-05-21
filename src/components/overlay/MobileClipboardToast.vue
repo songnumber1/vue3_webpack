@@ -18,6 +18,7 @@ import {usePlatformStore} from "@/stores/platformStore";
 
 const TOAST_DURATION_MS = 2200;
 const CLIPBOARD_EVENT_NAME = "app:clipboard-copied";
+const TOAST_EVENT_NAME = "app:toast-requested";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
@@ -33,7 +34,14 @@ function clearTimer() {
 
 function shouldShowMobileToast() {
   const info = platformStore.info || {};
-  return Boolean(info.isMobileBrowser && !info.isNativeRuntime && !info.isNativeApp);
+
+  return Boolean(
+    info.isMobileBrowser ||
+    info.isNativeRuntime ||
+    info.isNativeApp ||
+    info.isAndroidApp ||
+    info.isIosApp
+  );
 }
 
 function hideToast() {
@@ -43,7 +51,10 @@ function hideToast() {
 
 function showToast(event) {
   if (!shouldShowMobileToast()) return;
-  message.value = event.detail?.message || t("clipboardNote.message");
+  message.value =
+    event.detail?.toastMessage ||
+    event.detail?.message ||
+    t("clipboardNote.toastMessage");
   visible.value = true;
   clearTimer();
   timerId = window.setTimeout(hideToast, TOAST_DURATION_MS);
@@ -51,11 +62,13 @@ function showToast(event) {
 
 onMounted(() => {
   window.addEventListener(CLIPBOARD_EVENT_NAME, showToast);
+  window.addEventListener(TOAST_EVENT_NAME, showToast);
 });
 
 onBeforeUnmount(() => {
   clearTimer();
   window.removeEventListener(CLIPBOARD_EVENT_NAME, showToast);
+  window.removeEventListener(TOAST_EVENT_NAME, showToast);
 });
 </script>
 
