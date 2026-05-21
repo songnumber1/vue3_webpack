@@ -111,6 +111,22 @@ async function ensureMermaid() {
 
   return mermaid;
 }
+function setMermaidSvgActionVisibility(target, visible) {
+  const svgAction = target
+    ?.closest(".md-mermaid-card")
+    ?.querySelector(".md-mermaid-action--svg");
+
+  if (!svgAction) return;
+
+  svgAction.hidden = !visible;
+  svgAction.classList.toggle("md-mermaid-action--hidden", !visible);
+  if (visible) {
+    svgAction.style.removeProperty("display");
+  } else {
+    svgAction.style.setProperty("display", "none");
+  }
+}
+
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
     root.querySelectorAll(".md-mermaid[data-processed]")
@@ -121,8 +137,10 @@ function resetRenderedMermaid(root) {
     if (!source) return;
 
     target.removeAttribute("data-processed");
+    target.removeAttribute("data-mermaid-error");
     target.setAttribute("data-mermaid-pending", "true");
     target.textContent = source;
+    setMermaidSvgActionVisibility(target, false);
   });
 }
 export async function renderMermaidInElement(root, options = {}) {
@@ -143,6 +161,10 @@ export async function renderMermaidInElement(root, options = {}) {
     }
   });
 
+  targets.forEach((target) => {
+    setMermaidSvgActionVisibility(target, false);
+  });
+
   const mermaid = await ensureMermaid();
   if (!mermaid?.run) return;
 
@@ -153,6 +175,12 @@ export async function renderMermaidInElement(root, options = {}) {
 
   try {
     await mermaid.run({nodes: targets});
+    targets.forEach((target) => {
+      setMermaidSvgActionVisibility(
+        target,
+        Boolean(target.querySelector("svg"))
+      );
+    });
   } catch (error) {
     logWarn("Mermaid rendering failed.", error);
     targets.forEach((target) => {
@@ -160,6 +188,7 @@ export async function renderMermaidInElement(root, options = {}) {
         target.getAttribute("data-mermaid-source") || target.textContent || "";
       target.setAttribute("data-mermaid-error", "true");
       target.textContent = source;
+      setMermaidSvgActionVisibility(target, false);
     });
   }
 }

@@ -136,10 +136,16 @@ function mermaidActionButton(action, label) {
     tagName: "button",
     properties: {
       type: "button",
-      className: ["md-mermaid-action", `md-mermaid-action--${action}`],
+      className: [
+        "md-mermaid-action",
+        `md-mermaid-action--${action}`,
+        ...(action === "svg" ? ["md-mermaid-action--hidden"] : []),
+      ],
       dataMdMermaidAction: action,
       ariaLabel: label,
       title: label,
+      hidden: action === "svg" ? true : undefined,
+      style: action === "svg" ? "display: none;" : undefined,
     },
     children: [
       mermaidIcon(action),
