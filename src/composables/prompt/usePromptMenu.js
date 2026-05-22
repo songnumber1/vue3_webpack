@@ -1,6 +1,6 @@
 import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useEventListener, useWindowSize} from "@vueuse/core";
-import {useOutsideClick} from "@/composables/useOutsideClick";
+import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {PROMPT_MENU_TYPE} from "@/constants/promptComposer";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 

@@ -9,7 +9,6 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
-      :interaction-blocked="interactionBlocked"
       @rendered="handleMessageRendered"
       @regenerate="$emit('regenerate', $event)"
     />
@@ -30,7 +29,6 @@ const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
-  interactionBlocked: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
 });
 

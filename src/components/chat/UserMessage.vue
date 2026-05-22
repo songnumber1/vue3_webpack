@@ -48,19 +48,20 @@
 </template>
 
 <script setup>
-import {useI18n} from "vue-i18n";
-
-const {t} = useI18n();
 import {computed} from "vue";
+import {useI18n} from "vue-i18n";
+import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
+
+const {t} = useI18n();
 const props = defineProps({
   message: {type: Object, required: true},
-  interactionBlocked: {type: Boolean, default: false},
 });
 defineEmits(["rendered"]);
-const showMessageActions = computed(() => !props.interactionBlocked);
+const {isInteractionBlocked} = useInteractionGuard();
+const showMessageActions = computed(() => !isInteractionBlocked.value);
 const hasAttachments = computed(
   () =>
     Array.isArray(props.message.attachments) &&

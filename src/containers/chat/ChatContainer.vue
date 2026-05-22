@@ -23,7 +23,6 @@
       :model-readonly="isModelLocked"
       :is-active-model-unavailable="isActiveModelUnavailable"
       :is-generating="isGenerating"
-      :interaction-blocked="isInteractionBlocked"
       :messages="messages"
       :show-scroll-bottom="showScrollBottom"
       :auto-scroll-on-answer="autoScrollOnAnswer"
@@ -211,7 +210,6 @@ const {
   workspaceAssistantLabel,
   suggestions,
   isGenerating,
-  isInteractionBlocked,
   autoScrollOnAnswer,
   closeImagePreview,
   handlePreviewLoad,

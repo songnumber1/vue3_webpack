@@ -51,15 +51,16 @@
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {useMarkdownTools} from "@/composables/useMarkdownTools";
+import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
+import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import MessageActions from "./MessageActions.vue";
 
 const props = defineProps({
   message: {type: Object, required: true},
-  interactionBlocked: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
 const emit = defineEmits(["rendered", "regenerate"]);
+const {isInteractionBlocked} = useInteractionGuard();
 const html = ref("<p></p>");
 const reasoningHtml = ref("<p></p>");
 const contentRef = ref(null);
@@ -74,7 +75,7 @@ let reasoningRenderVersion = 0;
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
 const showMessageActions = computed(
   () =>
-    !props.interactionBlocked &&
+    !isInteractionBlocked.value &&
     (!props.message.status || props.message.status === "complete")
 );
 const isMessageComplete = computed(

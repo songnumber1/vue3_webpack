@@ -129,7 +129,7 @@ import {storeToRefs} from "pinia";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {setAppLocale} from "@/i18n";
-import {useOutsideClick} from "@/composables/useOutsideClick";
+import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useAuthStore} from "@/stores/authStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 

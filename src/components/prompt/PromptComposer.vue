@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import {usePromptComposer} from "@/composables/usePromptComposer";
+import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptActionToolbar from "@/components/prompt/parts/PromptActionToolbar.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/parts/PromptAttachmentPreviewList.vue";
 import PromptMobileSheets from "@/components/prompt/parts/PromptMobileSheets.vue";

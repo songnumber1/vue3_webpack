@@ -2,13 +2,11 @@
   <UserMessage
     v-if="message.role === 'user'"
     :message="message"
-    :interaction-blocked="interactionBlocked"
     @rendered="$emit('rendered')"
   />
   <AssistantMessage
     v-else
     :message="message"
-    :interaction-blocked="interactionBlocked"
     @rendered="$emit('rendered')"
     @regenerate="$emit('regenerate', $event)"
   />
@@ -19,7 +17,6 @@ import UserMessage from "./UserMessage.vue";
 import AssistantMessage from "./AssistantMessage.vue";
 defineProps({
   message: {type: Object, required: true},
-  interactionBlocked: {type: Boolean, default: false},
 });
 defineEmits(["rendered", "regenerate"]);
 </script>

@@ -30,7 +30,7 @@
 <script setup>
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useAppContext} from "@/composables/useAppContext";
+import {useAppContext} from "@/composables/app/useAppContext";
 
 const {appInfo, bridge} = useAppContext();
 const {t} = useI18n();

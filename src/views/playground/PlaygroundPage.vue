@@ -295,8 +295,8 @@
 import {computed, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
-import {useAppContext} from "@/composables/useAppContext";
-import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
+import {useAppContext} from "@/composables/app/useAppContext";
+import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {
   copyClipboardByPlatform,
   showToastByPlatform,

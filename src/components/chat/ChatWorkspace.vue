@@ -27,7 +27,7 @@
           class="suggestion-chip"
           type="button"
           :title="item.title || item.prompt"
-          :disabled="interactionBlocked"
+          :disabled="isInteractionBlocked"
           @click="handleSuggestionClick(item)"
         >
           <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
@@ -41,7 +41,7 @@
         :floating="false"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating || interactionBlocked"
+        :disabled="isGenerating || isInteractionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
         @update:selected-model="workspaceActions.updateSelectedModel($event)"
@@ -57,13 +57,12 @@
       ref="listRef"
       :messages="messages"
       :loading="isGenerating"
-      :interaction-blocked="interactionBlocked"
       :auto-scroll-on-answer="autoScrollOnAnswer"
       @content-rendered="workspaceActions.handleMessageContentRendered()"
       @regenerate="workspaceActions.regenerate($event)"
     />
     <button
-      v-if="showScrollBottom && !interactionBlocked"
+      v-if="showScrollBottom && !isInteractionBlocked"
       class="scroll-bottom-button"
       type="button"
       :aria-label="t('chat.scrollBottom')"
@@ -83,7 +82,7 @@
         :is-mobile="isMobile"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating || interactionBlocked"
+        :disabled="isGenerating || isInteractionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
         @update:selected-model="workspaceActions.updateSelectedModel($event)"
@@ -115,6 +114,7 @@ import {
   createEmptyWorkspaceActions,
 } from "@/composables/chat/chatActionContext";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
+import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 
 const {t} = useI18n();
 const listRef = ref(null);
@@ -126,6 +126,7 @@ const workspaceActions = inject(
   WORKSPACE_ACTIONS_KEY,
   createEmptyWorkspaceActions()
 );
+const {isInteractionBlocked} = useInteractionGuard();
 
 function updateComposerHeight() {
   const height = composerSlotRef.value?.offsetHeight || 0;
@@ -171,7 +172,6 @@ const props = defineProps({
   isActiveModelDeleted: {type: Boolean, default: false},
   isActiveModelUnavailable: {type: Boolean, default: false},
   isGenerating: {type: Boolean, default: false},
-  interactionBlocked: {type: Boolean, default: false},
   messages: {type: Array, default: () => []},
   showScrollBottom: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
@@ -188,7 +188,7 @@ const mainPromptClass = computed(() =>
 );
 
 function handleSuggestionClick(item) {
-  if (props.interactionBlocked) return;
+  if (isInteractionBlocked.value) return;
   const prompt = item?.prompt || item?.title || item?.text || "";
   mainPromptInputRef.value?.setText(prompt, {focus: true});
 }

@@ -171,10 +171,10 @@ import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList
 import ChatHistoryActionMenu from "@/components/navigation/parts/ChatHistoryActionMenu.vue";
 import SidebarUserFooter from "@/components/navigation/parts/SidebarUserFooter.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
+import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
-import {useOutsideClick} from "@/composables/useOutsideClick";
+import {useOutsideClick} from "@/composables/events/useOutsideClick";
 
 const emit = defineEmits([
   "new-chat",

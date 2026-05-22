@@ -2,13 +2,13 @@ import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useEventListener, useWindowSize} from "@vueuse/core";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
-import {useAppContext} from "@/composables/useAppContext";
-import {useAutoScroll} from "@/composables/useAutoScroll";
-import {useChatRuntime} from "@/composables/useChatRuntime";
-import {useChatSubmit} from "@/composables/useChatSubmit";
-import {useImagePreview} from "@/composables/useImagePreview";
-import {loadSharedConversation} from "@/composables/useSharedChat";
-import {useViewportGuard} from "@/composables/useViewportGuard";
+import {useAppContext} from "@/composables/app/useAppContext";
+import {useAutoScroll} from "@/composables/chat/useAutoScroll";
+import {useChatRuntime} from "@/composables/chat/useChatRuntime";
+import {useChatSubmit} from "@/composables/chat/useChatSubmit";
+import {useImagePreview} from "@/composables/chat/useImagePreview";
+import {loadSharedConversation} from "@/composables/chat/useSharedChat";
+import {useViewportGuard} from "@/composables/mobile-runtime/useViewportGuard";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
@@ -16,7 +16,6 @@ import {syncViewportModeClass} from "@/utils/viewportMode";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
@@ -32,7 +31,6 @@ export function useChatContainerController(props) {
   const navigationStore = useNavigationStore();
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
-  const chatStreamStore = useChatStreamStore();
   const {scrollToBottom} = useAutoScroll({value: null});
 
   const workspaceRef = ref(null);
@@ -49,7 +47,6 @@ export function useChatContainerController(props) {
   const autoScrollOnAnswer = computed(
     () => systemSettingsStore.autoScrollOnAnswer
   );
-  const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
   const currentMode = computed(() => props.mode);
   const isMainPage = computed(() => currentMode.value === "main");
   const isChatPage = computed(() => currentMode.value === "chat");
@@ -434,7 +431,6 @@ export function useChatContainerController(props) {
     workspaceAssistantLabel,
     suggestions,
     isGenerating,
-    isInteractionBlocked,
     autoScrollOnAnswer,
     closeImagePreview,
     handlePreviewLoad,

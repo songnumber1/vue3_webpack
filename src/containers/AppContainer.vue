@@ -10,8 +10,8 @@
 
 <script setup>
 import {computed} from "vue";
-import {useAppContext} from "@/composables/useAppContext";
-import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
+import {useAppContext} from "@/composables/app/useAppContext";
+import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 
 const {appInfo} = useAppContext();
 const {platformInfo, shouldUseMobileLayout, isMobileBrowser} =
