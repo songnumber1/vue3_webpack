@@ -27,7 +27,9 @@ export const Z_INDEX = Object.freeze({
   toast: 3000,
   appDialog: 2147482500,
   chatHistoryMenuBackdrop: 2147482990,
+  virtualKeyboardPanel: 2147482999,
   chatHistoryMenu: 2147483000,
+  virtualKeyboardFab: 2147483000,
   appDialogFront: 2147483100,
 });
 
@@ -52,6 +54,8 @@ export const Z_INDEX_CSS_VARIABLES = Object.freeze({
   toast: "--z-toast",
   appDialog: "--z-app-dialog",
   chatHistoryMenuBackdrop: "--z-chat-history-menu-backdrop",
+  virtualKeyboardPanel: "--z-virtual-keyboard-panel",
   chatHistoryMenu: "--z-chat-history-menu",
+  virtualKeyboardFab: "--z-virtual-keyboard-fab",
   appDialogFront: "--z-app-dialog-front",
 });

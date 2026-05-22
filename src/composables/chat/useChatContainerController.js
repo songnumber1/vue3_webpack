@@ -1,468 +1,113 @@
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {useEventListener} from "@vueuse/core";
-import {useI18n} from "vue-i18n";
-import {useRoute, useRouter} from "vue-router";
-import {useAppContext} from "@/composables/app/useAppContext";
-import {useAutoScroll} from "@/composables/chat/useAutoScroll";
+import {computed, onBeforeUnmount, ref, watch} from "vue";
+import {useRoute} from "vue-router";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
-import {useChatSubmit} from "@/composables/chat/useChatSubmit";
-import {useImagePreview} from "@/composables/chat/useImagePreview";
-import {loadSharedConversation} from "@/composables/chat/useSharedChat";
-import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
-import {useNavigationStore} from "@/stores/navigationStore";
-import {usePlatformStore} from "@/stores/platformStore";
-import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {syncViewportModeClass} from "@/platform/viewport/viewportMode";
-import {logWarn} from "@/utils/logger";
-import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useViewportStore} from "@/platform/viewport/viewportStore";
-import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
-import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
-import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
-import {useChatPromptActions} from "@/composables/chat/container/useChatPromptActions";
-import {useChatScrollController} from "@/composables/chat/container/useChatScrollController";
+import {useChatDataController} from "@/composables/chat/container/useChatDataController";
+import {useChatUIController} from "@/composables/chat/container/useChatUIController";
 
 export function useChatContainerController(props) {
-  const {t, locale} = useI18n();
-  const router = useRouter();
   const route = useRoute();
-  const {theme} = useAppContext();
   const runtime = useChatRuntime();
-  const navigationStore = useNavigationStore();
-  const platformStore = usePlatformStore();
-  const systemSettingsStore = useSystemSettingsStore();
-  const viewportStore = useViewportStore();
-  viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
-  const {scrollToBottom} = useAutoScroll({value: null});
-
-  const workspaceRef = ref(null);
-  const themeName = ref(theme.current);
   const messages = ref([]);
-  const assistantSheetOpen = ref(false);
-  const noticeOpen = ref(false);
-  const privacyOpen = ref(false);
-  const personalizationOpen = ref(false);
-  const systemOpen = ref(false);
-  const languageSheetOpen = ref(false);
-  const mobileSettingsOpen = ref(false);
-  const runtimeReady = ref(false);
-  const autoScrollOnAnswer = computed(
-    () => systemSettingsStore.autoScrollOnAnswer
-  );
   const currentMode = computed(() => props.mode);
-  const isMainPage = computed(() => currentMode.value === "main");
-  const isChatPage = computed(() => currentMode.value === "chat");
-  const isSharedPage = computed(() => currentMode.value === "shared");
-  const isConversationPage = computed(() => !isMainPage.value);
-
-  const {
-    assistants,
-    currentAssistant,
-    histories,
-    models,
-    selectedAssistantId,
-    selectedModel,
-    isModelLocked,
-    isActiveModelUnavailable,
-    activeSession,
-    ensureConversation,
-    setConversation,
-    createRemoteConversation,
-    createLocalConversation,
-    clearCurrentChatSelection,
-    appendUserAndAssistantMessages,
-    selectAssistantForNewChat,
-    currentExamplePrompts,
-    getHistory,
-    revokeMessageAttachments,
-    toggleHistoryBookmark,
-    renameHistory,
-    removeHistory,
-  } = runtime;
-
-  const {
-    previewImage,
-    closeImagePreview,
-    handlePreviewLoad,
-    handlePreviewError,
-  } = useImagePreview();
-
-  const isCompactScreen = computed(() => viewportStore.isCompact);
-  const platformInfo = computed(() => platformStore.info || {});
-  const {isMobile, updateMobileState} = useChatMobileState({
-    isCompactScreen,
-    platformInfo,
-  });
-
-  const {
-    showScrollBottom,
-    markForceBottom,
-    clearForceBottom,
-    scrollBottom,
-    scheduleBottomStateCheck,
-    handleMessageContentRendered,
-    cleanupScrollController,
-  } = useChatScrollController({
-    isConversationPage,
-    workspaceRef,
-    scrollToBottom,
-    autoScrollEnabled: autoScrollOnAnswer,
-  });
-
-  const {keyboardOpen, refreshViewport} = useViewportGuard({
-    onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
-      if (!isMainPage.value && isCompact && isKeyboardOpen) {
-        scrollBottom({stable: true});
-      }
-    },
-  });
-
-  const layoutKeyboardOpen = computed(
-    () => !isMainPage.value && keyboardOpen.value
-  );
-  const isReadOnly = computed(() => isSharedPage.value);
+  const pageState = {
+    currentMode,
+    isMainPage: computed(() => currentMode.value === "main"),
+    isChatPage: computed(() => currentMode.value === "chat"),
+    isSharedPage: computed(() => currentMode.value === "shared"),
+    isConversationPage: computed(() => currentMode.value !== "main"),
+    isReadOnly: computed(() => currentMode.value === "shared"),
+  };
   const activeHistoryId = computed(() => {
-    if (isChatPage.value) return route.params.id;
-    if (isSharedPage.value) return route.params.shareId;
+    if (pageState.isChatPage.value) return route.params.id;
+    if (pageState.isSharedPage.value) return route.params.shareId;
     return null;
   });
-  const activeHistory = computed(() => getHistory(activeHistoryId.value));
-  const activeConversationTitle = computed(() => {
-    if (isSharedPage.value) {
-      return t("chat.sharedConversationTitle", {
-        id: activeHistoryId.value || "",
-      }).trim();
-    }
-    return activeHistory.value?.title || "";
-  });
-  const workspaceAssistantLabel = computed(() => {
-    if (activeSession.value?.displayAssistantLabel) {
-      return activeSession.value.displayAssistantLabel;
-    }
-    if (
-      activeSession.value?.assistantLabel &&
-      !activeSession.value?.isModelUnavailable
-    ) {
-      return activeSession.value.assistantLabel;
-    }
-    return currentAssistant.value?.label || t("chat.assistant");
-  });
 
-  const {
-    historyDialogOpen,
-    historyDialogMode,
-    historyDialogTarget,
-    historyDialogTitle,
-    historyDialogMessage,
-    historyNoticeOpen,
-    historyNoticeMessage,
-    closeHistoryDialog,
-    confirmHistoryDialog,
-    handleHistoryMenuAction,
-  } = useChatHistoryDialog({
-    t,
-    router,
+  const ui = useChatUIController({
     messages,
+    runtime,
+    pageState,
     activeHistoryId,
-    toggleHistoryBookmark,
-    renameHistory,
-    removeHistory,
   });
 
-  const suggestions = computed(() => {
-    const assistantPrompts = currentExamplePrompts.value || [];
-    const isEnglish = locale.value === "en";
+  const data = useChatDataController({props, ui, runtime, messages});
 
-    return assistantPrompts
-      .slice(0, PROMPT_SUGGESTION_LIMIT)
-      .map((prompt) => {
-        const localizedTitle = isEnglish
-          ? prompt.titleEn || prompt.titleKo
-          : prompt.titleKo || prompt.titleEn;
-        const localizedContent = isEnglish
-          ? prompt.contentEn || prompt.contentKo || localizedTitle
-          : prompt.contentKo || prompt.contentEn || localizedTitle;
-        const text = localizedTitle || localizedContent;
-        const content = localizedContent || localizedTitle;
-
-        return {
-          id: prompt.id,
-          text,
-          title: content || text,
-          prompt: content || text,
-        };
-      })
-      .filter((item) => item.text && item.prompt);
-  });
-
-  const {handlePromptFocus, handlePromptResize} = useChatPromptActions({
-    isMainPage,
-    isReadOnly,
-    isActiveModelUnavailable,
-    isMobile,
-    refreshViewport,
-    scrollBottom,
-  });
-
-  async function loadRouteConversation() {
-    if (isMainPage.value) {
-      messages.value = [];
-      clearCurrentChatSelection();
-      return;
-    }
-
-    try {
-      if (isSharedPage.value) {
-        messages.value = await loadSharedConversation(activeHistoryId.value);
-        markForceBottom();
-        await nextTick();
-        await scrollBottom({behavior: "auto", force: true, stable: true});
-        return;
-      }
-
-      if (!activeHistoryId.value) {
-        messages.value = [];
-        clearCurrentChatSelection();
-        markForceBottom();
-        await nextTick();
-        await scrollBottom({behavior: "auto", force: true, stable: true});
-        return;
-      }
-
-      const history = getHistory(activeHistoryId.value);
-      if (!history) {
-        await router.replace({name: "main"}).catch(() => {});
-        return;
-      }
-      messages.value = await ensureConversation(history.id);
-      markForceBottom();
-      await nextTick();
-      await scrollBottom({behavior: "auto", force: true, stable: true});
-    } catch (error) {
-      logWarn(
-        "[useChatContainerController] loadRouteConversation 오류:",
-        error
-      );
-    }
-  }
-
-  async function renderAfterStream() {
-    try {
-      markForceBottom(1000);
-      await renderMermaidInElement(document.querySelector(".message-list"), {
-        force: true,
-      });
-      if (autoScrollOnAnswer.value) {
-        scrollBottom({force: true, stable: true, autoAnswer: true});
-      }
-    } catch (error) {
-      logWarn("[useChatContainerController] renderAfterStream 오류:", error);
-    }
-  }
-
-  const {isGenerating, handleSubmit, regenerateResponse} = useChatSubmit({
-    router,
-    route,
-    histories,
-    messages,
-    createRemoteConversation,
-    createConversation: async (normalized, context = {}) => {
-      try {
-        return await createRemoteConversation({
-          text: normalized.text,
-          assistantId: context.assistantId,
-          modelId: context.modelId,
-        });
-      } catch (error) {
-        logWarn(
-          "[useChatContainerController] new.do 호출 실패, local conversation으로 대체:",
-          error
-        );
-        return createLocalConversation(normalized);
-      }
-    },
-    appendUserAndAssistantMessages,
-    setConversation,
-    selectedAssistantId,
-    selectedModel,
-    scrollBottom: async (options = {}) => {
-      if (options.autoAnswer && !autoScrollOnAnswer.value) return;
-      if (options.autoAnswer) markForceBottom(2500);
-      await scrollBottom(options);
-    },
-    renderAfterStream,
-  });
-
-  function submitIfWritable(payload) {
-    if (isReadOnly.value || isActiveModelUnavailable.value) return;
-    handleSubmit(payload);
-  }
-
-  function regenerateIfWritable(message) {
-    if (isReadOnly.value || isActiveModelUnavailable.value) return;
-    regenerateResponse(message);
-  }
-
-  const {
-    startNewChat,
-    startNewChatWithAssistant,
-    openHistory,
-    toggleTheme,
-    openSwagger,
-    openPlayground,
-    openMobileDrawer,
-    openSettings,
-    openGuide,
-    openNotice,
-    openPrivacy,
-    openTerms,
-    openPersonalization,
-    openSystem,
-    openLanguage,
-    openAssistantFromHeader,
-    logout,
-  } = useChatNavigationActions({
-    router,
-    theme,
-    themeName,
-    messages,
-    isMobile,
-    assistantSheetOpen,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    navigationStore,
-    revokeMessageAttachments,
-    clearCurrentChatSelection,
-    selectAssistantForNewChat,
-    refreshViewport,
-    clearForceBottom,
-    scrollBottom,
-  });
-
-  watch(isCompactScreen, updateMobileState);
-  watch(platformInfo, updateMobileState);
-  useEventListener(window, "resize", updateMobileState, {passive: true});
-  useEventListener(window, "scroll", scheduleBottomStateCheck, {
-    capture: true,
-    passive: true,
-  });
-
-  watch(
-    () => [route.params.id, route.params.shareId, currentMode.value],
-    () => {
-      if (runtimeReady.value) loadRouteConversation();
-    }
-  );
-
-  watch(
-    () => {
-      if (!isChatPage.value || !activeHistoryId.value) return null;
-      return runtime.conversations.value?.[activeHistoryId.value] || null;
-    },
-    (nextMessages) => {
-      if (!Array.isArray(nextMessages)) return;
-      if (messages.value === nextMessages) return;
-      messages.value = nextMessages;
-    },
-    {deep: true}
-  );
-
-  onMounted(async () => {
-    updateMobileState();
-    try {
-      await runtime.initialize();
-    } catch (error) {
-      logWarn("[useChatContainerController] runtime.initialize 오류:", error);
-    }
-    await loadRouteConversation();
-    runtimeReady.value = true;
-  });
-
-  function handleSystemSettingsApplied() {
-    syncViewportModeClass(systemSettingsStore.mobileBreakpoint);
-    viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
-    viewportStore.refresh();
-    refreshViewport();
-    updateMobileState();
-    scrollBottom({stable: true});
-  }
+  watch(data.isMainPage, ui.updateMobileState);
+  watch(() => data.isConversationPage.value, ui.updateMobileState);
+  ui.bindUiEvents();
+  data.bindDataEvents();
+  data.initializeDataController();
 
   onBeforeUnmount(() => {
-    cleanupScrollController();
-    revokeMessageAttachments(messages.value);
+    ui.cleanupUiController();
   });
 
   return {
-    t,
-    runtimeReady,
-    workspaceRef,
-    assistants,
-    currentAssistant,
-    models,
-    selectedAssistantId,
-    selectedModel,
-    isModelLocked,
-    isActiveModelUnavailable,
-    messages,
-    showScrollBottom,
-    assistantSheetOpen,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    historyDialogOpen,
-    historyDialogMode,
-    historyDialogTarget,
-    historyDialogTitle,
-    historyDialogMessage,
-    historyNoticeOpen,
-    historyNoticeMessage,
-    previewImage,
-    themeName,
-    isMobile,
-    layoutKeyboardOpen,
-    isReadOnly,
-    activeConversationTitle,
-    workspaceAssistantLabel,
-    suggestions,
-    isGenerating,
-    autoScrollOnAnswer,
-    closeImagePreview,
-    handlePreviewLoad,
-    handlePreviewError,
-    startNewChatWithAssistant,
-    startNewChat,
-    openHistory,
-    handleHistoryMenuAction,
-    closeHistoryDialog,
-    confirmHistoryDialog,
-    openMobileDrawer,
-    toggleTheme,
-    openSwagger,
-    openPlayground,
-    openSettings,
-    openGuide,
-    openNotice,
-    openPrivacy,
-    openTerms,
-    openPersonalization,
-    openSystem,
-    openLanguage,
-    openAssistantFromHeader,
-    logout,
-    submitIfWritable,
-    regenerateIfWritable,
-    handlePromptFocus,
-    handlePromptResize,
-    handleMessageContentRendered,
-    scrollBottom,
-    handleSystemSettingsApplied,
+    t: ui.t,
+    runtimeReady: data.runtimeReady,
+    workspaceRef: ui.workspaceRef,
+    assistants: data.assistants,
+    currentAssistant: data.currentAssistant,
+    models: data.models,
+    selectedAssistantId: data.selectedAssistantId,
+    selectedModel: data.selectedModel,
+    isModelLocked: data.isModelLocked,
+    isActiveModelUnavailable: data.isActiveModelUnavailable,
+    messages: data.messages,
+    showScrollBottom: ui.showScrollBottom,
+    assistantSheetOpen: ui.assistantSheetOpen,
+    noticeOpen: ui.noticeOpen,
+    privacyOpen: ui.privacyOpen,
+    personalizationOpen: ui.personalizationOpen,
+    systemOpen: ui.systemOpen,
+    languageSheetOpen: ui.languageSheetOpen,
+    mobileSettingsOpen: ui.mobileSettingsOpen,
+    historyDialogOpen: ui.historyDialogOpen,
+    historyDialogMode: ui.historyDialogMode,
+    historyDialogTarget: ui.historyDialogTarget,
+    historyDialogTitle: ui.historyDialogTitle,
+    historyDialogMessage: ui.historyDialogMessage,
+    historyNoticeOpen: ui.historyNoticeOpen,
+    historyNoticeMessage: ui.historyNoticeMessage,
+    previewImage: ui.previewImage,
+    themeName: ui.themeName,
+    isMobile: ui.isMobile,
+    layoutKeyboardOpen: ui.layoutKeyboardOpen,
+    isReadOnly: data.isReadOnly,
+    activeConversationTitle: data.activeConversationTitle,
+    workspaceAssistantLabel: data.workspaceAssistantLabel,
+    suggestions: data.suggestions,
+    isGenerating: data.isGenerating,
+    autoScrollOnAnswer: ui.autoScrollOnAnswer,
+    closeImagePreview: ui.closeImagePreview,
+    handlePreviewLoad: ui.handlePreviewLoad,
+    handlePreviewError: ui.handlePreviewError,
+    startNewChatWithAssistant: ui.startNewChatWithAssistant,
+    startNewChat: ui.startNewChat,
+    openHistory: ui.openHistory,
+    handleHistoryMenuAction: ui.handleHistoryMenuAction,
+    closeHistoryDialog: ui.closeHistoryDialog,
+    confirmHistoryDialog: ui.confirmHistoryDialog,
+    openMobileDrawer: ui.openMobileDrawer,
+    toggleTheme: ui.toggleTheme,
+    openSwagger: ui.openSwagger,
+    openPlayground: ui.openPlayground,
+    openSettings: ui.openSettings,
+    openGuide: ui.openGuide,
+    openNotice: ui.openNotice,
+    openPrivacy: ui.openPrivacy,
+    openTerms: ui.openTerms,
+    openPersonalization: ui.openPersonalization,
+    openSystem: ui.openSystem,
+    openLanguage: ui.openLanguage,
+    openAssistantFromHeader: ui.openAssistantFromHeader,
+    logout: ui.logout,
+    submitIfWritable: data.submitIfWritable,
+    regenerateIfWritable: data.regenerateIfWritable,
+    handlePromptFocus: ui.handlePromptFocus,
+    handlePromptResize: ui.handlePromptResize,
+    handleMessageContentRendered: ui.handleMessageContentRendered,
+    scrollBottom: ui.scrollBottom,
+    handleSystemSettingsApplied: ui.handleSystemSettingsApplied,
   };
 }

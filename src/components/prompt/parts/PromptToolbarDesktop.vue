@@ -1,47 +1,20 @@
 <template>
   <div class="prompt-action-row">
     <div class="prompt-left-actions">
-      <div ref="modelRoot" class="prompt-selector-wrap">
-        <button
-          class="prompt-model-trigger"
-          type="button"
-          :disabled="disabled || modelReadonly"
-          :title="modelReadonly ? resolvedReadonlyTitle : undefined"
-          :aria-label="modelSelectLabel"
-          @click="$emit('open-model')"
-        >
-          <span>{{ currentModel.label }}</span>
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path
-              d="M5.5 7.5 10 12l4.5-4.5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-        <div
-          v-if="modelMenuOpen && !isMobileSheet"
-          class="prompt-popover model-menu prompt-model-menu"
-        >
-          <button
-            v-for="model in models"
-            :key="model.id"
-            class="model-option"
-            :class="{active: model.id === modelValue}"
-            type="button"
-            @click="$emit('select-model', model.id)"
-          >
-            <span class="model-option-main">
-              <strong>{{ model.label }}</strong>
-              <small>{{ model.description }}</small>
-            </span>
-            <CheckIcon v-if="model.id === modelValue" class="option-check" />
-          </button>
-        </div>
-      </div>
+      <PromptModelSelector
+        ref="modelSelectorRef"
+        :disabled="disabled"
+        :model-readonly="modelReadonly"
+        :model-value="modelValue"
+        :current-model="currentModel"
+        :models="models"
+        :model-menu-open="modelMenuOpen"
+        :is-mobile-sheet="isMobileSheet"
+        :model-select-label="modelSelectLabel"
+        :readonly-title="resolvedReadonlyTitle"
+        @open-model="$emit('open-model')"
+        @select-model="$emit('select-model', $event)"
+      />
 
       <div ref="toolRoot" class="prompt-selector-wrap">
         <button
@@ -146,99 +119,31 @@
         </div>
       </div>
 
-      <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap">
-        <button
-          class="prompt-icon-action attach-button"
-          :class="{'prompt-icon-action--active': attachMenuOpen}"
-          type="button"
-          :title="attachLabel"
-          :aria-label="attachLabel"
-          :disabled="disabled"
-          @click="$emit('open-attach')"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M21.4 11.6 12.1 20.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4.1 4.1 0 0 1 5.8 5.8l-9.4 9.4a2.2 2.2 0 1 1-3.1-3.1l8.6-8.6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-        <div
-          v-if="attachMenuOpen && !isMobileSheet"
-          ref="attachMenuRef"
-          class="prompt-popover attach-menu prompt-floating-menu"
-          :style="attachMenuStyle"
-          role="menu"
-        >
-          <button
-            v-for="option in attachOptions"
-            :key="option.id"
-            type="button"
-            role="menuitem"
-            @click="$emit('open-file-picker', option.id)"
-          >
-            <span aria-hidden="true">{{ option.icon }}</span>
-            <p>{{ option.label }}</p>
-          </button>
-        </div>
-      </div>
+      <PromptAttachButton
+        ref="attachButtonRef"
+        :disabled="disabled"
+        :attach-options="attachOptions"
+        :attach-menu-open="attachMenuOpen"
+        :is-mobile-sheet="isMobileSheet"
+        :attach-label="attachLabel"
+        @open-attach="$emit('open-attach')"
+        @open-file-picker="$emit('open-file-picker', $event)"
+      />
     </div>
 
-    <button
-      v-if="showVoiceStartButton"
-      class="voice-button voice-button--start"
-      type="button"
-      :disabled="disabled || !isSpeechSupported"
-      :title="voiceStartLabel"
-      :aria-label="voiceStartLabel"
-      @click="$emit('start-voice')"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
-
-    <button
-      v-else-if="showVoiceStopButton"
-      class="voice-button voice-button--stop"
-      type="button"
+    <PromptVoiceButton
       :disabled="disabled"
-      :title="voiceStopLabel"
-      :aria-label="voiceStopLabel"
-      @click="$emit('stop-voice')"
-    >
-      <span aria-hidden="true"></span>
-    </button>
-
-    <button
-      v-else
-      class="send-button"
-      type="submit"
-      :disabled="disabled || !canSubmit"
-      :title="sendLabel"
-      :aria-label="sendLabel"
-    >
-      ↗
-    </button>
+      :can-submit="canSubmit"
+      :has-prompt-text="hasPromptText"
+      :is-mic-enabled="isMicEnabled"
+      :is-voice-listening="isVoiceListening"
+      :is-speech-supported="isSpeechSupported"
+      :voice-start-label="voiceStartLabel"
+      :voice-stop-label="voiceStopLabel"
+      :send-label="sendLabel"
+      @start-voice="$emit('start-voice')"
+      @stop-voice="$emit('stop-voice')"
+    />
   </div>
 </template>
 
@@ -246,22 +151,21 @@
 import {computed, nextTick, ref, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
+import PromptAttachButton from "@/components/prompt/parts/PromptAttachButton.vue";
+import PromptModelSelector from "@/components/prompt/parts/PromptModelSelector.vue";
+import PromptVoiceButton from "@/components/prompt/parts/PromptVoiceButton.vue";
 
 const {t} = useI18n();
 
-const modelRoot = ref(null);
+const modelSelectorRef = ref(null);
 const toolRoot = ref(null);
-const attachRoot = ref(null);
+const attachButtonRef = ref(null);
 const toolMenuRef = ref(null);
-const attachMenuRef = ref(null);
 const toolPositionReady = ref(false);
-const attachPositionReady = ref(false);
 const activeToolGroupId = ref("");
 const submenuPlacement = ref("right");
 
 const toolReferenceRef = computed(() => toolRoot.value || null);
-const attachReferenceRef = computed(() => attachRoot.value || null);
 
 const {floatingStyles: toolFloatingStyles, update: updateToolFloating} =
   useFloating(toolReferenceRef, toolMenuRef, {
@@ -276,27 +180,9 @@ const {floatingStyles: toolFloatingStyles, update: updateToolFloating} =
     ],
   });
 
-const {floatingStyles: attachFloatingStyles, update: updateAttachFloating} =
-  useFloating(attachReferenceRef, attachMenuRef, {
-    placement: "top-start",
-    strategy: "absolute",
-    transform: false,
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(10),
-      flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-      shift({padding: 12}),
-    ],
-  });
-
 const toolMenuStyle = computed(() => ({
   ...toolFloatingStyles.value,
   visibility: toolPositionReady.value ? "visible" : "hidden",
-}));
-
-const attachMenuStyle = computed(() => ({
-  ...attachFloatingStyles.value,
-  visibility: attachPositionReady.value ? "visible" : "hidden",
 }));
 
 const props = defineProps({
@@ -338,17 +224,6 @@ const emit = defineEmits([
 
 const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
-);
-
-const showVoiceStartButton = computed(
-  () =>
-    props.isMicEnabled &&
-    props.isSpeechSupported &&
-    !props.hasPromptText &&
-    !props.isVoiceListening
-);
-const showVoiceStopButton = computed(
-  () => props.isMicEnabled && props.isVoiceListening
 );
 
 const activeToolGroup = computed(() => {
@@ -453,23 +328,17 @@ watch(
 );
 
 watch(
-  () => props.attachMenuOpen,
-  async (open) => {
-    attachPositionReady.value = false;
-    if (!open) return;
-
-    await nextTick();
-    await updateAttachFloating?.();
-    attachPositionReady.value = true;
-  },
-  {flush: "post"}
-);
-
-watch(
   () => props.isMobileSheet,
   () => {
     closeActiveToolGroup();
   }
+);
+
+const modelRoot = computed(
+  () => modelSelectorRef.value?.modelRoot?.value || modelSelectorRef.value?.modelRoot || null
+);
+const attachRoot = computed(
+  () => attachButtonRef.value?.attachRoot?.value || attachButtonRef.value?.attachRoot || null
 );
 
 defineExpose({modelRoot, toolRoot, attachRoot});
@@ -485,11 +354,6 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 }
 
 .prompt-selector-wrap {
-  min-width: 0;
-}
-
-.prompt-model-trigger span,
-.model-option-main {
   min-width: 0;
 }
 

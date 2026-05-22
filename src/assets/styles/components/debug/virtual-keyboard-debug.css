@@ -10,7 +10,7 @@ body.mobile-mode .virtual-keyboard-debug {
   position: fixed;
   right: max(16px, env(safe-area-inset-right, 0px) + 16px);
   bottom: calc(env(safe-area-inset-bottom, 0px) + 84px);
-  z-index: 2147483000;
+  z-index: var(--z-virtual-keyboard-fab);
   min-width: 72px;
   height: 40px;
   border: 1px solid var(--color-border, rgba(148, 163, 184, 0.35));
@@ -27,7 +27,7 @@ body.mobile-mode .virtual-keyboard-debug {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2147482999;
+  z-index: var(--z-virtual-keyboard-panel);
   min-height: 0;
   box-sizing: border-box;
   padding: 28px 24px calc(28px + env(safe-area-inset-bottom, 0px));
