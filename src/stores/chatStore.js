@@ -6,6 +6,8 @@ const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
   knowledgeSearch: [],
   webSearch: null,
   webSearchEnabled: false,
+  promptTemplateId: null,
+  promptTemplateOptions: {},
 });
 
 function clonePromptToolSettings(settings = {}) {
@@ -15,6 +17,8 @@ function clonePromptToolSettings(settings = {}) {
       : [],
     webSearch: settings.webSearch || null,
     webSearchEnabled: Boolean(settings.webSearchEnabled),
+    promptTemplateId: settings.promptTemplateId || null,
+    promptTemplateOptions: {...(settings.promptTemplateOptions || {})},
   };
 }
 
@@ -91,6 +95,50 @@ export const useChatStore = defineStore("chat", {
         };
       }
       return chatId;
+    },
+
+
+    resetActivePromptTemplate() {
+      const chatId = this.ensurePromptToolSettings();
+      const current = clonePromptToolSettings(
+        this.promptToolSettingsMap[chatId]
+      );
+      current.promptTemplateId = null;
+      current.promptTemplateOptions = {};
+
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [chatId]: current,
+      };
+    },
+    setActivePromptTemplate(templateId) {
+      const chatId = this.ensurePromptToolSettings();
+      const current = clonePromptToolSettings(
+        this.promptToolSettingsMap[chatId]
+      );
+      const nextTemplateId = current.promptTemplateId === templateId ? null : templateId;
+      current.promptTemplateId = nextTemplateId;
+      current.promptTemplateOptions = {};
+
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [chatId]: current,
+      };
+    },
+    setPromptTemplateOption(groupId, optionTag) {
+      const chatId = this.ensurePromptToolSettings();
+      const current = clonePromptToolSettings(
+        this.promptToolSettingsMap[chatId]
+      );
+      current.promptTemplateOptions = {
+        ...current.promptTemplateOptions,
+        [groupId]: optionTag,
+      };
+
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [chatId]: current,
+      };
     },
     setPromptToolGroupEnabled(groupId, enabled) {
       const chatId = this.ensurePromptToolSettings();

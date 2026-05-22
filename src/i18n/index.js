@@ -340,6 +340,16 @@ export const messages = {
       voiceStart: "음성 입력 시작",
       voiceStop: "음성 입력 중지",
       attach: "첨부",
+      templates: {
+        mail: "메일",
+        mailDescription: "메일 작성 템플릿",
+        translate: "번역",
+        translateDescription: "번역 템플릿",
+        summary: "요약",
+        summaryDescription: "요약 템플릿",
+        code: "코드",
+        codeDescription: "코드 생성/리뷰 템플릿",
+      },
       suggestions: {
         image: "이미지 만들기",
         writing: "글쓰기 또는 편집",
@@ -925,6 +935,16 @@ export const messages = {
       voiceStart: "Start voice input",
       voiceStop: "Stop voice input",
       attach: "Attach",
+      templates: {
+        mail: "Mail",
+        mailDescription: "Email writing template",
+        translate: "Translate",
+        translateDescription: "Translation template",
+        summary: "Summary",
+        summaryDescription: "Summary template",
+        code: "Code",
+        codeDescription: "Code generation/review template",
+      },
       suggestions: {
         image: "Create image",
         writing: "Write or edit",

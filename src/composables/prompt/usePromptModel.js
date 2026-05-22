@@ -3,6 +3,7 @@ import {
   DEFAULT_FALLBACK_MODEL,
   PROMPT_MENU_TYPE,
 } from "@/constants/promptComposer";
+import {useChatStore} from "@/stores/chatStore";
 
 /**
  * @description 모델 목록 관리, 모델 선택 메뉴 열기/닫기, 모델 선택을 처리합니다.
@@ -16,6 +17,8 @@ export function usePromptModel({
   toggleMenu,
   emit,
 }) {
+  const chatStore = useChatStore();
+
   const fallbackModels = computed(() => [
     {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
   ]);
@@ -37,6 +40,9 @@ export function usePromptModel({
   }
 
   function selectModel(id) {
+    if (id !== props.modelValue) {
+      chatStore.resetActivePromptTemplate();
+    }
     emit("update:modelValue", id);
     modelMenuOpen.value = false;
   }

@@ -8,6 +8,16 @@
         @preview-error="markPreviewError"
       />
 
+      <PromptTemplatePanel
+        :visible="hasSelectedTemplatePanel"
+        :groups="selectedTemplateGroups"
+        :active-mobile-group="activeMobileGroup"
+        :is-option-active="isTemplateOptionActive"
+        @select-option="selectTemplateOption"
+        @open-mobile-group="openTemplateOptionSheet"
+        @close-mobile-group="closeTemplateOptionSheet"
+      />
+
       <PromptTextarea
         ref="textareaComponentRef"
         v-model="text"
@@ -96,6 +106,7 @@ import PromptActionToolbar from "@/components/prompt/parts/PromptActionToolbar.v
 import PromptAttachmentPreviewList from "@/components/prompt/parts/PromptAttachmentPreviewList.vue";
 import PromptMobileSheets from "@/components/prompt/parts/PromptMobileSheets.vue";
 import PromptTextarea from "@/components/prompt/parts/PromptTextarea.vue";
+import PromptTemplatePanel from "@/components/prompt/parts/PromptTemplatePanel.vue";
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
@@ -135,6 +146,13 @@ const {
   currentModels,
   currentModel,
   tools,
+  selectedTemplateGroups,
+  hasSelectedTemplatePanel,
+  activeMobileGroup,
+  isTemplateOptionActive,
+  selectTemplateOption,
+  openTemplateOptionSheet,
+  closeTemplateOptionSheet,
   attachOptions,
   hasPromptText,
   canSubmit,

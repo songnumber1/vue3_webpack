@@ -66,7 +66,8 @@
             type="button"
             :class="{
               'prompt-tool-menu-parent': hasChildren(tool),
-              active: activeToolGroupId === tool.id,
+              active: activeToolGroupId === tool.id || tool.active,
+              'is-template-tool': Boolean(tool.promptTemplateKey),
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
             :aria-expanded="
@@ -74,8 +75,15 @@
             "
             @click="handleToolClick(tool)"
           >
-            <span aria-hidden="true">{{ tool.icon }}</span>
-            <p>{{ tool.label }}</p>
+            <span
+              v-if="!tool.promptTemplateKey"
+              class="prompt-tool-icon"
+              aria-hidden="true"
+              >{{ tool.icon }}</span
+            >
+            <span class="prompt-tool-text">
+              <strong>{{ tool.label }}</strong>
+            </span>
             <span
               v-if="hasChildren(tool) && tool.active && !isSwitchParent(tool)"
               class="prompt-menu-active-badge"
@@ -630,5 +638,69 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 
 .prompt-tool-child-option--selectedRow.is-active {
   background: var(--control-hover);
+}
+
+.prompt-tool-menu button.is-template-tool {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 5px;
+}
+
+.prompt-tool-menu button.is-template-tool + button.is-template-tool {
+  margin-top: 4px;
+}
+
+.prompt-tool-menu button.is-template-tool.active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--text);
+  box-shadow: none;
+}
+
+.prompt-tool-icon {
+  width: 24px !important;
+  text-align: center;
+}
+
+.prompt-tool-dot {
+  display: none;
+}
+
+.prompt-tool-text {
+  display: flex;
+  width: auto !important;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.prompt-tool-menu button.is-template-tool .prompt-tool-text small {
+  display: none;
+}
+
+.prompt-tool-text strong,
+.prompt-tool-text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prompt-tool-text strong {
+  font-size: var(--font-size-md);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.prompt-tool-text small {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prompt-tool-menu button.is-template-tool.active .prompt-tool-text small {
+  color: var(--muted);
 }
 </style>

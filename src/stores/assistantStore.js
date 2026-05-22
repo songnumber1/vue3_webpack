@@ -11,6 +11,7 @@ export const useAssistantStore = defineStore("assistant", {
     selectedAssistantId: "",
     selectedModelId: "",
     examplePromptMap: {},
+    promptTemplates: [],
   }),
   getters: {
     currentAssistant: (state) =>
@@ -34,6 +35,7 @@ export const useAssistantStore = defineStore("assistant", {
       this.selectedModelId =
         payload.initialModelId || this.currentModels[0]?.id || "";
       this.examplePromptMap = payload.examplePromptMap || {};
+      this.promptTemplates = payload.promptTemplates || [];
     },
     selectAssistant(id) {
       if (!this.assistantMap[id]) return;
@@ -57,6 +59,9 @@ export const useAssistantStore = defineStore("assistant", {
     },
     setExamplePromptMap(promptMap = {}) {
       this.examplePromptMap = {...promptMap};
+    },
+    setPromptTemplates(templates = []) {
+      this.promptTemplates = [...templates];
     },
   },
 });

@@ -34,16 +34,20 @@
         v-for="tool in tools"
         :key="tool.id"
         class="bottom-sheet-option bottom-sheet-option--row"
+        :class="{'is-active': tool.active, 'bottom-sheet-option--template': Boolean(tool.promptTemplateKey)}"
         type="button"
         @click="handleToolClick(tool)"
       >
-        <span aria-hidden="true">
+        <span v-if="!tool.promptTemplateKey" aria-hidden="true">
           {{ tool.icon }}
         </span>
 
-        <strong>
-          {{ tool.label }}
-        </strong>
+        <span class="bottom-sheet-option-main">
+          <strong>
+            {{ tool.label }}
+          </strong>
+          <small v-if="tool.description">{{ tool.description }}</small>
+        </span>
 
         <span
           v-if="hasChildren(tool) && tool.activeCount > 0"
@@ -432,5 +436,57 @@ watch(
   text-align: center !important;
   font-size: var(--text-size-body) !important;
   line-height: 1 !important;
+}
+
+.bottom-sheet-option--template {
+  min-height: 54px;
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-align: left !important;
+  border: 0;
+}
+
+.bottom-sheet-option--template.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, var(--control-hover));
+}
+
+.bottom-sheet-template-dot {
+  display: none;
+}
+
+.bottom-sheet-option--template > .bottom-sheet-option-main {
+  display: flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  text-align: left !important;
+}
+
+.bottom-sheet-option--template > .bottom-sheet-option-main strong,
+.bottom-sheet-option--template > .bottom-sheet-option-main small {
+  width: 100% !important;
+  text-align: left !important;
+}
+
+.bottom-sheet-option--template .bottom-sheet-option-main small {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+
+/* keep template menu rows readable even when mobile global span patches are active */
+:global(body.mobile-mode) .bottom-sheet-option--template > .bottom-sheet-option-main {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  text-align: left !important;
 }
 </style>

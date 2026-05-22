@@ -1,4 +1,4 @@
-import {computed, nextTick, onMounted, toRef} from "vue";
+import {computed, nextTick, onMounted, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
@@ -6,6 +6,8 @@ import {usePromptAttachment} from "@/composables/prompt/usePromptAttachment";
 import {usePromptSpeech} from "@/composables/prompt/usePromptSpeech";
 import {usePromptModel} from "@/composables/prompt/usePromptModel";
 import {usePromptTool} from "@/composables/prompt/usePromptTool";
+import {usePromptTemplate} from "@/composables/prompt/usePromptTemplate";
+import {useChatStore} from "@/stores/chatStore";
 
 /**
  * @description 프롬프트 입력 영역의 모든 기능을 조합하는 slim 조합기입니다.
@@ -18,6 +20,7 @@ import {usePromptTool} from "@/composables/prompt/usePromptTool";
 export function usePromptComposer(props, emit) {
   const {t} = useI18n();
   const disabled = toRef(props, "disabled");
+  const chatStore = useChatStore();
 
   // ── 공유 레이어: 뷰포트 감지 + 메뉴 상태 ──────────────────────────────
   const {
@@ -83,6 +86,17 @@ export function usePromptComposer(props, emit) {
     usePromptModel({props, modelMenuOpen, syncViewportMode, toggleMenu, emit});
 
   // ── 툴 선택 ───────────────────────────────────────────────────────────
+  const {
+    selectedTemplate,
+    selectedTemplateGroups,
+    hasSelectedTemplatePanel,
+    activeMobileGroup,
+    isTemplateOptionActive,
+    selectTemplateOption,
+    openTemplateOptionSheet,
+    closeTemplateOptionSheet,
+  } = usePromptTemplate({modelId: toRef(props, "modelValue")});
+
   const {tools, openToolSelector, applyTool} = usePromptTool({
     props,
     toolMenuOpen,
@@ -92,6 +106,15 @@ export function usePromptComposer(props, emit) {
     resize,
     focusTextarea,
   });
+
+  watch(
+    () => props.modelValue,
+    (nextModelId, prevModelId) => {
+      if (prevModelId && nextModelId !== prevModelId) {
+        chatStore.resetActivePromptTemplate();
+      }
+    }
+  );
 
   // ── 제출 (text + attachments 둘 다 필요하므로 조합기에 위치) ──────────
   const canSubmit = computed(
@@ -109,7 +132,11 @@ export function usePromptComposer(props, emit) {
   function submit() {
     const value = text.value.trim();
     if ((!value && attachments.value.length === 0) || props.disabled) return;
-    emit("submit", {text: value, attachments: attachments.value});
+    emit("submit", {
+      text: value,
+      attachments: attachments.value,
+      promptTemplate: selectedTemplate.value,
+    });
     text.value = "";
     clearAttachments();
     speech.resetToMic();
@@ -162,6 +189,15 @@ export function usePromptComposer(props, emit) {
     currentModel,
     openModelSelector,
     selectModel,
+    // template
+    selectedTemplate,
+    selectedTemplateGroups,
+    hasSelectedTemplatePanel,
+    activeMobileGroup,
+    isTemplateOptionActive,
+    selectTemplateOption,
+    openTemplateOptionSheet,
+    closeTemplateOptionSheet,
     // tool
     tools,
     openToolSelector,

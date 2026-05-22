@@ -49,24 +49,47 @@ export const PROMPT_TOOL_CONTROL_TYPE = Object.freeze({
   switch: "switch",
 });
 
+
+export const PROMPT_TEMPLATE_MODEL_IDS = Object.freeze([
+  "model-ds-thinking",
+  "model-ds-rag",
+]);
+
+export const PROMPT_TEMPLATE_TOOL_IDS = Object.freeze({
+  mail: "prompt-template-mail",
+  translate: "prompt-template-translate",
+  summary: "prompt-template-summary",
+  code: "prompt-template-code",
+});
+
 export const PROMPT_TOOL_DEFINITIONS = Object.freeze([
   {
-    id: "image",
-    icon: "▧",
-    labelKey: "chat.suggestions.image",
-    prompt: "이미지 생성 프롬프트를 만들어줘",
+    id: PROMPT_TEMPLATE_TOOL_IDS.mail,
+    icon: "",
+    labelKey: "chat.templates.mail",
+    descriptionKey: "chat.templates.mailDescription",
+    promptTemplateKey: "mail",
   },
   {
-    id: "write",
-    icon: "✎",
-    labelKey: "chat.suggestions.writing",
-    prompt: "아래 내용을 더 자연스럽게 다듬어줘",
+    id: PROMPT_TEMPLATE_TOOL_IDS.translate,
+    icon: "",
+    labelKey: "chat.templates.translate",
+    descriptionKey: "chat.templates.translateDescription",
+    promptTemplateKey: "translate",
   },
   {
-    id: "find",
-    icon: "◎",
-    labelKey: "chat.suggestions.search",
-    prompt: "프로젝트에서 빠진 항목을 찾아줘",
+    id: PROMPT_TEMPLATE_TOOL_IDS.summary,
+    icon: "",
+    labelKey: "chat.templates.summary",
+    descriptionKey: "chat.templates.summaryDescription",
+    promptTemplateKey: "summary",
+  },
+  {
+    id: PROMPT_TEMPLATE_TOOL_IDS.code,
+    icon: "",
+    labelKey: "chat.templates.code",
+    descriptionKey: "chat.templates.codeDescription",
+    promptTemplateKey: "code",
   },
   {
     id: "knowledge-search",

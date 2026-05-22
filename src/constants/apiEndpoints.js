@@ -12,5 +12,6 @@ export const API_ENDPOINTS = Object.freeze({
   CHAT_HISTORY_DELETE: "/chat-history/delete.do",
   CHAT_HISTORY_NEW: "/new.do",
   EXAMPLE_PROMPTS: "/example-prompts/list.do",
+  PROMPT_TEMPLATES: "/prompt-templates/list.do",
   GENERATION: "/generation.do",
 });

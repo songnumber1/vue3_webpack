@@ -2,7 +2,7 @@ import {resolveChatApis} from "@/api/runtime/chatApis";
 import {adaptAssistantList} from "@/adapters/assistantAdapter";
 import {adaptModelList, filterAvailableModels} from "@/adapters/modelAdapter";
 import {adaptChatHistoryList, adaptMessageList} from "@/adapters/chatAdapter";
-import {adaptExamplePromptList} from "@/adapters/promptAdapter";
+import {adaptExamplePromptList, adaptPromptTemplateList} from "@/adapters/promptAdapter";
 
 function toMap(items = []) {
   return items.reduce((acc, item) => {
@@ -47,8 +47,14 @@ function pickInitialModel(
 }
 export async function bootstrapChatRuntime(options = {}) {
   const {accessInfoOverride = null} = options;
-  const {accessApi, assistantApi, modelApi, chatHistoryApi, examplePromptApi} =
-    resolveChatApis();
+  const {
+    accessApi,
+    assistantApi,
+    modelApi,
+    chatHistoryApi,
+    examplePromptApi,
+    promptTemplateApi,
+  } = resolveChatApis();
 
   const accessInfoPromise = accessInfoOverride
     ? Promise.resolve(accessInfoOverride)
@@ -61,6 +67,7 @@ export async function bootstrapChatRuntime(options = {}) {
     modelApi.getModels(),
     modelApi.getStudioModels(),
     chatHistoryApi.getChatHistoryList(),
+    promptTemplateApi?.getPromptTemplates?.(),
   ]);
 
   const readSettledValue = (index, fallbackValue) =>
@@ -80,6 +87,7 @@ export async function bootstrapChatRuntime(options = {}) {
   const modelRaw = readSettledValue(3, []);
   const studioModelRaw = readSettledValue(4, []);
   const chatHistoryRaw = readSettledValue(5, []);
+  const promptTemplateRaw = readSettledValue(6, {list: []});
 
   const assistants = [
     ...adaptAssistantList(assistantRaw),
@@ -100,6 +108,7 @@ export async function bootstrapChatRuntime(options = {}) {
     assistantMap,
     modelMap,
   });
+  const promptTemplates = adaptPromptTemplateList(promptTemplateRaw);
   const examplePromptResults = await Promise.allSettled(
     assistants.map(async (assistant) => {
       const response = await examplePromptApi.getExamplePrompts({
@@ -131,6 +140,7 @@ export async function bootstrapChatRuntime(options = {}) {
     modelMapByAssistant,
     chatHistories,
     examplePromptMap,
+    promptTemplates,
     initialAssistantId: initialAssistant?.id || "",
     initialModelId: initialModel?.id || "",
   };
@@ -175,4 +185,10 @@ export async function loadExamplePrompts({assistantId, studioYN = false} = {}) {
   });
 
   return adaptExamplePromptList(response);
+}
+
+export async function loadPromptTemplates(params = {}) {
+  const {promptTemplateApi} = resolveChatApis();
+  const response = await promptTemplateApi.getPromptTemplates(params);
+  return adaptPromptTemplateList(response);
 }
