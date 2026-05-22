@@ -1,23 +1,27 @@
 <template>
-  <PromptInput
-    ref="promptInputRef"
-    :is-mobile="isMobile"
+  <PromptComposer
+    ref="composerRef"
+    :class="{'mobile-prompt-input': isMobile}"
     :floating="floating"
     :model-value="selectedModel"
     :models="models"
     :disabled="disabled"
     :model-readonly="modelReadonly"
     :show-help="showHelp"
-    @update:model-value="emit('update:selectedModel', $event)"
-    @submit="emit('submit', $event)"
-    @focus="emit('focus')"
-    @height-change="emit('height-change', $event)"
+    @update:model-value="workspaceActions.updateSelectedModel($event)"
+    @submit="workspaceActions.submit($event)"
+    @focus="workspaceActions.handlePromptFocus()"
+    @height-change="workspaceActions.handlePromptResize()"
   />
 </template>
 
 <script setup>
-import {ref} from "vue";
-import PromptInput from "@/components/prompt/PromptInput.vue";
+import {inject, ref} from "vue";
+import PromptComposer from "@/components/prompt/PromptComposer.vue";
+import {
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions,
+} from "@/composables/chat/chatActionContext";
 
 defineProps({
   isMobile: {type: Boolean, default: false},
@@ -29,17 +33,14 @@ defineProps({
   showHelp: {type: Boolean, default: false},
 });
 
-const emit = defineEmits([
-  "update:selectedModel",
-  "submit",
-  "focus",
-  "height-change",
-]);
-
-const promptInputRef = ref(null);
+const workspaceActions = inject(
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions()
+);
+const composerRef = ref(null);
 
 function setText(value, options) {
-  promptInputRef.value?.setText(value, options);
+  composerRef.value?.setText(value, options);
 }
 
 defineExpose({

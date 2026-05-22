@@ -44,10 +44,6 @@
         :disabled="isGenerating || isInteractionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
-        @update:selected-model="workspaceActions.updateSelectedModel($event)"
-        @submit="workspaceActions.submit($event)"
-        @focus="workspaceActions.handlePromptFocus()"
-        @height-change="workspaceActions.handlePromptResize()"
       />
     </div>
   </section>
@@ -85,10 +81,6 @@
         :disabled="isGenerating || isInteractionBlocked"
         :model-readonly="modelReadonly"
         :show-help="false"
-        @update:selected-model="workspaceActions.updateSelectedModel($event)"
-        @submit="workspaceActions.submit($event)"
-        @focus="workspaceActions.handlePromptFocus()"
-        @height-change="workspaceActions.handlePromptResize()"
       />
     </div>
   </template>
@@ -213,7 +205,7 @@ defineExpose({
 
 <style scoped>
 /* Mobile main/chat composer geometry is owned by ChatWorkspace because this
-   component decides whether PromptInput is rendered as main, chat or shared. */
+   component decides whether the shared prompt composer is rendered as main or chat. */
 :global(body.mobile-mode) .mobile-chat-prompt,
 :global(body.mobile-mode) .mobile-main-fixed-prompt {
   width: 100%;
