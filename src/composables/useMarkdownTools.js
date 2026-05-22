@@ -115,7 +115,7 @@ async function handleCodeAction(button) {
   }
 }
 
-export function useMarkdownMessageInteractions(contentRef) {
+export function useMarkdownTools(contentRef) {
   const platformStore = usePlatformStore();
   async function handleMarkdownClick(event) {
     const tableActionButton = event.target?.closest?.(

@@ -51,7 +51,7 @@
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {useMarkdownMessageInteractions} from "@/composables/useMarkdownMessageInteractions";
+import {useMarkdownTools} from "@/composables/useMarkdownTools";
 import MessageActions from "./MessageActions.vue";
 
 const props = defineProps({
@@ -65,9 +65,9 @@ const reasoningHtml = ref("<p></p>");
 const contentRef = ref(null);
 const reasoningRef = ref(null);
 const reasoningOpen = ref(true);
-const {handleMarkdownClick} = useMarkdownMessageInteractions(contentRef);
+const {handleMarkdownClick} = useMarkdownTools(contentRef);
 const {handleMarkdownClick: handleReasoningClick} =
-  useMarkdownMessageInteractions(reasoningRef);
+  useMarkdownTools(reasoningRef);
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
