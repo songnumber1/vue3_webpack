@@ -9,7 +9,6 @@
   --dialog-option-radius: 5px;
   --dialog-close-radius: 5px;
 
-  
   --breakpoint-mobile: 768px;
   --layout-sidebar-width: 260px;
   --layout-sidebar-collapsed-width: 68px;
@@ -24,7 +23,7 @@
   --space-4: 16px;
   --space-5: 20px;
   --space-6: 24px;
-  
+
   --z-content-raised: 20;
   --z-prompt: 70;
   --z-prompt-floating: 90;
@@ -108,7 +107,6 @@
   --shadow-menu: 0 18px 56px rgba(15, 23, 42, 0.16);
   --shadow-prompt: 0 8px 26px rgba(15, 23, 42, 0.1);
 
-  
   --message-user-radius: 22px;
   --message-user-desktop-max: min(720px, 74%);
   --message-user-mobile-max: 88%;
@@ -181,7 +179,6 @@
   --shadow-menu: 0 18px 60px rgba(0, 0, 0, 0.48);
   --shadow-prompt: 0 8px 26px rgba(0, 0, 0, 0.34);
 
-  
   --message-user-radius: 22px;
   --message-user-desktop-max: min(720px, 74%);
   --message-user-mobile-max: 88%;

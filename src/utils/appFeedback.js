@@ -9,10 +9,10 @@ export const FEEDBACK_CHANNEL = Object.freeze({
 export function shouldUseMobileFeedbackChannel(info = {}) {
   return Boolean(
     info.isNativeRuntime ||
-      info.isNativeApp ||
-      info.isAndroidApp ||
-      info.isIosApp ||
-      info.isMobileBrowser
+    info.isNativeApp ||
+    info.isAndroidApp ||
+    info.isIosApp ||
+    info.isMobileBrowser
   );
 }
 

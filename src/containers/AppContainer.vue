@@ -14,7 +14,8 @@ import {useAppContext} from "@/composables/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
 
 const {appInfo} = useAppContext();
-const {platformInfo, shouldUseMobileLayout, isMobileBrowser} = useRuntimeModeFlags();
+const {platformInfo, shouldUseMobileLayout, isMobileBrowser} =
+  useRuntimeModeFlags();
 const platformName = computed(
   () => platformInfo.value.env || appInfo?.platform || "web"
 );

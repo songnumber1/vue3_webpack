@@ -164,7 +164,8 @@ export function useViewportGuard(options = {}) {
       viewportWidth.value <= systemSettingsStore.mobileBreakpoint
   );
   function apply() {
-    if (typeof window === "undefined" || typeof document === "undefined") return;
+    if (typeof window === "undefined" || typeof document === "undefined")
+      return;
     const size = getViewportSize();
     viewportHeight.value = size.height;
     viewportWidth.value = size.width;

@@ -43,7 +43,8 @@ function getBrowserVersion(ua, browserName) {
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
   if (browserName === "samsung-internet")
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
-  if (browserName === "firefox") return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
+  if (browserName === "firefox")
+    return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
 
   return "";
 }
@@ -136,10 +137,18 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAccess = !isIos && !isUnsupportedBrowser;
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
-  const visualWidth = typeof window === "undefined" ? 0 : Math.round(window.visualViewport?.width || 0);
-  const compactWidthCandidates = [visualWidth, width].filter((value) => Number.isFinite(value) && value > 0);
-  const compactWidth = compactWidthCandidates.length ? Math.min(...compactWidthCandidates) : 0;
-  const isCompactViewport = compactWidth > 0 && compactWidth <= MOBILE_BREAKPOINT_PX;
+  const visualWidth =
+    typeof window === "undefined"
+      ? 0
+      : Math.round(window.visualViewport?.width || 0);
+  const compactWidthCandidates = [visualWidth, width].filter(
+    (value) => Number.isFinite(value) && value > 0
+  );
+  const compactWidth = compactWidthCandidates.length
+    ? Math.min(...compactWidthCandidates)
+    : 0;
+  const isCompactViewport =
+    compactWidth > 0 && compactWidth <= MOBILE_BREAKPOINT_PX;
   const isNativeRuntime = isNativeApp;
 
   return {

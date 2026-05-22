@@ -25,12 +25,13 @@ export function useRuntimeModeFlags() {
   const platformInfo = computed(() => platformStore.info || {});
   const isCompactViewport = computed(() =>
     Boolean(
-      width.value <= systemSettingsStore.mobileBreakpoint ||
-        hasBodyMobileMode()
+      width.value <= systemSettingsStore.mobileBreakpoint || hasBodyMobileMode()
     )
   );
   const isNativeRuntime = computed(() =>
-    Boolean(platformInfo.value.isNativeRuntime || platformInfo.value.isNativeApp)
+    Boolean(
+      platformInfo.value.isNativeRuntime || platformInfo.value.isNativeApp
+    )
   );
   const isAndroidApp = computed(() => Boolean(platformInfo.value.isAndroidApp));
   const isMobileBrowser = computed(() =>
@@ -39,9 +40,9 @@ export function useRuntimeModeFlags() {
   const shouldUseMobileLayout = computed(() =>
     Boolean(
       isCompactViewport.value ||
-        isAndroidApp.value ||
-        platformInfo.value.isIosApp ||
-        isMobileBrowser.value
+      isAndroidApp.value ||
+      platformInfo.value.isIosApp ||
+      isMobileBrowser.value
     )
   );
 

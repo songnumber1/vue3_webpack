@@ -1,12 +1,8 @@
-
-
 :root {
-  
   --font-family:
     "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 
-  
   --font-size-2xs: 11px;
   --font-size-xs: 12px;
   --font-size-sm: 13px;
@@ -36,7 +32,6 @@
   --line-height-body: 1.55;
   --line-height-relaxed: 1.65;
 
-  
   --text-size-caption: var(--font-size-xs);
   --text-size-helper: var(--font-size-sm);
   --text-size-body: var(--font-size-md);
@@ -50,7 +45,6 @@
   --text-size-icon: var(--font-size-xl);
   --text-size-icon-lg: var(--font-size-2xl);
 
-  
   --control-size-xs: 28px;
   --control-size-sm: 32px;
   --control-size-md: 36px;

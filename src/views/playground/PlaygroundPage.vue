@@ -109,7 +109,8 @@
           </button>
         </div>
         <div class="playground-log-list">
-          <strong>{{ t("playground.popup.lastResult") }}</strong><br />
+          <strong>{{ t("playground.popup.lastResult") }}</strong
+          ><br />
           {{ popupResult }}
         </div>
       </article>
@@ -121,12 +122,17 @@
         <h2>{{ t("playground.clipboard.title") }}</h2>
         <p>{{ t("playground.clipboard.description") }}</p>
         <div class="playground-actions">
-          <button class="playground-button" type="button" @click="copySampleText">
+          <button
+            class="playground-button"
+            type="button"
+            @click="copySampleText"
+          >
             {{ t("playground.clipboard.copyButton") }}
           </button>
         </div>
         <div class="playground-log-list">
-          <strong>{{ t("playground.clipboard.feedbackTarget") }}</strong><br />
+          <strong>{{ t("playground.clipboard.feedbackTarget") }}</strong
+          ><br />
           {{ clipboardFeedbackTarget }}
         </div>
       </article>
@@ -147,12 +153,17 @@
           />
         </label>
         <div class="playground-actions">
-          <button class="playground-button" type="button" @click="showToastMessage">
+          <button
+            class="playground-button"
+            type="button"
+            @click="showToastMessage"
+          >
             {{ t("playground.toast.showButton") }}
           </button>
         </div>
         <div class="playground-log-list">
-          <strong>{{ t("playground.toast.feedbackTarget") }}</strong><br />
+          <strong>{{ t("playground.toast.feedbackTarget") }}</strong
+          ><br />
           {{ toastFeedbackTarget }}
         </div>
       </article>
@@ -179,9 +190,15 @@
         <h2>{{ t("playground.navigation.title") }}</h2>
         <p>{{ t("playground.navigation.description") }}</p>
         <div class="playground-route-row">
-          <RouterLink to="/guide">{{ t("playground.navigation.guideRoute") }}</RouterLink>
-          <RouterLink to="/shared/sample-share-id">{{ t("playground.navigation.sharedRoute") }}</RouterLink>
-          <RouterLink to="/chat/1">{{ t("playground.navigation.chatRoute") }}</RouterLink>
+          <RouterLink to="/guide">{{
+            t("playground.navigation.guideRoute")
+          }}</RouterLink>
+          <RouterLink to="/shared/sample-share-id">{{
+            t("playground.navigation.sharedRoute")
+          }}</RouterLink>
+          <RouterLink to="/chat/1">{{
+            t("playground.navigation.chatRoute")
+          }}</RouterLink>
         </div>
       </article>
     </section>
@@ -243,7 +260,11 @@
               )
             "
           >
-            {{ activePopup.type === "confirm" ? t("common.confirm") : t("common.close") }}
+            {{
+              activePopup.type === "confirm"
+                ? t("common.confirm")
+                : t("common.close")
+            }}
           </button>
         </div>
       </div>
@@ -276,7 +297,10 @@ import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useAppContext} from "@/composables/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/useRuntimeModeFlags";
-import {copyClipboardByPlatform, showToastByPlatform} from "@/services/platformBridge";
+import {
+  copyClipboardByPlatform,
+  showToastByPlatform,
+} from "@/services/platformBridge";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";

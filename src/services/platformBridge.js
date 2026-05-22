@@ -63,7 +63,9 @@ export async function copyClipboardByPlatform(text) {
     });
 
     if (response?.isSuccess !== false) {
-      await showToastByPlatform(toastMessage, {title: t("clipboardNote.title")});
+      await showToastByPlatform(toastMessage, {
+        title: t("clipboardNote.title"),
+      });
     }
 
     return response;
@@ -92,10 +94,7 @@ export async function openNativeFilePicker(options = {}) {
 }
 export async function getPushToken() {
   if (!isAndroidApp())
-    return webSuccess(
-      {token: ""},
-      t("platformBridge.browserFcmUnavailable")
-    );
+    return webSuccess({token: ""}, t("platformBridge.browserFcmUnavailable"));
   const res = await callNative("GET_PUSH_TOKEN", {});
   getStore().setPushToken(res.data?.token);
 

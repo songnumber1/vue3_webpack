@@ -58,17 +58,21 @@ export const messages = {
       titles: {
         adjustNothing: "가상 키보드 테스트 영역 · adjustNothing",
         adjustPan: "가상 키보드 테스트 영역 · adjustPan",
-        adjustResize: "가상 키보드 테스트 영역 · adjustResize"
+        adjustResize: "가상 키보드 테스트 영역 · adjustResize",
       },
       descriptions: {
-        adjustNothing: "현재 모드는 화면 보정 없이 가상 키보드 영역만 덮어서 보여줍니다.",
-        adjustPan: "현재 모드는 CSS resize 없이 화면 내용을 위로 밀어 올리는 pan 동작을 흉내냅니다.",
-        adjustResize: "현재 모드는 CSS 키보드 높이 변수를 적용해 입력 영역과 컨텐츠 하단 여백을 조정합니다."
-      }
+        adjustNothing:
+          "현재 모드는 화면 보정 없이 가상 키보드 영역만 덮어서 보여줍니다.",
+        adjustPan:
+          "현재 모드는 CSS resize 없이 화면 내용을 위로 밀어 올리는 pan 동작을 흉내냅니다.",
+        adjustResize:
+          "현재 모드는 CSS 키보드 높이 변수를 적용해 입력 영역과 컨텐츠 하단 여백을 조정합니다.",
+      },
     },
     platformBridge: {
       browserHandled: "브라우저에서 처리되었습니다.",
-      browserFileInputRequired: "브라우저에서는 input[type=file]을 사용해야 합니다.",
+      browserFileInputRequired:
+        "브라우저에서는 input[type=file]을 사용해야 합니다.",
       browserFcmUnavailable:
         "브라우저에서는 FCM 토큰을 Native Bridge에서 조회하지 않습니다.",
       shareUnsupported: "현재 브라우저에서 공유 기능을 지원하지 않습니다.",
@@ -177,7 +181,8 @@ export const messages = {
     systemSettings: {
       eyebrow: "시스템",
       title: "앱 동작 설정",
-      description: "화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.",
+      description:
+        "화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.",
       close: "닫기",
       apply: "적용",
       groups: {
@@ -186,30 +191,97 @@ export const messages = {
         bottomSheet: "Bottom Sheet",
         chat: "채팅방",
         action: "사용자 액션",
-        menu: "사용자 메뉴"
+        menu: "사용자 메뉴",
       },
       items: {
-        useRealApi: {label: "실제 API 통신", description: "끄면 프론트엔드 mock 데이터를 사용합니다."},
-        mobileBreakpoint: {label: "모바일 반응형", description: "모바일 모드로 전환할 기준 너비(px)입니다."},
-        keyboardMode: {label: "키보드 모드", description: "메인/채팅 화면에서 키보드가 올라올 때 적용할 보정 정책입니다."},
-        useVirtualKeyboard: {label: "키보드 보정 사용", description: "adjustResize 모드에서 visualViewport 기반 CSS 보정 로직을 사용합니다."},
-        showVirtualKeyboardDebug: {label: "가상 키보드 디버그", description: "모바일 모드에서만 테스트용 가상 키보드 버튼을 노출합니다."},
-        virtualKeyboardHeight: {label: "가상 키보드 높이", description: "디버그용 가상 키보드 영역 높이(px)입니다. 기본값은 Android Chrome 확인용 340px입니다."},
-        useMicrophone: {label: "마이크 사용", description: "프롬프트 입력 영역의 음성 버튼 노출 여부입니다."},
-        showMobileApiProgress: {label: "API 진행 표시", description: "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다."},
-        bottomSheetMinHeight: {label: "최소 높이", description: "모바일 Bottom Sheet가 접혔을 때 유지할 최소 높이(px)입니다."},
-        bottomSheetMaxHeight: {label: "최대 높이", description: "모바일 Bottom Sheet가 확장될 때 넘지 않을 최대 높이(px)입니다."},
-        autoScrollOnAnswer: {label: "자동 스크롤", description: "답변 시 스크롤 자동 이동 여부입니다."},
-        showGuideButton: {label: "가이드 버튼 화면 출력", description: "헤더와 모바일 설정의 가이드 진입 버튼을 제어합니다."},
-        showThemeButton: {label: "테마 버튼 출력", description: "테마 전환 버튼 노출 여부입니다."},
-        showSwaggerButton: {label: "Swagger 버튼 출력", description: "Swagger 문서 버튼 노출 여부입니다."},
-        showNoticeMenu: {label: "공지 사항 출력", description: "사용자 메뉴와 모바일 설정의 공지 사항 노출 여부입니다."},
-        showPrivacyMenu: {label: "개인정보 처리 방침 출력", description: "개인정보 처리 방침 메뉴 노출 여부입니다."},
-        showTermsMenu: {label: "이용 약관 출력", description: "이용 약관 메뉴 노출 여부입니다."},
-        showPersonalizationMenu: {label: "개인화 출력", description: "기존 개인화 메뉴 노출 여부입니다."},
-        showPlaygroundMenu: {label: "플레이그라운드 출력", description: "Playground 진입 버튼과 메뉴 노출 여부입니다."},
-        showLogoutButton: {label: "로그아웃 버튼 출력", description: "로그아웃 버튼 노출 여부입니다."}
-      }
+        useRealApi: {
+          label: "실제 API 통신",
+          description: "끄면 프론트엔드 mock 데이터를 사용합니다.",
+        },
+        mobileBreakpoint: {
+          label: "모바일 반응형",
+          description: "모바일 모드로 전환할 기준 너비(px)입니다.",
+        },
+        keyboardMode: {
+          label: "키보드 모드",
+          description:
+            "메인/채팅 화면에서 키보드가 올라올 때 적용할 보정 정책입니다.",
+        },
+        useVirtualKeyboard: {
+          label: "키보드 보정 사용",
+          description:
+            "adjustResize 모드에서 visualViewport 기반 CSS 보정 로직을 사용합니다.",
+        },
+        showVirtualKeyboardDebug: {
+          label: "가상 키보드 디버그",
+          description:
+            "모바일 모드에서만 테스트용 가상 키보드 버튼을 노출합니다.",
+        },
+        virtualKeyboardHeight: {
+          label: "가상 키보드 높이",
+          description:
+            "디버그용 가상 키보드 영역 높이(px)입니다. 기본값은 Android Chrome 확인용 340px입니다.",
+        },
+        useMicrophone: {
+          label: "마이크 사용",
+          description: "프롬프트 입력 영역의 음성 버튼 노출 여부입니다.",
+        },
+        showMobileApiProgress: {
+          label: "API 진행 표시",
+          description:
+            "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다.",
+        },
+        bottomSheetMinHeight: {
+          label: "최소 높이",
+          description:
+            "모바일 Bottom Sheet가 접혔을 때 유지할 최소 높이(px)입니다.",
+        },
+        bottomSheetMaxHeight: {
+          label: "최대 높이",
+          description:
+            "모바일 Bottom Sheet가 확장될 때 넘지 않을 최대 높이(px)입니다.",
+        },
+        autoScrollOnAnswer: {
+          label: "자동 스크롤",
+          description: "답변 시 스크롤 자동 이동 여부입니다.",
+        },
+        showGuideButton: {
+          label: "가이드 버튼 화면 출력",
+          description: "헤더와 모바일 설정의 가이드 진입 버튼을 제어합니다.",
+        },
+        showThemeButton: {
+          label: "테마 버튼 출력",
+          description: "테마 전환 버튼 노출 여부입니다.",
+        },
+        showSwaggerButton: {
+          label: "Swagger 버튼 출력",
+          description: "Swagger 문서 버튼 노출 여부입니다.",
+        },
+        showNoticeMenu: {
+          label: "공지 사항 출력",
+          description: "사용자 메뉴와 모바일 설정의 공지 사항 노출 여부입니다.",
+        },
+        showPrivacyMenu: {
+          label: "개인정보 처리 방침 출력",
+          description: "개인정보 처리 방침 메뉴 노출 여부입니다.",
+        },
+        showTermsMenu: {
+          label: "이용 약관 출력",
+          description: "이용 약관 메뉴 노출 여부입니다.",
+        },
+        showPersonalizationMenu: {
+          label: "개인화 출력",
+          description: "기존 개인화 메뉴 노출 여부입니다.",
+        },
+        showPlaygroundMenu: {
+          label: "플레이그라운드 출력",
+          description: "Playground 진입 버튼과 메뉴 노출 여부입니다.",
+        },
+        showLogoutButton: {
+          label: "로그아웃 버튼 출력",
+          description: "로그아웃 버튼 노출 여부입니다.",
+        },
+      },
     },
     feedback: {
       like: "좋아요",
@@ -567,13 +639,16 @@ export const messages = {
       titles: {
         adjustNothing: "Virtual keyboard test area · adjustNothing",
         adjustPan: "Virtual keyboard test area · adjustPan",
-        adjustResize: "Virtual keyboard test area · adjustResize"
+        adjustResize: "Virtual keyboard test area · adjustResize",
       },
       descriptions: {
-        adjustNothing: "This mode only overlays the virtual keyboard area without screen correction.",
-        adjustPan: "This mode simulates pan behavior by moving content toward the focused input without CSS resize correction.",
-        adjustResize: "This mode applies CSS keyboard height variables to adjust the input area and bottom content spacing."
-      }
+        adjustNothing:
+          "This mode only overlays the virtual keyboard area without screen correction.",
+        adjustPan:
+          "This mode simulates pan behavior by moving content toward the focused input without CSS resize correction.",
+        adjustResize:
+          "This mode applies CSS keyboard height variables to adjust the input area and bottom content spacing.",
+      },
     },
     platformBridge: {
       browserHandled: "Handled in the browser.",
@@ -686,7 +761,8 @@ export const messages = {
     systemSettings: {
       eyebrow: "System",
       title: "App behavior settings",
-      description: "Manage visible screens, API usage, and mobile thresholds in one place. Changes are saved when you apply them and affect the next screen behavior immediately.",
+      description:
+        "Manage visible screens, API usage, and mobile thresholds in one place. Changes are saved when you apply them and affect the next screen behavior immediately.",
       close: "Close",
       apply: "Apply",
       groups: {
@@ -695,30 +771,102 @@ export const messages = {
         bottomSheet: "Bottom Sheet",
         chat: "Chat",
         action: "User actions",
-        menu: "User menu"
+        menu: "User menu",
       },
       items: {
-        useRealApi: {label: "Use real API", description: "Turn this off to use frontend mock data."},
-        mobileBreakpoint: {label: "Mobile breakpoint", description: "Viewport width in px used to switch to mobile mode."},
-        keyboardMode: {label: "Keyboard mode", description: "Correction policy applied when the keyboard opens on main/chat screens."},
-        useVirtualKeyboard: {label: "Use keyboard correction", description: "Use visualViewport-based CSS correction in adjustResize mode."},
-        showVirtualKeyboardDebug: {label: "Virtual keyboard debug", description: "Show the test virtual keyboard button only in mobile mode."},
-        virtualKeyboardHeight: {label: "Virtual keyboard height", description: "Height in px for the debug virtual keyboard area. The default is 340px for Android Chrome checks."},
-        useMicrophone: {label: "Use microphone", description: "Controls whether the voice button is shown in the prompt input."},
-        showMobileApiProgress: {label: "Show API progress", description: "Use a mobile full-screen progress blocker during API calls."},
-        bottomSheetMinHeight: {label: "Minimum height", description: "Minimum height in px kept when the mobile bottom sheet is collapsed."},
-        bottomSheetMaxHeight: {label: "Maximum height", description: "Maximum height in px when the mobile bottom sheet expands."},
-        autoScrollOnAnswer: {label: "Auto scroll", description: "Automatically scroll to the bottom while answers arrive."},
-        showGuideButton: {label: "Show guide button", description: "Controls guide entry buttons in the header and mobile settings."},
-        showThemeButton: {label: "Show theme button", description: "Controls whether the theme switch button is shown."},
-        showSwaggerButton: {label: "Show Swagger button", description: "Controls whether the Swagger documentation button is shown."},
-        showNoticeMenu: {label: "Show notices", description: "Controls notice menu visibility in user menu and mobile settings."},
-        showPrivacyMenu: {label: "Show privacy policy", description: "Controls privacy policy menu visibility."},
-        showTermsMenu: {label: "Show terms", description: "Controls terms menu visibility."},
-        showPersonalizationMenu: {label: "Show personalization", description: "Controls existing personalization menu visibility."},
-        showPlaygroundMenu: {label: "Show Playground", description: "Controls Playground entry buttons and menu visibility."},
-        showLogoutButton: {label: "Show logout button", description: "Controls whether the logout button is shown."}
-      }
+        useRealApi: {
+          label: "Use real API",
+          description: "Turn this off to use frontend mock data.",
+        },
+        mobileBreakpoint: {
+          label: "Mobile breakpoint",
+          description: "Viewport width in px used to switch to mobile mode.",
+        },
+        keyboardMode: {
+          label: "Keyboard mode",
+          description:
+            "Correction policy applied when the keyboard opens on main/chat screens.",
+        },
+        useVirtualKeyboard: {
+          label: "Use keyboard correction",
+          description:
+            "Use visualViewport-based CSS correction in adjustResize mode.",
+        },
+        showVirtualKeyboardDebug: {
+          label: "Virtual keyboard debug",
+          description:
+            "Show the test virtual keyboard button only in mobile mode.",
+        },
+        virtualKeyboardHeight: {
+          label: "Virtual keyboard height",
+          description:
+            "Height in px for the debug virtual keyboard area. The default is 340px for Android Chrome checks.",
+        },
+        useMicrophone: {
+          label: "Use microphone",
+          description:
+            "Controls whether the voice button is shown in the prompt input.",
+        },
+        showMobileApiProgress: {
+          label: "Show API progress",
+          description:
+            "Use a mobile full-screen progress blocker during API calls.",
+        },
+        bottomSheetMinHeight: {
+          label: "Minimum height",
+          description:
+            "Minimum height in px kept when the mobile bottom sheet is collapsed.",
+        },
+        bottomSheetMaxHeight: {
+          label: "Maximum height",
+          description:
+            "Maximum height in px when the mobile bottom sheet expands.",
+        },
+        autoScrollOnAnswer: {
+          label: "Auto scroll",
+          description:
+            "Automatically scroll to the bottom while answers arrive.",
+        },
+        showGuideButton: {
+          label: "Show guide button",
+          description:
+            "Controls guide entry buttons in the header and mobile settings.",
+        },
+        showThemeButton: {
+          label: "Show theme button",
+          description: "Controls whether the theme switch button is shown.",
+        },
+        showSwaggerButton: {
+          label: "Show Swagger button",
+          description:
+            "Controls whether the Swagger documentation button is shown.",
+        },
+        showNoticeMenu: {
+          label: "Show notices",
+          description:
+            "Controls notice menu visibility in user menu and mobile settings.",
+        },
+        showPrivacyMenu: {
+          label: "Show privacy policy",
+          description: "Controls privacy policy menu visibility.",
+        },
+        showTermsMenu: {
+          label: "Show terms",
+          description: "Controls terms menu visibility.",
+        },
+        showPersonalizationMenu: {
+          label: "Show personalization",
+          description: "Controls existing personalization menu visibility.",
+        },
+        showPlaygroundMenu: {
+          label: "Show Playground",
+          description: "Controls Playground entry buttons and menu visibility.",
+        },
+        showLogoutButton: {
+          label: "Show logout button",
+          description: "Controls whether the logout button is shown.",
+        },
+      },
     },
     feedback: {
       like: "Like",

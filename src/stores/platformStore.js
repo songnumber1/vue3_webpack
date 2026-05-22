@@ -15,7 +15,8 @@ export const usePlatformStore = defineStore("platform", {
   getters: {
     isAccess: (state) => state.info.isAccess,
     isCompactViewport: (state) => state.info.isCompactViewport,
-    isNativeRuntime: (state) => state.info.isNativeRuntime || state.info.isNativeApp,
+    isNativeRuntime: (state) =>
+      state.info.isNativeRuntime || state.info.isNativeApp,
     isAndroidApp: (state) => state.info.isAndroidApp,
     isMobileBrowser: (state) => state.info.isMobileBrowser,
     isIos: (state) => state.info.isIos,

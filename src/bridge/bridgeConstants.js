@@ -9,4 +9,3 @@ export const BRIDGE_CATEGORY = {
   JS_TO_ANDROID: "js-to-android",
   ANDROID_TO_JS: "android-to-js",
 };
-

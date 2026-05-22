@@ -1,5 +1,3 @@
-
-
 body.desktop-mode .chat-container-root--mode-main .empty-center {
   width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
   max-width: var(--layout-prompt-width, 820px) !important;

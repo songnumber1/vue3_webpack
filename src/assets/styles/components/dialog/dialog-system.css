@@ -1,5 +1,3 @@
-
-
 :root {
   --dialog-radius: 5px;
   --dialog-sheet-radius: 5px 5px 0 0;
@@ -18,7 +16,6 @@
   --dialog-option-radius: 5px;
   --dialog-close-radius: 5px;
 
-  
   --dialog-font-family: inherit;
   --dialog-title-font-size: 15px;
   --dialog-title-font-weight: 800;

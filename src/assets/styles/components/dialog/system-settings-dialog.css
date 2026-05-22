@@ -250,11 +250,15 @@ body.mobile-mode .responsive-panel--system-settings .system-settings-scroll {
   -webkit-overflow-scrolling: touch;
 }
 
-body.desktop-mode .responsive-overlay--desktop .responsive-panel--system-settings {
+body.desktop-mode
+  .responsive-overlay--desktop
+  .responsive-panel--system-settings {
   height: min(760px, calc(100vh - 56px));
 }
 
-body.mobile-mode .responsive-overlay--mobile-dialog .responsive-panel--system-settings {
+body.mobile-mode
+  .responsive-overlay--mobile-dialog
+  .responsive-panel--system-settings {
   height: min(760px, calc(var(--app-height, 100vh) - 48px));
   max-height: calc(var(--app-height, 100vh) - 48px);
 }
@@ -276,7 +280,9 @@ body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system {
   gap: 0;
 }
 
-body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-view {
+body.mobile-mode
+  .mobile-settings-detail.mobile-settings-detail--system
+  .system-settings-view {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
@@ -285,7 +291,9 @@ body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-
   overflow: hidden;
 }
 
-body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-scroll {
+body.mobile-mode
+  .mobile-settings-detail.mobile-settings-detail--system
+  .system-settings-scroll {
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
@@ -294,7 +302,9 @@ body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-
   padding: 18px 26px 20px;
 }
 
-body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-footer {
+body.mobile-mode
+  .mobile-settings-detail.mobile-settings-detail--system
+  .system-settings-footer {
   position: sticky;
   bottom: 0;
   flex: 0 0 auto;
@@ -326,13 +336,21 @@ body.mobile-mode .system-settings-footer .system-settings-apply-button {
 }
 
 body.desktop-mode .system-settings-footer .playground-button--primary:hover,
-body.desktop-mode .system-settings-footer .playground-button--primary:focus-visible,
+body.desktop-mode
+  .system-settings-footer
+  .playground-button--primary:focus-visible,
 body.desktop-mode .system-settings-footer .system-settings-apply-button:hover,
-body.desktop-mode .system-settings-footer .system-settings-apply-button:focus-visible,
+body.desktop-mode
+  .system-settings-footer
+  .system-settings-apply-button:focus-visible,
 body.mobile-mode .system-settings-footer .playground-button--primary:hover,
-body.mobile-mode .system-settings-footer .playground-button--primary:focus-visible,
+body.mobile-mode
+  .system-settings-footer
+  .playground-button--primary:focus-visible,
 body.mobile-mode .system-settings-footer .system-settings-apply-button:hover,
-body.mobile-mode .system-settings-footer .system-settings-apply-button:focus-visible {
+body.mobile-mode
+  .system-settings-footer
+  .system-settings-apply-button:focus-visible {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #fff;

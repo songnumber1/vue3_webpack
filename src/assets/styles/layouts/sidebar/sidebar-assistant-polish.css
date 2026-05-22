@@ -1,4 +1,3 @@
-
 body.desktop-mode .desktop-sidebar .sidebar-top {
   position: relative;
 }
@@ -654,7 +653,6 @@ body.mobile-mode .mobile-drawer-backdrop {
   border-radius: var(--mobile-root-radius);
 }
 
-
 body.mobile-mode .prompt-wrap,
 body.mobile-mode .prompt-wrap--floating,
 body.mobile-mode .mobile-chat-prompt,
@@ -695,7 +693,6 @@ body.mobile-mode .desktop-center-prompt .prompt-box--gemini {
   background: var(--prompt-bg);
   background-clip: padding-box;
 }
-
 
 .prompt-model-trigger,
 body.desktop-mode .prompt-model-trigger,

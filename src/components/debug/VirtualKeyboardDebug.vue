@@ -56,11 +56,15 @@ const panelStyle = computed(() => ({
 }));
 
 const modeTitle = computed(() =>
-  t(`virtualKeyboardDebug.titles.${keyboardMode.value || KEYBOARD_MODES.adjustResize}`)
+  t(
+    `virtualKeyboardDebug.titles.${keyboardMode.value || KEYBOARD_MODES.adjustResize}`
+  )
 );
 
 const modeDescription = computed(() =>
-  t(`virtualKeyboardDebug.descriptions.${keyboardMode.value || KEYBOARD_MODES.adjustResize}`)
+  t(
+    `virtualKeyboardDebug.descriptions.${keyboardMode.value || KEYBOARD_MODES.adjustResize}`
+  )
 );
 
 function getPanelHeight() {

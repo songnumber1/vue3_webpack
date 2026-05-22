@@ -1,5 +1,3 @@
-
-
 .suggestion-chip,
 body.mobile-mode .suggestion-chip {
   border-radius: var(--dialog-radius);
@@ -50,7 +48,7 @@ body.mobile-mode .suggestion-chip {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #ffffff;
-} 
+}
 body.mobile-mode .mobile-topbar .menu-toggle,
 body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.mobile-mode .mobile-topbar .menu-toggle,

@@ -122,10 +122,18 @@ const groups = computed(() => [
     title: t("systemSettings.groups.mobile"),
     items: [
       settingItem("mobileBreakpoint", {type: "number"}),
-      settingItem("keyboardMode", {type: "select", options: KEYBOARD_MODE_OPTIONS}),
+      settingItem("keyboardMode", {
+        type: "select",
+        options: KEYBOARD_MODE_OPTIONS,
+      }),
       settingItem("useVirtualKeyboard"),
       settingItem("showVirtualKeyboardDebug"),
-      settingItem("virtualKeyboardHeight", {type: "number", min: 180, max: 600, step: 1}),
+      settingItem("virtualKeyboardHeight", {
+        type: "number",
+        min: 180,
+        max: 600,
+        step: 1,
+      }),
       settingItem("useMicrophone"),
       settingItem("showMobileApiProgress"),
     ],
@@ -134,8 +142,18 @@ const groups = computed(() => [
     kicker: "BOTTOM SHEET",
     title: t("systemSettings.groups.bottomSheet"),
     items: [
-      settingItem("bottomSheetMinHeight", {type: "number", min: 180, max: 720, step: 1}),
-      settingItem("bottomSheetMaxHeight", {type: "number", min: 320, max: 960, step: 1}),
+      settingItem("bottomSheetMinHeight", {
+        type: "number",
+        min: 180,
+        max: 720,
+        step: 1,
+      }),
+      settingItem("bottomSheetMaxHeight", {
+        type: "number",
+        min: 320,
+        max: 960,
+        step: 1,
+      }),
     ],
   },
   {
