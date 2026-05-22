@@ -11,7 +11,10 @@
     "serve:local": "vue-cli-service serve --mode local",
     "serve:dev": "vue-cli-service serve --mode dev",
     "build:dev": "vue-cli-service build --mode dev",
-    "build:prod": "vue-cli-service build --mode prod"
+    "build:prod": "vue-cli-service build --mode prod",
+    "chart:graph": "madge --image graph.png src",
+    "chart:circular": "madge --circular src",
+    "chart:orphans": "madge --orphans src"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
@@ -44,6 +47,7 @@
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.33.0",
+    "madge": "^8.0.0",
     "prettier": "^3.3.3"
   }
 }

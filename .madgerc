@@ -1,0 +1,10 @@
+{
+  "fileExtensions": ["js", "ts", "vue"],
+  "detectiveOptions": {
+    "es6": {
+      "mixedImports": true
+    }
+  },
+  "dependencyFilter": "^[^node_modules]",
+  "webpackConfig": "./node_modules/@vue/cli-service/webpack.config.js"
+}
