@@ -11,4 +11,18 @@ module.exports = {
     parser: "@babel/eslint-parser",
     requireConfigFile: false,
   },
+  rules: {
+    "no-restricted-imports": [
+      "error",
+      {
+        paths: [
+          {
+            name: "@/assets/styles/components/debug/virtual-keyboard-debug.css",
+            message:
+              "Debug CSS must stay out of the production index bundle. Load it only through the development-only dynamic import in src/main.js.",
+          },
+        ],
+      },
+    ],
+  },
 };

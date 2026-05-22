@@ -23,16 +23,17 @@ assert(
   'viewport guard must keep visualViewport and keyboard focus tracking'
 );
 assert(
-  mobileState.includes('isMobilePlatform') &&
+  mobileState.includes('shouldUseMobilePlatformLayout') &&
     mobileState.includes('platformInfo.value') &&
     !mobileState.includes('querySelector'),
   'chat mobile state should derive mobile mode from media/platform state without DOM class probing'
 );
 assert(
   viewportUtils.includes('getMobileBrowserFamily') &&
-    viewportUtils.includes('SamsungBrowser') &&
-    viewportUtils.includes('Firefox'),
-  'viewport utils must preserve mobile browser family detection'
+    viewportUtils.includes('Chrome|CriOS|Chromium') &&
+    !viewportUtils.includes('SamsungBrowser') &&
+    !viewportUtils.includes('Firefox'),
+  'viewport utils should keep Chrome/WebView-oriented mobile browser detection without unsupported browser branches'
 );
 assert(
   promptComposer.includes('orientationchange') &&

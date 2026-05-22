@@ -1,3 +1,4 @@
+require('./freeze-css-policy.cjs');
 require('./bottom-sheet-structure.cjs');
 require('./bootstrap-runtime.cjs');
 require('./bridge-mock.cjs');

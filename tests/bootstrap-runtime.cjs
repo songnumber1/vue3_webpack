@@ -26,7 +26,7 @@ assert(
   'chat container/runtime should still compose submit logic and message state'
 );
 assert(
-  chatSubmit.includes('isGenerating') && chatSubmit.includes('streamText'),
+  chatSubmit.includes('isGenerating') && chatSubmit.includes('streamGeneration'),
   'chat submit/runtime should preserve guarded streaming flow'
 );
 

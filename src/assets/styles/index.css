@@ -15,8 +15,8 @@
 
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";
+@import "./layouts/sidebar/mobile-drawer-footer-stability.css";
 @import "./components/attachment/attachment-preview-tokens.css";
-@import "./components/debug/virtual-keyboard-debug.css";
 
 @import "./states/reasoning/reasoning.css";
 @import "./mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
@@ -32,3 +32,7 @@
 @import "./components/dialog/dialog-system.css";
 
 @import "./foundations/typography/responsive-typography.css";
+@import "./components/dialog/dialog-control-normalization.css";
+@import "./components/dialog/dialog-viewport-policy.css";
+@import "./components/dialog/system-settings-dialog.css";
+@import "./components/mobile/mobile-api-progress.css";

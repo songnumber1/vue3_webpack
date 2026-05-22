@@ -25,7 +25,7 @@ const expectedFiles = [
 
 expectedFiles.forEach((file) => assert(exists(file), `${file} is missing`));
 
-const sizing = read('src/composables/useBottomSheetSizing.js');
+const sizing = read('src/composables/bottom-sheet/useBottomSheetSizing.js');
 const drag = read('src/composables/bottom-sheet/useBottomSheetDrag.js');
 const snap = read('src/composables/bottom-sheet/useBottomSheetSnap.js');
 const viewport = read('src/composables/bottom-sheet/useBottomSheetViewport.js');
@@ -62,8 +62,8 @@ assert(
 assert(
   viewport.includes('window.visualViewport') &&
     viewport.includes('BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS') &&
-    viewport.includes('contentFirefox'),
-  'viewport module must preserve visualViewport, delayed refresh, and Firefox ratio logic'
+    !viewport.includes('contentFirefox'),
+  'viewport module must preserve visualViewport and delayed refresh without Firefox-specific ratio logic'
 );
 assert(
   safeArea.includes('getSafeAreaBottom'),
