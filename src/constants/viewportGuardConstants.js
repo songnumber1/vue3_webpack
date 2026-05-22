@@ -1,8 +1,6 @@
 export const VIEWPORT_BROWSER_CLASSES = Object.freeze([
   "mobile-browser-default",
   "mobile-browser-chrome",
-  "mobile-browser-samsung",
-  "mobile-browser-firefox",
 ]);
 
 export const VIEWPORT_GUARD_EVENTS = Object.freeze([

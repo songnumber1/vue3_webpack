@@ -7,7 +7,7 @@ export const messages = {
     app: {
       unsupportedTitle: "지원하지 않는 접속 환경입니다.",
       unsupportedMessage:
-        "iOS 앱, iOS Chrome, iOS Safari에서는 접속할 수 없습니다.",
+        "iOS, Samsung Browser, Firefox Android에서는 접속할 수 없습니다. Chrome 또는 Android WebView 환경을 사용해 주세요.",
     },
     common: {
       back: "뒤로",
@@ -516,7 +516,7 @@ export const messages = {
     app: {
       unsupportedTitle: "Unsupported access environment.",
       unsupportedMessage:
-        "iOS app, iOS Chrome, and iOS Safari are not supported.",
+        "iOS, Samsung Browser, and Firefox Android are not supported. Please use Chrome or Android WebView.",
     },
     common: {
       back: "Back",

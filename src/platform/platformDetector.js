@@ -6,6 +6,15 @@ import {
   hasExtensionRuntime,
 } from "@/core/config";
 import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+
+const UNSUPPORTED_MOBILE_BROWSERS = Object.freeze([
+  "samsung-internet",
+  "firefox",
+]);
+
+function isUnsupportedMobileBrowser({isMobileBrowser, browserName}) {
+  return isMobileBrowser && UNSUPPORTED_MOBILE_BROWSERS.includes(browserName);
+}
 function getNavigator() {
   return typeof window === "undefined" ? {} : window.navigator || {};
 }
@@ -21,6 +30,7 @@ function getBrowserName(ua) {
   if (/Edg\//i.test(ua)) return "edge";
   if (/OPR\//i.test(ua)) return "opera";
   if (/SamsungBrowser\//i.test(ua)) return "samsung-internet";
+  if (/Firefox|FxiOS\//i.test(ua)) return "firefox";
   if (/CriOS|Chrome\//i.test(ua)) return "chrome";
   if (/Safari\//i.test(ua)) return "safari";
 
@@ -33,6 +43,7 @@ function getBrowserVersion(ua, browserName) {
   if (browserName === "safari") return parseVersion(ua, /Version\/([\d.]+)/i);
   if (browserName === "samsung-internet")
     return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
+  if (browserName === "firefox") return parseVersion(ua, /(?:Firefox|FxiOS)\/([\d.]+)/i);
 
   return "";
 }
@@ -74,7 +85,7 @@ function getBridgeVersionFromBridge() {
  * @param {boolean} value.isAndroid - Android 환경 여부입니다.
  * @param {boolean} value.isMobileBrowser - 네이티브 앱이 아닌 모바일 브라우저 여부입니다.
  * @param {string} value.browserName - User-Agent로 판별한 브라우저 이름입니다.
- * @returns {boolean} Android Chrome 또는 Samsung Internet 모바일 브라우저이면 true를 반환합니다.
+ * @returns {boolean} 공식 지원 모바일 브라우저이면 true를 반환합니다.
  */
 function isSupportedMobileMicBrowser({
   isAndroid,
@@ -83,7 +94,7 @@ function isSupportedMobileMicBrowser({
 }) {
   // Android 모바일 브라우저가 아니면 PC와 동일하게 전송 버튼 fallback을 사용합니다.
   if (!isAndroid || !isMobileBrowser) return false;
-  return browserName === "chrome" || browserName === "samsung-internet";
+  return browserName === "chrome";
 }
 export function resolveDetailedPlatform(baseAppInfo = {}) {
   const nav = getNavigator();
@@ -113,7 +124,16 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isMobileBrowser,
     browserName,
   });
-  const isAccess = !isIos; // 현재 정책상 iOS 접근은 차단한다.
+  const isUnsupportedBrowser = isUnsupportedMobileBrowser({
+    isMobileBrowser,
+    browserName,
+  });
+  const unsupportedReason = isIos
+    ? "ios"
+    : isUnsupportedBrowser
+      ? "unsupported-mobile-browser"
+      : "";
+  const isAccess = !isIos && !isUnsupportedBrowser;
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
   const height = typeof window === "undefined" ? 0 : window.innerHeight;
   const visualWidth = typeof window === "undefined" ? 0 : Math.round(window.visualViewport?.width || 0);
@@ -133,6 +153,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     language: nav.language || "",
     languages: Array.from(nav.languages || []),
     isAccess,
+    unsupportedReason,
     isWindows,
     isAndroid,
     isIos,

@@ -7,7 +7,6 @@ import {
   MOBILE_BREAKPOINT_PX,
 } from "@/constants/uiTokens";
 import {
-  getMobileBrowserFamily,
   getViewportHeight as readViewportHeight,
   isMobileViewport as readIsMobileViewport,
 } from "@/utils/viewport";
@@ -142,10 +141,7 @@ export function createBottomSheetViewport(options) {
 
     const minimumSheetHeight = getMinimumSheetHeight();
     const contentHeight = getContentHeight();
-    const contentSnapRatio =
-      getMobileBrowserFamily() === "firefox"
-        ? BOTTOM_SHEET_SNAP_RATIO.contentFirefox
-        : BOTTOM_SHEET_SNAP_RATIO.contentDefault;
+    const contentSnapRatio = BOTTOM_SHEET_SNAP_RATIO.contentDefault;
 
     return Math.max(
       minimumSheetHeight,

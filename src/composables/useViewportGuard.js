@@ -56,15 +56,10 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     0
   );
   const candidateFromBaseline = Math.max(layoutHeight - visualBottom, 0);
-  const browserFamily = getMobileBrowserFamily();
   const keyboardHeight = hasTextFocus
     ? Math.max(candidateFromLayout, candidateFromBaseline)
     : 0;
-  const composerInset = hasTextFocus
-    ? browserFamily === "samsung"
-      ? Math.max(candidateFromLayout, candidateFromBaseline)
-      : candidateFromLayout
-    : 0;
+  const composerInset = hasTextFocus ? candidateFromLayout : 0;
 
   return {
     layoutHeight,
@@ -226,12 +221,7 @@ export function useViewportGuard(options = {}) {
       apply();
     });
 
-    const browserFamily = getMobileBrowserFamily();
-    const delay =
-      browserFamily === "samsung"
-        ? VIEWPORT_GUARD_DELAY_MS.samsung
-        : VIEWPORT_GUARD_DELAY_MS.default;
-    resizeTimer = window.setTimeout(apply, delay);
+    resizeTimer = window.setTimeout(apply, VIEWPORT_GUARD_DELAY_MS.default);
   }
 
   function handleFocusOut() {
