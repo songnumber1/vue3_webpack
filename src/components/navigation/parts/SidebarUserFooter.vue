@@ -49,7 +49,7 @@
         :title="t('common.logout')"
         @click="actions.logout()"
       >
-        <span class="logout-glyph">⏻</span>
+        <span class="logout-glyph" aria-hidden="true"></span>
       </button>
     </div>
   </div>
