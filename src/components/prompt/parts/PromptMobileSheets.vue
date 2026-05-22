@@ -288,6 +288,23 @@ watch(
   min-width: 0;
 }
 
+.bottom-sheet-option--row > .bottom-sheet-option-main {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: left;
+}
+
+.bottom-sheet-option--row > .bottom-sheet-option-main strong,
+.bottom-sheet-option--row > .bottom-sheet-option-main small {
+  width: 100%;
+  text-align: left;
+}
+
 .bottom-sheet-submenu-arrow {
   margin-left: auto;
   color: var(--muted);

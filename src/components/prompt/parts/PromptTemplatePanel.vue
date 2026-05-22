@@ -27,17 +27,21 @@
     </div>
 
     <div class="prompt-template-mobile-options">
-      <button
+      <div
         v-for="group in groups"
         :key="group.id"
-        class="prompt-template-mobile-chip"
-        type="button"
-        :aria-label="`${group.label}: ${group.selectedLabel}`"
-        @click="$emit('open-mobile-group', group.id)"
+        class="prompt-template-mobile-group"
       >
-        <span class="prompt-template-mobile-chip-title">{{ group.label }}</span>
-        <span class="prompt-template-mobile-chip-value">{{ group.selectedLabel }}</span>
-      </button>
+        <span class="prompt-template-mobile-title">{{ group.label }}</span>
+        <button
+          class="prompt-template-mobile-chip"
+          type="button"
+          :aria-label="`${group.label}: ${group.selectedLabel}`"
+          @click="$emit('open-mobile-group', group.id)"
+        >
+          <span>{{ group.selectedLabel }}</span>
+        </button>
+      </div>
     </div>
 
     <BaseBottomSheet
@@ -213,13 +217,29 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
 
 .prompt-template-mobile-options {
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
   padding: 0 0 2px;
   scrollbar-width: none;
+}
+
+.prompt-template-mobile-group {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 5px;
+  min-width: 0;
+}
+
+.prompt-template-mobile-title {
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  line-height: 1.2;
+  white-space: nowrap;
 }
 
 .prompt-template-mobile-options::-webkit-scrollbar {
@@ -235,7 +255,6 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
   flex: 0 0 auto;
   padding: 6px 10px;
   border: 1px solid var(--control-border);
@@ -248,23 +267,5 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   line-height: 1.2;
   cursor: pointer;
   white-space: nowrap;
-}
-
-.prompt-template-mobile-chip-title {
-  color: var(--muted);
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.prompt-template-mobile-chip-value {
-  color: var(--text);
-  font-size: var(--font-size-sm);
-  font-weight: 900;
-  line-height: 1.2;
-}
-
-.prompt-template-mobile-chip-title::after {
-  content: ':';
 }
 </style>
