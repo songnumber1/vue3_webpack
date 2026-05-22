@@ -3,10 +3,24 @@ import {ASSISTANT_TYPES} from "@/constants/domain";
 import {toBoolean} from "./booleanAdapter";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
 
+/**
+ * Assistant 이미지 경로를 다양한 형태로 처리하여 반환하는 헬퍼 함수
+ * @param {*} raw ep. { image48Src: "url", image20Src: { path: "url" }, ... }
+ * @param {*} key ep. ASSISTANT_KEYS.IMAGE_48_SRC, ASSISTANT_KEYS.IMAGE_20_SRC, ASSISTANT_KEYS.IMAGE_16_SRC
+ * @param {*} fallback 기본 이미지 경로 (DEFAULT_ASSISTANT_IMAGE에서 가져옴)
+ * @returns
+ */
 function resolveAssistantImage(raw, key, fallback) {
+  // raw 객체에서 key에 해당하는 값을 가져옴
   const value = raw?.[key];
+
+  // 값이 문자열이고 빈 문자열이 아닌 경우 해당 값을 반환
   if (typeof value === "string" && value) return value;
+
+  // 값의 형태가 객체이고 path 속성이 존재하는 경우 path 값을 반환
   if (value?.path) return value.path;
+
+  // 위 조건에 해당하지 않는 경우 fallback 이미지 경로를 반환
   return fallback;
 }
 
