@@ -12,9 +12,20 @@
     "serve:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode dev",
     "build:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode dev",
     "build:prod": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode prod",
-    "chart:graph": "madge --image graph.png src",
-    "chart:circular": "madge --circular src",
-    "chart:orphans": "madge --orphans src"
+    "madge:graph": "madge --image graph.png src",
+    "madge:chat": "madge --image madge-chat.svg src/components/chat",
+    "madge:stores": "madge --image madge-stores.svg src/stores",
+    "madge:composables": "madge --image madge-composables.svg src/composables",
+    "madge:overlay": "madge --image madge-overlay.svg src/components/overlay",
+    "madge:platform": "madge --image madge-platform.svg src/platform",
+    "madge:circular": "madge --circular src",
+    "madge:orphans": "madge --orphans src",
+    "depcruise": "depcruise src --no-config --include-only \"^src\" --output-type html > dependency-report.html",
+    "depcruise:circular": "depcruise src --no-config --output-type err",
+    "depcruise:composables": "depcruise src/composables --no-config --output-type html > composables-report.html",
+    "depcruise:stores": "depcruise src/stores --no-config --output-type html > stores-report.html",
+    "depcruise:chat": "depcruise src/components/chat --no-config --output-type html > chat-report.html",
+    "depcruise:json": "depcruise src --no-config --output-type json > dependency-report.json"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
@@ -44,6 +55,7 @@
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.25.9",
+    "dependency-cruiser": "^17.4.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.33.0",
