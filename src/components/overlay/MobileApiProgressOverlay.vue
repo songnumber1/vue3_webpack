@@ -19,7 +19,7 @@ import {storeToRefs} from "pinia";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
-import {isMobileLikeViewport} from "@/utils/viewportMode";
+import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 
 const {t} = useI18n();
 const apiRequestStore = useApiRequestStore();

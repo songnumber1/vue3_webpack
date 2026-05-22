@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import {MOBILE_BREAKPOINT_PX} from "@/constants/viewport";
+import {MOBILE_BREAKPOINT_PX} from "@/platform/viewport/viewportConstants";
 
 function readViewport() {
   if (typeof window === "undefined") {

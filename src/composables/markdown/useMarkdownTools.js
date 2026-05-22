@@ -1,7 +1,7 @@
 import {
   openExternalBrowser,
   copyClipboardByPlatform,
-} from "@/services/bridge/platformBridge";
+} from "@/platform/bridge/platformBridge";
 import {usePlatformStore} from "@/stores/platformStore";
 
 function tableToText(table) {

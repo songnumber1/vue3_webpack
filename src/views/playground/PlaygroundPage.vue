@@ -300,7 +300,7 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {
   copyClipboardByPlatform,
   showToastByPlatform,
-} from "@/services/bridge/platformBridge";
+} from "@/platform/bridge/platformBridge";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";

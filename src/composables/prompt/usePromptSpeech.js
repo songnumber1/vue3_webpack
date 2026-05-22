@@ -1,7 +1,7 @@
 import {computed, nextTick} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useSpeechRecognition} from "@/composables/mobile-runtime/useSpeechRecognition";
+import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {PROMPT_SPEECH_LANGUAGE} from "@/constants/promptComposer";
 
 /**

@@ -1,7 +1,7 @@
 import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useViewportStore} from "@/stores/viewportStore";
+import {useViewportStore} from "@/platform/viewport/viewportStore";
 
 function hasBodyMobileMode() {
   return (

@@ -11,11 +11,11 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const client = read('src/bridge/web/bridgeClient.js');
-const registry = read('src/bridge/runtime/bridgeCallbackRegistry.js');
-const runtime = read('src/bridge/runtime/bridgeRuntime.js');
-const nativeRuntime = read('src/bridge/native/bridgeNativeRuntime.js');
-const androidTransport = read('src/bridge/native/bridgeAndroidTransport.js');
+const client = read('src/platform/bridge/web/bridgeClient.js');
+const registry = read('src/platform/bridge/runtime/bridgeCallbackRegistry.js');
+const runtime = read('src/platform/bridge/runtime/bridgeRuntime.js');
+const nativeRuntime = read('src/platform/bridge/native/bridgeNativeRuntime.js');
+const androidTransport = read('src/platform/bridge/native/bridgeAndroidTransport.js');
 
 assert(
   client.includes('export {callNative}') && client.includes('executeContract'),

@@ -1,5 +1,5 @@
 import {useEventListener} from "@vueuse/core";
-import {BOTTOM_SHEET_SNAP_RATIO} from "@/constants/viewport";
+import {BOTTOM_SHEET_SNAP_RATIO} from "@/platform/viewport/viewportConstants";
 
 /**
  * @description 바텀시트 pointer drag 흐름을 기존 동작 그대로 분리 관리합니다.

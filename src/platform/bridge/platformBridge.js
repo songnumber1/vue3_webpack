@@ -1,7 +1,7 @@
-import {callNative} from "@/bridge/web/bridgeClient";
+import {callNative} from "@/platform/bridge/web/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
-import {copyText as copyWebText} from "@/utils/clipboard";
+import {copyText as copyWebText} from "@/platform/system/clipboard";
 import {i18n} from "@/i18n";
 import {
   APP_CLIPBOARD_COPIED_EVENT,

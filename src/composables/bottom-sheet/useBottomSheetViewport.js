@@ -1,15 +1,15 @@
 import {useEventListener} from "@vueuse/core";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {BOTTOM_SHEET_REFRESH_EVENTS} from "@/constants/viewport";
+import {BOTTOM_SHEET_REFRESH_EVENTS} from "@/platform/viewport/viewportConstants";
 import {
   BOTTOM_SHEET_SNAP_RATIO,
   BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
   MOBILE_BREAKPOINT_PX,
-} from "@/constants/viewport";
+} from "@/platform/viewport/viewportConstants";
 import {
   getViewportHeight as readViewportHeight,
   isMobileViewport as readIsMobileViewport,
-} from "@/utils/viewport";
+} from "@/platform/viewport/viewport";
 import {readBottomSheetSafeAreaBottom} from "./useBottomSheetSafeArea";
 import {
   DEFAULT_OPTION_HEIGHT_PX,

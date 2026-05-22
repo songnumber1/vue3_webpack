@@ -1,4 +1,4 @@
-import {BOTTOM_SHEET_SNAP_RATIO} from "@/constants/viewport";
+import {BOTTOM_SHEET_SNAP_RATIO} from "@/platform/viewport/viewportConstants";
 
 /**
  * @description 바텀시트 snap 높이 변경 로직을 관리합니다.

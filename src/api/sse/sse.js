@@ -6,7 +6,7 @@ import {streamText} from "@/api/mock/fakeStream";
 import {parseSseBuffer, readSseData} from "@/api/sse/sseParser";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {isMobileLikeViewport} from "@/utils/viewportMode";
+import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 
 function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";

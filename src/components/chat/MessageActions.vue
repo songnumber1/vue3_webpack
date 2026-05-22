@@ -154,7 +154,7 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
-import {copyClipboardByPlatform} from "@/services/bridge/platformBridge";
+import {copyClipboardByPlatform} from "@/platform/bridge/platformBridge";
 import {logWarn} from "@/utils/logger";
 
 defineEmits(["regenerate"]);

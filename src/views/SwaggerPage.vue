@@ -54,13 +54,13 @@ import {useI18n} from "vue-i18n";
 const {t} = useI18n();
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
-import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
-import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/swagger/openapi";
+import {BRIDGE_CATEGORY} from "@/platform/bridge/bridgeConstants";
+import {generateOpenApi, getOpenApiCategoryOptions} from "@/platform/bridge/swagger/openapi";
 import {
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
-} from "@/bridge/swagger/swaggerRuntime";
-import {installWebViewCompat} from "@/utils/webviewCompat";
+} from "@/platform/bridge/swagger/swaggerRuntime";
+import {installWebViewCompat} from "@/platform/browser/webviewCompat";
 import {logError} from "@/utils/logger";
 
 let swaggerInstance = null;

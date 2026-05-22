@@ -11,9 +11,9 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const viewportGuard = read('src/composables/mobile-runtime/useViewportGuard.js');
+const viewportGuard = read('src/platform/viewport/useViewportGuard.js');
 const mobileState = read('src/composables/chat/container/useChatMobileState.js');
-const viewportUtils = read('src/utils/viewport.js');
+const viewportUtils = read('src/platform/viewport/viewport.js');
 const promptComposer = read('src/composables/prompt/usePromptComposer.js');
 
 assert(

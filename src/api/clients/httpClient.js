@@ -3,7 +3,7 @@ import {shouldUseServerApi, SERVER_API_BASE_URL} from "@/constants/apiMode";
 import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {isMobileLikeViewport} from "@/utils/viewportMode";
+import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 
 function resolveBaseURL() {
   if (shouldUseServerApi()) {

@@ -4,15 +4,15 @@ import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   VIEWPORT_GUARD_DELAY_MS,
-} from "@/constants/viewport";
+} from "@/platform/viewport/viewportConstants";
 import {
   VIEWPORT_BROWSER_CLASSES,
   VIEWPORT_GUARD_CUSTOM_EVENT,
   VIEWPORT_GUARD_EVENTS,
-} from "@/constants/viewport";
+} from "@/platform/viewport/viewportConstants";
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";
+import {getMobileBrowserFamily, getViewportSize} from "@/platform/viewport/viewport";
 function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;

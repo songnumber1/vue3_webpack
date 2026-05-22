@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === "development") {
     "@/assets/styles/components/debug/virtual-keyboard-debug.css"
   );
 }
-import {installWebViewCompat} from "@/utils/webviewCompat";
+import {installWebViewCompat} from "@/platform/browser/webviewCompat";
 
 installWebViewCompat();
 bootstrap();

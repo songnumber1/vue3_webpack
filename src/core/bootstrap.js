@@ -1,7 +1,7 @@
 import {createApp} from "vue";
 import {createPinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
-import {useViewportStore} from "@/stores/viewportStore";
+import {useViewportStore} from "@/platform/viewport/viewportStore";
 import App from "@/App.vue";
 import {resolveAppConfig} from "@/core/config";
 import {resolveLayout} from "@/core/resolver/layout";
@@ -16,7 +16,7 @@ import {resolveTheme} from "@/core/resolver/theme";
 import {resolveErrorUI} from "@/core/resolver/errorUi";
 import {resolveUploadStrategy} from "@/core/resolver/upload";
 import {i18n} from "@/i18n";
-import {installViewportModeClass} from "@/utils/viewportMode";
+import {installViewportModeClass} from "@/platform/viewport/viewportMode";
 
 export async function bootstrap() {
   installViewportModeClass();

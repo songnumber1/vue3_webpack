@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "eslint --ext .js,.vue src",
-    "lint:fix": "eslint --ext .js,.vue src --fix",
-    "format": "prettier --write \"src/**/*.{js,vue,json,css,md}\"",
-    "serve:local": "vue-cli-service serve --mode local",
-    "serve:dev": "vue-cli-service serve --mode dev",
-    "build:dev": "vue-cli-service build --mode dev",
-    "build:prod": "vue-cli-service build --mode prod"
+    "serve": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
+    "build": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build",
+    "lint": "node node_modules/eslint/bin/eslint.js --ext .js,.vue src",
+    "lint:fix": "node node_modules/eslint/bin/eslint.js --ext .js,.vue src --fix",
+    "format": "node node_modules/prettier/bin/prettier.cjs --write \"src/**/*.{js,vue,json,css,md}\"",
+    "serve:local": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode local",
+    "serve:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode dev",
+    "build:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode dev",
+    "build:prod": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode prod"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

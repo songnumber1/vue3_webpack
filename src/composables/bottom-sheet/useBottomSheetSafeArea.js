@@ -1,4 +1,4 @@
-import {getSafeAreaBottom} from "@/utils/viewport";
+import {getSafeAreaBottom} from "@/platform/viewport/viewport";
 
 /**
  * @description 바텀시트 최대 높이 계산에 필요한 safe-area 하단 값을 읽습니다.
