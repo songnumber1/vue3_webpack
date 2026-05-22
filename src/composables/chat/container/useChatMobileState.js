@@ -1,28 +1,31 @@
-import {ref} from "vue";
+import {computed} from "vue";
 
 function shouldUseMobilePlatformLayout(platformInfo = {}) {
   return Boolean(
     platformInfo.isMobileBrowser ||
-    platformInfo.isAndroidApp ||
-    platformInfo.isIosApp
+      platformInfo.isAndroidApp ||
+      platformInfo.isIosApp
   );
 }
 
 /**
  * Keeps chat layout mobile state in one place.
  *
- * The decision intentionally combines the responsive breakpoint with the
- * platform store flags. This preserves desktop narrow-width behavior while
- * avoiding DOM class probing, which can lag behind reactive platform state
- * during mount/resume.
+ * The mobile decision must stay fully reactive to the runtime breakpoint. When
+ * the system setting changes from 768px to a wider value such as 1400px,
+ * overlay/page components should immediately switch modes without waiting for a
+ * resize event or a manual refresh callback.
  */
 export function useChatMobileState({isCompactScreen, platformInfo}) {
-  const isMobile = ref(false);
+  const isMobile = computed(() =>
+    Boolean(
+      isCompactScreen.value || shouldUseMobilePlatformLayout(platformInfo.value)
+    )
+  );
 
   function updateMobileState() {
-    isMobile.value = Boolean(
-      isCompactScreen.value || shouldUseMobilePlatformLayout(platformInfo.value)
-    );
+    // Kept for existing resize/watch call sites. isMobile is computed, so the
+    // actual state update is driven by viewportStore/platformStore reactivity.
   }
 
   return {

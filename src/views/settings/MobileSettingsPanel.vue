@@ -78,6 +78,7 @@
             <SystemSettingsView
               v-else-if="activeMenu === 'system'"
               @close="closePanel"
+              @applied="handleSystemSettingsApplied"
             />
 
             <section
@@ -143,7 +144,7 @@ const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: true},
 });
-const emit = defineEmits(["close", "desktop-open"]);
+const emit = defineEmits(["close", "desktop-open", "applied"]);
 const {t, tm, locale} = useI18n();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
@@ -254,6 +255,10 @@ function closePanel() {
 }
 function selectLocale(value) {
   setAppLocale(value);
+}
+
+function handleSystemSettingsApplied() {
+  emit("applied");
 }
 
 watch(

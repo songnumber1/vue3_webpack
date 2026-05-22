@@ -93,6 +93,7 @@
       :is-mobile="isMobile"
       @close="mobileSettingsOpen = false"
       @desktop-open="handleMobileSettingsDesktopOpen"
+      @applied="handleSystemSettingsApplied"
     />
 
     <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />

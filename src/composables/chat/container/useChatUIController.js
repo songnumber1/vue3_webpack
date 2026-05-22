@@ -1,4 +1,4 @@
-import {computed, ref} from "vue";
+import {computed, ref, watch} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
@@ -10,7 +10,7 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useViewportStore} from "@/platform/viewport/viewportStore";
-import {syncViewportModeClass} from "@/platform/viewport/viewportMode";
+import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
@@ -30,7 +30,7 @@ export function useChatUIController({
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
   const viewportStore = useViewportStore();
-  viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
+  syncViewportSettings(systemSettingsStore.mobileBreakpoint);
 
   const {scrollToBottom} = useAutoScroll({value: null});
   const workspaceRef = ref(null);
@@ -139,6 +139,16 @@ export function useChatUIController({
     scrollBottom,
   });
 
+
+  watch(
+    () => systemSettingsStore.mobileBreakpoint,
+    (breakpoint) => {
+      syncViewportSettings(breakpoint);
+      refreshViewport();
+      updateMobileState();
+    }
+  );
+
   function bindUiEvents() {
     useEventListener(window, "resize", updateMobileState, {passive: true});
     useEventListener(window, "scroll", scheduleBottomStateCheck, {
@@ -148,9 +158,7 @@ export function useChatUIController({
   }
 
   function handleSystemSettingsApplied() {
-    syncViewportModeClass(systemSettingsStore.mobileBreakpoint);
-    viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
-    viewportStore.refresh();
+    syncViewportSettings(systemSettingsStore.mobileBreakpoint);
     refreshViewport();
     updateMobileState();
     scrollBottom({stable: true});

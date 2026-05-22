@@ -87,6 +87,7 @@ import {computed, reactive, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   KEYBOARD_MODE_OPTIONS,
@@ -190,6 +191,7 @@ function syncDraft() {
 
 function apply() {
   systemSettingsStore.applySettings(draft);
+  syncViewportSettings(systemSettingsStore.mobileBreakpoint);
   emit("applied");
   emit("close");
 }
