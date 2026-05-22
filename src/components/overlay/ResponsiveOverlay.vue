@@ -53,8 +53,9 @@
 </template>
 
 <script setup>
-import {computed, watch} from "vue";
+import {computed, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
 
 const {t} = useI18n();
 
@@ -98,11 +99,21 @@ const panelRenderKey = computed(() => overlayMode.value);
 const showMobileBackButton = computed(() => isMobileFullscreen.value);
 const showCloseButton = computed(() => !isMobileFullscreen.value);
 
+useOverlayRegistration({
+  open: toRef(props, "open"),
+  kind: "responsive-overlay",
+  mode: overlayMode,
+});
+
 watch(
   () => [props.open, props.isMobile, props.mobileMode],
   () => {
-    if (typeof document === "undefined" || !props.open) return;
-    document.body.dataset.responsiveOverlayMode = overlayMode.value;
+    if (typeof document === "undefined") return;
+    if (props.open) {
+      document.body.dataset.responsiveOverlayMode = overlayMode.value;
+    } else if (document.body?.dataset?.responsiveOverlayMode) {
+      delete document.body.dataset.responsiveOverlayMode;
+    }
   },
   {immediate: true}
 );

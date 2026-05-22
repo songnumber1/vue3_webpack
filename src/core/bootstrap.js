@@ -1,6 +1,7 @@
 import {createApp} from "vue";
 import {createPinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
+import {useViewportStore} from "@/stores/viewportStore";
 import App from "@/App.vue";
 import {resolveAppConfig} from "@/core/config";
 import {resolveLayout} from "@/core/resolver/layout";
@@ -42,6 +43,9 @@ export async function bootstrap() {
   app.use(i18n);
   const platformStore = usePlatformStore();
   platformStore.initialize(appInfo);
+
+  const viewportStore = useViewportStore();
+  viewportStore.install({breakpoint: appInfo.mobileBreakpoint});
 
   if (
     typeof window !== "undefined" &&

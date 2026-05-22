@@ -1,18 +1,18 @@
 import {getActivePinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logWarn} from "@/utils/logger";
-import {AndroidToJsContract} from "./contract";
+import {AndroidToJsContract} from "../contract";
 import {
   createAndroidToJsFallbackError,
   createNativeDispatchRequiredResponse,
   createSuccessResponse,
-} from "./bridgeResponses";
-import {createResponseError} from "./bridgeErrors";
-import {createBridgeRequest, parseNativePayload} from "./bridgeUtils";
+} from "../runtime/bridgeResponses";
+import {createResponseError} from "../bridgeErrors";
+import {createBridgeRequest, parseNativePayload} from "../bridgeUtils";
 import {
   validateBridgeRequest,
   validateBridgeResponse,
-} from "./bridgeValidation";
+} from "../bridgeValidation";
 
 export function rejectAndroidToJsSwaggerExecution(type, payload = {}) {
   let request;

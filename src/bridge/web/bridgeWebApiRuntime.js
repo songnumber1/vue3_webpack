@@ -1,11 +1,11 @@
-import {WebApiContract} from "./contract";
-import {BRIDGE_CATEGORY} from "./bridgeConstants";
-import {createBridgeRequest} from "./bridgeUtils";
+import {WebApiContract} from "../contract";
+import {BRIDGE_CATEGORY} from "../bridgeConstants";
+import {createBridgeRequest} from "../bridgeUtils";
 import {
   createBackendSuccessResponse,
   createErrorResponse,
-} from "./bridgeResponses";
-import {getContract, throwIfErrorResponse} from "./bridgeValidation";
+} from "../runtime/bridgeResponses";
+import {getContract, throwIfErrorResponse} from "../bridgeValidation";
 
 function getApiBaseUrl() {
   const configured = process.env.VUE_APP_API_BASE_URL || "/api";

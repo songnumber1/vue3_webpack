@@ -1,4 +1,4 @@
-import {createErrorResponse} from "./bridgeResponses";
+import {createErrorResponse} from "./runtime/bridgeResponses";
 
 export function createContractError(
   request,

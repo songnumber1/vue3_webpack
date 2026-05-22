@@ -1,4 +1,4 @@
-import {callNative} from "@/bridge/bridgeClient";
+import {callNative} from "@/bridge/web/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/utils/clipboard";

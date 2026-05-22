@@ -1,7 +1,7 @@
 import {computed, nextTick, onBeforeUnmount, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {usePlatformStore} from "@/stores/platformStore";
-import {openNativeFilePicker} from "@/services/platformBridge";
+import {openNativeFilePicker} from "@/services/bridge/platformBridge";
 import {
   createBrowserAttachment,
   createNativeAttachment,

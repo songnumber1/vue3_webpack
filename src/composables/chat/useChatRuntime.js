@@ -11,7 +11,7 @@ import {
   loadExamplePrompts,
   renameChatHistory,
   updateChatBookmark,
-} from "@/business/chatBootstrap";
+} from "@/composables/app/chatBootstrap";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";

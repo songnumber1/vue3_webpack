@@ -3,8 +3,8 @@ import {
   BRIDGE_CATEGORY,
   JS_TO_ANDROID_PATH,
   WEB_API_PATH,
-} from "./bridgeConstants";
-import {executeContract} from "./bridgeClient";
+} from "../bridgeConstants";
+import {executeContract} from "../web/bridgeClient";
 
 let originalFetch = null;
 function getRequestUrl(input) {

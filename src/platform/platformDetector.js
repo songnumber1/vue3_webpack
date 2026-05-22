@@ -5,7 +5,7 @@ import {
   hasIosBridge,
   hasExtensionRuntime,
 } from "@/core/config";
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {MOBILE_BREAKPOINT_PX} from "@/constants/viewport";
 
 const UNSUPPORTED_MOBILE_BROWSERS = Object.freeze([
   "samsung-internet",

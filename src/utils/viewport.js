@@ -1,4 +1,4 @@
-import {MOBILE_BREAKPOINT_PX} from "@/constants/uiTokens";
+import {MOBILE_BREAKPOINT_PX} from "@/constants/viewport";
 
 export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
 export function getMobileBrowserFamily() {

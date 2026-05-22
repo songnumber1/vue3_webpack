@@ -1,7 +1,7 @@
 import {computed} from "vue";
-import {useWindowSize} from "@vueuse/core";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useViewportStore} from "@/stores/viewportStore";
 
 function hasBodyMobileMode() {
   return (
@@ -20,12 +20,13 @@ function hasBodyMobileMode() {
 export function useRuntimeModeFlags() {
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
-  const {width} = useWindowSize();
+  const viewportStore = useViewportStore();
+  viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
 
   const platformInfo = computed(() => platformStore.info || {});
   const isCompactViewport = computed(() =>
     Boolean(
-      width.value <= systemSettingsStore.mobileBreakpoint || hasBodyMobileMode()
+      viewportStore.isCompact || hasBodyMobileMode()
     )
   );
   const isNativeRuntime = computed(() =>

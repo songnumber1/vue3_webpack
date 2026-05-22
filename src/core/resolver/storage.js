@@ -1,5 +1,5 @@
 import {isNativeApp} from "@/core/config";
-import {callNative} from "@/bridge/bridgeClient";
+import {callNative} from "@/bridge/web/bridgeClient";
 import {logWarn} from "@/utils/logger";
 
 function getLocalStorage() {

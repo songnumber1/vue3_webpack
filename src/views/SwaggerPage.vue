@@ -55,11 +55,11 @@ const {t} = useI18n();
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {BRIDGE_CATEGORY} from "@/bridge/bridgeConstants";
-import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/openapi";
+import {generateOpenApi, getOpenApiCategoryOptions} from "@/bridge/swagger/openapi";
 import {
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
-} from "@/bridge/swaggerRuntime";
+} from "@/bridge/swagger/swaggerRuntime";
 import {installWebViewCompat} from "@/utils/webviewCompat";
 import {logError} from "@/utils/logger";
 

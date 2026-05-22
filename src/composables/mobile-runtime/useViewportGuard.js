@@ -4,12 +4,12 @@ import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
   VIEWPORT_GUARD_DELAY_MS,
-} from "@/constants/uiTokens";
+} from "@/constants/viewport";
 import {
   VIEWPORT_BROWSER_CLASSES,
   VIEWPORT_GUARD_CUSTOM_EVENT,
   VIEWPORT_GUARD_EVENTS,
-} from "@/constants/viewportGuardConstants";
+} from "@/constants/viewport";
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/utils/viewport";

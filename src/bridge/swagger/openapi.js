@@ -3,14 +3,14 @@ import {
   OpenApiGeneratorV3,
 } from "@asteasolutions/zod-to-openapi";
 
-import {getContractsByCategory} from "./contract";
+import {getContractsByCategory} from "../contract";
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
   JS_TO_ANDROID_PATH,
   WEB_API_PATH,
-} from "./bridgeConstants";
-import {BaseRequest, BaseResponse, BaseResponseError} from "./schemas/base";
+} from "../bridgeConstants";
+import {BaseRequest, BaseResponse, BaseResponseError} from "../schemas/base";
 
 const CATEGORY_OPTIONS = [
   {

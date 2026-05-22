@@ -11,10 +11,10 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const viewportGuard = read('src/composables/useViewportGuard.js');
+const viewportGuard = read('src/composables/mobile-runtime/useViewportGuard.js');
 const mobileState = read('src/composables/chat/container/useChatMobileState.js');
 const viewportUtils = read('src/utils/viewport.js');
-const promptComposer = read('src/composables/usePromptComposer.js');
+const promptComposer = read('src/composables/prompt/usePromptComposer.js');
 
 assert(
   viewportGuard.includes('window.visualViewport') &&

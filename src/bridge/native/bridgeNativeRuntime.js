@@ -1,5 +1,5 @@
-import {JsToAndroidContract} from "./contract";
-import {BRIDGE_TIMEOUT} from "./bridgeConstants";
+import {JsToAndroidContract} from "../contract";
+import {BRIDGE_TIMEOUT} from "../bridgeConstants";
 import {
   callDirectAndroidBridge,
   hasDirectAndroidBridge,
@@ -10,17 +10,17 @@ import {
   completeBridgeResponse,
   deleteBridgeCallback,
   setBridgeCallback,
-} from "./bridgeCallbackRegistry";
+} from "../runtime/bridgeCallbackRegistry";
 import {
   createBridgeUnavailableResponse,
   createErrorResponse,
   normalizeBridgeResponse,
-} from "./bridgeResponses";
+} from "../runtime/bridgeResponses";
 import {
   throwIfErrorResponse,
   validateBridgeRequest,
   validateBridgeResponse,
-} from "./bridgeValidation";
+} from "../bridgeValidation";
 
 function rejectWithBridgeResponse(reject, response) {
   const error = new Error(response.message);

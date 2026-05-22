@@ -1,14 +1,14 @@
-import {callNative} from "./bridgeNativeRuntime";
+import {callNative} from "../native/bridgeNativeRuntime";
 import {executeWebApi} from "./bridgeWebApiRuntime";
-import {rejectAndroidToJsSwaggerExecution} from "./bridgeAndroidToJsRuntime";
-import {registerBridgeRuntimeGlobals} from "./bridgeRuntime";
+import {rejectAndroidToJsSwaggerExecution} from "../native/bridgeAndroidToJsRuntime";
+import {registerBridgeRuntimeGlobals} from "../runtime/bridgeRuntime";
 
-export {callNative} from "./bridgeNativeRuntime";
+export {callNative} from "../native/bridgeNativeRuntime";
 export {executeWebApi} from "./bridgeWebApiRuntime";
 export {
   receiveNativeEvent,
   rejectAndroidToJsSwaggerExecution,
-} from "./bridgeAndroidToJsRuntime";
+} from "../native/bridgeAndroidToJsRuntime";
 
 export function executeContract(category, type, payload = {}) {
   if (category === "web-api") return executeWebApi(type, payload);

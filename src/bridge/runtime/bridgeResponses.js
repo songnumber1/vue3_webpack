@@ -1,9 +1,9 @@
-import {BRIDGE_CATEGORY} from "./bridgeConstants";
+import {BRIDGE_CATEGORY} from "../bridgeConstants";
 import {
   createBridgeRequest,
   createIsoDate,
   createRequestId,
-} from "./bridgeUtils";
+} from "../bridgeUtils";
 
 export function createSuccessResponse(
   request,

@@ -1,5 +1,5 @@
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {useEventListener, useWindowSize} from "@vueuse/core";
+import {useEventListener} from "@vueuse/core";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useAppContext} from "@/composables/app/useAppContext";
@@ -16,6 +16,7 @@ import {syncViewportModeClass} from "@/utils/viewportMode";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useViewportStore} from "@/stores/viewportStore";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
@@ -31,6 +32,8 @@ export function useChatContainerController(props) {
   const navigationStore = useNavigationStore();
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
+  const viewportStore = useViewportStore();
+  viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
   const {scrollToBottom} = useAutoScroll({value: null});
 
   const workspaceRef = ref(null);
@@ -85,10 +88,7 @@ export function useChatContainerController(props) {
     handlePreviewError,
   } = useImagePreview();
 
-  const {width: windowWidth} = useWindowSize();
-  const isCompactScreen = computed(
-    () => windowWidth.value <= systemSettingsStore.mobileBreakpoint
-  );
+  const isCompactScreen = computed(() => viewportStore.isCompact);
   const platformInfo = computed(() => platformStore.info || {});
   const {isMobile, updateMobileState} = useChatMobileState({
     isCompactScreen,
@@ -385,6 +385,8 @@ export function useChatContainerController(props) {
 
   function handleSystemSettingsApplied() {
     syncViewportModeClass(systemSettingsStore.mobileBreakpoint);
+    viewportStore.setBreakpoint(systemSettingsStore.mobileBreakpoint);
+    viewportStore.refresh();
     refreshViewport();
     updateMobileState();
     scrollBottom({stable: true});
