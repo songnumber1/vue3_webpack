@@ -43,7 +43,7 @@
   cursor: pointer;
   display: grid;
   place-items: center;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   font-weight: 900;
   transition:
     background var(--duration-fast),
@@ -90,7 +90,7 @@
   padding: 0 7px 6px;
 }
 .sidebar-title {
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   font-weight: 800;
   letter-spacing: -0.04em;
 }
@@ -110,7 +110,7 @@
   background: var(--control-bg);
   display: grid;
   place-items: center;
-  font-size: 20px;
+  font-size: var(--font-size-fixed-20);
   transition:
     background var(--duration-fast),
     transform var(--duration-fast),
@@ -143,7 +143,7 @@
   padding: 8px 9px;
   background: transparent;
   color: var(--sidebar-text);
-  font-size: 14px;
+  font-size: var(--font-size-md);
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
@@ -154,7 +154,7 @@
   width: 20px;
   text-align: center;
   color: var(--sidebar-icon);
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
 }
 .quick-item:hover,
 .project-item:hover,
@@ -166,7 +166,7 @@
 .section-label {
   padding: 18px 8px 6px;
   color: var(--sidebar-section);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 800;
   letter-spacing: -0.02em;
 }
@@ -195,17 +195,17 @@
   place-items: center;
   background: var(--primary);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 900;
 }
 .sidebar-user strong {
   display: block;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 .sidebar-user small {
   display: block;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: var(--font-size-2xs);
 }
 
 .chat-workspace {
@@ -249,13 +249,13 @@
   gap: 8px;
   padding: 0 16px;
   font-weight: 800;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   letter-spacing: -0.04em;
   box-shadow: var(--shadow-control);
 }
 .chevron {
   color: var(--text-muted);
-  font-size: 15px;
+  font-size: var(--font-size-base);
 }
 .model-menu {
   position: absolute;
@@ -284,7 +284,7 @@
 }
 .model-option strong {
   display: block;
-  font-size: 15px;
+  font-size: var(--font-size-base);
 }
 .model-option small {
   display: block;
@@ -317,7 +317,7 @@
 }
 .empty-center h1 {
   margin: 0 0 28px;
-  font-size: 25px;
+  font-size: var(--font-size-fixed-25);
   line-height: 1.25;
   letter-spacing: -0.04em;
   font-weight: 600;
@@ -395,7 +395,7 @@
   background: var(--assistant-avatar-bg);
   color: var(--assistant-avatar-text);
   font-weight: 900;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 .bubble {
   max-width: min(780px, 100%);
@@ -406,7 +406,7 @@
   box-shadow: var(--shadow-card);
 }
 .bubble-meta {
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   color: var(--text-muted);
   margin-bottom: 8px;
   font-weight: 800;
@@ -416,7 +416,7 @@
 }
 .bubble-content {
   line-height: 1.72;
-  font-size: 15px;
+  font-size: var(--font-size-base);
   word-break: break-word;
 }
 .bubble-content pre {
@@ -488,7 +488,7 @@
   min-height: 38px;
   max-height: 180px;
   padding: 9px 6px;
-  font-size: 15px;
+  font-size: var(--font-size-base);
   line-height: 1.45;
 }
 .prompt-box textarea::placeholder {
@@ -504,7 +504,7 @@
   display: grid;
   place-items: center;
   font-weight: 900;
-  font-size: 20px;
+  font-size: var(--font-size-fixed-20);
 }
 .attach-button,
 .mic-button {
@@ -518,7 +518,7 @@
 .prompt-help {
   text-align: center;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   margin: 10px 0 0;
 }
 
@@ -589,7 +589,7 @@ body.mobile-mode .mobile-topbar {
 body.mobile-mode .round-icon {
   width: 58px;
   height: 58px;
-  font-size: 29px;
+  font-size: var(--font-size-fixed-29);
   background: var(--mobile-pill-bg);
   border-color: var(--mobile-pill-border);
   box-shadow: var(--shadow-control);
@@ -600,7 +600,7 @@ body.mobile-mode .model-trigger {
   min-width: 160px;
   background: var(--mobile-pill-bg);
   border-color: var(--mobile-pill-border);
-  font-size: 26px;
+  font-size: var(--font-size-fixed-26);
 }
 
 body.mobile-mode .mobile-actions {
@@ -638,14 +638,14 @@ body.mobile-mode .project-title {
 
 body.mobile-mode .project-title h1 {
   margin: 0;
-  font-size: 38px;
+  font-size: var(--font-size-fixed-38);
   line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.05em;
 }
 
 body.mobile-mode .folder-icon {
-  font-size: 36px;
+  font-size: var(--font-size-fixed-36);
   color: var(--text);
 }
 
@@ -657,7 +657,7 @@ body.mobile-mode .source-chip {
   background: transparent;
   color: var(--text);
   padding: 0 24px;
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
 }
 
@@ -678,7 +678,7 @@ body.mobile-mode .mobile-recent-card {
 
 body.mobile-mode .mobile-recent-card strong {
   display: block;
-  font-size: 27px;
+  font-size: var(--font-size-fixed-27);
   font-weight: 550;
   letter-spacing: -0.04em;
   margin-bottom: 7px;
@@ -690,7 +690,7 @@ body.mobile-mode .mobile-recent-card strong {
 body.mobile-mode .mobile-recent-card span {
   display: block;
   color: var(--text-muted);
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
   line-height: 1.35;
   white-space: nowrap;
   overflow: hidden;
@@ -730,7 +730,7 @@ body.mobile-mode .message--user .bubble {
 }
 
 body.mobile-mode .bubble-content {
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
   line-height: 1.66;
 }
 
@@ -763,7 +763,7 @@ body.mobile-mode .prompt-box {
 
 body.mobile-mode .prompt-box textarea {
   min-height: 42px;
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
   padding-top: 10px;
 }
 
@@ -772,7 +772,7 @@ body.mobile-mode .mic-button,
 body.mobile-mode .send-button {
   width: 42px;
   height: 42px;
-  font-size: 25px;
+  font-size: var(--font-size-fixed-25);
 }
 
 body.mobile-mode .send-button {
@@ -809,7 +809,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-top {
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-title {
-  font-size: 30px;
+  font-size: var(--font-size-fixed-30);
 }
 
 body.mobile-mode .sidebar-content--mobile .quick-menu,
@@ -824,19 +824,19 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   min-height: 58px;
   border-radius: 0;
   padding: 12px 26px;
-  font-size: 27px;
+  font-size: var(--font-size-fixed-27);
   gap: 20px;
 }
 
 body.mobile-mode .sidebar-content--mobile .quick-item span,
 body.mobile-mode .sidebar-content--mobile .project-item span {
   width: 40px;
-  font-size: 29px;
+  font-size: var(--font-size-fixed-29);
 }
 
 body.mobile-mode .sidebar-content--mobile .section-label {
   padding: 18px 26px 4px;
-  font-size: 23px;
+  font-size: var(--font-size-fixed-23);
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-history {
@@ -845,7 +845,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-history {
 
 body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
   display: block;
-  font-size: 25px;
+  font-size: var(--font-size-fixed-25);
 }
 
 body.mobile-mode .mobile-new-chat-fab {
@@ -861,7 +861,7 @@ body.mobile-mode .mobile-new-chat-fab {
   gap: 14px;
   background: var(--fab-bg);
   color: var(--fab-text);
-  font-size: 25px;
+  font-size: var(--font-size-fixed-25);
   font-weight: 800;
   box-shadow: var(--shadow-menu);
 }
@@ -881,7 +881,7 @@ body.mobile-mode .sidebar-content--mobile .user-avatar {
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
-  font-size: 16px;
+  font-size: var(--font-size-lg);
 }
 
 .chat-container-root,
@@ -1041,7 +1041,7 @@ body.mobile-mode .prompt-box textarea {
   min-height: 38px;
   height: 38px;
   max-height: 136px;
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   padding-top: 8px;
   padding-bottom: 8px;
 }
@@ -1088,7 +1088,7 @@ body.mobile-mode .prompt-box--gemini textarea {
   resize: none;
   background: transparent;
   color: var(--text);
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
   line-height: 1.5;
 }
 
@@ -1116,7 +1116,7 @@ body.mobile-mode .prompt-box--gemini textarea {
   height: 38px;
   max-width: 172px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   box-shadow: none;
 }
 
@@ -1142,7 +1142,7 @@ body.mobile-mode .prompt-box--gemini .voice-button {
 .prompt-icon-action {
   background: transparent;
   color: var(--text);
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
 }
 
 .prompt-icon-action svg {
@@ -1160,7 +1160,7 @@ body.mobile-mode .prompt-box--gemini .send-button {
   flex: 0 0 auto;
   background: var(--send-bg);
   color: var(--send-text);
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
   font-weight: 900;
 }
 
@@ -1207,7 +1207,7 @@ body.mobile-mode .prompt-box--gemini .send-button:disabled {
 .prompt-tool-menu p,
 .attach-menu p {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 700;
 }
 
@@ -1238,7 +1238,7 @@ body.mobile-mode .prompt-box--gemini textarea {
   min-height: 40px;
   height: 40px;
   max-height: 136px;
-  font-size: 16px;
+  font-size: var(--font-size-lg);
 }
 
 body.mobile-mode .prompt-action-row {
@@ -1253,7 +1253,7 @@ body.mobile-mode .prompt-model-trigger {
   height: 36px;
   max-width: 132px;
   padding: 0 10px;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 
 body.mobile-mode .prompt-icon-action,
@@ -1392,7 +1392,7 @@ body.mobile-mode .topbar-actions {
 body.mobile-mode .topbar-actions .round-icon {
   width: 46px;
   height: 46px;
-  font-size: 20px;
+  font-size: var(--font-size-fixed-20);
 }
 
 body.mobile-mode .document-toggle svg,
@@ -1439,14 +1439,14 @@ body.mobile-mode .topbar-actions .round-icon {
   border-radius: 999px;
   background: var(--primary);
   color: #fff;
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   font-weight: 900;
 }
 
 .collapsed-recent-popover h2 {
   margin: 0 0 12px;
   color: var(--text);
-  font-size: 15px;
+  font-size: var(--font-size-base);
   font-weight: 900;
   letter-spacing: -0.02em;
 }
@@ -1461,7 +1461,7 @@ body.mobile-mode .topbar-actions .round-icon {
   background: transparent;
   color: var(--text);
   cursor: pointer;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   line-height: 1.35;
   text-align: left;
   white-space: nowrap;
@@ -1511,13 +1511,13 @@ body.mobile-mode .send-button {
   height: 38px;
   min-width: 38px;
   min-height: 38px;
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
 }
 
 .assistant-trigger {
   width: auto;
   max-width: 176px;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
 }
 
 .assistant-option,
@@ -1542,7 +1542,7 @@ body.mobile-mode .send-button {
 .assistant-option strong,
 .bottom-sheet-option strong {
   display: block;
-  font-size: 15px;
+  font-size: var(--font-size-base);
   font-weight: 800;
 }
 
@@ -1551,7 +1551,7 @@ body.mobile-mode .send-button {
   display: block;
   margin-top: 3px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-xs);
   line-height: 1.35;
 }
 
@@ -1619,7 +1619,7 @@ body.mobile-mode .send-button {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
   font-weight: 900;
   letter-spacing: -0.03em;
 }
@@ -1632,7 +1632,7 @@ body.mobile-mode .send-button {
   border-radius: 999px;
   background: var(--control-hover);
   color: var(--text);
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
   line-height: 1;
 }
 
@@ -1654,7 +1654,7 @@ body.mobile-mode .send-button {
 .bottom-sheet-option--row span {
   width: 28px;
   text-align: center;
-  font-size: 20px;
+  font-size: var(--font-size-fixed-20);
 }
 
 .sheet-fade-enter-active,
@@ -1694,7 +1694,7 @@ body.mobile-mode .empty-center {
   gap: 16px;
 }
 body.mobile-mode .empty-center h1 {
-  font-size: 24px;
+  font-size: var(--font-size-3xl);
   text-align: center;
   margin: 0;
 }
@@ -1706,7 +1706,7 @@ body.mobile-mode .suggestion-row {
 body.mobile-mode .suggestion-chip {
   min-height: 34px;
   padding: 0 12px;
-  font-size: 13px;
+  font-size: var(--font-size-sm);
 }
 
 .topbar-left {
@@ -1740,7 +1740,7 @@ body.mobile-mode .suggestion-chip {
 
 .conversation-title-wrap strong {
   flex: 0 0 auto;
-  font-size: 16px;
+  font-size: var(--font-size-lg);
   font-weight: 900;
   letter-spacing: -0.04em;
 }
@@ -1751,7 +1751,7 @@ body.mobile-mode .suggestion-chip {
   white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--text-muted);
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 .empty-stage--main {
@@ -1770,7 +1770,7 @@ body.mobile-mode .suggestion-chip {
   background: var(--control-bg);
   color: var(--text);
   box-shadow: var(--shadow-control);
-  font-size: 22px;
+  font-size: var(--font-size-2xl);
   font-weight: 900;
   cursor: pointer;
 }
@@ -1804,7 +1804,7 @@ body.mobile-mode .model-trigger--assistant {
   min-width: 0;
   max-width: 190px;
   height: 42px;
-  font-size: 18px;
+  font-size: var(--font-size-xl);
   padding: 0 14px;
 }
 
@@ -1849,7 +1849,7 @@ body.mobile-mode .scroll-bottom-button {
 .chat-history-dialog__field {
   display: grid;
   gap: 8px;
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 .chat-history-dialog__actions {

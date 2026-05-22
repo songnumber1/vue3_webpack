@@ -188,15 +188,15 @@
 body.mobile-mode .chat-container-root--mode-main .mobile-topbar,
 body.mobile-mode .chat-container-root--mode-chat .mobile-topbar,
 body.mobile-mode .chat-container-root--mode-shared .mobile-topbar {
-  height: 44px !important;
-  padding: 4px 12px !important;
+  height: 44px;
+  padding: 4px 12px;
 }
 
 body.mobile-mode .chat-container-root--mode-main .mobile-topbar .round-icon,
 body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .round-icon,
 body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .round-icon {
-  width: 34px !important;
-  height: 34px !important;
+  width: 34px;
+  height: 34px;
 }
 
 body.mobile-mode
@@ -211,96 +211,101 @@ body.mobile-mode
   .chat-container-root--mode-shared
   .mobile-topbar
   .model-trigger--assistant {
-  height: 34px !important;
+  height: 34px;
   min-width: 100px;
   gap: 6px;
-  padding: 0 10px !important;
-  font-size: var(--text-size-title-sm) !important;
+  padding: 0 10px;
+  font-size: var(--text-size-title-sm);
   line-height: 1.2;
 }
 
-.responsive-panel--system-settings {
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
+body.desktop-mode .responsive-panel--system-settings,
+body.mobile-mode .responsive-panel--system-settings {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.responsive-panel--system-settings .responsive-panel-body {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  padding: 0 !important;
+body.desktop-mode .responsive-panel--system-settings .responsive-panel-body,
+body.mobile-mode .responsive-panel--system-settings .responsive-panel-body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
-.responsive-panel--system-settings .system-settings-view {
+body.desktop-mode .responsive-panel--system-settings .system-settings-view,
+body.mobile-mode .responsive-panel--system-settings .system-settings-view {
   width: 100%;
   flex: 1 1 auto;
   max-height: none;
   min-height: 0;
 }
 
-.responsive-panel--system-settings .system-settings-scroll {
+body.desktop-mode .responsive-panel--system-settings .system-settings-scroll,
+body.mobile-mode .responsive-panel--system-settings .system-settings-scroll {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
 }
 
-.responsive-overlay--desktop .responsive-panel--system-settings {
+body.desktop-mode .responsive-overlay--desktop .responsive-panel--system-settings {
   height: min(760px, calc(100vh - 56px));
 }
 
-.responsive-overlay--mobile-dialog .responsive-panel--system-settings {
+body.mobile-mode .responsive-overlay--mobile-dialog .responsive-panel--system-settings {
   height: min(760px, calc(var(--app-height, 100vh) - 48px));
-  max-height: calc(var(--app-height, 100vh) - 48px) !important;
+  max-height: calc(var(--app-height, 100vh) - 48px);
 }
 
-.mobile-settings-body.mobile-settings-body--system {
-  display: flex !important;
-  flex-direction: column !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
-  padding: 0 !important;
+body.mobile-mode .mobile-settings-body.mobile-settings-body--system {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0;
 }
 
-.mobile-settings-detail.mobile-settings-detail--system {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  height: 100% !important;
-  overflow: hidden !important;
-  gap: 0 !important;
+body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  gap: 0;
 }
 
-.mobile-settings-detail.mobile-settings-detail--system .system-settings-view {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  height: 100% !important;
-  max-height: none !important;
-  overflow: hidden !important;
+body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-view {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
+  overflow: hidden;
 }
 
-.mobile-settings-detail.mobile-settings-detail--system .system-settings-scroll {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
+body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 18px 26px 20px !important;
+  padding: 18px 26px 20px;
 }
 
-.mobile-settings-detail.mobile-settings-detail--system .system-settings-footer {
-  position: sticky !important;
-  bottom: 0 !important;
-  flex: 0 0 auto !important;
-  z-index: 5 !important;
-  padding: 12px 26px calc(12px + env(safe-area-inset-bottom)) !important;
-  background: var(--surface-elevated, var(--surface, #fff)) !important;
+body.mobile-mode .mobile-settings-detail.mobile-settings-detail--system .system-settings-footer {
+  position: sticky;
+  bottom: 0;
+  flex: 0 0 auto;
+  z-index: 5;
+  padding: 12px 26px calc(12px + env(safe-area-inset-bottom));
+  background: var(--surface-elevated, var(--surface, #fff));
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
 }
 
-.system-settings-footer .playground-button {
+body.desktop-mode .system-settings-footer .playground-button,
+body.mobile-mode .system-settings-footer .playground-button {
   min-width: 86px;
   min-height: 44px;
   border-radius: var(--dialog-action-square-radius, 5px);
@@ -311,20 +316,26 @@ body.mobile-mode
   letter-spacing: -0.01em;
 }
 
-.system-settings-footer .playground-button--primary,
-.system-settings-footer .system-settings-apply-button {
-  border-color: var(--primary) !important;
-  background: var(--primary) !important;
-  color: #fff !important;
+body.desktop-mode .system-settings-footer .playground-button--primary,
+body.desktop-mode .system-settings-footer .system-settings-apply-button,
+body.mobile-mode .system-settings-footer .playground-button--primary,
+body.mobile-mode .system-settings-footer .system-settings-apply-button {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
 }
 
-.system-settings-footer .playground-button--primary:hover,
-.system-settings-footer .playground-button--primary:focus-visible,
-.system-settings-footer .system-settings-apply-button:hover,
-.system-settings-footer .system-settings-apply-button:focus-visible {
-  border-color: var(--primary-strong, var(--primary)) !important;
-  background: var(--primary-strong, var(--primary)) !important;
-  color: #fff !important;
+body.desktop-mode .system-settings-footer .playground-button--primary:hover,
+body.desktop-mode .system-settings-footer .playground-button--primary:focus-visible,
+body.desktop-mode .system-settings-footer .system-settings-apply-button:hover,
+body.desktop-mode .system-settings-footer .system-settings-apply-button:focus-visible,
+body.mobile-mode .system-settings-footer .playground-button--primary:hover,
+body.mobile-mode .system-settings-footer .playground-button--primary:focus-visible,
+body.mobile-mode .system-settings-footer .system-settings-apply-button:hover,
+body.mobile-mode .system-settings-footer .system-settings-apply-button:focus-visible {
+  border-color: var(--primary-strong, var(--primary));
+  background: var(--primary-strong, var(--primary));
+  color: #fff;
 }
 
 body.mobile-mode .system-settings-footer .playground-button {

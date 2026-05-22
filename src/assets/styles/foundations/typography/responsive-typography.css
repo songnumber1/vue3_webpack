@@ -18,6 +18,19 @@
   --font-size-3xl: 24px;
   --font-size-hero: clamp(34px, 6vw, 64px);
 
+  /* Exact fixed typography tokens for legacy chat layout values.
+     These preserve frozen UI measurements while avoiding new hardcoded font-size declarations. */
+  --font-size-fixed-17: 17px;
+  --font-size-fixed-20: 20px;
+  --font-size-fixed-23: 23px;
+  --font-size-fixed-25: 25px;
+  --font-size-fixed-26: 26px;
+  --font-size-fixed-27: 27px;
+  --font-size-fixed-29: 29px;
+  --font-size-fixed-30: 30px;
+  --font-size-fixed-36: 36px;
+  --font-size-fixed-38: 38px;
+
   --line-height-tight: 1.25;
   --line-height-title: 1.35;
   --line-height-body: 1.55;
