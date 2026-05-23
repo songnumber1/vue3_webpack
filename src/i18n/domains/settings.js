@@ -67,6 +67,10 @@ export const settingsMessages = {
           label: "자동 스크롤",
           description: "답변 시 스크롤 자동 이동 여부입니다.",
         },
+        abortChatOnMobileBackground: {
+          label: "모바일 백그라운드 모드 시 채팅 종료",
+          description: "모바일에서 브라우저가 백그라운드로 전환되면 진행 중인 답변 요청의 abort를 시도합니다.",
+        },
         showGuideButton: {
           label: "가이드 버튼 화면 출력",
           description: "헤더와 모바일 설정의 가이드 진입 버튼을 제어합니다.",
@@ -300,6 +304,11 @@ export const settingsMessages = {
           label: "Auto scroll",
           description:
             "Automatically scroll to the bottom while answers arrive.",
+        },
+        abortChatOnMobileBackground: {
+          label: "End chat on mobile background",
+          description:
+            "Try to abort an in-progress answer request when a mobile browser moves to the background.",
         },
         showGuideButton: {
           label: "Show guide button",

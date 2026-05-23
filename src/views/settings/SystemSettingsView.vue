@@ -160,7 +160,10 @@ const groups = computed(() => [
   {
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
-    items: [settingItem("autoScrollOnAnswer")],
+    items: [
+      settingItem("autoScrollOnAnswer"),
+      settingItem("abortChatOnMobileBackground"),
+    ],
   },
   {
     kicker: "ACTION",

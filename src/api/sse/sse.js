@@ -28,11 +28,14 @@ function createAbortError(reason) {
   return error;
 }
 
-function isMobileGenerationAbortTarget() {
+function shouldAbortChatOnMobileBackground() {
   if (typeof document === "undefined") return false;
   try {
     const settings = useSystemSettingsStore();
-    return isMobileLikeViewport(settings.mobileBreakpoint);
+    return Boolean(
+      settings.abortChatOnMobileBackground &&
+        isMobileLikeViewport(settings.mobileBreakpoint)
+    );
   } catch (_error) {
     return false;
   }
@@ -64,7 +67,7 @@ function createStreamLifecycleGuard(controller, getReader) {
 
   const handlePageEnd = () => abortStream("page lifecycle ended");
   const handleVisibilityChange = () => {
-    if (document.hidden && isMobileGenerationAbortTarget()) {
+    if (document.hidden && shouldAbortChatOnMobileBackground()) {
       abortStream("mobile page hidden");
     }
   };
@@ -87,6 +90,22 @@ function createStreamLifecycleGuard(controller, getReader) {
     });
     window.removeEventListener?.("freeze", handlePageEnd, {capture: true});
   };
+}
+
+function isDocumentHidden() {
+  return typeof document !== "undefined" && document.hidden;
+}
+
+function waitForBrowserPaint() {
+  if (isDocumentHidden()) {
+    return Promise.resolve();
+  }
+  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+    return Promise.resolve();
+  }
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  });
 }
 
 function resolveGenerationUrl() {
@@ -153,31 +172,108 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     let buffer = "";
     let accumulated = "";
     let done = false;
+    let hiddenBacklogPending = false;
+    let resumeBacklogFlushPending = false;
+    let flushingHiddenBacklog = null;
 
-    while (!done) {
-      if (controller?.signal?.aborted) {
-        throw controller.signal.reason || createAbortError("Aborted");
-      }
-      const result = await reader.read();
-      done = result.done;
-      if (result.value) {
-        buffer += decoder.decode(result.value, {stream: true});
-      }
-      if (done) {
-        buffer += decoder.decode();
-      }
-      const parsed = parseSseBuffer(buffer);
-      buffer = parsed.rest;
+    const flushHiddenBacklog = async () => {
+      if (!hiddenBacklogPending || !accumulated) return;
+      hiddenBacklogPending = false;
+      await onChunk?.(accumulated);
+    };
 
-      for (const event of parsed.events) {
-        const data = readSseData(event);
-        if (data.done) {
-          done = true;
-          break;
+    const scheduleHiddenBacklogFlush = () => {
+      if (isDocumentHidden() || !hiddenBacklogPending) return;
+      flushingHiddenBacklog = Promise.resolve(flushingHiddenBacklog)
+        .catch(() => {})
+        .then(flushHiddenBacklog);
+    };
+
+    const handleResumeFlush = () => {
+      if (isDocumentHidden()) {
+        resumeBacklogFlushPending = true;
+        return;
+      }
+      scheduleHiddenBacklogFlush();
+    };
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", handleResumeFlush, {
+        capture: true,
+      });
+    }
+
+    try {
+      while (!done) {
+        if (controller?.signal?.aborted) {
+          throw controller.signal.reason || createAbortError("Aborted");
         }
-        accumulated += data.content;
-        await onChunk?.(accumulated);
+        const result = await reader.read();
+        done = result.done;
+        if (result.value) {
+          buffer += decoder.decode(result.value, {stream: true});
+        }
+        if (done) {
+          buffer += decoder.decode();
+        }
+        const parsed = parseSseBuffer(buffer);
+        buffer = parsed.rest;
+
+        const shouldBatchBacklog =
+          isDocumentHidden() || hiddenBacklogPending || resumeBacklogFlushPending;
+
+        if (shouldBatchBacklog) {
+          let changed = false;
+          for (const event of parsed.events) {
+            const data = readSseData(event);
+            if (data.done) {
+              done = true;
+              break;
+            }
+            accumulated += data.content;
+            changed = true;
+          }
+
+          if (isDocumentHidden()) {
+            hiddenBacklogPending = hiddenBacklogPending || changed;
+            continue;
+          }
+
+          if (changed || hiddenBacklogPending || resumeBacklogFlushPending) {
+            const hadHiddenBacklog = hiddenBacklogPending;
+            resumeBacklogFlushPending = false;
+            await flushHiddenBacklog();
+            if (changed && !hadHiddenBacklog) {
+              await onChunk?.(accumulated);
+            }
+          }
+          continue;
+        }
+
+        for (const event of parsed.events) {
+          const data = readSseData(event);
+          if (data.done) {
+            done = true;
+            break;
+          }
+          accumulated += data.content;
+          await onChunk?.(accumulated);
+          await waitForBrowserPaint();
+        }
       }
+    } finally {
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", handleResumeFlush, {
+          capture: true,
+        });
+      }
+    }
+
+    if (hiddenBacklogPending) {
+      await flushHiddenBacklog();
+    }
+    if (flushingHiddenBacklog) {
+      await flushingHiddenBacklog.catch(() => {});
     }
 
     await onComplete?.();

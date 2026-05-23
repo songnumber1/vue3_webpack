@@ -13,58 +13,6 @@ function normalizePromptPayload(payload) {
   };
 }
 
-const STREAM_TYPEWRITER_DELAY_MS = 28;
-
-function sleep(ms) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
-
-function createTypewriterRenderer(commit) {
-  let targetContent = "";
-  let visibleLength = 0;
-  let running = false;
-  let stopped = false;
-
-  async function pump() {
-    if (running) return;
-    running = true;
-
-    try {
-      while (!stopped) {
-        const targetChars = Array.from(targetContent);
-        if (visibleLength >= targetChars.length) break;
-
-        visibleLength += 1;
-        commit(targetChars.slice(0, visibleLength).join(""));
-        await sleep(STREAM_TYPEWRITER_DELAY_MS);
-      }
-    } finally {
-      running = false;
-      const targetChars = Array.from(targetContent);
-      if (!stopped && visibleLength < targetChars.length) {
-        void pump();
-      }
-    }
-  }
-
-  return {
-    update(content = "") {
-      targetContent = String(content || "");
-      void pump();
-    },
-    async flush() {
-      while (!stopped) {
-        const targetChars = Array.from(targetContent);
-        if (!running && visibleLength >= targetChars.length) break;
-        await sleep(STREAM_TYPEWRITER_DELAY_MS);
-      }
-    },
-    stop() {
-      stopped = true;
-    },
-  };
-}
-
 function createRequestPayload(base = {}) {
   const requestId = createId("request");
   return {
@@ -137,10 +85,6 @@ export function useChatSubmit(options) {
 
     isGenerating.value = true;
     chatStreamStore.start();
-    const typewriter = createTypewriterRenderer((content) => {
-      commitAssistantMessage({content, status: "streaming"});
-    });
-
     try {
       await streamGeneration(
         createRequestPayload({
@@ -151,7 +95,7 @@ export function useChatSubmit(options) {
         }),
         {
           onChunk: async (content) => {
-            typewriter.update(content);
+            commitAssistantMessage({content, status: "streaming"});
             await nextTick();
             await options.scrollBottom({
               force: true,
@@ -160,7 +104,6 @@ export function useChatSubmit(options) {
             });
           },
           onComplete: async () => {
-            await typewriter.flush();
             commitAssistantMessage({
               status: "complete",
               reasoningStatus: "completed",
@@ -168,7 +111,6 @@ export function useChatSubmit(options) {
           },
         }
       );
-      await typewriter.flush();
       commitAssistantMessage({
         status: "complete",
         reasoningStatus: "completed",
@@ -176,7 +118,6 @@ export function useChatSubmit(options) {
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
-      typewriter.stop();
       if (isGenerationAbortError(error)) {
         logWarn("[useChatSubmit] 스트리밍이 중단되었습니다:", error);
         commitAssistantMessage({
@@ -253,10 +194,6 @@ export function useChatSubmit(options) {
 
     isGenerating.value = true;
     chatStreamStore.start();
-    const typewriter = createTypewriterRenderer((content) => {
-      commitAssistantMessage({content, status: "streaming"});
-    });
-
     try {
       await streamGeneration(
         createRequestPayload({
@@ -267,7 +204,7 @@ export function useChatSubmit(options) {
         }),
         {
           onChunk: async (content) => {
-            typewriter.update(content);
+            commitAssistantMessage({content, status: "streaming"});
             await nextTick();
             await options.scrollBottom({
               force: true,
@@ -276,7 +213,6 @@ export function useChatSubmit(options) {
             });
           },
           onComplete: async () => {
-            await typewriter.flush();
             commitAssistantMessage({
               status: "complete",
               reasoningStatus: "completed",
@@ -284,7 +220,6 @@ export function useChatSubmit(options) {
           },
         }
       );
-      await typewriter.flush();
       commitAssistantMessage({
         status: "complete",
         reasoningStatus: "completed",
@@ -292,7 +227,6 @@ export function useChatSubmit(options) {
       await nextTick();
       await options.renderAfterStream();
     } catch (error) {
-      typewriter.stop();
       if (isGenerationAbortError(error)) {
         logWarn("[useChatSubmit] 재생성 스트리밍이 중단되었습니다:", error);
         commitAssistantMessage({

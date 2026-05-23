@@ -31,6 +31,8 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showLogoutButton: (state) => state.settings.showLogoutButton,
     showMobileApiProgress: (state) => state.settings.showMobileApiProgress,
     autoScrollOnAnswer: (state) => state.settings.autoScrollOnAnswer,
+    abortChatOnMobileBackground: (state) =>
+      state.settings.abortChatOnMobileBackground,
   },
   actions: {
     hydrate() {
