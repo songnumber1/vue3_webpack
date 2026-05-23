@@ -15,7 +15,7 @@ export function isGenerationAbortError(error) {
   return (
     error?.name === "AbortError" ||
     error?.code === 20 ||
-    /aborted|abort|page lifecycle ended|mobile page hidden|mobile page frozen/i.test(message)
+    /aborted|abort|page lifecycle ended|page lifecycle frozen|mobile page hidden|mobile page frozen|mobile page unloading/i.test(message)
   );
 }
 
@@ -28,29 +28,67 @@ function createAbortError(reason) {
   return error;
 }
 
-function shouldAbortChatOnMobileBackground() {
-  if (typeof document === "undefined") return false;
+function isMobileUserAgent() {
+  if (typeof navigator === "undefined") return false;
+  const ua = String(navigator.userAgent || "").toLowerCase();
+  return /android|iphone|ipad|ipod|mobile|samsungbrowser|crios|fxios/.test(ua);
+}
+
+function isTouchRuntime() {
+  if (typeof navigator === "undefined") return false;
+  return Number(navigator.maxTouchPoints || 0) > 0;
+}
+
+function resolveMobileBackgroundPolicy() {
+  if (typeof document === "undefined") {
+    return {
+      abortOnBackground: false,
+      isMobileRuntime: false,
+    };
+  }
+
   try {
     const settings = useSystemSettingsStore();
-    return Boolean(
-      settings.abortChatOnMobileBackground &&
-        isMobileLikeViewport(settings.mobileBreakpoint)
+    const viewportMobile = isMobileLikeViewport(settings.mobileBreakpoint);
+    const isMobileRuntime = Boolean(
+      viewportMobile ||
+        isMobileUserAgent() ||
+        (isTouchRuntime() &&
+          typeof window !== "undefined" &&
+          window.innerWidth <= settings.mobileBreakpoint)
     );
+
+    return {
+      abortOnBackground: Boolean(
+        settings.abortChatOnMobileBackground && isMobileRuntime
+      ),
+      isMobileRuntime,
+    };
   } catch (_error) {
-    return false;
+    return {
+      abortOnBackground: false,
+      isMobileRuntime: false,
+    };
   }
 }
 
 /**
- * 모바일 백그라운드 전환은 사용자가 설정에서 ON/OFF 할 수 있는 정책이고,
- * 실제 페이지 종료/새로고침은 리소스 정리를 위해 항상 abort 해야 하는 정책입니다.
- * 두 이벤트를 같은 handler로 묶으면 OFF 상태에서도 freeze/pagehide에서 abort되는
- * 간헐 동작이 생길 수 있어 lifecycle 성격별로 분리합니다.
+ * 스트림 시작 시점의 모바일 백그라운드 정책을 snapshot으로 고정합니다.
+ *
+ * 설정 화면에서 OFF로 실행한 스트림이 모바일 lifecycle 이벤트 순서(pagehide → freeze →
+ * beforeunload)에 따라 중간에 ON처럼 abort되는 문제를 막기 위해, 모바일 런타임에서는
+ * visibilitychange/pagehide/freeze/beforeunload 모두 동일한 snapshot 정책을 따릅니다.
+ *
+ * - 모바일 + ON  : 백그라운드 성격 이벤트에서 abort
+ * - 모바일 + OFF : 어떤 lifecycle 이벤트에서도 명시적 abort 금지
+ * - 데스크톱     : pagehide/beforeunload는 페이지 이탈로 보고 abort
  */
-function createStreamLifecycleGuard(controller, getReader) {
+function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
   if (!controller || typeof window === "undefined") {
     return () => {};
   }
+
+  const policy = policySnapshot || resolveMobileBackgroundPolicy();
 
   const abortStream = (reason) => {
     if (controller.signal.aborted) return;
@@ -72,34 +110,43 @@ function createStreamLifecycleGuard(controller, getReader) {
   };
 
   const abortForMobileBackgroundIfEnabled = (reason) => {
-    if (shouldAbortChatOnMobileBackground()) {
-      abortStream(reason);
+    if (policy.isMobileRuntime) {
+      if (policy.abortOnBackground) {
+        abortStream(reason);
+      }
+      return;
     }
+
+    // 비모바일에서는 기존처럼 pagehide/beforeunload 계열을 페이지 이탈로 본다.
+    abortStream(reason);
   };
 
   const handleVisibilityChange = () => {
-    if (document.hidden) {
-      abortForMobileBackgroundIfEnabled("mobile page hidden");
+    if (!document.hidden) return;
+    if (policy.isMobileRuntime) {
+      if (policy.abortOnBackground) {
+        abortStream("mobile page hidden");
+      }
+      return;
     }
   };
 
   const handleFreeze = () => {
-    abortForMobileBackgroundIfEnabled("mobile page frozen");
+    abortForMobileBackgroundIfEnabled(
+      policy.isMobileRuntime ? "mobile page frozen" : "page lifecycle frozen"
+    );
   };
 
-  const handlePageHide = (event) => {
-    // persisted=true 는 BFCache/일시 중지 성격이 강하므로 모바일 백그라운드 설정을 따른다.
-    if (event?.persisted) {
-      abortForMobileBackgroundIfEnabled("mobile page hidden");
-      return;
-    }
-
-    // persisted=false 는 새로고침/탭 종료/페이지 이탈 성격이므로 항상 정리한다.
-    abortStream("page lifecycle ended");
+  const handlePageHide = () => {
+    abortForMobileBackgroundIfEnabled(
+      policy.isMobileRuntime ? "mobile page hidden" : "page lifecycle ended"
+    );
   };
 
   const handleBeforeUnload = () => {
-    abortStream("page lifecycle ended");
+    abortForMobileBackgroundIfEnabled(
+      policy.isMobileRuntime ? "mobile page unloading" : "page lifecycle ended"
+    );
   };
 
   window.addEventListener("pagehide", handlePageHide, {capture: true});
@@ -132,11 +179,49 @@ function waitForBrowserPaint() {
   if (isDocumentHidden()) {
     return Promise.resolve();
   }
-  if (typeof window === "undefined" || typeof window.requestAnimationFrame !== "function") {
+  if (
+    typeof window === "undefined" ||
+    typeof window.requestAnimationFrame !== "function"
+  ) {
     return Promise.resolve();
   }
+
   return new Promise((resolve) => {
-    window.requestAnimationFrame(() => resolve());
+    let resolved = false;
+    let frameId = null;
+
+    const cleanup = () => {
+      document.removeEventListener?.("visibilitychange", handleHidden, {
+        capture: true,
+      });
+      window.removeEventListener?.("pagehide", handleHidden, {capture: true});
+      window.removeEventListener?.("freeze", handleHidden, {capture: true});
+      if (frameId !== null && typeof window.cancelAnimationFrame === "function") {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
+
+    const finish = () => {
+      if (resolved) return;
+      resolved = true;
+      cleanup();
+      resolve();
+    };
+
+    const handleHidden = () => {
+      // rAF 대기 중 visibilitychange/pagehide/freeze가 발생하면 일부 모바일
+      // 브라우저에서 document.hidden 반영보다 lifecycle 이벤트가 먼저 올 수 있습니다.
+      // hidden 값만 기다리면 reader 루프가 rAF에서 멈출 수 있으므로 즉시 해제합니다.
+      finish();
+    };
+
+    document.addEventListener?.("visibilitychange", handleHidden, {
+      capture: true,
+    });
+    window.addEventListener?.("pagehide", handleHidden, {capture: true});
+    window.addEventListener?.("freeze", handleHidden, {capture: true});
+
+    frameId = window.requestAnimationFrame(finish);
   });
 }
 
@@ -174,7 +259,12 @@ export async function streamGeneration(payload = {}, handlers = {}) {
   const overlay = shouldUseOverlay(policy);
 
   let reader = null;
-  const cleanupLifecycleGuard = createStreamLifecycleGuard(controller, () => reader);
+  const mobileBackgroundPolicy = resolveMobileBackgroundPolicy();
+  const cleanupLifecycleGuard = createStreamLifecycleGuard(
+    controller,
+    () => reader,
+    mobileBackgroundPolicy
+  );
 
   if (controller) apiRequestStore.registerController(requestKey, controller);
   if (overlay) apiRequestStore.startOverlay();
