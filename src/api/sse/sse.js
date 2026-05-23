@@ -7,6 +7,87 @@ import {parseSseBuffer, readSseData} from "@/api/sse/sseParser";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
+import {logWarn} from "@/utils/logger";
+
+
+export function isGenerationAbortError(error) {
+  const message = String(error?.message || error || "");
+  return (
+    error?.name === "AbortError" ||
+    error?.code === 20 ||
+    /aborted|abort|page lifecycle ended|mobile page hidden/i.test(message)
+  );
+}
+
+function createAbortError(reason) {
+  if (typeof DOMException !== "undefined") {
+    return new DOMException(reason || "Aborted", "AbortError");
+  }
+  const error = new Error(reason || "Aborted");
+  error.name = "AbortError";
+  return error;
+}
+
+function isMobileGenerationAbortTarget() {
+  if (typeof document === "undefined") return false;
+  try {
+    const settings = useSystemSettingsStore();
+    return isMobileLikeViewport(settings.mobileBreakpoint);
+  } catch (_error) {
+    return false;
+  }
+}
+
+function createStreamLifecycleGuard(controller, getReader) {
+  if (!controller || typeof window === "undefined") {
+    return () => {};
+  }
+
+  const abortStream = (reason) => {
+    if (controller.signal.aborted) return;
+    const abortReason = createAbortError(reason);
+    try {
+      controller.abort(abortReason);
+    } catch (_error) {
+      controller.abort();
+    }
+
+    const reader = getReader?.();
+    if (reader) {
+      reader.cancel(controller.signal.reason || abortReason).catch((error) => {
+        if (!isGenerationAbortError(error)) {
+          logWarn("[streamGeneration] reader cancel failed:", error);
+        }
+      });
+    }
+  };
+
+  const handlePageEnd = () => abortStream("page lifecycle ended");
+  const handleVisibilityChange = () => {
+    if (document.hidden && isMobileGenerationAbortTarget()) {
+      abortStream("mobile page hidden");
+    }
+  };
+
+  window.addEventListener("pagehide", handlePageEnd, {capture: true});
+  window.addEventListener("beforeunload", handlePageEnd, {capture: true});
+  document.addEventListener("visibilitychange", handleVisibilityChange, {
+    capture: true,
+  });
+
+  if (typeof window.addEventListener === "function") {
+    window.addEventListener("freeze", handlePageEnd, {capture: true});
+  }
+
+  return () => {
+    window.removeEventListener("pagehide", handlePageEnd, {capture: true});
+    window.removeEventListener("beforeunload", handlePageEnd, {capture: true});
+    document.removeEventListener("visibilitychange", handleVisibilityChange, {
+      capture: true,
+    });
+    window.removeEventListener?.("freeze", handlePageEnd, {capture: true});
+  };
+}
 
 function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
@@ -41,6 +122,9 @@ export async function streamGeneration(payload = {}, handlers = {}) {
   const requestKey = `GENERATION-${Date.now()}-${Math.random()}`;
   const overlay = shouldUseOverlay(policy);
 
+  let reader = null;
+  const cleanupLifecycleGuard = createStreamLifecycleGuard(controller, () => reader);
+
   if (controller) apiRequestStore.registerController(requestKey, controller);
   if (overlay) apiRequestStore.startOverlay();
 
@@ -64,13 +148,16 @@ export async function streamGeneration(payload = {}, handlers = {}) {
       throw new Error("generation stream body is empty");
     }
 
-    const reader = response.body.getReader();
+    reader = response.body.getReader();
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
     let accumulated = "";
     let done = false;
 
     while (!done) {
+      if (controller?.signal?.aborted) {
+        throw controller.signal.reason || createAbortError("Aborted");
+      }
       const result = await reader.read();
       done = result.done;
       if (result.value) {
@@ -95,6 +182,14 @@ export async function streamGeneration(payload = {}, handlers = {}) {
 
     await onComplete?.();
   } finally {
+    cleanupLifecycleGuard();
+    if (reader && controller?.signal?.aborted) {
+      await reader.cancel(controller.signal.reason).catch((error) => {
+        if (!isGenerationAbortError(error)) {
+          logWarn("[streamGeneration] reader cleanup failed:", error);
+        }
+      });
+    }
     apiRequestStore.unregisterController(requestKey);
     if (overlay) apiRequestStore.stopOverlay();
   }

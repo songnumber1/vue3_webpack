@@ -1,5 +1,5 @@
 import {nextTick, ref} from "vue";
-import {streamGeneration} from "@/api/sse/sse";
+import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {createId} from "@/utils/id";
@@ -177,13 +177,23 @@ export function useChatSubmit(options) {
       await options.renderAfterStream();
     } catch (error) {
       typewriter.stop();
-      logWarn("[useChatSubmit] 스트리밍 오류:", error);
-      commitAssistantMessage({
-        status: "error",
-        reasoningStatus: "completed",
-        content:
-          liveAssistantMessage.content || "(응답 생성 중 오류가 발생했습니다.)",
-      });
+      if (isGenerationAbortError(error)) {
+        logWarn("[useChatSubmit] 스트리밍이 중단되었습니다:", error);
+        commitAssistantMessage({
+          status: liveAssistantMessage.content ? "complete" : "error",
+          reasoningStatus: "completed",
+          content:
+            liveAssistantMessage.content || "(응답 생성이 중단되었습니다.)",
+        });
+      } else {
+        logWarn("[useChatSubmit] 스트리밍 오류:", error);
+        commitAssistantMessage({
+          status: "error",
+          reasoningStatus: "completed",
+          content:
+            liveAssistantMessage.content || "(응답 생성 중 오류가 발생했습니다.)",
+        });
+      }
     } finally {
       isGenerating.value = false;
       chatStreamStore.finish();
@@ -283,14 +293,25 @@ export function useChatSubmit(options) {
       await options.renderAfterStream();
     } catch (error) {
       typewriter.stop();
-      logWarn("[useChatSubmit] 재생성 스트리밍 오류:", error);
-      commitAssistantMessage({
-        status: "error",
-        reasoningStatus: "completed",
-        content:
-          liveAssistantMessage.content ||
-          "(응답 재생성 중 오류가 발생했습니다.)",
-      });
+      if (isGenerationAbortError(error)) {
+        logWarn("[useChatSubmit] 재생성 스트리밍이 중단되었습니다:", error);
+        commitAssistantMessage({
+          status: liveAssistantMessage.content ? "complete" : "error",
+          reasoningStatus: "completed",
+          content:
+            liveAssistantMessage.content ||
+            "(응답 재생성이 중단되었습니다.)",
+        });
+      } else {
+        logWarn("[useChatSubmit] 재생성 스트리밍 오류:", error);
+        commitAssistantMessage({
+          status: "error",
+          reasoningStatus: "completed",
+          content:
+            liveAssistantMessage.content ||
+            "(응답 재생성 중 오류가 발생했습니다.)",
+        });
+      }
     } finally {
       isGenerating.value = false;
       chatStreamStore.finish();
