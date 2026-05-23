@@ -11,7 +11,6 @@ export function shouldUseMobileFeedbackChannel(info = {}) {
     info.isNativeRuntime ||
     info.isNativeApp ||
     info.isAndroidApp ||
-    info.isIosApp ||
     info.isMobileBrowser
   );
 }

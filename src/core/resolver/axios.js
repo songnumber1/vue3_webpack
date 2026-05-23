@@ -1,5 +1,5 @@
 import axios from "axios";
-import {isAndroidApp, isIosApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config";
 import {SERVER_API_BASE_URL} from "@/constants/apiMode";
 
 const baseConfig = {
@@ -18,12 +18,6 @@ const androidOverride = {
   },
 };
 
-const iosOverride = {
-  timeout: 20000,
-  headers: {
-    "X-Client-Platform": "ios-webview",
-  },
-};
 
 const webOverride = {
   headers: {
@@ -41,11 +35,7 @@ function mergeConfig(base, override) {
   };
 }
 export function resolveAxios(appInfo) {
-  const override = isAndroidApp(appInfo)
-    ? androidOverride
-    : isIosApp(appInfo)
-      ? iosOverride
-      : webOverride;
+  const override = isAndroidApp(appInfo) ? androidOverride : webOverride;
 
   return axios.create(mergeConfig(baseConfig, override));
 }

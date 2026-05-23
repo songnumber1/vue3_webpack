@@ -197,7 +197,7 @@ export const GetDeviceInfoResponse = createResponseSchema(
     manufacturer: z
       .string()
       .optional()
-      .openapi({description: "제조사", example: "Samsung"}),
+      .openapi({description: "제조사", example: "Google"}),
     appVersion: z
       .string()
       .optional()

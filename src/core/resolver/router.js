@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 import AssistantRoot from "@/views/AssistantRoot.vue";
 import MainPage from "@/views/MainPage.vue";
-import {isAndroidApp, isIosApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
@@ -124,7 +124,6 @@ const androidRoutes = [
     },
   },
 ];
-const iosRoutes = [];
 const notFoundRoute = {
   path: "/:pathMatch(.*)*",
   name: "not-found",
@@ -234,7 +233,6 @@ export function resolveRouter(appInfo, context = {}) {
     ...legalRoutes,
     ...authRoutes,
     ...(isAndroidApp(appInfo) ? androidRoutes : []),
-    ...(isIosApp(appInfo) ? iosRoutes : []),
     notFoundRoute,
   ]);
   const router = createRouter({history: createWebHistory(), routes});

@@ -9,6 +9,5 @@ export const PLATFORM = Object.freeze({
   MAC: "mac",
   LINUX: "linux",
   ANDROID: "android",
-  IOS: "ios",
   UNKNOWN: "unknown",
 });

@@ -1,4 +1,4 @@
-import {isAndroidApp, isIosApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config";
 import {logWarn} from "@/utils/logger";
 
 const noopBridge = {
@@ -13,11 +13,7 @@ const noopBridge = {
     Promise.reject(new Error("Native upload is not available.")),
 };
 export function resolveBridge(appInfo) {
-  if (isAndroidApp(appInfo) && window.AndroidBridge)
-    return window.AndroidBridge;
-  if (isIosApp(appInfo) && window.webkit?.messageHandlers?.AppBridge) {
-    return window.webkit.messageHandlers.AppBridge;
-  }
+  if (isAndroidApp(appInfo) && window.AndroidBridge) return window.AndroidBridge;
 
   return noopBridge;
 }

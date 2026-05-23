@@ -2,9 +2,7 @@ import {computed} from "vue";
 
 function shouldUseMobilePlatformLayout(platformInfo = {}) {
   return Boolean(
-    platformInfo.isMobileBrowser ||
-      platformInfo.isAndroidApp ||
-      platformInfo.isIosApp
+    platformInfo.isMobileBrowser || platformInfo.isAndroidApp
   );
 }
 

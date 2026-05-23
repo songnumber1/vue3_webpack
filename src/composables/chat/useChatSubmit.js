@@ -1,5 +1,6 @@
 import {nextTick, ref} from "vue";
 import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
+import {fetchGenerationResult} from "@/api/sse/generationResultApi";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {createId} from "@/utils/id";
@@ -38,6 +39,17 @@ function isDocumentHidden() {
  * scroll은 foreground에서만 한 번씩 예약합니다. 이렇게 해야 모바일 Chrome에서
  * background OFF 상태로 수신한 데이터도 화면 복귀 시 최신 content로 표시됩니다.
  */
+
+async function resolveGenerationResultContent(requestId) {
+  try {
+    const result = await fetchGenerationResult(requestId);
+    return result?.content || result?.answer || result?.data || "";
+  } catch (error) {
+    logWarn("[useChatSubmit] generation result sync failed:", error);
+    return "";
+  }
+}
+
 function createStreamScrollScheduler(options) {
   let pending = false;
 
@@ -158,19 +170,33 @@ export function useChatSubmit(options) {
     } catch (error) {
       if (isGenerationAbortError(error)) {
         logWarn("[useChatSubmit] 스트리밍이 중단되었습니다:", error);
+        const syncedContent = await resolveGenerationResultContent(
+          error.generationRequestId
+        );
+        const fallbackContent =
+          syncedContent ||
+          error.accumulated ||
+          liveAssistantMessage.content ||
+          "(응답 생성이 중단되었습니다.)";
         commitAssistantMessage({
-          status: liveAssistantMessage.content ? "complete" : "error",
+          status: fallbackContent ? "complete" : "error",
           reasoningStatus: "completed",
-          content:
-            liveAssistantMessage.content || "(응답 생성이 중단되었습니다.)",
+          content: fallbackContent,
         });
       } else {
         logWarn("[useChatSubmit] 스트리밍 오류:", error);
+        const syncedContent = await resolveGenerationResultContent(
+          error.generationRequestId
+        );
+        const fallbackContent =
+          syncedContent ||
+          error.accumulated ||
+          liveAssistantMessage.content ||
+          "(응답 생성 중 오류가 발생했습니다.)";
         commitAssistantMessage({
-          status: "error",
+          status: fallbackContent ? "complete" : "error",
           reasoningStatus: "completed",
-          content:
-            liveAssistantMessage.content || "(응답 생성 중 오류가 발생했습니다.)",
+          content: fallbackContent,
         });
       }
     } finally {
@@ -263,21 +289,33 @@ export function useChatSubmit(options) {
     } catch (error) {
       if (isGenerationAbortError(error)) {
         logWarn("[useChatSubmit] 재생성 스트리밍이 중단되었습니다:", error);
+        const syncedContent = await resolveGenerationResultContent(
+          error.generationRequestId
+        );
+        const fallbackContent =
+          syncedContent ||
+          error.accumulated ||
+          liveAssistantMessage.content ||
+          "(응답 재생성이 중단되었습니다.)";
         commitAssistantMessage({
-          status: liveAssistantMessage.content ? "complete" : "error",
+          status: fallbackContent ? "complete" : "error",
           reasoningStatus: "completed",
-          content:
-            liveAssistantMessage.content ||
-            "(응답 재생성이 중단되었습니다.)",
+          content: fallbackContent,
         });
       } else {
         logWarn("[useChatSubmit] 재생성 스트리밍 오류:", error);
+        const syncedContent = await resolveGenerationResultContent(
+          error.generationRequestId
+        );
+        const fallbackContent =
+          syncedContent ||
+          error.accumulated ||
+          liveAssistantMessage.content ||
+          "(응답 재생성 중 오류가 발생했습니다.)";
         commitAssistantMessage({
-          status: "error",
+          status: fallbackContent ? "complete" : "error",
           reasoningStatus: "completed",
-          content:
-            liveAssistantMessage.content ||
-            "(응답 재생성 중 오류가 발생했습니다.)",
+          content: fallbackContent,
         });
       }
     } finally {

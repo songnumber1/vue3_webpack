@@ -1,14 +1,10 @@
 import axios from "axios";
-import {isAndroidApp, isIosApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config";
 import {SERVER_API_BASE_URL} from "@/constants/apiMode";
 
 const AUTH_TIMEOUT = 10000;
 function resolveAuthHeaders(appInfo = {}) {
-  const platform = isAndroidApp(appInfo)
-    ? "android-webview"
-    : isIosApp(appInfo)
-      ? "ios-webview"
-      : "web";
+  const platform = isAndroidApp(appInfo) ? "android-webview" : "web";
 
   return {
     "Content-Type": "application/json",

@@ -137,7 +137,7 @@ const groups = computed(() => [
       }),
       settingItem("useMicrophone"),
       settingItem("showMobileApiProgress"),
-      //settingItem("abortChatOnMobileBackground"),
+      settingItem("abortChatOnMobileBackground"),
     ],
   },
   {

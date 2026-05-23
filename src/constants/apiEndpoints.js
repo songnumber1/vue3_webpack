@@ -14,4 +14,5 @@ export const API_ENDPOINTS = Object.freeze({
   EXAMPLE_PROMPTS: "/example-prompts/list.do",
   PROMPT_TEMPLATES: "/prompt-templates/list.do",
   GENERATION: "/generation.do",
+  GENERATION_RESULT: "/generation/result.do",
 });

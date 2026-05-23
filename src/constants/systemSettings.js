@@ -68,7 +68,7 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.showLogoutButton]: true,
   [SYSTEM_SETTING_KEYS.showMobileApiProgress]: true,
   [SYSTEM_SETTING_KEYS.autoScrollOnAnswer]: false,
-  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: true,
+  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: false,
 });
 
 function normalizeKeyboardMode(value) {

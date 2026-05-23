@@ -13,7 +13,7 @@ function hasBodyMobileMode() {
 /**
  * 화면 크기와 실행 환경을 분리해서 제공하는 공통 runtime flag입니다.
  * - isCompactViewport: 현재 viewport 폭 기준
- * - isNativeRuntime: Android/iOS 앱웹 같은 native bridge runtime 기준
+ * - isNativeRuntime: Android WebView native bridge runtime 기준
  * - isAndroidApp: Android bridge 기준
  * - isMobileBrowser: native가 아닌 모바일 브라우저 기준
  */
@@ -42,7 +42,6 @@ export function useRuntimeModeFlags() {
     Boolean(
       isCompactViewport.value ||
       isAndroidApp.value ||
-      platformInfo.value.isIosApp ||
       isMobileBrowser.value
     )
   );

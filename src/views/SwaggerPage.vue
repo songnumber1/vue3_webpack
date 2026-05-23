@@ -60,7 +60,7 @@ import {
   installSwaggerRuntime,
   uninstallSwaggerRuntime,
 } from "@/platform/bridge/swagger/swaggerRuntime";
-import {installWebViewCompat} from "@/platform/browser/webviewCompat";
+import {installViewportCssVars} from "@/platform/viewport/viewportCssVars";
 import {logError} from "@/utils/logger";
 
 let swaggerInstance = null;
@@ -78,7 +78,7 @@ const renderSwagger = async () => {
   renderError.value = "";
 
   try {
-    installWebViewCompat();
+    installViewportCssVars();
     const [{default: SwaggerUI}] = await Promise.all([
       import(
         /* webpackChunkName: "swagger-ui-runtime" */ "swagger-ui-dist/swagger-ui-es-bundle"
@@ -121,7 +121,7 @@ const renderSwagger = async () => {
 };
 
 onMounted(async () => {
-  installWebViewCompat();
+  installViewportCssVars();
   installSwaggerRuntime();
   await renderSwagger();
 });

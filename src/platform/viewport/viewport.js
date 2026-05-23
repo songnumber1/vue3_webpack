@@ -4,7 +4,7 @@ export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
 export function getMobileBrowserFamily() {
   const userAgent =
     typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
-  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
+  if (/Chrome|Chromium/i.test(userAgent)) return "chrome";
 
   return "default";
 }
