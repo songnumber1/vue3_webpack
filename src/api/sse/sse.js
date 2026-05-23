@@ -15,7 +15,7 @@ export function isGenerationAbortError(error) {
   return (
     error?.name === "AbortError" ||
     error?.code === 20 ||
-    /aborted|abort|page lifecycle ended|mobile page hidden/i.test(message)
+    /aborted|abort|page lifecycle ended|mobile page hidden|mobile page frozen/i.test(message)
   );
 }
 
@@ -41,6 +41,12 @@ function shouldAbortChatOnMobileBackground() {
   }
 }
 
+/**
+ * 모바일 백그라운드 전환은 사용자가 설정에서 ON/OFF 할 수 있는 정책이고,
+ * 실제 페이지 종료/새로고침은 리소스 정리를 위해 항상 abort 해야 하는 정책입니다.
+ * 두 이벤트를 같은 handler로 묶으면 OFF 상태에서도 freeze/pagehide에서 abort되는
+ * 간헐 동작이 생길 수 있어 lifecycle 성격별로 분리합니다.
+ */
 function createStreamLifecycleGuard(controller, getReader) {
   if (!controller || typeof window === "undefined") {
     return () => {};
@@ -65,30 +71,56 @@ function createStreamLifecycleGuard(controller, getReader) {
     }
   };
 
-  const handlePageEnd = () => abortStream("page lifecycle ended");
-  const handleVisibilityChange = () => {
-    if (document.hidden && shouldAbortChatOnMobileBackground()) {
-      abortStream("mobile page hidden");
+  const abortForMobileBackgroundIfEnabled = (reason) => {
+    if (shouldAbortChatOnMobileBackground()) {
+      abortStream(reason);
     }
   };
 
-  window.addEventListener("pagehide", handlePageEnd, {capture: true});
-  window.addEventListener("beforeunload", handlePageEnd, {capture: true});
+  const handleVisibilityChange = () => {
+    if (document.hidden) {
+      abortForMobileBackgroundIfEnabled("mobile page hidden");
+    }
+  };
+
+  const handleFreeze = () => {
+    abortForMobileBackgroundIfEnabled("mobile page frozen");
+  };
+
+  const handlePageHide = (event) => {
+    // persisted=true 는 BFCache/일시 중지 성격이 강하므로 모바일 백그라운드 설정을 따른다.
+    if (event?.persisted) {
+      abortForMobileBackgroundIfEnabled("mobile page hidden");
+      return;
+    }
+
+    // persisted=false 는 새로고침/탭 종료/페이지 이탈 성격이므로 항상 정리한다.
+    abortStream("page lifecycle ended");
+  };
+
+  const handleBeforeUnload = () => {
+    abortStream("page lifecycle ended");
+  };
+
+  window.addEventListener("pagehide", handlePageHide, {capture: true});
+  window.addEventListener("beforeunload", handleBeforeUnload, {capture: true});
   document.addEventListener("visibilitychange", handleVisibilityChange, {
     capture: true,
   });
 
   if (typeof window.addEventListener === "function") {
-    window.addEventListener("freeze", handlePageEnd, {capture: true});
+    window.addEventListener("freeze", handleFreeze, {capture: true});
   }
 
   return () => {
-    window.removeEventListener("pagehide", handlePageEnd, {capture: true});
-    window.removeEventListener("beforeunload", handlePageEnd, {capture: true});
+    window.removeEventListener("pagehide", handlePageHide, {capture: true});
+    window.removeEventListener("beforeunload", handleBeforeUnload, {
+      capture: true,
+    });
     document.removeEventListener("visibilitychange", handleVisibilityChange, {
       capture: true,
     });
-    window.removeEventListener?.("freeze", handlePageEnd, {capture: true});
+    window.removeEventListener?.("freeze", handleFreeze, {capture: true});
   };
 }
 

@@ -16,8 +16,8 @@
 
 <script setup>
 import {computed, ref} from "vue";
-import PromptToolbarDesktop from "@/components/prompt/parts/PromptToolbarDesktop.vue";
-import PromptToolbarMobile from "@/components/prompt/parts/PromptToolbarMobile.vue";
+import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
+import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},

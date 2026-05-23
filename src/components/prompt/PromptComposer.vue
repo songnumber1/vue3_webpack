@@ -102,11 +102,11 @@
 
 <script setup>
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
-import PromptActionToolbar from "@/components/prompt/parts/PromptActionToolbar.vue";
-import PromptAttachmentPreviewList from "@/components/prompt/parts/PromptAttachmentPreviewList.vue";
-import PromptMobileSheets from "@/components/prompt/parts/PromptMobileSheets.vue";
-import PromptTextarea from "@/components/prompt/parts/PromptTextarea.vue";
-import PromptTemplatePanel from "@/components/prompt/parts/PromptTemplatePanel.vue";
+import PromptActionToolbar from "@/components/prompt/controls/PromptActionToolbar.vue";
+import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
+import PromptMobileSheets from "@/components/prompt/controls/PromptMobileSheets.vue";
+import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
+import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePanel.vue";
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},

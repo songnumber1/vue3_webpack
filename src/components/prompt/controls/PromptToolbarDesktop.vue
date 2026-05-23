@@ -151,9 +151,9 @@
 import {computed, nextTick, ref, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
-import PromptAttachButton from "@/components/prompt/parts/PromptAttachButton.vue";
-import PromptModelSelector from "@/components/prompt/parts/PromptModelSelector.vue";
-import PromptVoiceButton from "@/components/prompt/parts/PromptVoiceButton.vue";
+import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.vue";
+import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
+import PromptVoiceButton from "@/components/prompt/controls/PromptVoiceButton.vue";
 
 const {t} = useI18n();
 
