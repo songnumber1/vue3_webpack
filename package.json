@@ -22,10 +22,10 @@
     "madge:orphans": "madge --orphans src",
     "depcruise": "depcruise src --no-config --include-only \"^src\" --output-type html > dependency-report.html",
     "depcruise:circular": "depcruise src --no-config --output-type err",
-    "depcruise:composables": "depcruise src/composables --no-config --output-type html > composables-report.html",
-    "depcruise:stores": "depcruise src/stores --no-config --output-type html > stores-report.html",
-    "depcruise:chat": "depcruise src/components/chat --no-config --output-type html > chat-report.html",
-    "depcruise:json": "depcruise src --no-config --output-type json > dependency-report.json"
+    "depcruise:composables": "depcruise src/composables --no-config --output-type html > depcruise-composables-report.html",
+    "depcruise:stores": "depcruise src/stores --no-config --output-type html > depcruise-stores-report.html",
+    "depcruise:chat": "depcruise src/components/chat --no-config --output-type html > depcruise-chat-report.html",
+    "depcruise:json": "depcruise src --no-config --output-type json > depcruise-report.json"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

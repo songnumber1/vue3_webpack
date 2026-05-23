@@ -194,7 +194,8 @@
       "dependents": [
         "src/App.vue",
         "src/api/clients/httpClient.js",
-        "src/api/sse/sse.js",
+        "src/api/sse/browser/chrome/chromeLifecycle.js",
+        "src/api/sse/common/streamRequest.js",
         "src/components/chat/ChatHeader.vue",
         "src/components/debug/VirtualKeyboardDebug.vue",
         "src/components/menu/UserMenu.vue",
@@ -277,11 +278,10 @@
         "src/components/overlay/MobileApiProgressOverlay.vue",
         "src/components/overlay/MobileClipboardToast.vue",
         "src/components/overlay/ResponsiveOverlay.vue",
-        "src/components/prompt/parts/PromptAttachmentPreviewList.vue",
-        "src/components/prompt/parts/PromptMobileSheets.vue",
-        "src/components/prompt/parts/PromptToolbarDesktop.vue",
-        "src/components/prompt/parts/PromptToolbarMobile.vue",
-        "src/components/prompt/parts/desktop/PromptModelSelector.vue",
+        "src/components/prompt/controls/PromptAttachmentPreviewList.vue",
+        "src/components/prompt/controls/PromptMobileSheets.vue",
+        "src/components/prompt/controls/PromptToolbarDesktop.vue",
+        "src/components/prompt/controls/PromptToolbarMobile.vue",
         "src/composables/chat/container/useChatDataController.js",
         "src/composables/chat/container/useChatUIController.js",
         "src/composables/prompt/usePromptAttachment.js",
@@ -1168,18 +1168,14 @@
         "src/components/overlay/MobileApiProgressOverlay.vue",
         "src/components/overlay/MobileClipboardToast.vue",
         "src/components/overlay/ResponsiveOverlay.vue",
-        "src/components/prompt/parts/PromptActionToolbar.vue",
-        "src/components/prompt/parts/PromptAttachButton.vue",
-        "src/components/prompt/parts/PromptMobileSheets.vue",
-        "src/components/prompt/parts/PromptModelSelector.vue",
-        "src/components/prompt/parts/PromptTextarea.vue",
-        "src/components/prompt/parts/PromptToolbarDesktop.vue",
-        "src/components/prompt/parts/PromptToolbarMobile.vue",
-        "src/components/prompt/parts/PromptVoiceButton.vue",
-        "src/components/prompt/parts/desktop/PromptAttachButton.vue",
-        "src/components/prompt/parts/desktop/PromptModelSelector.vue",
-        "src/components/prompt/parts/desktop/PromptToolSelector.vue",
-        "src/components/prompt/parts/desktop/PromptVoiceButton.vue",
+        "src/components/prompt/controls/PromptActionToolbar.vue",
+        "src/components/prompt/controls/PromptAttachButton.vue",
+        "src/components/prompt/controls/PromptMobileSheets.vue",
+        "src/components/prompt/controls/PromptModelSelector.vue",
+        "src/components/prompt/controls/PromptTextarea.vue",
+        "src/components/prompt/controls/PromptToolbarDesktop.vue",
+        "src/components/prompt/controls/PromptToolbarMobile.vue",
+        "src/components/prompt/controls/PromptVoiceButton.vue",
         "src/composables/app/useAppContext.js",
         "src/composables/app/useRuntimeModeFlags.js",
         "src/composables/bottom-sheet/useBottomSheetSizing.js",
@@ -2872,7 +2868,7 @@
       "dependents": [
         "src/api/clients/httpClient.js",
         "src/api/live/authApi.live.js",
-        "src/api/sse/sse.js"
+        "src/api/sse/common/streamRequest.js"
       ],
       "orphan": false,
       "valid": true
@@ -2890,6 +2886,7 @@
       "dependents": [
         "src/api/clients/httpClient.js",
         "src/api/runtime/chatApis.js",
+        "src/api/sse/common/streamRequest.js",
         "src/api/sse/sse.js",
         "src/core/resolver/authAxios.js",
         "src/core/resolver/authGuard.js",
@@ -2910,7 +2907,7 @@
       "dependencies": [],
       "dependents": [
         "src/api/clients/httpClient.js",
-        "src/api/sse/sse.js",
+        "src/api/sse/common/streamRequest.js",
         "src/components/overlay/MobileApiProgressOverlay.vue",
         "src/core/bootstrap.js",
         "src/utils/viewportSettingsSync.js"
@@ -2930,7 +2927,7 @@
       "dependencies": [],
       "dependents": [
         "src/api/clients/httpClient.js",
-        "src/api/sse/sse.js",
+        "src/api/sse/common/streamRequest.js",
         "src/components/overlay/MobileApiProgressOverlay.vue"
       ],
       "orphan": false,
@@ -5875,7 +5872,7 @@
         "src/api/live/examplePromptApi.live.js",
         "src/api/live/modelApi.live.js",
         "src/api/live/promptTemplateApi.live.js",
-        "src/api/sse/sse.js",
+        "src/api/sse/common/streamRequest.js",
         "src/core/resolver/authGuard.js"
       ],
       "orphan": false,
@@ -7126,17 +7123,17 @@
       "valid": true
     },
     {
-      "source": "src/api/sse/sse.js",
+      "source": "src/api/sse/browser/chrome/chromeLifecycle.js",
       "dependencies": [
         {
-          "module": "@/api/mock/data/generationSamples.raw",
+          "module": "@/api/sse/common/sseErrors",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/api/mock/data/generationSamples.raw",
+          "resolved": "@/api/sse/common/sseErrors",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -7145,14 +7142,432 @@
           "valid": true
         },
         {
-          "module": "@/api/mock/fakeStream",
+          "module": "@/stores/systemSettingsStore",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/api/mock/fakeStream",
+          "resolved": "@/stores/systemSettingsStore",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/utils/logger",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/utils/logger",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/common/sseErrors",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/chrome/chromeLifecycle.js",
+        "src/api/sse/browser/desktop/desktopLifecycle.js",
+        "src/api/sse/common/streamGenerationCore.js",
+        "src/api/sse/sse.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/utils/logger",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/chrome/chromeLifecycle.js",
+        "src/api/sse/browser/desktop/desktopLifecycle.js",
+        "src/api/sse/common/streamGenerationCore.js",
+        "src/components/chat/MessageActions.vue",
+        "src/composables/chat/container/useChatDataController.js",
+        "src/composables/chat/container/useChatHistoryDialog.js",
+        "src/composables/chat/container/useChatNavigationActions.js",
+        "src/composables/chat/useChatRuntime.js",
+        "src/composables/chat/useChatSubmit.js",
+        "src/composables/prompt/usePromptAttachment.js",
+        "src/core/resolver/authGuard.js",
+        "src/core/resolver/bridge.js",
+        "src/core/resolver/errorUi.js",
+        "src/core/resolver/router.js",
+        "src/core/resolver/storage.js",
+        "src/platform/bridge/native/bridgeAndroidToJsRuntime.js",
+        "src/platform/bridge/platformBridge.js",
+        "src/utils/mermaidRenderer.js",
+        "src/views/SwaggerPage.vue"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/browser/chrome/streamGenerationChrome.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/browser/chrome/chromeLifecycle",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/browser/chrome/chromeLifecycle",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamGenerationCore",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamGenerationCore",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamRequest",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamRequest",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/browser/chrome/chromeLifecycle",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/chrome/streamGenerationChrome.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/common/streamGenerationCore",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/chrome/streamGenerationChrome.js",
+        "src/api/sse/browser/desktop/streamGenerationDesktop.js",
+        "src/api/sse/webview/android/streamGenerationAndroidWebView.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/common/streamRequest",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/chrome/streamGenerationChrome.js",
+        "src/api/sse/browser/desktop/streamGenerationDesktop.js",
+        "src/api/sse/common/streamGenerationCore.js",
+        "src/api/sse/generationResultApi.js",
+        "src/api/sse/webview/android/streamGenerationAndroidWebView.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/browser/desktop/desktopLifecycle.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/common/sseErrors",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/sseErrors",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/utils/logger",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/utils/logger",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/browser/desktop/streamGenerationDesktop.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/browser/desktop/desktopLifecycle",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/browser/desktop/desktopLifecycle",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamGenerationCore",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamGenerationCore",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamRequest",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamRequest",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/browser/desktop/desktopLifecycle",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/browser/desktop/streamGenerationDesktop.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/common/chunkCommitter.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/common/sseErrors.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/common/sseFrame.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/sseParser",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/sseParser",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/sseParser",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/common/sseFrame.js",
+        "src/api/sse/common/streamGenerationCore.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/common/streamGenerationCore.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/common/chunkCommitter",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/chunkCommitter",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/sseErrors",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/sseErrors",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/sseFrame",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/sseFrame",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamRequest",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamRequest",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -7176,6 +7591,62 @@
           "circular": false,
           "valid": true
         },
+        {
+          "module": "@/utils/logger",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/utils/logger",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/common/chunkCommitter",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/common/streamGenerationCore.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/common/sseFrame",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/common/streamGenerationCore.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/common/streamRequest.js",
+      "dependencies": [
         {
           "module": "@/constants/apiConfig",
           "moduleSystem": "es6",
@@ -7278,6 +7749,182 @@
       "valid": true
     },
     {
+      "source": "src/api/sse/generationResultApi.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/common/streamRequest",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamRequest",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/sse.js",
+      "dependencies": [
+        {
+          "module": "@/api/mock/data/generationSamples.raw",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/mock/data/generationSamples.raw",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/mock/fakeStream",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/mock/fakeStream",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/browser/chrome/streamGenerationChrome",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/browser/chrome/streamGenerationChrome",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/browser/desktop/streamGenerationDesktop",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/browser/desktop/streamGenerationDesktop",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/sseErrors",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/sseErrors",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/webview/android/streamGenerationAndroidWebView",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/webview/android/streamGenerationAndroidWebView",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/constants/apiMode",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/constants/apiMode",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/platform/runtime/runtimeDetector",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/platform/runtime/runtimeDetector",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/platform/runtime/runtimeTypes",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/platform/runtime/runtimeTypes",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "@/api/mock/data/generationSamples.raw",
       "followable": false,
       "coreModule": false,
@@ -7310,7 +7957,7 @@
       "valid": true
     },
     {
-      "source": "@/api/sse/sseParser",
+      "source": "@/api/sse/browser/chrome/streamGenerationChrome",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -7326,10 +7973,154 @@
       "valid": true
     },
     {
+      "source": "@/api/sse/browser/desktop/streamGenerationDesktop",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/sse.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/webview/android/streamGenerationAndroidWebView",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/sse.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/platform/runtime/runtimeDetector",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/sse.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/platform/runtime/runtimeTypes",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/sse.js",
+        "src/platform/runtime/runtimeDetector.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "src/api/sse/sseParser.js",
       "dependencies": [],
       "dependents": [],
       "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/webview/android/androidWebViewLifecycle.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/api/sse/webview/android/streamGenerationAndroidWebView.js",
+      "dependencies": [
+        {
+          "module": "@/api/sse/common/streamGenerationCore",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamGenerationCore",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/common/streamRequest",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/common/streamRequest",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "module": "@/api/sse/webview/android/androidWebViewLifecycle",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/webview/android/androidWebViewLifecycle",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/webview/android/androidWebViewLifecycle",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/api/sse/webview/android/streamGenerationAndroidWebView.js"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
@@ -7420,8 +8211,8 @@
         "src/components/menu/LanguageSheet.vue",
         "src/components/navigation/AppSidebar.vue",
         "src/components/navigation/parts/ChatHistoryActionMenu.vue",
-        "src/components/prompt/parts/PromptMobileSheets.vue",
-        "src/components/prompt/parts/PromptTemplatePanel.vue",
+        "src/components/prompt/controls/PromptMobileSheets.vue",
+        "src/components/prompt/controls/PromptTemplatePanel.vue",
         "src/views/playground/PlaygroundPage.vue"
       ],
       "orphan": false,
@@ -7442,9 +8233,8 @@
         "src/components/menu/UserMenu.vue",
         "src/components/navigation/AppSidebar.vue",
         "src/components/navigation/parts/SidebarAssistantSelector.vue",
-        "src/components/prompt/parts/PromptMobileSheets.vue",
-        "src/components/prompt/parts/PromptModelSelector.vue",
-        "src/components/prompt/parts/desktop/PromptModelSelector.vue"
+        "src/components/prompt/controls/PromptMobileSheets.vue",
+        "src/components/prompt/controls/PromptModelSelector.vue"
       ],
       "orphan": false,
       "valid": true
@@ -7766,37 +8556,6 @@
         "src/composables/markdown/useMarkdownTools.js",
         "src/composables/prompt/usePromptAttachment.js",
         "src/views/playground/PlaygroundPage.vue"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "@/utils/logger",
-      "followable": false,
-      "coreModule": false,
-      "couldNotResolve": true,
-      "matchesDoNotFollow": false,
-      "dependencyTypes": [
-        "unknown"
-      ],
-      "dependencies": [],
-      "dependents": [
-        "src/components/chat/MessageActions.vue",
-        "src/composables/chat/container/useChatDataController.js",
-        "src/composables/chat/container/useChatHistoryDialog.js",
-        "src/composables/chat/container/useChatNavigationActions.js",
-        "src/composables/chat/useChatRuntime.js",
-        "src/composables/chat/useChatSubmit.js",
-        "src/composables/prompt/usePromptAttachment.js",
-        "src/core/resolver/authGuard.js",
-        "src/core/resolver/bridge.js",
-        "src/core/resolver/errorUi.js",
-        "src/core/resolver/router.js",
-        "src/core/resolver/storage.js",
-        "src/platform/bridge/native/bridgeAndroidToJsRuntime.js",
-        "src/platform/bridge/platformBridge.js",
-        "src/utils/mermaidRenderer.js",
-        "src/views/SwaggerPage.vue"
       ],
       "orphan": false,
       "valid": true
@@ -8874,7 +9633,7 @@
       "dependencies": [],
       "dependents": [
         "src/components/chat/UserMessage.vue",
-        "src/components/prompt/parts/PromptAttachmentPreviewList.vue",
+        "src/components/prompt/controls/PromptAttachmentPreviewList.vue",
         "src/composables/prompt/usePromptAttachment.js"
       ],
       "orphan": false,
@@ -10573,10 +11332,8 @@
       ],
       "dependents": [
         "src/components/navigation/parts/ChatHistoryActionMenu.vue",
-        "src/components/prompt/parts/PromptAttachButton.vue",
-        "src/components/prompt/parts/PromptToolbarDesktop.vue",
-        "src/components/prompt/parts/desktop/PromptAttachButton.vue",
-        "src/components/prompt/parts/desktop/PromptToolSelector.vue"
+        "src/components/prompt/controls/PromptAttachButton.vue",
+        "src/components/prompt/controls/PromptToolbarDesktop.vue"
       ],
       "orphan": false,
       "valid": true
@@ -11357,14 +12114,14 @@
       "source": "src/components/prompt/PromptComposer.vue",
       "dependencies": [
         {
-          "module": "@/components/prompt/parts/PromptActionToolbar.vue",
+          "module": "@/components/prompt/controls/PromptActionToolbar.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptActionToolbar.vue",
+          "resolved": "@/components/prompt/controls/PromptActionToolbar.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11373,14 +12130,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptAttachmentPreviewList.vue",
+          "module": "@/components/prompt/controls/PromptAttachmentPreviewList.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptAttachmentPreviewList.vue",
+          "resolved": "@/components/prompt/controls/PromptAttachmentPreviewList.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11389,14 +12146,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptMobileSheets.vue",
+          "module": "@/components/prompt/controls/PromptMobileSheets.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptMobileSheets.vue",
+          "resolved": "@/components/prompt/controls/PromptMobileSheets.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11405,14 +12162,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptTemplatePanel.vue",
+          "module": "@/components/prompt/controls/PromptTemplatePanel.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptTemplatePanel.vue",
+          "resolved": "@/components/prompt/controls/PromptTemplatePanel.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11421,14 +12178,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptTextarea.vue",
+          "module": "@/components/prompt/controls/PromptTextarea.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptTextarea.vue",
+          "resolved": "@/components/prompt/controls/PromptTextarea.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11458,7 +12215,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptActionToolbar.vue",
+      "source": "@/components/prompt/controls/PromptActionToolbar.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11474,7 +12231,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptAttachmentPreviewList.vue",
+      "source": "@/components/prompt/controls/PromptAttachmentPreviewList.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11490,7 +12247,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptMobileSheets.vue",
+      "source": "@/components/prompt/controls/PromptMobileSheets.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11506,7 +12263,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptTemplatePanel.vue",
+      "source": "@/components/prompt/controls/PromptTemplatePanel.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11522,7 +12279,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptTextarea.vue",
+      "source": "@/components/prompt/controls/PromptTextarea.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11554,17 +12311,17 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptActionToolbar.vue",
+      "source": "src/components/prompt/controls/PromptActionToolbar.vue",
       "dependencies": [
         {
-          "module": "@/components/prompt/parts/PromptToolbarDesktop.vue",
+          "module": "@/components/prompt/controls/PromptToolbarDesktop.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptToolbarDesktop.vue",
+          "resolved": "@/components/prompt/controls/PromptToolbarDesktop.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11573,14 +12330,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptToolbarMobile.vue",
+          "module": "@/components/prompt/controls/PromptToolbarMobile.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptToolbarMobile.vue",
+          "resolved": "@/components/prompt/controls/PromptToolbarMobile.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11611,7 +12368,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptToolbarDesktop.vue",
+      "source": "@/components/prompt/controls/PromptToolbarDesktop.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11621,13 +12378,13 @@
       ],
       "dependencies": [],
       "dependents": [
-        "src/components/prompt/parts/PromptActionToolbar.vue"
+        "src/components/prompt/controls/PromptActionToolbar.vue"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptToolbarMobile.vue",
+      "source": "@/components/prompt/controls/PromptToolbarMobile.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -11637,13 +12394,13 @@
       ],
       "dependencies": [],
       "dependents": [
-        "src/components/prompt/parts/PromptActionToolbar.vue"
+        "src/components/prompt/controls/PromptActionToolbar.vue"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptAttachButton.vue",
+      "source": "src/components/prompt/controls/PromptAttachButton.vue",
       "dependencies": [
         {
           "module": "@floating-ui/vue",
@@ -11685,7 +12442,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptAttachmentPreviewList.vue",
+      "source": "src/components/prompt/controls/PromptAttachmentPreviewList.vue",
       "dependencies": [
         {
           "module": "@/utils/attachment",
@@ -11726,7 +12483,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptMobileSheets.vue",
+      "source": "src/components/prompt/controls/PromptMobileSheets.vue",
       "dependencies": [
         {
           "module": "@/components/common/bottom-sheet/BaseBottomSheet.vue",
@@ -11800,7 +12557,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptModelSelector.vue",
+      "source": "src/components/prompt/controls/PromptModelSelector.vue",
       "dependencies": [
         {
           "module": "@/components/icons/CheckIcon.vue",
@@ -11841,7 +12598,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptTemplatePanel.vue",
+      "source": "src/components/prompt/controls/PromptTemplatePanel.vue",
       "dependencies": [
         {
           "module": "@/components/common/bottom-sheet/BaseBottomSheet.vue",
@@ -11865,7 +12622,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptTextarea.vue",
+      "source": "src/components/prompt/controls/PromptTextarea.vue",
       "dependencies": [
         {
           "module": "vue",
@@ -11890,17 +12647,17 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptToolbarDesktop.vue",
+      "source": "src/components/prompt/controls/PromptToolbarDesktop.vue",
       "dependencies": [
         {
-          "module": "@/components/prompt/parts/PromptAttachButton.vue",
+          "module": "@/components/prompt/controls/PromptAttachButton.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptAttachButton.vue",
+          "resolved": "@/components/prompt/controls/PromptAttachButton.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11909,14 +12666,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptModelSelector.vue",
+          "module": "@/components/prompt/controls/PromptModelSelector.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptModelSelector.vue",
+          "resolved": "@/components/prompt/controls/PromptModelSelector.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11925,14 +12682,14 @@
           "valid": true
         },
         {
-          "module": "@/components/prompt/parts/PromptVoiceButton.vue",
+          "module": "@/components/prompt/controls/PromptVoiceButton.vue",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/components/prompt/parts/PromptVoiceButton.vue",
+          "resolved": "@/components/prompt/controls/PromptVoiceButton.vue",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -11997,7 +12754,7 @@
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptAttachButton.vue",
+      "source": "@/components/prompt/controls/PromptAttachButton.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -12007,13 +12764,13 @@
       ],
       "dependencies": [],
       "dependents": [
-        "src/components/prompt/parts/PromptToolbarDesktop.vue"
+        "src/components/prompt/controls/PromptToolbarDesktop.vue"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptModelSelector.vue",
+      "source": "@/components/prompt/controls/PromptModelSelector.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -12023,13 +12780,13 @@
       ],
       "dependencies": [],
       "dependents": [
-        "src/components/prompt/parts/PromptToolbarDesktop.vue"
+        "src/components/prompt/controls/PromptToolbarDesktop.vue"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "@/components/prompt/parts/PromptVoiceButton.vue",
+      "source": "@/components/prompt/controls/PromptVoiceButton.vue",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -12039,13 +12796,13 @@
       ],
       "dependencies": [],
       "dependents": [
-        "src/components/prompt/parts/PromptToolbarDesktop.vue"
+        "src/components/prompt/controls/PromptToolbarDesktop.vue"
       ],
       "orphan": false,
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptToolbarMobile.vue",
+      "source": "src/components/prompt/controls/PromptToolbarMobile.vue",
       "dependencies": [
         {
           "module": "vue",
@@ -12087,174 +12844,7 @@
       "valid": true
     },
     {
-      "source": "src/components/prompt/parts/PromptVoiceButton.vue",
-      "dependencies": [
-        {
-          "module": "vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/vue/index.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/prompt/parts/desktop/PromptAttachButton.vue",
-      "dependencies": [
-        {
-          "module": "@floating-ui/vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/@floating-ui/vue/dist/floating-ui.vue.umd.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/vue/index.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/prompt/parts/desktop/PromptModelSelector.vue",
-      "dependencies": [
-        {
-          "module": "@/components/icons/CheckIcon.vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "unknown"
-          ],
-          "resolved": "@/components/icons/CheckIcon.vue",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": true,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/vue/index.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "vue-i18n",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/vue-i18n/index.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/prompt/parts/desktop/PromptToolSelector.vue",
-      "dependencies": [
-        {
-          "module": "@floating-ui/vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/@floating-ui/vue/dist/floating-ui.vue.umd.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "vue",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "npm",
-            "import"
-          ],
-          "resolved": "node_modules/vue/index.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/components/prompt/parts/desktop/PromptVoiceButton.vue",
+      "source": "src/components/prompt/controls/PromptVoiceButton.vue",
       "dependencies": [
         {
           "module": "vue",
@@ -14349,7 +14939,6 @@
         "src/core/config/android.js",
         "src/core/config/default.js",
         "src/core/config/extension.js",
-        "src/core/config/ios.js",
         "src/utils/attachment.js"
       ],
       "orphan": false,
@@ -14358,6 +14947,22 @@
     {
       "source": "src/composables/chat/useChatSubmit.js",
       "dependencies": [
+        {
+          "module": "@/api/sse/generationResultApi",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/api/sse/generationResultApi",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "module": "@/api/sse/sse",
           "moduleSystem": "es6",
@@ -14441,6 +15046,22 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "@/api/sse/generationResultApi",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": true,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "unknown"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/composables/chat/useChatSubmit.js"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -16951,8 +17572,7 @@
         "src/core/config/android.js",
         "src/core/config/default.js",
         "src/core/config/extension.js",
-        "src/core/config/index.js",
-        "src/core/config/ios.js"
+        "src/core/config/index.js"
       ],
       "orphan": false,
       "valid": true
@@ -17113,69 +17733,9 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
-        },
-        {
-          "module": "./ios",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/core/config/ios.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
         }
       ],
       "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "src/core/config/ios.js",
-      "dependencies": [
-        {
-          "module": "./constants",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "src/core/config/constants.js",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "module": "@/utils/id",
-          "moduleSystem": "es6",
-          "dynamic": false,
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "unknown"
-          ],
-          "resolved": "@/utils/id",
-          "coreModule": false,
-          "followable": false,
-          "couldNotResolve": true,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "src/core/config/index.js"
-      ],
       "orphan": false,
       "valid": true
     },
@@ -18411,34 +18971,6 @@
       "valid": true
     },
     {
-      "source": "src/i18n/messages/auth.js",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
-      "source": "src/i18n/messages/chat.js",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
-      "source": "src/i18n/messages/common.js",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
-      "source": "src/i18n/messages/settings.js",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
       "source": "src/main.js",
       "dependencies": [
         {
@@ -18490,14 +19022,14 @@
           "valid": true
         },
         {
-          "module": "@/platform/browser/webviewCompat",
+          "module": "@/platform/viewport/viewportCssVars",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/platform/browser/webviewCompat",
+          "resolved": "@/platform/viewport/viewportCssVars",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -18593,7 +19125,7 @@
       "valid": true
     },
     {
-      "source": "@/platform/browser/webviewCompat",
+      "source": "@/platform/viewport/viewportCssVars",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": true,
@@ -20378,13 +20910,6 @@
       "valid": true
     },
     {
-      "source": "src/platform/browser/webviewCompat.js",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
       "source": "src/platform/platformDetector.js",
       "dependencies": [
         {
@@ -20422,6 +20947,37 @@
       ],
       "dependents": [],
       "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/platform/runtime/runtimeDetector.js",
+      "dependencies": [
+        {
+          "module": "@/platform/runtime/runtimeTypes",
+          "moduleSystem": "es6",
+          "dynamic": false,
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "unknown"
+          ],
+          "resolved": "@/platform/runtime/runtimeTypes",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": true,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/platform/runtime/runtimeTypes.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
       "valid": true
     },
     {
@@ -20588,6 +21144,13 @@
     },
     {
       "source": "src/platform/viewport/viewportConstants.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "src/platform/viewport/viewportCssVars.js",
       "dependencies": [],
       "dependents": [],
       "orphan": true,
@@ -38998,14 +39561,14 @@
           "valid": true
         },
         {
-          "module": "@/platform/browser/webviewCompat",
+          "module": "@/platform/viewport/viewportCssVars",
           "moduleSystem": "es6",
           "dynamic": false,
           "exoticallyRequired": false,
           "dependencyTypes": [
             "unknown"
           ],
-          "resolved": "@/platform/browser/webviewCompat",
+          "resolved": "@/platform/viewport/viewportCssVars",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": true,
@@ -40261,8 +40824,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1124,
-    "totalDependenciesCruised": 1657,
+    "totalCruised": 1143,
+    "totalDependenciesCruised": 1676,
     "optionsUsed": {
       "baseDir": "/Volumes/minwoo/project/vue/vue3_webpack",
       "combinedDependencies": false,
