@@ -27,6 +27,48 @@ function buildMockReasoningContent(normalized) {
   return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.\n\n- 요청: ${target}\n- Assistant/Model payload를 생성했습니다.\n- 스트림 응답이 완료되기 전까지 메시지 액션은 숨김 처리됩니다.`;
 }
 
+function isDocumentHidden() {
+  return typeof document !== "undefined" && document.hidden;
+}
+
+/**
+ * stream 중에는 content 반영과 scroll/nextTick을 분리합니다.
+ *
+ * content는 background 상태에서도 즉시 반영되어야 하므로 동기적으로 commit하고,
+ * scroll은 foreground에서만 한 번씩 예약합니다. 이렇게 해야 모바일 Chrome에서
+ * background OFF 상태로 수신한 데이터도 화면 복귀 시 최신 content로 표시됩니다.
+ */
+function createStreamScrollScheduler(options) {
+  let pending = false;
+
+  return () => {
+    if (pending || isDocumentHidden()) return;
+
+    pending = true;
+
+    Promise.resolve()
+      .then(async () => {
+        pending = false;
+
+        if (isDocumentHidden()) return;
+
+        await nextTick();
+
+        if (isDocumentHidden()) return;
+
+        await options.scrollBottom({
+          force: true,
+          stable: true,
+          autoAnswer: true,
+        });
+      })
+      .catch((error) => {
+        pending = false;
+        logWarn("[useChatSubmit] stream scroll failed:", error);
+      });
+  };
+}
+
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
   const chatStreamStore = useChatStreamStore();
@@ -69,6 +111,7 @@ export function useChatSubmit(options) {
       reasoningContent: buildMockReasoningContent(normalized),
       reasoningStatus: "thinking",
     };
+    const scheduleStreamScroll = createStreamScrollScheduler(options);
 
     function commitAssistantMessage(patch = {}) {
       liveAssistantMessage = {...liveAssistantMessage, ...patch};
@@ -94,16 +137,11 @@ export function useChatSubmit(options) {
           chatId: targetHistoryId,
         }),
         {
-          onChunk: async (content) => {
+          onChunk: (content) => {
             commitAssistantMessage({content, status: "streaming"});
-            await nextTick();
-            await options.scrollBottom({
-              force: true,
-              stable: true,
-              autoAnswer: true,
-            });
+            scheduleStreamScroll();
           },
-          onComplete: async () => {
+          onComplete: () => {
             commitAssistantMessage({
               status: "complete",
               reasoningStatus: "completed",
@@ -178,6 +216,7 @@ export function useChatSubmit(options) {
       assistantMessage,
     ];
     let liveAssistantMessage = assistantMessage;
+    const scheduleStreamScroll = createStreamScrollScheduler(options);
 
     function commitAssistantMessage(patch = {}) {
       liveAssistantMessage = {...liveAssistantMessage, ...patch};
@@ -203,16 +242,11 @@ export function useChatSubmit(options) {
           chatId: targetHistoryId,
         }),
         {
-          onChunk: async (content) => {
+          onChunk: (content) => {
             commitAssistantMessage({content, status: "streaming"});
-            await nextTick();
-            await options.scrollBottom({
-              force: true,
-              stable: true,
-              autoAnswer: true,
-            });
+            scheduleStreamScroll();
           },
-          onComplete: async () => {
+          onComplete: () => {
             commitAssistantMessage({
               status: "complete",
               reasoningStatus: "completed",

@@ -9,7 +9,6 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 import {logWarn} from "@/utils/logger";
 
-
 export function isGenerationAbortError(error) {
   const message = String(error?.message || error || "");
   return (
@@ -39,7 +38,6 @@ function isTouchRuntime() {
   return Number(navigator.maxTouchPoints || 0) > 0;
 }
 
-
 const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_MESSAGE =
   "모바일 백그라운드 전환으로 진행 중인 답변 요청이 종료되었습니다.";
 
@@ -67,10 +65,6 @@ function showMobileBackgroundAbortResumeAlert() {
 
 /**
  * SSE 전송 중 모바일 백그라운드 abort가 발생했을 때만 foreground 복귀 alert를 예약합니다.
- *
- * stream lifecycle guard는 abort 직후 cleanup될 수 있으므로, 복귀 알림은 guard cleanup과
- * 독립적인 1회성 listener로 관리합니다. 이렇게 해야 백그라운드 진입 시 stream이 정상
- * abort되어도 사용자가 앱으로 돌아왔을 때 종료 사실을 확인할 수 있습니다.
  */
 function scheduleMobileBackgroundAbortResumeAlert() {
   if (typeof window === "undefined" || typeof document === "undefined") return;
@@ -131,12 +125,8 @@ function resolveMobileBackgroundPolicy() {
 /**
  * 스트림 시작 시점의 모바일 백그라운드 정책을 snapshot으로 고정합니다.
  *
- * 설정 화면에서 OFF로 실행한 스트림이 모바일 lifecycle 이벤트 순서(pagehide → freeze →
- * beforeunload)에 따라 중간에 ON처럼 abort되는 문제를 막기 위해, 모바일 런타임에서는
- * visibilitychange/pagehide/freeze/beforeunload 모두 동일한 snapshot 정책을 따릅니다.
- *
  * - 모바일 + ON  : 백그라운드 성격 이벤트에서 abort
- * - 모바일 + OFF : 어떤 lifecycle 이벤트에서도 명시적 abort 금지
+ * - 모바일 + OFF : lifecycle 이벤트에서 명시적 abort 금지
  * - 데스크톱     : pagehide/beforeunload는 페이지 이탈로 보고 abort
  */
 function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
@@ -149,6 +139,7 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
   const abortStream = (reason) => {
     if (controller.signal.aborted) return;
     const abortReason = createAbortError(reason);
+
     try {
       controller.abort(abortReason);
     } catch (_error) {
@@ -174,12 +165,12 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
       return;
     }
 
-    // 비모바일에서는 기존처럼 pagehide/beforeunload 계열을 페이지 이탈로 본다.
     abortStream(reason);
   };
 
   const handleVisibilityChange = () => {
     if (!document.hidden) return;
+
     if (policy.isMobileRuntime) {
       if (policy.abortOnBackground) {
         scheduleMobileBackgroundAbortResumeAlert();
@@ -213,9 +204,7 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
     capture: true,
   });
 
-  if (typeof window.addEventListener === "function") {
-    window.addEventListener("freeze", handleFreeze, {capture: true});
-  }
+  window.addEventListener?.("freeze", handleFreeze, {capture: true});
 
   return () => {
     window.removeEventListener("pagehide", handlePageHide, {capture: true});
@@ -229,60 +218,6 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
   };
 }
 
-function isDocumentHidden() {
-  return typeof document !== "undefined" && document.hidden;
-}
-
-function waitForBrowserPaint() {
-  if (isDocumentHidden()) {
-    return Promise.resolve();
-  }
-  if (
-    typeof window === "undefined" ||
-    typeof window.requestAnimationFrame !== "function"
-  ) {
-    return Promise.resolve();
-  }
-
-  return new Promise((resolve) => {
-    let resolved = false;
-    let frameId = null;
-
-    const cleanup = () => {
-      document.removeEventListener?.("visibilitychange", handleHidden, {
-        capture: true,
-      });
-      window.removeEventListener?.("pagehide", handleHidden, {capture: true});
-      window.removeEventListener?.("freeze", handleHidden, {capture: true});
-      if (frameId !== null && typeof window.cancelAnimationFrame === "function") {
-        window.cancelAnimationFrame(frameId);
-      }
-    };
-
-    const finish = () => {
-      if (resolved) return;
-      resolved = true;
-      cleanup();
-      resolve();
-    };
-
-    const handleHidden = () => {
-      // rAF 대기 중 visibilitychange/pagehide/freeze가 발생하면 일부 모바일
-      // 브라우저에서 document.hidden 반영보다 lifecycle 이벤트가 먼저 올 수 있습니다.
-      // hidden 값만 기다리면 reader 루프가 rAF에서 멈출 수 있으므로 즉시 해제합니다.
-      finish();
-    };
-
-    document.addEventListener?.("visibilitychange", handleHidden, {
-      capture: true,
-    });
-    window.addEventListener?.("pagehide", handleHidden, {capture: true});
-    window.addEventListener?.("freeze", handleHidden, {capture: true});
-
-    frameId = window.requestAnimationFrame(finish);
-  });
-}
-
 function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION}`;
@@ -292,9 +227,102 @@ function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
   return Boolean(
     policy.overlay &&
-    settings.showMobileApiProgress &&
-    isMobileLikeViewport(settings.mobileBreakpoint)
+      settings.showMobileApiProgress &&
+      isMobileLikeViewport(settings.mobileBreakpoint)
   );
+}
+
+/**
+ * 수신된 SSE frame을 누적 문자열로 변환합니다.
+ */
+function appendParsedEvents(events, accumulated) {
+  let nextAccumulated = accumulated;
+  let changed = false;
+  let streamDone = false;
+
+  for (const event of events) {
+    const data = readSseData(event);
+
+    if (data.done) {
+      streamDone = true;
+      break;
+    }
+
+    if (!data.content) continue;
+
+    nextAccumulated += data.content;
+    changed = true;
+  }
+
+  return {
+    accumulated: nextAccumulated,
+    changed,
+    done: streamDone,
+  };
+}
+
+/**
+ * 스트림 수신 루프와 화면 반영을 분리합니다.
+ *
+ * onChunk가 Vue 렌더링, markdown 파싱, scroll 처리 등 무거운 작업을 포함하더라도
+ * reader.read() 루프가 그 작업을 기다리지 않도록 최신 누적값만 예약 반영합니다.
+ */
+function createChunkCommitter(onChunk) {
+  let latestValue = "";
+  let committedValue = "";
+  let scheduled = false;
+  let chain = Promise.resolve();
+
+  const run = async () => {
+    scheduled = false;
+
+    if (!latestValue || latestValue === committedValue) {
+      return;
+    }
+
+    const valueToCommit = latestValue;
+    committedValue = valueToCommit;
+
+    await onChunk?.(valueToCommit);
+
+    if (latestValue !== committedValue) {
+      schedule();
+    }
+  };
+
+  function schedule() {
+    if (scheduled) return chain;
+
+    scheduled = true;
+    chain = chain.catch(() => {}).then(run);
+
+    return chain;
+  }
+
+  function update(value) {
+    latestValue = value || "";
+    return schedule();
+  }
+
+  async function flush(value) {
+    if (typeof value === "string") {
+      latestValue = value;
+    }
+
+    scheduled = false;
+    await chain.catch(() => {});
+
+    if (latestValue && latestValue !== committedValue) {
+      const valueToCommit = latestValue;
+      committedValue = valueToCommit;
+      await onChunk?.(valueToCommit);
+    }
+  }
+
+  return {
+    update,
+    flush,
+  };
 }
 
 export async function streamGeneration(payload = {}, handlers = {}) {
@@ -323,9 +351,12 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     () => reader,
     mobileBackgroundPolicy
   );
+  const committer = createChunkCommitter(onChunk);
 
   if (controller) apiRequestStore.registerController(requestKey, controller);
   if (overlay) apiRequestStore.startOverlay();
+
+  let accumulated = "";
 
   try {
     const response = await fetch(resolveGenerationUrl(), {
@@ -348,117 +379,52 @@ export async function streamGeneration(payload = {}, handlers = {}) {
     }
 
     reader = response.body.getReader();
+
     const decoder = new TextDecoder("utf-8");
     let buffer = "";
-    let accumulated = "";
     let done = false;
-    let hiddenBacklogPending = false;
-    let resumeBacklogFlushPending = false;
-    let flushingHiddenBacklog = null;
 
-    const flushHiddenBacklog = async () => {
-      if (!hiddenBacklogPending || !accumulated) return;
-      hiddenBacklogPending = false;
-      await onChunk?.(accumulated);
-    };
-
-    const scheduleHiddenBacklogFlush = () => {
-      if (isDocumentHidden() || !hiddenBacklogPending) return;
-      flushingHiddenBacklog = Promise.resolve(flushingHiddenBacklog)
-        .catch(() => {})
-        .then(flushHiddenBacklog);
-    };
-
-    const handleResumeFlush = () => {
-      if (isDocumentHidden()) {
-        resumeBacklogFlushPending = true;
-        return;
+    while (!done) {
+      if (controller?.signal?.aborted) {
+        throw controller.signal.reason || createAbortError("Aborted");
       }
-      scheduleHiddenBacklogFlush();
-    };
 
-    if (typeof document !== "undefined") {
-      document.addEventListener("visibilitychange", handleResumeFlush, {
-        capture: true,
-      });
-    }
+      const result = await reader.read();
+      done = result.done;
 
-    try {
-      while (!done) {
-        if (controller?.signal?.aborted) {
-          throw controller.signal.reason || createAbortError("Aborted");
-        }
-        const result = await reader.read();
-        done = result.done;
-        if (result.value) {
-          buffer += decoder.decode(result.value, {stream: true});
-        }
-        if (done) {
-          buffer += decoder.decode();
-        }
-        const parsed = parseSseBuffer(buffer);
-        buffer = parsed.rest;
-
-        const shouldBatchBacklog =
-          isDocumentHidden() || hiddenBacklogPending || resumeBacklogFlushPending;
-
-        if (shouldBatchBacklog) {
-          let changed = false;
-          for (const event of parsed.events) {
-            const data = readSseData(event);
-            if (data.done) {
-              done = true;
-              break;
-            }
-            accumulated += data.content;
-            changed = true;
-          }
-
-          if (isDocumentHidden()) {
-            hiddenBacklogPending = hiddenBacklogPending || changed;
-            continue;
-          }
-
-          if (changed || hiddenBacklogPending || resumeBacklogFlushPending) {
-            const hadHiddenBacklog = hiddenBacklogPending;
-            resumeBacklogFlushPending = false;
-            await flushHiddenBacklog();
-            if (changed && !hadHiddenBacklog) {
-              await onChunk?.(accumulated);
-            }
-          }
-          continue;
-        }
-
-        for (const event of parsed.events) {
-          const data = readSseData(event);
-          if (data.done) {
-            done = true;
-            break;
-          }
-          accumulated += data.content;
-          await onChunk?.(accumulated);
-          await waitForBrowserPaint();
-        }
+      if (result.value) {
+        buffer += decoder.decode(result.value, {stream: true});
       }
-    } finally {
-      if (typeof document !== "undefined") {
-        document.removeEventListener("visibilitychange", handleResumeFlush, {
-          capture: true,
-        });
+
+      if (done) {
+        buffer += decoder.decode();
+      }
+
+      const parsed = parseSseBuffer(buffer);
+      buffer = parsed.rest;
+
+      const nextState = appendParsedEvents(parsed.events, accumulated);
+      accumulated = nextState.accumulated;
+
+      if (nextState.done) {
+        done = true;
+      }
+
+      if (nextState.changed) {
+        committer.update(accumulated);
       }
     }
 
-    if (hiddenBacklogPending) {
-      await flushHiddenBacklog();
-    }
-    if (flushingHiddenBacklog) {
-      await flushingHiddenBacklog.catch(() => {});
-    }
-
+    await committer.flush(accumulated);
     await onComplete?.();
+  } catch (error) {
+    // 모바일 background OFF 상태에서도 브라우저가 stream connection을 중단할 수 있습니다.
+    // 이 경우에도 JS가 이미 받은 accumulated 값은 catch로 넘어가기 전에 반드시 화면에 반영합니다.
+    await committer.flush(accumulated);
+    throw error;
   } finally {
     cleanupLifecycleGuard();
+
     if (reader && controller?.signal?.aborted) {
       await reader.cancel(controller.signal.reason).catch((error) => {
         if (!isGenerationAbortError(error)) {
@@ -466,7 +432,9 @@ export async function streamGeneration(payload = {}, handlers = {}) {
         }
       });
     }
+
     apiRequestStore.unregisterController(requestKey);
+
     if (overlay) apiRequestStore.stopOverlay();
   }
 }
