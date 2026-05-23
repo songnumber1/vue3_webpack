@@ -21,7 +21,7 @@ export const settingsMessages = {
           description: "끄면 프론트엔드 mock 데이터를 사용합니다.",
         },
         mobileBreakpoint: {
-          label: "모바일 반응형",
+          label: "반응형 전환 기준",
           description: "모바일 모드로 전환할 기준 너비(px)입니다.",
         },
         keyboardMode: {
@@ -68,8 +68,9 @@ export const settingsMessages = {
           description: "답변 시 스크롤 자동 이동 여부입니다.",
         },
         abortChatOnMobileBackground: {
-          label: "모바일 백그라운드 모드 시 채팅 종료",
-          description: "모바일에서 브라우저가 백그라운드로 전환되면 진행 중인 답변 요청의 abort를 시도합니다.",
+          label: "백그라운드 모드 시 채팅 종료",
+          description:
+            "모바일에서 브라우저가 백그라운드로 전환되면 진행 중인 답변 요청의 abort를 시도합니다.",
         },
         showGuideButton: {
           label: "가이드 버튼 화면 출력",

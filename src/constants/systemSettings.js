@@ -48,7 +48,7 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
 });
 
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
-  [SYSTEM_SETTING_KEYS.useRealApi]: false,
+  [SYSTEM_SETTING_KEYS.useRealApi]: true,
   [SYSTEM_SETTING_KEYS.mobileBreakpoint]: 768,
   [SYSTEM_SETTING_KEYS.keyboardMode]: KEYBOARD_MODES.adjustResize,
   [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
@@ -65,10 +65,10 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.showTermsMenu]: true,
   [SYSTEM_SETTING_KEYS.showPersonalizationMenu]: true,
   [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: false,
-  [SYSTEM_SETTING_KEYS.showLogoutButton]: false,
+  [SYSTEM_SETTING_KEYS.showLogoutButton]: true,
   [SYSTEM_SETTING_KEYS.showMobileApiProgress]: true,
   [SYSTEM_SETTING_KEYS.autoScrollOnAnswer]: false,
-  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: true,
+  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: false,
 });
 
 function normalizeKeyboardMode(value) {

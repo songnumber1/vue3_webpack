@@ -137,6 +137,7 @@ const groups = computed(() => [
       }),
       settingItem("useMicrophone"),
       settingItem("showMobileApiProgress"),
+      settingItem("abortChatOnMobileBackground"),
     ],
   },
   {
@@ -160,10 +161,7 @@ const groups = computed(() => [
   {
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
-    items: [
-      settingItem("autoScrollOnAnswer"),
-      settingItem("abortChatOnMobileBackground"),
-    ],
+    items: [settingItem("autoScrollOnAnswer")],
   },
   {
     kicker: "ACTION",
