@@ -18,7 +18,7 @@
       <button
         type="button"
         class="auth-required-button"
-        :disabled="loading"
+        :disabled="isBusy"
         @click="tempLogin"
       >
         {{
@@ -29,7 +29,7 @@
       <button
         type="button"
         class="auth-required-secondary-button"
-        :disabled="loading"
+        :disabled="isBusy"
         @click="checkLogin"
       >
         {{ t("loginRequired.retrySessionCheck") }}
@@ -51,7 +51,11 @@ const {t} = useI18n();
 const authStore = useAuthStore();
 
 const loading = ref(false);
+const checking = ref(false);
 const errorMessage = ref("");
+const authFlowId = ref(0);
+
+const isBusy = computed(() => loading.value || checking.value);
 
 const message = computed(() => {
   const key = `loginRequired.reasons.${route.query.reason}`;
@@ -68,31 +72,57 @@ async function moveAfterAuthenticated() {
   await router.replace(redirectPath.value || "/");
 }
 
+function isStaleAuthFlow(flowId) {
+  return flowId !== authFlowId.value;
+}
+
 async function checkLogin() {
+  if (isBusy.value) return;
+
+  const flowId = ++authFlowId.value;
+  checking.value = true;
   errorMessage.value = "";
 
   try {
     const result = await authApiLive.checkLogin();
 
+    if (isStaleAuthFlow(flowId)) return;
+
     if (!result?.path) {
       await moveAfterAuthenticated();
     }
   } catch (error) {
+    if (isStaleAuthFlow(flowId)) return;
+
     errorMessage.value = t("loginRequired.checkFailed");
+  } finally {
+    if (!isStaleAuthFlow(flowId)) {
+      checking.value = false;
+    }
   }
 }
 
 async function tempLogin() {
+  if (isBusy.value) return;
+
+  const flowId = ++authFlowId.value;
   loading.value = true;
   errorMessage.value = "";
 
   try {
     await authApiLive.tempLogin({userId: "temp-user", userName: "임시 사용자"});
+
+    if (isStaleAuthFlow(flowId)) return;
+
     await moveAfterAuthenticated();
   } catch (error) {
+    if (isStaleAuthFlow(flowId)) return;
+
     errorMessage.value = t("loginRequired.loginFailed");
   } finally {
-    loading.value = false;
+    if (!isStaleAuthFlow(flowId)) {
+      loading.value = false;
+    }
   }
 }
 

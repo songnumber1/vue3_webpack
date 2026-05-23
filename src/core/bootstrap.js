@@ -17,6 +17,7 @@ import {resolveErrorUI} from "@/core/resolver/errorUi";
 import {resolveUploadStrategy} from "@/core/resolver/upload";
 import {i18n} from "@/i18n";
 import {installViewportModeClass} from "@/platform/viewport/viewportMode";
+import {logWarn} from "@/utils/logger";
 
 export async function bootstrap() {
   installViewportModeClass();
@@ -38,6 +39,11 @@ export async function bootstrap() {
   const Layout = resolveLayout(appInfo);
 
   const app = createApp(App);
+  app.config.errorHandler = (error, instance, info) => {
+    logWarn("[bootstrap] vue error:", error, info, instance);
+    errorUI?.notify?.("애플리케이션 처리 중 오류가 발생했습니다.");
+  };
+
   const pinia = createPinia();
   app.use(pinia);
   app.use(i18n);
