@@ -12,7 +12,7 @@
     "serve:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode dev",
     "build:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode dev",
     "build:prod": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode prod",
-    "madge:graph": "madge --image graph.png src",
+    "madge:graph": "madge --image madge-graph.png src",
     "madge:chat": "madge --image madge-chat.svg src/components/chat",
     "madge:stores": "madge --image madge-stores.svg src/stores",
     "madge:composables": "madge --image madge-composables.svg src/composables",

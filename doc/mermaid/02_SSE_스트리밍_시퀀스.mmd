@@ -1,0 +1,18 @@
+sequenceDiagram
+  actor User
+  participant PromptBox
+  participant ChatStore
+  participant GenerationApi
+  participant RuntimeFactory
+  participant ChromeRuntime
+  participant WebViewRuntime
+  participant CommonSSE
+  participant Backend
+  User->>PromptBox: 질문 입력
+  PromptBox->>ChatStore: sendMessage()
+  ChatStore->>GenerationApi: startGeneration(payload)
+  GenerationApi->>RuntimeFactory: resolve runtime
+  RuntimeFactory->>ChromeRuntime: Android Chrome streamGeneration()
+  RuntimeFactory->>WebViewRuntime: Android WebView streamGeneration()
+  ChromeRuntime->>Backend: POST /generation.do
+  Backend-->>CommonSSE: SSE chunk
