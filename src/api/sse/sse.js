@@ -39,6 +39,62 @@ function isTouchRuntime() {
   return Number(navigator.maxTouchPoints || 0) > 0;
 }
 
+
+const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_MESSAGE =
+  "모바일 백그라운드 전환으로 진행 중인 답변 요청이 종료되었습니다.";
+
+let pendingMobileBackgroundAbortAlert = false;
+let mobileBackgroundAbortAlertCleanup = null;
+
+function clearMobileBackgroundAbortAlertListeners() {
+  if (typeof mobileBackgroundAbortAlertCleanup === "function") {
+    mobileBackgroundAbortAlertCleanup();
+  }
+  mobileBackgroundAbortAlertCleanup = null;
+}
+
+function showMobileBackgroundAbortResumeAlert() {
+  if (!pendingMobileBackgroundAbortAlert) return;
+  if (typeof document !== "undefined" && document.hidden) return;
+
+  pendingMobileBackgroundAbortAlert = false;
+  clearMobileBackgroundAbortAlertListeners();
+
+  if (typeof window !== "undefined" && typeof window.alert === "function") {
+    window.alert(MOBILE_BACKGROUND_ABORT_RESUME_ALERT_MESSAGE);
+  }
+}
+
+/**
+ * SSE 전송 중 모바일 백그라운드 abort가 발생했을 때만 foreground 복귀 alert를 예약합니다.
+ *
+ * stream lifecycle guard는 abort 직후 cleanup될 수 있으므로, 복귀 알림은 guard cleanup과
+ * 독립적인 1회성 listener로 관리합니다. 이렇게 해야 백그라운드 진입 시 stream이 정상
+ * abort되어도 사용자가 앱으로 돌아왔을 때 종료 사실을 확인할 수 있습니다.
+ */
+function scheduleMobileBackgroundAbortResumeAlert() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+
+  pendingMobileBackgroundAbortAlert = true;
+  clearMobileBackgroundAbortAlertListeners();
+
+  const handleResume = () => {
+    showMobileBackgroundAbortResumeAlert();
+  };
+
+  document.addEventListener("visibilitychange", handleResume, {capture: true});
+  window.addEventListener("pageshow", handleResume, {capture: true});
+  window.addEventListener("focus", handleResume, {capture: true});
+
+  mobileBackgroundAbortAlertCleanup = () => {
+    document.removeEventListener("visibilitychange", handleResume, {
+      capture: true,
+    });
+    window.removeEventListener("pageshow", handleResume, {capture: true});
+    window.removeEventListener("focus", handleResume, {capture: true});
+  };
+}
+
 function resolveMobileBackgroundPolicy() {
   if (typeof document === "undefined") {
     return {
@@ -112,6 +168,7 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
   const abortForMobileBackgroundIfEnabled = (reason) => {
     if (policy.isMobileRuntime) {
       if (policy.abortOnBackground) {
+        scheduleMobileBackgroundAbortResumeAlert();
         abortStream(reason);
       }
       return;
@@ -125,6 +182,7 @@ function createStreamLifecycleGuard(controller, getReader, policySnapshot) {
     if (!document.hidden) return;
     if (policy.isMobileRuntime) {
       if (policy.abortOnBackground) {
+        scheduleMobileBackgroundAbortResumeAlert();
         abortStream("mobile page hidden");
       }
       return;
