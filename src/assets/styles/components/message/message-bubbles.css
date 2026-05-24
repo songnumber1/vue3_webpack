@@ -229,3 +229,44 @@ body.mobile-mode .message-actions button {
   color: var(--text-color, inherit);
   line-height: 1.5;
 }
+
+/* Streaming answer scrollbar policy
+   답변 수신 중 markdown re-render로 답변 박스와 내부 요소의 scrollbar가 깜빡이는 것을 방지한다.
+   message.status가 complete/error로 바뀌면 message--streaming 클래스가 제거되어 기존 overflow 정책이 복원된다. */
+.message--assistant.message--streaming .bubble,
+.message--assistant.message--streaming .bubble-content.markdown-body,
+.message--assistant.message--streaming .reasoning-content.markdown-body,
+.message--assistant.message--streaming .bubble-content.markdown-body pre,
+.message--assistant.message--streaming .reasoning-content.markdown-body pre,
+.message--assistant.message--streaming .bubble-content.markdown-body .md-table-wrapper,
+.message--assistant.message--streaming .reasoning-content.markdown-body .md-table-wrapper,
+.message--assistant.message--streaming .bubble-content.markdown-body .katex-display,
+.message--assistant.message--streaming .reasoning-content.markdown-body .katex-display,
+.message--assistant.message--streaming .bubble-content.markdown-body .md-mermaid,
+.message--assistant.message--streaming .reasoning-content.markdown-body .md-mermaid,
+.message--assistant.message--streaming .md-mermaid,
+.message--assistant.message--streaming .md-mermaid-card {
+  overflow: hidden !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.message--assistant.message--streaming .bubble::-webkit-scrollbar,
+.message--assistant.message--streaming .bubble-content.markdown-body::-webkit-scrollbar,
+.message--assistant.message--streaming .reasoning-content.markdown-body::-webkit-scrollbar,
+.message--assistant.message--streaming .bubble-content.markdown-body pre::-webkit-scrollbar,
+.message--assistant.message--streaming .reasoning-content.markdown-body pre::-webkit-scrollbar,
+.message--assistant.message--streaming .bubble-content.markdown-body .md-table-wrapper::-webkit-scrollbar,
+.message--assistant.message--streaming .reasoning-content.markdown-body .md-table-wrapper::-webkit-scrollbar,
+.message--assistant.message--streaming .bubble-content.markdown-body .katex-display::-webkit-scrollbar,
+.message--assistant.message--streaming .reasoning-content.markdown-body .katex-display::-webkit-scrollbar,
+.message--assistant.message--streaming .bubble-content.markdown-body .md-mermaid::-webkit-scrollbar,
+.message--assistant.message--streaming .reasoning-content.markdown-body .md-mermaid::-webkit-scrollbar,
+.message--assistant.message--streaming .md-mermaid::-webkit-scrollbar,
+.message--assistant.message--streaming .md-mermaid-card::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}

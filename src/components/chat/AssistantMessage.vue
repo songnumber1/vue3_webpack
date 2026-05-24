@@ -1,5 +1,5 @@
 <template>
-  <article class="message message--assistant">
+  <article class="message message--assistant" :class="{'message--streaming': !isMessageComplete}">
     <div class="avatar">AI</div>
     <div class="bubble bubble--assistant">
       <div class="bubble-meta">Assistant</div>
