@@ -8,6 +8,7 @@ function withRuntimePlatformOverride(baseAppInfo = {}) {
   return {
     ...baseAppInfo,
     platformOverride: systemSettingsStore.platformOverride,
+    mobileBreakpoint: systemSettingsStore.mobileBreakpoint,
   };
 }
 

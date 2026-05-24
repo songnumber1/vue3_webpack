@@ -1,7 +1,6 @@
 import {RUN_ENV, PLATFORM, hasAndroidBridge, hasExtensionRuntime} from "@/core/config";
-import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+import {DEFAULT_MOBILE_BREAKPOINT_PX, PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 import {logPlatformDebug} from "@/platform/platformDebug";
-import {MOBILE_BREAKPOINT_PX} from "@/platform/viewport/viewportConstants";
 
 function getNavigator() {
   return typeof window === "undefined" ? {} : window.navigator || {};
@@ -64,6 +63,13 @@ function getForcedPlatformOverride(value) {
   return Object.values(PLATFORM_OVERRIDE_MODES).includes(value)
     ? value
     : PLATFORM_OVERRIDE_MODES.auto;
+}
+
+function resolveCompactBreakpoint(value) {
+  const numeric = Number(value);
+  return Number.isFinite(numeric) && numeric > 0
+    ? Math.round(numeric)
+    : DEFAULT_MOBILE_BREAKPOINT_PX;
 }
 
 function resolveForcedPlatform({baseAppInfo, detected}) {
@@ -163,7 +169,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const visualWidth = typeof window === "undefined" ? 0 : Math.round(window.visualViewport?.width || 0);
   const compactWidthCandidates = [visualWidth, width].filter((value) => Number.isFinite(value) && value > 0);
   const compactWidth = compactWidthCandidates.length ? Math.min(...compactWidthCandidates) : 0;
-  const isCompactViewport = compactWidth > 0 && compactWidth <= MOBILE_BREAKPOINT_PX;
+  const compactBreakpoint = resolveCompactBreakpoint(baseAppInfo.mobileBreakpoint);
+  const isCompactViewport = compactWidth > 0 && compactWidth <= compactBreakpoint;
   const isMic = isSupportedMobileMicBrowser({isAndroid, isMobileBrowser, browserName});
 
   logPlatformDebug("platform.resolve", {
@@ -171,7 +178,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isPlatformForced: forcedPlatform.isForced,
     actualPlatform: actualPlatform.label,
     resolved: {env, runtime, device, browser: browserName, isAndroid, isMobile, isMobileBrowser, isAndroidApp, isCompactViewport},
-    viewport: {width, height, visualWidth, compactWidth},
+    viewport: {width, height, visualWidth, compactWidth, compactBreakpoint},
   });
 
   return {
@@ -217,6 +224,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       pixelRatio: typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
     },
     viewport: {width, height},
+    compactBreakpoint,
     updatedAt: new Date().toISOString(),
   };
 }
