@@ -137,6 +137,7 @@
       :has-prompt-text="hasPromptText"
       :is-mic-enabled="isMicEnabled"
       :is-voice-listening="isVoiceListening"
+      :generating="generating"
       :is-speech-supported="isSpeechSupported"
       :voice-start-label="voiceStartLabel"
       :voice-stop-label="voiceStopLabel"
