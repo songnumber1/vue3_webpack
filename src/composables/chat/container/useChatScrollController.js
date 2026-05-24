@@ -12,8 +12,15 @@ export function useChatScrollController({
 
   function getMessageListRef() {
     const exposed = workspaceRef.value?.listRef;
-    if (exposed?.scrollToBottom) return exposed;
-    if (exposed?.value?.scrollToBottom) return exposed.value;
+    if (exposed?.scrollToBottom || exposed?.scrollToLatestUserMessage) {
+      return exposed;
+    }
+    if (
+      exposed?.value?.scrollToBottom ||
+      exposed?.value?.scrollToLatestUserMessage
+    ) {
+      return exposed.value;
+    }
     return null;
   }
 
@@ -43,6 +50,18 @@ export function useChatScrollController({
     updateScrollBottomButton();
   }
 
+  async function scrollLatestUserMessage(options = {}) {
+    const list = getMessageListRef();
+    if (list?.scrollToLatestUserMessage) {
+      list.scrollToLatestUserMessage({
+        stable: true,
+        ...options,
+      });
+    }
+    updateScrollBottomButton();
+  }
+
+
   function updateScrollBottomButton() {
     const list = getMessageListRef();
     showScrollBottom.value =
@@ -70,6 +89,7 @@ export function useChatScrollController({
     markForceBottom,
     clearForceBottom,
     scrollBottom,
+    scrollLatestUserMessage,
     scheduleBottomStateCheck,
     handleMessageContentRendered,
     cleanupScrollController,

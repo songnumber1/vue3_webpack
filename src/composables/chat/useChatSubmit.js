@@ -81,6 +81,21 @@ function createStreamScrollScheduler(options) {
   };
 }
 
+async function scrollAfterUserSubmit(options) {
+  await nextTick();
+
+  if (options.autoScrollOnAnswer?.value) {
+    await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+    return;
+  }
+
+  await options.scrollLatestUserMessage?.({
+    behavior: "auto",
+    stable: true,
+    offset: 16,
+  });
+}
+
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
   const chatStreamStore = useChatStreamStore();
@@ -135,8 +150,7 @@ export function useChatSubmit(options) {
     }
 
     commitAssistantMessage();
-    await nextTick();
-    await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+    await scrollAfterUserSubmit(options);
 
     isGenerating.value = true;
     chatStreamStore.start();

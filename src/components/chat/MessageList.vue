@@ -9,6 +9,8 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
+      :message-dom-id="String(message.id || '')"
+      :message-dom-role="message.role"
       @rendered="handleMessageRendered"
       @regenerate="$emit('regenerate', $event)"
     />
@@ -74,6 +76,47 @@ function applyBottomScroll(behavior = "auto") {
   el.scrollTop = el.scrollHeight;
   userIsAtBottom.value = true;
 }
+
+function getLatestUserMessageElement() {
+  const el = getScrollElement();
+  if (!el) return null;
+  const userMessages = el.querySelectorAll('[data-message-role="user"]');
+  return userMessages.length ? userMessages[userMessages.length - 1] : null;
+}
+
+function applyElementScroll(target, options = {}) {
+  const el = getScrollElement();
+  if (!el || !target) return false;
+
+  const behavior = options.behavior || "auto";
+  const offset = Number.isFinite(options.offset) ? options.offset : 16;
+  const containerRect = el.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const nextTop = el.scrollTop + targetRect.top - containerRect.top - offset;
+
+  el.scrollTo({
+    top: Math.max(0, nextTop),
+    behavior,
+  });
+  updateBottomState();
+  return true;
+}
+
+function scrollToLatestUserMessage(options = {}) {
+  clearStableTimers();
+
+  const target = getLatestUserMessageElement();
+  if (!applyElementScroll(target, options)) return;
+
+  if (!options.stable) return;
+
+  STABLE_SCROLL_DELAYS.forEach((delay) => {
+    const timerId = window.setTimeout(() => {
+      applyElementScroll(target, {...options, behavior: "auto"});
+    }, delay);
+    stableScrollTimerIds.push(timerId);
+  });
+}
 function scrollToBottom(options = {}) {
   const force = options.force === true;
   const stable = options.stable === true;
@@ -113,6 +156,7 @@ function getIsAtBottom() {
 
 defineExpose({
   scrollToBottom,
+  scrollToLatestUserMessage,
   isAtBottom: getIsAtBottom,
   getScrollElement,
 });

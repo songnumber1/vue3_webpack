@@ -11,7 +11,17 @@ function parseVersion(ua, pattern) {
   const match = ua.match(pattern);
   return match?.[1] || "";
 }
-function getBrowserName(ua) {
+function isAndroidWebViewUserAgent(ua) {
+  return /Android/i.test(ua) && (/; wv\)/i.test(ua) || /Version\/\d+/i.test(ua));
+}
+
+function getBrowserName(ua, hasBridge = false) {
+  if (hasBridge) return "webview";
+  if (/SamsungBrowser\//i.test(ua)) return "samsung";
+  if (/EdgA\//i.test(ua)) return "edge";
+  if (/OPR\//i.test(ua) || /Opera\//i.test(ua)) return "opera";
+  if (/Firefox\//i.test(ua) || /FxiOS\//i.test(ua)) return "firefox";
+  if (isAndroidWebViewUserAgent(ua)) return "android-webview";
   if (/Chrome\//i.test(ua)) return "chrome";
   return "unknown";
 }
@@ -49,10 +59,11 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const screen = getScreen();
   const ua = nav.userAgent || "";
   const navPlatform = nav.platform || "";
-  const browserName = getBrowserName(ua);
+  const hasBridge = hasAndroidBridge();
+  const browserName = getBrowserName(ua, hasBridge);
   const browserVersion = getBrowserVersion(ua, browserName);
   const env = baseAppInfo.platform || detectEnv(ua, navPlatform);
-  const runtime = hasAndroidBridge()
+  const runtime = hasBridge
     ? RUN_ENV.NATIVE
     : hasExtensionRuntime()
       ? RUN_ENV.EXTENSION
@@ -61,7 +72,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAndroid = env === PLATFORM.ANDROID;
   const isWindows = env === PLATFORM.WINDOWS;
   const isNativeApp = runtime === RUN_ENV.NATIVE;
-  const isAndroidApp = isAndroid && hasAndroidBridge();
+  const isAndroidApp = isAndroid && hasBridge;
   const isMobile = isAndroid;
   const isMobileBrowser = isMobile && !isNativeApp;
   const isUnsupportedBrowser = isMobileBrowser && browserName !== "chrome";

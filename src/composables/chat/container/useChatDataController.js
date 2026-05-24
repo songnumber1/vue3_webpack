@@ -177,6 +177,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
       if (options.autoAnswer) ui.markForceBottom(2500);
       await ui.scrollBottom(options);
     },
+    scrollLatestUserMessage: ui.scrollLatestUserMessage,
+    autoScrollOnAnswer: ui.autoScrollOnAnswer,
     renderAfterStream,
   });
 

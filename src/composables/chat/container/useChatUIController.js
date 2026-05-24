@@ -65,6 +65,7 @@ export function useChatUIController({
     markForceBottom,
     clearForceBottom,
     scrollBottom,
+    scrollLatestUserMessage,
     scheduleBottomStateCheck,
     handleMessageContentRendered,
     cleanupScrollController,
@@ -76,10 +77,9 @@ export function useChatUIController({
   });
 
   const {keyboardOpen, refreshViewport} = useViewportGuard({
-    onChange: ({isCompact, keyboardOpen: isKeyboardOpen}) => {
-      if (!pageState.isMainPage.value && isCompact && isKeyboardOpen) {
-        scrollBottom({stable: true});
-      }
+    onChange: () => {
+      // Keyboard/focus viewport changes must not force scroll.
+      // Submit-time question scrolling is owned by useChatSubmit.
     },
   });
 
@@ -109,12 +109,9 @@ export function useChatUIController({
   });
 
   const {handlePromptFocus, handlePromptResize} = useChatPromptActions({
-    isMainPage: pageState.isMainPage,
     isReadOnly: pageState.isReadOnly,
     isActiveModelUnavailable: runtime.isActiveModelUnavailable,
-    isMobile,
     refreshViewport,
-    scrollBottom,
   });
 
   const navigationActions = useChatNavigationActions({
@@ -204,6 +201,7 @@ export function useChatUIController({
     markForceBottom,
     clearForceBottom,
     scrollBottom,
+    scrollLatestUserMessage,
     refreshViewport,
     updateMobileState,
     bindUiEvents,
