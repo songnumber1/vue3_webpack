@@ -37,6 +37,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     appendUserAndAssistantMessages,
     currentExamplePrompts,
     getHistory,
+    syncHistoriesInBackground,
   } = runtime;
 
   const activeHistoryId = computed(() => {
@@ -179,6 +180,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     },
     scrollLatestUserMessage: ui.scrollLatestUserMessage,
     autoScrollOnAnswer: ui.autoScrollOnAnswer,
+    syncHistories: () => syncHistoriesInBackground({notifyOnError: true}),
     renderAfterStream,
   });
 

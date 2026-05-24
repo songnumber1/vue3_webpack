@@ -10,6 +10,7 @@ export function useChatHistoryDialog({
   toggleHistoryBookmark,
   renameHistory,
   removeHistory,
+  syncHistoriesInBackground,
 }) {
   const chatStreamStore = useChatStreamStore();
   const historyDialogOpen = ref(false);
@@ -67,6 +68,7 @@ export function useChatHistoryDialog({
   async function handleHistoryMenuAction({action, history} = {}) {
     if (chatStreamStore.isStreaming) return;
     if (!history || !action) return;
+    syncHistoriesInBackground?.({notifyOnError: true});
     if (action === "pin" || action === "unpin") {
       try {
         await toggleHistoryBookmark(history);
@@ -82,6 +84,7 @@ export function useChatHistoryDialog({
       return;
     }
     if (action === "share") {
+      syncHistoriesInBackground?.({notifyOnError: true});
       historyNoticeMessage.value = t("chat.historyDialog.shareSelected");
       historyNoticeOpen.value = true;
       return;

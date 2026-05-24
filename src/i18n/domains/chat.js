@@ -81,6 +81,9 @@ export const chatMessages = {
         shareSelected: "공유 버튼을 선택했습니다.",
         titleField: "대화방 제목",
       },
+      historySync: {
+        loadFailed: "대화방 리스트를 가져오는데 실패했습니다.",
+      },
       imagePreview: {
         loading: "이미지를 불러오는 중입니다...",
         error: "이미지를 미리보기로 표시할 수 없습니다.",
@@ -184,6 +187,9 @@ export const chatMessages = {
         deleteMessage: "Delete '{title}'?",
         shareSelected: "Share was selected.",
         titleField: "Conversation title",
+      },
+      historySync: {
+        loadFailed: "Failed to load the chat list.",
       },
       imagePreview: {
         loading: "Loading image...",

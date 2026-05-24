@@ -17,6 +17,7 @@ import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
 import {adaptChatHistory} from "@/adapters/chatAdapter";
+import {notifyChatHistorySyncFailed} from "@/utils/chatHistorySyncFeedback";
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`;
 
@@ -134,7 +135,7 @@ export function useChatRuntime() {
     }
   }
 
-  async function refreshHistories() {
+  async function refreshHistories({notifyOnError = false} = {}) {
     try {
       const chatHistories = await loadChatHistoryList({
         assistantMap: assistantStore.assistantMap,
@@ -144,18 +145,28 @@ export function useChatRuntime() {
       return chatHistories;
     } catch (error) {
       logWarn("[useChatRuntime] refreshHistories 오류:", error);
+      if (notifyOnError) await notifyChatHistorySyncFailed(error);
       return chatStore.histories;
     }
+  }
+
+  function syncHistoriesInBackground(options = {}) {
+    Promise.resolve()
+      .then(() => refreshHistories(options))
+      .catch((error) => {
+        logWarn("[useChatRuntime] syncHistoriesInBackground 오류:", error);
+      });
   }
 
   async function toggleHistoryBookmark(history) {
     if (!history?.id) return;
     try {
+      syncHistoriesInBackground({notifyOnError: true});
       await updateChatBookmark({
         chatId: history.id,
         bookmarkYN: !history.isPinned,
       });
-      await refreshHistories();
+      syncHistoriesInBackground({notifyOnError: true});
     } catch (error) {
       logWarn("[useChatRuntime] toggleHistoryBookmark 오류:", error);
       throw error;
@@ -166,8 +177,9 @@ export function useChatRuntime() {
     const chatTitle = String(title || "").trim();
     if (!history?.id || !chatTitle) return;
     try {
+      syncHistoriesInBackground({notifyOnError: true});
       await renameChatHistory({chatId: history.id, chatTitle});
-      await refreshHistories();
+      syncHistoriesInBackground({notifyOnError: true});
     } catch (error) {
       logWarn("[useChatRuntime] renameHistory 오류:", error);
       throw error;
@@ -177,12 +189,13 @@ export function useChatRuntime() {
   async function removeHistory(history) {
     if (!history?.id) return;
     try {
+      syncHistoriesInBackground({notifyOnError: true});
       await deleteChatHistory({chatId: history.id});
       delete chatStore.messageMap[history.id];
       if (String(chatStore.selectedChatId) === String(history.id)) {
         chatStore.clearActiveSession();
       }
-      await refreshHistories();
+      syncHistoriesInBackground({notifyOnError: true});
     } catch (error) {
       logWarn("[useChatRuntime] removeHistory 오류:", error);
       throw error;
@@ -364,6 +377,7 @@ export function useChatRuntime() {
     isActiveModelUnavailable,
     conversations,
     refreshHistories,
+    syncHistoriesInBackground,
     toggleHistoryBookmark,
     renameHistory,
     removeHistory,

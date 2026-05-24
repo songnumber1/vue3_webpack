@@ -131,6 +131,7 @@ export function useChatSubmit(options) {
       targetHistoryId,
       normalized
     );
+    options.syncHistories?.();
     let liveMessages = messages;
     let liveAssistantMessage = {
       ...assistantMessage,

@@ -106,6 +106,7 @@ export function useChatUIController({
     toggleHistoryBookmark: runtime.toggleHistoryBookmark,
     renameHistory: runtime.renameHistory,
     removeHistory: runtime.removeHistory,
+    syncHistoriesInBackground: runtime.syncHistoriesInBackground,
   });
 
   const {handlePromptFocus, handlePromptResize} = useChatPromptActions({
