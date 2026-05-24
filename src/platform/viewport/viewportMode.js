@@ -1,4 +1,5 @@
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {logPlatformDebug} from "@/platform/platformDebug";
 
 const VIEWPORT_MODE_CLASSES = Object.freeze({
   mobile: "mobile-mode",
@@ -49,6 +50,16 @@ export function syncViewportModeClass(
   body.classList.toggle(VIEWPORT_MODE_CLASSES.desktop, !isMobile);
   body.dataset.viewportMode = isMobile ? "mobile" : "desktop";
   body.style.setProperty("--viewport-mode-breakpoint", `${breakpoint}px`);
+
+  logPlatformDebug("viewport.mode", {
+    width,
+    breakpoint,
+    viewportMode: isMobile ? "mobile" : "desktop",
+    bodyClass: {
+      mobile: body.classList.contains(VIEWPORT_MODE_CLASSES.mobile),
+      desktop: body.classList.contains(VIEWPORT_MODE_CLASSES.desktop),
+    },
+  });
 
   return isMobile;
 }

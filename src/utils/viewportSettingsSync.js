@@ -1,5 +1,6 @@
 import {useViewportStore} from "@/platform/viewport/viewportStore";
 import {syncViewportModeClass} from "@/platform/viewport/viewportMode";
+import {logPlatformDebug} from "@/platform/platformDebug";
 
 /**
  * Applies the currently configured mobile breakpoint to every viewport runtime
@@ -11,4 +12,12 @@ export function syncViewportSettings(breakpoint) {
   syncViewportModeClass(breakpoint);
   viewportStore.setBreakpoint(breakpoint);
   viewportStore.refresh();
+  logPlatformDebug("viewport.settings.sync", {
+    breakpoint,
+    viewport: {
+      width: viewportStore.width,
+      visualWidth: viewportStore.visualWidth,
+      isCompact: viewportStore.isCompact,
+    },
+  });
 }

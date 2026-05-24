@@ -87,20 +87,33 @@ import {computed, reactive, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {usePlatformStore} from "@/stores/platformStore";
 import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {
+  DEFAULT_MOBILE_BREAKPOINT_PX,
   DEFAULT_SYSTEM_SETTINGS,
+  FORCED_MOBILE_PLATFORM_BREAKPOINT_PX,
   KEYBOARD_MODE_OPTIONS,
+  PLATFORM_OVERRIDE_MODES,
+  PLATFORM_OVERRIDE_OPTIONS,
 } from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
 const {t} = useI18n();
 const systemSettingsStore = useSystemSettingsStore();
+const platformStore = usePlatformStore();
 const {settings} = storeToRefs(systemSettingsStore);
 
 const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
 
 const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
+
+const actualPlatformLabel = computed(() => {
+  const info = platformStore.info || {};
+  return info.actualPlatformLabel || [info.actualEnv, info.actualDevice, info.actualBrowser]
+    .filter(Boolean)
+    .join(" / ") || "-";
+});
 
 function settingItem(key, extra = {}) {
   return {
@@ -116,7 +129,16 @@ const groups = computed(() => [
   {
     kicker: t("common.api"),
     title: t("systemSettings.groups.api"),
-    items: [settingItem("useRealApi")],
+    items: [
+      settingItem("useRealApi"),
+      settingItem("platformOverride", {
+        type: "select",
+        label: t("systemSettings.items.platformOverride.labelWithActual", {
+          actual: actualPlatformLabel.value,
+        }),
+        options: PLATFORM_OVERRIDE_OPTIONS,
+      }),
+    ],
   },
   {
     kicker: "MOBILE",
@@ -190,12 +212,27 @@ function syncDraft() {
   Object.assign(draft, settings.value);
 }
 
+function resolvePlatformBreakpoint(platformOverride) {
+  return platformOverride === PLATFORM_OVERRIDE_MODES.auto
+    ? DEFAULT_MOBILE_BREAKPOINT_PX
+    : FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
+}
+
 function apply() {
+  draft.mobileBreakpoint = resolvePlatformBreakpoint(draft.platformOverride);
   systemSettingsStore.applySettings(draft);
+  platformStore.refresh();
   syncViewportSettings(systemSettingsStore.mobileBreakpoint);
   emit("applied");
   emit("close");
 }
+
+watch(
+  () => draft.platformOverride,
+  (platformOverride) => {
+    draft.mobileBreakpoint = resolvePlatformBreakpoint(platformOverride);
+  }
+);
 
 watch(settings, syncDraft, {immediate: true, deep: true});
 </script>

@@ -3,6 +3,7 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
 import {copyText as copyWebText} from "@/platform/system/clipboard";
 import {i18n} from "@/i18n";
+import {logPlatformDebug} from "@/platform/platformDebug";
 import {
   APP_CLIPBOARD_COPIED_EVENT,
   APP_TOAST_REQUESTED_EVENT,
@@ -53,6 +54,14 @@ function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
   };
 }
 export async function copyClipboardByPlatform(text) {
+  logPlatformDebug("feedback.clipboard.route", {
+    isAndroidApp: isAndroidApp(),
+    channel: getFeedbackChannel(),
+    platform: getStore().info?.env,
+    browser: getStore().info?.browser,
+    isPlatformForced: getStore().info?.isPlatformForced,
+  });
+
   const successMessage = t("clipboardNote.message");
   const toastMessage = t("clipboardNote.toastMessage");
 
@@ -150,6 +159,14 @@ export async function setBackHandler(enable) {
     : webSuccess({enabled: false});
 }
 export async function showToastByPlatform(message, options = {}) {
+  logPlatformDebug("feedback.toast.route", {
+    isAndroidApp: isAndroidApp(),
+    channel: getFeedbackChannel(),
+    platform: getStore().info?.env,
+    browser: getStore().info?.browser,
+    isPlatformForced: getStore().info?.isPlatformForced,
+  });
+
   const normalizedMessage = String(message || "").trim();
 
   if (!normalizedMessage) {

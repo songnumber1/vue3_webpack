@@ -1,3 +1,6 @@
+export const DEFAULT_MOBILE_BREAKPOINT_PX = 768;
+export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 1440;
+
 export const KEYBOARD_MODES = Object.freeze({
   adjustNothing: "adjustNothing",
   adjustPan: "adjustPan",
@@ -23,8 +26,34 @@ export const KEYBOARD_MODE_OPTIONS = Object.freeze([
   },
 ]);
 
+
+export const PLATFORM_OVERRIDE_MODES = Object.freeze({
+  auto: "auto",
+  androidChrome: "android-chrome",
+  androidWebView: "android-webview",
+});
+
+export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
+  {
+    value: PLATFORM_OVERRIDE_MODES.auto,
+    label: "Auto",
+    description: "현재 브라우저/앱 환경을 자동으로 판별합니다.",
+  },
+  {
+    value: PLATFORM_OVERRIDE_MODES.androidChrome,
+    label: "Android Chrome",
+    description: "웹 브라우저에서도 Android Chrome 모바일 브라우저 분기를 적용합니다.",
+  },
+  {
+    value: PLATFORM_OVERRIDE_MODES.androidWebView,
+    label: "Android WebView",
+    description: "웹 브라우저에서도 Android WebView 유사 분기를 적용합니다. Native Bridge는 실제 앱에서만 호출됩니다.",
+  },
+]);
+
 export const SYSTEM_SETTING_KEYS = Object.freeze({
   useRealApi: "useRealApi",
+  platformOverride: "platformOverride",
   mobileBreakpoint: "mobileBreakpoint",
   keyboardMode: "keyboardMode",
   useVirtualKeyboard: "useVirtualKeyboard",
@@ -49,7 +78,8 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
 
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.useRealApi]: true,
-  [SYSTEM_SETTING_KEYS.mobileBreakpoint]: 768,
+  [SYSTEM_SETTING_KEYS.platformOverride]: PLATFORM_OVERRIDE_MODES.auto,
+  [SYSTEM_SETTING_KEYS.mobileBreakpoint]: DEFAULT_MOBILE_BREAKPOINT_PX,
   [SYSTEM_SETTING_KEYS.keyboardMode]: KEYBOARD_MODES.adjustResize,
   [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
   [SYSTEM_SETTING_KEYS.showVirtualKeyboardDebug]: false,
@@ -71,6 +101,12 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: true,
 });
 
+function normalizePlatformOverride(value) {
+  return Object.values(PLATFORM_OVERRIDE_MODES).includes(value)
+    ? value
+    : DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.platformOverride];
+}
+
 function normalizeKeyboardMode(value) {
   return Object.values(KEYBOARD_MODES).includes(value)
     ? value
@@ -86,8 +122,12 @@ export function normalizeSystemSettings(value = {}) {
     if (key === SYSTEM_SETTING_KEYS.mobileBreakpoint) {
       const numeric = Number(source[key]);
       next[key] = Number.isFinite(numeric)
-        ? Math.min(Math.max(Math.round(numeric), 320), 1440)
+        ? Math.min(Math.max(Math.round(numeric), 320), FORCED_MOBILE_PLATFORM_BREAKPOINT_PX)
         : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+    if (key === SYSTEM_SETTING_KEYS.platformOverride) {
+      next[key] = normalizePlatformOverride(source[key]);
       return;
     }
     if (key === SYSTEM_SETTING_KEYS.keyboardMode) {
@@ -117,6 +157,13 @@ export function normalizeSystemSettings(value = {}) {
     }
     next[key] = Boolean(source[key]);
   });
+
+
+  if (next[SYSTEM_SETTING_KEYS.platformOverride] === PLATFORM_OVERRIDE_MODES.auto) {
+    next[SYSTEM_SETTING_KEYS.mobileBreakpoint] = DEFAULT_MOBILE_BREAKPOINT_PX;
+  } else {
+    next[SYSTEM_SETTING_KEYS.mobileBreakpoint] = FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
+  }
 
   if (
     next[SYSTEM_SETTING_KEYS.bottomSheetMaxHeight] <

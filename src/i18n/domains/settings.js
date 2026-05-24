@@ -24,6 +24,12 @@ export const settingsMessages = {
           label: "반응형 전환 기준",
           description: "모바일 모드로 전환할 기준 너비(px)입니다.",
         },
+        platformOverride: {
+          label: "플랫폼 강제 설정",
+          labelWithActual: "플랫폼 강제 설정 (진짜 플랫폼: {actual})",
+          description:
+            "웹 브라우저에서도 선택한 모바일 플랫폼 분기 로직을 적용합니다.",
+        },
         keyboardMode: {
           label: "키보드 모드",
           description:
@@ -260,6 +266,12 @@ export const settingsMessages = {
         mobileBreakpoint: {
           label: "Mobile breakpoint",
           description: "Viewport width in px used to switch to mobile mode.",
+        },
+        platformOverride: {
+          label: "Force platform",
+          labelWithActual: "Force platform (Actual: {actual})",
+          description:
+            "Apply the selected mobile platform branch logic even in a web browser.",
         },
         keyboardMode: {
           label: "Keyboard mode",

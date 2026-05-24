@@ -3,6 +3,7 @@ import {
   DEFAULT_SYSTEM_SETTINGS,
   normalizeSystemSettings,
 } from "@/constants/systemSettings";
+import {logPlatformDebug} from "@/platform/platformDebug";
 
 export const useSystemSettingsStore = defineStore("systemSettings", {
   state: () => ({
@@ -11,6 +12,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
   }),
   getters: {
     useRealApi: (state) => state.settings.useRealApi,
+    platformOverride: (state) => state.settings.platformOverride,
     mobileBreakpoint: (state) => state.settings.mobileBreakpoint,
     keyboardMode: (state) => state.settings.keyboardMode,
     useVirtualKeyboard: (state) => state.settings.useVirtualKeyboard,
@@ -40,8 +42,19 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
       this.hydrated = true;
     },
     applySettings(nextSettings) {
+      const previous = {...this.settings};
       this.settings = normalizeSystemSettings(nextSettings);
       this.hydrated = true;
+      logPlatformDebug("settings.apply", {
+        previous: {
+          platformOverride: previous.platformOverride,
+          mobileBreakpoint: previous.mobileBreakpoint,
+        },
+        next: {
+          platformOverride: this.settings.platformOverride,
+          mobileBreakpoint: this.settings.mobileBreakpoint,
+        },
+      });
     },
   },
 });

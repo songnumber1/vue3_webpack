@@ -4,6 +4,7 @@ import {API_KEYS, resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
+import {logPlatformDebug} from "@/platform/platformDebug";
 
 export function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
@@ -18,11 +19,22 @@ export function resolveGenerationResultUrl(requestId) {
 
 export function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
-  return Boolean(
+  const mobileLikeViewport = isMobileLikeViewport(settings.mobileBreakpoint);
+  const result = Boolean(
     policy.overlay &&
       settings.showMobileApiProgress &&
-      isMobileLikeViewport(settings.mobileBreakpoint)
+      mobileLikeViewport
   );
+
+  logPlatformDebug("sse.overlay", {
+    result,
+    policyOverlay: Boolean(policy.overlay),
+    showMobileApiProgress: Boolean(settings.showMobileApiProgress),
+    mobileBreakpoint: settings.mobileBreakpoint,
+    mobileLikeViewport,
+  });
+
+  return result;
 }
 
 export function createStreamRequestContext() {

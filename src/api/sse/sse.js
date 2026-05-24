@@ -4,6 +4,7 @@ import {streamText} from "@/api/mock/fakeStream";
 import {isGenerationAbortError} from "@/api/sse/common/sseErrors";
 import {resolveStreamRuntimeType} from "@/platform/runtime/runtimeDetector";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
+import {logPlatformDebug} from "@/platform/platformDebug";
 import {streamGenerationDesktop} from "@/api/sse/browser/desktop/streamGenerationDesktop";
 import {streamGenerationChrome} from "@/api/sse/browser/chrome/streamGenerationChrome";
 import {streamGenerationAndroidWebView} from "@/api/sse/webview/android/streamGenerationAndroidWebView";
@@ -34,6 +35,8 @@ export async function streamGeneration(payload = {}, handlers = {}) {
   if (!shouldUseServerApi()) return streamGenerationMock(payload, handlers);
 
   const runtimeType = resolveStreamRuntimeType();
+
+  logPlatformDebug("sse.route", {runtimeType});
 
   if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW) {
     return streamGenerationAndroidWebView(payload, handlers);

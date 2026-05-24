@@ -1,3 +1,6 @@
+import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {logPlatformDebug} from "@/platform/platformDebug";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 
 /**
@@ -64,14 +67,36 @@ export function isAndroidChromeUserAgent() {
  * @see {@link isAndroidChromeUserAgent} 크롬 브라우저 판단 함수
  */
 export function resolveStreamRuntimeType() {
-  // [1순위 판단] 안드로이드 전역 앱 브릿지가 연동되어 있다면 ANDROID_WEBVIEW 상수를 반환합니다.
-  if (hasAndroidWebViewBridge()) return STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
+  const settings = getRuntimeSystemSettings();
+  const override = settings.platformOverride || PLATFORM_OVERRIDE_MODES.auto;
+  const hasBridge = hasAndroidWebViewBridge();
+  const isAndroidChromeUa = isAndroidChromeUserAgent();
+  let runtimeType = STREAM_RUNTIME_TYPES.DESKTOP_BROWSER;
+  let reason = "desktop-browser-default";
 
-  // [2순위 판단] 앱 브릿지는 없으나 순정 안드로이드 크롬 브라우저 조건에 만족하면 ANDROID_CHROME 상수를 반환합니다.
-  if (isAndroidChromeUserAgent()) return STREAM_RUNTIME_TYPES.ANDROID_CHROME;
+  if (override === PLATFORM_OVERRIDE_MODES.androidChrome) {
+    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_CHROME;
+    reason = "forced-android-chrome";
+  } else if (override === PLATFORM_OVERRIDE_MODES.androidWebView) {
+    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
+    reason = "forced-android-webview";
+  } else if (hasBridge) {
+    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
+    reason = "actual-android-webview-bridge";
+  } else if (isAndroidChromeUa) {
+    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_CHROME;
+    reason = "actual-android-chrome-user-agent";
+  }
 
-  // [기본값] 위 두 가지 모바일 특수 환경이 아니라면 표준 데스크톱 브라우저 환경(DESKTOP_BROWSER)으로 처리합니다.
-  return STREAM_RUNTIME_TYPES.DESKTOP_BROWSER;
+  logPlatformDebug("sse.runtime", {
+    override,
+    runtimeType,
+    reason,
+    hasAndroidWebViewBridge: hasBridge,
+    isAndroidChromeUserAgent: isAndroidChromeUa,
+  });
+
+  return runtimeType;
 }
 
 /**

@@ -1,4 +1,6 @@
 import {RUN_ENV, PLATFORM, hasAndroidBridge, hasExtensionRuntime} from "@/core/config";
+import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+import {logPlatformDebug} from "@/platform/platformDebug";
 import {MOBILE_BREAKPOINT_PX} from "@/platform/viewport/viewportConstants";
 
 function getNavigator() {
@@ -36,12 +38,64 @@ function detectEnv(ua, platform) {
   if (/Linux/i.test(platform)) return PLATFORM.LINUX;
   return PLATFORM.UNKNOWN;
 }
+function resolveBasePlatform(value, ua, navPlatform) {
+  return Object.values(PLATFORM).includes(value) ? value : detectEnv(ua, navPlatform);
+}
+
 function detectDevice({env, browserName}) {
   if (hasAndroidBridge()) return "app";
   if (env === PLATFORM.ANDROID) return browserName === "chrome" ? "chrome" : "unsupported-android-browser";
   if (env === PLATFORM.WINDOWS || env === PLATFORM.MAC || env === PLATFORM.LINUX) return browserName === "unknown" ? "pc" : browserName;
   return "unknown";
 }
+
+function createActualPlatformInfo({env, runtime, device, browserName, browserVersion}) {
+  return {
+    env,
+    runtime,
+    device,
+    browser: browserName,
+    browserVersion,
+    label: [env, device, browserName].filter(Boolean).join(" / "),
+  };
+}
+
+function getForcedPlatformOverride(value) {
+  return Object.values(PLATFORM_OVERRIDE_MODES).includes(value)
+    ? value
+    : PLATFORM_OVERRIDE_MODES.auto;
+}
+
+function resolveForcedPlatform({baseAppInfo, detected}) {
+  const override = getForcedPlatformOverride(baseAppInfo.platformOverride);
+
+  if (override === PLATFORM_OVERRIDE_MODES.androidChrome) {
+    return {
+      ...detected,
+      env: PLATFORM.ANDROID,
+      runtime: RUN_ENV.BROWSER,
+      device: "chrome",
+      browserName: "chrome",
+      browserVersion: detected.browserVersion || "",
+      isForced: true,
+    };
+  }
+
+  if (override === PLATFORM_OVERRIDE_MODES.androidWebView) {
+    return {
+      ...detected,
+      env: PLATFORM.ANDROID,
+      runtime: RUN_ENV.BROWSER,
+      device: "android-webview",
+      browserName: "android-webview",
+      browserVersion: detected.browserVersion || "",
+      isForced: true,
+    };
+  }
+
+  return {...detected, isForced: false};
+}
+
 function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
   return bridge?.appVersion || bridge?.version || "";
@@ -60,22 +114,48 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const ua = nav.userAgent || "";
   const navPlatform = nav.platform || "";
   const hasBridge = hasAndroidBridge();
-  const browserName = getBrowserName(ua, hasBridge);
-  const browserVersion = getBrowserVersion(ua, browserName);
-  const env = baseAppInfo.platform || detectEnv(ua, navPlatform);
-  const runtime = hasBridge
+  const detectedBrowserName = getBrowserName(ua, hasBridge);
+  const detectedBrowserVersion = getBrowserVersion(ua, detectedBrowserName);
+  const detectedEnv = resolveBasePlatform(baseAppInfo.platform, ua, navPlatform);
+  const detectedRuntime = hasBridge
     ? RUN_ENV.NATIVE
     : hasExtensionRuntime()
       ? RUN_ENV.EXTENSION
       : RUN_ENV.BROWSER;
-  const device = detectDevice({env, browserName});
+  const detectedDevice = detectDevice({
+    env: detectedEnv,
+    browserName: detectedBrowserName,
+  });
+  const actualPlatform = createActualPlatformInfo({
+    env: detectedEnv,
+    runtime: detectedRuntime,
+    device: detectedDevice,
+    browserName: detectedBrowserName,
+    browserVersion: detectedBrowserVersion,
+  });
+  const forcedPlatform = resolveForcedPlatform({
+    baseAppInfo,
+    detected: {
+      env: detectedEnv,
+      runtime: detectedRuntime,
+      device: detectedDevice,
+      browserName: detectedBrowserName,
+      browserVersion: detectedBrowserVersion,
+    },
+  });
+  const browserName = forcedPlatform.browserName;
+  const browserVersion = forcedPlatform.browserVersion;
+  const env = forcedPlatform.env;
+  const runtime = forcedPlatform.runtime;
+  const device = forcedPlatform.device;
   const isAndroid = env === PLATFORM.ANDROID;
   const isWindows = env === PLATFORM.WINDOWS;
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
   const isMobile = isAndroid;
   const isMobileBrowser = isMobile && !isNativeApp;
-  const isUnsupportedBrowser = isMobileBrowser && browserName !== "chrome";
+  const isUnsupportedBrowser =
+    isMobileBrowser && browserName !== "chrome" && !forcedPlatform.isForced;
   const unsupportedReason = isUnsupportedBrowser ? "unsupported-android-browser" : "";
   const isAccess = !isUnsupportedBrowser;
   const width = typeof window === "undefined" ? 0 : window.innerWidth;
@@ -86,6 +166,14 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isCompactViewport = compactWidth > 0 && compactWidth <= MOBILE_BREAKPOINT_PX;
   const isMic = isSupportedMobileMicBrowser({isAndroid, isMobileBrowser, browserName});
 
+  logPlatformDebug("platform.resolve", {
+    platformOverride: getForcedPlatformOverride(baseAppInfo.platformOverride),
+    isPlatformForced: forcedPlatform.isForced,
+    actualPlatform: actualPlatform.label,
+    resolved: {env, runtime, device, browser: browserName, isAndroid, isMobile, isMobileBrowser, isAndroidApp, isCompactViewport},
+    viewport: {width, height, visualWidth, compactWidth},
+  });
+
   return {
     env,
     runtime,
@@ -94,6 +182,13 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     browserVersion,
     userAgent: ua,
     platform: navPlatform,
+    actualPlatform,
+    actualEnv: actualPlatform.env,
+    actualRuntime: actualPlatform.runtime,
+    actualDevice: actualPlatform.device,
+    actualBrowser: actualPlatform.browser,
+    actualBrowserVersion: actualPlatform.browserVersion,
+    actualPlatformLabel: actualPlatform.label,
     language: nav.language || "",
     languages: Array.from(nav.languages || []),
     isAccess,
@@ -107,6 +202,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isMobile,
     isMobileBrowser,
     isMic,
+    isPlatformForced: forcedPlatform.isForced,
+    platformOverride: getForcedPlatformOverride(baseAppInfo.platformOverride),
     isChrome: browserName === "chrome",
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",

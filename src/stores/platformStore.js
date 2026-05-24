@@ -1,5 +1,15 @@
 import {defineStore} from "pinia";
 import {resolveDetailedPlatform} from "@/platform/platformDetector";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+
+function withRuntimePlatformOverride(baseAppInfo = {}) {
+  const systemSettingsStore = useSystemSettingsStore();
+
+  return {
+    ...baseAppInfo,
+    platformOverride: systemSettingsStore.platformOverride,
+  };
+}
 
 export const usePlatformStore = defineStore("platform", {
   state: () => ({
@@ -23,12 +33,14 @@ export const usePlatformStore = defineStore("platform", {
   },
   actions: {
     initialize(baseAppInfo = {}) {
-      this.info = resolveDetailedPlatform(baseAppInfo);
+      this.info = resolveDetailedPlatform(withRuntimePlatformOverride(baseAppInfo));
       this.network.online =
         typeof navigator === "undefined" ? true : navigator.onLine;
     },
     refresh(baseAppInfo = {}) {
-      this.info = resolveDetailedPlatform({...this.info, ...baseAppInfo});
+      this.info = resolveDetailedPlatform(
+        withRuntimePlatformOverride({...this.info, ...baseAppInfo})
+      );
     },
     setPushToken(token) {
       this.pushToken = token || "";
