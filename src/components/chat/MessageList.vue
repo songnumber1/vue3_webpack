@@ -17,12 +17,18 @@
     <div v-if="loading" class="typing-row">
       <span></span><span></span><span></span>
     </div>
+    <div
+      v-if="streamFocusSpacerHeight > 0"
+      class="stream-focus-spacer"
+      :style="{height: `${streamFocusSpacerHeight}px`}"
+      aria-hidden="true"
+    ></div>
     <div ref="bottomRef" class="message-list-anchor" aria-hidden="true"></div>
   </section>
 </template>
 
 <script setup>
-import {nextTick, onBeforeUnmount, ref} from "vue";
+import {computed, nextTick, onBeforeUnmount, ref} from "vue";
 import ChatMessage from "./ChatMessage.vue";
 
 const BOTTOM_THRESHOLD = 48;
@@ -40,6 +46,17 @@ const scrollRef = ref(null);
 const bottomRef = ref(null);
 const userIsAtBottom = ref(true);
 let stableScrollTimerIds = [];
+const streamFocusSpacerHeight = computed(() => {
+  if (props.autoScrollOnAnswer || !props.loading) {
+    return 0;
+  }
+
+  const viewportHeight =
+    window.visualViewport?.height || window.innerHeight || 0;
+
+  return Math.max(0, Math.floor(viewportHeight * 0.72));
+});
+
 function getScrollElement() {
   return scrollRef.value;
 }
@@ -177,4 +194,10 @@ defineExpose({
 .typing-row {
   flex: 0 0 auto;
 }
+.stream-focus-spacer {
+  flex: 0 0 auto;
+  width: 100%;
+  pointer-events: none;
+}
+
 </style>
