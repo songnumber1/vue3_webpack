@@ -2,7 +2,7 @@
   <component
     :is="resolvedToolbarComponent"
     ref="toolbarComponentRef"
-    v-bind="props"
+    v-bind="toolbarProps"
     @open-model="forward('open-model')"
     @open-tool="forward('open-tool')"
     @open-attach="forward('open-attach')"
@@ -16,8 +16,10 @@
 
 <script setup>
 import {computed, ref} from "vue";
+import {storeToRefs} from "pinia";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
@@ -57,10 +59,17 @@ const emit = defineEmits([
   "stop-voice",
 ]);
 
+const chatStreamStore = useChatStreamStore();
+const {isStreaming} = storeToRefs(chatStreamStore);
+
 const toolbarComponentRef = ref(null);
 const resolvedToolbarComponent = computed(() =>
   props.isMobileSheet ? PromptToolbarMobile : PromptToolbarDesktop
 );
+const toolbarProps = computed(() => ({
+  ...props,
+  generating: props.generating || isStreaming.value,
+}));
 
 function forward(eventName, payload) {
   if (arguments.length > 1) {
