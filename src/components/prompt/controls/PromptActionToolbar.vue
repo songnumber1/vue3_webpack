@@ -36,6 +36,7 @@ const props = defineProps({
   isMicEnabled: {type: Boolean, default: false},
   isVoiceListening: {type: Boolean, default: false},
   hasVoiceStopped: {type: Boolean, default: false},
+  generating: {type: Boolean, default: false},
   isSpeechSupported: {type: Boolean, default: true},
   voiceStartLabel: {type: String, default: "Start voice input"},
   voiceStopLabel: {type: String, default: "Stop voice input"},

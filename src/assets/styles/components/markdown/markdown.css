@@ -241,6 +241,29 @@ body.mobile-mode .md-table-wrapper table {
   fill: #111827 !important;
 }
 
+:root[data-theme="dark"] .md-mermaid .actor > rect,
+:root[data-theme="dark"] .md-mermaid rect.actor,
+:root[data-theme="dark"] .md-mermaid .sequenceNumber {
+  fill: #2f2f2f !important;
+  stroke: #d1d5db !important;
+}
+:root[data-theme="dark"] .md-mermaid .actor > text,
+:root[data-theme="dark"] .md-mermaid text.actor,
+:root[data-theme="dark"] .md-mermaid text.labelText,
+:root[data-theme="dark"] .md-mermaid .labelText,
+:root[data-theme="dark"] .md-mermaid .loopText,
+:root[data-theme="dark"] .md-mermaid .noteText,
+:root[data-theme="dark"] .md-mermaid .signalText {
+  fill: #f4f4f4 !important;
+  color: #f4f4f4 !important;
+}
+:root[data-theme="dark"] .md-mermaid .labelBox,
+:root[data-theme="dark"] .md-mermaid .note,
+:root[data-theme="dark"] .md-mermaid .loopLine {
+  fill: #111827 !important;
+  stroke: #9ca3af !important;
+}
+
 .md-mermaid-card {
   width: 100%;
   max-width: 100%;

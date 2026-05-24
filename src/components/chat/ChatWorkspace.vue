@@ -41,7 +41,8 @@
         :floating="false"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating || isInteractionBlocked"
+        :disabled="false"
+        :generating="isGenerating"
         :model-readonly="modelReadonly"
         :show-help="false"
       />
@@ -78,7 +79,8 @@
         :is-mobile="isMobile"
         :selected-model="selectedModel"
         :models="models"
-        :disabled="isGenerating || isInteractionBlocked"
+        :disabled="false"
+        :generating="isGenerating"
         :model-readonly="modelReadonly"
         :show-help="false"
       />

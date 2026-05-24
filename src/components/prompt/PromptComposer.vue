@@ -32,7 +32,8 @@
 
       <PromptActionToolbar
         ref="toolbarRef"
-        :disabled="disabled"
+        :disabled="actionDisabled"
+        :generating="generating"
         :model-readonly="modelReadonly"
         :model-value="modelValue"
         :current-model="currentModel"
@@ -110,6 +111,7 @@ import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePane
 
 const props = defineProps({
   disabled: {type: Boolean, default: false},
+  generating: {type: Boolean, default: false},
   floating: {type: Boolean, default: false},
   showHelp: {type: Boolean, default: true},
   placeholder: {type: String, default: ""},
@@ -156,6 +158,7 @@ const {
   attachOptions,
   hasPromptText,
   canSubmit,
+  actionDisabled,
   resize,
   handleFocus,
   submit,

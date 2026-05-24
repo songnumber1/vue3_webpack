@@ -43,12 +43,14 @@
   <button
     v-else
     class="send-button"
+    :class="{'send-button--loading': generating}"
     type="submit"
-    :disabled="disabled || !canSubmit"
+    :disabled="disabled || generating || !canSubmit"
     :title="sendLabel"
     :aria-label="sendLabel"
   >
-    ↗
+    <span v-if="generating" class="send-button-spinner" aria-hidden="true"></span>
+    <span v-else aria-hidden="true">↗</span>
   </button>
 </template>
 
@@ -61,6 +63,7 @@ const props = defineProps({
   hasPromptText: {type: Boolean, default: false},
   isMicEnabled: {type: Boolean, default: false},
   isVoiceListening: {type: Boolean, default: false},
+  generating: {type: Boolean, default: false},
   isSpeechSupported: {type: Boolean, default: true},
   voiceStartLabel: {type: String, default: "Start voice input"},
   voiceStopLabel: {type: String, default: "Stop voice input"},
@@ -71,12 +74,13 @@ defineEmits(["start-voice", "stop-voice"]);
 
 const showVoiceStartButton = computed(
   () =>
+    !props.generating &&
     props.isMicEnabled &&
     props.isSpeechSupported &&
     !props.hasPromptText &&
     !props.isVoiceListening
 );
 const showVoiceStopButton = computed(
-  () => props.isMicEnabled && props.isVoiceListening
+  () => !props.generating && props.isMicEnabled && props.isVoiceListening
 );
 </script>

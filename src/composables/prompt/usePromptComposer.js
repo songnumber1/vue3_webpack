@@ -20,6 +20,7 @@ import {useChatStore} from "@/stores/chatStore";
 export function usePromptComposer(props, emit) {
   const {t} = useI18n();
   const disabled = toRef(props, "disabled");
+  const generating = toRef(props, "generating");
   const chatStore = useChatStore();
 
   // ── 공유 레이어: 뷰포트 감지 + 메뉴 상태 ──────────────────────────────
@@ -117,8 +118,9 @@ export function usePromptComposer(props, emit) {
   );
 
   // ── 제출 (text + attachments 둘 다 필요하므로 조합기에 위치) ──────────
+  const actionDisabled = computed(() => disabled.value || generating.value);
   const canSubmit = computed(
-    () => hasPromptText.value || attachments.value.length > 0
+    () => !generating.value && (hasPromptText.value || attachments.value.length > 0)
   );
 
   function setText(value, {focus = true} = {}) {
@@ -131,7 +133,7 @@ export function usePromptComposer(props, emit) {
 
   function submit() {
     const value = text.value.trim();
-    if ((!value && attachments.value.length === 0) || props.disabled) return;
+    if ((!value && attachments.value.length === 0) || props.disabled || props.generating) return;
     emit("submit", {
       text: value,
       attachments: attachments.value,
@@ -210,6 +212,7 @@ export function usePromptComposer(props, emit) {
     isMobileSheet,
     // submit
     canSubmit,
+    actionDisabled,
     submit,
     setText,
   };

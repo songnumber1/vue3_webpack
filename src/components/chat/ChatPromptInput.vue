@@ -6,6 +6,7 @@
     :model-value="selectedModel"
     :models="models"
     :disabled="disabled"
+    :generating="generating"
     :model-readonly="modelReadonly"
     :show-help="showHelp"
     @update:model-value="workspaceActions.updateSelectedModel($event)"
@@ -29,6 +30,7 @@ defineProps({
   selectedModel: {type: String, default: ""},
   models: {type: Array, default: () => []},
   disabled: {type: Boolean, default: false},
+  generating: {type: Boolean, default: false},
   modelReadonly: {type: Boolean, default: false},
   showHelp: {type: Boolean, default: false},
 });
