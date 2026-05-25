@@ -10,6 +10,10 @@ function isDocumentHidden() {
   return typeof document !== "undefined" && document.hidden;
 }
 
+/**
+ * 모바일 Chrome에서 페이지가 background로 전환될 때 stream과 reader를 함께 중단합니다.
+ * AbortController만 호출하면 reader가 즉시 정리되지 않는 경우가 있어 cancel도 같이 시도합니다.
+ */
 function abortController(controller, getReader, reason) {
   if (!controller || controller.signal.aborted) return;
 
@@ -30,6 +34,13 @@ function abortController(controller, getReader, reason) {
   }
 }
 
+/**
+ * Android Chrome/Samsung 계열 모바일 브라우저용 SSE lifecycle입니다.
+ *
+ * 모바일 브라우저는 화면 잠금, 탭 전환, 앱 background 전환 시 JS 타이머와 fetch stream이
+ * 일시 정지되거나 지연될 수 있습니다. 설정값이 켜져 있으면 background 진입 시
+ * generation stream을 중단하고, 사용자가 다시 돌아왔을 때 안내 alert를 보여줍니다.
+ */
 export function createChromeSseLifecycle() {
   const settings = useSystemSettingsStore();
   const abortOnBackground = Boolean(settings.abortChatOnMobileBackground);
@@ -42,6 +53,7 @@ export function createChromeSseLifecycle() {
     resumeAlertCleanup = null;
   };
 
+  // background에서 중단된 stream 안내는 사용자가 실제로 화면에 돌아온 뒤에만 표시합니다.
   const showResumeAlert = () => {
     if (!pendingResumeAlert) return;
     if (isDocumentHidden()) return;
@@ -54,6 +66,7 @@ export function createChromeSseLifecycle() {
     }
   };
 
+  // visibilitychange/pageshow/focus 중 먼저 발생하는 복귀 이벤트에서 alert를 1회 표시합니다.
   const scheduleResumeAlert = () => {
     if (typeof window === "undefined" || typeof document === "undefined") return;
 
@@ -78,12 +91,14 @@ export function createChromeSseLifecycle() {
         return () => {};
       }
 
+      // 설정이 꺼져 있으면 기존처럼 stream을 유지하고, 켜져 있으면 즉시 abort합니다.
       const abortForBackground = (reason) => {
         if (!abortOnBackground) return;
         scheduleResumeAlert();
         abortController(controller, getReader, reason);
       };
 
+      // document.hidden은 모바일 Chrome에서 가장 먼저 감지되는 background 신호입니다.
       const handleVisibilityChange = () => {
         if (document.hidden) {
           hiddenBacklogPending = true;

@@ -4,9 +4,17 @@ let mermaidLoader = null;
 
 const MERMAID_CDN =
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
+/**
+ * 현재 document theme를 기준으로 mermaid themeVariables를 선택합니다.
+ * 다크 테마에서 mermaid 기본 색상이 보이지 않는 문제를 방지합니다.
+ */
 function isDarkTheme() {
   return document.documentElement.getAttribute("data-theme") === "dark";
 }
+/**
+ * 앱 테마에 맞는 mermaid 초기화 설정입니다.
+ * securityLevel은 strict로 유지해 markdown 내 임의 HTML/script 실행을 막습니다.
+ */
 function getMermaidConfig() {
   const dark = isDarkTheme();
 
@@ -93,6 +101,10 @@ function getMermaidConfig() {
         },
   };
 }
+/**
+ * mermaid CDN script를 한 번만 주입합니다.
+ * 이미 script tag가 있으면 기존 load/error 이벤트를 재사용합니다.
+ */
 function loadScript(src) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
@@ -114,6 +126,10 @@ function loadScript(src) {
     document.head.appendChild(script);
   });
 }
+/**
+ * window.mermaid를 보장하고 현재 테마 설정으로 initialize합니다.
+ * CDN 로딩 실패 시 raw mermaid code block을 그대로 유지하기 위해 null을 반환합니다.
+ */
 async function ensureMermaid() {
   if (window.mermaid) {
     window.mermaid.initialize(getMermaidConfig());
@@ -143,6 +159,10 @@ function resolveMermaidCard(target) {
   return target?.closest?.(".md-mermaid-card") || null;
 }
 
+/**
+ * mermaid card의 렌더 상태를 data attribute로 표시합니다.
+ * toolbar의 SVG export 버튼 표시/숨김 및 오류 스타일이 이 상태를 참조합니다.
+ */
 function markMermaidCardState(target, state) {
   const card = resolveMermaidCard(target);
   if (!card) return;
@@ -160,6 +180,10 @@ function markMermaidCardState(target, state) {
   }
 }
 
+/**
+ * 이미 렌더된 mermaid SVG를 원본 source text로 되돌립니다.
+ * theme 변경이나 stream 완료 후 force render 시 같은 노드를 다시 렌더하기 위해 사용합니다.
+ */
 function resetRenderedMermaid(root) {
   const rendered = Array.from(
     root.querySelectorAll(".md-mermaid[data-processed]")
@@ -175,6 +199,15 @@ function resetRenderedMermaid(root) {
     target.textContent = source;
   });
 }
+/**
+ * root 내부의 pending mermaid block을 실제 SVG로 렌더합니다.
+ *
+ * 답변 streaming 중에는 markdown 단계에서 mermaid 렌더를 지연하고,
+ * stream 완료 후 이 함수가 `.md-mermaid[data-mermaid-pending="true"]` 노드만 찾아 처리합니다.
+ *
+ * @param {Element|Document|null} root 검색할 DOM root
+ * @param {{force?: boolean}} options force=true면 기존 렌더 결과를 source text로 되돌린 뒤 재렌더합니다.
+ */
 export async function renderMermaidInElement(root, options = {}) {
   if (!root) return;
 

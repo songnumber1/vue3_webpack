@@ -11,6 +11,13 @@ import {
   getFeedbackChannel as resolveFeedbackChannel,
 } from "@/utils/appFeedback";
 
+/**
+ * Android WebView와 일반 브라우저에서 동일한 API를 호출할 수 있게 하는 platform facade입니다.
+ *
+ * 각 exported 함수는 먼저 현재 런타임이 Android 앱인지 확인하고,
+ * 앱이면 window.AndroidBridge 기반 callNative를 사용합니다.
+ * 브라우저면 webSuccess 형태의 동일한 응답 구조를 만들어 상위 UI가 분기 없이 처리하게 합니다.
+ */
 function getFeedbackChannel() {
   return resolveFeedbackChannel(getStore().info || {});
 }
@@ -41,6 +48,10 @@ function getStore() {
 function isAndroidApp() {
   return getStore().info.isAndroidApp;
 }
+/**
+ * 브라우저 fallback도 네이티브 응답과 동일한 형태로 맞춥니다.
+ * 이 구조 덕분에 호출부는 Android/Web을 따로 분기하지 않아도 됩니다.
+ */
 function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
   return {
     requestId: `web_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -53,6 +64,11 @@ function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
     meta: {runtime: "browser"},
   };
 }
+/**
+ * 클립보드 복사 요청을 현재 플랫폼에 맞게 처리합니다.
+ * Android 앱에서는 네이티브 브릿지를 사용하고, 웹에서는 Clipboard API fallback 후
+ * PC note/mobile toast 이벤트를 발생시킵니다.
+ */
 export async function copyClipboardByPlatform(text) {
   logPlatformDebug("feedback.clipboard.route", {
     isAndroidApp: isAndroidApp(),
@@ -87,6 +103,9 @@ export async function copyClipboardByPlatform(text) {
 
   return webSuccess({copied}, message);
 }
+/**
+ * 외부 브라우저 열기는 WebView에서 native 위임이 필요하고, 일반 웹에서는 window.open fallback을 사용합니다.
+ */
 export async function openExternalBrowser(url) {
   if (isAndroidApp()) return callNative("OPEN_EXTERNAL_BROWSER", {url});
   window.open(url, "_blank", "noopener,noreferrer");
@@ -116,6 +135,9 @@ export async function getAppVersion() {
 
   return res;
 }
+/**
+ * 공유 기능은 Android native share sheet와 Web Share API를 동일한 호출 형태로 감쌉니다.
+ */
 export async function shareByPlatform(data) {
   if (isAndroidApp()) return callNative("SHARE", {data});
   if (navigator.share) {
@@ -125,11 +147,17 @@ export async function shareByPlatform(data) {
   }
   throw new Error(t("platformBridge.shareUnsupported"));
 }
+/**
+ * 네트워크 상태 확인은 Android native 값과 browser navigator.onLine 값을 같은 응답 형태로 정규화합니다.
+ */
 export async function checkNetworkByPlatform() {
   if (isAndroidApp()) return callNative("CHECK_NETWORK", {});
 
   return webSuccess({online: navigator.onLine, type: "browser"});
 }
+/**
+ * 스토리지 API는 Android native storage와 browser localStorage를 동일한 key/value 인터페이스로 맞춥니다.
+ */
 export async function getNativeStorage(key) {
   if (isAndroidApp()) return callNative("GET_STORAGE", {key});
   const value = window.localStorage?.getItem(key) ?? null;
@@ -158,6 +186,10 @@ export async function setBackHandler(enable) {
     ? callNative("SET_BACK_HANDLER", {enable})
     : webSuccess({enabled: false});
 }
+/**
+ * 플랫폼별 toast 요청 facade입니다.
+ * Android 앱에서는 native toast를 호출하고, 브라우저에서는 앱 내부 feedback event로 전달합니다.
+ */
 export async function showToastByPlatform(message, options = {}) {
   logPlatformDebug("feedback.toast.route", {
     isAndroidApp: isAndroidApp(),
@@ -183,6 +215,9 @@ export async function showToastByPlatform(message, options = {}) {
   return webSuccess({shown: true, channel: getFeedbackChannel()});
 }
 
+/**
+ * Android 앱이면 네이티브 기기 정보를 요청하고, 웹이면 platformStore의 탐지 정보를 반환합니다.
+ */
 export async function getDeviceInfo() {
   return isAndroidApp()
     ? callNative("GET_DEVICE_INFO", {})

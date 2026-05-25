@@ -13,6 +13,10 @@ import {
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/platform/viewport/viewport";
+/**
+ * 현재 모바일 브라우저 계열을 html/body class에 반영합니다.
+ * CSS patch는 이 class를 기준으로 Chrome/Samsung/Firefox/WebView 차이를 보정합니다.
+ */
 function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -38,6 +42,13 @@ function isTextEditingElement(element) {
     element.isContentEditable === true
   );
 }
+/**
+ * VisualViewport 값과 layout viewport 기준 높이를 비교해 키보드 높이를 계산합니다.
+ *
+ * 모바일 브라우저는 키보드가 열릴 때 visualViewport.height만 줄어드는 경우가 많고,
+ * 일부 브라우저는 offsetTop도 같이 변합니다. baselineHeight는 키보드가 닫힌 안정 높이로
+ * 사용해 false positive를 줄입니다.
+ */
 function getKeyboardMetrics(size, baselineHeight = 0) {
   const visualHeight = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
   const layoutHeight = Math.max(
@@ -68,6 +79,15 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
     offsetTop,
   };
 }
+/**
+ * viewport/keyboard 값을 CSS custom property로 내려줍니다.
+ *
+ * 레이아웃 CSS는 JS 상태를 직접 읽지 않고 아래 변수만 참조합니다.
+ * - --app-height / --app-width
+ * - --layout-viewport-height
+ * - --keyboard-height / --composer-keyboard-inset
+ * - --visual-viewport-offset-top
+ */
 function setCssViewportVars(
   size,
   baselineHeight = 0,
@@ -129,6 +149,10 @@ function setCssViewportVars(
     rawKeyboardHeight: rawMetrics.keyboardHeight,
   };
 }
+/**
+ * adjustPan 모드에서 키보드가 input을 가릴 때 현재 포커스 요소를 화면 중앙으로 이동합니다.
+ * adjustResize 모드에서는 CSS inset으로 처리하므로 이 함수를 사용하지 않습니다.
+ */
 function panFocusedElementIntoView() {
   if (typeof document === "undefined") return;
   const activeElement = document.activeElement;
@@ -147,6 +171,17 @@ function removeKeyboardModeVars() {
   document.documentElement.removeAttribute("data-keyboard-mode");
 }
 
+/**
+ * 모바일 viewport와 가상 키보드 상태를 감시하는 앱 전역 guard입니다.
+ *
+ * 핵심 역할:
+ * 1. resize/orientation/visualViewport/focus 이벤트를 한 곳에서 수집합니다.
+ * 2. 모바일 breakpoint와 keyboard mode에 맞춰 CSS 변수를 갱신합니다.
+ * 3. composer, bottom sheet, chat layout이 동일한 viewport 기준을 사용하게 합니다.
+ *
+ * @param {{onChange?: Function}} options viewport 변경 콜백
+ * @returns {{viewportHeight: import('vue').Ref<number>, viewportWidth: import('vue').Ref<number>, keyboardOpen: import('vue').Ref<boolean>, isCompact: import('vue').ComputedRef<boolean>, refreshViewport: Function}}
+ */
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
   const systemSettingsStore = useSystemSettingsStore();
@@ -163,6 +198,7 @@ export function useViewportGuard(options = {}) {
       viewportWidth.value > 0 &&
       viewportWidth.value <= systemSettingsStore.mobileBreakpoint
   );
+  // 실제 viewport 측정과 CSS 변수 반영을 수행하는 단일 진입점입니다.
   function apply() {
     if (typeof window === "undefined" || typeof document === "undefined")
       return;
@@ -173,6 +209,7 @@ export function useViewportGuard(options = {}) {
       typeof document !== "undefined" ? document.activeElement : null;
     const hasTextFocus = isTextEditingElement(activeElement);
     const stableHeight = Math.max(size.height || 0, size.layoutHeight || 0);
+    // 텍스트 입력 중이 아닐 때만 baseline을 갱신해 키보드 열린 높이를 안정 높이로 오인하지 않게 합니다.
     if (
       !hasTextFocus &&
       (!baselineHeight.value || stableHeight > baselineHeight.value)
@@ -213,6 +250,7 @@ export function useViewportGuard(options = {}) {
     resizeFrame = null;
   }
 
+  // 연속 resize 이벤트를 requestAnimationFrame + timeout으로 합쳐 과도한 DOM write를 줄입니다.
   function scheduleApply() {
     if (!mounted || typeof window === "undefined") return;
     clearScheduledApply();
@@ -225,6 +263,7 @@ export function useViewportGuard(options = {}) {
     resizeTimer = window.setTimeout(apply, VIEWPORT_GUARD_DELAY_MS.default);
   }
 
+  // focusout 직후 visualViewport 값이 늦게 복구되는 브라우저가 있어 한 번 지연 갱신합니다.
   function handleFocusOut() {
     window.setTimeout(scheduleApply, VIEWPORT_GUARD_DELAY_MS.default);
   }

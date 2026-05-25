@@ -10,6 +10,10 @@ import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
 
+/**
+ * Markdown AST node에서 순수 텍스트만 추출합니다.
+ * 코드/mermaid 원문을 data attribute에 보관할 때 사용합니다.
+ */
 function textContent(node) {
   if (!node) return "";
   if (typeof node.value === "string") return node.value;
@@ -20,6 +24,10 @@ function textContent(node) {
 function mdLabel(key) {
   return i18n.global.t(key);
 }
+/**
+ * rehype tree에 삽입할 table toolbar 버튼 node를 생성합니다.
+ * 실제 copy/csv 동작은 렌더 후 DOM event 위임에서 처리됩니다.
+ */
 function tableActionButton(action, label) {
   return {
     type: "element",
@@ -130,6 +138,10 @@ function mermaidIcon(action) {
   return icons[action] || icons.copy;
 }
 
+/**
+ * mermaid card toolbar 버튼 node를 생성합니다.
+ * copy/svg/code export 버튼은 markdown HTML 생성 단계에서 항상 같은 구조로 삽입됩니다.
+ */
 function mermaidActionButton(action, label) {
   return {
     type: "element",
@@ -153,6 +165,10 @@ function mermaidActionButton(action, label) {
   };
 }
 
+/**
+ * code block toolbar 버튼 node를 생성합니다.
+ * highlight 결과와 별도로 원본 코드는 dataMdCodeSource에 보관됩니다.
+ */
 function codeActionButton(action, label) {
   return {
     type: "element",
@@ -183,6 +199,10 @@ function codeActionButton(action, label) {
   };
 }
 
+/**
+ * table을 toolbar + scroll wrapper가 있는 카드 구조로 변환합니다.
+ * CSV 다운로드/복사 버튼을 붙이기 위해 원본 table node를 md-table-card 안으로 감쌉니다.
+ */
 function rehypeTableWrapper() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -227,6 +247,12 @@ function rehypeTableWrapper() {
     });
   };
 }
+/**
+ * ```mermaid 코드 블록을 mermaid 렌더 대상 카드로 변환합니다.
+ *
+ * streaming 중에는 renderMermaid=false processor를 사용해 이 변환을 건너뛰고,
+ * 답변 완료 후 renderMermaidInElement가 data-mermaid-pending 노드를 실제 SVG로 렌더합니다.
+ */
 function rehypeMermaidBlock() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -292,6 +318,10 @@ function detectCodeLanguage(codeNode) {
   return languageClass ? languageClass.replace("language-", "") : "text";
 }
 
+/**
+ * 일반 코드 블록을 toolbar가 있는 카드 구조로 변환합니다.
+ * mermaid block은 앞 단계에서 변환되므로 여기서는 일반 pre > code만 처리합니다.
+ */
 function rehypeCodeBlockWrapper() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -343,6 +373,12 @@ function rehypeCodeBlockWrapper() {
   };
 }
 
+/**
+ * Markdown processor를 생성합니다.
+ *
+ * renderMermaid=false는 SSE streaming 중에 사용됩니다. 스트리밍 중 mermaid를 매 chunk마다
+ * 렌더하면 비용이 크고 문법이 미완성일 수 있으므로, 완료 후 한 번만 렌더링합니다.
+ */
 function createProcessor({renderMermaid = true} = {}) {
   const nextProcessor = unified()
     .use(remarkParse)
@@ -370,6 +406,13 @@ function createProcessor({renderMermaid = true} = {}) {
 const defaultProcessor = createProcessor({renderMermaid: true});
 const streamingProcessor = createProcessor({renderMermaid: false});
 
+/**
+ * assistant/user message content를 HTML 문자열로 변환합니다.
+ *
+ * @param {string} text markdown 원문
+ * @param {{renderMermaid?: boolean}} options renderMermaid=false면 mermaid 변환을 생략합니다.
+ * @returns {Promise<string>} v-html에 전달할 HTML 문자열
+ */
 export async function renderMarkdown(text, options = {}) {
   const processor =
     options.renderMermaid === false ? streamingProcessor : defaultProcessor;
