@@ -51,28 +51,32 @@ export function usePromptText({isMobileSheet, emit}) {
     // 글자가 도중에 지워졌을 때(BackSpace 연타) 축소되어야 할 실제 컨텐츠 래핑 높이(scrollHeight)를 브라우저가 오차 없이 재측정할 수 있습니다.
     el.style.height = "auto";
 
-    // 최대 8줄까지 자연스럽게 확장하고, 그 이후부터 textarea 내부 스크롤을 사용합니다.
+    // maxRows 설정값이 실제 textarea 표시 줄 수의 단일 기준이 되도록 계산합니다.
+    // 기존 mobileMax/desktopMax 고정 상한을 함께 Math.max로 비교하면 maxRows를 2, 3으로 줄여도
+    // 136px/160px 상한이 계속 우선되어 설정값이 의미 없어지는 문제가 발생합니다.
     const computedStyle = window.getComputedStyle(el);
     const lineHeight = Number.parseFloat(computedStyle.lineHeight);
     const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
     const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
     const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
     const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
-    const eightLineHeight =
-      (Number.isFinite(lineHeight) ? lineHeight : PROMPT_TEXTAREA_HEIGHT.lineHeight) *
-        PROMPT_TEXTAREA_HEIGHT.maxRows +
+    const resolvedLineHeight = Number.isFinite(lineHeight)
+      ? lineHeight
+      : PROMPT_TEXTAREA_HEIGHT.lineHeight;
+    const resolvedMaxRows = Math.max(
+      Number.parseInt(PROMPT_TEXTAREA_HEIGHT.maxRows, 10) || 1,
+      1
+    );
+    const maxHeight =
+      resolvedLineHeight * resolvedMaxRows +
       paddingTop +
       paddingBottom +
       borderTop +
       borderBottom;
 
-    // 기존 모바일/데스크톱 상한보다 작아지는 회귀를 막기 위해 8줄 기준 높이를 우선 적용합니다.
-    const maxHeight = Math.max(
-      eightLineHeight,
-      isMobileSheet.value
-        ? PROMPT_TEXTAREA_HEIGHT.mobileMax
-        : PROMPT_TEXTAREA_HEIGHT.desktopMax
-    );
+    // 전역 CSS에 남아있는 max-height: 136px/160px/180px 규칙보다 maxRows 계산값이 우선되도록
+    // inline max-height도 같은 값으로 동기화합니다.
+    el.style.maxHeight = `${maxHeight}px`;
 
     // 측정 완료된 돔의 물리 내용물 총 높이(scrollHeight)를 기반으로 최소 규격과 최대 임계 사양을 안전하게 한정 매핑합니다.
     const nextHeight = Math.min(
