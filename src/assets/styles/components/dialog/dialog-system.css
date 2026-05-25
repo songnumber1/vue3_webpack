@@ -17,14 +17,14 @@
   --dialog-close-radius: 5px;
 
   --dialog-font-family: inherit;
-  --dialog-title-font-size: 15px;
+  --dialog-title-font-size: var(--font-size-fixed-15);
   --dialog-title-font-weight: 800;
   --dialog-title-line-height: 1.35;
-  --dialog-body-font-size: 14px;
+  --dialog-body-font-size: var(--font-size-fixed-14);
   --dialog-body-line-height: 1.5;
-  --dialog-caption-font-size: 12px;
+  --dialog-caption-font-size: var(--font-size-fixed-12);
   --dialog-caption-line-height: 1.35;
-  --dialog-action-font-size: 13px;
+  --dialog-action-font-size: var(--font-size-fixed-13);
   --dialog-action-font-weight: 700;
 }
 
@@ -32,10 +32,10 @@ body.mobile-mode {
   --dialog-header-min-height: 52px;
   --dialog-header-padding: 12px 14px;
   --dialog-body-padding: 14px;
-  --dialog-title-font-size: 14px;
-  --dialog-body-font-size: 13px;
-  --dialog-caption-font-size: 11px;
-  --dialog-action-font-size: 12px;
+  --dialog-title-font-size: var(--font-size-fixed-14);
+  --dialog-body-font-size: var(--font-size-fixed-13);
+  --dialog-caption-font-size: var(--font-size-fixed-11);
+  --dialog-action-font-size: var(--font-size-fixed-12);
 }
 
 .responsive-panel,

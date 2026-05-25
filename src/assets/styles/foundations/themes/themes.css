@@ -114,9 +114,9 @@
   --message-user-mobile-max: 88%;
   --message-user-padding: 17px 19px 11px;
   --message-user-mobile-padding: 12px 16px;
-  --message-plain-font-size: 17px;
-  --message-plain-desktop-compact-font-size: 15px;
-  --message-plain-mobile-font-size: 15px;
+  --message-plain-font-size: var(--font-size-fixed-17);
+  --message-plain-desktop-compact-font-size: var(--font-size-fixed-15);
+  --message-plain-mobile-font-size: var(--font-size-fixed-15);
   --message-plain-line-height: 1.66;
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);
@@ -186,9 +186,9 @@
   --message-user-mobile-max: 88%;
   --message-user-padding: 17px 19px 11px;
   --message-user-mobile-padding: 12px 16px;
-  --message-plain-font-size: 17px;
-  --message-plain-desktop-compact-font-size: 15px;
-  --message-plain-mobile-font-size: 15px;
+  --message-plain-font-size: var(--font-size-fixed-17);
+  --message-plain-desktop-compact-font-size: var(--font-size-fixed-15);
+  --message-plain-mobile-font-size: var(--font-size-fixed-15);
   --message-plain-line-height: 1.66;
   --message-user-meta: var(--text-muted);
   --reasoning-bg: var(--control-bg);

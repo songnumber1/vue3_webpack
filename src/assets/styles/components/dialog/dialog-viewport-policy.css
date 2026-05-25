@@ -72,7 +72,7 @@ body.desktop-mode
   padding: 0;
   background: transparent;
   color: var(--text);
-  font-size: 30px;
+  font-size: var(--font-size-fixed-30);
   line-height: 1;
   cursor: pointer;
 }

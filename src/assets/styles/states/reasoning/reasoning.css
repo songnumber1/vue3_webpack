@@ -17,7 +17,7 @@
   background: transparent;
   color: var(--text-muted);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   font-weight: 800;
   text-align: left;
   cursor: pointer;
@@ -46,7 +46,7 @@
   padding-top: 8px;
   border-top: 1px dashed var(--reasoning-border);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   line-height: 1.62;
 }
 
@@ -55,7 +55,7 @@
 .reasoning-content.markdown-body li,
 .reasoning-content.markdown-body table,
 .reasoning-content.markdown-body blockquote {
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
 }
 
 .reasoning-content.markdown-body > :first-child {
@@ -67,5 +67,5 @@
 }
 
 .reasoning-content pre {
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
 }

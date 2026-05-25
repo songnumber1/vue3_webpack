@@ -356,7 +356,7 @@ watch(
   border-radius: 999px;
   background: color-mix(in srgb, var(--accent) 14%, transparent);
   color: var(--accent);
-  font-size: 14px !important;
+  font-size: var(--font-size-fixed-14) !important;
   font-weight: 800;
   line-height: 1;
 }
@@ -433,7 +433,7 @@ watch(
   border-radius: 5px;
   background: var(--surface);
   color: var(--surface);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
   line-height: 1;
 }

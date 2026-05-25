@@ -516,7 +516,7 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   border-radius: 5px;
   background: var(--surface);
   color: var(--surface);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
   line-height: 1;
 }

@@ -79,7 +79,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   place-items: center;
   background: var(--control-bg);
   color: var(--primary);
-  font-size: 24px;
+  font-size: var(--font-size-fixed-24);
   font-weight: 900;
 }
 
@@ -110,7 +110,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   border-radius: var(--dialog-radius);
   background: var(--control-bg);
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   line-height: 1.6;
 }
 
@@ -154,7 +154,7 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
 }
 
 .responsive-overlay--mobile-dialog .responsive-panel-header strong {
-  font-size: 17px;
+  font-size: var(--font-size-fixed-17);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -427,11 +427,11 @@ body.mobile-mode .markdown-body img {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 18px;
+  font-size: var(--font-size-fixed-18);
   font-weight: 900;
 }
 .mobile-settings-nav span:first-child {
-  font-size: 34px;
+  font-size: var(--font-size-fixed-34);
   line-height: 1;
 }
 .mobile-settings-close {
@@ -440,7 +440,7 @@ body.mobile-mode .markdown-body img {
   border-radius: 999px;
   border: 1px solid var(--control-border);
   background: var(--control-bg);
-  font-size: 24px;
+  font-size: var(--font-size-fixed-24);
 }
 .mobile-settings-body {
   min-height: 0;
@@ -490,7 +490,7 @@ body.mobile-mode .markdown-body img {
 }
 .mobile-settings-item-arrow {
   color: var(--text-muted);
-  font-size: 24px;
+  font-size: var(--font-size-fixed-24);
 }
 .mobile-settings-detail {
   display: grid;
@@ -553,7 +553,7 @@ body.mobile-mode .markdown-body img {
   padding: 0 !important;
   display: grid;
   place-items: center;
-  font-size: 15px !important;
+  font-size: var(--font-size-fixed-15) !important;
 }
 .feedback-reason-panel,
 .feedback-send-panel {
@@ -569,7 +569,7 @@ body.mobile-mode .markdown-body img {
 .feedback-send-panel p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   line-height: 1.45;
 }
 .feedback-reason-list {
@@ -585,7 +585,7 @@ body.mobile-mode .markdown-body img {
   background: var(--control-bg);
   color: var(--text);
   padding: 7px 10px;
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
 }
 .feedback-reason-chip.active {
@@ -624,7 +624,7 @@ body.mobile-mode .message-action-icon {
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
   cursor: pointer;
 }
@@ -698,7 +698,7 @@ body.mobile-mode .message-action-icon {
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 22px;
+  font-size: var(--font-size-fixed-22);
   cursor: pointer;
 }
 
@@ -768,7 +768,7 @@ body.mobile-mode .empty-stage--mobile-main .empty-center {
 }
 body.mobile-mode .empty-stage--mobile-main .empty-center h1 {
   text-align: left !important;
-  font-size: 24px;
+  font-size: var(--font-size-fixed-24);
   line-height: 1.25;
 }
 body.mobile-mode .empty-stage--mobile-main .suggestion-row--between {
@@ -828,7 +828,7 @@ body.mobile-mode .feedback-dialog {
   gap: 8px;
   margin: 16px 0 12px;
   color: var(--text);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   font-weight: 800;
 }
 

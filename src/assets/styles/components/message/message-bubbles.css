@@ -73,7 +73,7 @@ body.mobile-mode .message:not(.message--user) {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   line-height: 1.25;
 }
 
@@ -82,7 +82,7 @@ body.mobile-mode .message:not(.message--user) {
   display: block;
   margin-top: 3px;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
 }
 
 .message-attachments {
@@ -206,7 +206,7 @@ body.mobile-mode .chat-container-root--keyboard-open .message-list {
   border-radius: 999px;
   background: transparent;
   color: var(--text-muted);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
   padding: 5px 8px;
   cursor: pointer;
@@ -220,7 +220,7 @@ body.mobile-mode .chat-container-root--keyboard-open .message-list {
 }
 
 body.mobile-mode .message-actions button {
-  font-size: 11px;
+  font-size: var(--font-size-fixed-11);
   padding: 5px 7px;
 }
 

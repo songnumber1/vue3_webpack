@@ -151,7 +151,7 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   background: var(--surface);
   color: var(--text);
   font: inherit;
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   font-weight: 800;
   white-space: nowrap;
   cursor: pointer;

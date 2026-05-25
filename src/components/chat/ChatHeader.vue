@@ -205,7 +205,7 @@ const showDesktopConversationTitle = computed(
 }
 
 :global(body.mobile-mode) .mobile-topbar .mobile-header-future-action {
-  font-size: 22px;
+  font-size: var(--font-size-fixed-22);
   font-weight: 900;
   line-height: 1;
 }

@@ -18,7 +18,7 @@ body.mobile-mode .virtual-keyboard-debug {
   background: var(--color-surface, #ffffff);
   color: var(--color-text, #111827);
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   font-weight: 700;
 }
 
@@ -49,14 +49,14 @@ body.mobile-mode .virtual-keyboard-debug {
 .virtual-keyboard-debug__panel strong {
   display: block;
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: var(--font-size-fixed-15);
 }
 
 .virtual-keyboard-debug__panel p {
   max-width: 320px;
   margin: 0 auto;
   color: var(--color-text-muted, #64748b);
-  font-size: 13px;
+  font-size: var(--font-size-fixed-13);
   line-height: 1.55;
 }
 
@@ -65,7 +65,7 @@ body.mobile-mode .virtual-keyboard-debug {
   max-width: 360px;
   margin: 10px auto 0;
   color: var(--color-text-muted, #64748b);
-  font-size: 12px;
+  font-size: var(--font-size-fixed-12);
   line-height: 1.45;
 }
 
