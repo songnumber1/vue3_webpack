@@ -20,6 +20,7 @@ import {
   ENABLE_AUTH_GUARD_DEBUG,
   AUTH_FAILURE_REASONS,
 } from "@/constants/auth";
+import {shouldUseServerApi} from "@/constants/apiMode";
 import {logInfo} from "@/utils/logger";
 
 // 초기 번들 크기 최적화를 위해 컴포넌트들을 Webpack Chunk 지정을 통해 비동기 지연 로딩(Lazy Loading) 처리합니다.
@@ -194,6 +195,8 @@ function shouldRequireAndroidUpdate(appInfo) {
 function shouldCheckAuth(to) {
   if (!ENABLE_AUTH_GUARD) return false; // 전역 인증 가드 비활성화 상태 시 스킵
 
+  if (!shouldUseServerApi()) return false; // 시스템 설정의 useRealApi가 false이면 Mock 모드로 간주하여 인증 가드 전체를 스킵
+
   if (to.meta?.skipAuthCheck) return false; // 라우트 자체에 인증 스킵 메타가 선언되어 있다면 패스
 
   // 상위 부모 라우트 트리 레코드 중 하나라도 인증(`meta.requireAuth`)을 요구하는지 검사
@@ -298,6 +301,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
         skipAuthCheck: Boolean(record.meta?.skipAuthCheck),
       })),
       enableAuthGuard: ENABLE_AUTH_GUARD,
+      useRealApi: shouldUseServerApi(),
       requiresAuth,
       platformAccess: platformStore.isAccess,
     });

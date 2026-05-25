@@ -55,6 +55,43 @@ export const PLATFORM_OVERRIDE_MODES = Object.freeze({
 /**
  * 플랫폼 오버라이드 셀렉터 컴포넌트 데이터 하이드레이션 딕셔너리 배열입니다.
  */
+
+/**
+ * @description Vue CLI 환경 변수 문자열을 불리언 값으로 안전하게 변환합니다.
+ * @param {string|undefined|null} value - process.env로부터 읽은 원시 문자열 값
+ * @param {boolean} fallback - 값이 비어있을 때 사용할 기본값
+ * @returns {boolean} 파싱된 불리언 값
+ */
+function readBooleanEnv(value, fallback) {
+  if (value === undefined || value === null || value === "") return fallback;
+  return ["true", "1", "yes", "y", "on"].includes(
+    String(value).trim().toLowerCase()
+  );
+}
+
+/**
+ * @description Vue CLI 환경 변수 문자열을 숫자 값으로 안전하게 변환합니다.
+ * @param {string|undefined|null} value - process.env로부터 읽은 원시 문자열 값
+ * @param {number} fallback - 값이 비어있거나 숫자가 아닐 때 사용할 기본값
+ * @returns {number} 파싱된 숫자 값
+ */
+function readNumberEnv(value, fallback) {
+  if (value === undefined || value === null || value === "") return fallback;
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+/**
+ * @description Vue CLI 환경 변수 문자열을 안전하게 읽어 빈 값이면 기본값으로 되돌립니다.
+ * @param {string|undefined|null} value - process.env로부터 읽은 원시 문자열 값
+ * @param {string} fallback - 값이 비어있을 때 사용할 기본값
+ * @returns {string} 최종 문자열 값
+ */
+function readStringEnv(value, fallback) {
+  if (value === undefined || value === null || value === "") return fallback;
+  return String(value);
+}
+
 export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
   {
     value: PLATFORM_OVERRIDE_MODES.auto,
@@ -107,28 +144,93 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
  * 인앱 대시보드 저장소에 아무런 데이터 설정 메타 정보가 매핑되지 않았을 때 수립되는 절대 보정 디폴트 기준 데이터 테이블 세트입니다.
  */
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
-  [SYSTEM_SETTING_KEYS.useRealApi]: true,
-  [SYSTEM_SETTING_KEYS.platformOverride]: PLATFORM_OVERRIDE_MODES.auto,
-  [SYSTEM_SETTING_KEYS.mobileBreakpoint]: DEFAULT_MOBILE_BREAKPOINT_PX,
-  [SYSTEM_SETTING_KEYS.keyboardMode]: KEYBOARD_MODES.adjustResize,
-  [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: true,
-  [SYSTEM_SETTING_KEYS.showVirtualKeyboardDebug]: false,
-  [SYSTEM_SETTING_KEYS.virtualKeyboardHeight]: 340,
-  [SYSTEM_SETTING_KEYS.bottomSheetMinHeight]: 260,
-  [SYSTEM_SETTING_KEYS.bottomSheetMaxHeight]: 720,
-  [SYSTEM_SETTING_KEYS.useMicrophone]: false,
-  [SYSTEM_SETTING_KEYS.showGuideButton]: false,
-  [SYSTEM_SETTING_KEYS.showThemeButton]: false,
-  [SYSTEM_SETTING_KEYS.showSwaggerButton]: false,
-  [SYSTEM_SETTING_KEYS.showNoticeMenu]: true,
-  [SYSTEM_SETTING_KEYS.showPrivacyMenu]: true,
-  [SYSTEM_SETTING_KEYS.showTermsMenu]: true,
-  [SYSTEM_SETTING_KEYS.showPersonalizationMenu]: true,
-  [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: false,
-  [SYSTEM_SETTING_KEYS.showLogoutButton]: true,
-  [SYSTEM_SETTING_KEYS.showMobileApiProgress]: true,
-  [SYSTEM_SETTING_KEYS.autoScrollOnAnswer]: false,
-  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: true,
+  [SYSTEM_SETTING_KEYS.useRealApi]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_USE_REAL_API ?? true
+  ),
+  [SYSTEM_SETTING_KEYS.platformOverride]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_PLATFORM_OVERRIDE,
+    PLATFORM_OVERRIDE_MODES.auto
+  ),
+  [SYSTEM_SETTING_KEYS.mobileBreakpoint]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT,
+    DEFAULT_MOBILE_BREAKPOINT_PX
+  ),
+  [SYSTEM_SETTING_KEYS.keyboardMode]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_KEYBOARD_MODE,
+    KEYBOARD_MODES.adjustResize
+  ),
+  [SYSTEM_SETTING_KEYS.useVirtualKeyboard]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_USE_VIRTUAL_KEYBOARD,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showVirtualKeyboardDebug]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_VIRTUAL_KEYBOARD_DEBUG,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.virtualKeyboardHeight]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_VIRTUAL_KEYBOARD_HEIGHT,
+    340
+  ),
+  [SYSTEM_SETTING_KEYS.bottomSheetMinHeight]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_BOTTOM_SHEET_MIN_HEIGHT,
+    260
+  ),
+  [SYSTEM_SETTING_KEYS.bottomSheetMaxHeight]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_BOTTOM_SHEET_MAX_HEIGHT,
+    720
+  ),
+  [SYSTEM_SETTING_KEYS.useMicrophone]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_USE_MICROPHONE,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.showGuideButton]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_GUIDE_BUTTON,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.showThemeButton]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_THEME_BUTTON,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.showSwaggerButton]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_SWAGGER_BUTTON,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.showNoticeMenu]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_NOTICE_MENU,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showPrivacyMenu]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_PRIVACY_MENU,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showTermsMenu]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_TERMS_MENU,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showPersonalizationMenu]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_PERSONALIZATION_MENU,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showPlaygroundMenu]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_PLAYGROUND_MENU,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.showLogoutButton]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_LOGOUT_BUTTON,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.showMobileApiProgress]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_MOBILE_API_PROGRESS,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.autoScrollOnAnswer]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_AUTO_SCROLL_ON_ANSWER,
+    false
+  ),
+  [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_ABORT_CHAT_ON_MOBILE_BACKGROUND,
+    true
+  ),
 });
 
 /**

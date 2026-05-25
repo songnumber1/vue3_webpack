@@ -18,7 +18,9 @@ function readBooleanEnv(value, fallback) {
   if (value === undefined || value === null || value === "") return fallback;
 
   // [확장형 불리언 대조 수식]: 대소문자 요동 현상을 방지하기 위해 스트링 강제 캐스팅 후 소문자로 포맷하여 승인 키워드 풀("true", "1", "yes", "y")에 매칭되는지 합집합 검증
-  return ["true", "1", "yes", "y"].includes(String(value).toLowerCase());
+  return ["true", "1", "yes", "y", "on"].includes(
+    String(value).trim().toLowerCase()
+  );
 }
 
 /**
