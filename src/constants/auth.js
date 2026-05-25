@@ -1,6 +1,6 @@
 /**
  * @file constants/auth/authEnvConfig.js
- * @description 시스템 환경 변수(.env) 파일을 해독하여 인앱 라우터 가드, 가상 Mocking 세션 작동 여부, 디버깅 모드 진입 플래그를 정적 수립하는 인증 인프라 설정 모듈입니다.
+ * @description 시스템 환경 변수(.env) 파일을 해독하여 인증 가드 캐시와 디버깅 옵션을 정적 수립하는 인증 인프라 설정 모듈입니다.
  *
  * 프리징 코드 주석 기준:
  * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
@@ -24,41 +24,8 @@ function readBooleanEnv(value, fallback) {
 }
 
 /**
- * @constant {boolean} ENABLE_AUTH_GUARD
- * @description 인앱 뷰 라우터(Vue Router)의 비정상 접근 차단 및 토큰 유효성 검증 가드 시스템 작동 여부 플래그 (기본값: true)
- */
-export const ENABLE_AUTH_GUARD = readBooleanEnv(
-  process.env.VUE_APP_ENABLE_AUTH_GUARD,
-  true
-);
-
-/**
- * @constant {boolean} USE_MOCK_AUTH
- * @description 백엔드 라이브 세션 서버 연동을 일시 중단하고 프론트엔드 단독 로컬 테스트를 위한 가상 모킹(Mock) 인증 모듈을 전격 가동할지 여부 플래그 (기본값: false)
- */
-export const USE_MOCK_AUTH = readBooleanEnv(
-  process.env.VUE_APP_USE_MOCK_AUTH,
-  false
-);
-
-/**
- * @constant {boolean} ALLOW_LOCAL_STORAGE_MOCK_AUTH
- * @description 개발자 도구 어플리케이션 영역의 로컬스토리지 제어권을 통해 런타임 모킹 세션을 임의 위변조 및 제어할 수 있도록 허용할지 여부 방어 플래그 (기본값: false)
- */
-export const ALLOW_LOCAL_STORAGE_MOCK_AUTH = readBooleanEnv(
-  process.env.VUE_APP_ALLOW_LOCAL_STORAGE_MOCK_AUTH,
-  false
-);
-
-/**
- * @constant {string} AUTH_MOCK_SCENARIO_STORAGE_KEY
- * @description 가상 테스트 시나리오 식별자를 브라우저 로컬 스토리지 버퍼에 적재 및 상시 트래킹하기 위한 전용 문자열 고유 네임스페이스 키
- */
-export const AUTH_MOCK_SCENARIO_STORAGE_KEY = "DS_AUTH_MOCK_SCENARIO";
-
-/**
  * @constant {object} AUTH_MOCK_SCENARIOS
- * @description 가상 가동 모드(`USE_MOCK_AUTH`) 활성화 시, 프론트엔드가 인위적으로 재현 및 시뮬레이션할 수 있는 시스템 가상 시나리오의 상태별 엔트리 딕셔너리 리스트입니다.
+ * @description 프론트엔드 모크 API(accessApiMock)가 내부 테스트 응답을 구성할 때 사용하는 인증 시나리오 상태별 엔트리 딕셔너리 리스트입니다.
  */
 export const AUTH_MOCK_SCENARIOS = Object.freeze({
   AUTHENTICATED: "authenticated", // 모든 권한이 완벽하게 승인 확인된 정상 회원 상태 시나리오

@@ -10,15 +10,9 @@
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
   AUTH_FAILURE_REASONS,
-  AUTH_MOCK_SCENARIOS,
-  AUTH_MOCK_SCENARIO_STORAGE_KEY,
-  USE_MOCK_AUTH,
-  ALLOW_LOCAL_STORAGE_MOCK_AUTH,
   ENABLE_AUTH_GUARD_DEBUG,
   ENABLE_AUTH_GUARD_CACHE,
 } from "@/constants/auth";
-import {shouldUseFrontendMockApi} from "@/constants/apiMode";
-import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
 import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
@@ -42,39 +36,6 @@ function createAccessPayload(to) {
   };
 }
 
-/**
- * 로컬 스토리지 또는 시스템 환경 변수로부터 현재 테스트 중인 모크 인증 시나리오 키를 안전하게 획득합니다.
- * @returns {string|null} 지정된 모크 시나리오 문자열 코드 또는 null
- */
-function getStoredMockScenario() {
-  // SSR 환경(Node.js 서버 사이드)일 경우 브라우저 스토리지가 없으므로 환경 변수에서만 바로 읽어옵니다.
-  if (typeof window === "undefined") {
-    return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
-  }
-
-  // 1. 개발자가 로컬 스토리지에 임의 지정한 모크 시나리오, 2. 빌드 환경 변수 시나리오 순서로 우선순위를 설정하여 탐색합니다.
-  return (
-    window.localStorage.getItem(AUTH_MOCK_SCENARIO_STORAGE_KEY) ||
-    process.env.VUE_APP_MOCK_AUTH_SCENARIO ||
-    null
-  );
-}
-
-/**
- * 현재 모킹(Mock) 모드로 가짜 인증 처리를 수행해야 하는 상태인지 다각도로 검사하여 판별합니다.
- * @returns {boolean} 가짜 모크 API 모드로 연동해야 하면 true, 실제 서버 통신이면 false
- * @see {@link shouldUseFrontendMockApi} 전역 모크 모드가 활성화되었는지 판단하는 기준 유틸 함수
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
-function shouldUseMockAuth() {
-  return (
-    shouldUseFrontendMockApi() || // 1. 프론트엔드 자체가 모크 모드이거나
-    USE_MOCK_AUTH || // 2. 인증 상수로 가짜 인증이 강제 활성화되었거나
-    (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario())) // 3. 로컬 스토리지 커스텀 시나리오가 존재하고 허용된 상태인 경우
-  );
-}
 
 /**
  * 인증 가드 디버그 플래그가 활성화되어 있을 때만 선택적으로 보안 콘솔 로그를 남깁니다.
@@ -88,32 +49,23 @@ function debugAuthGuard(...args) {
 }
 
 /**
- * 백엔드 서버 또는 로컬 모크 레포지토리 측에 실제 유저의 토큰/계정 유효성 정보(access/info.do)를 요청합니다.
+ * 백엔드 서버 측에 실제 유저의 토큰/계정 유효성 정보(access/info.do)를 요청합니다.
  * @param {import("axios").AxiosInstance} authAxios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
  * @param {Object} payload - {@link createAccessPayload} 유틸로 가공된 파라미터 본문
- * @returns {Promise<Object>} 서버/모크로부터 전달받은 가공되지 않은 순수 인증 결과 객체
+ * @returns {Promise<Object>} 서버로부터 전달받은 가공되지 않은 순수 인증 결과 객체
  */
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function requestAccessInfo(authAxios, payload) {
-  const useMock = shouldUseMockAuth();
-  const scenario = getStoredMockScenario() || AUTH_MOCK_SCENARIOS.AUTHENTICATED;
-
-  // 디버그 활성화 상태 시 현재 통신 방식(Mock 시나리오명 혹은 실서버 Live 모드) 상태를 로깅합니다.
+  // 디버그 활성화 상태 시 현재 실서버 인증 API 요청 상태를 로깅합니다.
   debugAuthGuard("request access/info.do", {
-    useMock,
-    scenario: useMock ? scenario : "live",
+    mode: "live",
     endpoint: API_ENDPOINTS.ACCESS_INFO,
     payload,
   });
 
-  // 모크 통신 대상인 경우 준비된 가짜 데이터 저장소(accessApiMock)로부터 시나리오별 객체를 반환받습니다.
-  if (useMock) {
-    return accessApiMock.getAccessInfo(payload, {scenario});
-  }
-
-  // 실서버 통신인데 부트스트랩 단계에서 인증 Axios 인스턴스가 주입되지 않았다면 예외를 발생시킵니다.
+  // 부트스트랩 단계에서 인증 Axios 인스턴스가 주입되지 않았다면 예외를 발생시킵니다.
   if (!authAxios) {
     throw new Error("[authGuard] Auth axios instance is not initialized.");
   }
@@ -170,7 +122,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   const payload = createAccessPayload(to);
 
   try {
-    // 백엔드 혹은 모킹 엔진으로부터 계정 정보 데이터를 수집합니다.
+    // 백엔드 인증 엔진으로부터 계정 정보 데이터를 수집합니다.
     const accessInfo = await requestAccessInfo(authAxios, payload);
     // 수집된 데이터를 프론트엔드가 즉시 읽을 수 있는 플랫한 규격 객체로 가공합니다.
     const result = normalizeAccessResult(accessInfo);

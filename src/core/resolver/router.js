@@ -15,11 +15,7 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
-import {
-  ENABLE_AUTH_GUARD,
-  ENABLE_AUTH_GUARD_DEBUG,
-  AUTH_FAILURE_REASONS,
-} from "@/constants/auth";
+import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {logInfo} from "@/utils/logger";
 
@@ -193,8 +189,6 @@ function shouldRequireAndroidUpdate(appInfo) {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function shouldCheckAuth(to) {
-  if (!ENABLE_AUTH_GUARD) return false; // 전역 인증 가드 비활성화 상태 시 스킵
-
   if (!shouldUseServerApi()) return false; // 시스템 설정의 useRealApi가 false이면 Mock 모드로 간주하여 인증 가드 전체를 스킵
 
   if (to.meta?.skipAuthCheck) return false; // 라우트 자체에 인증 스킵 메타가 선언되어 있다면 패스
@@ -300,7 +294,6 @@ function registerRouteGuard(router, appInfo, context = {}) {
         requireAuth: Boolean(record.meta?.requireAuth),
         skipAuthCheck: Boolean(record.meta?.skipAuthCheck),
       })),
-      enableAuthGuard: ENABLE_AUTH_GUARD,
       useRealApi: shouldUseServerApi(),
       requiresAuth,
       platformAccess: platformStore.isAccess,
