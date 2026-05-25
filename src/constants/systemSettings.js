@@ -145,7 +145,8 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
  */
 export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.useRealApi]: readBooleanEnv(
-    process.env.VUE_APP_SYSTEM_USE_REAL_API ?? true
+    process.env.VUE_APP_SYSTEM_USE_REAL_API,
+    true
   ),
   [SYSTEM_SETTING_KEYS.platformOverride]: readStringEnv(
     process.env.VUE_APP_SYSTEM_PLATFORM_OVERRIDE,
