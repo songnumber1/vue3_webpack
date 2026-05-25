@@ -99,11 +99,10 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {
-  DEFAULT_MOBILE_BREAKPOINT_PX,
   DEFAULT_SYSTEM_SETTINGS,
-  FORCED_MOBILE_PLATFORM_BREAKPOINT_PX,
   KEYBOARD_MODE_OPTIONS,
-  PLATFORM_OVERRIDE_MODES,
+  MAX_MOBILE_BREAKPOINT_PX,
+  MIN_MOBILE_BREAKPOINT_PX,
   PLATFORM_OVERRIDE_OPTIONS,
 } from "@/constants/systemSettings";
 
@@ -156,7 +155,12 @@ const groups = computed(() => [
     kicker: "MOBILE",
     title: t("systemSettings.groups.mobile"),
     items: [
-      settingItem("mobileBreakpoint", {type: "number"}),
+      settingItem("mobileBreakpoint", {
+        type: "number",
+        min: MIN_MOBILE_BREAKPOINT_PX,
+        max: MAX_MOBILE_BREAKPOINT_PX,
+        step: 1,
+      }),
       settingItem("keyboardMode", {
         type: "select",
         options: KEYBOARD_MODE_OPTIONS,
@@ -228,32 +232,15 @@ function syncDraft() {
 }
 
 /**
- * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
- */
-function resolvePlatformBreakpoint(platformOverride) {
-  return platformOverride === PLATFORM_OVERRIDE_MODES.auto
-    ? DEFAULT_MOBILE_BREAKPOINT_PX
-    : FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
-}
-
-/**
  * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function apply() {
-  draft.mobileBreakpoint = resolvePlatformBreakpoint(draft.platformOverride);
   systemSettingsStore.applySettings(draft);
   platformStore.refresh();
   syncViewportSettings(systemSettingsStore.mobileBreakpoint);
   emit("applied");
   emit("close");
 }
-
-watch(
-  () => draft.platformOverride,
-  (platformOverride) => {
-    draft.mobileBreakpoint = resolvePlatformBreakpoint(platformOverride);
-  }
-);
 
 watch(settings, syncDraft, {immediate: true, deep: true});
 </script>

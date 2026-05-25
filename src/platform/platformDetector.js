@@ -15,6 +15,8 @@ import {
 } from "@/core/config";
 import {
   DEFAULT_MOBILE_BREAKPOINT_PX,
+  MAX_MOBILE_BREAKPOINT_PX,
+  MIN_MOBILE_BREAKPOINT_PX,
   PLATFORM_OVERRIDE_MODES,
 } from "@/constants/systemSettings";
 import {logPlatformDebug} from "@/platform/platformDebug";
@@ -210,8 +212,11 @@ function getForcedPlatformOverride(value) {
 function resolveCompactBreakpoint(value) {
   const numeric = Number(value); // 명시적 수치 변환
   // 유한한 숫자이면서 유효 가용 양수 범위인 경우 반올림 처리하여 정수 픽셀 확보하고, 에러 사태 시 표준 가이드 디폴트 상수 바인딩 폴백
-  return Number.isFinite(numeric) && numeric > 0
-    ? Math.round(numeric)
+  return Number.isFinite(numeric)
+    ? Math.min(
+        Math.max(Math.round(numeric), MIN_MOBILE_BREAKPOINT_PX),
+        MAX_MOBILE_BREAKPOINT_PX
+      )
     : DEFAULT_MOBILE_BREAKPOINT_PX;
 }
 

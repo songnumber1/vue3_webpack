@@ -11,8 +11,12 @@
 export const DEFAULT_MOBILE_BREAKPOINT_PX =
   process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT;
 
-// 데스크톱 해상도 조건에서도 인위적인 강제 모바일 플랫폼 분기를 우회 활성화하기 위한 특수 최대 가상 임계폭 (1440px)
-export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 1440;
+// 사용자가 설정할 수 있는 모바일 전환 기준 너비의 최소/최대 허용 범위
+export const MIN_MOBILE_BREAKPOINT_PX = 400;
+export const MAX_MOBILE_BREAKPOINT_PX = 9999;
+
+// 하위 호환성을 위해 기존 export 명칭은 유지하되, 더 이상 플랫폼 오버라이드 여부로 강제 적용하지 않습니다.
+export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = MAX_MOBILE_BREAKPOINT_PX;
 
 /**
  * 모바일 가상 키보드가 전격 팝업될 때 화면 뷰포트를 어떤 레이아웃 공식으로 반응형 밀어내기 처리할지 규정하는 불변 모드 상수입니다.
@@ -273,9 +277,9 @@ export function normalizeSystemSettings(value = {}) {
       const numeric = Number(source[key]);
       next[key] = Number.isFinite(numeric)
         ? Math.min(
-            Math.max(Math.round(numeric), 320),
-            FORCED_MOBILE_PLATFORM_BREAKPOINT_PX
-          ) // 해상도가 비정상적으로 깨지는 현상을 막기 위해 최소 320px에서 최대 1440px로 범위 강제 잠금(Clamp)
+            Math.max(Math.round(numeric), MIN_MOBILE_BREAKPOINT_PX),
+            MAX_MOBILE_BREAKPOINT_PX
+          ) // 해상도가 비정상적으로 깨지는 현상을 막기 위해 최소 400px에서 최대 9999px로 범위 강제 잠금(Clamp)
         : DEFAULT_SYSTEM_SETTINGS[key];
       return;
     }
@@ -323,16 +327,8 @@ export function normalizeSystemSettings(value = {}) {
     next[key] = Boolean(source[key]);
   });
 
-  // [비즈니스 코어 규칙 레이어]: 플랫폼 수동 시뮬레이션 분기가 'Auto'가 아니라는 것은 PC 화면에서도 모바일 뷰를 보고 싶다는 의도이므로,
-  // 브레이크포인트 한계 제한선을 무조건 최대치인 `FORCED_MOBILE_PLATFORM_BREAKPOINT_PX(1440px)`로 자동 오버라이딩 승격하여 완벽한 모바일 전용 UI 분기를 유도합니다.
-  if (
-    next[SYSTEM_SETTING_KEYS.platformOverride] === PLATFORM_OVERRIDE_MODES.auto
-  ) {
-    next[SYSTEM_SETTING_KEYS.mobileBreakpoint] = DEFAULT_MOBILE_BREAKPOINT_PX;
-  } else {
-    next[SYSTEM_SETTING_KEYS.mobileBreakpoint] =
-      FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
-  }
+  // 반응형 전환 기준 너비는 플랫폼 오버라이드(auto/android...) 상태와 무관하게 사용자가 입력한 값을 유지합니다.
+  // 단, 비정상적인 레이아웃 붕괴를 막기 위해 400px ~ 9999px 범위로만 보정합니다.
 
   // [수학적 모순 차단 가드]: 만약 오염된 데이터가 침투하여 바텀시트 최대 제한 높이가 최소 제한 높이보다 작아지는 기하학적 역전 레이아웃 왜곡 현상이 포착되면,
   // 최대 높이를 최소 높이 수치와 강제 수평 동기화 셋업시킴으로써 화면이 반대로 일그러지거나 돔이 뒤집히는 그래픽 버그를 완전히 방어합니다.
