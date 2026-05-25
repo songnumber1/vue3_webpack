@@ -166,7 +166,7 @@ import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
-import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.vue";
+import ChatHistoryDialog from "@/components/navigation/controls/ChatHistoryDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";

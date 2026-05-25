@@ -60,7 +60,7 @@
 
 <script setup>
 /**
- * @file components/navigation/parts/CollapsedSidebar.vue
+ * @file components/navigation/controls/CollapsedSidebar.vue
  * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
  *
  * 프리징 코드 주석 기준:
@@ -70,7 +70,7 @@
 
 import {useI18n} from "vue-i18n";
 import Icon from "@/components/navigation/SidebarIcon.vue";
-import SidebarHistoryList from "@/components/navigation/parts/SidebarHistoryList.vue";
+import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
 
 const {t} = useI18n();
 

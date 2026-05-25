@@ -113,7 +113,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     return currentAssistant.value?.label || t("chat.assistant");
   });
 
-  // ── 🌐 [2. 글로벌 다국어 지원 추천 칩 가공 파트] ──────────────────
+  // ── [2. 글로벌 다국어 지원 추천 칩 가공 파트] ──────────────────
   // 현재 페르소나가 보유한 추천 예시 힌트 질문 리스트를 감지하여 다국어 설정(ko/en)에 부합하는 프로필 카드로 정형화합니다.
   const suggestions = computed(() => {
     const assistantPrompts = currentExamplePrompts.value || [];
@@ -218,7 +218,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  // ── 🛠️ [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
+  // ── [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
   const {isGenerating, submit, regenerate} = useChatSubmit({
     router,
     route,

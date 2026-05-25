@@ -1383,63 +1383,63 @@
 <path fill="none" stroke="#757575" d="M1221.15,-1185.57C1258.68,-1179.19 1306.68,-1172.07 1349.75,-1168.88 1483.49,-1158.96 1517.45,-1164.92 1651.5,-1168.88 1677.71,-1169.65 1705.96,-1171.03 1732.34,-1172.56"/>
 <polygon fill="#757575" stroke="#757575" points="1731.82,-1176.04 1742.01,-1173.14 1732.24,-1169.05 1731.82,-1176.04"/>
 </g>
-<!-- ../navigation/parts/ChatHistoryActionMenu.vue -->
+<!-- ../navigation/controls/ChatHistoryActionMenu.vue -->
 <g id="node89" class="node">
-<title>../navigation/parts/ChatHistoryActionMenu.vue</title>
+<title>../navigation/controls/ChatHistoryActionMenu.vue</title>
 <path fill="none" stroke="#c6c5fe" d="M1639.83,-1083.75C1639.83,-1083.75 1361.42,-1083.75 1361.42,-1083.75 1357.46,-1083.75 1353.5,-1079.79 1353.5,-1075.83 1353.5,-1075.83 1353.5,-1067.92 1353.5,-1067.92 1353.5,-1063.96 1357.46,-1060 1361.42,-1060 1361.42,-1060 1639.83,-1060 1639.83,-1060 1643.79,-1060 1647.75,-1063.96 1647.75,-1067.92 1647.75,-1067.92 1647.75,-1075.83 1647.75,-1075.83 1647.75,-1079.79 1643.79,-1083.75 1639.83,-1083.75"/>
-<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1066.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/parts/ChatHistoryActionMenu.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1066.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/controls/ChatHistoryActionMenu.vue</text>
 </g>
-<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/ChatHistoryActionMenu.vue -->
+<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/ChatHistoryActionMenu.vue -->
 <g id="edge142" class="edge">
-<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/ChatHistoryActionMenu.vue</title>
+<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/ChatHistoryActionMenu.vue</title>
 <path fill="none" stroke="#757575" d="M1174.26,-1185.6C1208.12,-1164.32 1281.71,-1120.68 1349.75,-1097.88 1363.22,-1093.36 1377.64,-1089.6 1392.03,-1086.47"/>
 <polygon fill="#757575" stroke="#757575" points="1392.44,-1089.96 1401.52,-1084.5 1391.02,-1083.1 1392.44,-1089.96"/>
 </g>
-<!-- ../navigation/parts/CollapsedSidebar.vue -->
+<!-- ../navigation/controls/CollapsedSidebar.vue -->
 <g id="node90" class="node">
-<title>../navigation/parts/CollapsedSidebar.vue</title>
+<title>../navigation/controls/CollapsedSidebar.vue</title>
 <path fill="none" stroke="#c6c5fe" d="M1621.46,-1201.75C1621.46,-1201.75 1379.79,-1201.75 1379.79,-1201.75 1375.83,-1201.75 1371.88,-1197.79 1371.88,-1193.83 1371.88,-1193.83 1371.88,-1185.92 1371.88,-1185.92 1371.88,-1181.96 1375.83,-1178 1379.79,-1178 1379.79,-1178 1621.46,-1178 1621.46,-1178 1625.42,-1178 1629.38,-1181.96 1629.38,-1185.92 1629.38,-1185.92 1629.38,-1193.83 1629.38,-1193.83 1629.38,-1197.79 1625.42,-1201.75 1621.46,-1201.75"/>
-<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1184.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/parts/CollapsedSidebar.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1184.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/controls/CollapsedSidebar.vue</text>
 </g>
-<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/CollapsedSidebar.vue -->
+<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/CollapsedSidebar.vue -->
 <g id="edge143" class="edge">
-<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/CollapsedSidebar.vue</title>
+<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/CollapsedSidebar.vue</title>
 <path fill="none" stroke="#757575" d="M1248.44,-1195.71C1282.89,-1194.91 1322.72,-1193.98 1360.37,-1193.11"/>
 <polygon fill="#757575" stroke="#757575" points="1360.02,-1196.62 1369.94,-1192.89 1359.86,-1189.62 1360.02,-1196.62"/>
 </g>
-<!-- ../navigation/parts/SidebarAssistantSelector.vue -->
+<!-- ../navigation/controls/SidebarAssistantSelector.vue -->
 <g id="node91" class="node">
-<title>../navigation/parts/SidebarAssistantSelector.vue</title>
+<title>../navigation/controls/SidebarAssistantSelector.vue</title>
 <path fill="none" stroke="#c6c5fe" d="M1643.58,-1563.75C1643.58,-1563.75 1357.67,-1563.75 1357.67,-1563.75 1353.71,-1563.75 1349.75,-1559.79 1349.75,-1555.83 1349.75,-1555.83 1349.75,-1547.92 1349.75,-1547.92 1349.75,-1543.96 1353.71,-1540 1357.67,-1540 1357.67,-1540 1643.58,-1540 1643.58,-1540 1647.54,-1540 1651.5,-1543.96 1651.5,-1547.92 1651.5,-1547.92 1651.5,-1555.83 1651.5,-1555.83 1651.5,-1559.79 1647.54,-1563.75 1643.58,-1563.75"/>
-<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1546.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/parts/SidebarAssistantSelector.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1546.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/controls/SidebarAssistantSelector.vue</text>
 </g>
-<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarAssistantSelector.vue -->
+<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarAssistantSelector.vue -->
 <g id="edge144" class="edge">
-<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarAssistantSelector.vue</title>
+<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarAssistantSelector.vue</title>
 <path fill="none" stroke="#757575" d="M1164.98,-1209.88C1191.71,-1243.31 1267.34,-1340.98 1313.75,-1431.88 1335.04,-1473.57 1313.36,-1501.41 1349.75,-1530.88 1350.9,-1531.81 1352.07,-1532.7 1353.26,-1533.57"/>
 <polygon fill="#757575" stroke="#757575" points="1351.18,-1536.4 1361.49,-1538.85 1354.96,-1530.51 1351.18,-1536.4"/>
 </g>
-<!-- ../navigation/parts/SidebarHistoryList.vue -->
+<!-- ../navigation/controls/SidebarHistoryList.vue -->
 <g id="node92" class="node">
-<title>../navigation/parts/SidebarHistoryList.vue</title>
+<title>../navigation/controls/SidebarHistoryList.vue</title>
 <path fill="none" stroke="#cfffac" d="M1961.46,-1242.75C1961.46,-1242.75 1716.04,-1242.75 1716.04,-1242.75 1712.08,-1242.75 1708.12,-1238.79 1708.12,-1234.83 1708.12,-1234.83 1708.12,-1226.92 1708.12,-1226.92 1708.12,-1222.96 1712.08,-1219 1716.04,-1219 1716.04,-1219 1961.46,-1219 1961.46,-1219 1965.42,-1219 1969.38,-1222.96 1969.38,-1226.92 1969.38,-1226.92 1969.38,-1234.83 1969.38,-1234.83 1969.38,-1238.79 1965.42,-1242.75 1961.46,-1242.75"/>
-<text xml:space="preserve" text-anchor="middle" x="1838.75" y="-1225.45" font-family="Arial" font-size="14.00" fill="#cfffac">../navigation/parts/SidebarHistoryList.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="1838.75" y="-1225.45" font-family="Arial" font-size="14.00" fill="#cfffac">../navigation/controls/SidebarHistoryList.vue</text>
 </g>
-<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarHistoryList.vue -->
+<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarHistoryList.vue -->
 <g id="edge145" class="edge">
-<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarHistoryList.vue</title>
+<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarHistoryList.vue</title>
 <path fill="none" stroke="#757575" d="M1248.22,-1204.58C1280.37,-1206.77 1316.63,-1209.09 1349.75,-1210.88 1466.42,-1217.16 1598.88,-1222.48 1696.33,-1226.04"/>
 <polygon fill="#757575" stroke="#757575" points="1696.1,-1229.54 1706.22,-1226.4 1696.35,-1222.54 1696.1,-1229.54"/>
 </g>
-<!-- ../navigation/parts/SidebarUserFooter.vue -->
+<!-- ../navigation/controls/SidebarUserFooter.vue -->
 <g id="node93" class="node">
-<title>../navigation/parts/SidebarUserFooter.vue</title>
+<title>../navigation/controls/SidebarUserFooter.vue</title>
 <path fill="none" stroke="#c6c5fe" d="M1625.21,-1605.75C1625.21,-1605.75 1376.04,-1605.75 1376.04,-1605.75 1372.08,-1605.75 1368.12,-1601.79 1368.12,-1597.83 1368.12,-1597.83 1368.12,-1589.92 1368.12,-1589.92 1368.12,-1585.96 1372.08,-1582 1376.04,-1582 1376.04,-1582 1625.21,-1582 1625.21,-1582 1629.17,-1582 1633.12,-1585.96 1633.12,-1589.92 1633.12,-1589.92 1633.12,-1597.83 1633.12,-1597.83 1633.12,-1601.79 1629.17,-1605.75 1625.21,-1605.75"/>
-<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1588.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/parts/SidebarUserFooter.vue</text>
+<text xml:space="preserve" text-anchor="middle" x="1500.62" y="-1588.45" font-family="Arial" font-size="14.00" fill="#c6c5fe">../navigation/controls/SidebarUserFooter.vue</text>
 </g>
-<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarUserFooter.vue -->
+<!-- ../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarUserFooter.vue -->
 <g id="edge146" class="edge">
-<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/parts/SidebarUserFooter.vue</title>
+<title>../navigation/AppSidebar.vue&#45;&gt;../navigation/controls/SidebarUserFooter.vue</title>
 <path fill="none" stroke="#757575" d="M1165.87,-1210.13C1194.17,-1243.42 1272.09,-1339.24 1313.75,-1431.88 1340.28,-1490.86 1301.55,-1529.74 1349.75,-1572.88 1352.41,-1575.25 1355.2,-1577.43 1358.11,-1579.44"/>
 <polygon fill="#757575" stroke="#757575" points="1356.11,-1582.32 1366.48,-1584.47 1359.71,-1576.32 1356.11,-1582.32"/>
 </g>
@@ -1467,57 +1467,57 @@
 <path fill="none" stroke="#757575" d="M1932.52,-1192.21C1951.96,-1196.49 1972.01,-1202.22 1990,-1209.88 2007.93,-1217.5 2007.79,-1227.97 2026,-1234.88 2041.07,-1240.59 2057.33,-1244.85 2073.67,-1248.01"/>
 <polygon fill="#757575" stroke="#757575" points="2073.04,-1251.45 2083.5,-1249.76 2074.27,-1244.56 2073.04,-1251.45"/>
 </g>
-<!-- ../navigation/parts/ChatHistoryActionMenu.vue&#45;&gt;../common/bottom&#45;sheet/BaseBottomSheet.vue -->
+<!-- ../navigation/controls/ChatHistoryActionMenu.vue&#45;&gt;../common/bottom&#45;sheet/BaseBottomSheet.vue -->
 <g id="edge151" class="edge">
-<title>../navigation/parts/ChatHistoryActionMenu.vue&#45;&gt;../common/bottom&#45;sheet/BaseBottomSheet.vue</title>
+<title>../navigation/controls/ChatHistoryActionMenu.vue&#45;&gt;../common/bottom&#45;sheet/BaseBottomSheet.vue</title>
 <path fill="none" stroke="#757575" d="M1648.08,-1071.88C1657.26,-1071.88 1666.53,-1071.88 1675.77,-1071.88"/>
 <polygon fill="#757575" stroke="#757575" points="1675.51,-1075.38 1685.51,-1071.88 1675.51,-1068.38 1675.51,-1075.38"/>
 </g>
-<!-- ../navigation/parts/CollapsedSidebar.vue&#45;&gt;../navigation/SidebarIcon.vue -->
+<!-- ../navigation/controls/CollapsedSidebar.vue&#45;&gt;../navigation/SidebarIcon.vue -->
 <g id="edge152" class="edge">
-<title>../navigation/parts/CollapsedSidebar.vue&#45;&gt;../navigation/SidebarIcon.vue</title>
+<title>../navigation/controls/CollapsedSidebar.vue&#45;&gt;../navigation/SidebarIcon.vue</title>
 <path fill="none" stroke="#757575" d="M1629.66,-1186.07C1663.43,-1185.06 1699.49,-1183.99 1731.95,-1183.02"/>
 <polygon fill="#757575" stroke="#757575" points="1731.86,-1186.53 1741.75,-1182.73 1731.65,-1179.53 1731.86,-1186.53"/>
 </g>
-<!-- ../navigation/parts/CollapsedSidebar.vue&#45;&gt;../navigation/parts/SidebarHistoryList.vue -->
+<!-- ../navigation/controls/CollapsedSidebar.vue&#45;&gt;../navigation/controls/SidebarHistoryList.vue -->
 <g id="edge153" class="edge">
-<title>../navigation/parts/CollapsedSidebar.vue&#45;&gt;../navigation/parts/SidebarHistoryList.vue</title>
+<title>../navigation/controls/CollapsedSidebar.vue&#45;&gt;../navigation/controls/SidebarHistoryList.vue</title>
 <path fill="none" stroke="#757575" d="M1602.93,-1202.23C1641.45,-1206.93 1685.57,-1212.31 1725.08,-1217.13"/>
 <polygon fill="#757575" stroke="#757575" points="1724.51,-1220.59 1734.86,-1218.32 1725.36,-1213.64 1724.51,-1220.59"/>
 </g>
-<!-- ../navigation/parts/SidebarAssistantSelector.vue&#45;&gt;../icons/CheckIcon.vue -->
+<!-- ../navigation/controls/SidebarAssistantSelector.vue&#45;&gt;../icons/CheckIcon.vue -->
 <g id="edge154" class="edge">
-<title>../navigation/parts/SidebarAssistantSelector.vue&#45;&gt;../icons/CheckIcon.vue</title>
+<title>../navigation/controls/SidebarAssistantSelector.vue&#45;&gt;../icons/CheckIcon.vue</title>
 <path fill="none" stroke="#757575" d="M1632.29,-1539.56C1638.94,-1537.09 1645.39,-1534.22 1651.5,-1530.88 1673.07,-1519.07 1667.46,-1503.12 1687.5,-1488.88 1714.94,-1469.36 1749.72,-1455.17 1778.9,-1445.6"/>
 <polygon fill="#757575" stroke="#757575" points="1779.87,-1448.97 1788.35,-1442.61 1777.76,-1442.29 1779.87,-1448.97"/>
 </g>
-<!-- ../navigation/parts/SidebarAssistantSelector.vue&#45;&gt;../icons/ChevronDownIcon.vue -->
+<!-- ../navigation/controls/SidebarAssistantSelector.vue&#45;&gt;../icons/ChevronDownIcon.vue -->
 <g id="edge155" class="edge">
-<title>../navigation/parts/SidebarAssistantSelector.vue&#45;&gt;../icons/ChevronDownIcon.vue</title>
+<title>../navigation/controls/SidebarAssistantSelector.vue&#45;&gt;../icons/ChevronDownIcon.vue</title>
 <path fill="none" stroke="#757575" d="M1651.99,-1551.88C1677.49,-1551.88 1703.54,-1551.88 1727.76,-1551.88"/>
 <polygon fill="#757575" stroke="#757575" points="1727.61,-1555.38 1737.61,-1551.88 1727.61,-1548.38 1727.61,-1555.38"/>
 </g>
-<!-- ../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../stores/systemSettingsStore.js -->
+<!-- ../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../stores/systemSettingsStore.js -->
 <g id="edge158" class="edge">
-<title>../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../stores/systemSettingsStore.js</title>
+<title>../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../stores/systemSettingsStore.js</title>
 <path fill="none" stroke="#757575" d="M1633.58,-1600.62C1732.8,-1602.72 1871.44,-1599.27 1990,-1572.88 2366.39,-1489.07 2466.46,-1447.51 2790.75,-1238.88 2876.89,-1183.46 2960.47,-1093.24 2995.95,-1052.73"/>
 <polygon fill="#757575" stroke="#757575" points="2998.45,-1055.19 3002.36,-1045.35 2993.16,-1050.61 2998.45,-1055.19"/>
 </g>
-<!-- ../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../composables/chat/chatActionContext.js -->
+<!-- ../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../composables/chat/chatActionContext.js -->
 <g id="edge156" class="edge">
-<title>../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../composables/chat/chatActionContext.js</title>
+<title>../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../composables/chat/chatActionContext.js</title>
 <path fill="none" stroke="#757575" d="M1624.33,-1606.19C1633.66,-1608.6 1642.82,-1611.46 1651.5,-1614.88 1718.26,-1641.1 1784.18,-1695.69 1816.75,-1725.1"/>
 <polygon fill="#757575" stroke="#757575" points="1814.17,-1727.48 1823.91,-1731.65 1818.9,-1722.32 1814.17,-1727.48"/>
 </g>
-<!-- ../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../stores/authStore.js -->
+<!-- ../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../stores/authStore.js -->
 <g id="edge157" class="edge">
-<title>../navigation/parts/SidebarUserFooter.vue&#45;&gt;../../stores/authStore.js</title>
+<title>../navigation/controls/SidebarUserFooter.vue&#45;&gt;../../stores/authStore.js</title>
 <path fill="none" stroke="#757575" d="M1632.29,-1581.56C1638.94,-1579.09 1645.39,-1576.22 1651.5,-1572.88 1673.07,-1561.07 1665.93,-1542.67 1687.5,-1530.88 1706.88,-1520.27 1729.69,-1514.36 1751.61,-1511.21"/>
 <polygon fill="#757575" stroke="#757575" points="1751.96,-1514.69 1761.46,-1509.99 1751.1,-1507.75 1751.96,-1514.69"/>
 </g>
-<!-- ../navigation/parts/SidebarUserFooter.vue&#45;&gt;../icons/SwaggerDocIcon.vue -->
+<!-- ../navigation/controls/SidebarUserFooter.vue&#45;&gt;../icons/SwaggerDocIcon.vue -->
 <g id="edge159" class="edge">
-<title>../navigation/parts/SidebarUserFooter.vue&#45;&gt;../icons/SwaggerDocIcon.vue</title>
+<title>../navigation/controls/SidebarUserFooter.vue&#45;&gt;../icons/SwaggerDocIcon.vue</title>
 <path fill="none" stroke="#757575" d="M1633.56,-1602.4C1640.01,-1605.81 1646.06,-1609.93 1651.5,-1614.88 1702.54,-1661.29 1640.58,-1715.29 1687.5,-1765.88 1701.11,-1780.54 1719.19,-1790.75 1738.08,-1797.85"/>
 <polygon fill="#757575" stroke="#757575" points="1736.92,-1801.15 1747.51,-1801.08 1739.19,-1794.53 1736.92,-1801.15"/>
 </g>
