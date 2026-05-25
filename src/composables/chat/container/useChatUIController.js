@@ -9,7 +9,7 @@ import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useViewportStore} from "@/platform/viewport/viewportStore";
+import {useViewportStore} from "@/stores/viewportStore";
 import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";

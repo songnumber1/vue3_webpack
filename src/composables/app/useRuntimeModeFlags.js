@@ -1,7 +1,7 @@
 import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useViewportStore} from "@/platform/viewport/viewportStore";
+import {useViewportStore} from "@/stores/viewportStore";
 
 /**
  * HTML의 `<body>` 태그가 모바일 클래스(`mobile-mode`)를 가지고 있는지 직접 판별합니다.

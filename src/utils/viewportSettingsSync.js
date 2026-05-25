@@ -1,4 +1,4 @@
-import {useViewportStore} from "@/platform/viewport/viewportStore";
+import {useViewportStore} from "@/stores/viewportStore";
 import {syncViewportModeClass} from "@/platform/viewport/viewportMode";
 import {logPlatformDebug} from "@/platform/platformDebug";
 
