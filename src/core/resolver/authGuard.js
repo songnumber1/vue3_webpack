@@ -13,22 +13,34 @@ import {accessApiMock} from "@/api/mock/accessApi.mock";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
 import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
+
+/**
+ * 라우터 진입 타깃 목적지(to) 정보를 바탕으로 백엔드 보안 엔진에 전달할 파라미터 페이로드를 생성합니다.
+ * @param {Object} to - Vue Router의 이동 대상 라우트 객체
+ * @returns {Object} 접근 제어 API용 규격 페이로드 객체
+ */
 function createAccessPayload(to) {
   return {
-    language: "ko",
-    entryType: to?.name === "chat" ? "chat" : "main",
-    shareId: to?.params?.shareId || null,
-    chatId: to?.params?.id || null,
-    msgId: null,
-    studioId: to?.query?.studioId || null,
+    language: "ko", // 기본 요청 국가/언어 코드 고정
+    entryType: to?.name === "chat" ? "chat" : "main", // 진입한 페이지 성격 분기
+    shareId: to?.params?.shareId || null, // 공유 페이지 진입 시 고유 공유 식별자
+    chatId: to?.params?.id || null, // 일반 대화방 진입 시 고유 대화 히스토리 식별자
+    msgId: null, // 특정 메시지 하이라이트 진입용 파라미터 (기본값 null)
+    studioId: to?.query?.studioId || null, // 쿼리 스트링으로 넘어온 특화 스튜디오 룸 ID
   };
 }
 
+/**
+ * 로컬 스토리지 또는 시스템 환경 변수로부터 현재 테스트 중인 모크 인증 시나리오 키를 안전하게 획득합니다.
+ * @returns {string|null} 지정된 모크 시나리오 문자열 코드 또는 null
+ */
 function getStoredMockScenario() {
+  // SSR 환경(Node.js 서버 사이드)일 경우 브라우저 스토리지가 없으므로 환경 변수에서만 바로 읽어옵니다.
   if (typeof window === "undefined") {
     return process.env.VUE_APP_MOCK_AUTH_SCENARIO || null;
   }
 
+  // 1. 개발자가 로컬 스토리지에 임의 지정한 모크 시나리오, 2. 빌드 환경 변수 시나리오 순서로 우선순위를 설정하여 탐색합니다.
   return (
     window.localStorage.getItem(AUTH_MOCK_SCENARIO_STORAGE_KEY) ||
     process.env.VUE_APP_MOCK_AUTH_SCENARIO ||
@@ -36,23 +48,41 @@ function getStoredMockScenario() {
   );
 }
 
+/**
+ * 현재 모킹(Mock) 모드로 가짜 인증 처리를 수행해야 하는 상태인지 다각도로 검사하여 판별합니다.
+ * @returns {boolean} 가짜 모크 API 모드로 연동해야 하면 true, 실제 서버 통신이면 false
+ * @see {@link shouldUseFrontendMockApi} 전역 모크 모드가 활성화되었는지 판단하는 기준 유틸 함수
+ */
 function shouldUseMockAuth() {
   return (
-    shouldUseFrontendMockApi() ||
-    USE_MOCK_AUTH ||
-    (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario()))
+    shouldUseFrontendMockApi() || // 1. 프론트엔드 자체가 모크 모드이거나
+    USE_MOCK_AUTH || // 2. 인증 상수로 가짜 인증이 강제 활성화되었거나
+    (ALLOW_LOCAL_STORAGE_MOCK_AUTH && Boolean(getStoredMockScenario())) // 3. 로컬 스토리지 커스텀 시나리오가 존재하고 허용된 상태인 경우
   );
 }
 
+/**
+ * 인증 가드 디버그 플래그가 활성화되어 있을 때만 선택적으로 보안 콘솔 로그를 남깁니다.
+ * @param {...*} args - 콘솔에 출력할 디버깅용 파라미터 나열
+ * @see {@link logInfo} 커스텀 조건부 로깅 모듈 유틸리티 함수
+ */
 function debugAuthGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
     logInfo("[auth-guard]", ...args);
   }
 }
+
+/**
+ * 백엔드 서버 또는 로컬 모크 레포지토리 측에 실제 유저의 토큰/계정 유효성 정보(access/info.do)를 요청합니다.
+ * @param {import("axios").AxiosInstance} authAxios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
+ * @param {Object} payload - {@link createAccessPayload} 유틸로 가공된 파라미터 본문
+ * @returns {Promise<Object>} 서버/모크로부터 전달받은 가공되지 않은 순수 인증 결과 객체
+ */
 async function requestAccessInfo(authAxios, payload) {
   const useMock = shouldUseMockAuth();
   const scenario = getStoredMockScenario() || AUTH_MOCK_SCENARIOS.AUTHENTICATED;
 
+  // 디버그 활성화 상태 시 현재 통신 방식(Mock 시나리오명 혹은 실서버 Live 모드) 상태를 로깅합니다.
   debugAuthGuard("request access/info.do", {
     useMock,
     scenario: useMock ? scenario : "live",
@@ -60,24 +90,45 @@ async function requestAccessInfo(authAxios, payload) {
     payload,
   });
 
+  // 모크 통신 대상인 경우 준비된 가짜 데이터 저장소(accessApiMock)로부터 시나리오별 객체를 반환받습니다.
   if (useMock) {
     return accessApiMock.getAccessInfo(payload, {scenario});
   }
 
+  // 실서버 통신인데 부트스트랩 단계에서 인증 Axios 인스턴스가 주입되지 않았다면 예외를 발생시킵니다.
   if (!authAxios) {
     throw new Error("[authGuard] Auth axios instance is not initialized.");
   }
 
+  // 준비된 인증용 Axios 인스턴스를 통해 백엔드 엔드포인트로 POST 비동기 요청을 전달합니다.
   const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);
 
   return response?.data || {};
 }
+
+/**
+ * 가공되지 않은 날것의 응답 데이터를 프론트엔드 전용 표준 규격 결과로 어댑팅 정문화합니다.
+ * @param {Object} [accessInfo={}] - 원본 응답 데이터 객체
+ * @returns {Object} 정형화 완료된 패스/실패 판별 결과 객체
+ * @see {@link resolveAuthAccessResult} 외부 응답 규격 보정 어댑터 함수
+ */
 function normalizeAccessResult(accessInfo = {}) {
   return resolveAuthAccessResult(accessInfo);
 }
+
+/**
+ * [외부 노출 메인 함수] 목적지 경로로의 전환이 안전한지 검증하고 인증 상태에 따라 전역 스토어를 갱신합니다.
+ * @param {Object} context - 라우터 가드 실행 콘텍스트
+ * @param {Object} context.to - 이동하고자 하는 목적지 라우트 객체
+ * @param {import("axios").AxiosInstance} context.authAxios - 통신에 활용할 인증 Axios 인스턴스
+ * @param {boolean} [context.force=false] - 캐시를 무시하고 무조건 서버에 재검증 API를 쏠지 여부 플래그
+ * @returns {Promise<Object>} 인증 최종 성공 여부(`authenticated`) 및 결과 리포트 객체
+ * @see {@link useAuthStore} 사용자 인증 상태값을 영구 기록 및 변동시키는 Pinia 전역 스토어
+ */
 export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   const authStore = useAuthStore();
 
+  // 캐시 옵션이 켜져 있고 강제 갱신(force)이 아니며, 이미 한 번 로그인을 체크했고 인증 상태가 유효하다면 API 호출을 생략합니다.
   if (
     ENABLE_AUTH_GUARD_CACHE &&
     !force &&
@@ -94,17 +145,22 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     };
   }
 
+  // 타깃 라우트 정보를 바탕으로 전송용 API 페이로드를 생성합니다.
   const payload = createAccessPayload(to);
 
   try {
+    // 백엔드 혹은 모킹 엔진으로부터 계정 정보 데이터를 수집합니다.
     const accessInfo = await requestAccessInfo(authAxios, payload);
+    // 수집된 데이터를 프론트엔드가 즉시 읽을 수 있는 플랫한 규격 객체로 가공합니다.
     const result = normalizeAccessResult(accessInfo);
 
     debugAuthGuard("access/info.do normalized result", result);
 
+    // 어댑터 가공 결과 최종 승인(authenticated: true) 상태라면 전역 스토어에 유저 정보를 안전하게 안착시킵니다.
     if (result.authenticated) {
       authStore.setAuthenticatedAccessInfo(result.accessInfo);
     } else {
+      // 실패했다면 실질적인 제한 사유(만료, 권한부족, 약관동의 누락 등) 코드를 스토어에 세팅합니다.
       authStore.setAuthFailure(result.reason, result.accessInfo);
     }
 
@@ -112,6 +168,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
   } catch (error) {
     debugAuthGuard("access/info.do error", error);
 
+    // 네트워크 오류 중 HTTP status 코드가 401(Unauthorized)이거나 403(Forbidden)인 경우, 로그인이 만료된 것으로 단언합니다.
     const status = error?.response?.status;
     if (status === 401 || status === 403) {
       authStore.setAuthFailure(AUTH_FAILURE_REASONS.LOGIN_REQUIRED);
@@ -123,6 +180,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
       };
     }
 
+    // 그 외 통신 단절, 500 내부 서버 에러 등은 시스템 자체의 하드 오류로 판단하여 처리합니다.
     authStore.setAuthError(error);
 
     return {

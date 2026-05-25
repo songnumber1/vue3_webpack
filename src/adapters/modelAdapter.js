@@ -1,5 +1,5 @@
 import {MODEL_KEYS} from "@/constants/apiKeys";
-import {toBoolean} from "./booleanAdapter";
+import {toBoolean} from "@/utils/typeConvert";
 
 export function adaptModel(raw = {}) {
   const id = raw[MODEL_KEYS.ID];
