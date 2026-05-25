@@ -71,16 +71,42 @@ const emit = defineEmits(["content-rendered", "regenerate"]);
 const scrollRef = ref(null);
 const bottomRef = ref(null);
 const userIsAtBottom = ref(true);
+const viewportHeightForFocusSpacer = ref(0);
 let stableScrollTimerIds = [];
+
+/**
+ * 자동 스크롤 OFF 상태에서 사용자 질문을 화면 상단으로 올리려면
+ * 최신 질문 아래쪽에 충분한 빈 스크롤 영역이 필요합니다.
+ * 실제 모바일 키보드가 열린 상태에서는 visualViewport.height가 작아지기 때문에
+ * visualViewport 비율만 사용하면 spacer가 부족해져 이전 답변이 일부 남을 수 있습니다.
+ */
+function updateFocusSpacerViewportHeight() {
+  const visualHeight = window.visualViewport?.height || 0;
+  const layoutHeight = window.innerHeight || 0;
+  const listHeight = scrollRef.value?.clientHeight || 0;
+
+  viewportHeightForFocusSpacer.value = Math.max(
+    visualHeight,
+    listHeight,
+    Math.floor(layoutHeight * 0.5)
+  );
+}
+
 const streamFocusSpacerHeight = computed(() => {
   if (props.autoScrollOnAnswer || !props.loading) {
     return 0;
   }
 
-  const viewportHeight =
-    window.visualViewport?.height || window.innerHeight || 0;
+  const viewportHeight = viewportHeightForFocusSpacer.value ||
+    window.visualViewport?.height ||
+    scrollRef.value?.clientHeight ||
+    window.innerHeight ||
+    0;
+  const listHeight = scrollRef.value?.clientHeight || 0;
+  const viewportBasedSpacer = Math.floor(viewportHeight * 0.92);
+  const listBasedSpacer = Math.max(0, listHeight - 48);
 
-  return Math.max(0, Math.floor(viewportHeight * 0.72));
+  return Math.max(0, viewportBasedSpacer, listBasedSpacer);
 });
 
 /**
@@ -250,6 +276,7 @@ function applyElementScroll(target, options = {}) {
  */
 function scrollToLatestUserMessage(options = {}) {
   clearStableTimers();
+  updateFocusSpacerViewportHeight();
 
   const target = getLatestUserMessageElement();
   if (!applyElementScroll(target, options)) return;
@@ -263,6 +290,7 @@ function scrollToLatestUserMessage(options = {}) {
   delays.forEach((delay) => {
     const timerId = window.setTimeout(() => {
       window.requestAnimationFrame(() => {
+        updateFocusSpacerViewportHeight();
         applyElementScroll(target, {...options, behavior: "auto"});
       });
     }, delay);
@@ -307,6 +335,11 @@ async function handleMessageRendered() {
 
 onMounted(() => {
   if (typeof window === "undefined") return;
+  updateFocusSpacerViewportHeight();
+  window.addEventListener("resize", updateFocusSpacerViewportHeight, {passive: true});
+  window.visualViewport?.addEventListener("resize", updateFocusSpacerViewportHeight, {
+    passive: true,
+  });
   window.addEventListener("touchstart", handleUserScrollIntent, {passive: true});
   window.addEventListener("wheel", handleUserScrollIntent, {passive: true});
 });
@@ -314,6 +347,11 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearStableTimers();
   if (typeof window === "undefined") return;
+  window.removeEventListener("resize", updateFocusSpacerViewportHeight);
+  window.visualViewport?.removeEventListener(
+    "resize",
+    updateFocusSpacerViewportHeight
+  );
   window.removeEventListener("touchstart", handleUserScrollIntent);
   window.removeEventListener("wheel", handleUserScrollIntent);
 });
