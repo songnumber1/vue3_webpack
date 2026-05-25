@@ -10,6 +10,7 @@ export async function runSseGenerationStream({
   handlers,
   controller,
   lifecycle,
+  runtimeType = "unknown",
 }) {
   const {onChunk, onComplete} = handlers || {};
   const committer = createChunkCommitter(onChunk);
@@ -83,6 +84,7 @@ export async function runSseGenerationStream({
       completed: true,
       requestId: payload?.requestId || payload?.request_id || "",
       accumulated,
+      runtimeType,
     };
   } catch (error) {
     await committer.flush(accumulated);

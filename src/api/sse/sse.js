@@ -2,12 +2,9 @@ import {shouldUseServerApi} from "@/constants/apiMode";
 import {pickGenerationSample} from "@/api/mock/data/generationSamples.raw";
 import {streamText} from "@/api/mock/fakeStream";
 import {isGenerationAbortError} from "@/api/sse/common/sseErrors";
-import {resolveStreamRuntimeType} from "@/platform/runtime/runtimeDetector";
-import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 import {logPlatformDebug} from "@/platform/platformDebug";
-import {streamGenerationDesktop} from "@/api/sse/browser/desktop/streamGenerationDesktop";
-import {streamGenerationChrome} from "@/api/sse/browser/chrome/streamGenerationChrome";
-import {streamGenerationAndroidWebView} from "@/api/sse/webview/android/streamGenerationAndroidWebView";
+import {runSseGenerationStream} from "@/api/sse/common/streamGenerationCore";
+import {createSseRuntimeContext} from "@/api/sse/platforms/streamRuntimeContext";
 
 export {isGenerationAbortError};
 
@@ -34,17 +31,19 @@ async function streamGenerationMock(payload = {}, handlers = {}) {
 export async function streamGeneration(payload = {}, handlers = {}) {
   if (!shouldUseServerApi()) return streamGenerationMock(payload, handlers);
 
-  const runtimeType = resolveStreamRuntimeType();
+  const context = createSseRuntimeContext();
 
-  logPlatformDebug("sse.route", {runtimeType});
+  logPlatformDebug("sse.route", {runtimeType: context.runtimeType});
 
-  if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW) {
-    return streamGenerationAndroidWebView(payload, handlers);
+  try {
+    return await runSseGenerationStream({
+      payload,
+      handlers,
+      controller: context.controller,
+      lifecycle: context.lifecycle,
+      runtimeType: context.runtimeType,
+    });
+  } finally {
+    context.cleanup?.();
   }
-
-  if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_CHROME) {
-    return streamGenerationChrome(payload, handlers);
-  }
-
-  return streamGenerationDesktop(payload, handlers);
 }

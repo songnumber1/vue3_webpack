@@ -81,6 +81,20 @@ function createStreamScrollScheduler(options) {
   };
 }
 
+
+async function commitFirstAnswerChunk({
+  content,
+  liveAssistantMessage,
+  commitAssistantMessage,
+}) {
+  if (liveAssistantMessage.reasoningStatus === "thinking") {
+    commitAssistantMessage({reasoningStatus: "completed"});
+    await nextTick();
+  }
+
+  commitAssistantMessage({content, status: "streaming"});
+}
+
 async function scrollAfterUserSubmit(options) {
   await nextTick();
 
@@ -164,8 +178,12 @@ export function useChatSubmit(options) {
           chatId: targetHistoryId,
         }),
         {
-          onChunk: (content) => {
-            commitAssistantMessage({content, status: "streaming"});
+          onChunk: async (content) => {
+            await commitFirstAnswerChunk({
+              content,
+              liveAssistantMessage,
+              commitAssistantMessage,
+            });
             scheduleStreamScroll();
           },
           onComplete: () => {
@@ -283,8 +301,12 @@ export function useChatSubmit(options) {
           chatId: targetHistoryId,
         }),
         {
-          onChunk: (content) => {
-            commitAssistantMessage({content, status: "streaming"});
+          onChunk: async (content) => {
+            await commitFirstAnswerChunk({
+              content,
+              liveAssistantMessage,
+              commitAssistantMessage,
+            });
             scheduleStreamScroll();
           },
           onComplete: () => {
