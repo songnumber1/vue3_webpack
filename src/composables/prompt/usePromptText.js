@@ -51,10 +51,28 @@ export function usePromptText({isMobileSheet, emit}) {
     // 글자가 도중에 지워졌을 때(BackSpace 연타) 축소되어야 할 실제 컨텐츠 래핑 높이(scrollHeight)를 브라우저가 오차 없이 재측정할 수 있습니다.
     el.style.height = "auto";
 
-    // 데스크톱과 모바일 디바이스 가상 키보드 점유 환경에 대응하여 최대 확장 가능 임계 임계치를 스위칭 빌드합니다.
-    const maxHeight = isMobileSheet.value
-      ? PROMPT_TEXTAREA_HEIGHT.mobileMax
-      : PROMPT_TEXTAREA_HEIGHT.desktopMax;
+    // 최대 8줄까지 자연스럽게 확장하고, 그 이후부터 textarea 내부 스크롤을 사용합니다.
+    const computedStyle = window.getComputedStyle(el);
+    const lineHeight = Number.parseFloat(computedStyle.lineHeight);
+    const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
+    const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
+    const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
+    const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
+    const eightLineHeight =
+      (Number.isFinite(lineHeight) ? lineHeight : PROMPT_TEXTAREA_HEIGHT.lineHeight) *
+        PROMPT_TEXTAREA_HEIGHT.maxRows +
+      paddingTop +
+      paddingBottom +
+      borderTop +
+      borderBottom;
+
+    // 기존 모바일/데스크톱 상한보다 작아지는 회귀를 막기 위해 8줄 기준 높이를 우선 적용합니다.
+    const maxHeight = Math.max(
+      eightLineHeight,
+      isMobileSheet.value
+        ? PROMPT_TEXTAREA_HEIGHT.mobileMax
+        : PROMPT_TEXTAREA_HEIGHT.desktopMax
+    );
 
     // 측정 완료된 돔의 물리 내용물 총 높이(scrollHeight)를 기반으로 최소 규격과 최대 임계 사양을 안전하게 한정 매핑합니다.
     const nextHeight = Math.min(

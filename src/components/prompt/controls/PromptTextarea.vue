@@ -1,6 +1,7 @@
 <template>
   <textarea
     ref="textareaRef"
+    class="prompt-textarea"
     :value="modelValue"
     :disabled="disabled"
     :placeholder="placeholder"
@@ -8,7 +9,8 @@
     @focus="$emit('focus')"
     @blur="$emit('blur')"
     @input="handleInput"
-    @keydown.enter.exact.prevent="$emit('submit')"
+    @keydown.enter.exact.prevent="handleEnterSubmit"
+    @keydown.shift.enter="handleShiftEnter"
     @paste="$emit('paste', $event)"
   />
 </template>
@@ -23,13 +25,15 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {ref} from "vue";
+import {nextTick, ref} from "vue";
 
 const textareaRef = ref(null);
 
-defineProps({
+const props = defineProps({
   modelValue: {type: String, default: ""},
   disabled: {type: Boolean, default: false},
+  generating: {type: Boolean, default: false},
+  canSubmit: {type: Boolean, default: false},
   placeholder: {type: String, default: ""},
 });
 
@@ -47,6 +51,22 @@ const emit = defineEmits([
 function handleInput(event) {
   emit("update:modelValue", event.target.value);
   emit("input", event);
+}
+
+/**
+ * Enter 단독 입력은 전송 단축키입니다. 답변 생성 중이거나 전송 조건이 맞지 않을 때는
+ * textarea는 활성 상태로 유지하되 submit 이벤트만 상위로 올리지 않습니다.
+ */
+function handleEnterSubmit() {
+  if (props.disabled || props.generating || !props.canSubmit) return;
+  emit("submit");
+}
+
+/**
+ * Shift+Enter는 브라우저 기본 개행을 유지하고, DOM 값 반영 이후 높이를 다시 계산합니다.
+ */
+function handleShiftEnter(event) {
+  nextTick(() => emit("input", event));
 }
 
 defineExpose({textareaRef});

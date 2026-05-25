@@ -27,7 +27,7 @@
           class="suggestion-chip"
           type="button"
           :title="item.title || item.prompt"
-          :disabled="isInteractionBlocked"
+          :disabled="false"
           @click="handleSuggestionClick(item)"
         >
           <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>

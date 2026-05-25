@@ -23,6 +23,8 @@
         ref="textareaComponentRef"
         v-model="text"
         :disabled="disabled"
+        :generating="generating"
+        :can-submit="canSubmit"
         :placeholder="placeholder || t('chat.promptPlaceholder')"
         @focus="handleFocus"
         @blur="emit('blur')"

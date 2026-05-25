@@ -317,7 +317,10 @@ provide(CHAT_ACTIONS_KEY, {
 });
 
 provide(WORKSPACE_ACTIONS_KEY, {
-  submit,
+  submit: (payload) => {
+    if (isGenerating.value) return;
+    submit(payload);
+  },
   regenerate,
   updateSelectedModel: (val) => {
     selectedModel.value = val;

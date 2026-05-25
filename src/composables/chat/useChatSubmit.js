@@ -428,55 +428,57 @@ export function useChatSubmit(options) {
       return;
     }
 
-    let targetHistoryId = String(options.route.params.id || "");
-
-    // [체크 유닛] 현재 라우팅 주소가 홈(Main)이거나 신규 방 생성이 수반되어야 하는 상태인 경우
-    if (
-      options.route.name === "main" ||
-      options.route.name === "chat-entry" ||
-      !targetHistoryId
-    ) {
-      // 백엔드 세션 방 생성을 선행 유도합니다.
-      const history = await createConversationForSubmit(options, normalized);
-      targetHistoryId = history.id;
-
-      // 주소창을 새로 개통된 대화방 전용 고유 주소 파라미터(`chat/:id`) 구조로 강제 강격 포워딩 전환합니다.
-      await options.router
-        .push({name: "chat", params: {id: targetHistoryId}})
-        .catch(() => {});
-      await nextTick();
-    }
-
-    // 1단계: 유저 대화 말풍선 객체와 껍데기만 수립된 AI 대기조 말풍선 한 쌍을 로컬 스토어 화면 배열 꼬리에 즉각 밀어 넣습니다.
-    const {messages, assistantMessage} = options.appendUserAndAssistantMessages(
-      targetHistoryId,
-      normalized
-    );
-    // 2단계: 사이드바 서랍 타이틀 텍스트를 최신 백그라운드 스냅샷 동기화 처리합니다.
-    options.syncHistories?.();
-
-    // 3단계: 가동 준비가 완료된 원소 정보들을 토대로 실시간 데이터 불변성 보정용 커미터 큐 인스턴스를 조립합니다.
-    const committer = createAssistantMessageCommitter({
-      chatId: targetHistoryId,
-      initialMessages: messages,
-      initialAssistantMessage: {
-        ...assistantMessage,
-        ...createAssistantStreamingPatch(isSelectedModelReasoning(options)),
-      },
-      messagesRef: options.messages,
-      setConversation: options.setConversation,
-    });
-
-    // 4단계: 초고속 인입 버퍼 정렬을 유도할 마이크로태스크 스크롤 스케줄러 기동 준비 완료
-    const scheduleStreamScroll = createStreamScrollScheduler(options);
-
-    committer.commit(); // 화면에 최초 스트리밍 대기 상태 레이아웃 마운트 집행
-    await scrollAfterUserSubmit(options, normalized);
-
     isGenerating.value = true;
-    chatStreamStore.start(); // 하단 텍스트 인풋 박스를 '생성 중... 잠금 및 취소 버튼 활성화' 상태로 UI 모드 격상
 
     try {
+      let targetHistoryId = String(options.route.params.id || "");
+
+      // [체크 유닛] 현재 라우팅 주소가 홈(Main)이거나 신규 방 생성이 수반되어야 하는 상태인 경우
+      if (
+        options.route.name === "main" ||
+        options.route.name === "chat-entry" ||
+        !targetHistoryId
+      ) {
+        // 백엔드 세션 방 생성을 선행 유도합니다.
+        const history = await createConversationForSubmit(options, normalized);
+        targetHistoryId = history.id;
+
+        // 주소창을 새로 개통된 대화방 전용 고유 주소 파라미터(`chat/:id`) 구조로 강제 강격 포워딩 전환합니다.
+        // 전역 스트리밍 가드가 router.push를 막지 않도록 chatStreamStore.start()는 라우터 이동 완료 후에만 실행합니다.
+        await options.router
+          .push({name: "chat", params: {id: targetHistoryId}})
+          .catch(() => {});
+        await nextTick();
+      }
+
+      // 1단계: 유저 대화 말풍선 객체와 껍데기만 수립된 AI 대기조 말풍선 한 쌍을 로컬 스토어 화면 배열 꼬리에 즉각 밀어 넣습니다.
+      const {messages, assistantMessage} = options.appendUserAndAssistantMessages(
+        targetHistoryId,
+        normalized
+      );
+      // 2단계: 사이드바 서랍 타이틀 텍스트를 최신 백그라운드 스냅샷 동기화 처리합니다.
+      options.syncHistories?.();
+
+      // 3단계: 가동 준비가 완료된 원소 정보들을 토대로 실시간 데이터 불변성 보정용 커미터 큐 인스턴스를 조립합니다.
+      const committer = createAssistantMessageCommitter({
+        chatId: targetHistoryId,
+        initialMessages: messages,
+        initialAssistantMessage: {
+          ...assistantMessage,
+          ...createAssistantStreamingPatch(isSelectedModelReasoning(options)),
+        },
+        messagesRef: options.messages,
+        setConversation: options.setConversation,
+      });
+
+      // 4단계: 초고속 인입 버퍼 정렬을 유도할 마이크로태스크 스크롤 스케줄러 기동 준비 완료
+      const scheduleStreamScroll = createStreamScrollScheduler(options);
+
+      committer.commit(); // 화면에 최초 스트리밍 대기 상태 레이아웃 마운트 집행
+      await scrollAfterUserSubmit(options, normalized);
+
+      chatStreamStore.start(); // 하단 텍스트 인풋 박스를 '생성 중... 잠금 및 취소 버튼 활성화' 상태로 UI 모드 격상
+
       // 5단계: 대망의 SSE 비동기 무한 스트림 가동 파이프라인 엔진을 정식 점화합니다.
       await runAssistantStream({
         options,
