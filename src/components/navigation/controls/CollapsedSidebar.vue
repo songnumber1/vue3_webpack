@@ -1,5 +1,9 @@
 <template>
-  <div class="collapsed-sidebar" :aria-label="t('chat.collapsedSidebar')">
+  <div
+    ref="rootRef"
+    class="collapsed-sidebar"
+    :aria-label="t('chat.collapsedSidebar')"
+  >
     <div class="collapsed-sidebar-actions">
       <button
         class="collapsed-icon-button"
@@ -68,17 +72,33 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import Icon from "@/components/navigation/SidebarIcon.vue";
 import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
+import {useOutsideClick} from "@/composables/events/useOutsideClick";
 
 const {t} = useI18n();
+const rootRef = ref(null);
 
-defineProps({
+const props = defineProps({
   open: {type: Boolean, default: false},
   histories: {type: Array, default: () => []},
   selectedChatId: {type: [String, Number], default: ""},
 });
 
-defineEmits(["expand", "new-chat", "set-recent-open", "select-history"]);
+const emit = defineEmits([
+  "expand",
+  "new-chat",
+  "set-recent-open",
+  "select-history",
+]);
+
+useOutsideClick(
+  rootRef,
+  () => {
+    emit("set-recent-open", false);
+  },
+  {shouldIgnore: () => !props.open}
+);
 </script>
