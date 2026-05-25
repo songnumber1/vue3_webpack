@@ -84,6 +84,10 @@ export const chatMessages = {
       historySync: {
         loadFailed: "대화방 리스트를 가져오는데 실패했습니다.",
       },
+      lifecycle: {
+        mobileBackgroundAbortResumeAlert:
+          "모바일 백그라운드 전환으로 진행 중인 답변 요청이 종료되었습니다.",
+      },
       imagePreview: {
         loading: "이미지를 불러오는 중입니다...",
         error: "이미지를 미리보기로 표시할 수 없습니다.",
@@ -190,6 +194,10 @@ export const chatMessages = {
       },
       historySync: {
         loadFailed: "Failed to load the chat list.",
+      },
+      lifecycle: {
+        mobileBackgroundAbortResumeAlert:
+          "The in-progress answer request was ended because the mobile browser moved to the background.",
       },
       imagePreview: {
         loading: "Loading image...",

@@ -1,9 +1,10 @@
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {createAbortError, isGenerationAbortError} from "@/api/sse/common/sseErrors";
 import {logWarn} from "@/utils/logger";
+import {i18n} from "@/i18n";
 
-const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_MESSAGE =
-  "모바일 백그라운드 전환으로 진행 중인 답변 요청이 종료되었습니다.";
+const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_KEY =
+  "chat.lifecycle.mobileBackgroundAbortResumeAlert";
 
 function isDocumentHidden() {
   return typeof document !== "undefined" && document.hidden;
@@ -49,7 +50,7 @@ export function createChromeSseLifecycle() {
     clearResumeAlertListeners();
 
     if (typeof window !== "undefined" && typeof window.alert === "function") {
-      window.alert(MOBILE_BACKGROUND_ABORT_RESUME_ALERT_MESSAGE);
+      window.alert(i18n.global.t(MOBILE_BACKGROUND_ABORT_RESUME_ALERT_KEY));
     }
   };
 
