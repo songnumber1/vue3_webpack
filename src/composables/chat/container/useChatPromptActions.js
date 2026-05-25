@@ -19,16 +19,8 @@ export function useChatPromptActions({
     refreshViewport?.();
   }
 
-  function handlePromptFocus() {
-    refreshPromptViewport();
-  }
-
-  function handlePromptResize() {
-    refreshPromptViewport();
-  }
-
   return {
-    handlePromptFocus,
-    handlePromptResize,
+    handlePromptFocus: refreshPromptViewport,
+    handlePromptResize: refreshPromptViewport,
   };
 }

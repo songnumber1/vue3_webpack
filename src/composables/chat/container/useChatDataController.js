@@ -36,7 +36,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
     clearCurrentChatSelection,
     appendUserAndAssistantMessages,
     currentExamplePrompts,
-    getHistory,
     syncHistoriesInBackground,
   } = runtime;
 
@@ -46,7 +45,12 @@ export function useChatDataController({props, ui, runtime, messages}) {
     return null;
   });
 
-  const activeHistory = computed(() => getHistory(activeHistoryId.value));
+  function findHistory(id) {
+    if (!id) return null;
+    return histories.value.find((history) => String(history.id) === String(id)) || null;
+  }
+
+  const activeHistory = computed(() => findHistory(activeHistoryId.value));
   const activeConversationTitle = computed(() => {
     if (isSharedPage.value) {
       return t("chat.sharedConversationTitle", {
@@ -120,7 +124,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
         return;
       }
 
-      const history = getHistory(activeHistoryId.value);
+      const history = findHistory(activeHistoryId.value);
       if (!history) {
         await router.replace({name: "main"}).catch(() => {});
         return;
@@ -148,27 +152,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  const {isGenerating, handleSubmit, regenerateResponse} = useChatSubmit({
+  const {isGenerating, submit, regenerate} = useChatSubmit({
     router,
     route,
     histories,
     messages,
     createRemoteConversation,
-    createConversation: async (normalized, context = {}) => {
-      try {
-        return await createRemoteConversation({
-          text: normalized.text,
-          assistantId: context.assistantId,
-          modelId: context.modelId,
-        });
-      } catch (error) {
-        logWarn(
-          "[useChatDataController] new.do 호출 실패, local conversation으로 대체:",
-          error
-        );
-        return createLocalConversation(normalized);
-      }
-    },
+    createLocalConversation,
     appendUserAndAssistantMessages,
     setConversation,
     selectedAssistantId,
@@ -182,17 +172,10 @@ export function useChatDataController({props, ui, runtime, messages}) {
     autoScrollOnAnswer: ui.autoScrollOnAnswer,
     syncHistories: () => syncHistoriesInBackground({notifyOnError: true}),
     renderAfterStream,
+    canWrite: () => !isReadOnly.value && !isActiveModelUnavailable.value,
+    isReadOnly,
+    isActiveModelUnavailable,
   });
-
-  function submitIfWritable(payload) {
-    if (isReadOnly.value || isActiveModelUnavailable.value) return;
-    handleSubmit(payload);
-  }
-
-  function regenerateIfWritable(message) {
-    if (isReadOnly.value || isActiveModelUnavailable.value) return;
-    regenerateResponse(message);
-  }
 
   function bindDataEvents() {
     watch(
@@ -249,8 +232,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
     workspaceAssistantLabel,
     suggestions,
     isGenerating,
-    submitIfWritable,
-    regenerateIfWritable,
+    submit,
+    regenerate,
     bindDataEvents,
     initializeDataController,
   };

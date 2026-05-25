@@ -54,13 +54,9 @@ export function useChatNavigationActions({
     await router.push({name: "main"}).catch(() => {});
   }
 
-  function startNewChat() {
-    return resetChatState();
-  }
-
-  function startNewChatWithAssistant(id) {
-    return resetChatState({assistantId: id});
-  }
+  const startNewChat = resetChatState;
+  const startNewChatWithAssistant = (assistantId) =>
+    resetChatState({assistantId});
 
   async function openHistory(item) {
     if (isBlockedByStream()) return;

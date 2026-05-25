@@ -338,21 +338,13 @@ export function useChatRuntime() {
   }
 
   /**
-   * [액션 9] 인메모리 스토어 뒤편에 안전하게 격리 저장된 특정 방 ID의 순수 히스토리 메타 정보를 단발성 풀링 조회해 옵니다.
-   * @param {string} id - 대화방 고유 ID
-   */
-  function getHistory(id) {
-    return chatStore.getHistory(id);
-  }
-
-  /**
    * [액션 10] 사용자가 특정 과거 대화방을 클릭하여 진입(라우팅 이동)했을 때, 해당 방의 대화 말풍선 히스토리 전체를 로드하고
    * 유효 세션 검증 상태(모델 삭제 여부 등)를 진단하여 방 내부 컴포넌트 환경을 최종 안착 연동해 주는 핵심 세션 수립 진입 함수입니다.
    * @param {string} historyId - 진입 타깃 대화방 ID
    * @returns {Promise<Array>} 최종 수집되어 화면에 즉시 그려질 유저-AI 대화 말풍선 메시지 전체 배열
    */
   async function ensureConversation(historyId) {
-    const history = getHistory(historyId);
+    const history = chatStore.getHistory(historyId);
     if (!history) return []; // 메모리 상에 해당 대화 역사가 통째로 실재하지 않는다면 이상 상황이므로 빈 배열 반환 탈출
 
     // 1. 해당 히스토리 기반 원본 소스를 검사하여 모델 탈락/유실 여부가 합산된 정밀 런타임 세션 구조체를 축조합니다.
@@ -551,7 +543,6 @@ export function useChatRuntime() {
     removeHistory,
     selectAssistant,
     selectAssistantForNewChat,
-    getHistory,
     ensureConversation,
     setConversation,
     createRemoteConversation,

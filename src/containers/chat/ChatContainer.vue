@@ -236,8 +236,8 @@ const {
   openLanguage,
   openAssistantFromHeader,
   logout,
-  submitIfWritable,
-  regenerateIfWritable,
+  submit,
+  regenerate,
   handlePromptFocus,
   handlePromptResize,
   handleMessageContentRendered,
@@ -286,8 +286,8 @@ provide(CHAT_ACTIONS_KEY, {
 });
 
 provide(WORKSPACE_ACTIONS_KEY, {
-  submit: submitIfWritable,
-  regenerate: regenerateIfWritable,
+  submit,
+  regenerate,
   updateSelectedModel: (val) => {
     selectedModel.value = val;
   },
