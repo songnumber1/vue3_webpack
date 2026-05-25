@@ -12,12 +12,13 @@ import {createId} from "@/utils/id";
  */
 function normalizePromptPayload(payload) {
   if (typeof payload === "string") {
-    return {text: payload.trim(), attachments: []};
+    return {text: payload.trim(), attachments: [], keyboardOpenOnSubmit: false};
   }
 
   return {
     text: String(payload?.text || "").trim(),
     attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
+    keyboardOpenOnSubmit: payload?.keyboardOpenOnSubmit === true,
   };
 }
 
@@ -177,7 +178,59 @@ async function commitFirstAnswerChunk({content, getAssistantMessage, commit}) {
  * 유저가 인풋창에서 엔터를 쳐서 질문을 전송한 직후,
  * 사용자 커스텀 자동 스크롤 옵션 스냅샷을 판별해 최하단으로 내리거나 유저 질문 라인으로 화면을 포커싱 앵커링합니다.
  */
-async function scrollAfterUserSubmit(options) {
+function wait(ms) {
+  return new Promise((resolve) => window.setTimeout(resolve, ms));
+}
+
+function waitAnimationFrame() {
+  return new Promise((resolve) => window.requestAnimationFrame(resolve));
+}
+
+/**
+ * 모바일 Chrome/WebView에서 키보드가 내려가는 동안에는 visualViewport 높이가 여러 번 바뀝니다.
+ * 이 구간에 스크롤을 실행하면 브라우저가 키보드 보정 스크롤로 다시 덮어써서
+ * 마지막 사용자 질문 앵커가 화면 상단에 맞지 않습니다.
+ */
+async function waitForKeyboardViewportToSettle() {
+  if (typeof window === "undefined") return;
+
+  const viewport = window.visualViewport;
+  if (!viewport) {
+    await wait(240);
+    return;
+  }
+
+  let lastHeight = viewport.height;
+  let lastChangeAt = Date.now();
+  const startedAt = Date.now();
+
+  const handleResize = () => {
+    const nextHeight = viewport.height;
+    if (Math.abs(nextHeight - lastHeight) > 1) {
+      lastHeight = nextHeight;
+      lastChangeAt = Date.now();
+    }
+  };
+
+  viewport.addEventListener("resize", handleResize, {passive: true});
+  try {
+    while (Date.now() - startedAt < 900) {
+      handleResize();
+      if (Date.now() - lastChangeAt >= 140) break;
+      await wait(40);
+    }
+    await waitAnimationFrame();
+    await waitAnimationFrame();
+  } finally {
+    viewport.removeEventListener("resize", handleResize);
+  }
+}
+
+/**
+ * 유저가 인풋창에서 엔터를 쳐서 질문을 전송한 직후,
+ * 사용자 커스텀 자동 스크롤 옵션 스냅샷을 판별해 최하단으로 내리거나 유저 질문 라인으로 화면을 포커싱 앵커링합니다.
+ */
+async function scrollAfterUserSubmit(options, normalized = {}) {
   await nextTick();
 
   if (options.autoScrollOnAnswer?.value) {
@@ -185,10 +238,17 @@ async function scrollAfterUserSubmit(options) {
     return;
   }
 
+  if (normalized.keyboardOpenOnSubmit) {
+    await waitForKeyboardViewportToSettle();
+    await nextTick();
+  }
+
   await options.scrollLatestUserMessage?.({
     behavior: "auto",
     stable: true,
     offset: 16,
+    pageFallback: normalized.keyboardOpenOnSubmit === true,
+    keyboardOpenOnSubmit: normalized.keyboardOpenOnSubmit === true,
   });
 }
 
@@ -370,7 +430,7 @@ export function useChatSubmit(options) {
     const scheduleStreamScroll = createStreamScrollScheduler(options);
 
     committer.commit(); // 화면에 최초 스트리밍 대기 상태 레이아웃 마운트 집행
-    await scrollAfterUserSubmit(options);
+    await scrollAfterUserSubmit(options, normalized);
 
     isGenerating.value = true;
     chatStreamStore.start(); // 하단 텍스트 인풋 박스를 '생성 중... 잠금 및 취소 버튼 활성화' 상태로 UI 모드 격상

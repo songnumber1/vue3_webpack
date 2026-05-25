@@ -162,6 +162,83 @@ export function usePromptComposer(props, emit) {
     });
   }
 
+  function getTextareaElement() {
+    const exposed = textareaComponentRef.value;
+    return (
+      exposed?.textareaRef?.value ||
+      exposed?.textareaRef ||
+      exposed?.$el ||
+      null
+    );
+  }
+
+  function isTextEditingElement(element) {
+    if (!element) return false;
+    const tagName = element.tagName?.toLowerCase?.();
+    return (
+      tagName === "textarea" ||
+      tagName === "input" ||
+      element.isContentEditable === true
+    );
+  }
+
+  function readRootPxVar(name) {
+    if (typeof window === "undefined" || typeof document === "undefined")
+      return 0;
+    const value = window
+      .getComputedStyle(document.documentElement)
+      .getPropertyValue(name);
+    const parsed = Number.parseFloat(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  function isSoftKeyboardLikelyOpen() {
+    if (typeof window === "undefined" || typeof document === "undefined")
+      return false;
+
+    const visualViewport = window.visualViewport;
+    const visualHeight = visualViewport?.height || 0;
+    const layoutHeight = Math.max(
+      window.innerHeight || 0,
+      document.documentElement?.clientHeight || 0,
+      readRootPxVar("--layout-viewport-height"),
+      readRootPxVar("--app-height")
+    );
+    const cssKeyboardHeight = Math.max(
+      readRootPxVar("--keyboard-height"),
+      readRootPxVar("--mobile-keyboard-inset"),
+      readRootPxVar("--composer-keyboard-inset")
+    );
+
+    return (
+      cssKeyboardHeight > 48 ||
+      (visualHeight > 0 && layoutHeight - visualHeight > 80)
+    );
+  }
+
+  function blurTextareaForMobileSubmit() {
+    if (!isMobileSheet.value) return false;
+
+    const textarea = getTextareaElement();
+    const activeElement =
+      typeof document !== "undefined" ? document.activeElement : null;
+    const wasFocused = activeElement === textarea;
+    const keyboardWasOpen = isSoftKeyboardLikelyOpen();
+
+    // 실제 모바일 Chrome에서는 전송 버튼 탭 시 activeElement가 버튼으로 바뀌어도
+    // visualViewport는 아직 키보드 열린 상태일 수 있으므로 textarea와 현재 편집 요소를 모두 blur합니다.
+    if (textarea && typeof textarea.blur === "function") textarea.blur();
+    if (
+      activeElement !== textarea &&
+      isTextEditingElement(activeElement) &&
+      typeof activeElement.blur === "function"
+    ) {
+      activeElement.blur();
+    }
+
+    return Boolean(wasFocused || keyboardWasOpen);
+  }
+
   /**
    * [핵심 최종 트리거] 사용자가 전송 버튼을 누르거나 엔터 단축키를 입력했을 때 유저 프롬프트 패키지를 패킹하여 부모 화면으로 최종 Submit 전송합니다.
    */
@@ -176,11 +253,14 @@ export function usePromptComposer(props, emit) {
     )
       return;
 
+    const keyboardOpenOnSubmit = blurTextareaForMobileSubmit();
+
     // 상위 부모 뷰(View) 인터페이스를 향해 수집된 핵심 프롬프트 메타데이터 세트를 실어 올립니다.
     emit("submit", {
       text: value, // 정문화된 유저 프롬프트 문자열
       attachments: attachments.value, // 최종 검증 통과된 업로드 파일 배열 본체
       promptTemplate: selectedTemplate.value, // 결합 적용된 프롬프트 기본 서식 명세 객체
+      keyboardOpenOnSubmit, // 모바일 키보드가 열린 상태에서 전송했는지 여부. 전송 후 앵커 스크롤 보정에 사용합니다.
     });
 
     // [초기화 사이클] 전송이 성공적으로 접수 완료되었으므로, 다음 대화를 위해 입력 폼 상태를 완전히 비워줍니다.
