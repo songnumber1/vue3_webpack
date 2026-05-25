@@ -55,7 +55,7 @@ export function revokeAttachmentUrl(attachment) {
   if (attachment?.url?.startsWith?.("blob:"))
     URL.revokeObjectURL(attachment.url);
 }
-export function hydrateImageAttachment(attachment, onHydrated) {
+export function imageAttachment(attachment, onHydrated) {
   const sourceFile = attachment?.file;
   if (!sourceFile || typeof FileReader === "undefined") return;
   const reader = new FileReader();

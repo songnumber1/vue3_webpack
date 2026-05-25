@@ -32,11 +32,11 @@ export function usePromptComposer(props, emit) {
   const {t} = useI18n();
   // 2. 외부 Props의 변경 사항을 하위 서브 훅들이 안전하게 반응형 추적할 수 있도록 `toRef` 단방향 참조 처리를 수행합니다.
   const disabled = toRef(props, "disabled");
-  const generating = toRef(props, "generating");
+
   // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 전역 채팅 Pinia 스토어를 로드합니다.
   const chatStore = useChatStore();
 
-  // ── 📂 [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
+  // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
   // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
   const {
     toolbarRef, // 하단 프롬프트 툴바 컨테이너 DOM 노드 접근용 Vue Ref
@@ -49,7 +49,7 @@ export function usePromptComposer(props, emit) {
     toggleMenu, // 특정 타깃 도구 팝업 메뉴를 토글식으로 열고 닫는 제어 메서드
   } = usePromptMenu();
 
-  // ── ✍️ [텍스트 입력 + 리사이즈] ────────────────────────────────────────────
+  // ── [텍스트 입력 + 리사이즈] ────────────────────────────────────────────
   // 사용자가 한 줄 혹은 여러 줄의 텍스트를 기재할 때 textarea 요소의 렌더링 물리 상태를 핸들링합니다.
   const {
     text, // 사용자가 작성 중인 순수 텍스트 문자열 반응형 참조 객체 (Ref)
@@ -62,7 +62,7 @@ export function usePromptComposer(props, emit) {
     focusTextarea, // 텍스트 입력창으로 포커스 커서를 강제 이동(주입)시키는 제어 함수
   } = usePromptText({isMobileSheet, emit});
 
-  // ── 📎 [첨부 파일] ─────────────────────────────────────────────────────────
+  // ── [첨부 파일] ─────────────────────────────────────────────────────────
   // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
   const {
     fileInputRef, // <input type="file" /> 실제 숨김 노드 접근용 Vue Ref
@@ -87,7 +87,7 @@ export function usePromptComposer(props, emit) {
     toggleMenu,
   });
 
-  // ── 🎙️ [음성 입력] ─────────────────────────────────────────────────────────
+  // ── [음성 입력] ─────────────────────────────────────────────────────────
   // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
   const {
     isMicEnabled, // 사용자가 마이크 장치 및 브라우저 오디오 보안 권한을 승인했는지 여부
@@ -99,12 +99,12 @@ export function usePromptComposer(props, emit) {
     stopVoiceInput, // 음성 인식을 수동으로 즉시 정지하고 종료하는 함수
   } = usePromptSpeech({text, resize, closeMenus, disabled, focusTextarea});
 
-  // ── 🤖 [모델 선택] ─────────────────────────────────────────────────────────
+  // ── [모델 선택] ─────────────────────────────────────────────────────────
   // 현재 어시스턴트에서 스위칭 가능한 LLM 백엔드 모델 라인업을 동기화하고 변경을 허용합니다.
   const {currentModels, currentModel, openModelSelector, selectModel} =
     usePromptModel({props, modelMenuOpen, syncViewportMode, toggleMenu, emit});
 
-  // ── 🛠️ [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
+  // ── [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
   // 특정 페르소나나 업무 서식이 가미된 프롬프트 문틀(Template) 및 확장 API 기능(Tool)을 조합합니다.
   const {
     selectedTemplate, // 현재 사용자가 마킹 선택한 활성 프롬프트 템플릿 객체
@@ -138,14 +138,16 @@ export function usePromptComposer(props, emit) {
     }
   );
 
-  // ── 🚀 [제출 제어 레이어] ──────────────────────────────────────────────────
+  // ── [제출 제어 레이어] ──────────────────────────────────────────────────
   // 전체 입력창의 잠금 플래그 상태 및 제출 가능 가동 조건을 한곳으로 집중하여 통합 산출합니다.
 
   /** 답변 스트리밍 중에도 입력창과 주변 액션 UI는 잠그지 않고, 전송 버튼만 generating 상태로 progress를 표시합니다. */
   const actionDisabled = computed(() => disabled.value);
 
   /** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 useChatSubmit에서 generating으로 방어합니다. */
-  const canSubmit = computed(() => hasPromptText.value || attachments.value.length > 0);
+  const canSubmit = computed(
+    () => hasPromptText.value || attachments.value.length > 0
+  );
 
   /**
    * 외부 추천 질문 칩(Chips) 선택이나 가이드 프롬프트 클릭 시, 텍스트창 내용을 강제 삽입하고 크기를 리사이징 보정하는 외부 연동 유틸 메서드입니다.
