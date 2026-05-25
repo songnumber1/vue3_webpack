@@ -3,14 +3,14 @@
     :is="resolvedToolbarComponent"
     ref="toolbarComponentRef"
     v-bind="toolbarProps"
-    @open-model="forward('open-model')"
-    @open-tool="forward('open-tool')"
-    @open-attach="forward('open-attach')"
-    @select-model="forward('select-model', $event)"
-    @apply-tool="forward('apply-tool', $event)"
-    @open-file-picker="forward('open-file-picker', $event)"
-    @start-voice="forward('start-voice')"
-    @stop-voice="forward('stop-voice')"
+    @open-model="$emit('open-model')"
+    @open-tool="$emit('open-tool')"
+    @open-attach="$emit('open-attach')"
+    @select-model="$emit('select-model', $event)"
+    @apply-tool="$emit('apply-tool', $event)"
+    @open-file-picker="$emit('open-file-picker', $event)"
+    @start-voice="$emit('start-voice')"
+    @stop-voice="$emit('stop-voice')"
   />
 </template>
 
@@ -48,7 +48,7 @@ const props = defineProps({
   readonlyTitle: {type: String, default: ""},
 });
 
-const emit = defineEmits([
+defineEmits([
   "open-model",
   "open-tool",
   "open-attach",
@@ -70,14 +70,6 @@ const toolbarProps = computed(() => ({
   ...props,
   generating: props.generating || isStreaming.value,
 }));
-
-function forward(eventName, payload) {
-  if (arguments.length > 1) {
-    emit(eventName, payload);
-    return;
-  }
-  emit(eventName);
-}
 
 const modelRoot = computed(() => toolbarComponentRef.value?.modelRoot || null);
 const toolRoot = computed(() => toolbarComponentRef.value?.toolRoot || null);

@@ -67,29 +67,15 @@ const modeDescription = computed(() =>
   )
 );
 
-function getPanelHeight() {
-  return panelHeight.value;
-}
-
-function setRootProperty(name, value) {
-  document.documentElement.style.setProperty(name, value);
-}
-
-function clearRootProperty(name) {
-  document.documentElement.style.removeProperty(name);
-}
-
-function dispatchViewportRefresh() {
-  window.dispatchEvent(new CustomEvent("virtual-keyboard-debug:changed"));
-}
-
 function clearVirtualKeyboardVars({refresh = true} = {}) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
   root.removeAttribute("data-virtual-keyboard-debug");
-  clearRootProperty("--virtual-keyboard-debug-height");
-  clearRootProperty("--virtual-keyboard-pan-offset");
-  if (refresh && typeof window !== "undefined") dispatchViewportRefresh();
+  root.style.removeProperty("--virtual-keyboard-debug-height");
+  root.style.removeProperty("--virtual-keyboard-pan-offset");
+  if (refresh && typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("virtual-keyboard-debug:changed"));
+  }
 }
 
 async function applyVirtualKeyboardMode() {
@@ -100,32 +86,32 @@ async function applyVirtualKeyboardMode() {
 
   await nextTick();
 
-  const height = getPanelHeight();
+  const height = panelHeight.value;
   const root = document.documentElement;
   const mode = keyboardMode.value || KEYBOARD_MODES.adjustResize;
 
   root.dataset.virtualKeyboardDebug = "open";
   root.dataset.keyboardMode = mode;
-  setRootProperty("--virtual-keyboard-debug-height", `${height}px`);
+  root.style.setProperty("--virtual-keyboard-debug-height", `${height}px`);
 
   if (mode === KEYBOARD_MODES.adjustResize) {
-    setRootProperty("--keyboard-height", `${height}px`);
-    setRootProperty("--mobile-keyboard-inset", `${height}px`);
-    setRootProperty("--composer-keyboard-inset", `${height}px`);
-    setRootProperty("--virtual-keyboard-pan-offset", "0px");
+    root.style.setProperty("--keyboard-height", `${height}px`);
+    root.style.setProperty("--mobile-keyboard-inset", `${height}px`);
+    root.style.setProperty("--composer-keyboard-inset", `${height}px`);
+    root.style.setProperty("--virtual-keyboard-pan-offset", "0px");
     return;
   }
 
-  setRootProperty("--keyboard-height", "0px");
-  setRootProperty("--mobile-keyboard-inset", "0px");
-  setRootProperty("--composer-keyboard-inset", "0px");
+  root.style.setProperty("--keyboard-height", "0px");
+  root.style.setProperty("--mobile-keyboard-inset", "0px");
+  root.style.setProperty("--composer-keyboard-inset", "0px");
 
   if (mode === KEYBOARD_MODES.adjustPan) {
-    setRootProperty("--virtual-keyboard-pan-offset", `${height}px`);
+    root.style.setProperty("--virtual-keyboard-pan-offset", `${height}px`);
     return;
   }
 
-  setRootProperty("--virtual-keyboard-pan-offset", "0px");
+  root.style.setProperty("--virtual-keyboard-pan-offset", "0px");
 }
 
 function closePanel() {

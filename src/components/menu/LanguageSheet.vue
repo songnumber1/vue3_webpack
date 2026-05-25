@@ -8,7 +8,7 @@
       class="bottom-sheet-option"
       :class="{active: locale === 'ko'}"
       type="button"
-      @click="selectLocale('ko')"
+      @click="setAppLocale('ko'); $emit('close')"
     >
       <strong>{{ t("common.korean") }}</strong>
       <small>{{ t("common.koreanUi") }}</small>
@@ -17,7 +17,7 @@
       class="bottom-sheet-option"
       :class="{active: locale === 'en'}"
       type="button"
-      @click="selectLocale('en')"
+      @click="setAppLocale('en'); $emit('close')"
     >
       <strong>{{ t("common.english") }}</strong>
       <small>{{ t("common.englishUi") }}</small>
@@ -32,13 +32,8 @@ import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vu
 import {setAppLocale} from "@/i18n";
 
 const props = defineProps({open: {type: Boolean, default: false}});
-const emit = defineEmits(["close"]);
+defineEmits(["close"]);
 const {t, locale: currentLocale} = useI18n();
 const locale = computed(() => currentLocale.value);
-function selectLocale(value) {
-  setAppLocale(value);
-  emit("close");
-}
-
 void props;
 </script>

@@ -109,7 +109,7 @@ export function useChatUIController({
     syncHistoriesInBackground: runtime.syncHistoriesInBackground,
   });
 
-  const {handlePromptFocus, handlePromptResize} = useChatPromptActions({
+  const {refreshPromptViewport} = useChatPromptActions({
     isReadOnly: pageState.isReadOnly,
     isActiveModelUnavailable: runtime.isActiveModelUnavailable,
     refreshViewport,
@@ -130,8 +130,8 @@ export function useChatUIController({
     mobileSettingsOpen,
     navigationStore,
     revokeMessageAttachments: runtime.revokeMessageAttachments,
-    clearCurrentChatSelection: runtime.clearCurrentChatSelection,
-    selectAssistantForNewChat: runtime.selectAssistantForNewChat,
+    clearActiveSession: runtime.clearActiveSession,
+    selectAssistant: runtime.selectAssistant,
     refreshViewport,
     clearForceBottom,
     scrollBottom,
@@ -196,8 +196,7 @@ export function useChatUIController({
     closeHistoryDialog,
     confirmHistoryDialog,
     handleHistoryMenuAction,
-    handlePromptFocus,
-    handlePromptResize,
+    refreshPromptViewport,
     handleMessageContentRendered,
     markForceBottom,
     clearForceBottom,

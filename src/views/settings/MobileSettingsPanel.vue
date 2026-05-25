@@ -78,7 +78,7 @@
             <SystemSettingsView
               v-else-if="activeMenu === 'system'"
               @close="closePanel"
-              @applied="handleSystemSettingsApplied"
+              @applied="$emit('applied')"
             />
 
             <section
@@ -104,7 +104,7 @@
                 class="settings-language-option"
                 :class="{active: locale === option.value}"
                 type="button"
-                @click="selectLocale(option.value)"
+                @click="setAppLocale(option.value)"
               >
                 <span>{{ option.label }}</span>
                 <span v-if="locale === option.value" aria-hidden="true">✓</span>
@@ -253,14 +253,6 @@ function closePanel() {
   activeMenu.value = "";
   emit("close");
 }
-function selectLocale(value) {
-  setAppLocale(value);
-}
-
-function handleSystemSettingsApplied() {
-  emit("applied");
-}
-
 watch(
   () => props.open,
   (value) => {

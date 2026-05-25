@@ -30,10 +30,10 @@ export function useChatDataController({props, ui, runtime, messages}) {
     isActiveModelUnavailable,
     activeSession,
     ensureConversation,
-    setConversation,
+    setMessages,
     createRemoteConversation,
     createLocalConversation,
-    clearCurrentChatSelection,
+    clearActiveSession,
     appendUserAndAssistantMessages,
     currentExamplePrompts,
     syncHistoriesInBackground,
@@ -102,7 +102,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
   async function loadRouteConversation() {
     if (isMainPage.value) {
       messages.value = [];
-      clearCurrentChatSelection();
+      clearActiveSession();
       return;
     }
 
@@ -117,7 +117,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
       if (!activeHistoryId.value) {
         messages.value = [];
-        clearCurrentChatSelection();
+        clearActiveSession();
         ui.markForceBottom();
         await nextTick();
         await ui.scrollBottom({behavior: "auto", force: true, stable: true});
@@ -160,7 +160,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     createRemoteConversation,
     createLocalConversation,
     appendUserAndAssistantMessages,
-    setConversation,
+    setConversation: setMessages,
     selectedAssistantId,
     selectedModel,
     scrollBottom: async (options = {}) => {

@@ -20,8 +20,8 @@ export function useChatNavigationActions({
   mobileSettingsOpen,
   navigationStore,
   revokeMessageAttachments,
-  clearCurrentChatSelection,
-  selectAssistantForNewChat,
+  clearActiveSession,
+  selectAssistant,
   refreshViewport,
   clearForceBottom,
   scrollBottom,
@@ -38,16 +38,13 @@ export function useChatNavigationActions({
     messages.value = [];
     if (assistantId) {
       try {
-        await selectAssistantForNewChat(assistantId);
+        await selectAssistant(assistantId, {forNewChat: true});
       } catch (error) {
-        logWarn(
-          "[useChatNavigationActions] selectAssistantForNewChat 오류:",
-          error
-        );
+        logWarn("[useChatNavigationActions] selectAssistant 오류:", error);
       }
       assistantSheetOpen.value = false;
     } else {
-      clearCurrentChatSelection();
+      clearActiveSession();
     }
     navigationStore.closeTransientPanels();
     clearForceBottom();
@@ -55,8 +52,6 @@ export function useChatNavigationActions({
   }
 
   const startNewChat = resetChatState;
-  const startNewChatWithAssistant = (assistantId) =>
-    resetChatState({assistantId});
 
   async function openHistory(item) {
     if (isBlockedByStream()) return;
@@ -173,7 +168,6 @@ export function useChatNavigationActions({
 
   return {
     startNewChat,
-    startNewChatWithAssistant,
     openHistory,
     toggleTheme,
     openSwagger,

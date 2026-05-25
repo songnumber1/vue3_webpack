@@ -9,6 +9,7 @@ export function useChatScrollController({
   const showScrollBottom = ref(false);
   let bottomStateTimer = 0;
   let forceBottomUntil = 0;
+  let latestUserScrollTimerIds = [];
 
   function getMessageListRef() {
     const exposed = workspaceRef.value?.listRef;
@@ -32,6 +33,11 @@ export function useChatScrollController({
     forceBottomUntil = 0;
   }
 
+  function clearLatestUserScrollTimers() {
+    latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    latestUserScrollTimerIds = [];
+  }
+
   function shouldKeepForceBottom() {
     return Boolean(autoScrollEnabled?.value) && Date.now() <= forceBottomUntil;
   }
@@ -51,14 +57,25 @@ export function useChatScrollController({
   }
 
   async function scrollLatestUserMessage(options = {}) {
-    const list = getMessageListRef();
-    if (list?.scrollToLatestUserMessage) {
+    clearLatestUserScrollTimers();
+
+    const apply = () => {
+      const list = getMessageListRef();
+      if (!list?.scrollToLatestUserMessage) return false;
       list.scrollToLatestUserMessage({
         stable: true,
         ...options,
       });
-    }
-    updateScrollBottomButton();
+      updateScrollBottomButton();
+      return true;
+    };
+
+    if (apply()) return;
+
+    [0, 32, 80, 160, 320].forEach((delay) => {
+      const timerId = window.setTimeout(apply, delay);
+      latestUserScrollTimerIds.push(timerId);
+    });
   }
 
 
@@ -82,6 +99,7 @@ export function useChatScrollController({
 
   function cleanupScrollController() {
     window.clearTimeout(bottomStateTimer);
+    clearLatestUserScrollTimers();
   }
 
   return {

@@ -22,7 +22,7 @@
             type="button"
             :title="t('chat.hideSidebar')"
             :aria-label="t('chat.hideSidebar')"
-            @click="setSidebarCollapsed(true)"
+            @click="navigationStore.setSidebarCollapsed(true)"
           >
             ☰
           </button>
@@ -52,9 +52,9 @@
       :open="collapsedRecentOpen"
       :histories="histories"
       :selected-chat-id="selectedChatId"
-      @expand="setSidebarCollapsed(false)"
+      @expand="navigationStore.setSidebarCollapsed(false)"
       @new-chat="handleNewChat"
-      @set-recent-open="setCollapsedRecentOpen"
+      @set-recent-open="navigationStore.setCollapsedRecentOpen"
       @select-history="handleSelectHistoryCollapsed"
     />
   </aside>
@@ -63,7 +63,7 @@
     <div
       v-if="drawerOpen"
       class="mobile-drawer-backdrop"
-      @click="setDrawerOpen(false)"
+      @click="navigationStore.setDrawerOpen(false)"
     ></div>
   </transition>
 
@@ -85,7 +85,7 @@
               type="button"
               :title="t('common.close')"
               :aria-label="t('common.close')"
-              @click="setDrawerOpen(false)"
+              @click="navigationStore.setDrawerOpen(false)"
             >
               ×
             </button>
@@ -214,22 +214,10 @@ function selectAssistant(id) {
   assistantMenuOpen.value = false;
 }
 
-function setSidebarCollapsed(value) {
-  navigationStore.setSidebarCollapsed(value);
-}
-
-function setDrawerOpen(value) {
-  navigationStore.setDrawerOpen(value);
-}
-
-function setCollapsedRecentOpen(value) {
-  navigationStore.setCollapsedRecentOpen(value);
-}
-
 function handleNewChat() {
   emit("new-chat");
-  setDrawerOpen(false);
-  setCollapsedRecentOpen(false);
+  navigationStore.setDrawerOpen(false);
+  navigationStore.setCollapsedRecentOpen(false);
 }
 
 function openHistoryMenu(payload = {}) {
@@ -255,12 +243,12 @@ function selectHistoryMenuAction(action) {
 
 function handleSelectHistory(item) {
   emit("select-history", item);
-  setDrawerOpen(false);
+  navigationStore.setDrawerOpen(false);
 }
 
 function handleSelectHistoryCollapsed(item) {
   emit("select-history", item);
-  setCollapsedRecentOpen(false);
+  navigationStore.setCollapsedRecentOpen(false);
 }
 
 useOutsideClick(
@@ -287,7 +275,7 @@ async function handleViewportModeChange(isCompact) {
 
   // PC 브라우저에서 모바일 폭으로 열려 있던 drawer가 웹 폭으로 전환될 때
   // 전역 .mobile-drawer fallback CSS가 남아 보이지 않도록 즉시 상태를 닫는다.
-  setDrawerOpen(false);
+  navigationStore.setDrawerOpen(false);
   assistantMenuOpen.value = false;
   closeHistoryMenu();
   await nextTick();
@@ -301,7 +289,7 @@ useEventListener(
   () => {
     syncViewportMode();
     if (!isCompactViewport.value && drawerOpen.value) {
-      setDrawerOpen(false);
+      navigationStore.setDrawerOpen(false);
     }
   },
   {passive: true}

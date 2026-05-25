@@ -3,7 +3,7 @@
     v-if="runtimeReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
-    @select-assistant="startNewChatWithAssistant"
+    @select-assistant="handleAssistantNewChat"
     @new-chat="startNewChat"
     @select-history="openHistory"
     @history-menu-action="handleHistoryMenuAction"
@@ -41,7 +41,7 @@
       :assistants="assistants"
       :selected-assistant-id="selectedAssistantId"
       @close="assistantSheetOpen = false"
-      @select="startNewChatWithAssistant"
+      @select="handleAssistantNewChat"
     />
 
     <AppOverlayProvider
@@ -216,7 +216,6 @@ const {
   closeImagePreview,
   handlePreviewLoad,
   handlePreviewError,
-  startNewChatWithAssistant,
   startNewChat,
   openHistory,
   handleHistoryMenuAction,
@@ -238,8 +237,7 @@ const {
   logout,
   submit,
   regenerate,
-  handlePromptFocus,
-  handlePromptResize,
+  refreshPromptViewport,
   handleMessageContentRendered,
   scrollBottom,
   handleSystemSettingsApplied,
@@ -248,6 +246,14 @@ const {
 const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
+
+function handleAssistantNewChat(assistantId) {
+  startNewChat({assistantId});
+}
+
+function handleWorkspaceScrollBottom() {
+  scrollBottom({force: true, behavior: "smooth", stable: true});
+}
 
 function handleMobileSettingsDesktopOpen(target) {
   mobileSettingsOpen.value = false;
@@ -291,11 +297,10 @@ provide(WORKSPACE_ACTIONS_KEY, {
   updateSelectedModel: (val) => {
     selectedModel.value = val;
   },
-  handlePromptFocus,
-  handlePromptResize,
+  handlePromptFocus: refreshPromptViewport,
+  handlePromptResize: refreshPromptViewport,
   handleMessageContentRendered,
-  scrollBottom: () =>
-    scrollBottom({force: true, behavior: "smooth", stable: true}),
+  scrollBottom: handleWorkspaceScrollBottom,
 });
 </script>
 

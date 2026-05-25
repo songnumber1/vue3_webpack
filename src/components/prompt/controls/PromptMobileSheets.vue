@@ -94,7 +94,7 @@
         type="button"
         :role="getChildRole(child)"
         :aria-checked="child.active"
-        @click="applyNestedTool(child)"
+        @click="$emit('apply-tool', child)"
       >
         <span
           v-if="isCheckboxChild(child)"
@@ -264,10 +264,6 @@ function closeActiveToolGroup() {
     emit("apply-tool", group);
   }
   activeToolGroupId.value = "";
-}
-
-function applyNestedTool(tool) {
-  emit("apply-tool", tool);
 }
 
 function closeToolSheet() {

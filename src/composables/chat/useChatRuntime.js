@@ -331,13 +331,6 @@ export function useChatRuntime() {
   }
 
   /**
-   * [액션 8-1 서브 래퍼] 완전히 비어있는 새 대화 홈 화면 모드 상태에서 어시스턴트를 교체할 때 직관적으로 바인딩하는 단축 특화 포워더 함수입니다.
-   */
-  function selectAssistantForNewChat(id) {
-    return selectAssistant(id, {forNewChat: true});
-  }
-
-  /**
    * [액션 10] 사용자가 특정 과거 대화방을 클릭하여 진입(라우팅 이동)했을 때, 해당 방의 대화 말풍선 히스토리 전체를 로드하고
    * 유효 세션 검증 상태(모델 삭제 여부 등)를 진단하여 방 내부 컴포넌트 환경을 최종 안착 연동해 주는 핵심 세션 수립 진입 함수입니다.
    * @param {string} historyId - 진입 타깃 대화방 ID
@@ -390,13 +383,6 @@ export function useChatRuntime() {
     }
 
     return chatStore.messageMap[history.id] || [];
-  }
-
-  /**
-   * 외부 스트리밍 가드 등에서 가공 완료한 정형화 메시지 배열을 스토어 특정 슬롯 채널에 강제 오버라이트 동기화시키는 동기식 주입 유틸입니다.
-   */
-  function setConversation(historyId, messages) {
-    chatStore.setMessages(historyId, messages);
   }
 
   /**
@@ -462,11 +448,6 @@ export function useChatRuntime() {
     );
 
     return history;
-  }
-
-  /** [액션 13] 현재 매핑된 액티브 대화 세션 정보창 관계를 해제하고 완전 청소 상태(초기 상태)로 원복 시킵니다. */
-  function clearCurrentChatSelection() {
-    chatStore.clearActiveSession();
   }
 
   /**
@@ -542,12 +523,11 @@ export function useChatRuntime() {
     renameHistory,
     removeHistory,
     selectAssistant,
-    selectAssistantForNewChat,
     ensureConversation,
-    setConversation,
+    setMessages: chatStore.setMessages.bind(chatStore),
     createRemoteConversation,
     createLocalConversation,
-    clearCurrentChatSelection,
+    clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
     appendUserAndAssistantMessages,
     revokeMessageAttachments,
   };

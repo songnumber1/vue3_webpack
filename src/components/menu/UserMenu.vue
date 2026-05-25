@@ -163,6 +163,11 @@ const userInitial = computed(() => {
   return name ? name.charAt(0).toUpperCase() : "U";
 });
 
+function closeMenu() {
+  open.value = false;
+  languageOpen.value = false;
+}
+
 function toggleOpen() {
   open.value = !open.value;
   if (!open.value) languageOpen.value = false;
@@ -173,22 +178,14 @@ function toggleLanguageOpen() {
 }
 
 function select(action) {
-  open.value = false;
-  languageOpen.value = false;
+  closeMenu();
   emit(action);
 }
 
 function selectLocale(value) {
   setAppLocale(value);
-  open.value = false;
-  languageOpen.value = false;
+  closeMenu();
 }
 
-useOutsideClick(
-  () => menuRef.value,
-  () => {
-    open.value = false;
-    languageOpen.value = false;
-  }
-);
+useOutsideClick(() => menuRef.value, closeMenu);
 </script>

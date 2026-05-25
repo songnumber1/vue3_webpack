@@ -141,14 +141,11 @@ export function usePromptComposer(props, emit) {
   // ── 🚀 [제출 제어 레이어] ──────────────────────────────────────────────────
   // 전체 입력창의 잠금 플래그 상태 및 제출 가능 가동 조건을 한곳으로 집중하여 통합 산출합니다.
 
-  /** 시스템 전체 비활성화 상태이거나 이미 AI가 답변 문장을 밀어내는 중일 때 액션 비활성화 플래그를 참으로 도출합니다. */
-  const actionDisabled = computed(() => disabled.value || generating.value);
+  /** 답변 스트리밍 중에도 입력창과 주변 액션 UI는 잠그지 않고, 전송 버튼만 generating 상태로 progress를 표시합니다. */
+  const actionDisabled = computed(() => disabled.value);
 
-  /** AI가 작동 중이지 않아야 하고, 텍스트 입력창에 글이 있거나 혹은 대기 중인 첨부파일 배열이 최소 한 개 이상 실재할 때 전송 버튼을 활성화합니다. */
-  const canSubmit = computed(
-    () =>
-      !generating.value && (hasPromptText.value || attachments.value.length > 0)
-  );
+  /** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 useChatSubmit에서 generating으로 방어합니다. */
+  const canSubmit = computed(() => hasPromptText.value || attachments.value.length > 0);
 
   /**
    * 외부 추천 질문 칩(Chips) 선택이나 가이드 프롬프트 클릭 시, 텍스트창 내용을 강제 삽입하고 크기를 리사이징 보정하는 외부 연동 유틸 메서드입니다.
