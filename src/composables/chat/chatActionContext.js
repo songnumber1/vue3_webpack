@@ -8,16 +8,16 @@
  */
 
 /**
- * @constant {Symbol} CHAT_ACTIONS_KEY
+ * @constant {String} CHAT_ACTIONS_KEY
  * @description 글로벌 네비게이션, 모달 다이어로그 팝업, 세션 인증 탈거 등 '채팅 앱 전반의 외곽 프레임 제어 액션 집합'을 하위 트리 컴포넌트에 주입(Provide)하고 수신(Inject)하기 위한 고유 고유 식별자 토큰 키입니다.
  */
-export const CHAT_ACTIONS_KEY = Symbol("CHAT_ACTIONS");
+export const CHAT_ACTIONS_KEY = "CHAT_ACTIONS";
 
 /**
- * @constant {Symbol} WORKSPACE_ACTIONS_KEY
+ * @constant {String} WORKSPACE_ACTIONS_KEY
  * @description 프롬프트 질문 전송, 답변 재생성, 마크다운 렌더링 스크롤 동기화 등 '중앙 대화방 워크스페이스 내부의 실시간 물리 조작 핸들러 묶음'을 안전하게 격리 전파하기 위한 고유 식별자 토큰 키입니다.
  */
-export const WORKSPACE_ACTIONS_KEY = Symbol("WORKSPACE_ACTIONS");
+export const WORKSPACE_ACTIONS_KEY = "WORKSPACE_ACTIONS";
 
 /**
  * @description [Null Object 패턴] 글로벌 네비게이션 제어기(`useChatNavigationActions`) 레이어가 아직 Provide되기 전이거나, 독립형 단위 테스트(Vitest/Jest) 런타임 환경에서 예외 크래시를 방지하기 위해 아무 동작도 수행하지 않는 안전 우회용 빈 더미 함수 객체를 빌드합니다.
