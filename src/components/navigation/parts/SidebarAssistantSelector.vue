@@ -36,11 +36,23 @@
 </template>
 
 <script setup>
+/**
+ * @file components/navigation/parts/SidebarAssistantSelector.vue
+ * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   assistants: {type: Array, default: () => []},
   selectedAssistantId: {type: String, default: ""},

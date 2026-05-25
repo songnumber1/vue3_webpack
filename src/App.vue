@@ -35,6 +35,15 @@
 </template>
 
 <script setup>
+/**
+ * @file App.vue
+ * @description 최상위 Vue Shell입니다. 실제 화면 전환은 RouterView와 하위 컨테이너에서 처리됩니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";

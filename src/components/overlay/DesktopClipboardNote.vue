@@ -15,6 +15,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/overlay/DesktopClipboardNote.vue
+ * @description 재사용 UI 컴포넌트입니다. 화면 상태는 상위 props/action에서 받고 내부에서는 렌더와 사용자 이벤트만 처리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
@@ -37,22 +46,34 @@ let remainingMs = NOTE_DURATION_MS;
 
 const title = computed(() => noteTitle.value || t("clipboardNote.title"));
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function shouldShowWebClipboardNote() {
   return !shouldUseMobileFeedbackChannel(platformStore.info || {});
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function clearTimer() {
   if (!timerId) return;
   window.clearTimeout(timerId);
   timerId = 0;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function hideNote() {
   clearTimer();
   visible.value = false;
   remainingMs = NOTE_DURATION_MS;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function startTimer(duration = NOTE_DURATION_MS) {
   clearTimer();
   remainingMs = duration;
@@ -60,17 +81,26 @@ function startTimer(duration = NOTE_DURATION_MS) {
   timerId = window.setTimeout(hideNote, duration);
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function pauseTimer() {
   if (!visible.value || !timerId) return;
   remainingMs = Math.max(0, remainingMs - (Date.now() - startedAt));
   clearTimer();
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function resumeTimer() {
   if (!visible.value) return;
   startTimer(remainingMs || NOTE_DURATION_MS);
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function showNote(event) {
   if (!shouldShowWebClipboardNote()) return;
   noteTitle.value =

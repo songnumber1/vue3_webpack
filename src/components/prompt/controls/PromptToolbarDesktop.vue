@@ -149,6 +149,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/prompt/controls/PromptToolbarDesktop.vue
+ * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, nextTick, ref, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
@@ -186,6 +195,9 @@ const toolMenuStyle = computed(() => ({
   visibility: toolPositionReady.value ? "visible" : "hidden",
 }));
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   disabled: {type: Boolean, default: false},
   modelReadonly: {type: Boolean, default: false},
@@ -234,24 +246,39 @@ const activeToolGroup = computed(() => {
   );
 });
 
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function hasChildren(tool) {
   return Array.isArray(tool?.children) && tool.children.length > 0;
 }
 
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isSwitchParent(tool) {
   return tool?.parentControlType === "switch";
 }
 
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isCheckboxChild(tool) {
   return tool?.controlType === "checkbox";
 }
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getChildRole(tool) {
   return tool?.selectionMode === "single"
     ? "menuitemradio"
     : "menuitemcheckbox";
 }
 
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveSubmenuPlacement() {
   const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
   if (!menuRect) {
@@ -268,6 +295,9 @@ function resolveSubmenuPlacement() {
     rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 async function handleToolClick(tool) {
   if (!hasChildren(tool)) {
     emit("apply-tool", tool);
@@ -287,6 +317,9 @@ async function handleToolClick(tool) {
   resolveSubmenuPlacement();
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 async function handleToolSwitchClick(tool) {
   if (!isSwitchParent(tool)) return;
 
@@ -301,6 +334,9 @@ async function handleToolSwitchClick(tool) {
   resolveSubmenuPlacement();
 }
 
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closeActiveToolGroup() {
   const group = activeToolGroup.value;
   if (isSwitchParent(group) && group.active && group.activeCount === 0) {

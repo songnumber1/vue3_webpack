@@ -1,3 +1,12 @@
+/**
+ * @file composables/chat/container/useChatDataController.js
+ * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
@@ -6,6 +15,12 @@ import {loadSharedConversation} from "@/composables/chat/useSharedChat";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
+
+/**
+ * [Route/Data controller]
+ * route가 main/chat/shared 중 무엇인지에 따라 messages, active title, shared read-only 상태를 동기화합니다.
+ * submit 자체의 세부 로직은 useChatSubmit.js에 있고, 이 파일은 화면 상태와 route 전환을 연결하는 역할입니다.
+ */
 
 /**
  * @function useChatDataController

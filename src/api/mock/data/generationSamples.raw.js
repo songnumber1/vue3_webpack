@@ -1,3 +1,12 @@
+/**
+ * @file api/mock/data/generationSamples.raw.js
+ * @description 개발/데모용 mock API 또는 mock 데이터입니다. 실제 API 비활성화 시 화면 동작을 보장합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 export const GENERATION_SAMPLE_RESPONSES = Object.freeze([
   `요청하신 내용을 기준으로 간단히 정리했습니다.\n\n- 프론트엔드 mock 모드에서는 서버 호출 없이 이 응답을 스트리밍처럼 표시합니다.\n- API 모드에서는 backend의 /generation.do stream 응답을 사용합니다.\n- 응답 완료 전에는 좋아요, 싫어요, 피드백 버튼이 표시되지 않습니다.`,
   `아래는 표 렌더링 테스트용 응답입니다.\n\n| 구분 | 설명 | 상태 |\n| --- | --- | --- |\n| Router | /, /chat/:id 기반 화면 전환 | 완료 |\n| SSE | data chunk 수신 후 화면 갱신 | 테스트 |\n| Overlay | 모바일 API 요청 중 터치 차단 | 설정 가능 |\n\n표 복사와 CSV 다운로드 버튼도 함께 확인할 수 있습니다.`,

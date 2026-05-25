@@ -26,6 +26,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/debug/VirtualKeyboardDebug.vue
+ * @description 개발/디버그 전용 UI입니다. 운영 기능보다 런타임 상태 확인과 모바일 키보드 검증을 돕습니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
@@ -35,6 +44,9 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const {t} = useI18n();
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   visible: {type: Boolean, default: false},
 });
@@ -67,6 +79,9 @@ const modeDescription = computed(() =>
   )
 );
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function clearVirtualKeyboardVars({refresh = true} = {}) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -78,6 +93,9 @@ function clearVirtualKeyboardVars({refresh = true} = {}) {
   }
 }
 
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
+ */
 async function applyVirtualKeyboardMode() {
   if (typeof document === "undefined" || !panelOpen.value || !props.visible) {
     clearVirtualKeyboardVars({refresh: false});
@@ -114,12 +132,18 @@ async function applyVirtualKeyboardMode() {
   root.style.setProperty("--virtual-keyboard-pan-offset", "0px");
 }
 
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closePanel() {
   if (!panelOpen.value) return;
   panelOpen.value = false;
   clearVirtualKeyboardVars();
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function togglePanel() {
   panelOpen.value = !panelOpen.value;
 }

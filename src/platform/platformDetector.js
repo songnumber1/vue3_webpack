@@ -1,3 +1,12 @@
+/**
+ * @file platform/platformDetector.js
+ * @description 브라우저/모바일/WebView 실행 환경 차이를 흡수하는 platform 계층입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {
   RUN_ENV,
   PLATFORM,
@@ -32,6 +41,9 @@ function getScreen() {
  * @param {RegExp} pattern - 버전을 캡처하기 위한 정규식 패턴
  * @returns {string} 매칭 완료된 버전 문자열 (미매칭 시 빈 문자열)
  */
+/**
+ * 문자열 또는 stream buffer를 의미 있는 frame/object로 파싱합니다.
+ */
 function parseVersion(ua, pattern) {
   const match = ua.match(pattern); // 정규식 매칭 수행
   return match?.[1] || ""; // 첫 번째 캡처 그룹 반환 및 예외 가드 처리
@@ -41,6 +53,9 @@ function parseVersion(ua, pattern) {
  * @description 현재 클라이언트 진입 환경이 안드로이드 인앱 웹뷰(WebView)인지 UA 식별 구조를 대조하여 판별합니다.
  * @param {string} ua - 브라우저 고유 User-Agent 문자열
  * @returns {boolean} 안드로이드 웹뷰 환경 여부
+ */
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
  */
 function isAndroidWebViewUserAgent(ua) {
   // 'Android' 문구를 포함하면서, 무선 웹뷰 식별자 '; wv)' 가 있거나 크롬 웹뷰 규격인 'Version/숫자' 형태가 존재하는지 검사
@@ -54,6 +69,9 @@ function isAndroidWebViewUserAgent(ua) {
  * @param {string} ua - 브라우저 고유 User-Agent 문자열
  * @param {boolean} [hasBridge=false] - 안드로이드 하이브리드 네이티브 앱 브릿지 소유 여부
  * @returns {string} 브라우저 식별 카테고리 문자열 키 (예: 'chrome', 'samsung', 'webview' 등)
+ */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
 function getBrowserName(ua, hasBridge = false) {
   if (hasBridge) return "webview"; // 네이티브 앱 브릿지가 점등되어 있다면 즉시 웹뷰로 분류
@@ -72,6 +90,9 @@ function getBrowserName(ua, hasBridge = false) {
  * @param {string} browserName - getBrowserName 함수를 통해 1차 식별된 브라우저 명칭
  * @returns {string} 점으로 구분된 상세 버전 넘버 텍스트
  */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getBrowserVersion(ua, browserName) {
   if (browserName === "chrome") return parseVersion(ua, /Chrome\/([\d.]+)/i); // 크롬 버전 정밀 캡처 파싱
   return ""; // 크롬 외 브라우저는 공백 폴백 가드
@@ -82,6 +103,9 @@ function getBrowserVersion(ua, browserName) {
  * @param {string} ua - 브라우저 고유 User-Agent 문자열
  * @param {string} platform - navigator.platform 하드웨어 아키텍처 식별 스트링
  * @returns {string} PLATFORM 상수에 바인딩된 고유 OS 식별 키
+ */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function detectEnv(ua, platform) {
   if (/Android/i.test(ua)) return PLATFORM.ANDROID; // 안드로이드 환경 모바일 기기 감지
@@ -98,6 +122,9 @@ function detectEnv(ua, platform) {
  * @param {string} navPlatform - navigator.platform 하드웨어 아키텍처 식별 스트링
  * @returns {string} 최종 검증 및 추론이 마감된 운영체제(OS) 식별 코드
  */
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveBasePlatform(value, ua, navPlatform) {
   // 상위 주입값이 유효 유효 도메인 풀에 속해 있다면 해당 값을 보존 상속하고, 부재 시 네이티브 OS 추론식 엔진 가동
   return Object.values(PLATFORM).includes(value)
@@ -111,6 +138,9 @@ function resolveBasePlatform(value, ua, navPlatform) {
  * @param {string} param0.env - 1차 검증 완료된 PLATFORM 식별 코드
  * @param {string} param0.browserName - getBrowserName을 통과한 브라우저 코드명
  * @returns {string} 비즈니스 로직 가이드라인에 입각한 최종 디바이스 명칭 키 (예: 'app', 'chrome', 'pc' 등)
+ */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function detectDevice({env, browserName}) {
   if (hasAndroidBridge()) return "app"; // 하이브리드 앱 아웃쉘 전용 자바스크립트 인터페이스 브릿지 검출 시 최상위 'app' 확정 고정
@@ -135,6 +165,9 @@ function detectDevice({env, browserName}) {
  * @param {string} param0.browserVersion - 브라우저 상세 버전 정보
  * @returns {object} 포맷팅 및 디버깅용 직관적 라벨 스트링을 동반한 원시 플랫폼 스냅샷 객체
  */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
+ */
 function createActualPlatformInfo({
   env,
   runtime,
@@ -157,6 +190,9 @@ function createActualPlatformInfo({
  * @param {string} value - 수동 오버라이드 희망 모드 문자열 키
  * @returns {string} 안전성이 보장된 확정 오버라이드 명령어 제어 코드 (기본값은 'auto' 자동 모드)
  */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getForcedPlatformOverride(value) {
   return Object.values(PLATFORM_OVERRIDE_MODES).includes(value)
     ? value
@@ -167,6 +203,9 @@ function getForcedPlatformOverride(value) {
  * @description 모바일 레이아웃 강제 수축 반응형 변환 기준점인 해상도 수치를 정밀 정수 규격으로 보정 연산합니다.
  * @param {number|string} value - 외부 주입 픽셀 너비 임계 수치
  * @returns {number} 안전하게 정규화 완료된 반응형 중단점 정수 픽셀 수치
+ */
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
  */
 function resolveCompactBreakpoint(value) {
   const numeric = Number(value); // 명시적 수치 변환
@@ -182,6 +221,9 @@ function resolveCompactBreakpoint(value) {
  * @param {object} param0.baseAppInfo - 상위 전역 스토어 등에서 이식 전송받은 런타임 환경 메타 데이터 파라미터
  * @param {object} param0.detected - 하드웨어 탐색 엔진이 1차 감지한 날것의 물리 환경 정보 구조체
  * @returns {object} 위장 모드 플래그(`isForced`)가 온오프 동기화된 가상/실제 플랫폼 정보 결합 구조체
+ */
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
  */
 function resolveForcedPlatform({baseAppInfo, detected}) {
   const override = getForcedPlatformOverride(baseAppInfo.platformOverride); // 수동 강제 덮어쓰기 설정값 로드
@@ -220,6 +262,9 @@ function resolveForcedPlatform({baseAppInfo, detected}) {
  * @description 안드로이드 네이티브 앱 자바스크립트 인터페이스 브릿지 영역을 직접 노크하여 빌드 릴리스 패키지의 마스터 버전 코드를 추출합니다.
  * @returns {string} 네이티브 빌드 버전 넘버 스트링 (미개통 혹은 웹 런타임 환경 시 공백 폴백)
  */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge; // 전역 브릿지 네이티브 버스 포인터 스캔
   return bridge?.appVersion || bridge?.version || ""; // 상이한 백엔드 네이티브 버전 키 호환성 가드 스크리닝
@@ -241,6 +286,9 @@ function getBridgeVersionFromBridge() {
  * @param {boolean} param0.isMobileBrowser - 네이티브 하이브리드 앱 아웃쉘이 아닌 일반 모바일 웹 브라우저 상태 여부
  * @param {string} param0.browserName - 최종 확정된 브라우저 고유 코드명
  * @returns {boolean} 음성 오디오 마이크 탑재 및 시동 가용 유무 플래그
+ */
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
  */
 function isSupportedMobileMicBrowser({
   isAndroid,

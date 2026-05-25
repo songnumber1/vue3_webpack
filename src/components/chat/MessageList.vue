@@ -31,13 +31,35 @@
 </template>
 
 <script setup>
+/**
+ * @file components/chat/MessageList.vue
+ * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import ChatMessage from "./ChatMessage.vue";
+
+/**
+ * [모바일 질문 앵커/스크롤 보정]
+ * 자동 스크롤 OFF 상태에서는 답변 chunk마다 하단으로 내리지 않고,
+ * 전송 직후 마지막 사용자 질문 엘리먼트를 찾아 상단 근처로 이동합니다.
+ *
+ * 모바일 Chrome/WebView에서는 키보드가 내려가는 동안 visualViewport 높이가 여러 번 변하므로
+ * 한 번의 scrollIntoView만으로는 실패할 수 있습니다. 그래서 stable delay 배열로 여러 번 보정합니다.
+ * 사용자가 직접 scroll/touch/wheel/pointer를 시작하면 예약된 보정 타이머를 취소해 강제 복귀를 막습니다.
+ */
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [0, 80, 160, 320, 600, 900, 1300, 1800, 2300];
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
@@ -61,9 +83,15 @@ const streamFocusSpacerHeight = computed(() => {
   return Math.max(0, Math.floor(viewportHeight * 0.72));
 });
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getScrollElement() {
   return scrollRef.value;
 }
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isNearBottom() {
   const el = getScrollElement();
   if (!el) return true;
@@ -72,19 +100,34 @@ function isNearBottom() {
 
   return remaining <= BOTTOM_THRESHOLD;
 }
+/**
+ * 현재 상태를 기준으로 reactive 값 또는 DOM 보조 값을 갱신합니다.
+ */
 function updateBottomState() {
   userIsAtBottom.value = isNearBottom();
 }
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleScroll() {
   updateBottomState();
 }
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleUserScrollIntent() {
   clearStableTimers();
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function clearStableTimers() {
   stableScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
   stableScrollTimerIds = [];
 }
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
+ */
 function applyBottomScroll(behavior = "auto") {
   const el = getScrollElement();
   if (!el) return;
@@ -101,6 +144,9 @@ function applyBottomScroll(behavior = "auto") {
   userIsAtBottom.value = true;
 }
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getLatestUserMessageElement() {
   const el = getScrollElement();
   if (!el) return null;
@@ -110,6 +156,9 @@ function getLatestUserMessageElement() {
   return userMessages.length ? userMessages[userMessages.length - 1] : null;
 }
 
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function canElementScroll(element) {
   if (!element || element === document.body || element === document.documentElement)
     return false;
@@ -121,6 +170,9 @@ function canElementScroll(element) {
   );
 }
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getScrollableAncestors(target) {
   if (typeof window === "undefined" || typeof document === "undefined")
     return [];
@@ -134,6 +186,9 @@ function getScrollableAncestors(target) {
   return result;
 }
 
+/**
+ * 채팅/viewport scroll 위치를 보정합니다. 모바일 키보드 상태에 영향을 받을 수 있습니다.
+ */
 function scrollElementToTarget(container, target, options = {}) {
   if (!container || !target) return false;
 
@@ -152,6 +207,9 @@ function scrollElementToTarget(container, target, options = {}) {
   return true;
 }
 
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
+ */
 function applyWindowFallbackScroll(target, containerRect, options = {}) {
   if (!options.pageFallback || typeof window === "undefined") return;
 
@@ -165,6 +223,9 @@ function applyWindowFallbackScroll(target, containerRect, options = {}) {
   window.scrollBy({top: delta, behavior});
 }
 
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
+ */
 function applyElementScroll(target, options = {}) {
   const el = getScrollElement();
   if (!el || !target) return false;
@@ -184,6 +245,9 @@ function applyElementScroll(target, options = {}) {
   return applied;
 }
 
+/**
+ * 채팅/viewport scroll 위치를 보정합니다. 모바일 키보드 상태에 영향을 받을 수 있습니다.
+ */
 function scrollToLatestUserMessage(options = {}) {
   clearStableTimers();
 
@@ -205,6 +269,9 @@ function scrollToLatestUserMessage(options = {}) {
     stableScrollTimerIds.push(timerId);
   });
 }
+/**
+ * 채팅/viewport scroll 위치를 보정합니다. 모바일 키보드 상태에 영향을 받을 수 있습니다.
+ */
 function scrollToBottom(options = {}) {
   const force = options.force === true;
   const stable = options.stable === true;
@@ -226,6 +293,9 @@ function scrollToBottom(options = {}) {
     stableScrollTimerIds.push(timerId);
   });
 }
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 async function handleMessageRendered() {
   emit("content-rendered");
 
@@ -247,6 +317,9 @@ onBeforeUnmount(() => {
   window.removeEventListener("touchstart", handleUserScrollIntent);
   window.removeEventListener("wheel", handleUserScrollIntent);
 });
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getIsAtBottom() {
   updateBottomState();
 

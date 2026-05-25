@@ -1,12 +1,27 @@
+/**
+ * @file composables/chat/useImagePreview.js
+ * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {ref} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getPreviewSources(detail = {}) {
   return [detail.dataUrl, detail.previewUrl, detail.url]
     .filter((url) => typeof url === "string" && url.length > 0)
     .filter((url, index, array) => array.indexOf(url) === index);
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function readPreviewDataUrl(file) {
   return new Promise((resolve) => {
     if (!file || typeof FileReader === "undefined") return resolve("");

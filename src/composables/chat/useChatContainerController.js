@@ -1,8 +1,24 @@
+/**
+ * @file composables/chat/useChatContainerController.js
+ * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {useChatDataController} from "@/composables/chat/container/useChatDataController";
 import {useChatUIController} from "@/composables/chat/container/useChatUIController";
+
+/**
+ * [ChatContainer 최상위 controller]
+ * runtime/store, UI state, route data, submit/SSE 흐름을 하나로 조립합니다.
+ * 하위 composable이 많기 때문에 여기서는 '어떤 도메인을 연결하는지'만 보고,
+ * 실제 상태 변경은 useChatUIController/useChatDataController/useChatRuntime에서 추적하는 것이 좋습니다.
+ */
 
 /**
  * @function useChatContainerController

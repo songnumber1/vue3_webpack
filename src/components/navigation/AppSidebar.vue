@@ -158,6 +158,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/navigation/AppSidebar.vue
+ * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
@@ -200,26 +209,41 @@ const historyMenuRef = ref(null);
 const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuReferenceEl = ref(null);
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function syncViewportMode() {
   isMobileSheet.value = shouldUseMobileLayout.value;
 }
 
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
+ */
 function openAssistantSelector() {
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function selectAssistant(id) {
   emit("select-assistant", id);
   assistantMenuOpen.value = false;
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleNewChat() {
   emit("new-chat");
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
 }
 
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
+ */
 function openHistoryMenu(payload = {}) {
   const {item, event} = payload;
   syncViewportMode();
@@ -228,12 +252,18 @@ function openHistoryMenu(payload = {}) {
   historyMenuOpen.value = true;
 }
 
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closeHistoryMenu() {
   historyMenuOpen.value = false;
   historyMenuTarget.value = null;
   historyMenuReferenceEl.value = null;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
@@ -241,11 +271,17 @@ function selectHistoryMenuAction(action) {
   emit("history-menu-action", {action, history});
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleSelectHistory(item) {
   emit("select-history", item);
   navigationStore.setDrawerOpen(false);
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleSelectHistoryCollapsed(item) {
   emit("select-history", item);
   navigationStore.setCollapsedRecentOpen(false);
@@ -269,6 +305,9 @@ useOutsideClick(
 
 syncViewportMode();
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 async function handleViewportModeChange(isCompact) {
   syncViewportMode();
   if (isCompact) return;

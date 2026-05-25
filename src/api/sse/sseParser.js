@@ -1,3 +1,19 @@
+
+/**
+ * [SSE data frame parser]
+ * 서버 응답은 일반적으로 `data: ...\n\n` 형식입니다.
+ * 네트워크 chunk는 frame 경계와 일치하지 않을 수 있으므로 buffer의 마지막 미완성 frame은 rest로 남깁니다.
+ * complete frame만 events로 넘겨야 JSON parse 오류와 content 누락을 방지할 수 있습니다.
+ */
+/**
+ * @file api/sse/sseParser.js
+ * @description SSE 스트리밍 계층입니다. fetch ReadableStream, data: frame 파싱, chunk commit, 모바일 lifecycle abort를 처리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 export const SSE_DONE_TOKEN = "[DONE]";
 
 /**

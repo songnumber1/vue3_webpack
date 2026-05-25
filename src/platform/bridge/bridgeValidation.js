@@ -1,3 +1,12 @@
+/**
+ * @file platform/bridge/bridgeValidation.js
+ * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {BridgeContract} from "./contract";
 import {createContractError, createResponseError} from "./bridgeErrors";
 import {createBridgeRequest} from "./bridgeUtils";
@@ -12,6 +21,9 @@ export function getContract(type, contractMap = BridgeContract) {
   return contract;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function formatZodIssues(error) {
   return (
     error?.errors
@@ -20,6 +32,9 @@ function formatZodIssues(error) {
   );
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function safeParseBySchema(schema, value, request, options) {
   const parsed = schema.safeParse(value || {});
 

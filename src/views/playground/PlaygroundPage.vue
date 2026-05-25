@@ -292,6 +292,15 @@
 </template>
 
 <script setup>
+/**
+ * @file views/playground/PlaygroundPage.vue
+ * @description 라우터가 직접 렌더하는 페이지 진입 컴포넌트입니다. 대부분 실제 로직은 container에 위임합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {useI18n} from "vue-i18n";
@@ -374,10 +383,16 @@ const popupSamples = computed(() => ({
 }));
 
 const activePopup = computed(() => popupSamples.value[activePopupType.value]);
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
+ */
 function openPopup(type) {
   activePopupType.value = type;
   popupOpen.value = true;
 }
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closePopup(action) {
   popupOpen.value = false;
   popupResult.value = t("playground.popup.result", {
@@ -385,9 +400,15 @@ function closePopup(action) {
     action,
   });
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 async function copySampleText() {
   await copyClipboardByPlatform(t("playground.clipboard.sampleText"));
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 async function showToastMessage() {
   await showToastByPlatform(toastMessage.value, {
     title: t("playground.toast.noteTitle"),

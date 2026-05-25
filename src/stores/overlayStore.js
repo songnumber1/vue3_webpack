@@ -1,3 +1,12 @@
+/**
+ * @file stores/overlayStore.js
+ * @description Pinia 전역 상태 저장소입니다. 화면 간 공유되어야 하는 business/runtime 상태를 관리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {defineStore} from "pinia";
 
 // 오버레이 활성화 시 최상단 body 돔 태그에 마운트 마킹할 글로벌 잠금 제어용 표준 CSS 클래스 명칭
@@ -11,6 +20,9 @@ const DEFAULT_OVERLAY_KIND = "overlay";
  * 최상위 HTML `<body>` 원시 노드의 클래스 리스트 및 data 속성 명세에 메타 태그 마킹을 실시간 강제 강제 반영합니다.
  * 이를 통해 레이어가 뜬 시점의 뒷배경 스크롤 잠금 및 다중 포커스 무력화 CSS 스펙을 글로벌 전역 브라우저 인터페이스에 전파 전파 수립합니다.
  * @param {Map} activeOverlays - 현재 레지스트리에 보존 마운트되어 적치된 활성 레이어 해시 맵 인스턴스
+ */
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyBodyOverlayState(activeOverlays) {
   if (typeof document === "undefined") return; // SSR(서버 사이드 렌더링) 환경 노드 노드 컴파일 도중 크래시 현상 방지 가드 가탈

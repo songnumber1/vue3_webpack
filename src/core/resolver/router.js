@@ -1,3 +1,12 @@
+/**
+ * @file core/resolver/router.js
+ * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {createRouter, createWebHistory} from "vue-router";
 import AssistantRoot from "@/views/AssistantRoot.vue";
 import MainPage from "@/views/MainPage.vue";
@@ -161,6 +170,9 @@ const notFoundRoute = {
  * @param {object} appInfo - 플랫폼 스토어 등에서 전달받은 현재 애플리케이션 사양 메타 정보
  * @returns {boolean} 강제 업데이트 대상 여부
  */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function shouldRequireAndroidUpdate(appInfo) {
   if (!isAndroidApp(appInfo)) return false; // 안드로이드 앱 환경이 아닌 경우 타겟 제외
   const currentVersion = appInfo?.appVersion; // 클라이언트 현재 빌드 버전
@@ -176,6 +188,9 @@ function shouldRequireAndroidUpdate(appInfo) {
  * @param {import('vue-router').RouteLocationNormalized} to - 이동하고자 하는 목적지 라우트 객체
  * @returns {boolean} 인증 프로세스 진입 여부
  */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function shouldCheckAuth(to) {
   if (!ENABLE_AUTH_GUARD) return false; // 전역 인증 가드 비활성화 상태 시 스킵
 
@@ -190,6 +205,9 @@ function shouldCheckAuth(to) {
  * @param {import('vue-router').RouteLocationNormalized} to - 원래 유저가 진입하려던 목적지 라우트 객체
  * @param {string} reason - 인증 실패 코어 사유 코드
  * @returns {import('vue-router').RouteLocationRaw} Vue Router 변환용 리디렉션 타깃 매핑 오브젝트
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createLoginRequiredRedirect(to, reason) {
   return {
@@ -219,6 +237,9 @@ function debugRouteGuard(...args) {
  * @param {boolean} [inheritedRequireAuth=false] - 부모 트리 계층으로부터 전파 상속된 인증 조건 플래그
  * @returns {Array<import('vue-router').RouteRecordRaw>} 상속 매핑 및 불변성이 확보된 정규화 라우트 배열 원품
  */
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
+ */
 function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
   return routes.map((route) => {
     const ownMeta = route.meta || {};
@@ -247,6 +268,9 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
  * @param {object} appInfo - 애플리케이션 고유 런타임 물리 정보 팩
  * @param {object} [context={}] - Axios 토큰 버스 등 외부 플러그인 의존성 인젝션 컨텍스트
  * @returns {void}
+ */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function registerRouteGuard(router, appInfo, context = {}) {
   const {authAxios} = context;

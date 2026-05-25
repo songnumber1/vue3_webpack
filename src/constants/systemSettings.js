@@ -1,3 +1,12 @@
+/**
+ * @file constants/systemSettings.js
+ * @description 여러 계층에서 공유하는 상수 모음입니다. UI/런타임/이미지/설정 값의 단일 출처 역할을 합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 export const DEFAULT_MOBILE_BREAKPOINT_PX = 768;
 export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 1440;
 
@@ -101,12 +110,18 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: true,
 });
 
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
+ */
 function normalizePlatformOverride(value) {
   return Object.values(PLATFORM_OVERRIDE_MODES).includes(value)
     ? value
     : DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.platformOverride];
 }
 
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
+ */
 function normalizeKeyboardMode(value) {
   return Object.values(KEYBOARD_MODES).includes(value)
     ? value

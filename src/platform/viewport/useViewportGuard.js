@@ -1,3 +1,12 @@
+/**
+ * @file platform/viewport/useViewportGuard.js
+ * @description 브라우저 viewport, VisualViewport, 모바일 키보드, safe-area 관련 런타임 보정 모듈입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {
@@ -13,6 +22,15 @@ import {
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {getMobileBrowserFamily, getViewportSize} from "@/platform/viewport/viewport";
+
+/**
+ * [Viewport/Keyboard Guard]
+ * 모바일 브라우저는 주소창, 키보드, WebView resize 정책에 따라 innerHeight와 visualViewport 값이 다르게 변합니다.
+ * 이 composable은 그 차이를 CSS 변수로 정규화하고 body/html class를 갱신해 CSS patch가 같은 기준을 보도록 합니다.
+ *
+ * 특히 전송 직후 키보드가 내려가는 동안 scroll 보정이 먼저 실행되면 질문 앵커 위치가 틀어질 수 있으므로,
+ * viewport refresh 이벤트와 delayed resize 처리를 통해 안정화 시점을 확보합니다.
+ */
 /**
  * 현재 모바일 브라우저 계열을 html/body class에 반영합니다.
  * CSS patch는 이 class를 기준으로 Chrome/Samsung/Firefox/WebView 차이를 보정합니다.
@@ -32,6 +50,9 @@ function applyBrowserViewportClass(browserFamily) {
   root.classList.add(className);
   body?.classList.add(className);
 }
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isTextEditingElement(element) {
   if (!element) return false;
   const tagName = element.tagName?.toLowerCase?.();
@@ -48,6 +69,9 @@ function isTextEditingElement(element) {
  * 모바일 브라우저는 키보드가 열릴 때 visualViewport.height만 줄어드는 경우가 많고,
  * 일부 브라우저는 offsetTop도 같이 변합니다. baselineHeight는 키보드가 닫힌 안정 높이로
  * 사용해 false positive를 줄입니다.
+ */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
 function getKeyboardMetrics(size, baselineHeight = 0) {
   const visualHeight = Math.max(size.height || 0, MIN_VIEWPORT_HEIGHT_PX);
@@ -87,6 +111,9 @@ function getKeyboardMetrics(size, baselineHeight = 0) {
  * - --layout-viewport-height
  * - --keyboard-height / --composer-keyboard-inset
  * - --visual-viewport-offset-top
+ */
+/**
+ * store, DOM CSS 변수 또는 reactive 상태에 값을 반영합니다.
  */
 function setCssViewportVars(
   size,
@@ -166,6 +193,9 @@ function panFocusedElementIntoView() {
     });
   });
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function removeKeyboardModeVars() {
   if (typeof document === "undefined") return;
   document.documentElement.removeAttribute("data-keyboard-mode");

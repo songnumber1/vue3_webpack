@@ -1,3 +1,12 @@
+/**
+ * @file composables/overlay/useOverlayRegistration.js
+ * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, onBeforeUnmount, watch} from "vue";
 import {useOverlayStore} from "@/stores/overlayStore";
 
@@ -9,6 +18,9 @@ let overlaySequence = 0;
  * [순수 유틸리티] 오버레이 종류(종류 명칭)를 기반으로 겹치지 않는 고유 고리 식별자 ID를 동적 생성합니다.
  * @param {string} kind - 오버레이 유닛의 타입 성격 (예: 'modal', 'sheet', 'popover')
  * @returns {string} 'modal-1', 'sheet-2' 양식의 고유 문자열 키
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createOverlayId(kind) {
   overlaySequence += 1;

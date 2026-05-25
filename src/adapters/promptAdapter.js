@@ -1,3 +1,12 @@
+/**
+ * @file adapters/promptAdapter.js
+ * @description 백엔드/mock 원본 응답을 화면에서 쓰기 쉬운 형태로 정규화하는 adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {PROMPT_TEMPLATE_MODEL_IDS} from "@/constants/promptComposer";
 export function adaptExamplePrompt(raw = {}) {
   return {
@@ -19,6 +28,9 @@ export function adaptExamplePromptList(response = {}) {
     .filter((item) => item.id);
 }
 
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveTemplateKey(raw = {}) {
   const name = String(
     raw.promptTemplateName || raw.name_ko || raw.name_en || raw.nameKo || raw.nameEn || ""

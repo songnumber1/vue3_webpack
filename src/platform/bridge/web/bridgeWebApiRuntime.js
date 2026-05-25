@@ -1,3 +1,12 @@
+/**
+ * @file platform/bridge/web/bridgeWebApiRuntime.js
+ * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {WebApiContract} from "../contract";
 import {BRIDGE_CATEGORY} from "../bridgeConstants";
 import {createBridgeRequest} from "../bridgeUtils";
@@ -7,17 +16,26 @@ import {
 } from "../runtime/bridgeResponses";
 import {getContract, throwIfErrorResponse} from "../bridgeValidation";
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getApiBaseUrl() {
   const configured = process.env.VUE_APP_API_BASE_URL || "/api";
   return configured.replace(/\/$/, "");
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function interpolatePath(path, payload) {
   return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) =>
     encodeURIComponent(payload?.[key] ?? "")
   );
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function buildBackendUrl(contract, payload) {
   const rawPath =
     contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
@@ -25,6 +43,9 @@ function buildBackendUrl(contract, payload) {
   return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function pickRequestBody(method, request) {
   const normalizedMethod = method.toUpperCase();
 
@@ -35,6 +56,9 @@ function pickRequestBody(method, request) {
   return JSON.stringify(request);
 }
 
+/**
+ * 문자열 또는 stream buffer를 의미 있는 frame/object로 파싱합니다.
+ */
 async function parseBackendBody(response) {
   const contentType = response.headers.get("content-type") || "";
   const text = await response.text();
@@ -52,6 +76,9 @@ async function parseBackendBody(response) {
   }
 }
 
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
+ */
 function normalizeBackendSuccess(request, backendBody, contract) {
   if (
     backendBody &&
@@ -64,6 +91,9 @@ function normalizeBackendSuccess(request, backendBody, contract) {
   return createBackendSuccessResponse(request, backendBody, contract);
 }
 
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
+ */
 function normalizeBackendError(request, response, backendBody, contract) {
   const status = response?.status || 500;
   const statusText = response?.statusText || "Backend Error";
@@ -88,6 +118,9 @@ function normalizeBackendError(request, response, backendBody, contract) {
   return error;
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 async function requestBackend(request, contract) {
   const method = (contract.httpMethod || "POST").toUpperCase();
   const url = buildBackendUrl(contract, request);

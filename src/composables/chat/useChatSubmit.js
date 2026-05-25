@@ -1,3 +1,12 @@
+/**
+ * @file composables/chat/useChatSubmit.js
+ * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {nextTick, ref} from "vue";
 import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
 import {fetchGenerationResult} from "@/api/sse/generationResultApi";
@@ -6,9 +15,26 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {createId} from "@/utils/id";
 
 /**
+ * [질의/답변 핵심 흐름]
+ * 1. PromptComposer에서 넘어온 payload를 normalizePromptPayload()로 정규화합니다.
+ * 2. 메인 화면이면 createRemoteConversation()으로 대화방을 만들고 실패 시 local fallback을 사용합니다.
+ * 3. appendUserAndAssistantMessages()로 사용자 질문과 빈 assistant placeholder를 먼저 화면/store에 추가합니다.
+ * 4. streamGeneration()이 fetch ReadableStream 기반 SSE를 시작합니다.
+ * 5. onChunk()마다 누적 답변 content를 assistant 메시지에 commit하고 Vue ref + Pinia store를 함께 갱신합니다.
+ * 6. [DONE] 또는 complete 시 status를 complete로 바꾸고 Mermaid 등 최종 렌더 후처리를 실행합니다.
+ *
+ * 주의:
+ * - commitAssistantMessage()가 실제 화면 반영 지점입니다.
+ * - 모바일에서 키보드가 열린 상태의 submit은 scrollLatestUserMessage()/MessageList anchor 보정과 연결됩니다.
+ */
+
+/**
  * [순수 유틸리티] 유저가 입력한 원시 페이로드(단순 스트링 vs 첨부파일 포함 객체)의 타입을 단일 정형화 규격으로 변환합니다.
  * @param {string|Object} payload - 입력창으로부터 넘어온 순수 문자열 혹은 믹스드 객체
  * @returns {Object} { text: string, attachments: Array } 양식의 클린 오브젝트
+ */
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
  */
 function normalizePromptPayload(payload) {
   if (typeof payload === "string") {
@@ -82,6 +108,9 @@ function canWrite(options) {
  * @description [장애 복구 보정 파트] HTTP SSE 스트리밍이 불안정한 와이파이 환경 등으로 도중 단절되었을 때,
  * 백엔드 데이터베이스에 최종 정상 적치 완결되었을지 모르는 완전한 대화 본문을 REST API로 역추적 패치해 오는 안전 가드 함수입니다.
  */
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 async function resolveGenerationResultContent(requestId) {
   try {
     const result = await fetchGenerationResult(requestId);
@@ -96,6 +125,9 @@ async function resolveGenerationResultContent(requestId) {
  * @function createStreamScrollScheduler
  * @description [마이크로태스크 배치 스케줄러] 데이터 토큰 조각이 들어올 때마다 매번 동기식 돔 스크롤을 튕기면 브라우저가 터지는 현상(Layout Thrashing)이 발생합니다.
  * Promise microtask 큐를 활용해 한 프레임에 단 한 번만 최하단 스크롤 연산이 예약 집행되도록 디바운싱 조율합니다.
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createStreamScrollScheduler(options) {
   let pending = false;
@@ -131,6 +163,9 @@ function createStreamScrollScheduler(options) {
  * @function createAssistantMessageCommitter
  * @description [불변성 데이터 커미터 클로저] 특정 대화방 내부의 메시지 배열 레퍼런스를 훼손하지 않으면서,
  * 어시스턴트가 뿜어내는 글자 패치 조각을 깊은 복사 결합 구조로 갱신하고 상위 Pinia 상태 저장소에 동기화 처리를 대행합니다.
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createAssistantMessageCommitter({
   chatId,
@@ -182,6 +217,9 @@ function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function waitAnimationFrame() {
   return new Promise((resolve) => window.requestAnimationFrame(resolve));
 }
@@ -269,6 +307,9 @@ function createGenerationPayload(options, normalized, chatId) {
  * @function createConversationForSubmit
  * @description [대화 서랍 최초 자동 개통 레이어] 유저가 홈(Main) 화면이나 빈 엔트리 진입로에서 첫 질문을 던진 상황인 경우,
  * 백엔드 원격지에 대화방 고유 세션 데이터베이스 생성을 선행 요청(`new.do`)하고 실패 시 프론트 자체 인메모리 로컬 세션으로 비상 가드 시동합니다.
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 async function createConversationForSubmit(options, normalized) {
   const context = {

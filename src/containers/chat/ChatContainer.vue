@@ -138,6 +138,15 @@
 </template>
 
 <script setup>
+/**
+ * @file containers/chat/ChatContainer.vue
+ * @description 채팅 화면의 최상위 조립 계층입니다. Controller에서 받은 상태와 action을 하위 Vue 컴포넌트에 연결합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, provide} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute} from "vue-router";
@@ -161,6 +170,13 @@ import ChatHistoryDialog from "@/components/navigation/parts/ChatHistoryDialog.v
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+
+/**
+ * [ChatContainer 연결 구조]
+ * 이 파일은 UI를 직접 계산하기보다 useChatContainerController()에서 받은 상태/action을 하위 컴포넌트에 배선합니다.
+ * Header/Workspace/Prompt/ImagePreview/Sheet는 서로 직접 import하지 않고 provide/inject 또는 props/event로 연결됩니다.
+ * 따라서 문제 추적 시 '렌더 위치(ChatContainer)'와 '상태 변경 위치(controller/store)'를 나누어 확인해야 합니다.
+ */
 
 const route = useRoute();
 const systemSettingsStore = useSystemSettingsStore();
@@ -247,14 +263,23 @@ const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleAssistantNewChat(assistantId) {
   startNewChat({assistantId});
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleWorkspaceScrollBottom() {
   scrollBottom({force: true, behavior: "smooth", stable: true});
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleMobileSettingsDesktopOpen(target) {
   mobileSettingsOpen.value = false;
   if (target === "notice") {

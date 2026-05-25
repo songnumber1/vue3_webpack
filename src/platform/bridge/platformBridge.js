@@ -1,3 +1,12 @@
+/**
+ * @file platform/bridge/platformBridge.js
+ * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {callNative} from "@/platform/bridge/web/bridgeClient";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo} from "@/utils/logger";
@@ -12,24 +21,42 @@ import {
 } from "@/utils/appFeedback";
 
 /**
+ * [Android WebView Bridge / Web fallback]
+ * AndroidBridge가 존재하면 네이티브 기능을 호출하고, 일반 웹에서는 가능한 브라우저 API로 fallback합니다.
+ * 같은 기능이라도 WebView와 모바일 브라우저에서 권한/동작 방식이 다르므로 이 파일에서 platform 차이를 흡수합니다.
+ */
+
+/**
  * Android WebView와 일반 브라우저에서 동일한 API를 호출할 수 있게 하는 platform facade입니다.
  *
  * 각 exported 함수는 먼저 현재 런타임이 Android 앱인지 확인하고,
  * 앱이면 window.AndroidBridge 기반 callNative를 사용합니다.
  * 브라우저면 webSuccess 형태의 동일한 응답 구조를 만들어 상위 UI가 분기 없이 처리하게 합니다.
  */
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getFeedbackChannel() {
   return resolveFeedbackChannel(getStore().info || {});
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function dispatchFeedbackEvent(name, detail) {
   dispatchAppFeedbackEvent(name, detail, getStore().info || {});
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function notifyClipboardCopied(message, toastMessage = message) {
   dispatchFeedbackEvent(APP_CLIPBOARD_COPIED_EVENT, {message, toastMessage});
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function notifyToastRequested(message, options = {}) {
   dispatchFeedbackEvent(APP_TOAST_REQUESTED_EVENT, {
     message,
@@ -38,13 +65,22 @@ function notifyToastRequested(message, options = {}) {
   });
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function t(key, params) {
   return i18n.global.t(key, params);
 }
 
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getStore() {
   return usePlatformStore();
 }
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isAndroidApp() {
   return getStore().info.isAndroidApp;
 }

@@ -1,3 +1,19 @@
+
+/**
+ * [chunk commit scheduler]
+ * SSE chunk가 너무 자주 들어오면 Vue render/markdown render가 과도하게 발생합니다.
+ * 이 committer는 최신 누적 content만 보관하고 microtask/timeout 경계에서 onChunk를 호출해
+ * 화면 업데이트 빈도를 완화합니다. flush()는 stream 완료 시 마지막 content 누락을 막습니다.
+ */
+/**
+ * @file api/sse/common/chunkCommitter.js
+ * @description SSE 스트리밍 계층입니다. fetch ReadableStream, data: frame 파싱, chunk commit, 모바일 lifecycle abort를 처리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 /**
  * SSE chunk를 UI에 반영하는 빈도를 제어합니다.
  *

@@ -1,3 +1,12 @@
+/**
+ * @file composables/prompt/usePromptTool.js
+ * @description 프롬프트 입력 도메인 composable입니다. 텍스트/첨부/도구/모델 선택 상태와 submit emit을 관리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {useChatStore} from "@/stores/chatStore";
@@ -12,6 +21,9 @@ import {
  * [순수 검증식] 특정 하위 툴 옵션 유닛이 전역 Pinia 스토어 설정값에 비추어 현재 점등(Active) 상태인지 판별합니다.
  * @param {Object} settings - Pinia 스토어 내 현재 활성화된 도구 스냅샷 데이터 팩
  * @param {Object} tool - 적격성을 판별할 타깃 도구 객체 소스
+ */
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
  */
 function isToolOptionActive(settings, tool) {
   // 케이스 A: 프롬프트 템플릿형 도구인 경우 스토어의 활성 ID와 대조합니다.

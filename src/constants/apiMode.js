@@ -1,3 +1,12 @@
+/**
+ * @file constants/apiMode.js
+ * @description 여러 계층에서 공유하는 상수 모음입니다. UI/런타임/이미지/설정 값의 단일 출처 역할을 합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 
 /**
@@ -5,6 +14,9 @@ import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
  * 로컬 호스트 도메인을 타깃으로 하는 주소에 한해서만 `https://` 프로토콜을 `http://`로 강제 교정(Normalize)합니다.
  * @param {string} value - 정규화 검증을 진행할 기준 주소 URL 문자열
  * @returns {string} 로컬 조건에 부합 시 프로토콜이 교정된 URL, 그 외에는 공백 제거된 원본 문자열
+ */
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
  */
 function normalizeLocalHttpUrl(value) {
   // 인자로 넘어온 값을 안전하게 문자열로 형변환한 후 좌우 공백을 제거합니다.

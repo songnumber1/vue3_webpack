@@ -151,6 +151,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/chat/MessageActions.vue
+ * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
@@ -159,6 +168,9 @@ import {logWarn} from "@/utils/logger";
 
 defineEmits(["regenerate"]);
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   role: {type: String, required: true},
   content: {type: String, default: ""},
@@ -184,6 +196,9 @@ const hasMoreReasons = computed(
   () =>
     !showAllReasons.value && HALLUCINATION_REASONS.length > defaultReasonCount
 );
+/**
+ * store, DOM CSS 변수 또는 reactive 상태에 값을 반영합니다.
+ */
 function setFeedback(value) {
   feedback.value = feedback.value === value ? "" : value;
   if (feedback.value !== FEEDBACK_ACTIONS.DISLIKE) {
@@ -191,24 +206,42 @@ function setFeedback(value) {
     selectedReasons.value = [];
   }
 }
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
+ */
 function openFeedbackDialog() {
   feedbackDialogOpen.value = true;
 }
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closeFeedbackDialog() {
   feedbackDialogOpen.value = false;
 }
+/**
+ * 프롬프트 입력 payload를 검증한 뒤 채팅 전송 흐름으로 연결합니다.
+ */
 function submitFeedback() {
   feedbackText.value = "";
   closeFeedbackDialog();
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function reasonLabel(reason) {
   return locale.value === "ko" ? reason.ko : reason.en;
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function toggleReason(id) {
   selectedReasons.value = selectedReasons.value.includes(id)
     ? selectedReasons.value.filter((item) => item !== id)
     : [...selectedReasons.value, id];
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 async function copy() {
   try {
     await copyClipboardByPlatform(props.content || "");

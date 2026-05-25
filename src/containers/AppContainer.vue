@@ -9,6 +9,15 @@
 </template>
 
 <script setup>
+/**
+ * @file containers/AppContainer.vue
+ * @description 프로젝트 공통 JavaScript/Vue 모듈입니다. 하위 계층에서 재사용되는 상태, action, 렌더 보조 로직을 포함합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed} from "vue";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";

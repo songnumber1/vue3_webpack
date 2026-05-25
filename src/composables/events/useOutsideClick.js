@@ -1,10 +1,25 @@
+/**
+ * @file composables/events/useOutsideClick.js
+ * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {useEventListener} from "@vueuse/core";
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function unwrapRoot(root) {
   const value = typeof root === "function" ? root() : root;
   return value?.value || value;
 }
 
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function isEventInsideElement(event, element) {
   if (!element) return false;
   const path =

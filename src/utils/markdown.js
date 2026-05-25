@@ -1,3 +1,12 @@
+/**
+ * @file utils/markdown.js
+ * @description 여러 영역에서 공유하는 유틸리티입니다. DOM/Markdown/feedback/viewport 보정 등 공통 처리를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {unified} from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -11,6 +20,13 @@ import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
 
 /**
+ * [Markdown render pipeline]
+ * assistant message content를 HTML로 변환합니다.
+ * 스트리밍 중에는 content가 계속 바뀌기 때문에 무거운 Mermaid 렌더는 완료 상태에서만 실행하는 것이 중요합니다.
+ * code highlight, table toolbar, math 렌더 등 후처리와 연결되므로 output HTML 구조를 변경할 때는 MessageActions/MarkdownTools 영향도 확인해야 합니다.
+ */
+
+/**
  * Markdown AST node에서 순수 텍스트만 추출합니다.
  * 코드/mermaid 원문을 data attribute에 보관할 때 사용합니다.
  */
@@ -21,6 +37,9 @@ function textContent(node) {
 
   return node.children.map(textContent).join("");
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function mdLabel(key) {
   return i18n.global.t(key);
 }
@@ -61,6 +80,9 @@ function tableActionButton(action, label) {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function svgElement(children) {
   return {
     type: "element",
@@ -80,6 +102,9 @@ function svgElement(children) {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function svgPath(d) {
   return {
     type: "element",
@@ -89,6 +114,9 @@ function svgPath(d) {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function svgLine(x1, y1, x2, y2) {
   return {
     type: "element",
@@ -98,6 +126,9 @@ function svgLine(x1, y1, x2, y2) {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function svgPolyline(points) {
   return {
     type: "element",
@@ -107,6 +138,9 @@ function svgPolyline(points) {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function svgRect(x, y, width, height, rx = "2") {
   return {
     type: "element",
@@ -116,6 +150,9 @@ function svgRect(x, y, width, height, rx = "2") {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function mermaidIcon(action) {
   const icons = {
     copy: svgElement([
@@ -253,6 +290,9 @@ function rehypeTableWrapper() {
  * streaming 중에는 renderMermaid=false processor를 사용해 이 변환을 건너뛰고,
  * 답변 완료 후 renderMermaidInElement가 data-mermaid-pending 노드를 실제 SVG로 렌더합니다.
  */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function rehypeMermaidBlock() {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
@@ -310,6 +350,9 @@ function rehypeMermaidBlock() {
   };
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function detectCodeLanguage(codeNode) {
   const classNames = codeNode?.properties?.className || [];
   const languageClass = classNames.find((item) =>
@@ -378,6 +421,9 @@ function rehypeCodeBlockWrapper() {
  *
  * renderMermaid=false는 SSE streaming 중에 사용됩니다. 스트리밍 중 mermaid를 매 chunk마다
  * 렌더하면 비용이 크고 문법이 미완성일 수 있으므로, 완료 후 한 번만 렌더링합니다.
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createProcessor({renderMermaid = true} = {}) {
   const nextProcessor = unified()

@@ -89,6 +89,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/chat/ChatWorkspace.vue
+ * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {
   computed,
   inject,
@@ -110,6 +119,12 @@ import {
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 
+/**
+ * [Main/Chat 화면 분기 Root]
+ * MainPage와 ChatPage가 같은 ChatContainer를 사용해도 화면이 달라지는 이유는 route 기반 mode가 이 컴포넌트까지 내려오기 때문입니다.
+ * mode가 main이면 시작 화면/추천 질문/메인 prompt를 표시하고, chat이면 MessageList와 하단 composer slot을 표시합니다.
+ */
+
 const {t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
@@ -122,6 +137,9 @@ const workspaceActions = inject(
 );
 const {isInteractionBlocked} = useInteractionGuard();
 
+/**
+ * 현재 상태를 기준으로 reactive 값 또는 DOM 보조 값을 갱신합니다.
+ */
 function updateComposerHeight() {
   const height = composerSlotRef.value?.offsetHeight || 0;
   document.documentElement.style.setProperty(
@@ -130,6 +148,9 @@ function updateComposerHeight() {
   );
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function observeComposerHeight() {
   if (!composerSlotRef.value) return;
   updateComposerHeight();
@@ -139,6 +160,9 @@ function observeComposerHeight() {
   }
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function cleanupComposerHeightObserver() {
   composerResizeObserver?.disconnect();
   composerResizeObserver = null;
@@ -151,6 +175,9 @@ onMounted(async () => {
 
 onBeforeUnmount(cleanupComposerHeightObserver);
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   mode: {type: String, default: "main"},
   readonly: {type: Boolean, default: false},
@@ -181,6 +208,9 @@ const mainPromptClass = computed(() =>
   props.isMobile ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
 );
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleSuggestionClick(item) {
   if (isInteractionBlocked.value) return;
   const prompt = item?.prompt || item?.title || item?.text || "";

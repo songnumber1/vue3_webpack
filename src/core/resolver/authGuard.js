@@ -1,3 +1,12 @@
+/**
+ * @file core/resolver/authGuard.js
+ * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {
   AUTH_FAILURE_REASONS,
@@ -18,6 +27,9 @@ import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
  * 라우터 진입 타깃 목적지(to) 정보를 바탕으로 백엔드 보안 엔진에 전달할 파라미터 페이로드를 생성합니다.
  * @param {Object} to - Vue Router의 이동 대상 라우트 객체
  * @returns {Object} 접근 제어 API용 규격 페이로드 객체
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createAccessPayload(to) {
   return {
@@ -53,6 +65,9 @@ function getStoredMockScenario() {
  * @returns {boolean} 가짜 모크 API 모드로 연동해야 하면 true, 실제 서버 통신이면 false
  * @see {@link shouldUseFrontendMockApi} 전역 모크 모드가 활성화되었는지 판단하는 기준 유틸 함수
  */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function shouldUseMockAuth() {
   return (
     shouldUseFrontendMockApi() || // 1. 프론트엔드 자체가 모크 모드이거나
@@ -77,6 +92,9 @@ function debugAuthGuard(...args) {
  * @param {import("axios").AxiosInstance} authAxios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
  * @param {Object} payload - {@link createAccessPayload} 유틸로 가공된 파라미터 본문
  * @returns {Promise<Object>} 서버/모크로부터 전달받은 가공되지 않은 순수 인증 결과 객체
+ */
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function requestAccessInfo(authAxios, payload) {
   const useMock = shouldUseMockAuth();
@@ -111,6 +129,9 @@ async function requestAccessInfo(authAxios, payload) {
  * @param {Object} [accessInfo={}] - 원본 응답 데이터 객체
  * @returns {Object} 정형화 완료된 패스/실패 판별 결과 객체
  * @see {@link resolveAuthAccessResult} 외부 응답 규격 보정 어댑터 함수
+ */
+/**
+ * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
  */
 function normalizeAccessResult(accessInfo = {}) {
   return resolveAuthAccessResult(accessInfo);

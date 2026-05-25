@@ -1,3 +1,12 @@
+/**
+ * @file composables/prompt/usePromptMenu.js
+ * @description 프롬프트 입력 도메인 composable입니다. 텍스트/첨부/도구/모델 선택 상태와 submit emit을 관리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useEventListener, useWindowSize} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
@@ -11,6 +20,9 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
  * @param {Ref<string|null>} activeMenu - 현재 유일하게 열려있는 메뉴 식별자 상태 고리
  * @param {string} menuType - 본 인스턴스가 전담 방어할 메뉴 고유 카테고리 명칭 (model, tool, attach 등)
  * @returns {WritableComputedRef<boolean>} HTML 템플릿의 v-model 또는 개폐 바인딩에 즉시 이식 가능한 boolean 헬퍼 래퍼
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createMenuOpenRef(activeMenu, menuType) {
   return computed({

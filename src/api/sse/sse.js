@@ -1,3 +1,12 @@
+/**
+ * @file api/sse/sse.js
+ * @description SSE 스트리밍 계층입니다. fetch ReadableStream, data: frame 파싱, chunk commit, 모바일 lifecycle abort를 처리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {pickGenerationSample} from "@/api/mock/data/generationSamples.raw";
 import {streamText} from "@/api/mock/fakeStream";
@@ -8,10 +17,16 @@ import {createSseRuntimeContext} from "@/api/sse/platforms/streamRuntimeContext"
 
 export {isGenerationAbortError};
 
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveRequestId(payload = {}) {
   return payload?.requestId || payload?.request_id || "";
 }
 
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 async function streamGenerationMock(payload = {}, handlers = {}) {
   const {onChunk, onReasonChunk, onComplete} = handlers;
   const text = pickGenerationSample(payload.input);

@@ -1,9 +1,21 @@
+/**
+ * @file core/resolver/interceptor.js
+ * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {isNativeApp} from "@/core/config";
 
 /**
  * @description 일반 웹(Web) 브라우저 환경에서 작동하는 Axios 요청 인터셉터입니다. 로컬 스토리지에서 인증 토큰을 꺼내 헤더에 주입합니다.
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
  * @returns {void}
+ */
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyWebRequestInterceptor(instance) {
   instance.interceptors.request.use((config) => {
@@ -25,6 +37,9 @@ function applyWebRequestInterceptor(instance) {
  * @param {object} bridge - 안드로이드/iOS 네이티브 OS 소켓 웹뷰 자바스크립트 인터페이스 브릿지 객체
  * @param {object} appInfo - 애플리케이션 코어 빌드 및 버전 정보 구조체
  * @returns {void}
+ */
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   instance.interceptors.request.use((config) => {
@@ -50,6 +65,9 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
  * @param {object} errorUI - 전역 알림(Toast/Modal) 레이어를 트리거할 UI 가드 인스턴스 기구 컨텍스트
  * @returns {void}
+ */
+/**
+ * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyResponseInterceptor(instance, errorUI) {
   instance.interceptors.response.use(

@@ -118,6 +118,15 @@
 </template>
 
 <script setup>
+/**
+ * @file views/settings/MobileSettingsPanel.vue
+ * @description 라우터가 직접 렌더하는 페이지 진입 컴포넌트입니다. 대부분 실제 로직은 container에 위임합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
@@ -140,6 +149,9 @@ import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
 import languageIcon from "@/assets/img/settings/language.svg";
 import playgroundIcon from "@/assets/img/settings/playground.svg";
 
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   open: {type: Boolean, default: false},
   isMobile: {type: Boolean, default: true},
@@ -231,6 +243,9 @@ const languageOptions = computed(() => [
   {value: "ko", label: t("common.korean")},
   {value: "en", label: t("common.english")},
 ]);
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function selectMenuItem(key) {
   if (key === "terms" || key === "playground") {
     closePanel();
@@ -242,6 +257,9 @@ function selectMenuItem(key) {
   activeMenu.value = key;
 }
 
+/**
+ * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
+ */
 function handleBack() {
   if (activeMenu.value) {
     activeMenu.value = "";
@@ -249,6 +267,9 @@ function handleBack() {
   }
   closePanel();
 }
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
+ */
 function closePanel() {
   activeMenu.value = "";
   emit("close");

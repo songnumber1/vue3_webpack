@@ -1,3 +1,12 @@
+/**
+ * @file composables/prompt/usePromptTemplate.js
+ * @description 프롬프트 입력 도메인 composable입니다. 텍스트/첨부/도구/모델 선택 상태와 submit emit을 관리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useAssistantStore} from "@/stores/assistantStore";
@@ -17,6 +26,9 @@ function hasTemplateFields(template = {}) {
  * 현재 사용자의 브라우저 언어 설정에 맞는 결과물을 파싱하되, 유실 시 한국어(ko) 또는 영어(en)를 숏서킷 폴백합니다.
  * @param {Object} value - 언어별 키를 가진 텍스트 믹스드 데이터 (예: { ko: '요약', en: 'Summary' })
  * @param {string} locale - 'ko' 또는 'en' 등의 현재 런타임 다국어 국가 코드
+ */
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
  */
 function resolveLocaleValue(value = {}, locale = "ko") {
   if (!value || typeof value !== "object") return "";

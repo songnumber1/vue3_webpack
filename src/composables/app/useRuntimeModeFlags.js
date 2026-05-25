@@ -1,3 +1,12 @@
+/**
+ * @file composables/app/useRuntimeModeFlags.js
+ * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
@@ -7,6 +16,9 @@ import {useViewportStore} from "@/stores/viewportStore";
  * HTML의 `<body>` 태그가 모바일 클래스(`mobile-mode`)를 가지고 있는지 직접 판별합니다.
  * @returns {boolean} body 태그에 모바일 모드 클래스가 포함되어 있다면 true, 아니면 false
  * @see {@link installViewportModeClass} 최상단 진입점에서 전역 클래스를 주입하는 유틸리티
+ */
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
  */
 function hasBodyMobileMode() {
   // 브라우저 런타임 환경(document 객체가 존재)이면서, body 객체의 classList 배열 내에 'mobile-mode'가 존재하는지 검사합니다.

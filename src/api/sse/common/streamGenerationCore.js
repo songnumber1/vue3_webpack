@@ -1,9 +1,32 @@
+/**
+ * @file api/sse/common/streamGenerationCore.js
+ * @description SSE 스트리밍 계층입니다. fetch ReadableStream, data: frame 파싱, chunk commit, 모바일 lifecycle abort를 처리합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {parseSseBuffer} from "@/api/sse/sseParser";
 import {appendParsedEvents} from "@/api/sse/common/sseFrame";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError, isGenerationAbortError} from "@/api/sse/common/sseErrors";
 import {resolveGenerationUrl} from "@/api/sse/common/streamRequest";
 import {logWarn} from "@/utils/logger";
+
+/**
+ * [SSE 실제 수신 계층]
+ * 이 프로젝트는 EventSource가 아니라 fetch + ReadableStream으로 SSE를 처리합니다.
+ * POST body, credentials, AbortController가 필요하기 때문에 EventSource 대신 reader.read() 루프를 사용합니다.
+ *
+ * 처리 순서:
+ * - fetch(generation.do)
+ * - response.body.getReader()
+ * - TextDecoder로 Uint8Array를 문자열 buffer로 누적
+ * - parseSseBuffer()로 data: frame 단위 분리
+ * - appendParsedEvents()로 content/reasoning/[DONE] 반영
+ * - chunkCommitter가 Vue 업데이트 빈도를 제어
+ */
 
 /**
  * 실제 generation.do SSE 요청을 실행하는 핵심 함수입니다.

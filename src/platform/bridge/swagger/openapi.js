@@ -1,3 +1,12 @@
+/**
+ * @file platform/bridge/swagger/openapi.js
+ * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {
   OpenAPIRegistry,
   OpenApiGeneratorV3,
@@ -35,6 +44,9 @@ const CATEGORY_OPTIONS = [
     description: "Android가 WebView 내부 JS 이벤트 핸들러를 호출하는 contract",
   },
 ];
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
+ */
 function createErrorResponse(description, schema) {
   return {
     description,
@@ -45,18 +57,27 @@ function createErrorResponse(description, schema) {
     },
   };
 }
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getCategoryPath(category) {
   if (category === BRIDGE_CATEGORY.JS_TO_ANDROID) return JS_TO_ANDROID_PATH;
   if (category === BRIDGE_CATEGORY.ANDROID_TO_JS) return ANDROID_TO_JS_PATH;
 
   return WEB_API_PATH;
 }
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getCategoryDescription(category) {
   return (
     CATEGORY_OPTIONS.find((option) => option.value === category)?.description ||
     "Bridge contract"
   );
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function shouldIncludeContract(selectedCategory, contract) {
   return (
     selectedCategory === BRIDGE_CATEGORY.ALL ||

@@ -1,3 +1,12 @@
+/**
+ * @file platform/bridge/swagger/swaggerRuntime.js
+ * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {
   ANDROID_TO_JS_PATH,
   BRIDGE_CATEGORY,
@@ -7,6 +16,9 @@ import {
 import {executeContract} from "../web/bridgeClient";
 
 let originalFetch = null;
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getRequestUrl(input) {
   const rawUrl = typeof input === "string" ? input : input?.url || "";
 
@@ -16,12 +28,21 @@ function getRequestUrl(input) {
     return String(rawUrl || "").split(/[?#]/)[0];
   }
 }
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function canUseBlob(value) {
   return typeof Blob !== "undefined" && value instanceof Blob;
 }
+/**
+ * 현재 상태가 특정 조건을 만족하는지 판단합니다.
+ */
 function canUseRequest(value) {
   return typeof Request !== "undefined" && value instanceof Request;
 }
+/**
+ * 문자열 또는 stream buffer를 의미 있는 frame/object로 파싱합니다.
+ */
 async function parseTextBody(text) {
   if (!text) return {};
 
@@ -31,6 +52,9 @@ async function parseTextBody(text) {
     return {rawBody: text};
   }
 }
+/**
+ * 문자열 또는 stream buffer를 의미 있는 frame/object로 파싱합니다.
+ */
 async function parsePayload(input, init = {}) {
   const body = init?.body;
 
@@ -56,6 +80,9 @@ async function parsePayload(input, init = {}) {
 
   return {};
 }
+/**
+ * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
+ */
 function toContractType(pathname) {
   const lastSegment =
     String(pathname || "")
@@ -65,6 +92,9 @@ function toContractType(pathname) {
 
   return decodeURIComponent(lastSegment).toUpperCase();
 }
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveCategoryFromUrl(pathname) {
   if (pathname.includes(JS_TO_ANDROID_PATH))
     return BRIDGE_CATEGORY.JS_TO_ANDROID;
@@ -74,6 +104,9 @@ function resolveCategoryFromUrl(pathname) {
 
   return null;
 }
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
+ */
 function createJsonResponse(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
@@ -81,6 +114,9 @@ function createJsonResponse(body, status = 200) {
     headers: {"Content-Type": "application/json; charset=utf-8"},
   });
 }
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
+ */
 function createFallbackError(error) {
   const now = new Date().toISOString();
 

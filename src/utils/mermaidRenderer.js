@@ -1,4 +1,20 @@
+/**
+ * @file utils/mermaidRenderer.js
+ * @description 여러 영역에서 공유하는 유틸리티입니다. DOM/Markdown/feedback/viewport 보정 등 공통 처리를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {logWarn} from "@/utils/logger";
+
+/**
+ * [Mermaid 후처리 렌더러]
+ * Markdown 단계에서 mermaid code block이 생성된 뒤 실제 SVG 변환을 수행합니다.
+ * 스트림 중간 렌더는 문법이 완성되지 않은 상태일 수 있어 실패 가능성이 높으므로,
+ * 보통 assistant message status가 complete 된 뒤 force 렌더로 다시 처리합니다.
+ */
 
 let mermaidLoader = null;
 
@@ -155,6 +171,9 @@ async function ensureMermaid() {
 
   return mermaid;
 }
+/**
+ * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ */
 function resolveMermaidCard(target) {
   return target?.closest?.(".md-mermaid-card") || null;
 }

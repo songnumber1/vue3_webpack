@@ -48,6 +48,15 @@
 </template>
 
 <script setup>
+/**
+ * @file components/chat/UserMessage.vue
+ * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
@@ -56,6 +65,9 @@ import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
 
 const {t} = useI18n();
+/**
+ * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
+ */
 const props = defineProps({
   message: {type: Object, required: true},
 });
@@ -67,9 +79,15 @@ const hasAttachments = computed(
     Array.isArray(props.message.attachments) &&
     props.message.attachments.length > 0
 );
+/**
+ * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
+ */
 function getPreviewUrl(file) {
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
+/**
+ * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
+ */
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent(IMAGE_PREVIEW_EVENT, {

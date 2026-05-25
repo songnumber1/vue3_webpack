@@ -1,3 +1,12 @@
+/**
+ * @file composables/chat/useChatRuntime.js
+ * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
+ *
+ * 프리징 코드 주석 기준:
+ * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
+ * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ */
+
 import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
@@ -20,12 +29,21 @@ import {adaptChatHistory} from "@/adapters/chatAdapter";
 import {notifyChatHistorySyncFailed} from "@/utils/chatHistorySyncFeedback";
 
 /**
+ * [Chat runtime facade]
+ * Pinia store, API bootstrap, assistant/model/history 선택 상태를 ChatContainer controller가 쓰기 쉬운 형태로 묶습니다.
+ * business state는 store에 남기고, 여기서는 화면 orchestration에 필요한 action만 조립합니다.
+ */
+
+/**
  * [순수 유틸리티 함수] 클라이언트(로컬) 단에서 즉시 채팅을 시작할 때 사용하는 임시 대화방 레코드 객체를 생성합니다.
  * @param {Object} context - 대화방 초기 정보 소스
  * @param {string} context.text - 최초 입력된 프롬프트 내용 (방 제목 힌트)
  * @param {Object} context.assistant - 현재 활성화된 AI 어시스턴트 메타데이터
  * @param {Object} context.model - 현재 선택된 AI 거대모델 메타데이터
  * @returns {Object} 로컬 캐시용 가짜(Temporary) 히스토리 오브젝트
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createLocalHistory({text, assistant, model}) {
   const id = `chat-local-${Date.now()}`; // 중복 방지를 위한 로컬 타임스탬프 기반 가상 ID
@@ -55,6 +73,9 @@ function createLocalHistory({text, assistant, model}) {
  * @param {Object} [modelMap={}] - 전체 AI 모델 매핑 정보 데이터 셋
  * @param {Object} [assistantMap={}] - 전체 AI 어시스턴트 매핑 정보 데이터 셋
  * @returns {Object|null} 유효성 판별 검증 데이터가 합산된 런타임 세션 객체
+ */
+/**
+ * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
   if (!history) return null;
