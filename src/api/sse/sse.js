@@ -13,10 +13,14 @@ function resolveRequestId(payload = {}) {
 }
 
 async function streamGenerationMock(payload = {}, handlers = {}) {
-  const {onChunk, onComplete} = handlers;
+  const {onChunk, onReasonChunk, onComplete} = handlers;
   const text = pickGenerationSample(payload.input);
   const requestId = resolveRequestId(payload);
 
+  if (payload.isReasoning) {
+    const reason = `질문을 분석하고 답변에 필요한 조건을 정리하고 있습니다.\n\n- 선택 모델: ${payload.modelId || ""}\n- 사용자 질문: ${payload.input || ""}\n- 핵심 요청사항을 확인합니다.`;
+    await streamText(reason, (chunk) => onReasonChunk?.(chunk), {delay: 18});
+  }
   await streamText(text, (chunk) => onChunk?.(chunk), {delay: 18});
   await onComplete?.({requestId});
 
@@ -24,6 +28,7 @@ async function streamGenerationMock(payload = {}, handlers = {}) {
     completed: true,
     requestId,
     accumulated: text,
+    reasonAccumulated: payload.isReasoning ? "mock reasoning" : "",
     runtimeType: "mock",
   };
 }

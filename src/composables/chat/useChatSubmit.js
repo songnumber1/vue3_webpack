@@ -25,9 +25,21 @@ function createRequestPayload(base = {}) {
   };
 }
 
-function buildMockReasoningContent(normalized) {
-  const target = normalized.text || "첨부 기반 요청";
-  return `사용자 요청을 먼저 분해하고 답변에 필요한 항목을 정리했습니다.\n\n- 요청: ${target}\n- Assistant/Model payload를 생성했습니다.\n- 스트림 응답이 완료되기 전까지 메시지 액션은 숨김 처리됩니다.`;
+function isSelectedModelReasoning(options) {
+  const modelId = options.selectedModel?.value || "";
+  const models = Array.isArray(options.models?.value) ? options.models.value : [];
+  const selected = models.find((model) => model.id === modelId);
+
+  return Boolean(selected?.isReasoning);
+}
+
+function createAssistantStreamingPatch(isReasoning) {
+  return {
+    status: "streaming",
+    isReasoning,
+    reasoningContent: "",
+    reasoningStatus: isReasoning ? "thinking" : "completed",
+  };
 }
 
 function isDocumentHidden() {
@@ -133,6 +145,7 @@ function createGenerationPayload(options, normalized, chatId) {
   return createRequestPayload({
     assistantId: options.selectedAssistantId?.value || "",
     modelId: options.selectedModel?.value || "",
+    isReasoning: isSelectedModelReasoning(options),
     input: normalized.text,
     chatId,
   });
@@ -177,6 +190,10 @@ async function runAssistantStream({
 }) {
   try {
     await streamGeneration(createGenerationPayload(options, normalized, chatId), {
+      onReasonChunk: async (reasoningContent) => {
+        commit({reasoningContent, reasoningStatus: "thinking"});
+        scheduleStreamScroll();
+      },
       onChunk: async (content) => {
         await commitFirstAnswerChunk({content, getAssistantMessage, commit});
         scheduleStreamScroll();
@@ -254,9 +271,7 @@ export function useChatSubmit(options) {
       initialMessages: messages,
       initialAssistantMessage: {
         ...assistantMessage,
-        status: "streaming",
-        reasoningContent: buildMockReasoningContent(normalized),
-        reasoningStatus: "thinking",
+        ...createAssistantStreamingPatch(isSelectedModelReasoning(options)),
       },
       messagesRef: options.messages,
       setConversation: options.setConversation,
@@ -315,9 +330,7 @@ export function useChatSubmit(options) {
       id: createId("message"),
       role: "assistant",
       content: "",
-      reasoningContent: buildMockReasoningContent(normalized),
-      reasoningStatus: "thinking",
-      status: "streaming",
+      ...createAssistantStreamingPatch(isSelectedModelReasoning(options)),
       createdAt: new Date().toISOString(),
     };
     const committer = createAssistantMessageCommitter({

@@ -163,6 +163,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     setConversation: setMessages,
     selectedAssistantId,
     selectedModel,
+    models,
     scrollBottom: async (options = {}) => {
       if (options.autoAnswer && !ui.autoScrollOnAnswer.value) return;
       if (options.autoAnswer) ui.markForceBottom(2500);

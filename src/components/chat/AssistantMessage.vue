@@ -65,14 +65,14 @@ const html = ref("<p></p>");
 const reasoningHtml = ref("<p></p>");
 const contentRef = ref(null);
 const reasoningRef = ref(null);
-const reasoningOpen = ref(true);
+const reasoningOpen = ref(false);
 const {handleMarkdownClick} = useMarkdownTools(contentRef);
 const {handleMarkdownClick: handleReasoningClick} =
   useMarkdownTools(reasoningRef);
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
-const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
+const hasReasoning = computed(() => Boolean(props.message.isReasoning && props.message.reasoningContent));
 const showMessageActions = computed(
   () =>
     !isInteractionBlocked.value &&

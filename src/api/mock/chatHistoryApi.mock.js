@@ -1,6 +1,7 @@
 import {CHAT_KEYS} from "@/constants/apiKeys";
 import {CHAT_HISTORY_LIST_RAW} from "@/api/mock/data/chatHistoryList.raw";
 import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
+import {MODELS_RAW} from "@/api/mock/data/models.raw";
 import {resolveMock} from "./mockUtils";
 
 const historyStore = CHAT_HISTORY_LIST_RAW.map((item) => ({...item}));
@@ -30,11 +31,22 @@ function shouldAttachReasoning(message, index) {
   return Math.random() >= 0.45 || index === 1;
 }
 
-function attachMockReasoning(messages = []) {
+function isReasoningHistory(chatId) {
+  const history = findHistory(chatId);
+  const modelId = history?.modelId || history?.modeId || "";
+  const model = MODELS_RAW.find((item) => item.modelId === modelId);
+
+  return Boolean(model?.isReasoning);
+}
+
+function attachMockReasoning(messages = [], chatId = "") {
+  const isReasoning = isReasoningHistory(chatId);
+
   return messages.map((message, index) => {
-    if (!shouldAttachReasoning(message, index)) return {...message};
+    if (!isReasoning || !shouldAttachReasoning(message, index)) return {...message};
     return {
       ...message,
+      isReasoning: true,
       reasoningContent:
         SAMPLE_REASONING_CONTENTS[index % SAMPLE_REASONING_CONTENTS.length],
       reasoningStatus: "completed",
@@ -70,7 +82,7 @@ export const chatHistoryApiMock = {
     return resolveMock(history, 160);
   },
   getChatHistoryDetail({chatId} = {}) {
-    return resolveMock(attachMockReasoning(messageStore[chatId] || []), 180);
+    return resolveMock(attachMockReasoning(messageStore[chatId] || [], chatId), 180);
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

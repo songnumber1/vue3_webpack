@@ -83,6 +83,7 @@ export function adaptMessage(raw = {}) {
     reasoningStatus:
       raw[MESSAGE_KEYS.REASONING_STATUS] ||
       (raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning ? "completed" : ""),
+    isReasoning: toBoolean(raw.isReasoning),
 
     createdAt: raw[MESSAGE_KEYS.SENT_AT] || "", // 서버에 영구 안착 타임스탬프 시간 기록
     isSent: toBoolean(raw.isSend), // 소켓 전송 성공 완료 승인 플래그 캐스팅

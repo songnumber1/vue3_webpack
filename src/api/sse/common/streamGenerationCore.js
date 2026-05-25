@@ -12,16 +12,18 @@ export async function runSseGenerationStream({
   lifecycle,
   runtimeType = "unknown",
 }) {
-  const {onChunk, onComplete} = handlers || {};
+  const {onChunk, onReasonChunk, onComplete} = handlers || {};
   const committer = createChunkCommitter(onChunk);
+  const reasonCommitter = createChunkCommitter(onReasonChunk);
   let reader = null;
   let accumulated = "";
+  let reasonAccumulated = "";
 
   const cleanupLifecycle = lifecycle?.install?.({
     controller,
     getReader: () => reader,
     getAccumulated: () => accumulated,
-    flush: () => committer.flush(accumulated),
+    flush: () => Promise.all([committer.flush(accumulated), reasonCommitter.flush(reasonAccumulated)]),
   });
 
   try {
@@ -68,15 +70,20 @@ export async function runSseGenerationStream({
       const parsed = parseSseBuffer(buffer);
       buffer = parsed.rest;
 
-      const nextState = appendParsedEvents(parsed.events, accumulated);
+      const nextState = appendParsedEvents(parsed.events, accumulated, reasonAccumulated);
       accumulated = nextState.accumulated;
+      reasonAccumulated = nextState.reasonAccumulated;
 
       if (nextState.done) done = true;
+      if (nextState.reasonChanged) {
+        reasonCommitter.update(reasonAccumulated);
+      }
       if (nextState.changed) {
         lifecycle?.onAccumulated?.({accumulated, committer});
       }
     }
 
+    await reasonCommitter.flush(reasonAccumulated);
     await committer.flush(accumulated);
     await onComplete?.({requestId: payload?.requestId || payload?.request_id || ""});
 
@@ -84,11 +91,14 @@ export async function runSseGenerationStream({
       completed: true,
       requestId: payload?.requestId || payload?.request_id || "",
       accumulated,
+      reasonAccumulated,
       runtimeType,
     };
   } catch (error) {
+    await reasonCommitter.flush(reasonAccumulated);
     await committer.flush(accumulated);
     error.accumulated = accumulated;
+    error.reasonAccumulated = reasonAccumulated;
     error.generationRequestId = payload?.requestId || payload?.request_id || "";
     throw error;
   } finally {

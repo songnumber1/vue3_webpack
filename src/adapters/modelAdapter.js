@@ -21,6 +21,7 @@ export function adaptModel(raw = {}) {
     isStudioModel: toBoolean(raw.studioYN),
     hasImage: toBoolean(raw.imageYN),
     hasRag: toBoolean(raw.ragYN),
+    isReasoning: toBoolean(raw.isReasoning),
     raw,
   };
 }

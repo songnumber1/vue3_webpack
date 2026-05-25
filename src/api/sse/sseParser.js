@@ -21,11 +21,14 @@ export function readSseData(raw) {
   if (raw === SSE_DONE_TOKEN) return {done: true, content: ""};
   try {
     const parsed = JSON.parse(raw);
+    const type = String(parsed?.type || (parsed?.reason != null ? "reason" : "answer"));
     return {
       done: false,
+      type,
       content: String(parsed?.data ?? parsed?.content ?? ""),
+      reason: String(parsed?.reason ?? parsed?.reasonContent ?? ""),
     };
   } catch (_error) {
-    return {done: false, content: String(raw || "")};
+    return {done: false, type: "answer", content: String(raw || ""), reason: ""};
   }
 }
