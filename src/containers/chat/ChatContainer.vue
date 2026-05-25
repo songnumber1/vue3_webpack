@@ -28,6 +28,7 @@
       :auto-scroll-on-answer="autoScrollOnAnswer"
     />
 
+    <!-- 이미지 크게 보기 -->
     <ChatImagePreview
       :image="previewImage"
       @close="closeImagePreview"

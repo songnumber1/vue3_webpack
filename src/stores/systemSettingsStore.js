@@ -37,7 +37,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
       state.settings.abortChatOnMobileBackground,
   },
   actions: {
-    hydrate() {
+    init() {
       this.settings = normalizeSystemSettings(this.settings);
       this.hydrated = true;
     },

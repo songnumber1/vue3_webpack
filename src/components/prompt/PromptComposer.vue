@@ -1,6 +1,7 @@
 <template>
   <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
+      <!-- input에 추가되는 이미지 미리보기 -->
       <PromptAttachmentPreviewList
         :attachments="attachments"
         @preview="previewImage"

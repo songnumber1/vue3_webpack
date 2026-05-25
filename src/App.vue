@@ -45,5 +45,5 @@ import MobileClipboardToast from "@/components/overlay/MobileClipboardToast.vue"
 const {t} = useI18n();
 const platformStore = usePlatformStore();
 const systemSettingsStore = useSystemSettingsStore();
-systemSettingsStore.hydrate();
+systemSettingsStore.init();
 </script>
