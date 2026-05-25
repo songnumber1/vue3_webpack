@@ -8,7 +8,9 @@
  */
 
 // 일반적인 모바일 터치 디바이스 판정 기준 가로폭 해상도 (768px)
-export const DEFAULT_MOBILE_BREAKPOINT_PX = 768;
+export const DEFAULT_MOBILE_BREAKPOINT_PX =
+  process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT;
+
 // 데스크톱 해상도 조건에서도 인위적인 강제 모바일 플랫폼 분기를 우회 활성화하기 위한 특수 최대 가상 임계폭 (1440px)
 export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 1440;
 

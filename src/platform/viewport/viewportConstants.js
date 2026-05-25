@@ -7,7 +7,8 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-export const MOBILE_BREAKPOINT_PX = 768;
+export const MOBILE_BREAKPOINT_PX =
+  process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT;
 
 export const MIN_VIEWPORT_HEIGHT_PX = 320;
 
