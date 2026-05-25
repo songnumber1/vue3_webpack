@@ -40,7 +40,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import ChatMessage from "./ChatMessage.vue";
 
 /**
@@ -71,43 +71,56 @@ const emit = defineEmits(["content-rendered", "regenerate"]);
 const scrollRef = ref(null);
 const bottomRef = ref(null);
 const userIsAtBottom = ref(true);
-const viewportHeightForFocusSpacer = ref(0);
+const streamFocusSpacerHeight = ref(0);
 let stableScrollTimerIds = [];
 
 /**
- * 자동 스크롤 OFF 상태에서 사용자 질문을 화면 상단으로 올리려면
- * 최신 질문 아래쪽에 충분한 빈 스크롤 영역이 필요합니다.
- * 실제 모바일 키보드가 열린 상태에서는 visualViewport.height가 작아지기 때문에
- * visualViewport 비율만 사용하면 spacer가 부족해져 이전 답변이 일부 남을 수 있습니다.
+ * 자동 스크롤 OFF 상태에서 최신 사용자 질문을 화면 상단으로 올리려면
+ * 질문 아래쪽에 부족한 만큼의 임시 여백이 필요합니다.
+ *
+ * 이전 구현처럼 viewport 기준 고정 spacer를 계속 유지하면 답변이 렌더링된 뒤에도
+ * 실제 콘텐츠보다 스크롤 영역이 과도하게 커져 하단에 빈 화면이 생길 수 있습니다.
+ * 따라서 현재 DOM 기준으로 "최신 질문을 offset 위치에 맞추는 데 필요한 부족분"만 계산하고,
+ * 답변 콘텐츠가 늘어날 때마다 spacer를 다시 줄입니다.
  */
-function updateFocusSpacerViewportHeight() {
-  const visualHeight = window.visualViewport?.height || 0;
-  const layoutHeight = window.innerHeight || 0;
-  const listHeight = scrollRef.value?.clientHeight || 0;
+function getElementTopInScroll(container, target) {
+  const containerRect = container.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  return container.scrollTop + targetRect.top - containerRect.top;
+}
 
-  viewportHeightForFocusSpacer.value = Math.max(
-    visualHeight,
-    listHeight,
-    Math.floor(layoutHeight * 0.5)
+function recalculateFocusSpacerHeight(options = {}) {
+  if (props.autoScrollOnAnswer || !props.loading) {
+    streamFocusSpacerHeight.value = 0;
+    return;
+  }
+
+  const el = getScrollElement();
+  const target = getLatestUserMessageElement();
+  if (!el || !target) {
+    streamFocusSpacerHeight.value = 0;
+    return;
+  }
+
+  const offset = Number.isFinite(options.offset) ? options.offset : 16;
+  const currentSpacer = streamFocusSpacerHeight.value || 0;
+  const naturalScrollHeight = Math.max(0, el.scrollHeight - currentSpacer);
+  const targetTop = getElementTopInScroll(el, target);
+  const requiredSpacer = Math.ceil(
+    targetTop - offset + el.clientHeight - naturalScrollHeight
+  );
+  const maxUsefulSpacer = Math.max(0, el.clientHeight - offset);
+
+  streamFocusSpacerHeight.value = Math.max(
+    0,
+    Math.min(requiredSpacer, maxUsefulSpacer)
   );
 }
 
-const streamFocusSpacerHeight = computed(() => {
-  if (props.autoScrollOnAnswer || !props.loading) {
-    return 0;
-  }
-
-  const viewportHeight = viewportHeightForFocusSpacer.value ||
-    window.visualViewport?.height ||
-    scrollRef.value?.clientHeight ||
-    window.innerHeight ||
-    0;
-  const listHeight = scrollRef.value?.clientHeight || 0;
-  const viewportBasedSpacer = Math.floor(viewportHeight * 0.92);
-  const listBasedSpacer = Math.max(0, listHeight - 48);
-
-  return Math.max(0, viewportBasedSpacer, listBasedSpacer);
-});
+async function refreshFocusSpacerAfterRender(options = {}) {
+  await nextTick();
+  recalculateFocusSpacerHeight(options);
+}
 
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
@@ -276,7 +289,7 @@ function applyElementScroll(target, options = {}) {
  */
 function scrollToLatestUserMessage(options = {}) {
   clearStableTimers();
-  updateFocusSpacerViewportHeight();
+  recalculateFocusSpacerHeight(options);
 
   const target = getLatestUserMessageElement();
   if (!applyElementScroll(target, options)) return;
@@ -290,7 +303,7 @@ function scrollToLatestUserMessage(options = {}) {
   delays.forEach((delay) => {
     const timerId = window.setTimeout(() => {
       window.requestAnimationFrame(() => {
-        updateFocusSpacerViewportHeight();
+        recalculateFocusSpacerHeight(options);
         applyElementScroll(target, {...options, behavior: "auto"});
       });
     }, delay);
@@ -328,16 +341,24 @@ async function handleMessageRendered() {
   emit("content-rendered");
 
   await nextTick();
+  recalculateFocusSpacerHeight();
   if (props.autoScrollOnAnswer) {
     scrollToBottom({stable: true});
   }
 }
 
+watch(
+  () => [props.loading, props.autoScrollOnAnswer, props.messages.length],
+  () => {
+    refreshFocusSpacerAfterRender();
+  }
+);
+
 onMounted(() => {
   if (typeof window === "undefined") return;
-  updateFocusSpacerViewportHeight();
-  window.addEventListener("resize", updateFocusSpacerViewportHeight, {passive: true});
-  window.visualViewport?.addEventListener("resize", updateFocusSpacerViewportHeight, {
+  recalculateFocusSpacerHeight();
+  window.addEventListener("resize", recalculateFocusSpacerHeight, {passive: true});
+  window.visualViewport?.addEventListener("resize", recalculateFocusSpacerHeight, {
     passive: true,
   });
   window.addEventListener("touchstart", handleUserScrollIntent, {passive: true});
@@ -347,10 +368,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearStableTimers();
   if (typeof window === "undefined") return;
-  window.removeEventListener("resize", updateFocusSpacerViewportHeight);
+  window.removeEventListener("resize", recalculateFocusSpacerHeight);
   window.visualViewport?.removeEventListener(
     "resize",
-    updateFocusSpacerViewportHeight
+    recalculateFocusSpacerHeight
   );
   window.removeEventListener("touchstart", handleUserScrollIntent);
   window.removeEventListener("wheel", handleUserScrollIntent);
