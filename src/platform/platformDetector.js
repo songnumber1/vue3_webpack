@@ -16,7 +16,7 @@ import {
   getForcedPlatformOverride,
   resolveForcedPlatform,
 } from "./platformOverride";
-import {resolveViewportInfo} from "./platformViewport";
+import {resolveViewportInfo} from "./platformBreakpoint";
 
 export function resolveDetailedPlatform(baseAppInfo = {}) {
   const nav = getNavigator();

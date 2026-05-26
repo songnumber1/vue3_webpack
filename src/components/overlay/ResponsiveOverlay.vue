@@ -10,7 +10,6 @@
         <div
           v-if="!isMobile"
           class="responsive-overlay-backdrop app-dialog-backdrop"
-          @click="$emit('close')"
         ></div>
         <section
           :key="panelRenderKey"
@@ -25,7 +24,7 @@
               v-if="showMobileBackButton"
               class="responsive-back-button app-dialog-close"
               type="button"
-              @click="$emit('close')"
+              @click="emit('close')"
             >
               <span aria-hidden="true">‹</span>
               <span class="sr-only">{{ t("common.back") }}</span>
@@ -38,7 +37,7 @@
               v-if="showCloseButton"
               class="responsive-close-button app-dialog-close"
               type="button"
-              @click="$emit('close')"
+              @click="emit('close')"
             >
               ×
             </button>
@@ -84,7 +83,7 @@ const props = defineProps({
   panelClass: {type: [String, Array, Object], default: ""},
 });
 
-defineEmits(["close"]);
+const emit = defineEmits(["close"]);
 
 const isMobileFullscreen = computed(
   () => props.isMobile && props.mobileMode === "fullscreen"

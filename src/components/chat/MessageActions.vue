@@ -110,7 +110,6 @@
         v-if="feedbackDialogOpen"
         class="feedback-dialog-backdrop app-dialog-backdrop"
         role="presentation"
-        @click.self="closeFeedbackDialog"
       >
         <section
           class="feedback-dialog app-dialog-panel"

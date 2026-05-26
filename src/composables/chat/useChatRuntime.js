@@ -14,110 +14,29 @@ import {logWarn} from "@/utils/logger";
 import {
   bootstrapChatRuntime,
   createChatHistory,
-  deleteChatHistory,
-  loadChatHistoryList,
   loadChatMessages,
   loadExamplePrompts,
-  renameChatHistory,
-  updateChatBookmark,
 } from "@/composables/app/chatBootstrap";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
 import {adaptChatHistory} from "@/adapters/chatAdapter";
-import {notifyChatHistorySyncFailed} from "@/utils/chatHistorySyncFeedback";
+import {
+  createLocalHistory,
+  createSessionFromHistory,
+} from "@/composables/chat/runtime/useConversationFactory";
+import {
+  appendUserAndAssistantMessages as appendMessagesToChat,
+  revokeMessageAttachments,
+} from "@/composables/chat/runtime/useMessageAppender";
+import {createChatHistoryRuntime} from "@/composables/chat/runtime/useChatHistoryRuntime";
 
 /**
  * [Chat runtime facade]
  * Pinia store, API bootstrap, assistant/model/history 선택 상태를 ChatContainer controller가 쓰기 쉬운 형태로 묶습니다.
  * business state는 store에 남기고, 여기서는 화면 orchestration에 필요한 action만 조립합니다.
  */
-
-/**
- * [순수 유틸리티 함수] 클라이언트(로컬) 단에서 즉시 채팅을 시작할 때 사용하는 임시 대화방 레코드 객체를 생성합니다.
- * @param {Object} context - 대화방 초기 정보 소스
- * @param {string} context.text - 최초 입력된 프롬프트 내용 (방 제목 힌트)
- * @param {Object} context.assistant - 현재 활성화된 AI 어시스턴트 메타데이터
- * @param {Object} context.model - 현재 선택된 AI 거대모델 메타데이터
- * @returns {Object} 로컬 캐시용 가짜(Temporary) 히스토리 오브젝트
- */
-/**
- * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
- */
-function createLocalHistory({text, assistant, model}) {
-  const id = `chat-local-${Date.now()}`; // 중복 방지를 위한 로컬 타임스탬프 기반 가상 ID
-
-  return {
-    id,
-    temporary: true, // 서버 미등록 로컬 상태임을 나타내는 플래그
-    syncStatus: "local", // 동기화 상태 구분 키
-    title: text || "New chat", // 사이드바 노출용 타이틀
-    preview: text || "New conversation from attachments",
-    modelId: model?.id || "",
-    assistantId: assistant?.id || model?.assistId || "",
-    assistantType: assistant?.type || "",
-    assistantLabel: assistant?.label || "",
-    modelLabel: model?.label || "",
-    isPinned: false, // 북마크 고정 여부 (초기값 false)
-    endedAt: new Date().toISOString(),
-    userId: "",
-    raw: null, // 원본 백엔드 응답 데이터 슬롯
-  };
-}
-
-/**
- * [순수 유틸리티 함수] 특정 대화 이력(History) 데이터와 마스터 메타 맵을 대조 및 파싱하여, 현재 런타임에서 안전하게 통제할 액티브 세션 구조체를 빌드합니다.
- * 특히 과거에 썼던 특정 모델이 관리자에 의해 삭제되었거나 서비스 대상에서 제외(Missing)되었는지 정밀 검사합니다.
- * @param {Object} history - 변환 타깃이 되는 단일 대화방 이력 객체
- * @param {Object} [modelMap={}] - 전체 AI 모델 매핑 정보 데이터 셋
- * @param {Object} [assistantMap={}] - 전체 AI 어시스턴트 매핑 정보 데이터 셋
- * @returns {Object|null} 유효성 판별 검증 데이터가 합산된 런타임 세션 객체
- */
-/**
- * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
- */
-function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
-  if (!history) return null;
-
-  const model = modelMap[history.modelId] || null;
-  const assistant =
-    assistantMap[history.assistantId || model?.assistId] || null;
-
-  // 상태 변질 우려 검증 3단계 디텍팅 플래그 수립
-  const modelMissing = Boolean(history.modelId && !model); // 역사엔 존재하나 마스터 맵엔 없는 경우
-  const assistantMissing = Boolean(
-    (history.assistantId || model?.assistId) && !assistant
-  );
-  const modelDeleted = Boolean(model?.isDeleted); // 마스터 맵엔 존재하나 삭제 마킹 처리된 경우
-
-  // 최종 사용 불가 사유 텍스트 코드를 수립합니다.
-  const unavailableReason = modelDeleted
-    ? "deleted"
-    : modelMissing
-      ? "missing-model"
-      : assistantMissing
-        ? "missing-assistant"
-        : "";
-
-  return {
-    chatId: history.id,
-    assistantId: assistant?.id || history.assistantId || model?.assistId || "",
-    assistantType: assistant?.type || history.assistantType || "",
-    assistantLabel: assistant?.label || history.assistantLabel || "",
-    modelId: model?.id || history.modelId || "",
-    modelName: model?.label || history.modelLabel || "",
-    modelType: model?.type || "",
-    isModelDeleted: modelDeleted,
-    isModelMissing: modelMissing,
-    isAssistantMissing: assistantMissing,
-    isModelUnavailable: Boolean(unavailableReason), // 사용 불가 상황 판단 최종 불리언
-    modelUnavailableReason: unavailableReason,
-    displayAssistantId: "",
-    displayAssistantLabel: "",
-    readonlyModel: true, // 대화 도중 모델 변조 차단용 플래그
-  };
-}
 
 /**
  * 애플리케이션의 핵심 대화 파이프라인 가동, 무중단 히스토리 동기화 및 렌더링 세션 활성화를 주도하는 전역 런타임 컴포저블입니다.
@@ -137,6 +56,13 @@ export function useChatRuntime() {
   const {assistants, selectedAssistantId, selectedModelId, examplePromptMap} =
     storeToRefs(assistantStore);
   const {histories} = storeToRefs(chatStore);
+  const {
+    refreshHistories,
+    syncHistoriesInBackground,
+    toggleHistoryBookmark,
+    renameHistory,
+    removeHistory,
+  } = createChatHistoryRuntime({assistantStore, chatStore});
 
   /** [Computed] 현재 선택된 메인 어시스턴트 객체를 반환하며, 유실 시 0번째 기본 어시스턴트 객체로 자동 폴백합니다. */
   const currentAssistant = computed(
@@ -218,101 +144,6 @@ export function useChatRuntime() {
       appRuntimeStore.finishLoading(); // 전역 스플래시 종료 처리 및 앱 활성화 완료 통보
     } catch (error) {
       appRuntimeStore.fail(error); // 인프라 다운 예외 처리 화면 스위칭 트리거
-      throw error;
-    }
-  }
-
-  /**
-   * [액션 2] 백엔드 최신 상태를 강제 풀링하여 사이드바의 대화 히스토리 목록 배열을 최신 상태로 강제 재인화(Refresh)합니다.
-   * @param {Object} [options={}] - 디테일 에러 피드백 제어 옵션
-   * @param {boolean} options.notifyOnError - 통신 오류 발생 시 화면 우측에 알림 토스트를 띄울지 여부
-   * @returns {Promise<Array>} 최신화 완료된 히스토리 배열 목록
-   */
-  async function refreshHistories({notifyOnError = false} = {}) {
-    try {
-      const chatHistories = await loadChatHistoryList({
-        assistantMap: assistantStore.assistantMap,
-        modelMap: assistantStore.modelMap,
-      });
-      chatStore.setHistories(chatHistories); // Pinia 스토어 전격 동기화 대체
-      return chatHistories;
-    } catch (error) {
-      logWarn("[useChatRuntime] refreshHistories 오류:", error);
-      if (notifyOnError) await notifyChatHistorySyncFailed(error); // 토스트 레이어 연동 피드백 알림
-      return chatStore.histories; // 실패 시 기존 메모리 상의 구버전 데이터를 폴백 유지 반환
-    }
-  }
-
-  /**
-   * [액션 3] 유저가 대화방을 지우거나 이름을 바꾸는 행동 시, UI상의 반응형 화면 처리를 가로막지 않도록 백그라운드 비동기 쓰레드 형태로 무중단 동기화를 집행하는 내부 오케스트레이션 헬퍼입니다.
-   * @param {Object} [options={}] - 동기화 옵션 패키지
-   */
-  function syncHistoriesInBackground(options = {}) {
-    Promise.resolve()
-      .then(() => refreshHistories(options))
-      .catch((error) => {
-        logWarn("[useChatRuntime] syncHistoriesInBackground 오류:", error);
-      });
-  }
-
-  /**
-   * [액션 4] 특정 대화 히스토리 항목의 상단 북마크 고정(Pin/Unpin) 상태를 원격 토글 처리합니다.
-   * 선제적 백그라운드 싱크 예약을 걸어 레이스 컨디션을 미연에 차단합니다.
-   * @param {Object} history - 고정/해제 대상 대화 히스토리 객체
-   */
-  async function toggleHistoryBookmark(history) {
-    if (!history?.id) return;
-    try {
-      syncHistoriesInBackground({notifyOnError: true}); // 사전 비동기 정합성 조율 시도
-      await updateChatBookmark({
-        chatId: history.id,
-        bookmarkYN: !history.isPinned, // 현재 고정 상태의 반대 논리값 투척 (토글)
-      });
-      syncHistoriesInBackground({notifyOnError: true}); // 완결 후 사후 리스트 최신화
-    } catch (error) {
-      logWarn("[useChatRuntime] toggleHistoryBookmark 오류:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * [액션 5] 유저가 수정한 텍스트 명칭을 대화방의 새로운 실제 대외적 방 타이틀 이름으로 변경 및 반영 보존합니다.
-   * @param {Object} history - 이름 변경 타깃 히스토리 객체
-   * @param {string} title - 새롭게 덮어씌울 신규 문자열 명칭
-   */
-  async function renameHistory(history, title) {
-    const chatTitle = String(title || "").trim();
-    if (!history?.id || !chatTitle) return;
-    try {
-      syncHistoriesInBackground({notifyOnError: true});
-      await renameChatHistory({chatId: history.id, chatTitle});
-      syncHistoriesInBackground({notifyOnError: true});
-    } catch (error) {
-      logWarn("[useChatRuntime] renameHistory 오류:", error);
-      throw error;
-    }
-  }
-
-  /**
-   * [액션 6] 사용자가 특정 대화방 삭제 명령을 내렸을 때 시스템 인메모리 맵 및 원격 DB 레포지토리 양측에서 영구 소멸 소거 처리를 감행합니다.
-   * @param {Object} history - 소멸 폐기 처리할 대화 히스토리 대상 객체
-   */
-  async function removeHistory(history) {
-    if (!history?.id) return;
-    try {
-      syncHistoriesInBackground({notifyOnError: true});
-      // 원격 저장소 레코드 영구 삭제 명령 전송
-      await deleteChatHistory({chatId: history.id});
-      // 프론트엔드 로컬 인메모리 메시지 캐시 딕셔너리에서 해당 대화방 고유 키 슬롯을 완벽히 도려냅니다.
-      delete chatStore.messageMap[history.id];
-
-      // 만약 유저가 현재 눈으로 보며 대화 중이던 바로 그 방을 삭제한 상황이라면, 세션 강제 폭파 및 홈 화면 복귀 유도를 유발합니다.
-      if (String(chatStore.selectedChatId) === String(history.id)) {
-        chatStore.clearActiveSession();
-      }
-      syncHistoriesInBackground({notifyOnError: true});
-    } catch (error) {
-      logWarn("[useChatRuntime] removeHistory 오류:", error);
       throw error;
     }
   }
@@ -471,56 +302,8 @@ export function useChatRuntime() {
     return history;
   }
 
-  /**
-   * [가비지 컬렉션 GC 유틸] 파일 첨부 등을 통해 브라우저 메모리 힙(Heap) 상에 생성되어 잔존해 있던 인메모리 임시 프리뷰 이미지 URL 바이너리 블롭 락 오브젝트들을 완전히 영구 해제(`revokeObjectURL`)하여 프론트엔드 메모리 누수(Memory Leak) 장애를 원천 차단 청소합니다.
-   * @param {Array} [items=[]] - 검사 대상이 될 타깃 메시지 말풍선 배열 묶음
-   */
-  function revokeMessageAttachments(items = []) {
-    items.forEach((message) => {
-      if (!Array.isArray(message.attachments)) return;
-      message.attachments.forEach((file) => {
-        // 프리뷰 참조용 브라우저 로컬 blob 가상 주소 패턴 스트링 문자열 구조인지 정밀 매칭 검사합니다.
-        if (file?.url?.startsWith?.("blob:")) {
-          URL.revokeObjectURL(file.url); // 운영체제 가상 메모리 반환 및 힙 메모리 영구 폐기 소거 처리
-        }
-      });
-    });
-  }
-
-  /**
-   * [액션 14] 프롬프트 서브밋 전송 발생 직후, 유저가 방금 기재한 질문 데이터 인스턴스와 AI가 타이핑을 쳐내려갈 스트리밍 대기 빈 인스턴스 2개를 동시에 생성하여 대화 리스트 배열 꼬리에 즉시 융합 결합해 주는 화면 즉각 반영용 고속 인젝터 메서드입니다. (Optimistic UI 렌더링 패턴 핵심부)
-   * @param {string} chatId - 대상 대화방 ID
-   * @param {Object} normalized - {@link usePromptComposer} 단에서 정문화되어 넘어온 유저 프롬프트 본체 메타 패키지
-   * @returns {Object} 스냅샷으로 가공 갱신 처리된 차기 메시지 토탈 배열 및 실시간 업데이트 타깃이 될 어시스턴트 반응성 포인터 레퍼런스
-   */
   function appendUserAndAssistantMessages(chatId, normalized) {
-    const currentMessages = chatStore.messageMap[chatId] || [];
-
-    // 1차 패킹: 사용자 발송 질문 말풍선 인스턴스 구축
-    const userMessage = {
-      id: createId("message"),
-      role: "user",
-      content: normalized.text,
-      attachments: normalized.attachments,
-      createdAt: new Date().toISOString(),
-    };
-
-    // 2차 패킹: AI가 SSE 채널로 조각 텍스트를 채워 넣을 스트리밍 빈 그릇 어시스턴트 인스턴스 구축
-    const assistantMessage = {
-      id: createId("message"),
-      role: "assistant",
-      content: "",
-      reasoningContent: "", // 추론 텍스트 적립용 빈 슬롯
-      reasoningStatus: "thinking", // 초동 포커스는 우선 '생각 중' 상태 레이아웃으로 기동 선언
-      status: "streaming", // 현재 진행형 모드 상태 고정
-      createdAt: new Date().toISOString(),
-    };
-
-    // 기존 불변 메시지 배열 복사본 뒤에 신규 타깃 2쌍을 깔끔하게 이어붙여 차기 최종 가상 상태 배열을 도출합니다.
-    const nextMessages = [...currentMessages, userMessage, assistantMessage];
-    chatStore.setMessages(chatId, nextMessages); // 즉시 뷰 렌더링 트리거 레이아웃 동기화 완료
-
-    return {messages: nextMessages, assistantMessage};
+    return appendMessagesToChat({chatStore, chatId, normalized});
   }
 
   // 최상위 대화 인터페이스 쉘 및 컨테이너 프레임워크 컴포넌트 뷰 영역 전체에서 호출 가동할 수 있도록 총괄 자원을 누수 없이 최종 노출 반환합니다.

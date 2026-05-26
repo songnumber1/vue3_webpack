@@ -147,11 +147,12 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, ref, watch} from "vue";
+import {watch} from "vue";
 import {useI18n} from "vue-i18n";
 
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
+import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
 const {t} = useI18n();
 
@@ -219,92 +220,20 @@ const emit = defineEmits([
   "open-file-picker",
 ]);
 
-const activeToolGroupId = ref("");
-
-const activeToolGroup = computed(() => {
-  return (
-    props.tools.find((tool) => tool.id === activeToolGroupId.value) || null
-  );
+const {
+  activeToolGroup,
+  hasChildren,
+  isSwitchParent,
+  isCheckboxChild,
+  getChildRole,
+  handleToolClick,
+  handleToolSwitchClick,
+  closeActiveToolGroup,
+} = usePromptToolMenuActions({
+  tools: () => props.tools,
+  emit,
 });
 
-const resolvedModelTitle = computed(() => {
-  return props.modelTitle || t("prompt.modelSelect");
-});
-
-const resolvedAttachTitle = computed(() => {
-  return props.attachTitle || t("prompt.attach");
-});
-
-const resolvedToolTitle = computed(() => {
-  return activeToolGroup.value?.label || props.toolTitle;
-});
-
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function hasChildren(tool) {
-  return Array.isArray(tool?.children) && tool.children.length > 0;
-}
-
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function isSwitchParent(tool) {
-  return tool?.parentControlType === "switch";
-}
-
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function isCheckboxChild(tool) {
-  return tool?.controlType === "checkbox";
-}
-
-/**
- * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
- */
-function getChildRole(tool) {
-  return tool?.selectionMode === "single"
-    ? "menuitemradio"
-    : "menuitemcheckbox";
-}
-
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-function handleToolClick(tool) {
-  if (!hasChildren(tool)) {
-    emit("apply-tool", tool);
-    return;
-  }
-
-  activeToolGroupId.value = tool.id;
-}
-
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-function handleToolSwitchClick(tool) {
-  if (!isSwitchParent(tool)) return;
-  const willEnable = !tool.active;
-  emit("apply-tool", tool);
-  activeToolGroupId.value = willEnable ? tool.id : "";
-}
-
-/**
- * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
- */
-function closeActiveToolGroup() {
-  const group = activeToolGroup.value;
-  if (isSwitchParent(group) && group.active && group.activeCount === 0) {
-    emit("apply-tool", group);
-  }
-  activeToolGroupId.value = "";
-}
-
-/**
- * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
- */
 function closeToolSheet() {
   closeActiveToolGroup();
   emit("close-tool");

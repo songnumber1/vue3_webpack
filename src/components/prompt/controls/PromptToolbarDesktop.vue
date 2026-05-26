@@ -131,10 +131,63 @@
       />
     </div>
 
-    <PromptVoiceButton
-      @start-voice="$emit('start-voice')"
-      @stop-voice="$emit('stop-voice')"
-    />
+    <button
+      v-if="showVoiceStartButton"
+      class="voice-button voice-button--start"
+      type="button"
+      :disabled="disabled || !isSpeechSupported"
+      :title="voiceStartLabel"
+      :aria-label="voiceStartLabel"
+      @click="$emit('start-voice')"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <path
+          d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <button
+      v-else-if="showVoiceStopButton"
+      class="voice-button voice-button--stop"
+      type="button"
+      :disabled="disabled"
+      :title="voiceStopLabel"
+      :aria-label="voiceStopLabel"
+      @click="$emit('stop-voice')"
+    >
+      <span aria-hidden="true"></span>
+    </button>
+
+    <button
+      v-else
+      class="send-button"
+      :class="{'send-button--loading': generating}"
+      type="submit"
+      :disabled="disabled || generating || !canSubmit"
+      :title="sendLabel"
+      :aria-label="sendLabel"
+    >
+      <span
+        v-if="generating"
+        class="send-button-spinner"
+        aria-hidden="true"
+      ></span>
+      <span v-else aria-hidden="true">↗</span>
+    </button>
   </div>
 </template>
 
@@ -157,7 +210,7 @@ import {
 } from "@/composables/chat/chatActionContext";
 import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.vue";
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
-import PromptVoiceButton from "@/components/prompt/controls/PromptVoiceButton.vue";
+import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
 const {t} = useI18n();
 
@@ -166,7 +219,6 @@ const toolRoot = ref(null);
 const attachButtonRef = ref(null);
 const toolMenuRef = ref(null);
 const toolPositionReady = ref(false);
-const activeToolGroupId = ref("");
 const submenuPlacement = ref("right");
 
 const toolReferenceRef = computed(() => toolRoot.value || null);
@@ -282,7 +334,13 @@ const {
   toolMenuOpen,
   attachMenuOpen,
   isMobileSheet,
+  canSubmit,
+  generating,
+  isSpeechSupported,
+  voiceStartLabel,
+  voiceStopLabel,
   attachLabel,
+  sendLabel,
   modelSelectLabel,
 } = toRefs(props);
 
@@ -301,45 +359,38 @@ const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );
 
-const activeToolGroup = computed(() => {
-  return (
-    props.tools.find((tool) => tool.id === activeToolGroupId.value) || null
-  );
+const {
+  activeToolGroupId,
+  activeToolGroup,
+  hasChildren,
+  isSwitchParent,
+  isCheckboxChild,
+  getChildRole,
+  handleToolClick,
+  handleToolSwitchClick,
+  closeActiveToolGroup,
+} = usePromptToolMenuActions({
+  tools: () => props.tools,
+  emit,
+  onGroupOpen: async () => {
+    await nextTick();
+    await updateToolFloating?.();
+    resolveSubmenuPlacement();
+  },
 });
 
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function hasChildren(tool) {
-  return Array.isArray(tool?.children) && tool.children.length > 0;
-}
+const showVoiceStartButton = computed(
+  () =>
+    !props.generating &&
+    props.isMicEnabled &&
+    props.isSpeechSupported &&
+    !props.hasPromptText &&
+    !props.isVoiceListening
+);
+const showVoiceStopButton = computed(
+  () => !props.generating && props.isMicEnabled && props.isVoiceListening
+);
 
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function isSwitchParent(tool) {
-  return tool?.parentControlType === "switch";
-}
-
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function isCheckboxChild(tool) {
-  return tool?.controlType === "checkbox";
-}
-
-/**
- * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
- */
-function getChildRole(tool) {
-  return tool?.selectionMode === "single"
-    ? "menuitemradio"
-    : "menuitemcheckbox";
-}
-
-/**
- * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
- */
 function resolveSubmenuPlacement() {
   const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
   if (!menuRect) {
@@ -354,56 +405,6 @@ function resolveSubmenuPlacement() {
   const leftSpace = menuRect.left;
   submenuPlacement.value =
     rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
-}
-
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-async function handleToolClick(tool) {
-  if (!hasChildren(tool)) {
-    emit("apply-tool", tool);
-    return;
-  }
-
-  if (activeToolGroupId.value === tool.id) {
-    closeActiveToolGroup();
-    return;
-  }
-
-  closeActiveToolGroup();
-  activeToolGroupId.value = tool.id;
-
-  await nextTick();
-  await updateToolFloating?.();
-  resolveSubmenuPlacement();
-}
-
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-async function handleToolSwitchClick(tool) {
-  if (!isSwitchParent(tool)) return;
-
-  const willEnable = !tool.active;
-  emit("apply-tool", tool);
-
-  activeToolGroupId.value = willEnable ? tool.id : "";
-  if (!willEnable) return;
-
-  await nextTick();
-  await updateToolFloating?.();
-  resolveSubmenuPlacement();
-}
-
-/**
- * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
- */
-function closeActiveToolGroup() {
-  const group = activeToolGroup.value;
-  if (isSwitchParent(group) && group.active && group.activeCount === 0) {
-    emit("apply-tool", group);
-  }
-  activeToolGroupId.value = "";
 }
 
 watch(
