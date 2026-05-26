@@ -1,7 +1,6 @@
 <template>
   <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
     <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
-      <!-- input에 추가되는 이미지 미리보기 -->
       <PromptAttachmentPreviewList
         :attachments="attachments"
         @preview="previewImage"
@@ -21,11 +20,6 @@
 
       <PromptTextarea
         ref="textareaComponentRef"
-        v-model="text"
-        :disabled="disabled"
-        :generating="generating"
-        :can-submit="canSubmit"
-        :placeholder="placeholder || t('chat.promptPlaceholder')"
         @focus="handleFocus"
         @blur="emit('blur')"
         @input="resize"
@@ -35,30 +29,6 @@
 
       <PromptActionToolbar
         ref="toolbarRef"
-        :disabled="actionDisabled"
-        :generating="generating"
-        :model-readonly="modelReadonly"
-        :model-value="modelValue"
-        :current-model="currentModel"
-        :models="currentModels"
-        :tools="tools"
-        :model-menu-open="modelMenuOpen"
-        :tool-menu-open="toolMenuOpen"
-        :attach-menu-open="attachMenuOpen"
-        :is-mobile-sheet="isMobileSheet"
-        :attach-options="attachOptions"
-        :can-submit="canSubmit"
-        :has-prompt-text="hasPromptText"
-        :is-mic-enabled="isMicEnabled"
-        :is-voice-listening="isVoiceListening"
-        :has-voice-stopped="hasVoiceStopped"
-        :is-speech-supported="isSpeechSupported"
-        :voice-start-label="t('chat.voiceStart')"
-        :voice-stop-label="t('chat.voiceStop')"
-        :attach-label="t('chat.attach')"
-        :send-label="t('chat.send')"
-        :model-select-label="t('chat.modelSelect')"
-        :readonly-title="t('chat.modelReadonly')"
         @open-model="openModelSelector"
         @open-tool="openToolSelector"
         @open-attach="openAttachSelector"
@@ -107,32 +77,49 @@
 <script setup>
 /**
  * @file components/prompt/PromptComposer.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
+import {computed, inject, provide, reactive} from "vue";
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptActionToolbar from "@/components/prompt/controls/PromptActionToolbar.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
 import PromptMobileSheets from "@/components/prompt/controls/PromptMobileSheets.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
 import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePanel.vue";
+import {
+  PROMPT_STATE_KEY,
+  PROMPT_TEXTAREA_STATE_KEY,
+  PROMPT_TOOLBAR_STATE_KEY,
+  createEmptyPromptState,
+} from "@/composables/chat/chatActionContext";
 
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
-const props = defineProps({
-  disabled: {type: Boolean, default: false},
-  generating: {type: Boolean, default: false},
-  floating: {type: Boolean, default: false},
-  showHelp: {type: Boolean, default: true},
-  placeholder: {type: String, default: ""},
-  modelValue: {type: String, default: "gpt-5-thinking"},
-  models: {type: Array, default: () => []},
-  modelReadonly: {type: Boolean, default: false},
+const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
+const props = reactive({
+  get disabled() {
+    return promptState.value.disabled;
+  },
+  get generating() {
+    return promptState.value.generating;
+  },
+  get floating() {
+    return promptState.value.floating;
+  },
+  get showHelp() {
+    return promptState.value.showHelp;
+  },
+  get placeholder() {
+    return promptState.value.placeholder;
+  },
+  get modelValue() {
+    return promptState.value.selectedModel;
+  },
+  get models() {
+    return promptState.value.models;
+  },
+  get modelReadonly() {
+    return promptState.value.modelReadonly;
+  },
 });
 
 const emit = defineEmits([
@@ -192,6 +179,46 @@ const {
   removeAttachment,
   setText,
 } = usePromptComposer(props, emit);
+
+const floating = computed(() => props.floating);
+const showHelp = computed(() => props.showHelp);
+const placeholder = computed(() => props.placeholder);
+const modelValue = computed(() => props.modelValue);
+
+provide(PROMPT_TEXTAREA_STATE_KEY, {
+  text,
+  placeholder: computed(() => placeholder.value || t("chat.promptPlaceholder")),
+  disabled: computed(() => Boolean(props.disabled)),
+  generating: computed(() => Boolean(props.generating)),
+  canSubmit,
+});
+
+provide(PROMPT_TOOLBAR_STATE_KEY, computed(() => ({
+  disabled: actionDisabled.value,
+  modelReadonly: props.modelReadonly,
+  modelValue: props.modelValue,
+  currentModel: currentModel.value,
+  models: currentModels.value,
+  tools: tools.value,
+  attachOptions: attachOptions.value,
+  modelMenuOpen: modelMenuOpen.value,
+  toolMenuOpen: toolMenuOpen.value,
+  attachMenuOpen: attachMenuOpen.value,
+  isMobileSheet: isMobileSheet.value,
+  canSubmit: canSubmit.value,
+  hasPromptText: hasPromptText.value,
+  isMicEnabled: isMicEnabled.value,
+  isVoiceListening: isVoiceListening.value,
+  hasVoiceStopped: hasVoiceStopped.value,
+  generating: props.generating,
+  isSpeechSupported: isSpeechSupported.value,
+  voiceStartLabel: t('chat.voiceStart'),
+  voiceStopLabel: t('chat.voiceStop'),
+  attachLabel: t('chat.attach'),
+  sendLabel: t('chat.send'),
+  modelSelectLabel: t('chat.modelSelect'),
+  readonlyTitle: t('chat.modelReadonly'),
+})));
 
 defineExpose({
   setText,

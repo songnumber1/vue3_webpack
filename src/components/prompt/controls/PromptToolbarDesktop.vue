@@ -132,16 +132,6 @@
     </div>
 
     <PromptVoiceButton
-      :disabled="disabled"
-      :can-submit="canSubmit"
-      :has-prompt-text="hasPromptText"
-      :is-mic-enabled="isMicEnabled"
-      :is-voice-listening="isVoiceListening"
-      :generating="generating"
-      :is-speech-supported="isSpeechSupported"
-      :voice-start-label="voiceStartLabel"
-      :voice-stop-label="voiceStopLabel"
-      :send-label="sendLabel"
       @start-voice="$emit('start-voice')"
       @stop-voice="$emit('stop-voice')"
     />
@@ -158,9 +148,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, ref, watch} from "vue";
+import {computed, inject, nextTick, reactive, ref, toRefs, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
+import {
+  PROMPT_TOOLBAR_STATE_KEY,
+  createEmptyPromptToolbarState,
+} from "@/composables/chat/chatActionContext";
 import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.vue";
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
 import PromptVoiceButton from "@/components/prompt/controls/PromptVoiceButton.vue";
@@ -198,32 +192,99 @@ const toolMenuStyle = computed(() => ({
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
-const props = defineProps({
-  disabled: {type: Boolean, default: false},
-  modelReadonly: {type: Boolean, default: false},
-  modelValue: {type: String, default: ""},
-  currentModel: {type: Object, required: true},
-  models: {type: Array, default: () => []},
-  tools: {type: Array, default: () => []},
-  attachOptions: {type: Array, default: () => []},
-  modelMenuOpen: {type: Boolean, default: false},
-  toolMenuOpen: {type: Boolean, default: false},
-  attachMenuOpen: {type: Boolean, default: false},
-  isMobileSheet: {type: Boolean, default: false},
-  canSubmit: {type: Boolean, default: false},
-  hasPromptText: {type: Boolean, default: false},
-  isMicEnabled: {type: Boolean, default: false},
-  isVoiceListening: {type: Boolean, default: false},
-  hasVoiceStopped: {type: Boolean, default: false},
-  generating: {type: Boolean, default: false},
-  isSpeechSupported: {type: Boolean, default: true},
-  voiceStartLabel: {type: String, default: "Start voice input"},
-  voiceStopLabel: {type: String, default: "Stop voice input"},
-  attachLabel: {type: String, default: "Attach"},
-  sendLabel: {type: String, default: "Send"},
-  modelSelectLabel: {type: String, default: "Select model"},
-  readonlyTitle: {type: String, default: ""},
+const toolbarState = inject(
+  PROMPT_TOOLBAR_STATE_KEY,
+  computed(createEmptyPromptToolbarState)
+);
+const props = reactive({
+  get disabled() {
+    return toolbarState.value.disabled;
+  },
+  get modelReadonly() {
+    return toolbarState.value.modelReadonly;
+  },
+  get modelValue() {
+    return toolbarState.value.modelValue;
+  },
+  get currentModel() {
+    return toolbarState.value.currentModel;
+  },
+  get models() {
+    return toolbarState.value.models;
+  },
+  get tools() {
+    return toolbarState.value.tools;
+  },
+  get attachOptions() {
+    return toolbarState.value.attachOptions;
+  },
+  get modelMenuOpen() {
+    return toolbarState.value.modelMenuOpen;
+  },
+  get toolMenuOpen() {
+    return toolbarState.value.toolMenuOpen;
+  },
+  get attachMenuOpen() {
+    return toolbarState.value.attachMenuOpen;
+  },
+  get isMobileSheet() {
+    return toolbarState.value.isMobileSheet;
+  },
+  get canSubmit() {
+    return toolbarState.value.canSubmit;
+  },
+  get hasPromptText() {
+    return toolbarState.value.hasPromptText;
+  },
+  get isMicEnabled() {
+    return toolbarState.value.isMicEnabled;
+  },
+  get isVoiceListening() {
+    return toolbarState.value.isVoiceListening;
+  },
+  get hasVoiceStopped() {
+    return toolbarState.value.hasVoiceStopped;
+  },
+  get generating() {
+    return toolbarState.value.generating;
+  },
+  get isSpeechSupported() {
+    return toolbarState.value.isSpeechSupported;
+  },
+  get voiceStartLabel() {
+    return toolbarState.value.voiceStartLabel;
+  },
+  get voiceStopLabel() {
+    return toolbarState.value.voiceStopLabel;
+  },
+  get attachLabel() {
+    return toolbarState.value.attachLabel;
+  },
+  get sendLabel() {
+    return toolbarState.value.sendLabel;
+  },
+  get modelSelectLabel() {
+    return toolbarState.value.modelSelectLabel;
+  },
+  get readonlyTitle() {
+    return toolbarState.value.readonlyTitle;
+  },
 });
+const {
+  disabled,
+  modelReadonly,
+  modelValue,
+  currentModel,
+  models,
+  tools,
+  attachOptions,
+  modelMenuOpen,
+  toolMenuOpen,
+  attachMenuOpen,
+  isMobileSheet,
+  attachLabel,
+  modelSelectLabel
+} = toRefs(props);
 
 const emit = defineEmits([
   "open-model",

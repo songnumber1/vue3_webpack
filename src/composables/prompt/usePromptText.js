@@ -30,9 +30,16 @@ export function usePromptText({isMobileSheet, emit}) {
   let lastHeight = 0;
 
   // 컴포넌트 인스턴스 내부에 박혀있는 실제 브라우저 원시 HTML5 엘리먼트(`HTMLTextAreaElement`)의 노출 주소를 계산 추려냅니다.
-  const textareaRef = computed(
-    () => textareaComponentRef.value?.textareaRef || null
-  );
+  const textareaRef = computed(() => {
+    const exposed = textareaComponentRef.value;
+    const candidate =
+      exposed?.textareaRef?.value ||
+      exposed?.textareaRef ||
+      exposed?.$el ||
+      null;
+
+    return candidate && typeof candidate === "object" ? candidate : null;
+  });
 
   // 현재 인풋 란에 단순 공백 문자열을 제외하고 실제 유의미한 유저 전송용 쿼리가 타이핑되어 채워져 있는지 판별하는 플래그
   const hasPromptText = computed(() => text.value.trim().length > 0);

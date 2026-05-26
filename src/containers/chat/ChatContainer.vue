@@ -8,25 +8,7 @@
     @select-history="openHistory"
     @history-menu-action="handleHistoryMenuAction"
   >
-    <ChatWorkspace
-      ref="workspaceRef"
-      :mode="routeMode"
-      :readonly="isReadOnly"
-      :is-mobile="isMobile"
-      :assistant-label="workspaceAssistantLabel"
-      :assistant="currentAssistant"
-      :conversation-title="activeConversationTitle"
-      :theme-name="themeName"
-      :suggestions="suggestions"
-      :selected-model="selectedModel"
-      :models="models"
-      :model-readonly="isModelLocked"
-      :is-active-model-unavailable="isActiveModelUnavailable"
-      :is-generating="isGenerating"
-      :messages="messages"
-      :show-scroll-bottom="showScrollBottom"
-      :auto-scroll-on-answer="autoScrollOnAnswer"
-    />
+    <ChatWorkspace ref="workspaceRef" />
 
     <!-- 이미지 크게 보기 -->
     <ChatImagePreview
@@ -153,6 +135,8 @@ import {useRoute} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {
   CHAT_ACTIONS_KEY,
+  CHAT_WORKSPACE_STATE_KEY,
+  PROMPT_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,
 } from "@/composables/chat/chatActionContext";
 import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
@@ -298,6 +282,36 @@ function handleMobileSettingsDesktopOpen(target) {
     systemOpen.value = true;
   }
 }
+
+
+provide(CHAT_WORKSPACE_STATE_KEY, computed(() => ({
+  mode: routeMode.value,
+  readonly: isReadOnly.value,
+  isMobile: isMobile.value,
+  assistantLabel: workspaceAssistantLabel.value,
+  assistant: currentAssistant.value,
+  conversationTitle: activeConversationTitle.value,
+  themeName: themeName.value,
+  suggestions: suggestions.value,
+  isActiveModelDeleted: false,
+  isActiveModelUnavailable: isActiveModelUnavailable.value,
+  isGenerating: isGenerating.value,
+  messages: messages.value,
+  showScrollBottom: showScrollBottom.value,
+  autoScrollOnAnswer: autoScrollOnAnswer.value,
+})));
+
+provide(PROMPT_STATE_KEY, computed(() => ({
+  isMobile: isMobile.value,
+  floating: false,
+  showHelp: false,
+  selectedModel: selectedModel.value,
+  models: models.value,
+  disabled: false,
+  generating: isGenerating.value,
+  modelReadonly: isModelLocked.value,
+  placeholder: "",
+})));
 
 provide(CHAT_ACTIONS_KEY, {
   openDrawer: openMobileDrawer,

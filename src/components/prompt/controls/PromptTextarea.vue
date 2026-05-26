@@ -2,9 +2,9 @@
   <textarea
     ref="textareaRef"
     class="prompt-textarea"
-    :value="modelValue"
-    :disabled="disabled"
-    :placeholder="placeholder"
+    :value="textareaValue"
+    :disabled="isDisabled"
+    :placeholder="resolvedPlaceholder"
     rows="1"
     @focus="$emit('focus')"
     @blur="$emit('blur')"
@@ -25,20 +25,22 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {nextTick, ref} from "vue";
+import {computed, inject, nextTick, ref} from "vue";
+import {
+  PROMPT_TEXTAREA_STATE_KEY,
+} from "@/composables/chat/chatActionContext";
 
 const textareaRef = ref(null);
+const localText = ref("");
 
-const props = defineProps({
-  modelValue: {type: String, default: ""},
-  disabled: {type: Boolean, default: false},
-  generating: {type: Boolean, default: false},
-  canSubmit: {type: Boolean, default: false},
-  placeholder: {type: String, default: ""},
-});
+const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
+const textareaValue = computed(() => textareaState?.text?.value ?? localText.value);
+const resolvedPlaceholder = computed(() => textareaState?.placeholder?.value || "");
+const isDisabled = computed(() => Boolean(textareaState?.disabled?.value));
+const isGenerating = computed(() => Boolean(textareaState?.generating?.value));
+const canSubmit = computed(() => Boolean(textareaState?.canSubmit?.value));
 
 const emit = defineEmits([
-  "update:modelValue",
   "focus",
   "blur",
   "input",
@@ -49,7 +51,11 @@ const emit = defineEmits([
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleInput(event) {
-  emit("update:modelValue", event.target.value);
+  if (textareaState?.text) {
+    textareaState.text.value = event.target.value;
+  } else {
+    localText.value = event.target.value;
+  }
   emit("input", event);
 }
 
@@ -58,7 +64,7 @@ function handleInput(event) {
  * textarea는 활성 상태로 유지하되 submit 이벤트만 상위로 올리지 않습니다.
  */
 function handleEnterSubmit() {
-  if (props.disabled || props.generating || !props.canSubmit) return;
+  if (isDisabled.value || isGenerating.value || !canSubmit.value) return;
   emit("submit");
 }
 
@@ -74,6 +80,10 @@ defineExpose({textareaRef});
 
 <style scoped>
 .prompt-textarea {
+  display: block;
+  width: 100%;
   min-width: 0;
+  min-height: 38px;
+  flex: 0 0 auto;
 }
 </style>

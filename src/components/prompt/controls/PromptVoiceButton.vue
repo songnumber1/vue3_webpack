@@ -57,32 +57,62 @@
 <script setup>
 /**
  * @file components/prompt/controls/PromptVoiceButton.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 전송/음성 버튼입니다. 버튼 상태는 PROMPT_TOOLBAR_STATE_KEY로 주입받습니다.
  */
 
-import {computed} from "vue";
-
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
-const props = defineProps({
-  disabled: {type: Boolean, default: false},
-  canSubmit: {type: Boolean, default: false},
-  hasPromptText: {type: Boolean, default: false},
-  isMicEnabled: {type: Boolean, default: false},
-  isVoiceListening: {type: Boolean, default: false},
-  generating: {type: Boolean, default: false},
-  isSpeechSupported: {type: Boolean, default: true},
-  voiceStartLabel: {type: String, default: "Start voice input"},
-  voiceStopLabel: {type: String, default: "Stop voice input"},
-  sendLabel: {type: String, default: "Send"},
-});
+import {computed, inject, reactive, toRefs} from "vue";
+import {
+  PROMPT_TOOLBAR_STATE_KEY,
+  createEmptyPromptToolbarState,
+} from "@/composables/chat/chatActionContext";
 
 defineEmits(["start-voice", "stop-voice"]);
+
+const toolbarState = inject(
+  PROMPT_TOOLBAR_STATE_KEY,
+  computed(createEmptyPromptToolbarState)
+);
+const props = reactive({
+  get disabled() {
+    return toolbarState.value.disabled;
+  },
+  get canSubmit() {
+    return toolbarState.value.canSubmit;
+  },
+  get hasPromptText() {
+    return toolbarState.value.hasPromptText;
+  },
+  get isMicEnabled() {
+    return toolbarState.value.isMicEnabled;
+  },
+  get isVoiceListening() {
+    return toolbarState.value.isVoiceListening;
+  },
+  get generating() {
+    return toolbarState.value.generating;
+  },
+  get isSpeechSupported() {
+    return toolbarState.value.isSpeechSupported;
+  },
+  get voiceStartLabel() {
+    return toolbarState.value.voiceStartLabel;
+  },
+  get voiceStopLabel() {
+    return toolbarState.value.voiceStopLabel;
+  },
+  get sendLabel() {
+    return toolbarState.value.sendLabel;
+  },
+});
+const {
+  disabled,
+  canSubmit,
+  generating,
+  isSpeechSupported,
+  voiceStartLabel,
+  voiceStopLabel,
+  sendLabel
+} = toRefs(props);
 
 const showVoiceStartButton = computed(
   () =>
