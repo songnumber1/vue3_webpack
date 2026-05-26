@@ -13,6 +13,7 @@ import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
+import {applyAuthRequestConfig, handleAuthResponseError} from "@/auth/httpAuthInterceptor";
 
 /**
  * @description 현재 애플리케이션의 런타임 환경 변수 및 설정 스토어의 API 모드 점등 유무를 대조하여 Axios 요청에 주입할 최적의 베이스 프록시 엔드포인트 URL 주소를 도출합니다.
@@ -71,7 +72,7 @@ export function createHttpClient() {
   const client = axios.create({
     baseURL: resolveBaseURL(),
     timeout: Number(process.env.VUE_APP_API_TIMEOUT || 15000), // 렌더링 지연 방지를 위해 기본 15초 타임아웃 락인
-    withCredentials: true, // 쿠키 및 세션 정보 교차 오리진 전송 허용 보장
+    withCredentials: true, // 실제 요청 직전 authPolicy(session/jwt)에 따라 동적으로 보정
     headers: {
       "Content-Type": "application/json",
     },
@@ -79,6 +80,7 @@ export function createHttpClient() {
 
   // 2. [Request Interceptor] 네트워크 패킷이 브라우저 밖으로 방출되기 직전에 거치는 전처리 관문 개통
   client.interceptors.request.use((config) => {
+    config = applyAuthRequestConfig(config);
     const apiPolicy = resolveApiPolicy(config.apiKey);
     const apiRequestStore = useApiRequestStore();
 
@@ -125,8 +127,8 @@ export function createHttpClient() {
       apiRequestStore.unregisterController(error.config?.__apiRequestKey);
       if (error.config?.__apiOverlay) apiRequestStore.stopOverlay();
 
-      // 후속 공통 에러 핸들러 및 개별 컴포넌트 try-catch 구문으로 에러 객체를 안전하게 전가 던짐 처리
-      return Promise.reject(error);
+      // JWT 모드에서는 access token 만료(401) 시 refresh 후 원 요청을 1회 재시도합니다.
+      return handleAuthResponseError(error, client);
     }
   );
 

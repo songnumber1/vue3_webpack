@@ -72,6 +72,15 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     // 브라우저가 백그라운드로 소외 이탈(무효 유휴 세션 진입)했을 때 진행 중인 무거운 거대 AI 통신 토큰 세션을 리소스 절약을 위해 즉각 강제 폭파 낙태 취소(Abort)시킬지 여부
     abortChatOnMobileBackground: (state) =>
       state.settings.abortChatOnMobileBackground,
+    webAuthMode: (state) => state.settings.webAuthMode,
+    mobileAuthMode: (state) => state.settings.mobileAuthMode,
+    webLoginUrl: (state) => state.settings.webLoginUrl,
+    mobileLoginUrl: (state) => state.settings.mobileLoginUrl,
+    tempLoginUrl: (state) => state.settings.tempLoginUrl,
+    accessInfoUrl: (state) => state.settings.accessInfoUrl,
+    logoutUrl: (state) => state.settings.logoutUrl,
+    jwtRefreshUrl: (state) => state.settings.jwtRefreshUrl,
+    jwtWithCredentials: (state) => state.settings.jwtWithCredentials,
   },
   actions: {
     /**

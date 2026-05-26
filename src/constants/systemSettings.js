@@ -58,6 +58,12 @@ export const PLATFORM_OVERRIDE_MODES = Object.freeze({
   androidWebView: "android-webview", // 탐색 분기: 강제 안드로이드 인앱 하이브리드 웹뷰 타깃 고정 분기 활성화
 });
 
+export const AUTH_MODE_OPTIONS = Object.freeze(["session", "jwt"]);
+
+function normalizeAuthMode(value, fallback) {
+  return AUTH_MODE_OPTIONS.includes(value) ? value : fallback;
+}
+
 /**
  * 플랫폼 오버라이드 셀렉터 컴포넌트 데이터 하이드레이션 딕셔너리 배열입니다.
  */
@@ -144,6 +150,15 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showMobileApiProgress: "showMobileApiProgress", // 모바일 화면 상단에 미세 API 게이지 바 노출 처리 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
   abortChatOnMobileBackground: "abortChatOnMobileBackground", // 모바일 환경에서 사용자가 홈 화면으로 빠져나가 백그라운드로 전환될 때 통신 파괴 여부
+  webAuthMode: "webAuthMode", // 웹/PC 환경 기본 인증 방식(session/jwt)
+  mobileAuthMode: "mobileAuthMode", // 모바일 브라우저/WebView 환경 기본 인증 방식(session/jwt)
+  webLoginUrl: "webLoginUrl", // 웹/PC 환경 로그인 확인 URL
+  mobileLoginUrl: "mobileLoginUrl", // 모바일 환경 로그인 확인 URL
+  tempLoginUrl: "tempLoginUrl", // 로컬 검증용 임시 로그인 URL
+  accessInfoUrl: "accessInfoUrl", // 인증/권한 확인 URL
+  logoutUrl: "logoutUrl", // 로그아웃 URL
+  jwtRefreshUrl: "jwtRefreshUrl", // JWT access token 재발급 URL
+  jwtWithCredentials: "jwtWithCredentials", // JWT 모드에서도 쿠키 credential을 함께 보낼지 여부
 });
 
 /**
@@ -238,6 +253,42 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
     process.env.VUE_APP_SYSTEM_ABORT_CHAT_ON_MOBILE_BACKGROUND,
     true
   ),
+  [SYSTEM_SETTING_KEYS.webAuthMode]: normalizeAuthMode(
+    readStringEnv(process.env.VUE_APP_SYSTEM_WEB_AUTH_MODE, "session"),
+    "session"
+  ),
+  [SYSTEM_SETTING_KEYS.mobileAuthMode]: normalizeAuthMode(
+    readStringEnv(process.env.VUE_APP_SYSTEM_MOBILE_AUTH_MODE, "jwt"),
+    "jwt"
+  ),
+  [SYSTEM_SETTING_KEYS.webLoginUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_WEB_LOGIN_URL,
+    "/login.do"
+  ),
+  [SYSTEM_SETTING_KEYS.mobileLoginUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_LOGIN_URL,
+    "/login.do"
+  ),
+  [SYSTEM_SETTING_KEYS.tempLoginUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_TEMP_LOGIN_URL,
+    "/temp-login.do"
+  ),
+  [SYSTEM_SETTING_KEYS.accessInfoUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_ACCESS_INFO_URL,
+    "/access/info.do"
+  ),
+  [SYSTEM_SETTING_KEYS.logoutUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_LOGOUT_URL,
+    "/logout.do"
+  ),
+  [SYSTEM_SETTING_KEYS.jwtRefreshUrl]: readStringEnv(
+    process.env.VUE_APP_SYSTEM_JWT_REFRESH_URL,
+    "/auth/refresh.do"
+  ),
+  [SYSTEM_SETTING_KEYS.jwtWithCredentials]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_JWT_WITH_CREDENTIALS,
+    false
+  ),
 });
 
 /**
@@ -293,6 +344,28 @@ export function normalizeSystemSettings(value = {}) {
     // 세부 정규화 3구역: 가상 키보드 뷰포트 충돌 알고리즘 유형 유효 구문 대조
     if (key === SYSTEM_SETTING_KEYS.keyboardMode) {
       next[key] = normalizeKeyboardMode(source[key]);
+      return;
+    }
+
+    if (key === SYSTEM_SETTING_KEYS.webAuthMode) {
+      next[key] = normalizeAuthMode(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
+      return;
+    }
+
+    if (key === SYSTEM_SETTING_KEYS.mobileAuthMode) {
+      next[key] = normalizeAuthMode(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
+      return;
+    }
+
+    if ([
+      SYSTEM_SETTING_KEYS.webLoginUrl,
+      SYSTEM_SETTING_KEYS.mobileLoginUrl,
+      SYSTEM_SETTING_KEYS.tempLoginUrl,
+      SYSTEM_SETTING_KEYS.accessInfoUrl,
+      SYSTEM_SETTING_KEYS.logoutUrl,
+      SYSTEM_SETTING_KEYS.jwtRefreshUrl,
+    ].includes(key)) {
+      next[key] = readStringEnv(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
       return;
     }
 

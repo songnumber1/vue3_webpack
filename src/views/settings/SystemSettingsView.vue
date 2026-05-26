@@ -38,6 +38,13 @@
             :max="item.max || 9999"
             :step="item.step || 1"
           />
+          <input
+            v-else-if="item.type === 'text'"
+            :id="`system-setting-${item.key}`"
+            v-model="draft[item.key]"
+            class="system-settings-text"
+            type="text"
+          />
           <select
             v-else-if="item.type === 'select'"
             :id="`system-setting-${item.key}`"
@@ -104,6 +111,7 @@ import {
   MAX_MOBILE_BREAKPOINT_PX,
   MIN_MOBILE_BREAKPOINT_PX,
   PLATFORM_OVERRIDE_OPTIONS,
+  AUTH_MODE_OPTIONS,
 } from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
@@ -153,6 +161,27 @@ const groups = computed(() => [
         }),
         options: PLATFORM_OVERRIDE_OPTIONS,
       }),
+    ],
+  },
+  {
+    kicker: "AUTH",
+    title: t("systemSettings.groups.auth"),
+    items: [
+      settingItem("webAuthMode", {
+        type: "select",
+        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
+      }),
+      settingItem("mobileAuthMode", {
+        type: "select",
+        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
+      }),
+      settingItem("webLoginUrl", {type: "text"}),
+      settingItem("mobileLoginUrl", {type: "text"}),
+      settingItem("tempLoginUrl", {type: "text"}),
+      settingItem("accessInfoUrl", {type: "text"}),
+      settingItem("logoutUrl", {type: "text"}),
+      settingItem("jwtRefreshUrl", {type: "text"}),
+      settingItem("jwtWithCredentials"),
     ],
   },
   {

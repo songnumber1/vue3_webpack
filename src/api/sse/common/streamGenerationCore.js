@@ -2,7 +2,7 @@ import {applyGenerationStreamData} from "@/api/sse/common/generationStreamParser
 import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
-import {resolveGenerationUrl} from "@/api/sse/common/streamRequest";
+import {resolveGenerationUrl, resolveSseAuthOptions} from "@/api/sse/common/streamRequest";
 
 export async function runSseGenerationStream({
   payload,
@@ -42,6 +42,7 @@ export async function runSseGenerationStream({
   controller?.signal?.addEventListener?.("abort", abortListener, {once: true});
 
   try {
+    const authOptions = await resolveSseAuthOptions();
     await new Promise((resolve, reject) => {
       const finishResolve = () => {
         if (settled) return;
@@ -57,9 +58,10 @@ export async function runSseGenerationStream({
       source = new SSE(resolveGenerationUrl(), {
         start: false,
         method: "POST",
-        withCredentials: true,
+        withCredentials: authOptions.withCredentials,
         autoReconnect: false,
         headers: {
+          ...authOptions.headers,
           "Content-Type": "application/json",
           Accept: "text/event-stream",
           "Cache-Control": "no-cache",

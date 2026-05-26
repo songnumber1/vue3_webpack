@@ -5,6 +5,37 @@ import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 import {logPlatformDebug} from "@/platform/platformDebug";
+import {resolveAuthPolicy} from "@/auth/authPolicy";
+import {getAccessToken} from "@/auth/tokenStore";
+import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+
+
+export async function resolveSseAuthOptions() {
+  const policy = resolveAuthPolicy();
+  const headers = {
+    "X-Client-Platform": policy.platform,
+    "X-Auth-Mode": policy.authMode,
+  };
+
+  if (policy.isJwt) {
+    let token = getAccessToken();
+    if (!token) {
+      try {
+        token = await refreshAccessTokenOnce();
+      } catch (_error) {
+        token = "";
+      }
+    }
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
+
+  return {
+    policy,
+    withCredentials: policy.withCredentials,
+    credentials: policy.withCredentials ? "include" : "same-origin",
+    headers,
+  };
+}
 
 export function resolveGenerationUrl() {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
@@ -22,14 +53,30 @@ function resolveGenerationResultUrl(requestId) {
 export async function fetchGenerationResult(requestId) {
   if (!requestId) return null;
 
-  const response = await fetch(resolveGenerationResultUrl(requestId), {
+  const authOptions = await resolveSseAuthOptions();
+  const buildOptions = (headers) => ({
     method: "GET",
-    credentials: "include",
+    credentials: authOptions.credentials,
     headers: {
+      ...headers,
       Accept: "application/json",
       "Cache-Control": "no-cache",
     },
   });
+
+  let response = await fetch(resolveGenerationResultUrl(requestId), buildOptions(authOptions.headers));
+
+  if (response.status === 401 && authOptions.policy.isJwt) {
+    try {
+      const accessToken = await refreshAccessTokenOnce();
+      response = await fetch(
+        resolveGenerationResultUrl(requestId),
+        buildOptions({...authOptions.headers, Authorization: `Bearer ${accessToken}`})
+      );
+    } catch (_error) {
+      return null;
+    }
+  }
 
   if (!response.ok) return null;
 

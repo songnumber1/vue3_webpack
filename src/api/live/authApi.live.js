@@ -9,26 +9,35 @@
 
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_KEYS} from "@/constants/apiConfig";
+import {resolveAuthPolicy} from "@/auth/authPolicy";
+import {setTokens, clearTokens} from "@/auth/tokenStore";
 
 export const authApiLive = {
   async checkLogin() {
-    const response = await httpClient.get("/login.do", {
+    const response = await httpClient.get(resolveAuthPolicy().loginUrl, {
       apiKey: API_KEYS.LOGIN,
     });
     return unwrapResponseData(response, {});
   },
 
   async tempLogin(payload = {}) {
-    const response = await httpClient.post("/temp-login.do", payload, {
+    const response = await httpClient.post(resolveAuthPolicy().tempLoginUrl, payload, {
       apiKey: API_KEYS.LOGIN,
     });
-    return unwrapResponseData(response, {});
+    const data = unwrapResponseData(response, {});
+    setTokens({
+      accessToken: data.accessToken || data.access_token,
+      refreshToken: data.refreshToken || data.refresh_token,
+    });
+    return data;
   },
 
   async logout() {
-    const response = await httpClient.post("/logout.do", undefined, {
+    const response = await httpClient.post(resolveAuthPolicy().logoutUrl, undefined, {
       apiKey: API_KEYS.LOGIN,
     });
-    return unwrapResponseData(response, {});
+    const data = unwrapResponseData(response, {});
+    clearTokens();
+    return data;
   },
 };

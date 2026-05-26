@@ -16,6 +16,7 @@ import {
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
 import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
+import {resolveAuthPolicy} from "@/auth/authPolicy";
 
 /**
  * 라우터 진입 타깃 목적지(to) 정보를 바탕으로 백엔드 보안 엔진에 전달할 파라미터 페이로드를 생성합니다.
@@ -70,7 +71,7 @@ async function requestAccessInfo(authAxios, payload) {
   }
 
   // 준비된 인증용 Axios 인스턴스를 통해 백엔드 엔드포인트로 POST 비동기 요청을 전달합니다.
-  const response = await authAxios.post(API_ENDPOINTS.ACCESS_INFO, payload);
+  const response = await authAxios.post(resolveAuthPolicy().accessInfoUrl || API_ENDPOINTS.ACCESS_INFO, payload);
 
   return response?.data || {};
 }
