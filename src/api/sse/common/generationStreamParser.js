@@ -1,4 +1,4 @@
-export const SSE_DONE_TOKEN = "[DONE]";
+const SSE_DONE_TOKEN = "[DONE]";
 
 function createGenerationStreamError() {
   const error = new Error("generation stream returned Error");

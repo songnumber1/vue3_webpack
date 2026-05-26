@@ -1,15 +1,4 @@
-import {createAbortError} from "@/api/sse/common/sseErrors";
-
-function abortController(controller, reason) {
-  if (!controller || controller.signal.aborted) return;
-
-  const abortReason = createAbortError(reason);
-  try {
-    controller.abort(abortReason);
-  } catch (_error) {
-    controller.abort();
-  }
-}
+import {abortGenerationController} from "@/api/sse/common/sseErrors";
 
 export function createDesktopSseLifecycle() {
   return {
@@ -17,7 +6,7 @@ export function createDesktopSseLifecycle() {
       if (typeof window === "undefined") return () => {};
 
       const handlePageEnd = () => {
-        abortController(controller, "page lifecycle ended");
+        abortGenerationController(controller, "page lifecycle ended");
       };
 
       window.addEventListener("pagehide", handlePageEnd, {capture: true});

@@ -12,13 +12,12 @@ export function resolveGenerationUrl() {
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION}`;
 }
 
-export function resolveGenerationResultUrl(requestId) {
+function resolveGenerationResultUrl(requestId) {
   const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
 
   const query = encodeURIComponent(requestId || "");
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION_RESULT}?requestId=${query}`;
 }
-
 
 export async function fetchGenerationResult(requestId) {
   if (!requestId) return null;
@@ -37,7 +36,7 @@ export async function fetchGenerationResult(requestId) {
   return response.json();
 }
 
-export function shouldUseOverlay(policy) {
+function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
 
   const mobileLikeViewport = isMobileLikeViewport(settings.mobileBreakpoint);

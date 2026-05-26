@@ -1,5 +1,5 @@
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {createAbortError} from "@/api/sse/common/sseErrors";
+import {abortGenerationController} from "@/api/sse/common/sseErrors";
 import {i18n} from "@/i18n";
 
 const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_KEY =
@@ -7,17 +7,6 @@ const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_KEY =
 
 function isDocumentHidden() {
   return typeof document !== "undefined" && document.hidden;
-}
-
-function abortController(controller, reason) {
-  if (!controller || controller.signal.aborted) return;
-
-  const abortReason = createAbortError(reason);
-  try {
-    controller.abort(abortReason);
-  } catch (_error) {
-    controller.abort();
-  }
 }
 
 export function createChromeSseLifecycle() {
@@ -79,7 +68,7 @@ export function createChromeSseLifecycle() {
       const abortForBackground = (reason) => {
         if (!abortOnBackground) return;
         scheduleResumeAlert();
-        abortController(controller, reason);
+        abortGenerationController(controller, reason);
       };
 
       const handleVisibilityChange = () => {

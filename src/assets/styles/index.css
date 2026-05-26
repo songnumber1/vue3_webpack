@@ -19,7 +19,6 @@
 @import "./components/attachment/attachment-preview-tokens.css";
 
 @import "./states/reasoning/reasoning.css";
-@import "./platform/mobile-runtime/mobile-layout/mobile-composer-targeted-patches.css";
 
 @import "./states/error/exception.css";
 @import "./components/assistant/assistant-icon-binding.css";

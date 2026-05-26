@@ -19,3 +19,15 @@ export function createAbortError(reason) {
   error.name = "AbortError";
   return error;
 }
+
+
+export function abortGenerationController(controller, reason) {
+  if (!controller || controller.signal.aborted) return;
+
+  const abortReason = createAbortError(reason);
+  try {
+    controller.abort(abortReason);
+  } catch (_error) {
+    controller.abort();
+  }
+}

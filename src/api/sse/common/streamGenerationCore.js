@@ -23,8 +23,6 @@ export async function runSseGenerationStream({
 
   const cleanupLifecycle = lifecycle?.install?.({
     controller,
-    getSource: () => source,
-    getAccumulated: () => accumulated,
     flush: () =>
       Promise.all([
         committer.flush(accumulated),
@@ -128,9 +126,6 @@ export async function runSseGenerationStream({
         }
       });
 
-      source.addEventListener("load", () => {
-        if (!completed) finishResolve();
-      });
 
       source.stream();
     });

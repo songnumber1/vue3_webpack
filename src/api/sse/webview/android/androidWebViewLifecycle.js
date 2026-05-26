@@ -1,5 +1,3 @@
-function isDocumentHidden() {}
-
 export function createAndroidWebViewSseLifecycle() {
   let paused = false;
 
@@ -36,7 +34,7 @@ export function createAndroidWebViewSseLifecycle() {
     },
 
     onAccumulated({accumulated, committer}) {
-      if (paused || isDocumentHidden()) backlogPending = true;
+      if (paused) backlogPending = true;
 
       committer.update(accumulated);
     },
