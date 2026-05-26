@@ -8,6 +8,7 @@
  */
 
 import {isNativeApp} from "@/core/config";
+import {applyAuthRequestConfig, handleAuthResponseError} from "@/auth/httpAuthInterceptor";
 
 /**
  * @description 일반 웹(Web) 브라우저 환경에서 작동하는 Axios 요청 인터셉터입니다. 로컬 스토리지에서 인증 토큰을 꺼내 헤더에 주입합니다.
@@ -18,17 +19,7 @@ import {isNativeApp} from "@/core/config";
  * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyWebRequestInterceptor(instance) {
-  instance.interceptors.request.use((config) => {
-    // 브라우저 샌드박스 표준 저장소인 localStorage에서 인증 토큰 로드
-    const token = localStorage.getItem("access_token");
-
-    // 토큰이 존재할 경우 HTTP Authorization 표준 Bearer 규격 헤더 자동 주입
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
-    return config;
-  });
+  instance.interceptors.request.use((config) => applyAuthRequestConfig(config));
 }
 
 /**
@@ -43,13 +34,7 @@ function applyWebRequestInterceptor(instance) {
  */
 function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   instance.interceptors.request.use((config) => {
-    // 1순위로 네이티브 쉘 메모리에 실시간 동기화된 getToken() 메서드를 노크하고, 부재 시 부트스트랩 인입 정보(appInfo.token)로 대체
-    const token = bridge?.getToken?.() || appInfo?.token;
-
-    // 추출된 네이티브 토큰이 존재할 경우 Bearer 규격 헤더 주입
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    config = applyAuthRequestConfig(config);
 
     // [원격 서버 분석 및 로그 수집용] 현재 구동 중인 앱의 네이티브 메타 데이터를 커스텀 X-헤더 파싱 영역에 영구 동기화
     config.headers["X-App-Version"] = appInfo?.appVersion || ""; // 앱 릴리스 버전 (예: 1.2.0)
@@ -88,8 +73,8 @@ function applyResponseInterceptor(instance, errorUI) {
         errorUI?.notify?.("서버 오류가 발생했습니다.");
       }
 
-      // 비즈니스 컴포넌트 내부 try-catch 혹은 .catch 구문이 에러를 인지할 수 있도록 에러 객체를 Promise.reject로 최종 낙태 분기 처리
-      return Promise.reject(error);
+      // JWT 모드에서는 access token 만료 시 refresh 후 원 요청을 1회 재시도합니다.
+      return handleAuthResponseError(error, instance);
     }
   );
 }

@@ -8,10 +8,10 @@
  */
 
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
-import {API_ENDPOINTS} from "@/constants/apiEndpoints";
+import {resolveAuthPolicy} from "@/auth/authPolicy";
 
 export async function getAccessInfo(payload = {}) {
-  const response = await httpClient.post(API_ENDPOINTS.ACCESS_INFO, payload);
+  const response = await httpClient.post(resolveAuthPolicy().accessInfoUrl, payload);
 
   return unwrapResponseData(response, {});
 }

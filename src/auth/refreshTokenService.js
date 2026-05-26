@@ -51,7 +51,9 @@ export async function refreshAccessTokenOnce() {
     clearTokens();
     try {
       useAuthStore().resetAuth();
-    } catch (_storeError) {}
+    } catch (_storeError) {
+      // 인증 스토어가 아직 초기화되지 않은 부트스트랩 구간에서는 토큰만 정리합니다.
+    }
     throw error;
   } finally {
     refreshPromise = null;

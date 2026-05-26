@@ -3,6 +3,12 @@ import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
 import {resolveGenerationUrl, resolveSseAuthOptions} from "@/api/sse/common/streamRequest";
+import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+
+function isUnauthorizedStreamError(error) {
+  const status = Number(error?.status || error?.responseCode || error?.code || 0);
+  return status === 401;
+}
 
 export async function runSseGenerationStream({
   payload,
@@ -41,8 +47,10 @@ export async function runSseGenerationStream({
   const abortListener = () => closeSource();
   controller?.signal?.addEventListener?.("abort", abortListener, {once: true});
 
-  try {
-    const authOptions = await resolveSseAuthOptions();
+  const executeStream = async (authOptions) => {
+    completed = false;
+    settled = false;
+
     await new Promise((resolve, reject) => {
       const finishResolve = () => {
         if (settled) return;
@@ -128,9 +136,35 @@ export async function runSseGenerationStream({
         }
       });
 
-
       source.stream();
     });
+  };
+
+  try {
+    let authOptions = await resolveSseAuthOptions();
+
+    try {
+      await executeStream(authOptions);
+    } catch (error) {
+      if (
+        authOptions.policy.isJwt &&
+        isUnauthorizedStreamError(error) &&
+        !controller?.signal?.aborted
+      ) {
+        const accessToken = await refreshAccessTokenOnce();
+        authOptions = {
+          ...authOptions,
+          headers: {
+            ...authOptions.headers,
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+        closeSource();
+        await executeStream(authOptions);
+      } else {
+        throw error;
+      }
+    }
 
     await reasonCommitter.flush(reasonAccumulated);
     await committer.flush(accumulated);

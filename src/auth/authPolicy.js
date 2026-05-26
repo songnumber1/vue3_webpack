@@ -52,5 +52,15 @@ export function isAuthRefreshUrl(url = "") {
 
 export function isAuthPublicUrl(url = "") {
   const value = String(url || "");
-  return ["/temp-login.do", "/logout.do", "/auth/refresh.do"].some((path) => value.includes(path));
+  const policy = resolveAuthPolicy();
+  return [
+    policy.loginUrl,
+    policy.tempLoginUrl,
+    policy.logoutUrl,
+    policy.refreshUrl,
+    "/login.do",
+    "/temp-login.do",
+    "/logout.do",
+    "/auth/refresh.do",
+  ].filter(Boolean).some((path) => value.includes(path));
 }
