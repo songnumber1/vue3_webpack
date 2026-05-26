@@ -41,6 +41,7 @@
           </svg>
         </button>
         <button
+          v-if="showRegenerate"
           type="button"
           class="message-action-text-button"
           @click="$emit('regenerate')"
@@ -173,6 +174,7 @@ defineEmits(["regenerate"]);
 const props = defineProps({
   role: {type: String, required: true},
   content: {type: String, default: ""},
+  showRegenerate: {type: Boolean, default: true},
 });
 const {t, locale} = useI18n();
 const feedback = ref("");

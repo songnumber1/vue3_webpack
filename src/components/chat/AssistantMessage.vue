@@ -44,6 +44,7 @@
         v-if="showMessageActions"
         role="assistant"
         :content="message.content"
+        :show-regenerate="showRegenerate"
         @regenerate="emit('regenerate', message)"
       />
     </div>
@@ -72,6 +73,7 @@ import MessageActions from "./MessageActions.vue";
  */
 const props = defineProps({
   message: {type: Object, required: true},
+  showRegenerate: {type: Boolean, default: true},
 });
 const {locale, t} = useI18n();
 const emit = defineEmits(["rendered", "regenerate"]);

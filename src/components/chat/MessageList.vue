@@ -12,6 +12,7 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
+      :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
       @rendered="handleMessageRendered"
@@ -41,6 +42,21 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["content-rendered", "regenerate"]);
+
+function isLastAssistantMessage(message) {
+  if (!message || message.role !== "assistant") {
+    return false;
+  }
+
+  for (let index = props.messages.length - 1; index >= 0; index -= 1) {
+    const candidate = props.messages[index];
+    if (candidate?.role === "assistant") {
+      return candidate === message || candidate?.id === message.id;
+    }
+  }
+
+  return false;
+}
 
 const {
   scrollRef,

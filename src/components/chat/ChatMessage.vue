@@ -11,6 +11,7 @@
     :data-message-id="messageDomId"
     :data-message-role="messageDomRole"
     :message="message"
+    :show-regenerate="showRegenerate"
     @rendered="$emit('rendered')"
     @regenerate="$emit('regenerate', $event)"
   />
@@ -33,6 +34,7 @@ defineProps({
   message: {type: Object, required: true},
   messageDomId: {type: String, default: ""},
   messageDomRole: {type: String, default: ""},
+  showRegenerate: {type: Boolean, default: true},
 });
 defineEmits(["rendered", "regenerate"]);
 </script>
