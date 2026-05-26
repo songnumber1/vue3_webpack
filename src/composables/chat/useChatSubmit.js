@@ -9,7 +9,7 @@
 
 import {nextTick, ref} from "vue";
 import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
-import {fetchGenerationResult} from "@/api/sse/generationResultApi";
+import {fetchGenerationResult} from "@/api/sse/common/streamRequest";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";

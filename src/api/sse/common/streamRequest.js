@@ -19,6 +19,24 @@ export function resolveGenerationResultUrl(requestId) {
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION_RESULT}?requestId=${query}`;
 }
 
+
+export async function fetchGenerationResult(requestId) {
+  if (!requestId) return null;
+
+  const response = await fetch(resolveGenerationResultUrl(requestId), {
+    method: "GET",
+    credentials: "include",
+    headers: {
+      Accept: "application/json",
+      "Cache-Control": "no-cache",
+    },
+  });
+
+  if (!response.ok) return null;
+
+  return response.json();
+}
+
 export function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
 
