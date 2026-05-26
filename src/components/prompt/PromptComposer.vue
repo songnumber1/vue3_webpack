@@ -10,6 +10,7 @@
 
       <PromptTemplatePanel
         :visible="hasSelectedTemplatePanel"
+        :is-mobile-sheet="isMobileSheet"
         :groups="selectedTemplateGroups"
         :active-mobile-group="activeMobileGroup"
         :is-option-active="isTemplateOptionActive"

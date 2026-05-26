@@ -2,6 +2,7 @@
   <section
     v-if="visible"
     class="prompt-template-panel"
+    :class="{'prompt-template-panel--mobile': isMobileSheet}"
     aria-label="Prompt template options"
   >
     <div class="prompt-template-desktop-options">
@@ -83,6 +84,7 @@ import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vu
 
 defineProps({
   visible: {type: Boolean, default: false},
+  isMobileSheet: {type: Boolean, default: false},
   groups: {type: Array, default: () => []},
   activeMobileGroup: {type: Object, default: null},
   isOptionActive: {type: Function, required: true},
@@ -173,6 +175,14 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
 
 .prompt-template-mobile-options {
   display: none;
+}
+
+.prompt-template-panel--mobile .prompt-template-desktop-options {
+  display: none;
+}
+
+.prompt-template-panel--mobile .prompt-template-mobile-options {
+  display: flex;
 }
 
 .prompt-template-sheet-option {

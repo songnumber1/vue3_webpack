@@ -19,7 +19,7 @@ import {PROMPT_TEXTAREA_HEIGHT} from "@/constants/promptComposer";
  * @param {Function} context.emit - 높이 변동, 포커스 등 실시간 DOM 이벤트를 부모 입력 컴포넌트 밖으로 송출하기 위한 에미터
  * @returns {Object} 템플릿 마크업 텍스트박스 인풋 폼에 바인딩할 반응형 변수, 엘리먼트 Refs 및 이벤트 가드 핸들러 팩
  */
-export function usePromptText({isMobileSheet, emit}) {
+export function usePromptText({emit}) {
   // 사용자가 타이핑 중인 인풋 텍스트 본문 문자열을 저장하는 메인 데이터 모델 (v-model="text")
   const text = ref("");
 

@@ -59,18 +59,32 @@ export function usePromptMenu() {
   const attachMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.attach); // 클립 파일 첨부 서랍
 
   // 현재 브라우저의 너비 사양이 시스템 모바일 중단점(Breakpoint) 이하로 압축되었는지 감지하는 플래그
-  const isPromptCompactViewport = computed(
-    () => width.value <= systemSettingsStore.mobileBreakpoint
-  );
-  const isForcedMobilePlatform = computed(() =>
-    Boolean(
-      platformStore.info?.isMobileBrowser ||
-        platformStore.info?.isAndroidApp ||
-        platformStore.info?.isPlatformForced ||
+  const isPromptCompactViewport = computed(() => {
+    const breakpoint = Number(systemSettingsStore.mobileBreakpoint);
+    const currentWidth = Number(width.value);
+    return (
+      Number.isFinite(currentWidth) &&
+      currentWidth > 0 &&
+      Number.isFinite(breakpoint) &&
+      currentWidth <= breakpoint
+    );
+  });
+  const isForcedMobilePlatform = computed(() => {
+    const info = platformStore.info || {};
+    const override = systemSettingsStore.platformOverride;
+    return Boolean(
+      info.isMobileBrowser ||
+        info.isAndroidApp ||
+        info.isNativeApp ||
+        info.isNativeRuntime ||
+        info.isForced ||
+        info.isPlatformForced ||
+        override === "android-chrome" ||
+        override === "android-webview" ||
         (typeof document !== "undefined" &&
           document.body?.classList?.contains("mobile-mode"))
-    )
-  );
+    );
+  });
   // 모바일 뷰포트 사양 가이드와 가상 키보드 충돌 요소를 계산하여 최종 '모바일 바텀시트' 형태로 서랍을 분출할지 판별하는 플래그
   const isMobileSheet = ref(false);
 
