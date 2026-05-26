@@ -12,6 +12,7 @@ import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
 import {fetchGenerationResult} from "@/api/sse/generationResultApi";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 import {createId} from "@/utils/id";
 
 /**
@@ -19,7 +20,7 @@ import {createId} from "@/utils/id";
  * 1. PromptComposer에서 넘어온 payload를 normalizePromptPayload()로 정규화합니다.
  * 2. 메인 화면이면 createRemoteConversation()으로 대화방을 만들고 실패 시 local fallback을 사용합니다.
  * 3. appendUserAndAssistantMessages()로 사용자 질문과 빈 assistant placeholder를 먼저 화면/store에 추가합니다.
- * 4. streamGeneration()이 fetch ReadableStream 기반 SSE를 시작합니다.
+ * 4. streamGeneration()이 회사 sse.js 기반 XHR POST SSE를 시작합니다.
  * 5. onChunk()마다 누적 답변 content를 assistant 메시지에 commit하고 Vue ref + Pinia store를 함께 갱신합니다.
  * 6. [DONE] 또는 complete 시 status를 complete로 바꾸고 Mermaid 등 최종 렌더 후처리를 실행합니다.
  *
@@ -52,10 +53,11 @@ function normalizePromptPayload(payload) {
  * [순수 유틸리티] 네트워크 추적성 확보 및 중복 패킷 전송 결함 방지를 위한 프론트엔드 자체 고유 발급 ID 메타데이터를 주입합니다.
  */
 function createRequestPayload(base = {}) {
-  const requestId = createId("request");
+  const msgId = createId("message");
+  const respMsgId = createId("message");
   return {
-    request_id: requestId,
-    requestId,
+    msgId,
+    respMsgId,
     ...base,
   };
 }
@@ -293,13 +295,53 @@ async function scrollAfterUserSubmit(options, normalized = {}) {
 /**
  * 백엔드 통신용 규격에 맞는 직렬화 완료된 대화 생성 페이로드 팩을 빌드합니다.
  */
+function resolvePromptToolSettings() {
+  const chatStore = useChatStore();
+  return chatStore.activePromptToolSettings || {};
+}
+
+function resolveStyleOptions(settings = {}) {
+  const values = [];
+
+  if (settings.promptTemplateId) values.push(settings.promptTemplateId);
+
+  Object.values(settings.promptTemplateOptions || {}).forEach((value) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item) values.push(String(item));
+      });
+      return;
+    }
+
+    if (value) values.push(String(value));
+  });
+
+  return values;
+}
+
 function createGenerationPayload(options, normalized, chatId) {
+  const settings = resolvePromptToolSettings();
+  const knowledgeSearch = Array.isArray(settings.knowledgeSearch)
+    ? settings.knowledgeSearch.filter(Boolean)
+    : [];
+
   return createRequestPayload({
-    assistantId: options.selectedAssistantId?.value || "",
-    modelId: options.selectedModel?.value || "",
-    isReasoning: isSelectedModelReasoning(options),
-    input: normalized.text,
     chatId,
+    assistId: options.selectedAssistantId?.value || "",
+    modelId: options.selectedModel?.value || "",
+    studio: false,
+    intention: "직접입력",
+    rag: true,
+    ragCot: false,
+    imageS3Path: null,
+    sourceType: "internal",
+    arrayOptions: knowledgeSearch,
+    messageFileHist: null,
+    style: resolveStyleOptions(settings),
+    body: normalized.text,
+    byteSize: 10000,
+    lastFederationInfo: null,
+    uiStateInfoWrapper: null,
   });
 }
 

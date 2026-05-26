@@ -37,9 +37,13 @@ const platformStore = usePlatformStore();
 const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
 const visible = computed(() => {
+  const info = platformStore.info || {};
+  const isActualMobilePlatform = info.isPlatformForced
+    ? info.actualEnv === "android" && info.actualRuntime !== "native"
+    : info.isMobile;
   const isMobile =
     isMobileLikeViewport(systemSettingsStore.mobileBreakpoint) ||
-    platformStore.info?.isMobile;
+    isActualMobilePlatform;
   return Boolean(
     isMobile &&
     systemSettingsStore.showMobileApiProgress &&

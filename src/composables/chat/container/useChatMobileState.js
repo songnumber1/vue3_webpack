@@ -6,15 +6,21 @@ import {computed} from "vue";
  * @returns {boolean} 모바일 플랫폼 레이아웃 강제 활성화 대상 여부
  */
 function shouldUseMobilePlatformLayout(platformInfo = {}) {
+  if (platformInfo.isPlatformForced) {
+    return Boolean(
+      platformInfo.isAndroidApp ||
+        platformInfo.isNativeApp ||
+        platformInfo.isNativeRuntime ||
+        (platformInfo.actualEnv === "android" &&
+          platformInfo.actualRuntime !== "native")
+    );
+  }
+
   return Boolean(
     platformInfo.isMobileBrowser ||
       platformInfo.isAndroidApp ||
       platformInfo.isNativeApp ||
-      platformInfo.isNativeRuntime ||
-      platformInfo.isForced ||
-      platformInfo.isPlatformForced ||
-      platformInfo.platformOverride === "android-chrome" ||
-      platformInfo.platformOverride === "android-webview"
+      platformInfo.isNativeRuntime
   );
 }
 

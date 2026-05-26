@@ -8,7 +8,6 @@
  */
 
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
-import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 import {logPlatformDebug} from "@/platform/platformDebug";
 
 const VIEWPORT_MODE_CLASSES = Object.freeze({
@@ -34,18 +33,9 @@ function getViewportModeWidth() {
   return candidates.length ? Math.min(...candidates) : 0;
 }
 
-function shouldForceMobileMode(settings = getRuntimeSystemSettings()) {
-  return [
-    PLATFORM_OVERRIDE_MODES.androidChrome,
-    PLATFORM_OVERRIDE_MODES.androidWebView,
-  ].includes(settings.platformOverride);
-}
-
 export function isMobileLikeViewport(
   breakpoint = getRuntimeSystemSettings().mobileBreakpoint
 ) {
-  const settings = getRuntimeSystemSettings();
-  if (shouldForceMobileMode(settings)) return true;
   const width = getViewportModeWidth();
   return width > 0 && width <= breakpoint;
 }
@@ -60,9 +50,8 @@ export function syncViewportModeClass(
   breakpoint = getRuntimeSystemSettings().mobileBreakpoint
 ) {
   if (typeof document === "undefined") return false;
-  const settings = getRuntimeSystemSettings();
   const width = getViewportModeWidth();
-  const isMobile = shouldForceMobileMode(settings) || (width > 0 && width <= breakpoint);
+  const isMobile = width > 0 && width <= breakpoint;
   const {body} = document;
 
   if (!body) return isMobile;

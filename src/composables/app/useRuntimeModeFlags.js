@@ -81,15 +81,19 @@ export function useRuntimeModeFlags() {
 
   /**
    * 네이티브 앱이 아닌, 모바일 기기의 순수 모바일 웹 브라우저(Safari, Chrome Mobile 등) 환경인지 판별합니다.
+   * 플랫폼 강제 설정은 런타임 테스트용으로만 사용하고, 레이아웃 전환은 실제 뷰포트/실제 모바일 런타임 기준을 따릅니다.
    * @type {import("vue").ComputedRef<boolean>}
    * @see {@link isAndroidChromeUserAgent} 순정 안드로이드 크롬 판단 로직 연동
    */
-  const isMobileBrowser = computed(() =>
-    Boolean(platformInfo.value.isMobileBrowser)
-  );
+  const isMobileBrowser = computed(() => {
+    const info = platformInfo.value;
+    if (!info.isPlatformForced) return Boolean(info.isMobileBrowser);
+    return Boolean(info.actualEnv === "android" && info.actualRuntime !== "native");
+  });
 
   /**
-   * 해상도 조건(Compact), 안드로이드 앱 여부, 모바일 브라우저 여부 중 하나라도 일치하여 최종적으로 모바일 전용 레이아웃을 송출해야 하는지 통합 판별합니다.
+   * 해상도 조건(Compact), 안드로이드 앱 여부, 실제 모바일 브라우저 여부 중 하나라도 일치하여 최종적으로 모바일 전용 레이아웃을 송출해야 하는지 통합 판별합니다.
+   * PC 브라우저에서 Android Chrome/WebView로 강제 플랫폼을 바꾸더라도 모바일 전환 기준 너비를 우회하지 않습니다.
    * @type {import("vue").ComputedRef<boolean>}
    */
   const shouldUseMobileLayout = computed(() =>

@@ -52,19 +52,60 @@ export function parseSseBuffer(buffer) {
  * @returns {{done: boolean, type?: string, content: string, reason: string}}
  */
 export function readSseData(raw) {
+  const normalizedRaw = String(raw || "").trim();
+
   // 백엔드 완료 신호는 content로 누적하지 않고 종료 상태만 전달합니다.
-  if (raw === SSE_DONE_TOKEN) return {done: true, content: ""};
+  if (normalizedRaw === SSE_DONE_TOKEN) return {done: true, content: ""};
+
   try {
-    const parsed = JSON.parse(raw);
-    const type = String(parsed?.type || (parsed?.reason != null ? "reason" : "answer"));
+    const parsed = JSON.parse(normalizedRaw);
+
+    // 회사 generation.do 오류 규격: data: "Error"
+    if (parsed === "Error") {
+      const error = new Error("generation stream returned Error");
+      error.name = "GenerationStreamError";
+      throw error;
+    }
+
+    const delta = parsed?.choices?.[0]?.delta || null;
+    if (delta) {
+      const content =
+        typeof delta.content === "string" && delta.content !== ""
+          ? delta.content
+          : "";
+      const reason =
+        typeof delta.reasoning_content === "string" &&
+        delta.reasoning_content !== ""
+          ? delta.reasoning_content
+          : typeof delta.reasoning === "string" && delta.reasoning !== ""
+            ? delta.reasoning
+            : "";
+
+      if (reason) return {done: false, type: "reason", content: "", reason};
+      return {done: false, type: "answer", content, reason: ""};
+    }
+
+    const type = String(
+      parsed?.type ||
+        (parsed?.reason != null || parsed?.reasonContent != null
+          ? "reason"
+          : "answer")
+    );
     return {
       done: false,
       type,
       content: String(parsed?.data ?? parsed?.content ?? ""),
       reason: String(parsed?.reason ?? parsed?.reasonContent ?? ""),
     };
-  } catch (_error) {
+  } catch (error) {
+    if (error?.name === "GenerationStreamError") throw error;
+
     // plain text SSE도 허용해 mock/레거시 백엔드와 호환합니다.
+    if (normalizedRaw === "Error") {
+      const streamError = new Error("generation stream returned Error");
+      streamError.name = "GenerationStreamError";
+      throw streamError;
+    }
     return {done: false, type: "answer", content: String(raw || ""), reason: ""};
   }
 }

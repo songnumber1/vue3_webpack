@@ -1,6 +1,6 @@
 /**
  * @file api/sse/sse.js
- * @description SSE 스트리밍 계층입니다. fetch ReadableStream, data: frame 파싱, chunk commit, 모바일 lifecycle abort를 처리합니다.
+ * @description SSE 스트리밍 엔트리포인트입니다. 회사 sse.js 기반 XHR POST SSE, mock stream 분기, 모바일 lifecycle cleanup을 처리합니다.
  *
  * 프리징 코드 주석 기준:
  * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
@@ -23,7 +23,7 @@ export {isGenerationAbortError};
  * @returns {string} 추출 완료된 세션 고유 ID 문자열 (부재 시 빈 문자열 반환)
  */
 function resolveRequestId(payload = {}) {
-  return payload?.requestId || payload?.request_id || "";
+  return payload?.requestId || payload?.request_id || payload?.msgId || payload?.respMsgId || "";
 }
 
 /**
@@ -39,13 +39,14 @@ async function streamGenerationMock(payload = {}, handlers = {}) {
   const {onChunk, onReasonChunk, onComplete} = handlers;
 
   // 사용자 질문 텍스트 원문을 기반으로 가짜 답변 샘플 풀(Pool)에서 알맞은 결과 텍스트 매칭 추출
-  const text = pickGenerationSample(payload.input);
+  const promptText = payload.body || payload.input || "";
+  const text = pickGenerationSample(promptText);
   // 추적 로그 연동을 위한 ID 포인터 수립
   const requestId = resolveRequestId(payload);
 
   // DeepSeek 등의 추론 기능을 모방하기 위해 패킷 상에 추론 플래그(isReasoning)가 활성화되어 있는 경우, 사전에 준비된 추론 템플릿 텍스트를 먼저 타이핑 에뮬레이션 가동
   if (payload.isReasoning) {
-    const reason = `질문을 분석하고 답변에 필요한 조건을 정리하고 있습니다.\n\n- 선택 모델: ${payload.modelId || ""}\n- 사용자 질문: ${payload.input || ""}\n- 핵심 요청사항을 확인합니다.`;
+    const reason = `질문을 분석하고 답변에 필요한 조건을 정리하고 있습니다.\n\n- 선택 모델: ${payload.modelId || ""}\n- 사용자 질문: ${promptText || ""}\n- 핵심 요청사항을 확인합니다.`;
     // 18ms 인터벌 지연 주기를 두고 글자 파편을 UI 단의 'onReasonChunk'로 비동기 방출
     await streamText(reason, (chunk) => onReasonChunk?.(chunk), {delay: 18});
   }
@@ -82,7 +83,7 @@ export async function streamGeneration(payload = {}, handlers = {}) {
   logPlatformDebug("sse.route", {runtimeType: context.runtimeType});
 
   try {
-    // 2. 통합 검증 완료된 컨텍스트를 주입하여 실제 fetch + ReadableStream 기반의 Core 비동기 루프 엔진을 점화 실행
+    // 2. 통합 검증 완료된 컨텍스트를 주입하여 실제 회사 sse.js 기반 XHR POST SSE Core 비동기 루프 엔진을 점화 실행
     return await runSseGenerationStream({
       payload,
       handlers,
