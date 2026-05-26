@@ -9,6 +9,8 @@
 
 import {ref} from "vue";
 
+const LIST_READY_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520, 900];
+
 /**
  * @typedef {object} ChatScrollControllerDependencies
  * @property {import('vue').Ref<boolean>} isConversationPage - 현재 사용자가 메인 홈이 아닌 실제 대화방 내부(/chat/:id)에 진입해 있는지 판별하는 플래그
@@ -37,6 +39,7 @@ export function useChatScrollController({
   let forceBottomUntil = 0;
   // 컴포넌트 마운트 레이턴시 및 마크다운 비동기 파싱 지연에 대응하기 위해 예약된 멀티 단계 타이머 핸들 수거 배열
   let latestUserScrollTimerIds = [];
+  let pendingBottomScrollTimerIds = [];
 
   /**
    * @description 외부 워크스페이스 컴포넌트 내부에서 노출(`defineExpose`)해 준 메시지 리스트 템플릿의 스크롤 조작 메서드 인터페이스 객체를 동적으로 탐색 수색하여 포인터를 탈취합니다.
@@ -82,6 +85,27 @@ export function useChatScrollController({
     latestUserScrollTimerIds = [];
   }
 
+  function clearPendingBottomScrollTimers() {
+    pendingBottomScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    pendingBottomScrollTimerIds = [];
+  }
+
+  function scheduleBottomScrollWhenListReady(options = {}) {
+    clearPendingBottomScrollTimers();
+
+    LIST_READY_SCROLL_DELAYS.forEach((delay) => {
+      const timerId = window.setTimeout(() => {
+        const list = getMessageListRef();
+        if (!list?.scrollToBottom) return;
+
+        list.scrollToBottom({...options, force: true, stable: true});
+        updateScrollBottomButton();
+        clearPendingBottomScrollTimers();
+      }, delay);
+      pendingBottomScrollTimerIds.push(timerId);
+    });
+  }
+
   /**
    * @description 사용자가 설정 메뉴에서 자동 스크롤 기능을 꺼두지 않았고, 현재 시간축이 지정된 하단 고정 만료 타임스탬프 범위 안에서 숨쉬고 있는지 판별합니다.
    * @returns {boolean} 강제 바닥 고정 유지 필요 여부
@@ -96,21 +120,25 @@ export function useChatScrollController({
    * @param {boolean} [options.autoAnswer] - 이번 스크롤 명령이 AI 답변 패킷 스트리밍 수신에 의해 유발된 자동 제어인지 여부 플래그
    */
   async function scrollBottom(options = {}) {
-    // 자동 스크롤 락 방어 가드: AI가 답변을 출력 중인데 사용자가 과거 내역을 위로 정주행 중이라 자동 추적 스위치를 잠시 꺼둔 경우라면 이동 명령을 거부하고 버튼 상태만 최신화
     if (options.autoAnswer && !autoScrollEnabled?.value) {
       updateScrollBottomButton();
       return;
     }
 
     const list = getMessageListRef();
-    // 1순위: 리스트 전용 최적화 가상 스크롤 인프라가 갖춰진 경우 해당 고성능 메서드 인보크 호출
     if (list?.scrollToBottom) {
+      clearPendingBottomScrollTimers();
       list.scrollToBottom(options);
-    } else {
-      // 2순위: 아직 초기 마운트 국면이거나 정적 스크롤 영역인 경우 부모 헬퍼 단의 범용 메서드로 폴백 구동
-      await scrollToBottom(options);
+      updateScrollBottomButton();
+      return;
     }
-    updateScrollBottomButton(); // 조작 완수 후 팝업 버튼 가시성 최신 동기화
+
+    await scrollToBottom(options);
+    updateScrollBottomButton();
+
+    if (options.force || options.stable) {
+      scheduleBottomScrollWhenListReady(options);
+    }
   }
 
   /**
@@ -179,6 +207,7 @@ export function useChatScrollController({
   function cleanupScrollController() {
     window.clearTimeout(bottomStateTimer);
     clearLatestUserScrollTimers();
+    clearPendingBottomScrollTimers();
   }
 
   // 최상위 ChatContainer 컨트롤러 및 우측 하단 플로팅 버튼 컴포넌트 단바인딩용 제어 인터페이스 레버 배출 반환
