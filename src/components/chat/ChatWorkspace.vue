@@ -47,7 +47,7 @@
       :messages="messages"
       :loading="isGenerating"
       :auto-scroll-on-answer="autoScrollOnAnswer"
-      @content-rendered="workspaceActions.handleMessageContentRendered()"
+      @content-rendered="handleMessageContentRendered"
       @regenerate="workspaceActions.regenerate($event)"
     />
     <button
@@ -107,6 +107,7 @@ const listRef = ref(null);
 const composerSlotRef = ref(null);
 const mainPromptInputRef = ref(null);
 let composerResizeObserver = null;
+let composerHeightTimerIds = [];
 
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
@@ -150,6 +151,23 @@ function updateComposerHeight() {
   );
 }
 
+
+function scheduleComposerHeightUpdate() {
+  if (typeof window === "undefined") {
+    updateComposerHeight();
+    return;
+  }
+  composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  composerHeightTimerIds = [0, 32, 80, 160].map((delay) =>
+    window.setTimeout(updateComposerHeight, delay)
+  );
+}
+
+function handleMessageContentRendered() {
+  workspaceActions.handleMessageContentRendered();
+  scheduleComposerHeightUpdate();
+}
+
 function observeComposerHeight() {
   if (!composerSlotRef.value) return;
   updateComposerHeight();
@@ -160,6 +178,8 @@ function observeComposerHeight() {
 }
 
 function cleanupComposerHeightObserver() {
+  composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  composerHeightTimerIds = [];
   composerResizeObserver?.disconnect();
   composerResizeObserver = null;
 }
@@ -183,10 +203,12 @@ watch(
     mode.value,
     showScrollBottom.value,
     isActiveModelUnavailable.value,
+    isGenerating.value,
+    messages.value.length,
   ],
   async () => {
     await nextTick();
-    updateComposerHeight();
+    scheduleComposerHeightUpdate();
   }
 );
 

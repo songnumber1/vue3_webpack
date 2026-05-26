@@ -12,6 +12,7 @@ import {useEventListener, useWindowSize} from "@vueuse/core";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {PROMPT_MENU_TYPE} from "@/constants/promptComposer";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {usePlatformStore} from "@/stores/platformStore";
 
 /**
  * @function createMenuOpenRef
@@ -44,6 +45,7 @@ function createMenuOpenRef(activeMenu, menuType) {
  */
 export function usePromptMenu() {
   const systemSettingsStore = useSystemSettingsStore();
+  const platformStore = usePlatformStore();
   const {width} = useWindowSize();
 
   // 툴바 하위 컴포넌트들의 마스터 DOM 참조점들이 맵 구조로 주입될 앵커 포인터
@@ -59,6 +61,15 @@ export function usePromptMenu() {
   // 현재 브라우저의 너비 사양이 시스템 모바일 중단점(Breakpoint) 이하로 압축되었는지 감지하는 플래그
   const isPromptCompactViewport = computed(
     () => width.value <= systemSettingsStore.mobileBreakpoint
+  );
+  const isForcedMobilePlatform = computed(() =>
+    Boolean(
+      platformStore.info?.isMobileBrowser ||
+        platformStore.info?.isAndroidApp ||
+        platformStore.info?.isPlatformForced ||
+        (typeof document !== "undefined" &&
+          document.body?.classList?.contains("mobile-mode"))
+    )
   );
   // 모바일 뷰포트 사양 가이드와 가상 키보드 충돌 요소를 계산하여 최종 '모바일 바텀시트' 형태로 서랍을 분출할지 판별하는 플래그
   const isMobileSheet = ref(false);
@@ -80,7 +91,7 @@ export function usePromptMenu() {
    * 데스크톱 웹 해상도와 모바일 뷰포트 사양 간의 인터페이스 마운트 모드를 동적 최신화합니다.
    */
   function syncViewportMode() {
-    isMobileSheet.value = Boolean(isPromptCompactViewport.value);
+    isMobileSheet.value = Boolean(isPromptCompactViewport.value || isForcedMobilePlatform.value);
   }
 
   /**
@@ -140,7 +151,7 @@ export function usePromptMenu() {
     }
   });
 
-  watch(isPromptCompactViewport, syncViewportMode);
+  watch([isPromptCompactViewport, isForcedMobilePlatform], syncViewportMode);
 
   // ── 📱 [하드웨어 가상 키보드 팽창 및 해상도 리사이즈 이벤트 버스 개통] ──────────────────
   useEventListener(window, "resize", syncViewportMode, {passive: true});
