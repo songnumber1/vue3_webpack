@@ -143,6 +143,20 @@ export function usePromptText({emit}) {
     textareaRef.value?.focus();
   }
 
+  /**
+   * 전송 직후 Vue 반응형 값과 실제 textarea DOM 값을 함께 비웁니다.
+   * 한글/일본어 등 IME 조합 입력 직후 Enter 전송 시 compositionend/input 이벤트가
+   * 늦게 도착하면서 마지막 글자가 DOM에 다시 남는 케이스를 방지합니다.
+   */
+  function clearText() {
+    text.value = "";
+
+    const el = textareaRef.value;
+    if (el && typeof el.value === "string") {
+      el.value = "";
+    }
+  }
+
   // 인풋 마크업 뷰 바인딩 및 파일 가레채기 연동 모듈 전달용 마스터 버스 인터페이스 노출
   return {
     text,
@@ -154,5 +168,6 @@ export function usePromptText({emit}) {
     handlePaste,
     getLastHeight,
     focusTextarea,
+    clearText,
   };
 }

@@ -69,6 +69,7 @@ export function usePromptComposer(props, emit) {
     handlePaste: getRawPastedFiles, // 붙여넣기 이벤트 시 텍스트 속에 섞인 원본 파일 오브젝트만 필터 추출하는 핸들러
     getLastHeight, // 이전 시점에 기록되었던 텍스트 창의 최종 높이 픽셀값을 반환하는 유틸 함수
     focusTextarea, // 텍스트 입력창으로 포커스 커서를 강제 이동(주입)시키는 제어 함수
+    clearText, // 전송 직후 반응형 값과 실제 textarea DOM 값을 함께 비우는 함수
   } = usePromptText({isMobileSheet, emit});
 
   // ── [첨부 파일] ─────────────────────────────────────────────────────────
@@ -273,7 +274,7 @@ export function usePromptComposer(props, emit) {
     });
 
     // [초기화 사이클] 전송이 성공적으로 접수 완료되었으므로, 다음 대화를 위해 입력 폼 상태를 완전히 비워줍니다.
-    text.value = ""; // 입력란 초기화
+    clearText(); // 입력란 초기화
     clearAttachments(); // 첨부파일 큐 초기화
     speech.resetToMic(); // STT 마이크 모드 정상 상태 원복
     closeMenus(); // 열려 있던 모든 도구창 닫기 처리
