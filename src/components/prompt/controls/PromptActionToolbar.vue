@@ -49,7 +49,9 @@ const resolvedToolbarComponent = computed(() =>
 
 const modelRoot = computed(() => toolbarComponentRef.value?.modelRoot || null);
 const toolRoot = computed(() => toolbarComponentRef.value?.toolRoot || null);
-const attachRoot = computed(() => toolbarComponentRef.value?.attachRoot || null);
+const attachRoot = computed(
+  () => toolbarComponentRef.value?.attachRoot || null
+);
 
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>

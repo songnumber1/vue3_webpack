@@ -74,15 +74,15 @@ export function usePromptMenu() {
     const override = systemSettingsStore.platformOverride;
     return Boolean(
       info.isMobileBrowser ||
-        info.isAndroidApp ||
-        info.isNativeApp ||
-        info.isNativeRuntime ||
-        info.isForced ||
-        info.isPlatformForced ||
-        override === "android-chrome" ||
-        override === "android-webview" ||
-        (typeof document !== "undefined" &&
-          document.body?.classList?.contains("mobile-mode"))
+      info.isAndroidApp ||
+      info.isNativeApp ||
+      info.isNativeRuntime ||
+      info.isForced ||
+      info.isPlatformForced ||
+      override === "android-chrome" ||
+      override === "android-webview" ||
+      (typeof document !== "undefined" &&
+        document.body?.classList?.contains("mobile-mode"))
     );
   });
   // 모바일 뷰포트 사양 가이드와 가상 키보드 충돌 요소를 계산하여 최종 '모바일 바텀시트' 형태로 서랍을 분출할지 판별하는 플래그
@@ -105,7 +105,9 @@ export function usePromptMenu() {
    * 데스크톱 웹 해상도와 모바일 뷰포트 사양 간의 인터페이스 마운트 모드를 동적 최신화합니다.
    */
   function syncViewportMode() {
-    isMobileSheet.value = Boolean(isPromptCompactViewport.value || isForcedMobilePlatform.value);
+    isMobileSheet.value = Boolean(
+      isPromptCompactViewport.value || isForcedMobilePlatform.value
+    );
   }
 
   /**

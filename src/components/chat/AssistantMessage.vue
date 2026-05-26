@@ -1,5 +1,8 @@
 <template>
-  <article class="message message--assistant" :class="{'message--streaming': !isMessageComplete}">
+  <article
+    class="message message--assistant"
+    :class="{'message--streaming': !isMessageComplete}"
+  >
     <div class="avatar">AI</div>
     <div class="bubble bubble--assistant">
       <div class="bubble-meta">Assistant</div>
@@ -84,7 +87,9 @@ const {handleMarkdownClick: handleReasoningClick} =
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
-const hasReasoning = computed(() => Boolean(props.message.isReasoning && props.message.reasoningContent));
+const hasReasoning = computed(() =>
+  Boolean(props.message.isReasoning && props.message.reasoningContent)
+);
 const showMessageActions = computed(
   () =>
     !isInteractionBlocked.value &&

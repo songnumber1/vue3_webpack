@@ -55,7 +55,9 @@ import ChatMessage from "./ChatMessage.vue";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
-const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [0, 80, 160, 320, 600, 900, 1300, 1800, 2300];
+const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
+  0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
+];
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -199,7 +201,11 @@ function getLatestUserMessageElement() {
  * 현재 상태가 특정 조건을 만족하는지 판단합니다.
  */
 function canElementScroll(element) {
-  if (!element || element === document.body || element === document.documentElement)
+  if (
+    !element ||
+    element === document.body ||
+    element === document.documentElement
+  )
     return false;
   const style = window.getComputedStyle(element);
   const overflowY = `${style.overflowY || ""} ${style.overflow || ""}`;
@@ -218,7 +224,11 @@ function getScrollableAncestors(target) {
 
   const result = [];
   let current = target?.parentElement || null;
-  while (current && current !== document.body && current !== document.documentElement) {
+  while (
+    current &&
+    current !== document.body &&
+    current !== document.documentElement
+  ) {
     if (canElementScroll(current)) result.push(current);
     current = current.parentElement;
   }
@@ -357,11 +367,19 @@ watch(
 onMounted(() => {
   if (typeof window === "undefined") return;
   recalculateFocusSpacerHeight();
-  window.addEventListener("resize", recalculateFocusSpacerHeight, {passive: true});
-  window.visualViewport?.addEventListener("resize", recalculateFocusSpacerHeight, {
+  window.addEventListener("resize", recalculateFocusSpacerHeight, {
     passive: true,
   });
-  window.addEventListener("touchstart", handleUserScrollIntent, {passive: true});
+  window.visualViewport?.addEventListener(
+    "resize",
+    recalculateFocusSpacerHeight,
+    {
+      passive: true,
+    }
+  );
+  window.addEventListener("touchstart", handleUserScrollIntent, {
+    passive: true,
+  });
   window.addEventListener("wheel", handleUserScrollIntent, {passive: true});
 });
 
@@ -413,5 +431,4 @@ defineExpose({
   width: 100%;
   pointer-events: none;
 }
-
 </style>

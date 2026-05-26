@@ -494,10 +494,8 @@ export function useChatSubmit(options) {
       }
 
       // 1단계: 유저 대화 말풍선 객체와 껍데기만 수립된 AI 대기조 말풍선 한 쌍을 로컬 스토어 화면 배열 꼬리에 즉각 밀어 넣습니다.
-      const {messages, assistantMessage} = options.appendUserAndAssistantMessages(
-        targetHistoryId,
-        normalized
-      );
+      const {messages, assistantMessage} =
+        options.appendUserAndAssistantMessages(targetHistoryId, normalized);
       // 2단계: 사이드바 서랍 타이틀 텍스트를 최신 백그라운드 스냅샷 동기화 처리합니다.
       options.syncHistories?.();
 

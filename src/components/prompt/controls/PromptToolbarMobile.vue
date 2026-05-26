@@ -111,7 +111,11 @@
       :title="sendLabel"
       :aria-label="sendLabel"
     >
-      <span v-if="generating" class="send-button-spinner" aria-hidden="true"></span>
+      <span
+        v-if="generating"
+        class="send-button-spinner"
+        aria-hidden="true"
+      ></span>
       <span v-else aria-hidden="true">↗</span>
     </button>
   </div>
@@ -233,7 +237,7 @@ const {
   voiceStopLabel,
   attachLabel,
   sendLabel,
-  modelSelectLabel
+  modelSelectLabel,
 } = toRefs(props);
 
 defineEmits([

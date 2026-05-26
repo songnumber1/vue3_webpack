@@ -88,7 +88,9 @@ export function useRuntimeModeFlags() {
   const isMobileBrowser = computed(() => {
     const info = platformInfo.value;
     if (!info.isPlatformForced) return Boolean(info.isMobileBrowser);
-    return Boolean(info.actualEnv === "android" && info.actualRuntime !== "native");
+    return Boolean(
+      info.actualEnv === "android" && info.actualRuntime !== "native"
+    );
   });
 
   /**

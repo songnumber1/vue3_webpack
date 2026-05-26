@@ -238,12 +238,24 @@ body.mobile-mode .message-actions button {
 .message--assistant.message--streaming .reasoning-content.markdown-body,
 .message--assistant.message--streaming .bubble-content.markdown-body pre,
 .message--assistant.message--streaming .reasoning-content.markdown-body pre,
-.message--assistant.message--streaming .bubble-content.markdown-body .md-table-wrapper,
-.message--assistant.message--streaming .reasoning-content.markdown-body .md-table-wrapper,
-.message--assistant.message--streaming .bubble-content.markdown-body .katex-display,
-.message--assistant.message--streaming .reasoning-content.markdown-body .katex-display,
-.message--assistant.message--streaming .bubble-content.markdown-body .md-mermaid,
-.message--assistant.message--streaming .reasoning-content.markdown-body .md-mermaid,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .md-table-wrapper,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .md-table-wrapper,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .katex-display,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .katex-display,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .md-mermaid,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .md-mermaid,
 .message--assistant.message--streaming .md-mermaid,
 .message--assistant.message--streaming .md-mermaid-card {
   overflow: hidden !important;
@@ -254,16 +266,34 @@ body.mobile-mode .message-actions button {
 }
 
 .message--assistant.message--streaming .bubble::-webkit-scrollbar,
-.message--assistant.message--streaming .bubble-content.markdown-body::-webkit-scrollbar,
-.message--assistant.message--streaming .reasoning-content.markdown-body::-webkit-scrollbar,
-.message--assistant.message--streaming .bubble-content.markdown-body pre::-webkit-scrollbar,
-.message--assistant.message--streaming .reasoning-content.markdown-body pre::-webkit-scrollbar,
-.message--assistant.message--streaming .bubble-content.markdown-body .md-table-wrapper::-webkit-scrollbar,
-.message--assistant.message--streaming .reasoning-content.markdown-body .md-table-wrapper::-webkit-scrollbar,
-.message--assistant.message--streaming .bubble-content.markdown-body .katex-display::-webkit-scrollbar,
-.message--assistant.message--streaming .reasoning-content.markdown-body .katex-display::-webkit-scrollbar,
-.message--assistant.message--streaming .bubble-content.markdown-body .md-mermaid::-webkit-scrollbar,
-.message--assistant.message--streaming .reasoning-content.markdown-body .md-mermaid::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  pre::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  pre::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .md-table-wrapper::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .md-table-wrapper::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .katex-display::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .katex-display::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .bubble-content.markdown-body
+  .md-mermaid::-webkit-scrollbar,
+.message--assistant.message--streaming
+  .reasoning-content.markdown-body
+  .md-mermaid::-webkit-scrollbar,
 .message--assistant.message--streaming .md-mermaid::-webkit-scrollbar,
 .message--assistant.message--streaming .md-mermaid-card::-webkit-scrollbar {
   width: 0 !important;

@@ -34,7 +34,10 @@
         v-for="tool in tools"
         :key="tool.id"
         class="bottom-sheet-option bottom-sheet-option--row"
-        :class="{'is-active': tool.active, 'bottom-sheet-option--template': Boolean(tool.promptTemplateKey)}"
+        :class="{
+          'is-active': tool.active,
+          'bottom-sheet-option--template': Boolean(tool.promptTemplateKey),
+        }"
         type="button"
         @click="handleToolClick(tool)"
       >
@@ -530,9 +533,10 @@ watch(
   line-height: 1.2;
 }
 
-
 /* keep template menu rows readable even when mobile global span patches are active */
-:global(body.mobile-mode) .bottom-sheet-option--template > .bottom-sheet-option-main {
+:global(body.mobile-mode)
+  .bottom-sheet-option--template
+  > .bottom-sheet-option-main {
   width: auto !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;

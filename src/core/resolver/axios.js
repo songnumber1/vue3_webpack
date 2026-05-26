@@ -27,7 +27,6 @@ const androidOverride = {
   },
 };
 
-
 const webOverride = {
   headers: {
     "X-Client-Platform": "web",

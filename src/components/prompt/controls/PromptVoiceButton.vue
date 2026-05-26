@@ -49,7 +49,11 @@
     :title="sendLabel"
     :aria-label="sendLabel"
   >
-    <span v-if="generating" class="send-button-spinner" aria-hidden="true"></span>
+    <span
+      v-if="generating"
+      class="send-button-spinner"
+      aria-hidden="true"
+    ></span>
     <span v-else aria-hidden="true">↗</span>
   </button>
 </template>
@@ -111,7 +115,7 @@ const {
   isSpeechSupported,
   voiceStartLabel,
   voiceStopLabel,
-  sendLabel
+  sendLabel,
 } = toRefs(props);
 
 const showVoiceStartButton = computed(

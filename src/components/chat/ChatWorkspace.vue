@@ -34,10 +34,7 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
-      <ChatPromptInput
-        ref="mainPromptInputRef"
-        :class="mainPromptClass"
-      />
+      <ChatPromptInput ref="mainPromptInputRef" :class="mainPromptClass" />
     </div>
   </section>
 
@@ -65,10 +62,7 @@
         v-else-if="isActiveModelUnavailable"
         :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
       />
-      <ChatPromptInput
-        v-else
-        :class="{'mobile-chat-prompt': isMobile}"
-      />
+      <ChatPromptInput v-else :class="{'mobile-chat-prompt': isMobile}" />
     </div>
   </template>
 </template>
@@ -124,15 +118,23 @@ const readonly = computed(() => workspaceState.value.readonly);
 const isMobile = computed(() => workspaceState.value.isMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
-const conversationTitle = computed(() => workspaceState.value.conversationTitle);
+const conversationTitle = computed(
+  () => workspaceState.value.conversationTitle
+);
 const themeName = computed(() => workspaceState.value.themeName);
 const suggestions = computed(() => workspaceState.value.suggestions || []);
-const isActiveModelDeleted = computed(() => workspaceState.value.isActiveModelDeleted);
-const isActiveModelUnavailable = computed(() => workspaceState.value.isActiveModelUnavailable);
+const isActiveModelDeleted = computed(
+  () => workspaceState.value.isActiveModelDeleted
+);
+const isActiveModelUnavailable = computed(
+  () => workspaceState.value.isActiveModelUnavailable
+);
 const isGenerating = computed(() => workspaceState.value.isGenerating);
 const messages = computed(() => workspaceState.value.messages || []);
 const showScrollBottom = computed(() => workspaceState.value.showScrollBottom);
-const autoScrollOnAnswer = computed(() => workspaceState.value.autoScrollOnAnswer);
+const autoScrollOnAnswer = computed(
+  () => workspaceState.value.autoScrollOnAnswer
+);
 const isMainPage = computed(() => mode.value === "main");
 
 const mainAssistantIcon = computed(() =>
@@ -150,7 +152,6 @@ function updateComposerHeight() {
     `${Math.max(height, 72)}px`
   );
 }
-
 
 function scheduleComposerHeightUpdate() {
   if (typeof window === "undefined") {

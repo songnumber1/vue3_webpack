@@ -9,18 +9,18 @@ function shouldUseMobilePlatformLayout(platformInfo = {}) {
   if (platformInfo.isPlatformForced) {
     return Boolean(
       platformInfo.isAndroidApp ||
-        platformInfo.isNativeApp ||
-        platformInfo.isNativeRuntime ||
-        (platformInfo.actualEnv === "android" &&
-          platformInfo.actualRuntime !== "native")
+      platformInfo.isNativeApp ||
+      platformInfo.isNativeRuntime ||
+      (platformInfo.actualEnv === "android" &&
+        platformInfo.actualRuntime !== "native")
     );
   }
 
   return Boolean(
     platformInfo.isMobileBrowser ||
-      platformInfo.isAndroidApp ||
-      platformInfo.isNativeApp ||
-      platformInfo.isNativeRuntime
+    platformInfo.isAndroidApp ||
+    platformInfo.isNativeApp ||
+    platformInfo.isNativeRuntime
   );
 }
 

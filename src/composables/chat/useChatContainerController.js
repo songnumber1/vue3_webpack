@@ -117,5 +117,4 @@ export function useChatContainerController(props) {
     submit: data.submit,
     regenerate: data.regenerate,
   };
-
 }

@@ -8,7 +8,10 @@
       class="bottom-sheet-option"
       :class="{active: locale === 'ko'}"
       type="button"
-      @click="setAppLocale('ko'); $emit('close')"
+      @click="
+        setAppLocale('ko');
+        $emit('close');
+      "
     >
       <strong>{{ t("common.korean") }}</strong>
       <small>{{ t("common.koreanUi") }}</small>
@@ -17,7 +20,10 @@
       class="bottom-sheet-option"
       :class="{active: locale === 'en'}"
       type="button"
-      @click="setAppLocale('en'); $emit('close')"
+      @click="
+        setAppLocale('en');
+        $emit('close');
+      "
     >
       <strong>{{ t("common.english") }}</strong>
       <small>{{ t("common.englishUi") }}</small>

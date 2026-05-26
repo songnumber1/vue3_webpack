@@ -60,7 +60,6 @@ export const PROMPT_TOOL_CONTROL_TYPE = Object.freeze({
   switch: "switch",
 });
 
-
 export const PROMPT_TEMPLATE_MODEL_IDS = Object.freeze([
   "model-ds-thinking",
   "model-ds-rag",

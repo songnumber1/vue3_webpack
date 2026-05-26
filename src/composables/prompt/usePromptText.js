@@ -66,7 +66,8 @@ export function usePromptText({emit}) {
     const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
     const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
     const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
-    const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
+    const borderBottom =
+      Number.parseFloat(computedStyle.borderBottomWidth) || 0;
     const resolvedLineHeight = Number.isFinite(lineHeight)
       ? lineHeight
       : PROMPT_TEXTAREA_HEIGHT.lineHeight;

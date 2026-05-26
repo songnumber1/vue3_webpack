@@ -64,7 +64,8 @@ function attachMockReasoning(messages = [], chatId = "") {
   const isReasoning = isReasoningHistory(chatId);
 
   return messages.map((message, index) => {
-    if (!isReasoning || !shouldAttachReasoning(message, index)) return {...message};
+    if (!isReasoning || !shouldAttachReasoning(message, index))
+      return {...message};
     return {
       ...message,
       isReasoning: true,
@@ -106,7 +107,10 @@ export const chatHistoryApiMock = {
     return resolveMock(history, 160);
   },
   getChatHistoryDetail({chatId} = {}) {
-    return resolveMock(attachMockReasoning(messageStore[chatId] || [], chatId), 180);
+    return resolveMock(
+      attachMockReasoning(messageStore[chatId] || [], chatId),
+      180
+    );
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

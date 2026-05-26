@@ -283,7 +283,7 @@ const {
   attachMenuOpen,
   isMobileSheet,
   attachLabel,
-  modelSelectLabel
+  modelSelectLabel,
 } = toRefs(props);
 
 const emit = defineEmits([
@@ -430,10 +430,16 @@ watch(
 );
 
 const modelRoot = computed(
-  () => modelSelectorRef.value?.modelRoot?.value || modelSelectorRef.value?.modelRoot || null
+  () =>
+    modelSelectorRef.value?.modelRoot?.value ||
+    modelSelectorRef.value?.modelRoot ||
+    null
 );
 const attachRoot = computed(
-  () => attachButtonRef.value?.attachRoot?.value || attachButtonRef.value?.attachRoot || null
+  () =>
+    attachButtonRef.value?.attachRoot?.value ||
+    attachButtonRef.value?.attachRoot ||
+    null
 );
 
 defineExpose({modelRoot, toolRoot, attachRoot});

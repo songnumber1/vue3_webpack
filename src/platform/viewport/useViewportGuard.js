@@ -21,7 +21,10 @@ import {
 } from "@/platform/viewport/viewportConstants";
 import {KEYBOARD_MODES} from "@/constants/systemSettings";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {getMobileBrowserFamily, getViewportSize} from "@/platform/viewport/viewport";
+import {
+  getMobileBrowserFamily,
+  getViewportSize,
+} from "@/platform/viewport/viewport";
 
 /**
  * [Viewport/Keyboard Guard]

@@ -64,7 +64,10 @@ const {t} = useI18n();
 import {nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {RouterLink} from "vue-router";
 import {BRIDGE_CATEGORY} from "@/platform/bridge/bridgeConstants";
-import {generateOpenApi, getOpenApiCategoryOptions} from "@/platform/bridge/swagger/openapi";
+import {
+  generateOpenApi,
+  getOpenApiCategoryOptions,
+} from "@/platform/bridge/swagger/openapi";
 import {
   installSwaggerRuntime,
   uninstallSwaggerRuntime,

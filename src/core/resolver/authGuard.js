@@ -36,7 +36,6 @@ function createAccessPayload(to) {
   };
 }
 
-
 /**
  * 인증 가드 디버그 플래그가 활성화되어 있을 때만 선택적으로 보안 콘솔 로그를 남깁니다.
  * @param {...*} args - 콘솔에 출력할 디버깅용 파라미터 나열

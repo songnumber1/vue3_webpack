@@ -283,35 +283,40 @@ function handleMobileSettingsDesktopOpen(target) {
   }
 }
 
+provide(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(() => ({
+    mode: routeMode.value,
+    readonly: isReadOnly.value,
+    isMobile: isMobile.value,
+    assistantLabel: workspaceAssistantLabel.value,
+    assistant: currentAssistant.value,
+    conversationTitle: activeConversationTitle.value,
+    themeName: themeName.value,
+    suggestions: suggestions.value,
+    isActiveModelDeleted: false,
+    isActiveModelUnavailable: isActiveModelUnavailable.value,
+    isGenerating: isGenerating.value,
+    messages: messages.value,
+    showScrollBottom: showScrollBottom.value,
+    autoScrollOnAnswer: autoScrollOnAnswer.value,
+  }))
+);
 
-provide(CHAT_WORKSPACE_STATE_KEY, computed(() => ({
-  mode: routeMode.value,
-  readonly: isReadOnly.value,
-  isMobile: isMobile.value,
-  assistantLabel: workspaceAssistantLabel.value,
-  assistant: currentAssistant.value,
-  conversationTitle: activeConversationTitle.value,
-  themeName: themeName.value,
-  suggestions: suggestions.value,
-  isActiveModelDeleted: false,
-  isActiveModelUnavailable: isActiveModelUnavailable.value,
-  isGenerating: isGenerating.value,
-  messages: messages.value,
-  showScrollBottom: showScrollBottom.value,
-  autoScrollOnAnswer: autoScrollOnAnswer.value,
-})));
-
-provide(PROMPT_STATE_KEY, computed(() => ({
-  isMobile: isMobile.value,
-  floating: false,
-  showHelp: false,
-  selectedModel: selectedModel.value,
-  models: models.value,
-  disabled: false,
-  generating: isGenerating.value,
-  modelReadonly: isModelLocked.value,
-  placeholder: "",
-})));
+provide(
+  PROMPT_STATE_KEY,
+  computed(() => ({
+    isMobile: isMobile.value,
+    floating: false,
+    showHelp: false,
+    selectedModel: selectedModel.value,
+    models: models.value,
+    disabled: false,
+    generating: isGenerating.value,
+    modelReadonly: isModelLocked.value,
+    placeholder: "",
+  }))
+);
 
 provide(CHAT_ACTIONS_KEY, {
   openDrawer: openMobileDrawer,

@@ -26,27 +26,23 @@
  */
 
 import {computed, inject, nextTick, ref} from "vue";
-import {
-  PROMPT_TEXTAREA_STATE_KEY,
-} from "@/composables/chat/chatActionContext";
+import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatActionContext";
 
 const textareaRef = ref(null);
 const localText = ref("");
 
 const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
-const textareaValue = computed(() => textareaState?.text?.value ?? localText.value);
-const resolvedPlaceholder = computed(() => textareaState?.placeholder?.value || "");
+const textareaValue = computed(
+  () => textareaState?.text?.value ?? localText.value
+);
+const resolvedPlaceholder = computed(
+  () => textareaState?.placeholder?.value || ""
+);
 const isDisabled = computed(() => Boolean(textareaState?.disabled?.value));
 const isGenerating = computed(() => Boolean(textareaState?.generating?.value));
 const canSubmit = computed(() => Boolean(textareaState?.canSubmit?.value));
 
-const emit = defineEmits([
-  "focus",
-  "blur",
-  "input",
-  "submit",
-  "paste",
-]);
+const emit = defineEmits(["focus", "blur", "input", "submit", "paste"]);
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */

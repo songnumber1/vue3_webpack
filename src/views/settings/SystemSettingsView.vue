@@ -118,9 +118,13 @@ const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
 
 const actualPlatformLabel = computed(() => {
   const info = platformStore.info || {};
-  return info.actualPlatformLabel || [info.actualEnv, info.actualDevice, info.actualBrowser]
-    .filter(Boolean)
-    .join(" / ") || "-";
+  return (
+    info.actualPlatformLabel ||
+    [info.actualEnv, info.actualDevice, info.actualBrowser]
+      .filter(Boolean)
+      .join(" / ") ||
+    "-"
+  );
 });
 
 /**
