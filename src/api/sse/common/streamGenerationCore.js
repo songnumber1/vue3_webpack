@@ -4,6 +4,7 @@ import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
 import {resolveGenerationUrl, resolveSseAuthOptions} from "@/api/sse/common/streamRequest";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 
 function isUnauthorizedStreamError(error) {
   const status = Number(error?.status || error?.responseCode || error?.code || 0);
@@ -160,7 +161,14 @@ export async function runSseGenerationStream({
           },
         };
         closeSource();
-        await executeStream(authOptions);
+        try {
+          await executeStream(authOptions);
+        } catch (retryError) {
+          if (isUnauthorizedStreamError(retryError)) {
+            resetAuthStateSafely();
+          }
+          throw retryError;
+        }
       } else {
         throw error;
       }

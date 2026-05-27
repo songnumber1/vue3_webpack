@@ -8,7 +8,11 @@
  */
 
 import {isNativeApp} from "@/core/config";
-import {applyAuthRequestConfig, handleAuthResponseError} from "@/auth/httpAuthInterceptor";
+import {
+  applyAuthRequestConfig,
+  handleAuthResponseError,
+  shouldTryRefresh,
+} from "@/auth/httpAuthInterceptor";
 
 /**
  * @description 일반 웹(Web) 브라우저 환경에서 작동하는 Axios 요청 인터셉터입니다. 로컬 스토리지에서 인증 토큰을 꺼내 헤더에 주입합니다.
@@ -54,27 +58,40 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
 /**
  * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
+function notifyHttpError(error, errorUI) {
+  const status = error?.response?.status; // 인입된 HTTP Status Code 스캔
+
+  // 인증 토큰 만료 혹은 비인가 접근 제한 사태 발생 시 (Unauthorized)
+  if (status === 401) {
+    errorUI?.notify?.("인증 정보가 만료되었습니다.");
+  }
+
+  // 백엔드 인프라 파이프라인 내부 코어 폭파 및 크래시 발생 시 (Internal Server Error)
+  if (status >= 500) {
+    errorUI?.notify?.("서버 오류가 발생했습니다.");
+  }
+}
+
 function applyResponseInterceptor(instance, errorUI) {
   instance.interceptors.response.use(
     // 케이스 A: HTTP 상태 코드가 200~300대 정상 범위인 경우 가공 없이 응답 원본 본품을 그대로 패스 바이패스
     (response) => response,
 
     // 케이스 B: 백엔드 API 레이어에서 에러 예외 핸들링 판정이 반환되어 400~500대 코드가 인입된 경우
-    (error) => {
-      const status = error?.response?.status; // 인입된 HTTP Status Code 스캔
-
-      // 인증 토큰 만료 혹은 비인가 접근 제한 사태 발생 시 (Unauthorized)
-      if (status === 401) {
-        errorUI?.notify?.("인증 정보가 만료되었습니다.");
-      }
-
-      // 백엔드 인프라 파이프라인 내부 코어 폭파 및 크래시 발생 시 (Internal Server Error)
-      if (status >= 500) {
-        errorUI?.notify?.("서버 오류가 발생했습니다.");
-      }
-
+    async (error) => {
       // JWT 모드에서는 access token 만료 시 refresh 후 원 요청을 1회 재시도합니다.
-      return handleAuthResponseError(error, instance);
+      // refresh 대상 401은 재시도 결과가 최종 실패로 확정된 뒤에만 알림을 표시해 중복/오탐 알림을 방지합니다.
+      if (shouldTryRefresh(error)) {
+        try {
+          return await handleAuthResponseError(error, instance);
+        } catch (finalError) {
+          notifyHttpError(finalError, errorUI);
+          return Promise.reject(finalError);
+        }
+      }
+
+      notifyHttpError(error, errorUI);
+      return Promise.reject(error);
     }
   );
 }

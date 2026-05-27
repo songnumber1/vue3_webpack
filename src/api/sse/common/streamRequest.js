@@ -8,6 +8,7 @@ import {logPlatformDebug} from "@/platform/platformDebug";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {getAccessToken} from "@/auth/tokenStore";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 
 
 export async function resolveSseAuthOptions() {
@@ -73,6 +74,9 @@ export async function fetchGenerationResult(requestId) {
         resolveGenerationResultUrl(requestId),
         buildOptions({...authOptions.headers, Authorization: `Bearer ${accessToken}`})
       );
+      if (response.status === 401) {
+        resetAuthStateSafely();
+      }
     } catch (_error) {
       return null;
     }

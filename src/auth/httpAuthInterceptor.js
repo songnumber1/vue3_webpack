@@ -1,7 +1,8 @@
 import {resolveAuthPolicy, isAuthPublicUrl} from "@/auth/authPolicy";
 import {AUTH_HEADER_NAMES} from "@/auth/authConstants";
-import {getAccessToken} from "@/auth/tokenStore";
+import {getAccessToken, clearTokens} from "@/auth/tokenStore";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+import {useAuthStore} from "@/stores/authStore";
 
 function ensureHeaders(config) {
   config.headers = config.headers || {};
@@ -24,7 +25,7 @@ export function applyAuthRequestConfig(config = {}) {
   return config;
 }
 
-function shouldTryRefresh(error) {
+export function shouldTryRefresh(error) {
   const status = error?.response?.status;
   const config = error?.config || {};
   if (status !== 401) return false;
@@ -45,11 +46,43 @@ function cleanupRetryConfig(config, accessToken) {
   return nextConfig;
 }
 
+export function resetAuthStateSafely() {
+  clearTokens();
+  try {
+    useAuthStore().resetAuth();
+  } catch (_storeError) {
+    // Pinia 초기화 전 또는 테스트 환경에서는 토큰 정리만 수행합니다.
+  }
+}
+
+function isUnauthorized(error) {
+  return error?.response?.status === 401;
+}
+
 export async function handleAuthResponseError(error, client) {
   if (!shouldTryRefresh(error)) return Promise.reject(error);
-  const accessToken = await refreshAccessTokenOnce();
+
+  let accessToken;
+  try {
+    accessToken = await refreshAccessTokenOnce();
+  } catch (refreshError) {
+    // refreshAccessTokenOnce 내부에서도 정리하지만, 호출 경로가 바뀌어도 인증 상태가 남지 않게 한 번 더 방어합니다.
+    resetAuthStateSafely();
+    return Promise.reject(refreshError);
+  }
+
   const retryConfig = cleanupRetryConfig(error.config, accessToken);
-  return client.request(retryConfig);
+
+  try {
+    return await client.request(retryConfig);
+  } catch (retryError) {
+    // refresh는 성공했지만 같은 요청이 다시 401이면 현재 인증 상태를 더 이상 신뢰하지 않습니다.
+    // 500, timeout, network error 등은 인증 토큰 문제가 아닐 수 있으므로 원본 에러만 호출부로 전파합니다.
+    if (isUnauthorized(retryError)) {
+      resetAuthStateSafely();
+    }
+    return Promise.reject(retryError);
+  }
 }
 
 export function attachAuthInterceptors(client) {

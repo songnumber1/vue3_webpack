@@ -33,11 +33,13 @@ export const authApiLive = {
   },
 
   async logout() {
-    const response = await httpClient.post(resolveAuthPolicy().logoutUrl, undefined, {
-      apiKey: API_KEYS.LOGIN,
-    });
-    const data = unwrapResponseData(response, {});
-    clearTokens();
-    return data;
+    try {
+      const response = await httpClient.post(resolveAuthPolicy().logoutUrl, undefined, {
+        apiKey: API_KEYS.LOGIN,
+      });
+      return unwrapResponseData(response, {});
+    } finally {
+      clearTokens();
+    }
   },
 };

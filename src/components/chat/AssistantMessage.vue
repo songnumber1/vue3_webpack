@@ -66,6 +66,7 @@ import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
+import {logWarn} from "@/utils/logger";
 import MessageActions from "./MessageActions.vue";
 
 /**
@@ -107,24 +108,43 @@ const reasoningTitle = computed(() =>
     : t("chat.reasoning.completed")
 );
 
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/\n/g, "<br>");
+}
+
 /**
  * Markdown, Mermaid 또는 Vue DOM에 표시할 결과물을 렌더링합니다.
  */
 async function renderContent() {
   const currentVersion = ++renderVersion;
-  const {renderMarkdown} = await import("@/utils/markdown");
-  const rendered = props.message.content
-    ? await renderMarkdown(props.message.content, {
-        renderMermaid: isMessageComplete.value,
-      })
-    : "";
-  if (currentVersion !== renderVersion) return;
-  html.value = rendered;
-  await nextTick();
-  if (isMessageComplete.value) {
-    await renderMermaidInElement(contentRef.value);
+
+  try {
+    const {renderMarkdown} = await import("@/utils/markdown");
+    const rendered = props.message.content
+      ? await renderMarkdown(props.message.content, {
+          renderMermaid: isMessageComplete.value,
+        })
+      : "";
+    if (currentVersion !== renderVersion) return;
+    html.value = rendered;
+    await nextTick();
+    if (isMessageComplete.value) {
+      await renderMermaidInElement(contentRef.value);
+    }
+  } catch (error) {
+    if (currentVersion !== renderVersion) return;
+    logWarn("[AssistantMessage] content render failed:", error);
+    html.value = escapeHtml(props.message.content || "");
+  } finally {
+    if (currentVersion === renderVersion) emit("rendered");
   }
-  emit("rendered");
 }
 
 /**
@@ -132,15 +152,23 @@ async function renderContent() {
  */
 async function renderReasoningContent() {
   const currentVersion = ++reasoningRenderVersion;
-  const {renderMarkdown} = await import("@/utils/markdown");
-  const rendered = props.message.reasoningContent
-    ? await renderMarkdown(props.message.reasoningContent)
-    : "";
-  if (currentVersion !== reasoningRenderVersion) return;
-  reasoningHtml.value = rendered;
-  await nextTick();
-  await renderMermaidInElement(reasoningRef.value);
-  emit("rendered");
+
+  try {
+    const {renderMarkdown} = await import("@/utils/markdown");
+    const rendered = props.message.reasoningContent
+      ? await renderMarkdown(props.message.reasoningContent)
+      : "";
+    if (currentVersion !== reasoningRenderVersion) return;
+    reasoningHtml.value = rendered;
+    await nextTick();
+    await renderMermaidInElement(reasoningRef.value);
+  } catch (error) {
+    if (currentVersion !== reasoningRenderVersion) return;
+    logWarn("[AssistantMessage] reasoning render failed:", error);
+    reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
+  } finally {
+    if (currentVersion === reasoningRenderVersion) emit("rendered");
+  }
 }
 
 watch(() => [props.message.content, props.message.status], renderContent, {
