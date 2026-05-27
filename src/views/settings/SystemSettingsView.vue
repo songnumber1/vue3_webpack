@@ -99,11 +99,15 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, reactive, watch} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
+import {useAuthStore} from "@/stores/authStore";
+import {authApiLive} from "@/api/live/authApi.live";
+import {logWarn} from "@/utils/logger";
 import {syncViewportSettings} from "@/utils/viewportSettingsSync";
 import {
   DEFAULT_SYSTEM_SETTINGS,
@@ -116,11 +120,14 @@ import {
 
 const emit = defineEmits(["close", "applied"]);
 const {t} = useI18n();
+const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
+const authStore = useAuthStore();
 const {settings} = storeToRefs(systemSettingsStore);
 
 const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
+const applying = ref(false);
 
 const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
 
@@ -265,14 +272,74 @@ function syncDraft() {
 }
 
 /**
+ * 인증 방식이 변경되면 기존 JWT 토큰 또는 세션 쿠키가 새 인증 정책과 섞이지 않도록
+ * 설정 적용 전에 사용자에게 알리고 현재 인증 정책 기준으로 로그아웃을 먼저 수행합니다.
+ */
+function hasAuthModeChanged() {
+  return (
+    draft.webAuthMode !== settings.value.webAuthMode ||
+    draft.mobileAuthMode !== settings.value.mobileAuthMode
+  );
+}
+
+/**
+ * 브라우저 기본 confirm을 사용해 기존 디자인/CSS를 건드리지 않고 로그아웃 안내만 제공합니다.
+ */
+function confirmAuthModeLogout() {
+  if (typeof window === "undefined" || typeof window.confirm !== "function") {
+    return true;
+  }
+
+  return window.confirm(t("systemSettings.authModeChangeLogoutConfirm"));
+}
+
+/**
+ * 인증 모드 전환 시 기존 인증 컨텍스트를 정리합니다.
+ * 서버 로그아웃이 실패해도 클라이언트 인증 상태는 반드시 초기화합니다.
+ */
+async function forceLogoutForAuthModeChange() {
+  try {
+    await authApiLive.logout();
+  } catch (error) {
+    logWarn("[SystemSettingsView] auth mode change logout 오류:", error);
+  } finally {
+    authStore.resetAuth();
+  }
+}
+
+/**
  * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
-function apply() {
-  systemSettingsStore.applySettings(draft);
-  platformStore.refresh();
-  syncViewportSettings(systemSettingsStore.mobileBreakpoint);
-  emit("applied");
-  emit("close");
+async function apply() {
+  if (applying.value) return;
+
+  const authModeChanged = hasAuthModeChanged();
+
+  if (authModeChanged && !confirmAuthModeLogout()) {
+    return;
+  }
+
+  applying.value = true;
+
+  try {
+    if (authModeChanged) {
+      await forceLogoutForAuthModeChange();
+    }
+
+    systemSettingsStore.applySettings(draft);
+    platformStore.refresh();
+    syncViewportSettings(systemSettingsStore.mobileBreakpoint);
+    emit("applied");
+    emit("close");
+
+    if (authModeChanged) {
+      await router
+        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .catch(() => {});
+    }
+  } finally {
+    applying.value = false;
+  }
 }
 
 watch(settings, syncDraft, {immediate: true, deep: true});

@@ -16,6 +16,8 @@ export const settingsMessages = {
         "화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.",
       close: "닫기",
       apply: "적용",
+      authModeChangeLogoutConfirm:
+        "인증 방식이 변경되어 현재 로그인 상태가 초기화됩니다. 적용 후 다시 로그인이 필요합니다. 계속하시겠습니까?",
       groups: {
         api: "API",
         auth: "인증",
@@ -297,6 +299,8 @@ export const settingsMessages = {
         "Manage visible screens, API usage, and mobile thresholds in one place. Changes are saved when you apply them and affect the next screen behavior immediately.",
       close: "Close",
       apply: "Apply",
+      authModeChangeLogoutConfirm:
+        "The authentication mode has changed, so your current login state will be cleared. You will need to sign in again after applying. Continue?",
       groups: {
         api: "API",
         auth: "Authentication",
