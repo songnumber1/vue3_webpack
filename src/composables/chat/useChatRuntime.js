@@ -243,17 +243,17 @@ export function useChatRuntime() {
    * @returns {Promise<Object>} 원격 어댑팅 처리가 최종 완결된 신규 히스토리 인스턴스 단일 객체
    */
   async function createRemoteConversation({text, assistantId, modelId} = {}) {
-    const requestId = createId("request"); // 통신 추적용 유니크 트래킹 키 발급
+    const chatId = createId(); // new.do 요청 시점에 채팅방 ID를 UUID로 선발급합니다.
+    const chatTitle = String(text || "").trim().slice(0, 20);
+    const assistant = assistantStore.assistantMap?.[assistantId] || null;
 
     // 백엔드 데이터베이스 엔드포인트에 룸 신규 영구 개설 API 패킷을 송출합니다.
     const rawHistory = await createChatHistory({
-      request_id: requestId,
-      requestId,
-      assistantId,
+      chatId,
       assistId: assistantId,
       modelId,
-      input: text,
-      chatTitle: text,
+      ChatTilte: chatTitle || String(text || "").trim(),
+      studio: assistant?.type === "studio",
     });
 
     // 수신된 거친 백엔드 규격 응답 데이터 구조를 프론트엔드 표준 규격 객체로 정형화(Adapting) 통일합니다.

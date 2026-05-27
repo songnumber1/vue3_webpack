@@ -9,6 +9,7 @@ import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {getAccessToken} from "@/auth/tokenStore";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
+import {createId} from "@/utils/id";
 
 
 export async function resolveSseAuthOptions() {
@@ -117,7 +118,7 @@ export function createStreamRequestContext() {
       ? new AbortController()
       : null;
 
-  const requestKey = `GENERATION-${Date.now()}-${Math.random()}`;
+  const requestKey = createId();
 
   const overlay = shouldUseOverlay(policy);
 

@@ -7,7 +7,6 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-let fallbackCounter = 0;
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
@@ -36,13 +35,11 @@ function createUuidV4Fallback() {
 
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10, 16).join("")}`;
 }
-export function createId(prefix = "id") {
+export function createId() {
   const cryptoObj = globalThis.crypto || globalThis.msCrypto;
   if (typeof cryptoObj?.randomUUID === "function") {
     return cryptoObj.randomUUID();
   }
 
-  fallbackCounter += 1;
-
-  return `${prefix}-${Date.now().toString(36)}-${fallbackCounter.toString(36)}-${createUuidV4Fallback()}`;
+  return createUuidV4Fallback();
 }

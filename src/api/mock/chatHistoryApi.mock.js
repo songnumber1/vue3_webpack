@@ -11,6 +11,7 @@ import {CHAT_KEYS} from "@/constants/apiKeys";
 import {CHAT_HISTORY_LIST_RAW} from "@/api/mock/data/chatHistoryList.raw";
 import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
 import {MODELS_RAW} from "@/api/mock/data/models.raw";
+import {createId} from "@/utils/id";
 import {resolveMock} from "./mockUtils";
 
 const historyStore = CHAT_HISTORY_LIST_RAW.map((item) => ({...item}));
@@ -22,7 +23,7 @@ const messageStore = {...CHAT_MESSAGES_RAW};
 function createChatTitle(input) {
   const value = String(input || "").trim();
   if (!value) return "새 대화";
-  return value.length > 28 ? `${value.slice(0, 28)}...` : value;
+  return value.length > 20 ? value.slice(0, 20) : value;
 }
 
 const SAMPLE_REASONING_CONTENTS = [
@@ -89,10 +90,13 @@ export const chatHistoryApiMock = {
   getChatHistoryList() {
     return resolveMock(historyStore, 210);
   },
-  createChat({assistantId, modelId, input} = {}) {
-    const chatId = `chat-new-${Date.now()}`;
+  createChat(payload = {}) {
+    const chatId = payload.chatId || createId();
+    const modelId = payload.modelId || "";
+    const assistantId = payload.assistId || payload.assistantId || "";
+    const titleSource = payload.ChatTilte || payload.chatTitle || payload.input || "";
     const history = {
-      chatTitle: createChatTitle(input),
+      chatTitle: createChatTitle(titleSource),
       chatId,
       modeId: modelId || "",
       modelId: modelId || "",

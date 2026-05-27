@@ -12,7 +12,7 @@ import {z} from "../zod";
 export const BaseRequest = z.object({
   requestId: z.string().min(1).openapi({
     description: "요청 추적 ID",
-    example: "req_20260507_001",
+    example: "550e8400-e29b-41d4-a716-446655440000",
   }),
   requestDate: z.string().datetime({offset: true}).openapi({
     description: "요청 생성 일시(ISO-8601)",

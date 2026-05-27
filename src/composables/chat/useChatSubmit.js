@@ -2,6 +2,7 @@ import {nextTick, ref} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
+import {shouldUseServerApi} from "@/constants/apiMode";
 import {
   canWrite,
   isSelectedModelReasoning,
@@ -16,6 +17,10 @@ import {
   scrollAfterUserSubmit,
 } from "./submit/chatSubmitScroll";
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
+
+function normalizeChatId(chatId) {
+  return String(chatId || "").trim();
+}
 
 async function createConversationForSubmit(options, normalized) {
   const context = {
@@ -34,6 +39,11 @@ async function createConversationForSubmit(options, normalized) {
       modelId: context.modelId,
     });
   } catch (error) {
+    if (shouldUseServerApi()) {
+      logWarn("[useChatSubmit] new.do 호출 실패:", error);
+      throw error;
+    }
+
     logWarn(
       "[useChatSubmit] new.do 호출 실패, local conversation으로 대체:",
       error
@@ -51,14 +61,18 @@ function shouldCreateConversation(options, targetHistoryId) {
 }
 
 async function ensureConversationForSubmit(options, normalized) {
-  let targetHistoryId = String(options.route.params.id || "");
+  let targetHistoryId = normalizeChatId(options.route.params.id);
 
   if (!shouldCreateConversation(options, targetHistoryId)) {
     return targetHistoryId;
   }
 
   const history = await createConversationForSubmit(options, normalized);
-  targetHistoryId = history.id;
+  targetHistoryId = normalizeChatId(history?.id);
+
+  if (!targetHistoryId) {
+    throw new Error("new.do response does not contain chatId.");
+  }
 
   await options.router
     .push({name: "chat", params: {id: targetHistoryId}})
@@ -157,7 +171,7 @@ export function useChatSubmit(options) {
   async function regenerateResponse(message = {}) {
     if (!canWrite(options) || isGenerating.value) return;
 
-    const targetHistoryId = String(options.route.params.id || "");
+    const targetHistoryId = normalizeChatId(options.route.params.id);
     if (!targetHistoryId) return;
 
     const currentMessages = Array.isArray(options.messages.value)

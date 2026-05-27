@@ -1,3 +1,5 @@
+import {createId} from "@/utils/id";
+
 /**
  * @file platform/bridge/bridgeUtils.js
  * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
@@ -8,7 +10,7 @@
  */
 
 export function createRequestId() {
-  return `req_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+  return createId();
 }
 
 export function createIsoDate() {

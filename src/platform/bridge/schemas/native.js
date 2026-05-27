@@ -49,7 +49,7 @@ export const OpenFilePickerResponse = createResponseSchema(
       .openapi({description: "파일 선택 UI 실행 여부", example: true}),
     requestId: z.string().optional().openapi({
       description: "결과 매칭용 요청 ID",
-      example: "req_20260507_001",
+      example: "550e8400-e29b-41d4-a716-446655440000",
     }),
   })
 );

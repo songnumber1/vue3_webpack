@@ -23,6 +23,10 @@ function createRequestPayload(base = {}) {
   };
 }
 
+function normalizeChatId(chatId) {
+  return String(chatId || "").trim();
+}
+
 function resolvePromptToolSettings() {
   const chatStore = useChatStore();
   return chatStore.activePromptToolSettings || {};
@@ -30,8 +34,6 @@ function resolvePromptToolSettings() {
 
 function resolveStyleOptions(settings = {}) {
   const values = [];
-
-  if (settings.promptTemplateId) values.push(settings.promptTemplateId);
 
   Object.values(settings.promptTemplateOptions || {}).forEach((value) => {
     if (Array.isArray(value)) {
@@ -48,24 +50,30 @@ function resolveStyleOptions(settings = {}) {
 }
 
 export function createGenerationPayload(options, normalized, chatId) {
+  const resolvedChatId = normalizeChatId(chatId);
+
+  if (!resolvedChatId) {
+    throw new Error("generation.do payload requires chatId from new.do or current route.");
+  }
+
   const settings = resolvePromptToolSettings();
   const knowledgeSearch = Array.isArray(settings.knowledgeSearch)
     ? settings.knowledgeSearch.filter(Boolean)
     : [];
 
   return createRequestPayload({
-    chatId,
+    chatId: resolvedChatId,
     assistId: options.selectedAssistantId?.value || "",
     modelId: options.selectedModel?.value || "",
     studio: false,
     intention: "직접입력",
-    rag: true,
+    rag: knowledgeSearch.length > 0,
     ragCot: false,
-    imageS3Path: null,
+    imgS3Path: null,
     sourceType: "internal",
     arrayOptions: knowledgeSearch,
     messageFileHist: null,
-    style: resolveStyleOptions(settings),
+    styles: resolveStyleOptions(settings),
     body: normalized.text,
     byteSize: 10000,
     lastFederationInfo: null,

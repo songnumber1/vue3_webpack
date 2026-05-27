@@ -10,6 +10,7 @@
 import {isNativeApp} from "@/core/config";
 import {callNative} from "@/platform/bridge/web/bridgeClient";
 import {logWarn} from "@/utils/logger";
+import {createId} from "@/utils/id";
 
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
@@ -60,7 +61,7 @@ function removeFallback(key) {
 function createRequest(payload = {}) {
   return {
     // 앱과 네이티브 간 비동기 메시징 및 로깅 추적을 고유하게 식별할 임의 유니크 ID 스트링 생성
-    requestId: `storage_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    requestId: createId(),
     requestDate: new Date().toISOString(), // ISO 표준 타임스탬프 스탬핑
     ...payload, // 전송할 실제 데이터 본문 결합
   };

@@ -14,6 +14,7 @@ import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
 import {applyAuthRequestConfig, handleAuthResponseError} from "@/auth/httpAuthInterceptor";
+import {createId} from "@/utils/id";
 
 /**
  * @description 현재 애플리케이션의 런타임 환경 변수 및 설정 스토어의 API 모드 점등 유무를 대조하여 Axios 요청에 주입할 최적의 베이스 프록시 엔드포인트 URL 주소를 도출합니다.
@@ -85,7 +86,7 @@ export function createHttpClient() {
     const apiRequestStore = useApiRequestStore();
 
     // 요청 고유 식별자(Request Key) 난수 조합 생성: 동시 다발적 중복 요청 트래킹 및 특정 요청 타깃 중도 abort 저격을 위함
-    const requestKey = `${config.apiKey || "DEFAULT"}-${Date.now()}-${Math.random()}`;
+    const requestKey = createId();
     const controller = createAbortController(apiPolicy, config);
     const overlay = shouldShowMobileOverlay(apiPolicy);
 

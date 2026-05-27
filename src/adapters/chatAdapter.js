@@ -76,23 +76,27 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
  * @returns {Object} 뷰 인프라 및 마크다운 파서가 완벽하게 인지할 수 있는 정문화된 단일 메시지 객체
  */
 export function adaptMessage(raw = {}) {
+  const reasoningContent =
+    raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "";
+  const content =
+    raw[MESSAGE_KEYS.CONTENT] || raw.answer || raw.body || reasoningContent || "";
+
   return {
     id: raw[MESSAGE_KEYS.ID], // 말풍선 고유 고정 ID 키
     role:
       raw[MESSAGE_KEYS.ROLE] === MESSAGE_ROLES.USER
         ? MESSAGE_ROLES.USER
         : MESSAGE_ROLES.ASSISTANT, // 메시지 발송 주체 권한 역할 매핑 보정 (User 혹은 Assistant)
-    content: raw[MESSAGE_KEYS.CONTENT] || "", // AI 최종 완성 답변 혹은 사용자의 질문 본문 텍스트 스트링 문자열
+    content, // AI 최종 완성 답변 혹은 사용자의 질문 본문 텍스트 스트링 문자열
 
     // LLM 추론 모델(O1, DeepSeek-R1 등)의 생각 프로세스 내역(Reasoning Content)을 통합 추출 가드합니다.
-    reasoningContent:
-      raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "",
+    reasoningContent,
 
     // 현재 생각 프로세스의 마감 가이드 상태를 산출합니다. 내용이 이미 완벽히 실재한다면 수립 완료('completed') 처리합니다.
     reasoningStatus:
       raw[MESSAGE_KEYS.REASONING_STATUS] ||
-      (raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning ? "completed" : ""),
-    isReasoning: toBoolean(raw.isReasoning),
+      (reasoningContent ? "completed" : ""),
+    isReasoning: toBoolean(raw.isReasoning) || Boolean(reasoningContent),
 
     createdAt: raw[MESSAGE_KEYS.SENT_AT] || "", // 서버에 영구 안착 타임스탬프 시간 기록
     isSent: toBoolean(raw.isSend), // 소켓 전송 성공 완료 승인 플래그 캐스팅

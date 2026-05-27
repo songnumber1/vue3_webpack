@@ -13,6 +13,7 @@ import {logInfo, logWarn} from "@/utils/logger";
 import {copyText as copyWebText} from "@/platform/system/clipboard";
 import {i18n} from "@/i18n";
 import {logPlatformDebug} from "@/platform/platformDebug";
+import {createId} from "@/utils/id";
 import {
   APP_CLIPBOARD_COPIED_EVENT,
   APP_TOAST_REQUESTED_EVENT,
@@ -100,7 +101,7 @@ async function callNativeWithLogging(type, payload = {}) {
  */
 function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
   return {
-    requestId: `web_${Date.now()}_${Math.random().toString(36).slice(2)}`,
+    requestId: createId(),
     requestDate: new Date().toISOString(),
     responseDate: new Date().toISOString(),
     isSuccess: true,

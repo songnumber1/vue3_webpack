@@ -1,5 +1,7 @@
+import {createId} from "@/utils/id";
+
 export function createLocalHistory({text, assistant, model}) {
-  const id = `chat-local-${Date.now()}`;
+  const id = createId();
 
   return {
     id,
