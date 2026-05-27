@@ -47,6 +47,20 @@ function normalizeLegacyPayload(parsed) {
   };
 }
 
+function splitNestedSseData(raw) {
+  const text = String(raw || "");
+  const trimmed = text.trim();
+
+  if (!trimmed.startsWith("data:")) {
+    return [text];
+  }
+
+  return trimmed
+    .split(/(?=data:\s*)/g)
+    .map((frame) => frame.replace(/^data:\s*/, "").trim())
+    .filter(Boolean);
+}
+
 function parseGenerationStreamData(raw) {
   const normalizedRaw = String(raw || "").trim();
 
@@ -71,13 +85,11 @@ function parseGenerationStreamData(raw) {
   }
 }
 
-export function applyGenerationStreamData({
-  raw,
+function applyParsedGenerationData({
+  data,
   accumulated,
-  reasonAccumulated = "",
+  reasonAccumulated,
 }) {
-  const data = parseGenerationStreamData(raw);
-
   if (data.done) {
     return {
       accumulated,
@@ -125,5 +137,43 @@ export function applyGenerationStreamData({
     changed: true,
     reasonChanged: false,
     done: false,
+  };
+}
+
+export function applyGenerationStreamData({
+  raw,
+  accumulated,
+  reasonAccumulated = "",
+}) {
+  const frames = splitNestedSseData(raw);
+  let nextAccumulated = accumulated;
+  let nextReasonAccumulated = reasonAccumulated;
+  let changed = false;
+  let reasonChanged = false;
+  let done = false;
+
+  frames.forEach((frame) => {
+    if (done) return;
+
+    const data = parseGenerationStreamData(frame);
+    const nextState = applyParsedGenerationData({
+      data,
+      accumulated: nextAccumulated,
+      reasonAccumulated: nextReasonAccumulated,
+    });
+
+    nextAccumulated = nextState.accumulated;
+    nextReasonAccumulated = nextState.reasonAccumulated;
+    changed = changed || nextState.changed;
+    reasonChanged = reasonChanged || nextState.reasonChanged;
+    done = nextState.done;
+  });
+
+  return {
+    accumulated: nextAccumulated,
+    reasonAccumulated: nextReasonAccumulated,
+    changed,
+    reasonChanged,
+    done,
   };
 }
