@@ -15,7 +15,7 @@
       :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
-      @rendered="handleMessageRendered"
+      @rendered="handleMessageRendered(message.id)"
       @regenerate="$emit('regenerate', $event)"
     />
     <div v-if="loading" class="typing-row">
@@ -66,6 +66,7 @@ const {
   handleUserScrollIntent,
   handleMessageRendered,
   scrollToBottom,
+  scrollToBottomAfterRender,
   scrollToLatestUserMessage,
   getIsAtBottom,
   getScrollElement,
@@ -73,6 +74,7 @@ const {
 
 defineExpose({
   scrollToBottom,
+  scrollToBottomAfterRender,
   scrollToLatestUserMessage,
   isAtBottom: getIsAtBottom,
   getScrollElement,

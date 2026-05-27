@@ -98,7 +98,11 @@ export function useChatScrollController({
         const list = getMessageListRef();
         if (!list?.scrollToBottom) return;
 
-        list.scrollToBottom({...options, force: true, stable: true});
+        if (options.afterRender && list.scrollToBottomAfterRender) {
+          list.scrollToBottomAfterRender({...options, force: true, stable: false});
+        } else {
+          list.scrollToBottom({...options, force: true, stable: true});
+        }
         updateScrollBottomButton();
         clearPendingBottomScrollTimers();
       }, delay);
@@ -128,7 +132,11 @@ export function useChatScrollController({
     const list = getMessageListRef();
     if (list?.scrollToBottom) {
       clearPendingBottomScrollTimers();
-      list.scrollToBottom(options);
+      if (options.afterRender && list.scrollToBottomAfterRender) {
+        list.scrollToBottomAfterRender(options);
+      } else {
+        list.scrollToBottom(options);
+      }
       updateScrollBottomButton();
       return;
     }

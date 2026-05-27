@@ -42,6 +42,7 @@
       <SidebarHistoryList
         :histories="histories"
         :selected-chat-id="selectedChatId"
+        use-overlay-scrollbar
         @select="handleSelectHistory"
         @open-menu="openHistoryMenu"
       />

@@ -193,31 +193,32 @@ export async function bootstrapChatRuntime(options = {}) {
 
   const promptTemplates = adaptPromptTemplateList(promptTemplateRaw);
 
-  // 9. [하위 비동기 2단계 체인 트리거] 로드 완료된 마스터 어시스턴트 요소를 순회하며, 화면 로딩 딜레이 최소화를 위해 각각 매핑된 웰컴 추천 예시 질문 칩 데이터를 병렬 수집 기동합니다.
-  const examplePromptResults = await Promise.allSettled(
-    assistants.map(async (assistant) => {
-      const response = await examplePromptApi.getExamplePrompts({
-        assistId: assistant.id,
-        studioYN: assistant.type === "studio",
-      });
-      return [assistant.id, adaptExamplePromptList(response)];
-    })
-  );
-
-  // 10. 성공적으로 패치 완료된 어시스턴트별 추천 질문 세트들을 Key-Value 오브젝트 객체 지도로 동적 임베딩합니다.
-  const examplePromptMap = Object.fromEntries(
-    examplePromptResults
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => result.value)
-  );
-
-  // 11. 최종 수집된 빅 데이터 정보 풀과 유저 세션 선호 프리셋 정보를 최종 대조하여 초동 디폴트 페르소나 조합쌍을 도출해 냅니다.
+  // 9. 최종 수집된 빅 데이터 정보 풀과 유저 세션 선호 프리셋 정보를 먼저 대조하여 초동 디폴트 페르소나 조합쌍을 도출해 냅니다.
+  // 예시 질문은 모든 assistant를 한꺼번에 호출하지 않고, 최초 화면에 실제로 필요한 assistant의 것만 선로딩합니다.
   const initialAssistant = pickInitialAssistant(assistants, accessInfo);
   const initialModel = pickInitialModel(
     initialAssistant,
     modelMapByAssistant,
     accessInfo
   );
+
+  // 10. 최초 로그인/새로고침 성능을 위해 현재 assistant의 추천 예시 질문만 가져옵니다.
+  // 다른 assistant의 예시는 사용자가 assistant를 선택할 때 preloadExamplePrompts()에서 지연 로드합니다.
+  let examplePromptMap = {};
+  if (initialAssistant?.id) {
+    const examplePromptResult = await Promise.allSettled([
+      examplePromptApi.getExamplePrompts({
+        assistId: initialAssistant.id,
+        studioYN: initialAssistant.type === "studio",
+      }),
+    ]);
+
+    if (examplePromptResult[0]?.status === "fulfilled") {
+      examplePromptMap = {
+        [initialAssistant.id]: adaptExamplePromptList(examplePromptResult[0].value),
+      };
+    }
+  }
 
   // 글로벌 스토어 엔진 유닛이 그대로 받아 인메모리에 장착할 완성형 마스터 패키지를 반환 처리합니다.
   return {

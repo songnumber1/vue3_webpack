@@ -78,6 +78,9 @@ export function useMessageListScroll({props, emit}) {
   const bottomRef = ref(null);
   const userIsAtBottom = ref(true);
   let stableScrollTimerIds = [];
+  let afterRenderScrollTimerId = 0;
+  let pendingAfterRenderAssistantIds = null;
+  let pendingAfterRenderOptions = null;
 
   function getScrollElement() {
     return scrollRef.value;
@@ -123,8 +126,21 @@ export function useMessageListScroll({props, emit}) {
     stableScrollTimerIds = [];
   }
 
+  function clearAfterRenderScrollTimer() {
+    if (!afterRenderScrollTimerId) return;
+    window.clearTimeout(afterRenderScrollTimerId);
+    afterRenderScrollTimerId = 0;
+  }
+
+  function clearAfterRenderScrollState() {
+    clearAfterRenderScrollTimer();
+    pendingAfterRenderAssistantIds = null;
+    pendingAfterRenderOptions = null;
+  }
+
   function handleUserScrollIntent() {
     clearStableTimers();
+    clearAfterRenderScrollState();
   }
 
   function applyBottomScroll(behavior = "auto") {
@@ -186,6 +202,44 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
+
+  function applyBottomScrollAfterRender() {
+    const options = pendingAfterRenderOptions || {};
+    clearAfterRenderScrollState();
+
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        applyBottomScroll(options.behavior || "auto");
+      });
+    });
+  }
+
+  function scheduleAfterRenderScrollFallback() {
+    clearAfterRenderScrollTimer();
+    afterRenderScrollTimerId = window.setTimeout(() => {
+      applyBottomScrollAfterRender();
+    }, 1200);
+  }
+
+  function scrollToBottomAfterRender(options = {}) {
+    clearStableTimers();
+    clearAfterRenderScrollState();
+
+    const assistantIds = (props.messages || [])
+      .filter((message) => message?.role === "assistant")
+      .map((message, index) => String(message.id ?? `assistant-${index}`));
+
+    pendingAfterRenderOptions = {...options, force: true, stable: false};
+    pendingAfterRenderAssistantIds = new Set(assistantIds);
+
+    if (!pendingAfterRenderAssistantIds.size) {
+      applyBottomScrollAfterRender();
+      return;
+    }
+
+    scheduleAfterRenderScrollFallback();
+  }
+
   function scrollToBottom(options = {}) {
     const force = options.force === true;
     const stable = options.stable === true;
@@ -206,12 +260,24 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-  async function handleMessageRendered() {
+  async function handleMessageRendered(messageId) {
     emit("content-rendered");
 
     await nextTick();
     recalculateFocusSpacerHeight();
-    if (props.autoScrollOnAnswer) {
+
+    if (pendingAfterRenderAssistantIds) {
+      pendingAfterRenderAssistantIds.delete(String(messageId ?? ""));
+      if (!pendingAfterRenderAssistantIds.size) {
+        applyBottomScrollAfterRender();
+      }
+      return;
+    }
+
+    // 채팅방 입장으로 기존 메시지를 한꺼번에 렌더링하는 동안에는
+    // 각 메시지의 rendered 이벤트마다 바닥 스크롤을 반복하지 않습니다.
+    // 실시간 답변 스트리밍/typing 상태에서만 기존 자동 스크롤을 유지합니다.
+    if (props.loading && props.autoScrollOnAnswer) {
       scrollToBottom({stable: true});
     }
   }
@@ -247,6 +313,7 @@ export function useMessageListScroll({props, emit}) {
 
   onBeforeUnmount(() => {
     clearStableTimers();
+    clearAfterRenderScrollState();
     if (typeof window === "undefined") return;
     window.removeEventListener("resize", recalculateFocusSpacerHeight);
     window.visualViewport?.removeEventListener(
@@ -265,6 +332,7 @@ export function useMessageListScroll({props, emit}) {
     handleUserScrollIntent,
     handleMessageRendered,
     scrollToBottom,
+    scrollToBottomAfterRender,
     scrollToLatestUserMessage,
     getIsAtBottom,
     getScrollElement,

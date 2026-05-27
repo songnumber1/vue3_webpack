@@ -162,9 +162,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // 케이스 2: 공유 오픈방 열람 페이지인 경우 원격지의 전용 익명 오픈 조회 엔드포인트 파이프라인으로 우회 라우팅합니다.
       if (isSharedPage.value) {
         messages.value = await loadSharedConversation(activeHistoryId.value);
-        ui.markForceBottom(); // 스크롤 하단 고정 잠금 예약 가동
         await nextTick();
-        await ui.scrollBottom({behavior: "auto", force: true, stable: true});
+        await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
         return;
       }
 
@@ -172,9 +171,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
       if (!activeHistoryId.value) {
         messages.value = [];
         clearActiveSession();
-        ui.markForceBottom();
         await nextTick();
-        await ui.scrollBottom({behavior: "auto", force: true, stable: true});
+        await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
         return;
       }
 
@@ -188,9 +186,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
       messages.value = await ensureConversation(history.id);
-      ui.markForceBottom();
       await nextTick();
-      await ui.scrollBottom({behavior: "auto", force: true, stable: true});
+      await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
     } catch (error) {
       logWarn("[useChatDataController] loadRouteConversation 오류:", error);
     }

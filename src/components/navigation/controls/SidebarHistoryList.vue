@@ -1,5 +1,9 @@
 <template>
-  <div :class="containerClass">
+  <component
+    :is="scrollContainerComponent"
+    :class="containerClass"
+    v-bind="scrollContainerAttrs"
+  >
     <div
       v-for="item in histories"
       :key="item.id"
@@ -35,7 +39,7 @@
         </button>
       </div>
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup>
@@ -48,11 +52,14 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+import {computed} from "vue";
+import {OverlayScrollbarsComponent} from "overlayscrollbars-vue";
+import "overlayscrollbars/overlayscrollbars.css";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 
-defineProps({
+const props = defineProps({
   histories: {type: Array, default: () => []},
   selectedChatId: {type: [String, Number], default: ""},
   containerClass: {
@@ -60,9 +67,30 @@ defineProps({
     default: "sidebar-history sidebar-history--main",
   },
   itemClass: {type: String, default: "sidebar-history-item"},
+  useOverlayScrollbar: {type: Boolean, default: false},
 });
 
 defineEmits(["select", "open-menu"]);
+
+const overlayScrollbarOptions = {
+  scrollbars: {
+    autoHide: "leave",
+    autoHideDelay: 450,
+  },
+};
+
+const scrollContainerComponent = computed(() =>
+  props.useOverlayScrollbar ? OverlayScrollbarsComponent : "div"
+);
+
+const scrollContainerAttrs = computed(() =>
+  props.useOverlayScrollbar
+    ? {
+        defer: true,
+        options: overlayScrollbarOptions,
+      }
+    : {}
+);
 </script>
 
 <style scoped>
