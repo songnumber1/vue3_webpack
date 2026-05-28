@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-runtime-shared-patches.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 .shared-readonly-icon {
   width: 34px;
   height: 34px;
@@ -125,8 +125,7 @@ body.mobile-mode .message--assistant .bubble {
 
 .mobile-settings-item-arrow {
   font-size: 0;
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   position: relative;
 }
 
@@ -170,8 +169,7 @@ body.mobile-mode .message--assistant .bubble {
 }
 
 .mobile-settings-item-arrow .chevron-right-icon {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   transition:
     transform var(--duration-fast),
     color var(--duration-fast);

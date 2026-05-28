@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/components/bottom-sheet/bottom-sheet-composer.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 body.mobile-mode .bottom-sheet-option {
   min-height: 50px;
 }
@@ -89,8 +89,7 @@ body.mobile-mode .chat-container-root--keyboard-open .message-list {
 
 body.mobile-mode .scroll-bottom-button {
   right: 16px !important;
-  width: 44px;
-  height: 44px;
+  @include square(44px);
 }
 
 :root {
@@ -163,8 +162,7 @@ body.mobile-mode .scroll-bottom-button {
   font-weight: 800;
 }
 .user-avatar--header {
-  width: 28px;
-  height: 28px;
+  @include square(28px);
   flex: 0 0 28px;
 }
 .user-menu-name {
@@ -284,15 +282,13 @@ body.mobile-mode .scroll-bottom-button {
   border: 1px solid var(--control-border);
   background: var(--control-bg);
   color: var(--text);
-  display: grid;
-  place-items: center;
+  @include grid-center;
 }
 .responsive-overlay {
   position: fixed;
   inset: 0;
   z-index: var(--z-modal);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   padding: 24px;
 }
 .responsive-overlay-backdrop {
@@ -344,14 +340,12 @@ body.mobile-mode .scroll-bottom-button {
 }
 .responsive-close-button,
 .responsive-back-button {
-  width: 40px;
-  height: 40px;
+  @include square(40px);
   border-radius: 999px;
   border: 1px solid var(--control-border);
   background: var(--control-bg);
   color: var(--text);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   font-size: var(--font-size-fixed-24);
 }
 .responsive-back-button span[aria-hidden="true"] {
@@ -862,8 +856,7 @@ body.desktop-mode .app-container--desktop .mobile-topbar {
 }
 
 .guide-link.guide-link--icon {
-  width: 44px;
-  height: 44px;
+  @include square(44px);
   min-height: 44px;
   padding: 0;
   border-radius: 999px;
@@ -1099,9 +1092,7 @@ body.mobile-mode .quick-menu--mobile-search .quick-item {
 .playground-button,
 .playground-route-row a {
   min-height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0 14px;
   border-radius: 999px;
   border: 1px solid var(--control-border);

@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/states/reasoning/reasoning.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 .reasoning-panel {
   margin: 0 0 12px;
@@ -27,8 +28,7 @@
 }
 
 .reasoning-chevron {
-  width: 16px;
-  height: 16px;
+  @include square(16px);
   flex: 0 0 auto;
   color: currentColor;
   fill: none;

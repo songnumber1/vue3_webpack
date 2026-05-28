@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/components/attachment/attachment-preview-tokens.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 :root {
   --attachment-mobile-size: 72px;
   --attachment-mobile-radius: 14px;
@@ -55,8 +55,7 @@
 }
 
 .attachment-preview-thumb img {
-  width: 100%;
-  height: 100%;
+  @include square(100%);
   display: block;
   object-fit: cover;
 }
@@ -66,10 +65,8 @@
 }
 
 .attachment-preview-file {
-  width: 48px;
-  height: 48px;
-  display: grid;
-  place-items: center;
+  @include square(48px);
+  @include grid-center;
   border-radius: 12px;
   background: var(--control-hover);
   font-size: var(--font-size-fixed-22);
@@ -84,8 +81,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--z-image-preview-backdrop);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   padding: 24px;
   background: rgba(0, 0, 0, 0.78);
 }
@@ -104,8 +100,7 @@
   right: calc(18px + env(safe-area-inset-right));
   width: 42px;
   height: 42px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.92);
@@ -140,8 +135,7 @@ body.mobile-mode .image-preview-large {
 }
 
 .attachment-preview-thumb {
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background:
     linear-gradient(45deg, rgba(148, 163, 184, 0.14) 25%, transparent 25%),
     linear-gradient(-45deg, rgba(148, 163, 184, 0.14) 25%, transparent 25%),
@@ -162,9 +156,7 @@ body.mobile-mode .image-preview-large {
 }
 
 .attachment-preview-remove {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   font-size: var(--font-size-fixed-18);
   font-weight: 500;
   padding: 0;
@@ -175,8 +167,7 @@ body.mobile-mode .image-preview-large {
 }
 
 .image-preview-stage {
-  display: grid;
-  place-items: center;
+  @include grid-center;
   max-width: min(96vw, 1120px);
   max-height: 88vh;
   padding: 18px;
@@ -204,9 +195,7 @@ body.mobile-mode .image-preview-large {
 }
 
 .image-preview-close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0 0 2px;
   font-size: var(--font-size-fixed-26);
   font-weight: 400;
@@ -287,8 +276,7 @@ body.mobile-mode .image-preview-large {
 }
 
 .image-preview-close {
-  width: 48px;
-  height: 48px;
+  @include square(48px);
   min-width: 48px;
   min-height: 48px;
   touch-action: manipulation;
@@ -319,8 +307,7 @@ body.mobile-mode .attachment-preview-thumb {
 body.mobile-mode .attachment-preview-remove {
   top: -10px;
   right: -10px;
-  width: 48px;
-  height: 48px;
+  @include square(48px);
   min-width: 48px;
   min-height: 48px;
   font-size: var(--font-size-fixed-26);
@@ -374,8 +361,7 @@ body.mobile-mode .attachment-preview-thumb {
   width: 100%;
   height: 88px;
   min-height: 88px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   padding: 0;
   border: 0;
   border-radius: 10px;
@@ -397,8 +383,7 @@ body.mobile-mode .attachment-preview-thumb {
 
 .attachment-preview-thumb img,
 body.mobile-mode .attachment-preview-thumb img {
-  width: 100%;
-  height: 100%;
+  @include square(100%);
   display: block;
   padding: 0;
   object-fit: cover;
@@ -530,9 +515,7 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
 .image-preview-error {
   min-width: 190px;
   min-height: 52px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 14px 18px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.94);
@@ -652,8 +635,7 @@ body.mobile-mode .attachment-preview-remove::before {
   right: 6px;
   width: 22px;
   height: 22px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   border: 1px solid var(--control-border);
   border-radius: 999px;
   background: var(--prompt-bg);
@@ -669,8 +651,7 @@ body.mobile-mode .attachment-preview-remove::before {
 .attachment-preview-remove {
   top: -8px;
   right: -8px;
-  width: 44px;
-  height: 44px;
+  @include square(44px);
   min-width: 44px;
   min-height: 44px;
   padding: 0 0 2px;
@@ -711,13 +692,10 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   position: absolute;
   top: -18px;
   right: -18px;
-  width: 44px;
-  height: 44px;
+  @include square(44px);
   min-width: 44px;
   min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0 0 2px;
   border: 1px solid rgba(15, 23, 42, 0.12);
   border-radius: 999px;

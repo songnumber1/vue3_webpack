@@ -1,12 +1,10 @@
 /* Migrated from src/assets/styles/states/error/exception.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 .exception-page {
   min-height: var(--app-height, 100vh);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 
   padding: 24px;
 
@@ -171,8 +169,7 @@ body.mobile-mode .exception-title {
 
 .access-denied-page {
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--app-bg, #fff);
   padding: 24px;
 }

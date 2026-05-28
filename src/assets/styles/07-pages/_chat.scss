@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/pages/chat/targeted-chat-polish.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 body.desktop-mode .message--user {
   width: 100%;
   max-width: 100%;
@@ -53,8 +53,7 @@ body.mobile-mode .message--user .message-actions {
   gap: 0;
 }
 body.mobile-mode .message--user .message-action-icon {
-  width: 28px;
-  height: 28px;
+  @include square(28px);
 }
 body.mobile-mode .message--user .message-action-icon svg {
   width: 18px;

@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/layouts/sidebar/sidebar-assistant-polish.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 body.desktop-mode .desktop-sidebar .sidebar-top {
   position: relative;
 }
@@ -48,13 +48,11 @@ body.desktop-mode .desktop-sidebar .assistant-menu {
 }
 
 .assistant-brand-logo--desktop {
-  width: 48px;
-  height: 48px;
+  @include square(48px);
 }
 
 .assistant-brand-logo--mobile {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
 }
 
 body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
@@ -211,8 +209,7 @@ body.mobile-mode .sidebar-content--mobile,
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100%;
+  @include square(100%);
   max-height: 100%;
   min-height: 0;
   padding: calc(12px + env(safe-area-inset-top)) 0
@@ -260,8 +257,7 @@ body.mobile-mode .sidebar-content--mobile .sidebar-title,
 body.mobile-mode .sidebar-content--mobile .sidebar-round,
 .mobile-drawer .sidebar-content--mobile .sidebar-round {
   flex: 0 0 auto;
-  width: 40px;
-  height: 40px;
+  @include square(40px);
   color: var(--sidebar-text, #202123);
   background: var(--control-bg, #ffffff);
 }
@@ -514,9 +510,7 @@ body.mobile-mode .sidebar-history--main {
 }
 
 .sidebar-history-pin {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   width: 24px;
   height: 24px;
   font-size: var(--font-size-fixed-13);
@@ -524,11 +518,8 @@ body.mobile-mode .sidebar-history--main {
 }
 
 .sidebar-history-menu-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
+  @include inline-center;
+  @include square(28px);
   border: 0;
   border-radius: 999px;
   background: transparent;

@@ -1,14 +1,11 @@
 /* Migrated from src/assets/styles/layouts/sidebar/mobile-drawer-footer-stability.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 /* Mobile drawer footer stability rules isolated from sidebar visual polish. */
 body.mobile-mode .mobile-drawer,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
-  height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
-  max-height: var(
-    --layout-viewport-height,
-    var(--app-height, 100dvh)
-  ) !important;
+  @include viewport-height(var(--layout-viewport-height, var(--app-height, 100dvh)), true);
   overflow: hidden !important;
 }
 
@@ -58,6 +55,7 @@ body.mobile-mode .mobile-drawer .sidebar-content--mobile {
 body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
   flex: 1 1 auto !important;
   min-height: 0 !important;
+  @include scroll-y-touch;
   overflow-y: auto !important;
 
   padding-bottom: 8px !important;

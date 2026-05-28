@@ -1,7 +1,7 @@
 /* Consolidated from the extracted responsive keyboard migration patches.
    Exact duplicate selectors were merged with last-declaration-wins semantics
    to reduce CSS output while preserving the final cascade of this legacy layer. */
-
+@use "../00-abstracts/mixins" as *;
 .message--user .avatar {
   background: var(--primary);
   color: #fff;
@@ -54,8 +54,7 @@
 }
 
 .theme-glyph {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   border-radius: 999px;
   border: 2px solid currentColor;
   background: linear-gradient(90deg, currentColor 50%, transparent 50%);
@@ -380,9 +379,7 @@ body.mobile-mode .app-container {
 }
 
 .icon-wrap {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   width: 22px;
   height: 22px;
   flex: 0 0 22px;
@@ -452,14 +449,12 @@ body.mobile-mode .mobile-recent-list {
 }
 
 body.mobile-mode .folder-icon.nav-icon {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   flex-basis: 20px;
 }
 
 body.mobile-mode .icon-wrap {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   flex-basis: 20px;
 }
 

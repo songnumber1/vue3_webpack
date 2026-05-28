@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/components/dialog/dialog-viewport-policy.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 /* Extracted from responsive-typography.css to keep typography tokens isolated. */
 .user-menu-panel {
   border-radius: var(--dialog-radius);
@@ -69,9 +69,7 @@ body.desktop-mode
   height: 38px;
   border: 0;
   border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0;
   background: transparent;
   color: var(--text);

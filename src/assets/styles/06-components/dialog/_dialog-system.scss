@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/components/dialog/dialog-system.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../../00-abstracts/mixins" as *;
 
 :root {
   --dialog-radius: 5px;
@@ -31,7 +32,7 @@
   --dialog-action-font-weight: 700;
 }
 
-body.mobile-mode {
+@include mobile-root {
   --dialog-header-min-height: 52px;
   --dialog-header-padding: 12px 14px;
   --dialog-body-padding: 14px;

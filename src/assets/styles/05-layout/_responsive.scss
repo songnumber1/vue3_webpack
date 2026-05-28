@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/layouts/responsive/desktop-main-feedback-patch.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 body.desktop-mode .chat-container-root--mode-main .empty-center {
   width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
@@ -24,20 +25,13 @@ body.desktop-mode
 }
 
 .feedback-dialog-backdrop {
-  position: fixed !important;
-  inset: 0 !important;
-  top: var(--visual-viewport-offset-top, 0px) !important;
-  bottom: auto !important;
+  @include fixed-inset-important;
+  @include dialog-viewport-backdrop;
   width: 100vw !important;
-  min-height: 0 !important;
-  height: var(--app-height, 100dvh) !important;
-  display: grid !important;
-  place-items: center !important;
   align-items: center !important;
   justify-items: center !important;
   padding: max(12px, env(safe-area-inset-top)) 12px
     max(12px, env(safe-area-inset-bottom)) !important;
-  overflow-y: auto !important;
 }
 
 .feedback-dialog {
