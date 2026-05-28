@@ -48,6 +48,7 @@ export const useChatStore = defineStore("chat", {
     activeSession: null, // 백엔드 세션 소켓 커넥션 정보 및 읽기 전용 가드 상태 믹스드 객체
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
     promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
+    pendingNewSubmitChatIds: {}, // 메인 새 대화 submit 직후 라우트 전환 시 기존 대화방 hydration overlay/scroll을 건너뛰기 위한 일회성 플래그 맵
   }),
   getters: {
     /**
@@ -77,6 +78,34 @@ export const useChatStore = defineStore("chat", {
     },
   },
   actions: {
+
+    /**
+     * 메인 화면 새 대화 첫 질문으로 생성된 방 ID를 일회성 플래그로 기록합니다.
+     * ChatContainer가 main -> chat 라우트 전환으로 재생성되어도 Pinia store에 남아 있어
+     * 기존 대화방 입장용 hydration overlay와 하단 강제 이동을 정확히 건너뛸 수 있습니다.
+     */
+    markPendingNewSubmitChat(chatId) {
+      const id = String(chatId || "").trim();
+      if (!id) return;
+      this.pendingNewSubmitChatIds = {
+        ...this.pendingNewSubmitChatIds,
+        [id]: true,
+      };
+    },
+    /**
+     * 새 대화 submit 플래그를 한 번만 소비합니다.
+     * true가 반환되는 경우에는 이미 submit 흐름에서 사용자 질문/assistant typing 메시지가
+     * messageMap에 들어간 상태이므로 history hydration을 수행하지 않습니다.
+     */
+    consumePendingNewSubmitChat(chatId) {
+      const id = String(chatId || "").trim();
+      if (!id || !this.pendingNewSubmitChatIds[id]) return false;
+      const next = {...this.pendingNewSubmitChatIds};
+      delete next[id];
+      this.pendingNewSubmitChatIds = next;
+      return true;
+    },
+
     /**
      * 백엔드 세션 조회 API 등으로부터 전달받은 전체 대화 이력 히스토리를 강제 동기화 수립합니다.
      */

@@ -9,12 +9,15 @@
 
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
+import {API_KEYS} from "@/constants/apiConfig";
 
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
 async function getChatHistoryList() {
-  const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST);
+  const response = await httpClient.get(API_ENDPOINTS.CHAT_HISTORY_LIST, {
+    apiKey: API_KEYS.CHAT_HISTORY_SYNC,
+  });
   return unwrapResponseData(response, []);
 }
 
@@ -24,7 +27,8 @@ async function getChatHistoryList() {
 async function createChat(payload = {}) {
   const response = await httpClient.post(
     API_ENDPOINTS.CHAT_HISTORY_NEW,
-    payload
+    payload,
+    {apiKey: API_KEYS.CHAT_HISTORY_NEW}
   );
   return response?.data?.data || response?.data || {};
 }

@@ -1,5 +1,6 @@
 import {nextTick, ref} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -73,14 +74,9 @@ async function ensureConversationForSubmit(options, normalized) {
   }
 
   // 새 대화는 기존 방 입장용 hydration overlay 대상이 아닙니다.
-  // 사용자 질문과 기존 typing("...") 상태가 즉시 보여야 하므로, route watcher가
-  // 새 방 이동을 기존 히스토리 복원으로 오인하지 않도록 미리 등록합니다.
+  // 라우트 이동보다 먼저 호출부에서 사용자 질문과 assistant typing("...") 메시지를
+  // store에 append해야 메인 화면 첫 질문도 기존 채팅방 질문과 동일하게 보입니다.
   options.markNewSubmitConversation?.(targetHistoryId);
-
-  await options.router
-    .push({name: "chat", params: {id: targetHistoryId}})
-    .catch(() => {});
-  await nextTick();
 
   return targetHistoryId;
 }
@@ -123,6 +119,7 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
 export function useChatSubmit(options) {
   const isGenerating = ref(false);
   const chatStreamStore = useChatStreamStore();
+  const apiRequestStore = useApiRequestStore();
 
   async function submitPrompt(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -136,6 +133,18 @@ export function useChatSubmit(options) {
 
     isGenerating.value = true;
 
+    const initialHistoryId = normalizeChatId(options.route.params.id);
+    const isNewConversationSubmit = shouldCreateConversation(
+      options,
+      initialHistoryId
+    );
+    let overlaySuppressed = false;
+
+    if (isNewConversationSubmit) {
+      apiRequestStore.suppressOverlay();
+      overlaySuppressed = true;
+    }
+
     try {
       const targetHistoryId = await ensureConversationForSubmit(
         options,
@@ -143,8 +152,6 @@ export function useChatSubmit(options) {
       );
       const {messages, assistantMessage} =
         options.appendUserAndAssistantMessages(targetHistoryId, normalized);
-
-      options.syncHistories?.();
 
       const committer = createSubmitCommitter(
         options,
@@ -155,6 +162,15 @@ export function useChatSubmit(options) {
       const scheduleStreamScroll = createStreamScrollScheduler(options);
 
       committer.commit();
+
+      if (isNewConversationSubmit) {
+        await options.router
+          .push({name: "chat", params: {id: targetHistoryId}})
+          .catch(() => {});
+      }
+
+      await nextTick();
+      options.syncHistories?.();
       await scrollAfterUserSubmit(options, normalized);
 
       chatStreamStore.start();
@@ -171,6 +187,10 @@ export function useChatSubmit(options) {
         logPrefix: "[useChatSubmit]",
       });
     } finally {
+      if (overlaySuppressed) {
+        apiRequestStore.resumeOverlay();
+        overlaySuppressed = false;
+      }
       isGenerating.value = false;
       chatStreamStore.finish();
     }

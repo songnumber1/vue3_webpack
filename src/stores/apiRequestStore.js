@@ -17,11 +17,13 @@ export const useApiRequestStore = defineStore("apiRequest", {
   // 실시간 기동 중인 활성 비동기 인프라 패킷들의 라이브 레지스트리 상태 정의 명세
   state: () => ({
     activeOverlayCount: 0, // 현재 브라우저 전면 화면 레이아웃을 마우스 클릭 잠금 방어하고 있는 로딩 스피너/화면 차단 딤 레이어 오버레이의 총 누적 스택 개수
+    overlaySuppressCount: 0, // 새 대화 submit처럼 인라인 typing UI를 우선해야 하는 구간에서 전역 progress overlay 표시만 임시 차단하는 중첩 카운터
     controllers: {}, // 강제 중단 시그널 전달용 브라우저 네이티브 네이티브 `AbortController` 인스턴스 인스턴스들을 고유 라우터 세션 키별로 적치 보존해 두는 해시 보관소 맵
   }),
   getters: {
     // 1개 이상의 API가 화면 전면 차단형 트랜잭션을 밀어붙이고 있어서 사용자 인터랙션을 불허 마킹해야 하는지 판별 게터
-    isOverlayVisible: (state) => state.activeOverlayCount > 0,
+    isOverlayVisible: (state) =>
+      state.activeOverlayCount > 0 && state.overlaySuppressCount <= 0,
   },
   actions: {
     /**
@@ -30,6 +32,21 @@ export const useApiRequestStore = defineStore("apiRequest", {
     startOverlay() {
       this.activeOverlayCount += 1;
     },
+    /**
+     * 새 대화 submit처럼 사용자 질문/typing 표시가 즉시 노출되어야 하는 구간에서
+     * 모바일 전역 circle progress overlay 표시만 임시 차단합니다.
+     * activeOverlayCount 자체는 유지하므로 기존 요청 cleanup 카운터 정합성은 깨지지 않습니다.
+     */
+    suppressOverlay() {
+      this.overlaySuppressCount += 1;
+    },
+    /**
+     * suppressOverlay로 열어둔 전역 progress 표시 차단 구간을 해제합니다.
+     */
+    resumeOverlay() {
+      this.overlaySuppressCount = Math.max(this.overlaySuppressCount - 1, 0);
+    },
+
     /**
      * 특정 트랜잭션 요청이 무사 완료 완결 혹은 타임아웃 종료되었을 때 차단 카운트를 차감 소등 유도하며 음수 언더플로우를 방어 가드합니다.
      */
