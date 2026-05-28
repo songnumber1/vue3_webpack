@@ -44,7 +44,26 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const runtimeReady = ref(false);
   const isHistoryHydrating = ref(false);
   const apiRequestStore = useApiRequestStore();
+  const newSubmitConversationIds = new Set();
   let historyHydrationOverlayActive = false;
+
+  function normalizeChatId(value) {
+    return String(value || "").trim();
+  }
+
+  function markNewSubmitConversation(chatId) {
+    const normalizedId = normalizeChatId(chatId);
+    if (normalizedId) newSubmitConversationIds.add(normalizedId);
+  }
+
+  function consumeNewSubmitConversation(chatId) {
+    const normalizedId = normalizeChatId(chatId);
+    if (!normalizedId || !newSubmitConversationIds.has(normalizedId)) {
+      return false;
+    }
+    newSubmitConversationIds.delete(normalizedId);
+    return true;
+  }
 
   function beginHistoryHydration() {
     isHistoryHydrating.value = true;
@@ -207,6 +226,16 @@ export function useChatDataController({props, ui, runtime, messages}) {
         return;
       }
 
+      // 새 대화 생성 직후 라우터가 chat 화면으로 이동하는 경우에는 기존 대화방 입장용
+      // hydration overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
+      // typing("...") 표시 로직이 즉시 append되므로 빈 방 복원 처리만 조용히 마칩니다.
+      if (consumeNewSubmitConversation(history.id)) {
+        finishHistoryHydration();
+        messages.value = runtime.conversations.value?.[history.id] || [];
+        await nextTick();
+        return;
+      }
+
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
       beginHistoryHydration();
       messages.value = await ensureConversation(history.id);
@@ -274,6 +303,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     canWrite: () => !isReadOnly.value && !isActiveModelUnavailable.value, // 현재 전송 가능 상태 가드 밸리데이션 검증식
     isReadOnly,
     isActiveModelUnavailable,
+    markNewSubmitConversation,
   });
 
   const isGenerating = computed(
