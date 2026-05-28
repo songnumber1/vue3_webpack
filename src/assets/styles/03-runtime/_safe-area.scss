@@ -1,51 +1,15 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-safe-area-patches.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
-body.mobile-mode .sidebar-content--mobile {
-  padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
-}
-
-body.mobile-mode .sidebar-content--mobile .sidebar-user {
-  margin-bottom: max(10px, env(safe-area-inset-bottom)) !important;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
-}
-
-body.mobile-mode .sidebar-content--mobile {
-  min-height: 100%;
-  padding-bottom: calc(
-    var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
-  ) !important;
-}
-
-body.mobile-mode .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .sidebar-user--mobile {
-  margin-top: auto !important;
-  margin-bottom: calc(
-    var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
-  ) !important;
-  padding-bottom: var(--space-4) !important;
-}
+   Consolidated to remove repeated declarations while preserving the final computed values
+   produced by the original patch order. */
 
 body.mobile-mode .sidebar-content--mobile,
 body.mobile-mode .mobile-drawer .sidebar-content--mobile {
+  min-height: 100%;
   height: 100% !important;
   padding-bottom: calc(
     24px + var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
   ) !important;
   box-sizing: border-box !important;
-}
-
-body.mobile-mode .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .sidebar-user--mobile,
-body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  margin-top: auto;
-  margin-bottom: max(
-    22px,
-    calc(var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom))
-  ) !important;
-  padding-bottom: 18px !important;
-  flex: 0 0 auto;
 }
 
 body.mobile-mode .sidebar-content--mobile .sidebar-user,

@@ -1,3 +1,15 @@
+/* Radius and shape tokens.
+   Single source for reusable radius variables.
+   Component-specific 5px policies are intentionally kept as dedicated dialog/control tokens. */
+
 :root {
-  --radius-sm: 5px;
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --dialog-radius: 5px;
+  --dialog-sheet-radius: 5px 5px 0 0;
+  --dialog-input-radius: 5px;
+  --dialog-option-radius: 5px;
+  --dialog-close-radius: 5px;
+  --control-radius-sm: 5px;
 }

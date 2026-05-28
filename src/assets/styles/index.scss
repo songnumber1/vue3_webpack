@@ -1,140 +1,96 @@
 /* Sass entrypoint generated from the previous CSS import chain. */
-@use "./00-utils/variables" as m_00-utils-variables;
-@use "./00-utils/functions" as m_00-utils-functions;
-@use "./00-utils/mixins" as m_00-utils-mixins;
-@use "./00-utils/theme" as m_00-utils-theme;
-@use "./00-utils/runtime" as m_00-utils-runtime;
-@use "./02-foundation/tokens/z-index.tokens" as
-  m_02-foundation-tokens-z-index-tokens;
-@use "./02-foundation/tokens/color.tokens" as
-  m_02-foundation-tokens-color-tokens;
-@use "./02-foundation/tokens/spacing.tokens" as
-  m_02-foundation-tokens-spacing-tokens;
-@use "./02-foundation/tokens/radius.tokens" as
-  m_02-foundation-tokens-radius-tokens;
-@use "./02-foundation/tokens/shadow.tokens" as
-  m_02-foundation-tokens-shadow-tokens;
-@use "./02-foundation/tokens/layout.tokens" as
-  m_02-foundation-tokens-layout-tokens;
-@use "./02-foundation/tokens/typography.tokens" as
-  m_02-foundation-tokens-typography-tokens;
-@use "./02-foundation/semantic/surface.semantic" as
-  m_02-foundation-semantic-surface-semantic;
-@use "./02-foundation/semantic/text.semantic" as
-  m_02-foundation-semantic-text-semantic;
-@use "./02-foundation/semantic/border.semantic" as
-  m_02-foundation-semantic-border-semantic;
-@use "./02-foundation/semantic/control.semantic" as
-  m_02-foundation-semantic-control-semantic;
-@use "./02-foundation/semantic/message.semantic" as
-  m_02-foundation-semantic-message-semantic;
-@use "./02-foundation/semantic/state.semantic" as
-  m_02-foundation-semantic-state-semantic;
-@use "./02-foundation/themes/themes" as m_02-foundation-themes-themes;
-@use "./02-foundation/themes/light.theme" as m_02-foundation-themes-light-theme;
-@use "./02-foundation/themes/dark.theme" as m_02-foundation-themes-dark-theme;
-@use "./02-foundation/themes/spring.theme" as
-  m_02-foundation-themes-spring-theme;
-@use "./02-foundation/themes/summer.theme" as
-  m_02-foundation-themes-summer-theme;
-@use "./02-foundation/themes/autumn.theme" as
-  m_02-foundation-themes-autumn-theme;
-@use "./02-foundation/themes/winter.theme" as
-  m_02-foundation-themes-winter-theme;
-@use "./01-base/reset" as m_01-base-reset;
-@use "./01-base/body" as m_01-base-body;
-@use "./01-base/font" as m_01-base-font;
-@use "./01-base/scrollbar" as m_01-base-scrollbar;
-@use "./01-base/interaction-base" as m_01-base-interaction-base;
-@use "./01-base/base" as m_01-base-base;
-@use "./05-layout/app-shell" as m_05-layout-app-shell;
-@use "./05-layout/chat-core" as m_05-layout-chat-core;
-@use "./06-components/markdown/markdown" as m_06-components-markdown-markdown;
-@use "./06-components/bottom-sheet/bottom-sheet" as
-  m_06-components-bottom-sheet-bottom-sheet;
-@use "./07-pages/playground" as m_07-pages-playground;
-@use "./03-runtime/keyboard" as m_03-runtime-keyboard;
-@use "./03-runtime/mobile-mode" as m_03-runtime-mobile-mode;
-@use "./03-runtime/safe-area" as m_03-runtime-safe-area;
-@use "./03-runtime/viewport-keyboard" as m_03-runtime-viewport-keyboard;
-@use "./03-runtime/scroll-lock" as m_03-runtime-scroll-lock;
-@use "./03-runtime/bottom-sheet-runtime" as m_03-runtime-bottom-sheet-runtime;
-@use "./03-runtime/overlay" as m_03-runtime-overlay;
-@use "./03-runtime/gesture" as m_03-runtime-gesture;
-@use "./04-platform/android" as m_04-platform-android;
-@use "./04-platform/android-chrome" as m_04-platform-android-chrome;
-@use "./04-platform/android-webview" as m_04-platform-android-webview;
-@use "./04-platform/android-chrome-webview" as
-  m_04-platform-android-chrome-webview;
-@use "./04-platform/legacy-mobile-patches" as
-  m_04-platform-legacy-mobile-patches;
-@use "./05-layout/chat-mobile" as m_05-layout-chat-mobile;
-@use "./06-components/message/message" as m_06-components-message-message;
-@use "./06-components/message/message-bubbles" as
-  m_06-components-message-message-bubbles;
-@use "./05-layout/sidebar" as m_05-layout-sidebar;
-@use "./05-layout/sidebar-mobile" as m_05-layout-sidebar-mobile;
-@use "./06-components/attachment/attachment-preview" as
-  m_06-components-attachment-attachment-preview;
-@use "./08-state/reasoning" as m_08-state-reasoning;
-@use "./08-state/error" as m_08-state-error;
-@use "./06-components/assistant/assistant-icon" as
-  m_06-components-assistant-assistant-icon;
-@use "./08-state/interaction" as m_08-state-interaction;
-@use "./05-layout/header" as m_05-layout-header;
-@use "./07-pages/chat" as m_07-pages-chat;
-@use "./05-layout/responsive" as m_05-layout-responsive;
-@use "./06-components/dialog/dialog-system" as
-  m_06-components-dialog-dialog-system;
-@use "./02-foundation/typography" as m_02-foundation-typography;
-@use "./06-components/dialog/dialog-control" as
-  m_06-components-dialog-dialog-control;
-@use "./06-components/dialog/dialog-viewport" as
-  m_06-components-dialog-dialog-viewport;
-@use "./06-components/dialog/system-settings-dialog" as
-  m_06-components-dialog-system-settings-dialog;
-@use "./06-components/mobile/mobile-api-progress" as
-  m_06-components-mobile-mobile-api-progress;
-@use "./06-components/message/message-actions" as
-  m_06-components-message-message-actions;
-@use "./06-components/message/message-error" as
-  m_06-components-message-message-error;
-@use "./06-components/overlay/desktop-clipboard-note" as
-  m_06-components-overlay-desktop-clipboard-note;
-@use "./06-components/overlay/mobile-clipboard-toast" as
-  m_06-components-overlay-mobile-clipboard-toast;
-@use "./06-components/overlay/progress-overlay" as
-  m_06-components-overlay-progress-overlay;
-@use "./06-components/prompt/prompt-composer" as
-  m_06-components-prompt-prompt-composer;
-@use "./06-components/prompt/prompt-toolbar-desktop" as
-  m_06-components-prompt-prompt-toolbar-desktop;
-@use "./06-components/prompt/prompt-toolbar-mobile" as
-  m_06-components-prompt-prompt-toolbar-mobile;
-@use "./06-components/prompt/prompt-mobile-sheets" as
-  m_06-components-prompt-prompt-mobile-sheets;
-@use "./06-components/prompt/prompt-template-panel" as
-  m_06-components-prompt-prompt-template-panel;
-@use "./06-components/prompt/prompt-attachment" as
-  m_06-components-prompt-prompt-attachment;
-@use "./06-components/prompt/prompt-model-selector" as
-  m_06-components-prompt-prompt-model-selector;
-@use "./06-components/prompt/prompt-textarea" as
-  m_06-components-prompt-prompt-textarea;
-@use "./06-components/toast/toast" as m_06-components-toast-toast;
-@use "./07-pages/main" as m_07-pages-main;
-@use "./07-pages/swagger" as m_07-pages-swagger;
-@use "./07-pages/terms" as m_07-pages-terms;
-@use "./07-pages/login-required" as m_07-pages-login-required;
-@use "./07-pages/settings/privacy-policy" as m_07-pages-settings-privacy-policy;
-@use "./08-state/streaming" as m_08-state-streaming;
-@use "./08-state/loading" as m_08-state-loading;
-@use "./08-state/disabled" as m_08-state-disabled;
-@use "./10-vendor-overrides/katex-overrides" as
-  m_10-vendor-overrides-katex-overrides;
-@use "./10-vendor-overrides/highlight-overrides" as
-  m_10-vendor-overrides-highlight-overrides;
-@use "./10-vendor-overrides/swagger-overrides" as
-  m_10-vendor-overrides-swagger-overrides;
-@use "./10-vendor-overrides/overlayscrollbars-overrides" as
-  m_10-vendor-overrides-overlayscrollbars-overrides;
+@use "./00-utils/variables" as *;
+@use "./00-utils/functions" as *;
+@use "./00-utils/mixins" as *;
+@use "./00-utils/theme" as *;
+@use "./00-utils/runtime" as *;
+@use "./02-foundation/tokens/z-index.tokens" as *;
+@use "./02-foundation/tokens/color.tokens" as *;
+@use "./02-foundation/tokens/spacing.tokens" as *;
+@use "./02-foundation/tokens/radius.tokens" as *;
+@use "./02-foundation/tokens/shadow.tokens" as *;
+@use "./02-foundation/tokens/layout.tokens" as *;
+@use "./02-foundation/tokens/typography.tokens" as *;
+@use "./02-foundation/semantic/surface.semantic" as *;
+@use "./02-foundation/semantic/text.semantic" as *;
+@use "./02-foundation/semantic/border.semantic" as *;
+@use "./02-foundation/semantic/control.semantic" as *;
+@use "./02-foundation/semantic/message.semantic" as *;
+@use "./02-foundation/semantic/state.semantic" as *;
+@use "./02-foundation/themes/themes" as *;
+@use "./02-foundation/themes/light.theme" as *;
+@use "./02-foundation/themes/dark.theme" as *;
+@use "./02-foundation/themes/spring.theme" as *;
+@use "./02-foundation/themes/summer.theme" as *;
+@use "./02-foundation/themes/autumn.theme" as *;
+@use "./02-foundation/themes/winter.theme" as *;
+@use "./01-base/reset" as *;
+@use "./01-base/body" as *;
+@use "./01-base/font" as *;
+@use "./01-base/scrollbar" as *;
+@use "./01-base/interaction-base" as *;
+@use "./01-base/base" as *;
+@use "./05-layout/app-shell" as *;
+@use "./05-layout/chat-core" as *;
+@use "./06-components/markdown/markdown" as *;
+@use "./06-components/bottom-sheet/bottom-sheet" as *;
+@use "./07-pages/playground" as *;
+@use "./03-runtime/keyboard" as *;
+@use "./99-legacy/responsive-keyboard-extracted-patches" as *;
+@use "./03-runtime/mobile-mode" as *;
+@use "./03-runtime/safe-area" as *;
+@use "./03-runtime/viewport-keyboard" as *;
+@use "./03-runtime/scroll-lock" as *;
+@use "./03-runtime/bottom-sheet-runtime" as *;
+@use "./03-runtime/overlay" as *;
+@use "./03-runtime/gesture" as *;
+@use "./04-platform/android" as *;
+@use "./04-platform/android-chrome" as *;
+@use "./04-platform/android-webview" as *;
+@use "./04-platform/android-chrome-webview" as *;
+@use "./04-platform/legacy-mobile-patches" as *;
+@use "./05-layout/chat-mobile" as *;
+@use "./06-components/message/message" as *;
+@use "./06-components/message/message-bubbles" as *;
+@use "./05-layout/sidebar" as *;
+@use "./05-layout/sidebar-mobile" as *;
+@use "./06-components/attachment/attachment-preview" as *;
+@use "./08-state/reasoning" as *;
+@use "./08-state/error" as *;
+@use "./06-components/assistant/assistant-icon" as *;
+@use "./08-state/interaction" as *;
+@use "./05-layout/header" as *;
+@use "./07-pages/chat" as *;
+@use "./05-layout/responsive" as *;
+@use "./06-components/dialog/dialog-system" as *;
+@use "./02-foundation/typography" as *;
+@use "./06-components/dialog/dialog-control" as *;
+@use "./06-components/dialog/dialog-viewport" as *;
+@use "./06-components/dialog/system-settings-dialog" as *;
+@use "./06-components/mobile/mobile-api-progress" as *;
+@use "./06-components/message/message-actions" as *;
+@use "./06-components/message/message-error" as *;
+@use "./06-components/overlay/desktop-clipboard-note" as *;
+@use "./06-components/overlay/mobile-clipboard-toast" as *;
+@use "./06-components/overlay/progress-overlay" as *;
+@use "./06-components/prompt/prompt-composer" as *;
+@use "./06-components/prompt/prompt-toolbar-desktop" as *;
+@use "./06-components/prompt/prompt-toolbar-mobile" as *;
+@use "./06-components/prompt/prompt-mobile-sheets" as *;
+@use "./06-components/prompt/prompt-template-panel" as *;
+@use "./06-components/prompt/prompt-attachment" as *;
+@use "./06-components/prompt/prompt-model-selector" as *;
+@use "./06-components/prompt/prompt-textarea" as *;
+@use "./06-components/toast/toast" as *;
+@use "./07-pages/main" as *;
+@use "./07-pages/swagger" as *;
+@use "./07-pages/terms" as *;
+@use "./07-pages/login-required" as *;
+@use "./07-pages/settings/privacy-policy" as *;
+@use "./08-state/streaming" as *;
+@use "./08-state/loading" as *;
+@use "./08-state/disabled" as *;
+@use "./10-vendor-overrides/katex-overrides" as *;
+@use "./10-vendor-overrides/highlight-overrides" as *;
+@use "./10-vendor-overrides/swagger-overrides" as *;
+@use "./10-vendor-overrides/overlayscrollbars-overrides" as *;
