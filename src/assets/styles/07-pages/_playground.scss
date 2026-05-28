@@ -657,105 +657,6 @@ body.mobile-mode .message-action-icon {
   justify-self: start;
 }
 
-.feedback-dialog-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-feedback-dialog);
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  background: rgba(15, 23, 42, 0.36);
-}
-
-.feedback-dialog {
-  width: min(520px, calc(100vw - 32px));
-  max-height: min(640px, calc(100dvh - 40px));
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border: 1px solid var(--control-border);
-  border-radius: var(--dialog-radius);
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: var(--shadow-panel, 0 22px 80px rgba(15, 23, 42, 0.2));
-}
-
-.feedback-dialog-header,
-.feedback-dialog-footer {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-}
-
-.feedback-dialog-header {
-  justify-content: space-between;
-  border-bottom: 1px solid var(--control-border);
-}
-
-.feedback-dialog-close {
-  width: 34px;
-  height: 34px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: var(--font-size-fixed-22);
-  cursor: pointer;
-}
-
-.feedback-dialog-close:hover {
-  background: var(--control-hover);
-  color: var(--text);
-}
-
-.feedback-dialog-body {
-  min-height: 0;
-  overflow-y: auto;
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-}
-
-.feedback-dialog-body p {
-  margin: 0;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-.feedback-dialog-body textarea {
-  width: 100%;
-  min-height: 150px;
-  border: 1px solid var(--control-border);
-  border-radius: var(--dialog-radius);
-  background: var(--control-bg);
-  color: var(--text);
-  padding: 12px;
-  resize: vertical;
-  outline: none;
-}
-
-.feedback-dialog-footer {
-  justify-content: flex-end;
-  border-top: 1px solid var(--control-border);
-}
-
-.feedback-dialog-footer button {
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid var(--control-border);
-  border-radius: 999px;
-  background: var(--control-bg);
-  color: var(--text);
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.feedback-dialog-footer button:first-child {
-  border-color: var(--primary);
-  color: var(--primary-strong, var(--primary));
-}
 body.mobile-mode .empty-stage--mobile-main {
   place-items: start center !important;
   align-content: start !important;
@@ -809,16 +710,9 @@ body.mobile-mode
   ) !important;
 }
 
-body.mobile-mode .feedback-dialog-backdrop {
-  align-items: end;
-  padding: 12px;
-}
 
-body.mobile-mode .feedback-dialog {
-  width: 100%;
-  max-height: calc(100dvh - 24px);
-  border-radius: var(--dialog-radius);
-}
+
+
 .mobile-settings-item-icon img {
   display: block;
   width: 24px;

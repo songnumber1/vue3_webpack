@@ -35,6 +35,7 @@
 @use "./06-components/markdown/markdown" as *;
 @use "./06-components/bottom-sheet/bottom-sheet" as *;
 @use "./07-pages/playground" as *;
+@use "./06-components/dialog/feedback-dialog" as *;
 @use "./03-runtime/keyboard" as *;
 @use "./99-legacy/responsive-keyboard-extracted-patches" as *;
 @use "./03-runtime/mobile-mode" as *;
