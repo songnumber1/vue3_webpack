@@ -17,6 +17,7 @@ import {usePromptModel} from "@/composables/prompt/usePromptModel";
 import {usePromptTool} from "@/composables/prompt/usePromptTool";
 import {usePromptTemplate} from "@/composables/prompt/usePromptTemplate";
 import {useChatStore} from "@/stores/chatStore";
+import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 
 /**
  * @function usePromptComposer
@@ -38,7 +39,7 @@ import {useChatStore} from "@/stores/chatStore";
  */
 export function usePromptComposer(props, emit) {
   // 1. 다국어 메시지 처리를 위한 i18n 인스턴스로부터 t 번역 메서드를 확보합니다.
-  const {t} = useI18n();
+  const {t, locale} = useI18n();
   // 2. 외부 Props의 변경 사항을 하위 서브 훅들이 안전하게 반응형 추적할 수 있도록 `toRef` 단방향 참조 처리를 수행합니다.
   const disabled = toRef(props, "disabled");
 
@@ -135,6 +136,22 @@ export function usePromptComposer(props, emit) {
     text,
     resize,
     focusTextarea,
+  });
+
+  const selectedTemplateTool = computed(() => {
+    const template = selectedTemplate.value;
+    if (!template) return null;
+
+    const label =
+      locale.value === "en"
+        ? template.nameEn || template.nameKo || template.templateName || ""
+        : template.nameKo || template.nameEn || template.templateName || "";
+
+    return {
+      ...template,
+      label,
+      iconSrc: resolvePromptTemplateToolIcon(template.key),
+    };
   });
 
   // 4. [반응형 감시자 (Watch)] 유저가 상단이나 설정에서 AI 거대모델(modelValue)을 다른 종류로 전격 스위칭한 경우,
@@ -336,6 +353,7 @@ export function usePromptComposer(props, emit) {
     selectModel,
     // template 프롬프트 서식 제어 파트
     selectedTemplate,
+    selectedTemplateTool,
     selectedTemplateGroups,
     hasSelectedTemplatePanel,
     activeMobileGroup,

@@ -18,6 +18,7 @@
 
       <div ref="toolRoot" class="prompt-selector-wrap">
         <button
+          v-if="!selectedTemplateTool"
           class="prompt-icon-action"
           :class="{'prompt-icon-action--active': toolMenuOpen}"
           type="button"
@@ -26,6 +27,24 @@
           @click="$emit('open-tool')"
         >
           ＋
+        </button>
+        <button
+          v-else
+          class="prompt-selected-tool-chip prompt-selected-tool-chip--desktop"
+          :class="{'prompt-selected-tool-chip--active': toolMenuOpen}"
+          type="button"
+          :disabled="disabled"
+          :title="selectedTemplateTool.label"
+          :aria-label="selectedTemplateTool.label"
+          @click="$emit('open-tool')"
+        >
+          <img
+            v-if="selectedTemplateTool.iconSrc"
+            :src="selectedTemplateTool.iconSrc"
+            alt=""
+            aria-hidden="true"
+          />
+          <span>{{ selectedTemplateTool.label }}</span>
         </button>
         <div
           v-if="toolMenuOpen && !isMobileSheet"
@@ -48,8 +67,15 @@
             "
             @click="handleToolClick(tool)"
           >
+            <img
+              v-if="tool.iconSrc"
+              class="prompt-tool-icon-img"
+              :src="tool.iconSrc"
+              alt=""
+              aria-hidden="true"
+            />
             <span
-              v-if="!tool.promptTemplateKey"
+              v-else-if="!tool.promptTemplateKey"
               class="prompt-tool-icon"
               aria-hidden="true"
               >{{ tool.icon }}</span
@@ -270,6 +296,9 @@ const props = reactive({
   get attachOptions() {
     return toolbarState.value.attachOptions;
   },
+  get selectedTemplateTool() {
+    return toolbarState.value.selectedTemplateTool;
+  },
   get modelMenuOpen() {
     return toolbarState.value.modelMenuOpen;
   },
@@ -334,6 +363,7 @@ const {
   toolMenuOpen,
   attachMenuOpen,
   isMobileSheet,
+  selectedTemplateTool,
   canSubmit,
   generating,
   isSpeechSupported,
@@ -668,5 +698,47 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 
 .prompt-tool-menu button.is-template-tool.active .prompt-tool-text small {
   color: var(--muted);
+}
+
+.prompt-selected-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  max-width: 128px;
+  padding: 0 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prompt-selected-tool-chip--active {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--control-border));
+  color: var(--accent);
+}
+
+.prompt-selected-tool-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.prompt-selected-tool-chip img,
+.prompt-tool-icon-img {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  object-fit: contain;
+}
+
+.prompt-selected-tool-chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

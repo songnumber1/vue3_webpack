@@ -33,6 +33,37 @@ const assistant = (id, content, sendTime, references = []) => ({
 });
 
 export const CHAT_MESSAGES_RAW = {
+  "chat-error-response": [
+    {
+      role: "user",
+      content: "오류 응답 영역을 확인하고 싶어",
+      id: "msg-error-1",
+      isSend: true,
+      isRAG: false,
+      isRagCot: false,
+      intention: "직접입력",
+      sendTime: "2026-05-16T09:00:00Z",
+      tags: [],
+      refreences: [],
+    },
+    {
+      role: "assistant",
+      content: "서버 응답을 정상적으로 불러오지 못했습니다.",
+      id: "msg-error-2",
+      status: "error",
+      error: true,
+      errorTitle: "답변 생성 실패",
+      errorMessage:
+        "테스트용 오류 응답입니다. 실제 API 오류가 발생하면 일반 텍스트 대신 이 에러 카드 영역이 표시됩니다.",
+      isSend: false,
+      isRAG: false,
+      isRagCot: false,
+      intention: null,
+      sendTime: "2026-05-16T09:00:05Z",
+      tags: ["ERROR"],
+      refreences: [],
+    },
+  ],
   "chat-deleted-model": [
     user(
       "msg-deleted-1",

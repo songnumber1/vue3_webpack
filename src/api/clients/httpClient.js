@@ -8,7 +8,11 @@
  */
 
 import axios from "axios";
-import {shouldUseServerApi, SERVER_API_BASE_URL} from "@/constants/apiMode";
+import {
+  DEFAULT_API_BASE_PATH,
+  shouldUseServerApi,
+  SERVER_API_BASE_URL,
+} from "@/constants/apiMode";
 import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
@@ -30,7 +34,7 @@ function resolveBaseURL() {
   }
 
   // 기본적으로 환경 변수(`VUE_APP_API_BASE_URL`)를 추적하되, 유실 시 로컬 프록시 패스인 `"/api"`를 기본 바인딩
-  return process.env.VUE_APP_API_BASE_URL || "/api";
+  return process.env.VUE_APP_API_BASE_URL || DEFAULT_API_BASE_PATH;
 }
 
 /**

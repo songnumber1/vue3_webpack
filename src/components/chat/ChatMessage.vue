@@ -6,6 +6,13 @@
     :message="message"
     @rendered="$emit('rendered', $event)"
   />
+  <AssistantErrorMessage
+    v-else-if="isErrorMessage"
+    :data-message-id="messageDomId"
+    :data-message-role="messageDomRole"
+    :message="message"
+    @rendered="$emit('rendered', $event)"
+  />
   <AssistantMessage
     v-else
     :data-message-id="messageDomId"
@@ -27,16 +34,24 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+import {computed} from "vue";
 import UserMessage from "./UserMessage.vue";
 import AssistantMessage from "./AssistantMessage.vue";
+import AssistantErrorMessage from "./AssistantErrorMessage.vue";
 
-defineProps({
+const props = defineProps({
   message: {type: Object, required: true},
   messageDomId: {type: String, default: ""},
   messageDomRole: {type: String, default: ""},
   showRegenerate: {type: Boolean, default: true},
 });
 defineEmits(["rendered", "regenerate"]);
+
+const isErrorMessage = computed(
+  () =>
+    props.message?.role !== "user" &&
+    (props.message?.status === "error" || props.message?.error === true)
+);
 </script>
 
 <style scoped>

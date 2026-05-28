@@ -1,6 +1,11 @@
 <template>
   <teleport to="body">
-    <div v-if="visible" class="mobile-api-progress-overlay" role="status" aria-live="polite">
+    <div
+      v-if="visible"
+      class="mobile-api-progress-overlay"
+      role="status"
+      aria-live="polite"
+    >
       <span class="mobile-api-progress-spinner" aria-hidden="true"></span>
       <span class="sr-only">{{ t("overlayProgress.apiProcessing") }}</span>
     </div>
@@ -17,16 +22,16 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import { computed } from "vue";
-import { useI18n } from "vue-i18n";
-import { storeToRefs } from "pinia";
-import { useApiRequestStore } from "@/stores/apiRequestStore";
-import { useSystemSettingsStore } from "@/stores/systemSettingsStore";
+import {computed} from "vue";
+import {useI18n} from "vue-i18n";
+import {storeToRefs} from "pinia";
+import {useApiRequestStore} from "@/stores/apiRequestStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
-const { t } = useI18n();
+const {t} = useI18n();
 const apiRequestStore = useApiRequestStore();
 const systemSettingsStore = useSystemSettingsStore();
-const { isOverlayVisible } = storeToRefs(apiRequestStore);
+const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
 const visible = computed(() =>
   Boolean(systemSettingsStore.showMobileApiProgress && isOverlayVisible.value)

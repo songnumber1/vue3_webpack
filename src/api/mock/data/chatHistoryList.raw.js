@@ -9,6 +9,15 @@
 
 export const CHAT_HISTORY_LIST_RAW = [
   {
+    chatTitle: "오류 응답",
+    chatId: "chat-error-response",
+    modeId: "model-ds-thinking",
+    bookmarkYN: true,
+    dayGroup: 0,
+    chatEndDt: "2026-05-16T09:00:00Z",
+    userId: "user-1234",
+  },
+  {
     chatTitle:
       "Markdown 렌더링 종합 테스트: 표, Mermaid, 코드, 링크, 이미지, 수식",
     chatId: "chat-md-showcase",

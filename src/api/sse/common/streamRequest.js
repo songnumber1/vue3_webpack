@@ -1,5 +1,9 @@
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
-import {SERVER_API_BASE_URL, shouldUseServerApi} from "@/constants/apiMode";
+import {
+  DEFAULT_API_BASE_PATH,
+  SERVER_API_BASE_URL,
+  shouldUseServerApi,
+} from "@/constants/apiMode";
 import {API_KEYS, resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
@@ -39,13 +43,17 @@ export async function resolveSseAuthOptions() {
 }
 
 export function resolveGenerationUrl() {
-  const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
+  const base = shouldUseServerApi()
+    ? SERVER_API_BASE_URL
+    : DEFAULT_API_BASE_PATH;
 
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION}`;
 }
 
 function resolveGenerationResultUrl(requestId) {
-  const base = shouldUseServerApi() ? SERVER_API_BASE_URL : "/api";
+  const base = shouldUseServerApi()
+    ? SERVER_API_BASE_URL
+    : DEFAULT_API_BASE_PATH;
 
   const query = encodeURIComponent(requestId || "");
   return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION_RESULT}?requestId=${query}`;

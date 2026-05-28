@@ -113,7 +113,17 @@ function resolveTemplateKey(raw = {}) {
  */
 export function adaptPromptTemplate(raw = {}) {
   // 백엔드 명세 변경이나 시스템별 키 구조 상이(Snake vs Camel vs Nested) 사태를 방어하기 위한 통합 Nullish 연산 개통
-  const id = raw.prompts_id || raw.id || raw.promptTemplateId || "";
+  const fallbackId = [
+    raw.modelId || raw.model_id,
+    raw.promptTemplateOrder ?? raw.order,
+    raw.promptTemplateName ||
+      raw.promptTemplateNameEn ||
+      raw.name_ko ||
+      raw.nameKo,
+  ]
+    .filter(Boolean)
+    .join("-");
+  const id = raw.prompts_id || raw.id || raw.promptTemplateId || fallbackId;
   const modelId = raw.model_id || raw.modelId || "";
   const template = raw.promptTemplate || {};
 
@@ -128,11 +138,21 @@ export function adaptPromptTemplate(raw = {}) {
 
     // 다중 명세 대응형 다국어 텍스트 필드 정제 파이프라인 수립
     nameKo: raw.name_ko || raw.nameKo || raw.promptTemplateName || "",
-    nameEn: raw.name_en || raw.nameEn || raw.promptTemplateName || "",
+    nameEn:
+      raw.name_en ||
+      raw.nameEn ||
+      raw.promptTemplateNameEn ||
+      raw.promptTemplateName ||
+      "",
     descKo: raw.desc_ko || raw.descKo || "",
     descEn: raw.desc_en || raw.descEn || "",
 
-    templateName: raw.promptTemplateName || raw.name_ko || raw.name_en || "",
+    templateName:
+      raw.promptTemplateName ||
+      raw.promptTemplateNameEn ||
+      raw.name_ko ||
+      raw.name_en ||
+      "",
     template,
 
     // 원본 데이터 참조 앵커 포인터 보존

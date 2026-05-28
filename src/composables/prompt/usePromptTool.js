@@ -16,6 +16,7 @@ import {
   PROMPT_TOOL_DEFINITIONS,
   PROMPT_TEMPLATE_MODEL_IDS,
 } from "@/constants/promptComposer";
+import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 
 /**
  * [순수 검증식] 특정 하위 툴 옵션 유닛이 전역 Pinia 스토어 설정값에 비추어 현재 점등(Active) 상태인지 판별합니다.
@@ -96,6 +97,7 @@ export function usePromptTool({
       .map((template) => ({
         id: template.id,
         icon: "",
+        iconSrc: resolvePromptTemplateToolIcon(template.key),
         label: resolveTemplateLabel(template, locale.value),
         description: resolveTemplateDescription(template, locale.value),
         promptTemplateKey: template.key,

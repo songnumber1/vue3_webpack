@@ -107,6 +107,10 @@ export function adaptMessage(raw = {}) {
         ? MESSAGE_ROLES.USER
         : MESSAGE_ROLES.ASSISTANT, // 메시지 발송 주체 권한 역할 매핑 보정 (User 혹은 Assistant)
     content, // AI 최종 완성 답변 혹은 사용자의 질문 본문 텍스트 스트링 문자열
+    status: raw.status || (raw.error === true ? "error" : "complete"),
+    error: raw.error === true || raw.status === "error",
+    errorTitle: raw.errorTitle || raw.error_title || "",
+    errorMessage: raw.errorMessage || raw.error_message || "",
 
     // LLM 추론 모델(O1, DeepSeek-R1 등)의 생각 프로세스 내역(Reasoning Content)을 통합 추출 가드합니다.
     reasoningContent,

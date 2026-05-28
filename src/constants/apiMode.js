@@ -39,9 +39,11 @@ function normalizeLocalHttpUrl(value) {
  * @type {string}
  * @see {@link normalizeLocalHttpUrl} 로컬 호스트 주소 가로채기 및 HTTP 교정 함수
  */
+export const DEFAULT_API_BASE_PATH = "/api";
+
 export const SERVER_API_BASE_URL = normalizeLocalHttpUrl(
-  // Vue.js 환경 변수에 선언된 API 주소를 우선 채택하고, 정의되어 있지 않다면 폴백(Fallback) 값으로 프록시용 상대 경로인 "/api"를 할당합니다.
-  process.env.VUE_APP_API_BASE_URL || "/api"
+  // Vue.js 환경 변수에 선언된 API 주소를 우선 채택하고, 정의되어 있지 않다면 폴백(Fallback) API 경로를 할당합니다.
+  process.env.VUE_APP_API_BASE_URL || DEFAULT_API_BASE_PATH
 );
 
 /**

@@ -85,6 +85,7 @@ export function createEmptyPromptToolbarState() {
     currentModel: {id: "", label: ""},
     models: [],
     tools: [],
+    selectedTemplateTool: null,
     attachOptions: [],
     modelMenuOpen: false,
     toolMenuOpen: false,

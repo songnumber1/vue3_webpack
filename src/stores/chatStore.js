@@ -182,8 +182,7 @@ export const useChatStore = defineStore("chat", {
      * @param {string} templateId - 타깃 시스템 프롬프트 템플릿의 고유 Key
      */
     setActivePromptTemplate(templateId) {
-      const chatId =
-        this.ensurePromptTurnAroundSettings || this.ensurePromptToolSettings();
+      const chatId = this.ensurePromptToolSettings();
       const current = clonePromptToolSettings(
         this.promptToolSettingsMap[chatId]
       );

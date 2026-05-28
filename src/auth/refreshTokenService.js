@@ -1,5 +1,9 @@
 import axios from "axios";
-import {SERVER_API_BASE_URL, shouldUseServerApi} from "@/constants/apiMode";
+import {
+  DEFAULT_API_BASE_PATH,
+  SERVER_API_BASE_URL,
+  shouldUseServerApi,
+} from "@/constants/apiMode";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {getRefreshToken, setTokens, clearTokens} from "@/auth/tokenStore";
 import {AUTH_HEADER_NAMES, AUTH_MODES} from "@/auth/authConstants";
@@ -10,7 +14,7 @@ let refreshPromise = null;
 function resolveBaseURL() {
   return shouldUseServerApi()
     ? SERVER_API_BASE_URL
-    : process.env.VUE_APP_API_BASE_URL || "/api";
+    : process.env.VUE_APP_API_BASE_URL || DEFAULT_API_BASE_PATH;
 }
 
 function createRefreshClient() {

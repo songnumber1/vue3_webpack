@@ -67,8 +67,17 @@ export async function runAssistantStream({
       getAssistantMessage().content ||
       (isAbort ? abortFallbackMessage : errorFallbackMessage);
 
+    const shouldShowErrorArea = !isAbort && !syncedContent;
+
     commit({
-      status: fallbackContent ? "complete" : "error",
+      status: shouldShowErrorArea
+        ? "error"
+        : fallbackContent
+          ? "complete"
+          : "error",
+      error: shouldShowErrorArea,
+      errorTitle: shouldShowErrorArea ? "답변 생성 실패" : "",
+      errorMessage: shouldShowErrorArea ? fallbackContent : "",
       isReasoning:
         getAssistantMessage().isReasoning || Boolean(error.reasonAccumulated),
       reasoningContent:

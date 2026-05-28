@@ -26,14 +26,27 @@
 
       <div ref="toolRoot" class="prompt-selector-wrap">
         <button
-          class="prompt-icon-action"
-          :class="{'prompt-icon-action--active': toolMenuOpen}"
+          class="prompt-icon-action prompt-tool-mobile-trigger"
+          :class="{
+            'prompt-icon-action--active': toolMenuOpen,
+            'prompt-tool-mobile-trigger--selected':
+              Boolean(selectedTemplateTool),
+          }"
           type="button"
           :disabled="disabled"
-          aria-label="Tools"
+          :title="selectedTemplateTool ? selectedTemplateTool.label : 'Tools'"
+          :aria-label="
+            selectedTemplateTool ? selectedTemplateTool.label : 'Tools'
+          "
           @click="$emit('open-tool')"
         >
-          ＋
+          <img
+            v-if="selectedTemplateTool?.iconSrc"
+            :src="selectedTemplateTool.iconSrc"
+            alt=""
+            aria-hidden="true"
+          />
+          <span v-else aria-hidden="true">＋</span>
         </button>
       </div>
 
@@ -172,6 +185,9 @@ const props = reactive({
   get attachOptions() {
     return toolbarState.value.attachOptions;
   },
+  get selectedTemplateTool() {
+    return toolbarState.value.selectedTemplateTool;
+  },
   get modelMenuOpen() {
     return toolbarState.value.modelMenuOpen;
   },
@@ -230,6 +246,7 @@ const {
   currentModel,
   toolMenuOpen,
   attachMenuOpen,
+  selectedTemplateTool,
   canSubmit,
   generating,
   isSpeechSupported,
@@ -278,5 +295,16 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 
 .prompt-model-trigger span {
   min-width: 0;
+}
+
+.prompt-tool-mobile-trigger img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.prompt-tool-mobile-trigger--selected {
+  background: transparent;
+  border-color: var(--control-border);
 }
 </style>

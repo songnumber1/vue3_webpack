@@ -41,7 +41,14 @@
         type="button"
         @click="handleToolClick(tool)"
       >
-        <span v-if="!tool.promptTemplateKey" aria-hidden="true">
+        <img
+          v-if="tool.iconSrc"
+          class="bottom-sheet-tool-icon"
+          :src="tool.iconSrc"
+          alt=""
+          aria-hidden="true"
+        />
+        <span v-else-if="!tool.promptTemplateKey" aria-hidden="true">
           {{ tool.icon }}
         </span>
 
@@ -478,5 +485,13 @@ watch(
   min-width: 0 !important;
   flex: 1 1 auto !important;
   text-align: left !important;
+}
+
+.bottom-sheet-tool-icon {
+  width: 22px !important;
+  min-width: 22px !important;
+  height: 22px !important;
+  flex: 0 0 22px !important;
+  object-fit: contain;
 }
 </style>

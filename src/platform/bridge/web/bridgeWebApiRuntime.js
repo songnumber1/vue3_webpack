@@ -1,3 +1,4 @@
+import {DEFAULT_API_BASE_PATH} from "@/constants/apiMode";
 /**
  * @file platform/bridge/web/bridgeWebApiRuntime.js
  * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
@@ -20,7 +21,7 @@ import {getContract, throwIfErrorResponse} from "../bridgeValidation";
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
 function getApiBaseUrl() {
-  const configured = process.env.VUE_APP_API_BASE_URL || "/api";
+  const configured = process.env.VUE_APP_API_BASE_URL || DEFAULT_API_BASE_PATH;
   return configured.replace(/\/$/, "");
 }
 

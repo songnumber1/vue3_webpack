@@ -1,3 +1,5 @@
+import {DEFAULT_API_BASE_PATH} from "@/constants/apiMode";
+
 export const AUTH_MODES = Object.freeze({
   SESSION: "session",
   JWT: "jwt",
@@ -9,13 +11,14 @@ export const AUTH_HEADER_NAMES = Object.freeze({
   AUTH_MODE: "X-Auth-Mode",
 });
 
-export const AUTH_SKIP_URLS = [
+const AUTH_PUBLIC_PATHS = [
   "/login.do",
   "/temp-login.do",
   "/logout.do",
   "/auth/refresh.do",
-  "/api/login.do",
-  "/api/temp-login.do",
-  "/api/logout.do",
-  "/api/auth/refresh.do",
+];
+
+export const AUTH_SKIP_URLS = [
+  ...AUTH_PUBLIC_PATHS,
+  ...AUTH_PUBLIC_PATHS.map((path) => `${DEFAULT_API_BASE_PATH}${path}`),
 ];
