@@ -151,7 +151,6 @@ const {
   currentModels,
   currentModel,
   tools,
-  selectedTemplate,
   selectedTemplateTool,
   selectedTemplateGroups,
   hasSelectedTemplatePanel,
@@ -232,7 +231,7 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* The base prompt border is component-owned; browser/keyboard patches remain global. */
 .prompt-box,
 .prompt-box--gemini {

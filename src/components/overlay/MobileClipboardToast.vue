@@ -88,7 +88,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .mobile-clipboard-toast {
   position: fixed;
   left: 50%;

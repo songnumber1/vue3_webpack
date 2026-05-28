@@ -93,7 +93,7 @@ defineProps({
 defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-template-panel {
   width: 100%;
   margin: 0 0 2px;

@@ -93,7 +93,7 @@ const scrollContainerAttrs = computed(() =>
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sidebar-history {
   min-width: 0;
 }

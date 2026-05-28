@@ -11,19 +11,19 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const indexCss = read('src/assets/styles/index.css');
+const indexScss = read('src/assets/styles/index.scss');
 const main = read('src/main.js');
-const typography = read('src/assets/styles/foundations/typography/responsive-typography.css');
-const sidebar = read('src/assets/styles/layouts/sidebar/sidebar-assistant-polish.css');
+const typography = read('src/assets/styles/02-foundation/_typography.scss');
+const sidebar = read('src/assets/styles/05-layout/_sidebar.scss');
 
 assert(
-  !indexCss.includes('components/debug/virtual-keyboard-debug.css'),
-  'virtual keyboard debug CSS must not be imported by index.css'
+  !indexScss.includes('virtual-keyboard-debug.scss'),
+  'virtual keyboard debug SCSS must not be imported by index.scss'
 );
 assert(
   main.includes('process.env.NODE_ENV === "development"') &&
-    main.includes('virtual-keyboard-debug.css'),
-  'virtual keyboard debug CSS should be loaded only in development from main.js'
+    main.includes('virtual-keyboard-debug.scss'),
+  'virtual keyboard debug SCSS should be loaded only in development from main.js'
 );
 assert(
   !typography.includes('.system-settings-view') &&
@@ -37,11 +37,11 @@ assert(
   'mobile drawer footer stability rules must stay isolated outside sidebar visual polish'
 );
 assert(
-  indexCss.includes('mobile-drawer-footer-stability.css') &&
-    indexCss.includes('dialog-control-normalization.css') &&
-    indexCss.includes('dialog-viewport-policy.css') &&
-    indexCss.includes('system-settings-dialog.css'),
-  'freeze CSS split files must be imported explicitly'
+  indexScss.includes('sidebar-mobile') &&
+    indexScss.includes('dialog-control') &&
+    indexScss.includes('dialog-viewport') &&
+    indexScss.includes('system-settings-dialog'),
+  'freeze Sass split files must be imported explicitly'
 );
 
-console.log('freeze CSS policy checks passed');
+console.log('freeze Sass policy checks passed');

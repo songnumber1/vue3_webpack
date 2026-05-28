@@ -88,7 +88,7 @@ function emitPreview(file) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Attachment preview sizing belongs to the preview list component. */
 :global(body.mobile-mode) .attachment-preview-row {
   width: 100%;

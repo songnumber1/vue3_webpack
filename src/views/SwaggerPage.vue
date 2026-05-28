@@ -155,7 +155,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .swagger-page {
   width: 100%;
   height: var(--app-height, 100vh);

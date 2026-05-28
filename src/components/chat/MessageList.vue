@@ -88,7 +88,7 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .message-list {
   min-width: 0;
   min-height: 0;

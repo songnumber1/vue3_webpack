@@ -7,7 +7,7 @@
     "build": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build",
     "lint": "node node_modules/eslint/bin/eslint.js --ext .js,.vue src",
     "lint:fix": "node node_modules/eslint/bin/eslint.js --ext .js,.vue src --fix",
-    "format": "node node_modules/prettier/bin/prettier.cjs --write \"src/**/*.{js,vue,json,css,md}\"",
+    "format": "node node_modules/prettier/bin/prettier.cjs --write \"src/**/*.{js,vue,json,scss,md}\"",
     "serve:local": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode local",
     "serve:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js serve --mode dev",
     "build:dev": "node node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode dev",
@@ -36,6 +36,7 @@
     "core-js": "^3.37.1",
     "highlight.js": "^11.11.1",
     "katex": "^0.16.45",
+    "overlayscrollbars": "^2.16.0",
     "overlayscrollbars-vue": "^0.5.10",
     "pinia": "^2.3.1",
     "rehype-external-links": "^3.0.0",
@@ -55,12 +56,15 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
     "@babel/eslint-parser": "^7.25.9",
     "dependency-cruiser": "^17.4.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-vue": "^9.33.0",
     "madge": "^8.0.0",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "sass": "^1.100.0",
+    "sass-loader": "^12.6.0"
   }
 }

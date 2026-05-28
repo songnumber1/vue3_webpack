@@ -1,0 +1,74 @@
+/* Migrated from src/assets/styles/layouts/responsive/desktop-main-feedback-patch.css.
+   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+
+body.desktop-mode .chat-container-root--mode-main .empty-center {
+  width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt {
+  width: min(var(--layout-prompt-width, 820px), 100%) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+body.desktop-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box,
+body.desktop-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box--gemini {
+  width: 100% !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+.feedback-dialog-backdrop {
+  position: fixed !important;
+  inset: 0 !important;
+  top: var(--visual-viewport-offset-top, 0px) !important;
+  bottom: auto !important;
+  width: 100vw !important;
+  min-height: 0 !important;
+  height: var(--app-height, 100dvh) !important;
+  display: grid !important;
+  place-items: center !important;
+  align-items: center !important;
+  justify-items: center !important;
+  padding: max(12px, env(safe-area-inset-top)) 12px
+    max(12px, env(safe-area-inset-bottom)) !important;
+  overflow-y: auto !important;
+}
+
+.feedback-dialog {
+  width: min(680px, calc(100vw - 32px)) !important;
+  max-height: calc(
+    var(--app-height, 100dvh) - 24px - env(safe-area-inset-top) -
+      env(safe-area-inset-bottom)
+  ) !important;
+  margin: auto !important;
+  border-radius: 5px !important;
+}
+
+body.mobile-mode .feedback-dialog-backdrop {
+  place-items: center !important;
+  align-items: center !important;
+  justify-items: center !important;
+}
+
+body.mobile-mode .feedback-dialog {
+  width: min(100%, 520px) !important;
+  border-radius: 5px !important;
+}
+
+body.mobile-mode .feedback-dialog-body {
+  max-height: calc(
+    var(--app-height, 100dvh) - 180px - env(safe-area-inset-top) -
+      env(safe-area-inset-bottom)
+  );
+  overflow-y: auto;
+}
+
+body.mobile-mode .feedback-dialog-body textarea {
+  max-height: max(110px, calc(var(--app-height, 100dvh) - 320px)) !important;
+}

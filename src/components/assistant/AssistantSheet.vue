@@ -62,7 +62,7 @@ defineProps({
 defineEmits(["close", "select"]);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .assistant-sheet-option-content {
   display: flex;
   align-items: center;

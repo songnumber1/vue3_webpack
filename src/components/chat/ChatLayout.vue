@@ -50,7 +50,7 @@ defineEmits([
 ]);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chat-layout {
   min-width: 0;
   min-height: 0;

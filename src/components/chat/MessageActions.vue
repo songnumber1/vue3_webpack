@@ -252,7 +252,7 @@ async function copy() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .message-actions {
   min-width: 0;
 }

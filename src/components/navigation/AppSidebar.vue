@@ -336,7 +336,7 @@ useEventListener(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /*
  * AppSidebar local guard styles.
  * Shared mobile drawer/browser fallback rules stay in global CSS because they

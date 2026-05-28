@@ -476,7 +476,7 @@ const attachRoot = computed(
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-action-row {
   min-width: 0;
 }

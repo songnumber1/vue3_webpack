@@ -1,0 +1,6 @@
+// Sass compile-time variables for migration safety.
+// Runtime-facing values remain CSS custom properties to preserve current behavior.
+$mobile-mode-class: "body.mobile-mode" !default;
+$android-chrome-class: "body.android-chrome" !default;
+$android-webview-class: "body.android-webview" !default;
+$keyboard-visible-class: "body.keyboard-visible" !default;

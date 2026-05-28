@@ -229,7 +229,7 @@ defineExpose({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Mobile main/chat composer geometry is owned by ChatWorkspace because this
    component decides whether the shared prompt composer is rendered as main or chat. */
 :global(body.mobile-mode) .mobile-chat-prompt,

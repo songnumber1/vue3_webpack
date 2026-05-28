@@ -1,0 +1,44 @@
+/* Migrated from src/assets/styles/platform/mobile-runtime/viewport/android-chrome-webview-layout-patches.css.
+   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+
+body.mobile-mode {
+  --mobile-browser-safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: calc(
+    var(--composer-keyboard-inset, 0px) + var(--mobile-browser-safe-bottom, 0px)
+  ) !important;
+  left: 0 !important;
+  z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
+  flex: none !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: var(--space-3, 12px) var(--space-4, 16px)
+    max(var(--space-3, 12px), var(--mobile-browser-safe-bottom, 0px)) !important;
+  transform: translate3d(0, 0, 0) !important;
+  background: linear-gradient(
+    to top,
+    var(--mobile-bg, var(--chat-bg)) 86%,
+    color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
+  ) !important;
+  box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08) !important;
+  overflow: visible !important;
+  overscroll-behavior: none !important;
+  touch-action: manipulation !important;
+  will-change: bottom !important;
+}
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box {
+  width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin: 0 auto !important;
+}

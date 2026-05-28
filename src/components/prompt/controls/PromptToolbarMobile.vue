@@ -286,7 +286,7 @@ const showVoiceStopButton = computed(
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-action-row,
 .prompt-left-actions,
 .prompt-selector-wrap {

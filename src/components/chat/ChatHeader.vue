@@ -175,7 +175,7 @@ const showDesktopConversationTitle = computed(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Compact mobile header sizing is local to ChatHeader. */
 :global(body.mobile-mode) .mobile-topbar {
   height: 44px;

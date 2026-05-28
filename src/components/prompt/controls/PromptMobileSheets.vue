@@ -262,7 +262,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .bottom-sheet-option-main {
   min-width: 0;
 }

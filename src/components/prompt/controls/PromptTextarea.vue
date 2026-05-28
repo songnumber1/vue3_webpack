@@ -96,7 +96,7 @@ function handleShiftEnter(event) {
 defineExpose({textareaRef});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-textarea {
   display: block;
   width: 100%;

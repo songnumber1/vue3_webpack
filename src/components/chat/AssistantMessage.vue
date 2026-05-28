@@ -188,7 +188,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .message-content {
   min-width: 0;
 }

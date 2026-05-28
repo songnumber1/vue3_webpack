@@ -64,7 +64,7 @@ function confirmTerms() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .legal-page {
   width: 100%;
   height: var(--app-height, 100vh);

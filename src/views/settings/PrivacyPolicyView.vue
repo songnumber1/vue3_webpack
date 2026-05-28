@@ -38,7 +38,7 @@ const {t, tm} = useI18n();
 const privacySections = computed(() => tm("legal.privacy.sections") || []);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .privacy-policy-view {
   display: grid;
   gap: 18px;

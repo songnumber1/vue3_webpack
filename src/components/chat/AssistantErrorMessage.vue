@@ -36,7 +36,7 @@ const errorMessage = computed(
 onMounted(() => emit("rendered", "error"));
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .bubble--error {
   border-color: color-mix(in srgb, #dc2626 28%, var(--prompt-border));
   background: color-mix(in srgb, #dc2626 4%, var(--surface));

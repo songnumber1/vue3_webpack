@@ -1,0 +1,259 @@
+/* Migrated from src/assets/styles/components/dialog/dialog-system.css.
+   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+
+:root {
+  --dialog-radius: 5px;
+  --dialog-sheet-radius: 5px 5px 0 0;
+  --dialog-backdrop: var(--overlay-backdrop, rgba(15, 23, 42, 0.36));
+  --dialog-backdrop-strong: rgba(0, 0, 0, 0.45);
+  --dialog-panel-bg: var(--menu-bg, var(--surface, #fff));
+  --dialog-panel-text: var(--text, #202123);
+  --dialog-panel-border: var(--control-border, var(--border, #e5e7eb));
+  --dialog-panel-shadow: var(--shadow-menu, 0 22px 80px rgba(15, 23, 42, 0.2));
+  --dialog-header-min-height: 58px;
+  --dialog-header-padding: 14px 16px;
+  --dialog-body-padding: 16px;
+  --dialog-action-radius: 5px;
+  --dialog-action-square-radius: 5px;
+  --dialog-input-radius: 5px;
+  --dialog-option-radius: 5px;
+  --dialog-close-radius: 5px;
+
+  --dialog-font-family: inherit;
+  --dialog-title-font-size: var(--font-size-fixed-15);
+  --dialog-title-font-weight: 800;
+  --dialog-title-line-height: 1.35;
+  --dialog-body-font-size: var(--font-size-fixed-14);
+  --dialog-body-line-height: 1.5;
+  --dialog-caption-font-size: var(--font-size-fixed-12);
+  --dialog-caption-line-height: 1.35;
+  --dialog-action-font-size: var(--font-size-fixed-13);
+  --dialog-action-font-weight: 700;
+}
+
+body.mobile-mode {
+  --dialog-header-min-height: 52px;
+  --dialog-header-padding: 12px 14px;
+  --dialog-body-padding: 14px;
+  --dialog-title-font-size: var(--font-size-fixed-14);
+  --dialog-body-font-size: var(--font-size-fixed-13);
+  --dialog-caption-font-size: var(--font-size-fixed-11);
+  --dialog-action-font-size: var(--font-size-fixed-12);
+}
+
+.responsive-panel,
+.feedback-dialog,
+.bottom-sheet,
+.chat-history-context-menu {
+  font-family: var(--dialog-font-family);
+}
+
+.responsive-panel-header strong,
+.feedback-dialog-header strong,
+.bottom-sheet-header h2 {
+  margin: 0;
+  color: var(--dialog-panel-text);
+  font-size: var(--dialog-title-font-size);
+  font-weight: var(--dialog-title-font-weight);
+  line-height: var(--dialog-title-line-height);
+}
+
+.responsive-panel-header small,
+.bottom-sheet-option-main small,
+.assistant-sheet-option-main small {
+  color: var(--text-muted);
+  font-size: var(--dialog-caption-font-size);
+  line-height: var(--dialog-caption-line-height);
+}
+
+.responsive-panel-body,
+.feedback-dialog-body,
+.bottom-sheet-body,
+.chat-history-dialog,
+.playground-popup-content {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.feedback-dialog-body p,
+.chat-history-dialog__message,
+.chat-history-dialog__field span {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.feedback-dialog-body textarea,
+.chat-history-dialog__input {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.bottom-sheet-option,
+.assistant-option,
+.model-option,
+.language-option,
+.settings-language-option,
+.chat-history-context-menu__item,
+.feedback-reason-chip,
+.feedback-more-button,
+.feedback-dialog-footer button,
+.chat-history-dialog__actions .playground-button,
+.playground-dialog-actions .playground-button,
+.responsive-panel .playground-button {
+  font-size: var(--dialog-action-font-size);
+  font-weight: var(--dialog-action-font-weight);
+  line-height: 1.35;
+}
+
+.message-action-text-button,
+body.mobile-mode .message-action-text-button {
+  border-radius: var(--dialog-radius);
+}
+
+.message-action-text-button,
+.message-action-text-button:hover,
+.message-action-text-button:focus-visible,
+body.mobile-mode .message-action-text-button {
+  border-radius: 5px;
+}
+
+.responsive-overlay,
+.feedback-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+}
+
+.responsive-overlay-backdrop,
+.feedback-dialog-backdrop,
+.bottom-sheet-backdrop {
+  background: var(--dialog-backdrop);
+}
+
+.bottom-sheet-backdrop {
+  background: var(--dialog-backdrop-strong);
+}
+
+.responsive-panel,
+.feedback-dialog,
+.chat-history-context-menu {
+  border: 1px solid var(--dialog-panel-border);
+  border-radius: var(--dialog-radius);
+  background: var(--dialog-panel-bg);
+  color: var(--dialog-panel-text);
+  box-shadow: var(--dialog-panel-shadow);
+  overflow: hidden;
+}
+
+.bottom-sheet,
+.bottom-sheet--fullscreen {
+  border-radius: var(--dialog-sheet-radius);
+}
+
+.responsive-panel-header,
+.feedback-dialog-header,
+.feedback-dialog-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--dialog-header-padding);
+}
+
+.responsive-panel-header,
+.feedback-dialog-header {
+  min-height: var(--dialog-header-min-height);
+  border-bottom: 1px solid var(--dialog-panel-border);
+}
+
+.feedback-dialog-footer {
+  border-top: 1px solid var(--dialog-panel-border);
+}
+
+.responsive-panel-body,
+.feedback-dialog-body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--dialog-body-padding);
+}
+
+.responsive-close-button,
+.responsive-back-button,
+.feedback-dialog-close,
+.bottom-sheet-close,
+.chat-image-preview-close {
+  border-radius: var(--dialog-close-radius);
+}
+
+.bottom-sheet-option,
+.assistant-option,
+.model-option,
+.language-option,
+.settings-language-option,
+.chat-history-context-menu__item,
+.feedback-reason-chip {
+  border-radius: var(--dialog-option-radius);
+}
+
+.feedback-dialog-footer button,
+.chat-history-dialog__actions .playground-button,
+.playground-dialog-actions .playground-button,
+.responsive-panel .playground-button {
+  border-radius: var(--dialog-action-square-radius);
+}
+
+.feedback-dialog-body textarea,
+.chat-history-dialog__input {
+  border-radius: var(--dialog-input-radius);
+}
+
+.responsive-overlay--mobile-dialog {
+  padding: max(16px, env(safe-area-inset-top)) 16px
+    max(16px, env(safe-area-inset-bottom));
+  place-items: center;
+}
+
+.responsive-overlay--mobile-dialog .responsive-panel {
+  width: min(100%, 420px);
+  max-width: calc(100vw - 32px);
+  border-radius: var(--dialog-radius);
+}
+
+body.mobile-mode .responsive-overlay--mobile .responsive-panel {
+  border-radius: 0;
+}
+
+.feedback-dialog {
+  border-radius: var(--dialog-radius);
+}
+
+body.mobile-mode .feedback-dialog {
+  border-radius: var(--dialog-radius);
+}
+
+.playground-popup-icon,
+.playground-popup-content {
+  border-radius: var(--dialog-radius);
+}
+
+.app-dialog-backdrop {
+  background: var(--dialog-backdrop);
+}
+
+.app-dialog-panel {
+  border-radius: var(--dialog-radius);
+}
+
+.app-bottom-sheet-panel {
+  border-radius: var(--dialog-sheet-radius);
+}
+
+.app-dialog-header {
+  min-height: var(--dialog-header-min-height);
+}
+
+.app-dialog-body {
+  min-height: 0;
+}
+
+.app-dialog-close {
+  border-radius: var(--dialog-close-radius);
+}

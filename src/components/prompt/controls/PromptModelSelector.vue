@@ -74,7 +74,7 @@ defineEmits(["open-model", "select-model"]);
 defineExpose({modelRoot});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-selector-wrap {
   min-width: 0;
 }

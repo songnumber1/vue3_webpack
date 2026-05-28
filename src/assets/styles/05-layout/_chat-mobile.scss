@@ -1,0 +1,202 @@
+/* Migrated from src/assets/styles/platform/mobile-runtime/mobile-layout/chat-mobile.css.
+   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+
+body.mobile-mode {
+  --mobile-main-composer-space: 174px;
+  --mobile-main-content-top: var(--mobile-header-height, 76px);
+  --mobile-main-content-inline: var(--space-4, 16px);
+  --mobile-main-content-gap: var(--space-4, 16px);
+  --mobile-main-composer-z: var(--z-prompt-floating);
+}
+html:has(> body.mobile-mode),
+body.mobile-mode,
+body.mobile-mode #app {
+  height: var(--layout-viewport-height, 100dvh) !important;
+  min-height: var(--layout-viewport-height, 100dvh);
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+}
+body.mobile-mode .chat-container-root--mode-main {
+  position: relative !important;
+  height: var(--layout-viewport-height, 100dvh) !important;
+  min-height: var(--layout-viewport-height, 100dvh);
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+body.mobile-mode .chat-container-root--mode-main .chat-workspace {
+  position: relative !important;
+  height: var(--layout-viewport-height, 100dvh) !important;
+  min-height: 0;
+  max-height: var(--layout-viewport-height, 100dvh) !important;
+  overflow: hidden !important;
+  display: block;
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+body.mobile-mode .empty-stage--mobile-main,
+body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
+  position: relative !important;
+  display: block;
+  height: 100% !important;
+  min-height: 0;
+  max-height: 100% !important;
+  width: 100%;
+  overflow: hidden !important;
+  padding: 0;
+  background: var(--chat-bg);
+  overscroll-behavior: none !important;
+  touch-action: none;
+}
+body.mobile-mode .empty-stage--mobile-main .empty-center,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center {
+  position: absolute !important;
+  top: var(--mobile-main-content-top) !important;
+  right: 0 !important;
+  bottom: calc(
+    var(--mobile-main-composer-space) + var(--keyboard-height, 0px)
+  ) !important;
+  left: 0 !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: var(--mobile-main-content-gap);
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-6, 24px) var(--mobile-main-content-inline)
+    var(--space-4, 16px);
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  overscroll-behavior: contain !important;
+  touch-action: pan-y;
+  transform: none;
+}
+body.mobile-mode .empty-stage--mobile-main .empty-center h1,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center
+  h1 {
+  flex: 0 0 auto;
+  margin: 0 0 var(--space-1, 4px);
+}
+body.mobile-mode .empty-stage--mobile-main .suggestion-row--between,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .suggestion-row--between {
+  flex: 0 0 auto;
+}
+body.mobile-mode .mobile-main-fixed-prompt,
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: calc(
+    var(--keyboard-height, 0px) + max(0px, env(safe-area-inset-bottom))
+  ) !important;
+  left: 0 !important;
+  z-index: var(--mobile-main-composer-z) !important;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: var(--space-3, 12px) var(--space-4, 16px)
+    max(var(--space-3, 12px), env(safe-area-inset-bottom));
+  transform: translate3d(0, 0, 0);
+  background: linear-gradient(
+    to top,
+    var(--mobile-bg, var(--chat-bg)) 86%,
+    color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
+  );
+  box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
+  will-change: bottom;
+  touch-action: manipulation;
+}
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box {
+  width: min(100%, var(--layout-prompt-width, 820px));
+  max-width: min(100%, var(--layout-prompt-width, 820px));
+  margin: 0 auto;
+}
+body.mobile-mode .mobile-main-fixed-prompt textarea,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  textarea {
+  overscroll-behavior: contain !important;
+  touch-action: manipulation;
+}
+body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt.prompt-wrap--floating {
+  position: static !important;
+  bottom: auto !important;
+  transform: none;
+}
+
+body.mobile-mode .chat-container-root--mode-main .empty-center,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center {
+  bottom: calc(
+    var(--mobile-main-composer-space) + var(--mobile-keyboard-inset, 0px)
+  ) !important;
+  padding-bottom: calc(
+    var(--space-4, 16px) + var(--mobile-keyboard-inset, 0px)
+  );
+}
+body.mobile-mode .mobile-main-fixed-prompt,
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap {
+  bottom: calc(
+    var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
+  ) !important;
+  padding-bottom: max(var(--space-3, 12px), env(safe-area-inset-bottom, 0px));
+
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  overscroll-behavior: none !important;
+  touch-action: manipulation;
+}
+body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box {
+  transform: translateZ(0);
+}
+body.mobile-mode .mobile-main-fixed-prompt textarea,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  textarea,
+body.mobile-mode .mobile-main-fixed-prompt .prompt-action-row,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-action-row {
+  overscroll-behavior: contain !important;
+  touch-action: manipulation;
+}

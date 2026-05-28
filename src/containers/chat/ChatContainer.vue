@@ -355,7 +355,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chat-container-root {
   min-width: 0;
   min-height: 0;

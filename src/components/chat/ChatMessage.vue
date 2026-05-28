@@ -54,7 +54,7 @@ const isErrorMessage = computed(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .message {
   min-width: 0;
 }

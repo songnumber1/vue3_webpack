@@ -1,0 +1,35 @@
+@mixin mobile-mode {
+  body.mobile-mode & {
+    @content;
+  }
+}
+
+@mixin desktop-mode {
+  body:not(.mobile-mode) & {
+    @content;
+  }
+}
+
+@mixin theme($name) {
+  :root[data-theme="#{$name}"] & {
+    @content;
+  }
+}
+
+@mixin android-chrome {
+  body.android-chrome & {
+    @content;
+  }
+}
+
+@mixin android-webview {
+  body.android-webview & {
+    @content;
+  }
+}
+
+@mixin keyboard-visible {
+  body.keyboard-visible & {
+    @content;
+  }
+}

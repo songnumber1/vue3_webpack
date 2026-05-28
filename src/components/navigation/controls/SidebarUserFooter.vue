@@ -91,7 +91,7 @@ const userInitial = computed(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 /* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
 .sidebar-user--mobile,
 .sidebar-user-profile,

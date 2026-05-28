@@ -150,7 +150,7 @@ async function tempLogin() {
 onMounted(checkLogin);
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .auth-required-page {
   min-height: 100vh;
   min-height: 100dvh;

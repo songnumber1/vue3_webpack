@@ -106,7 +106,7 @@ watch(
 defineExpose({attachRoot});
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .prompt-selector-wrap {
   min-width: 0;
 }

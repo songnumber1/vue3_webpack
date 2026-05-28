@@ -10,12 +10,12 @@
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
 import {bootstrap} from "@/core/bootstrap";
-import "@/assets/styles/index.css";
+import "@/assets/styles/index.scss";
 
 if (process.env.NODE_ENV === "development") {
   import(
     /* webpackChunkName: "virtual-keyboard-debug-style" */
-    "@/assets/styles/components/debug/virtual-keyboard-debug.css"
+    "@/assets/styles/09-features/virtual-keyboard-debug.scss"
   );
 }
 import {installViewportCssVars} from "@/platform/viewport/viewportCssVars";

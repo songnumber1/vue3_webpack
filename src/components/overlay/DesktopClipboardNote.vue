@@ -124,7 +124,7 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .desktop-clipboard-note {
   position: fixed;
   top: calc(var(--desktop-header-height, 64px) + 20px);

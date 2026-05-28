@@ -1,0 +1,207 @@
+/* Migrated from src/assets/styles/components/dialog/dialog-control-normalization.css.
+   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+
+/* Extracted from responsive-typography.css to keep typography tokens isolated. */
+:root {
+  --dialog-title-font-size: var(--text-size-title-sm);
+  --dialog-body-font-size: var(--text-size-body);
+  --dialog-caption-font-size: var(--text-size-caption);
+  --dialog-action-font-size: var(--text-size-action);
+}
+
+body.mobile-mode {
+  --dialog-title-font-size: var(--text-size-title-sm);
+  --dialog-body-font-size: var(--text-size-body);
+  --dialog-caption-font-size: var(--text-size-caption);
+  --dialog-action-font-size: var(--text-size-action);
+}
+
+.app-dialog-close,
+.responsive-close-button,
+.responsive-back-button,
+.feedback-dialog-close,
+.bottom-sheet-close,
+.bottom-sheet-back,
+.mobile-settings-close,
+.image-preview-close,
+.chat-image-preview-close {
+  width: var(--close-button-size);
+  height: var(--close-button-size);
+  min-width: var(--close-button-size);
+  min-height: var(--close-button-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: var(--close-button-font-size);
+  line-height: 1;
+}
+
+body.mobile-mode .app-dialog-close,
+body.mobile-mode .responsive-close-button,
+body.mobile-mode .responsive-back-button,
+body.mobile-mode .feedback-dialog-close,
+body.mobile-mode .bottom-sheet-close,
+body.mobile-mode .bottom-sheet-back,
+body.mobile-mode .mobile-settings-close,
+body.mobile-mode .image-preview-close,
+body.mobile-mode .chat-image-preview-close {
+  width: var(--mobile-close-button-size);
+  height: var(--mobile-close-button-size);
+  min-width: var(--mobile-close-button-size);
+  min-height: var(--mobile-close-button-size);
+  font-size: var(--mobile-close-button-font-size);
+}
+
+.app-dialog-close svg,
+.responsive-close-button svg,
+.responsive-back-button svg,
+.feedback-dialog-close svg,
+.bottom-sheet-close svg,
+.bottom-sheet-back svg,
+.mobile-settings-close svg,
+.image-preview-close svg,
+.chat-image-preview-close svg {
+  width: var(--close-button-icon-size);
+  height: var(--close-button-icon-size);
+}
+
+body .image-preview-close {
+  width: var(--mobile-close-button-size) !important;
+  height: var(--mobile-close-button-size) !important;
+  min-width: var(--mobile-close-button-size) !important;
+  min-height: var(--mobile-close-button-size) !important;
+  border-radius: var(--dialog-close-radius, 5px) !important;
+  font-size: var(--mobile-close-button-font-size) !important;
+  line-height: 1 !important;
+}
+
+.user-menu-panel,
+.user-menu-panel button,
+.mobile-settings-page,
+.mobile-settings-page button,
+.responsive-panel,
+.feedback-dialog,
+.bottom-sheet,
+.chat-history-context-menu {
+  font-family: var(--font-family);
+}
+
+.user-menu-item strong,
+.mobile-settings-item strong,
+.assistant-option strong,
+.bottom-sheet-option strong,
+.settings-language-option span,
+.notice-card h3,
+.personal-card h3,
+.guide-card h2,
+.privacy-policy-card h3,
+.settings-placeholder-card h3 {
+  font-size: var(--text-size-body);
+  line-height: var(--line-height-title);
+}
+
+.user-menu-item small,
+.mobile-settings-item small,
+.assistant-option small,
+.bottom-sheet-option small,
+.notice-card span,
+.personal-eyebrow,
+.guide-card span,
+.privacy-policy-eyebrow,
+.privacy-policy-updated {
+  font-size: var(--text-size-caption);
+  line-height: var(--line-height-title);
+}
+
+.notice-card p,
+.personal-card p,
+.guide-card p,
+.privacy-policy-header p,
+.privacy-policy-card p,
+.settings-placeholder-card p,
+.settings-placeholder-card li {
+  font-size: var(--text-size-body);
+  line-height: var(--line-height-body);
+}
+
+.not-found-code,
+.android-update-eyebrow {
+  font-size: var(--text-size-helper);
+}
+
+.not-found-card h1,
+.android-update-card h1,
+.login-card h1,
+.terms-header h1,
+.privacy-policy-header h2 {
+  font-size: var(--text-size-page-title);
+  line-height: var(--line-height-title);
+}
+
+.not-found-card p:not(.not-found-code),
+.android-update-message,
+.login-card p,
+.terms-header p,
+.terms-card p,
+.terms-card li,
+.privacy-policy-header p,
+.privacy-policy-card p,
+.privacy-policy-card li {
+  font-size: var(--text-size-body);
+  line-height: var(--line-height-body);
+}
+
+.user-menu-panel,
+.user-menu-panel button,
+.mobile-settings-page,
+.mobile-settings-page button,
+.responsive-panel .notice-view,
+.responsive-panel .personalization-view,
+.responsive-panel .privacy-policy-view {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.user-menu-item strong,
+.user-menu-language-option span,
+.mobile-settings-item strong,
+.notice-card h3,
+.personal-card h3,
+.guide-card h2,
+.responsive-panel .privacy-policy-card h3,
+.responsive-panel .privacy-policy-header h2,
+.settings-placeholder-card h3 {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-title-line-height);
+  letter-spacing: normal;
+}
+
+.user-menu-item small,
+.mobile-settings-item small,
+.notice-card span,
+.personal-eyebrow,
+.guide-card span,
+.responsive-panel .privacy-policy-eyebrow,
+.responsive-panel .privacy-policy-updated {
+  font-size: var(--dialog-caption-font-size);
+  line-height: var(--dialog-caption-line-height);
+  letter-spacing: normal;
+}
+
+.notice-card p,
+.personal-card p,
+.guide-card p,
+.responsive-panel .privacy-policy-header p:last-child,
+.responsive-panel .privacy-policy-card p,
+.settings-placeholder-card p,
+.settings-placeholder-card li {
+  font-size: var(--dialog-body-font-size);
+  line-height: var(--dialog-body-line-height);
+}
+
+.user-menu-item,
+.user-menu-language-option,
+.mobile-settings-item {
+  font-weight: var(--dialog-title-font-weight);
+}
