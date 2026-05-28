@@ -7,12 +7,7 @@
       'chat-container-root--sidebar-collapsed': sidebarCollapsed,
     }"
   >
-    <AppSidebar
-      @new-chat="$emit('new-chat')"
-      @select-history="$emit('select-history', $event)"
-      @history-menu-action="$emit('history-menu-action', $event)"
-      @select-assistant="$emit('select-assistant', $event)"
-    />
+    <AppSidebar />
 
     <main class="chat-workspace">
       <slot />
@@ -42,12 +37,6 @@ defineProps({
   mode: {type: String, default: "main"},
 });
 
-defineEmits([
-  "new-chat",
-  "select-history",
-  "history-menu-action",
-  "select-assistant",
-]);
 </script>
 
 <style scoped lang="scss">

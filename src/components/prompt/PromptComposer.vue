@@ -28,7 +28,8 @@
         @paste="handlePaste"
       />
 
-      <PromptActionToolbar
+      <component
+        :is="resolvedToolbarComponent"
         ref="toolbarRef"
         @open-model="openModelSelector"
         @open-tool="openToolSelector"
@@ -83,7 +84,8 @@
 
 import {computed, inject, provide, reactive} from "vue";
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
-import PromptActionToolbar from "@/components/prompt/controls/PromptActionToolbar.vue";
+import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
+import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
 import PromptMobileSheets from "@/components/prompt/controls/PromptMobileSheets.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
@@ -92,10 +94,16 @@ import {
   PROMPT_STATE_KEY,
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
+  WORKSPACE_ACTIONS_KEY,
   createEmptyPromptState,
+  createEmptyWorkspaceActions,
 } from "@/composables/chat/chatActionContext";
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
+const workspaceActions = inject(
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions()
+);
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -123,13 +131,29 @@ const props = reactive({
   },
 });
 
-const emit = defineEmits([
-  "submit",
-  "focus",
-  "blur",
-  "height-change",
-  "update:modelValue",
-]);
+const emit = defineEmits(["blur"]);
+
+function handleComposerEvent(eventName, payload) {
+  if (eventName === "submit") {
+    workspaceActions.submit(payload);
+    return;
+  }
+  if (eventName === "update:modelValue") {
+    workspaceActions.updateSelectedModel(payload);
+    return;
+  }
+  if (eventName === "focus") {
+    workspaceActions.handlePromptFocus();
+    return;
+  }
+  if (eventName === "height-change") {
+    workspaceActions.handlePromptResize();
+    return;
+  }
+  if (eventName === "blur") {
+    emit("blur", payload);
+  }
+}
 
 const {
   t,
@@ -180,12 +204,15 @@ const {
   previewImage,
   removeAttachment,
   setText,
-} = usePromptComposer(props, emit);
+} = usePromptComposer(props, handleComposerEvent);
 
 const floating = computed(() => props.floating);
 const showHelp = computed(() => props.showHelp);
 const placeholder = computed(() => props.placeholder);
 const modelValue = computed(() => props.modelValue);
+const resolvedToolbarComponent = computed(() =>
+  isMobileSheet.value ? PromptToolbarMobile : PromptToolbarDesktop
+);
 
 provide(PROMPT_TEXTAREA_STATE_KEY, {
   text,

@@ -142,6 +142,10 @@ export function createEmptyChatActions() {
     openLanguage: () => {}, // 언어 스위칭 바텀시트 무동작 스텁
     openPlayground: () => {}, // 실험실 플레이그라운드 무동작 스텁
     logout: () => {}, // 인증 토큰 소멸 추방 무동작 스텁
+    newChat: () => {}, // 새 대화 시작 무동작 스텁
+    selectHistory: () => {}, // 대화방 선택 무동작 스텁
+    historyMenuAction: () => {}, // 대화방 메뉴 액션 무동작 스텁
+    selectAssistant: () => {}, // 어시스턴트 선택 무동작 스텁
   };
 }
 

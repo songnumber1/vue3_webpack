@@ -168,7 +168,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {nextTick, ref, watch} from "vue";
+import {inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useEventListener} from "@vueuse/core";
@@ -185,13 +185,9 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
+import {CHAT_ACTIONS_KEY, createEmptyChatActions} from "@/composables/chat/chatActionContext";
 
-const emit = defineEmits([
-  "new-chat",
-  "select-history",
-  "history-menu-action",
-  "select-assistant",
-]);
+const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
@@ -229,7 +225,7 @@ function openAssistantSelector() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectAssistant(id) {
-  emit("select-assistant", id);
+  chatActions.selectAssistant(id);
   assistantMenuOpen.value = false;
 }
 
@@ -237,7 +233,7 @@ function selectAssistant(id) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleNewChat() {
-  emit("new-chat");
+  chatActions.newChat();
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
 }
@@ -269,14 +265,14 @@ function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
   if (!history || !action) return;
-  emit("history-menu-action", {action, history});
+  chatActions.historyMenuAction({action, history});
 }
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleSelectHistory(item) {
-  emit("select-history", item);
+  chatActions.selectHistory(item);
   navigationStore.setDrawerOpen(false);
 }
 
@@ -284,7 +280,7 @@ function handleSelectHistory(item) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleSelectHistoryCollapsed(item) {
-  emit("select-history", item);
+  chatActions.selectHistory(item);
   navigationStore.setCollapsedRecentOpen(false);
 }
 

@@ -34,7 +34,7 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
-      <ChatPromptInput ref="mainPromptInputRef" :class="mainPromptClass" />
+      <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
     </div>
   </section>
 
@@ -64,7 +64,7 @@
         v-else-if="isActiveModelUnavailable"
         :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
       />
-      <ChatPromptInput v-else :class="{'mobile-chat-prompt': isMobile}" />
+      <PromptComposer v-else :class="{'mobile-chat-prompt': isMobile}" />
     </div>
   </template>
 </template>
@@ -88,7 +88,7 @@ import {useI18n} from "vue-i18n";
 import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
-import ChatPromptInput from "./ChatPromptInput.vue";
+import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,

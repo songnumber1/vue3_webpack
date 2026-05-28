@@ -3,10 +3,6 @@
     v-if="runtimeReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
-    @select-assistant="handleAssistantNewChat"
-    @new-chat="startNewChat"
-    @select-history="openHistory"
-    @history-menu-action="handleHistoryMenuAction"
   >
     <ChatWorkspace ref="workspaceRef" />
 
@@ -336,6 +332,10 @@ provide(CHAT_ACTIONS_KEY, {
   openLanguage,
   openPlayground,
   logout,
+  newChat: startNewChat,
+  selectHistory: openHistory,
+  historyMenuAction: handleHistoryMenuAction,
+  selectAssistant: handleAssistantNewChat,
 });
 
 provide(WORKSPACE_ACTIONS_KEY, {
