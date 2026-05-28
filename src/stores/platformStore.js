@@ -33,7 +33,7 @@ export const usePlatformStore = defineStore("platform", {
   // 물리 디바이스 및 하이브리드 소켓 통신 가용성 상태 정보 명세
   state: () => ({
     info: resolveDetailedPlatform(), // 파싱 엔진이 1차 감지 완료해 둔 OS 유형, 브라우저 스펙 등 핵심 정보 구조체
-    nativeEvents: [], // AOS/iOS 하이브리드 앱 아웃쉘 웹뷰 원격지 채널을 통해 하향 인입된 네이티브 원시 이벤트 버퍼 로그 스택 어레이 (최대 50개 유지 보관)
+    nativeEvents: [], // AOS 하이브리드 앱 아웃쉘 웹뷰 원격지 채널을 통해 하향 인입된 네이티브 원시 이벤트 버퍼 로그 스택 어레이 (최대 50개 유지 보관)
     lastNativeEvent: null, // 디버그 추적 추적 편의성을 위해 오픈오픈 열어둔 최신 최종 하드웨어 인입 이벤트 패킷 단품
     network: {
       online: typeof navigator === "undefined" ? true : navigator.onLine, // 하드웨어 무선 물리 네트워크 케이블 연결 실시간 가용성 상태 플래그
@@ -46,7 +46,7 @@ export const usePlatformStore = defineStore("platform", {
     isAccess: (state) => state.info.isAccess,
     // 현재 물리 뷰포트 장치 해상도 가이드라인이 모바일 이하 초압축 해상도 컴팩트 화면 규격인지 대조 게터
     isCompactViewport: (state) => state.info.isCompactViewport,
-    // 표준 모바일 모바일 브라우저 탭 웹 서핑이 아닌, AOS/iOS 전용 래핑 하이브리드 앱 인프라 쉘 내부 런타임 위에서 실제 구동 중인지 가드 판별식
+    // 표준 모바일 모바일 브라우저 탭 웹 서핑이 아닌, AOS 전용 래핑 하이브리드 앱 인프라 쉘 내부 런타임 위에서 실제 구동 중인지 가드 판별식
     isNativeRuntime: (state) =>
       state.info.isNativeRuntime || state.info.isNativeApp,
     // 안드로이드 네이티브 전용 앱 빌드 환경 내부 구동 판별 게터

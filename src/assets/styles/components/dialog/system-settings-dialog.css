@@ -247,7 +247,6 @@ body.desktop-mode .responsive-panel--system-settings .system-settings-scroll,
 body.mobile-mode .responsive-panel--system-settings .system-settings-scroll {
   overflow-y: auto;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
 }
 
 body.desktop-mode
@@ -298,7 +297,7 @@ body.mobile-mode
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+
   padding: 18px 26px 20px;
 }
 

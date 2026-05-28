@@ -8,7 +8,9 @@ import {useAuthStore} from "@/stores/authStore";
 let refreshPromise = null;
 
 function resolveBaseURL() {
-  return shouldUseServerApi() ? SERVER_API_BASE_URL : (process.env.VUE_APP_API_BASE_URL || "/api");
+  return shouldUseServerApi()
+    ? SERVER_API_BASE_URL
+    : process.env.VUE_APP_API_BASE_URL || "/api";
 }
 
 function createRefreshClient() {
@@ -31,15 +33,20 @@ export async function refreshAccessTokenOnce() {
     }
 
     const client = createRefreshClient();
-    const response = await client.post(policy.refreshUrl, {refreshToken}, {
-      headers: {
-        [AUTH_HEADER_NAMES.CLIENT_PLATFORM]: policy.platform,
-        [AUTH_HEADER_NAMES.AUTH_MODE]: AUTH_MODES.JWT,
-      },
-    });
+    const response = await client.post(
+      policy.refreshUrl,
+      {refreshToken},
+      {
+        headers: {
+          [AUTH_HEADER_NAMES.CLIENT_PLATFORM]: policy.platform,
+          [AUTH_HEADER_NAMES.AUTH_MODE]: AUTH_MODES.JWT,
+        },
+      }
+    );
     const data = response?.data || {};
     const accessToken = data.accessToken || data.access_token;
-    const nextRefreshToken = data.refreshToken || data.refresh_token || refreshToken;
+    const nextRefreshToken =
+      data.refreshToken || data.refresh_token || refreshToken;
     if (!accessToken) throw new Error("Refresh response has no access token.");
     setTokens({accessToken, refreshToken: nextRefreshToken});
     return accessToken;

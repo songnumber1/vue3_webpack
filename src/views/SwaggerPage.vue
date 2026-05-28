@@ -160,7 +160,7 @@ onBeforeUnmount(() => {
   width: 100%;
   height: var(--app-height, 100vh);
   overflow: auto;
-  -webkit-overflow-scrolling: touch;
+
   background: #ffffff;
   color: #111827;
 }

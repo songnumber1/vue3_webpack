@@ -129,7 +129,7 @@ export function resolveStorage(appInfo, bridge) {
   const localStorageAdapter = createLocalStorageAdapter(); // 웹용 기본 어댑터 인프라 가동
 
   // ==========================================
-  // [분기 A]: 안드로이드/iOS 네이티브 앱 환경인 경우
+  // [분기 A]: 안드로이드 네이티브 WebView 앱 환경인 경우
   // ==========================================
   if (isNativeApp(appInfo)) {
     return {

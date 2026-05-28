@@ -72,7 +72,7 @@ body.mobile-mode
     var(--space-4, 16px);
   overflow-x: hidden !important;
   overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch !important;
+
   overscroll-behavior: contain !important;
   touch-action: pan-y;
   transform: none;

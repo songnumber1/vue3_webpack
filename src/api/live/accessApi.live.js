@@ -11,7 +11,10 @@ import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 
 export async function getAccessInfo(payload = {}) {
-  const response = await httpClient.post(resolveAuthPolicy().accessInfoUrl, payload);
+  const response = await httpClient.post(
+    resolveAuthPolicy().accessInfoUrl,
+    payload
+  );
 
   return unwrapResponseData(response, {});
 }

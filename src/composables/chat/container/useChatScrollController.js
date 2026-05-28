@@ -86,28 +86,35 @@ export function useChatScrollController({
   }
 
   function clearPendingBottomScrollTimers() {
-    pendingBottomScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    pendingBottomScrollTimerIds.forEach((timerId) =>
+      window.clearTimeout(timerId)
+    );
     pendingBottomScrollTimerIds = [];
   }
 
   function scheduleBottomScrollWhenListReady(options = {}) {
     clearPendingBottomScrollTimers();
 
-    LIST_READY_SCROLL_DELAYS.forEach((delay) => {
-      const timerId = window.setTimeout(() => {
-        const list = getMessageListRef();
-        if (!list?.scrollToBottom) return;
+    // 대화방 진입 시 메시지 렌더링이 단계적으로 완료될 때마다 반복적으로 스크롤을 이동하면
+    // 긴 대화방에서 사용자가 실제로 스크롤이 내려가는 과정을 보게 됩니다.
+    // 가장 마지막 렌더 안정화 시점 1회만 실행하여 즉시 최하단으로 고정합니다.
+    const delay = LIST_READY_SCROLL_DELAYS[LIST_READY_SCROLL_DELAYS.length - 1];
 
-        if (options.afterRender && list.scrollToBottomAfterRender) {
-          list.scrollToBottomAfterRender({...options, force: true, stable: false});
-        } else {
-          list.scrollToBottom({...options, force: true, stable: true});
-        }
-        updateScrollBottomButton();
-        clearPendingBottomScrollTimers();
-      }, delay);
-      pendingBottomScrollTimerIds.push(timerId);
-    });
+    const timerId = window.setTimeout(() => {
+      const list = getMessageListRef();
+      if (!list?.scrollToBottom) return;
+
+      if (options.afterRender && list.scrollToBottomAfterRender) {
+        list.scrollToBottomAfterRender({...options, force: true, stable: true});
+      } else {
+        list.scrollToBottom({...options, force: true, stable: true});
+      }
+
+      updateScrollBottomButton();
+      clearPendingBottomScrollTimers();
+    }, delay);
+
+    pendingBottomScrollTimerIds.push(timerId);
   }
 
   /**

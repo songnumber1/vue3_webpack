@@ -19,19 +19,27 @@ function isAndroidWebViewUserAgent(ua) {
   );
 }
 
+function isChromeUserAgent(ua) {
+  return /Chrome\//i.test(ua) || /Chromium\//i.test(ua);
+}
+
 export function getBrowserName(ua, hasBridge = false) {
-  if (hasBridge) return "webview";
-  if (/SamsungBrowser\//i.test(ua)) return "samsung";
-  if (/EdgA\//i.test(ua)) return "edge";
-  if (/OPR\//i.test(ua) || /Opera\//i.test(ua)) return "opera";
-  if (/Firefox\//i.test(ua) || /FxiOS\//i.test(ua)) return "firefox";
+  if (hasBridge) return "android-webview";
   if (isAndroidWebViewUserAgent(ua)) return "android-webview";
-  if (/Chrome\//i.test(ua)) return "chrome";
-  return "unknown";
+  if (isChromeUserAgent(ua)) return "chrome";
+  return "unsupported";
 }
 
 export function getBrowserVersion(ua, browserName) {
-  if (browserName === "chrome") return parseVersion(ua, /Chrome\/([\d.]+)/i);
+  if (browserName === "chrome") {
+    return parseVersion(ua, /(?:Chrome|Chromium)\/([\d.]+)/i);
+  }
+  if (browserName === "android-webview") {
+    return (
+      parseVersion(ua, /(?:Chrome|Chromium)\/([\d.]+)/i) ||
+      parseVersion(ua, /Version\/([\d.]+)/i)
+    );
+  }
   return "";
 }
 
@@ -49,19 +57,25 @@ export function resolveBasePlatform(value, ua, navPlatform) {
     : detectEnv(ua, navPlatform);
 }
 
+export function isSupportedBrowserName(browserName) {
+  return browserName === "chrome" || browserName === "android-webview";
+}
+
 export function detectDevice({env, browserName}) {
-  if (hasAndroidBridge()) return "app";
+  if (hasAndroidBridge()) return "android-webview";
   if (env === PLATFORM.ANDROID) {
-    return browserName === "chrome" ? "chrome" : "unsupported-android-browser";
+    return isSupportedBrowserName(browserName)
+      ? browserName
+      : "unsupported-browser";
   }
   if (
     env === PLATFORM.WINDOWS ||
     env === PLATFORM.MAC ||
     env === PLATFORM.LINUX
   ) {
-    return browserName === "unknown" ? "pc" : browserName;
+    return browserName === "chrome" ? "chrome" : "unsupported-browser";
   }
-  return "unknown";
+  return "unsupported-browser";
 }
 
 export function createActualPlatformInfo({

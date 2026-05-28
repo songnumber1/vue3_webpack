@@ -357,14 +357,16 @@ export function normalizeSystemSettings(value = {}) {
       return;
     }
 
-    if ([
-      SYSTEM_SETTING_KEYS.webLoginUrl,
-      SYSTEM_SETTING_KEYS.mobileLoginUrl,
-      SYSTEM_SETTING_KEYS.tempLoginUrl,
-      SYSTEM_SETTING_KEYS.accessInfoUrl,
-      SYSTEM_SETTING_KEYS.logoutUrl,
-      SYSTEM_SETTING_KEYS.jwtRefreshUrl,
-    ].includes(key)) {
+    if (
+      [
+        SYSTEM_SETTING_KEYS.webLoginUrl,
+        SYSTEM_SETTING_KEYS.mobileLoginUrl,
+        SYSTEM_SETTING_KEYS.tempLoginUrl,
+        SYSTEM_SETTING_KEYS.accessInfoUrl,
+        SYSTEM_SETTING_KEYS.logoutUrl,
+        SYSTEM_SETTING_KEYS.jwtRefreshUrl,
+      ].includes(key)
+    ) {
       next[key] = readStringEnv(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
       return;
     }

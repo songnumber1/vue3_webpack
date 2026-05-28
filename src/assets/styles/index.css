@@ -9,9 +9,9 @@
 
 @import "./platform/mobile-runtime/keyboard/responsive-keyboard.css";
 
-@import "./platform/mobile-runtime/viewport/mobile-session-browser-patches.css";
+@import "./platform/mobile-runtime/viewport/android-mobile-runtime-patches.css";
 @import "./platform/mobile-runtime/mobile-layout/chat-mobile.css";
-@import "./browser-patches/mobile/mobile-browser-layout-patches.css";
+@import "./platform/mobile-runtime/viewport/android-chrome-webview-layout-patches.css";
 
 @import "./components/message/message-bubbles.css";
 @import "./layouts/sidebar/sidebar-assistant-polish.css";

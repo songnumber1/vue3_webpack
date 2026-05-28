@@ -116,7 +116,6 @@ body.mobile-mode .attachment-preview-row {
   flex-wrap: nowrap;
   overflow-x: auto;
   padding-bottom: 9px;
-  -webkit-overflow-scrolling: touch;
 }
 
 body.mobile-mode .attachment-preview-card {
@@ -458,7 +457,6 @@ body.mobile-mode .attachment-preview-row {
   overflow-y: visible;
   padding: 18px 18px 12px 4px;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
 }
 body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
   display: none;
@@ -742,5 +740,4 @@ body.mobile-mode .attachment-preview-row {
   overflow-x: auto !important;
   overflow-y: visible !important;
   scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch !important;
 }

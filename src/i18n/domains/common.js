@@ -12,7 +12,7 @@ export const commonMessages = {
     app: {
       unsupportedTitle: "지원하지 않는 접속 환경입니다.",
       unsupportedMessage:
-        "지원 모바일 환경은 Android Chrome과 Android 13+ WebView입니다.",
+        "지원 환경은 Chrome 브라우저와 Android WebView입니다.",
     },
     common: {
       back: "뒤로",
@@ -241,7 +241,7 @@ export const commonMessages = {
     app: {
       unsupportedTitle: "Unsupported access environment.",
       unsupportedMessage:
-        "Supported mobile environments are Android Chrome and Android 13+ WebView.",
+        "Supported environments are Chrome browser and Android WebView.",
     },
     common: {
       back: "Back",

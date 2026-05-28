@@ -55,7 +55,7 @@
 .markdown-body pre {
   max-width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+
   white-space: pre;
 }
 .markdown-body pre code {
@@ -74,7 +74,7 @@
 .md-table-wrapper {
   max-width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+
   border: 1px solid var(--border);
   border-radius: 12px;
 }

@@ -35,8 +35,8 @@ export function hasAndroidWebViewBridge() {
 }
 
 /**
- * 현재 브라우저의 UserAgent를 분석하여 지원 대상인 '순정 안드로이드 크롬'인지 확인합니다.
- * 다른 모바일 브라우저(삼성 인터넷, 파이어폭스, 엣지, 오페라 등) 및 일반 웹뷰 환경은 제외합니다.
+ * 현재 브라우저의 UserAgent를 분석하여 지원 대상인 안드로이드 Chrome인지 확인합니다.
+ * Android WebView는 별도 런타임으로 분리하므로 여기에서는 제외합니다.
  * @returns {boolean} 순정 안드로이드 크롬 환경일 경우 true, 그 외의 경우 false
  * @see {@link STREAM_RUNTIME_TYPES.ANDROID_CHROME} 판별의 핵심 기준이 됩니다.
  */
@@ -44,25 +44,24 @@ export function isAndroidChromeUserAgent() {
   // 현재 브라우저의 고유 유저 에이전트(userAgent) 문자열을 획득합니다.
   const ua = getUserAgent();
 
-  // 기본 전제: 대소문자 구분 없이 문자열 내에 'Android'와 'Chrome'이 모두 매칭되어야 하며, 하나라도 없으면 탈락(false)입니다.
-  if (!/Android/i.test(ua) || !/Chrome\//i.test(ua)) return false;
+  // 기본 전제: 대소문자 구분 없이 문자열 내에 Android와 Chrome/Chromium이 모두 매칭되어야 합니다.
+  if (!/Android/i.test(ua) || !/(Chrome|Chromium)\//i.test(ua)) return false;
 
-  // 삼성 인터넷 브라우저(SamsungBrowser) 식별 시 지원 대상에서 제외합니다.
-  if (/SamsungBrowser\//i.test(ua)) return false;
-
-  // 마이크로소프트 엣지(EdgA) 또는 오페라(OPR, Opera) 모바일 브라우저 식별 시 제외합니다.
-  if (/EdgA\//i.test(ua) || /OPR\//i.test(ua) || /Opera\//i.test(ua)) {
-    return false;
-  }
-
-  // 파이어폭스(Firefox, FxiOS) 모바일 브라우저 식별 시 제외합니다.
-  if (/Firefox\//i.test(ua) || /FxiOS\//i.test(ua)) return false;
-
-  // 네이티브 인앱 웹뷰의 전형적인 특징인 '; wv)' 표기 또는 'Version/X.X' 패턴이 매칭되는 일반 안드로이드 웹뷰는 제외합니다.
+  // Android WebView의 전형적인 특징인 '; wv)' 표기 또는 'Version/X.X' 패턴은 WebView 런타임으로 분리합니다.
   if (/; wv\)/i.test(ua) || /Version\/\d+/i.test(ua)) return false;
 
-  // 상기 모든 타사 브라우저 및 웹뷰 특이 케이스 필터링을 통과했으므로 순정 안드로이드 크롬으로 판정합니다.
   return true;
+}
+
+/**
+ * Android WebView UserAgent인지 확인합니다. Native Bridge가 늦게 주입되는 케이스도 WebView 런타임으로 처리하기 위한 보조 판별식입니다.
+ * @returns {boolean} Android WebView UserAgent 여부
+ */
+export function isAndroidWebViewUserAgent() {
+  const ua = getUserAgent();
+  return (
+    /Android/i.test(ua) && (/; wv\)/i.test(ua) || /Version\/\d+/i.test(ua))
+  );
 }
 
 /**
@@ -80,6 +79,7 @@ export function resolveStreamRuntimeType() {
   const override = settings.platformOverride || PLATFORM_OVERRIDE_MODES.auto;
   const hasBridge = hasAndroidWebViewBridge();
   const isAndroidChromeUa = isAndroidChromeUserAgent();
+  const isAndroidWebViewUa = isAndroidWebViewUserAgent();
   let runtimeType = STREAM_RUNTIME_TYPES.DESKTOP_BROWSER;
   let reason = "desktop-browser-default";
 
@@ -89,9 +89,11 @@ export function resolveStreamRuntimeType() {
   } else if (override === PLATFORM_OVERRIDE_MODES.androidWebView) {
     runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
     reason = "forced-android-webview";
-  } else if (hasBridge) {
+  } else if (hasBridge || isAndroidWebViewUa) {
     runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
-    reason = "actual-android-webview-bridge";
+    reason = hasBridge
+      ? "actual-android-webview-bridge"
+      : "actual-android-webview-user-agent";
   } else if (isAndroidChromeUa) {
     runtimeType = STREAM_RUNTIME_TYPES.ANDROID_CHROME;
     reason = "actual-android-chrome-user-agent";
@@ -103,6 +105,7 @@ export function resolveStreamRuntimeType() {
     reason,
     hasAndroidWebViewBridge: hasBridge,
     isAndroidChromeUserAgent: isAndroidChromeUa,
+    isAndroidWebViewUserAgent: isAndroidWebViewUa,
   });
 
   return runtimeType;

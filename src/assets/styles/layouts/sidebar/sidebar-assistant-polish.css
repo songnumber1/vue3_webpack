@@ -217,7 +217,7 @@ body.mobile-mode .sidebar-content--mobile,
   gap: 6px;
   overflow-y: auto;
   overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
+
   background: var(--sidebar-bg, #ffffff);
   color: var(--sidebar-text, #202123);
   opacity: 1;

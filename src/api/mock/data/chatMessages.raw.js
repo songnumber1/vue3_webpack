@@ -98,7 +98,7 @@ export async function bootstrapChatRuntime() {
     chatHistoryApi.getChatHistoryList(),
   ]);
 
-  
+
   return normalizeBootstrapResult({ accessInfo, assistants, studios, models, studioModels, histories });
 }
 \`\`\`
@@ -195,7 +195,7 @@ sequenceDiagram
 
 .mobile-bottom-sheet__content {
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+
 }
 \`\`\`
 
@@ -257,7 +257,7 @@ export const CHAT_KEYS = Object.freeze({
   LEGACY_MODEL_ID: 'modeId',
 });
 export function adaptChatHistory(raw) {
-  
+
   return {
     id: raw[CHAT_KEYS.ID],
     title: raw[CHAT_KEYS.TITLE],

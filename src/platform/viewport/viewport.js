@@ -17,18 +17,17 @@ export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
 
 /**
  * @description 현재 접속한 모바일 브라우저의 엔진 계열(User Agent)을 분석하여 식별 코드를 반환합니다.
- * @returns {"chrome"|"default"} 모바일 브라우저 브랜드 계열 식별자
+ * @returns {"chrome"} 지원 대상 모바일 브라우저 계열 식별자
  */
 export function getMobileBrowserFamily() {
   // 서버 사이드 렌더링(SSR) 환경에서의 자바스크립트 실행 크래시를 방지하기 위해 navigator 유무 확인
   const userAgent =
     typeof navigator !== "undefined" ? navigator.userAgent || "" : "";
 
-  // 크롬 및 크로미움 기반 브라우저(삼성 인터넷, 웨일 등 포함) 스크리닝 정규식 검사
-  if (/Chrome|Chromium/i.test(userAgent)) return "chrome";
+  // 지원 대상은 Android Chrome/WebView 계열이므로 Chrome/Chromium 클래스 하나로 정규화합니다.
+  if (/Chrome|CriOS|Chromium/i.test(userAgent)) return "chrome";
 
-  // 사파리, 파이어폭스 등 기타 엔진 브라우저일 경우 폴백 기본값 반환
-  return "default";
+  return "chrome";
 }
 
 /**
@@ -137,7 +136,7 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
 }
 
 /**
- * @description 아이폰(iOS) 노치 디자인 및 최신 안드로이드 하단 내비게이션 바 영역인 하단 물리 안전 영역(safe-area-inset-bottom)의 정밀 픽셀 수치를 돔 프롭(Probe) 기법으로 계측합니다.
+ * @description 안드로이드 하단 내비게이션 바 또는 WebView 컨테이너의 하단 안전 영역(safe-area-inset-bottom)의 정밀 픽셀 수치를 돔 프롭(Probe) 기법으로 계측합니다.
  * @returns {number} 추출 연산 완료된 기기별 하단 세이프 에어리어 인셋 픽셀 물리 수치 (단위: px)
  */
 export function getSafeAreaBottom() {

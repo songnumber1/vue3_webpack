@@ -50,7 +50,6 @@ body.mobile-mode
   padding: 20px !important;
   background: var(--overlay-backdrop) !important;
   overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
 }
 
 .feedback-dialog {

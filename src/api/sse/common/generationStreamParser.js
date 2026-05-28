@@ -6,22 +6,27 @@ function createGenerationStreamError() {
   return error;
 }
 
+function readFirstString(...values) {
+  const found = values.find(
+    (value) => typeof value === "string" && value !== ""
+  );
+  return found || "";
+}
+
 function normalizeCompanyDelta(parsed) {
   const delta = parsed?.choices?.[0]?.delta;
   if (!delta) return null;
 
-  const content =
-    typeof delta.content === "string" && delta.content !== ""
-      ? delta.content
-      : "";
+  const content = readFirstString(delta.content);
 
-  const reason =
-    typeof delta.reasoning_content === "string" &&
-    delta.reasoning_content !== ""
-      ? delta.reasoning_content
-      : typeof delta.reasoning === "string" && delta.reasoning !== ""
-        ? delta.reasoning
-        : "";
+  // 회사 실시간 generation.do는 reasoning_content(snake_case)를 사용합니다.
+  // 일부 테스트/레거시 응답이 reasoningContent(camelCase)를 보낼 수 있어
+  // 수신부에서는 함께 흡수하되, 우선순위는 회사 규격인 reasoning_content입니다.
+  const reason = readFirstString(
+    delta.reasoning_content,
+    delta.reasoningContent,
+    delta.reasoning
+  );
 
   return {
     done: false,
@@ -32,19 +37,35 @@ function normalizeCompanyDelta(parsed) {
 }
 
 function normalizeLegacyPayload(parsed) {
-  const type = String(
-    parsed?.type ||
-      (parsed?.reason != null || parsed?.reasonContent != null
-        ? "reason"
-        : "answer")
+  const reason = readFirstString(
+    parsed?.reasoning_content,
+    parsed?.reasoningContent,
+    parsed?.reasonContent,
+    parsed?.reasoning,
+    parsed?.reason
   );
+  const type = String(parsed?.type || (reason ? "reason" : "answer"));
 
   return {
     done: false,
     type,
     content: String(parsed?.data ?? parsed?.content ?? ""),
-    reason: String(parsed?.reason ?? parsed?.reasonContent ?? ""),
+    reason,
   };
+}
+
+function splitNestedSseData(raw) {
+  const text = String(raw || "");
+  const trimmed = text.trim();
+
+  if (!trimmed.startsWith("data:")) {
+    return [text];
+  }
+
+  return trimmed
+    .split(/(?=data:\s*)/g)
+    .map((frame) => frame.replace(/^data:\s*/, "").trim())
+    .filter(Boolean);
 }
 
 function parseGenerationStreamData(raw) {
@@ -71,13 +92,7 @@ function parseGenerationStreamData(raw) {
   }
 }
 
-export function applyGenerationStreamData({
-  raw,
-  accumulated,
-  reasonAccumulated = "",
-}) {
-  const data = parseGenerationStreamData(raw);
-
+function applyParsedGenerationData({data, accumulated, reasonAccumulated}) {
   if (data.done) {
     return {
       accumulated,
@@ -125,5 +140,43 @@ export function applyGenerationStreamData({
     changed: true,
     reasonChanged: false,
     done: false,
+  };
+}
+
+export function applyGenerationStreamData({
+  raw,
+  accumulated,
+  reasonAccumulated = "",
+}) {
+  const frames = splitNestedSseData(raw);
+  let nextAccumulated = accumulated;
+  let nextReasonAccumulated = reasonAccumulated;
+  let changed = false;
+  let reasonChanged = false;
+  let done = false;
+
+  frames.forEach((frame) => {
+    if (done) return;
+
+    const data = parseGenerationStreamData(frame);
+    const nextState = applyParsedGenerationData({
+      data,
+      accumulated: nextAccumulated,
+      reasonAccumulated: nextReasonAccumulated,
+    });
+
+    nextAccumulated = nextState.accumulated;
+    nextReasonAccumulated = nextState.reasonAccumulated;
+    changed = changed || nextState.changed;
+    reasonChanged = reasonChanged || nextState.reasonChanged;
+    done = nextState.done;
+  });
+
+  return {
+    accumulated: nextAccumulated,
+    reasonAccumulated: nextReasonAccumulated,
+    changed,
+    reasonChanged,
+    done,
   };
 }

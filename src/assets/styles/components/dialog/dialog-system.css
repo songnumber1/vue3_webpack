@@ -170,7 +170,6 @@ body.mobile-mode .message-action-text-button {
   min-height: 0;
   overflow-y: auto;
   padding: var(--dialog-body-padding);
-  -webkit-overflow-scrolling: touch;
 }
 
 .responsive-close-button,

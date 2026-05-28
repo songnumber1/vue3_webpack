@@ -1665,7 +1665,6 @@ body.mobile-mode .send-button {
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 4px 0 0;
-  -webkit-overflow-scrolling: touch;
 }
 
 .bottom-sheet-option--row {

@@ -101,7 +101,6 @@ body.mobile-mode .responsive-overlay.responsive-overlay--mobile-dialog {
     max(12px, env(safe-area-inset-bottom)) !important;
   overflow-y: auto !important;
   overscroll-behavior: contain !important;
-  -webkit-overflow-scrolling: touch;
 }
 
 body.mobile-mode
@@ -126,7 +125,6 @@ body.mobile-mode
       env(safe-area-inset-bottom)
   ) !important;
   overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
 }
 
 /* 모바일 전체 화면 오버레이의 뒤로 가기는 모바일 설정 화면처럼 아이콘만 노출합니다. */

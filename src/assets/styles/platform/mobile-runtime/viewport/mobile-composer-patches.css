@@ -182,7 +182,7 @@ body.mobile-mode .empty-stage--mobile-main {
   overflow-y: auto !important;
   overflow-x: hidden !important;
   padding: 78px 16px calc(170px + env(safe-area-inset-bottom));
-  -webkit-overflow-scrolling: touch !important;
+
   overscroll-behavior: contain !important;
 }
 body.mobile-mode .empty-stage--mobile-main .empty-center {
@@ -237,7 +237,7 @@ body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
   ) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
+
   overscroll-behavior: contain !important;
   padding-top: 78px;
   padding-right: 16px;
@@ -312,7 +312,7 @@ body.mobile-mode
   max-width: none;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  -webkit-overflow-scrolling: touch !important;
+
   overscroll-behavior: contain !important;
   display: flex;
   flex-direction: column;

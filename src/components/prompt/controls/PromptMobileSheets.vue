@@ -220,9 +220,13 @@ const emit = defineEmits([
   "open-file-picker",
 ]);
 
-const resolvedModelTitle = computed(() => props.modelTitle || t("chat.modelSelect"));
+const resolvedModelTitle = computed(
+  () => props.modelTitle || t("chat.modelSelect")
+);
 const resolvedToolTitle = computed(() => props.toolTitle || t("chat.tools"));
-const resolvedAttachTitle = computed(() => props.attachTitle || t("chat.attach"));
+const resolvedAttachTitle = computed(
+  () => props.attachTitle || t("chat.attach")
+);
 
 const {
   activeToolGroup,

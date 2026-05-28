@@ -273,7 +273,7 @@ body.mobile-mode .sidebar-content--mobile .quick-menu,
 body.mobile-mode .sidebar-content--mobile .project-list,
 body.mobile-mode .sidebar-content--mobile .sidebar-history {
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+
   padding-right: 0;
 }
 
@@ -1008,7 +1008,7 @@ body.mobile-mode .bubble-content {
 .empty-stage,
 .message-list {
   min-height: 0;
-  -webkit-overflow-scrolling: touch;
+
   overscroll-behavior: contain;
 }
 .message-list-anchor {

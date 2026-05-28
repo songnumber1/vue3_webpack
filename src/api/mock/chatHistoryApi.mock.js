@@ -94,7 +94,8 @@ export const chatHistoryApiMock = {
     const chatId = payload.chatId || createId();
     const modelId = payload.modelId || "";
     const assistantId = payload.assistId || payload.assistantId || "";
-    const titleSource = payload.ChatTilte || payload.chatTitle || payload.input || "";
+    const titleSource =
+      payload.ChatTilte || payload.chatTitle || payload.input || "";
     const history = {
       chatTitle: createChatTitle(titleSource),
       chatId,

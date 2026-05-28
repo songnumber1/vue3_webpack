@@ -9,7 +9,11 @@ export function revokeMessageAttachments(items = []) {
   });
 }
 
-export function appendUserAndAssistantMessages({chatStore, chatId, normalized}) {
+export function appendUserAndAssistantMessages({
+  chatStore,
+  chatId,
+  normalized,
+}) {
   const currentMessages = chatStore.messageMap[chatId] || [];
   const userMessage = {
     id: createId("message"),

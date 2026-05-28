@@ -35,7 +35,11 @@ export function createAssistantMessageCommitter({
   };
 }
 
-export async function commitFirstAnswerChunk({content, getAssistantMessage, commit}) {
+export async function commitFirstAnswerChunk({
+  content,
+  getAssistantMessage,
+  commit,
+}) {
   if (getAssistantMessage().reasoningStatus === "thinking") {
     commit({reasoningStatus: "completed"});
     await nextTick();

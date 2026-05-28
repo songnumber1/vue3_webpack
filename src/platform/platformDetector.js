@@ -1,4 +1,9 @@
-import {RUN_ENV, PLATFORM, hasAndroidBridge, hasExtensionRuntime} from "@/core/config";
+import {
+  RUN_ENV,
+  PLATFORM,
+  hasAndroidBridge,
+  hasExtensionRuntime,
+} from "@/core/config";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {
   createActualPlatformInfo,
@@ -9,6 +14,7 @@ import {
   getBrowserVersion,
   getNavigator,
   getScreen,
+  isSupportedBrowserName,
   isSupportedMobileMicBrowser,
   resolveBasePlatform,
 } from "./browserDetector";
@@ -68,13 +74,13 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isWindows = env === PLATFORM.WINDOWS;
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
+  const isAndroidWebView = isAndroid && browserName === "android-webview";
   const isMobile = isAndroid;
-  const isMobileBrowser = isMobile && !isNativeApp;
-  const isUnsupportedBrowser =
-    isMobileBrowser && browserName !== "chrome" && !forcedPlatform.isForced;
-  const unsupportedReason = isUnsupportedBrowser
-    ? "unsupported-android-browser"
-    : "";
+  const isMobileBrowser = isMobile && !isNativeApp && browserName === "chrome";
+  const isSupportedRuntime =
+    forcedPlatform.isForced || isSupportedBrowserName(browserName);
+  const isUnsupportedBrowser = !isSupportedRuntime;
+  const unsupportedReason = isUnsupportedBrowser ? "unsupported-browser" : "";
   const isAccess = !isUnsupportedBrowser;
   const viewportInfo = resolveViewportInfo(baseAppInfo);
   const isMic = isSupportedMobileMicBrowser({
@@ -135,12 +141,14 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isNativeRuntime: isNativeApp,
     isCompactViewport: viewportInfo.isCompactViewport,
     isAndroidApp,
+    isAndroidWebView,
     isMobile,
     isMobileBrowser,
     isMic,
     isPlatformForced: forcedPlatform.isForced,
     platformOverride,
     isChrome: browserName === "chrome",
+    isSupportedRuntime,
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",
     appBuildVersion: baseAppInfo.appBuildVersion || "",

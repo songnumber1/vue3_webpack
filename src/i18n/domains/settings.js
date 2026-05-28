@@ -39,7 +39,8 @@ export const settingsMessages = {
         },
         mobileAuthMode: {
           label: "모바일 인증 방식",
-          description: "모바일 브라우저/WebView 환경에서 사용할 인증 방식을 선택합니다.",
+          description:
+            "모바일 브라우저/WebView 환경에서 사용할 인증 방식을 선택합니다.",
         },
         webLoginUrl: {
           label: "웹 로그인 URL",
@@ -47,7 +48,8 @@ export const settingsMessages = {
         },
         mobileLoginUrl: {
           label: "모바일 로그인 URL",
-          description: "모바일 환경에서 로그인 확인 또는 진입에 사용할 URL입니다.",
+          description:
+            "모바일 환경에서 로그인 확인 또는 진입에 사용할 URL입니다.",
         },
         tempLoginUrl: {
           label: "임시 로그인 URL",
@@ -55,7 +57,8 @@ export const settingsMessages = {
         },
         accessInfoUrl: {
           label: "권한 확인 URL",
-          description: "라우터 가드와 초기 인증 확인에 사용할 access/info URL입니다.",
+          description:
+            "라우터 가드와 초기 인증 확인에 사용할 access/info URL입니다.",
         },
         logoutUrl: {
           label: "로그아웃 URL",
@@ -63,11 +66,13 @@ export const settingsMessages = {
         },
         jwtRefreshUrl: {
           label: "JWT 갱신 URL",
-          description: "access token 만료 시 refresh token으로 재발급 받을 URL입니다.",
+          description:
+            "access token 만료 시 refresh token으로 재발급 받을 URL입니다.",
         },
         jwtWithCredentials: {
           label: "JWT credential 전송",
-          description: "JWT 모드에서도 쿠키 credential을 함께 보낼지 여부입니다.",
+          description:
+            "JWT 모드에서도 쿠키 credential을 함께 보낼지 여부입니다.",
         },
         mobileBreakpoint: {
           label: "반응형 전환 기준",
@@ -322,7 +327,8 @@ export const settingsMessages = {
         },
         mobileAuthMode: {
           label: "Mobile auth mode",
-          description: "Select the authentication mode for mobile browser/WebView.",
+          description:
+            "Select the authentication mode for mobile browser/WebView.",
         },
         webLoginUrl: {
           label: "Web login URL",
@@ -338,7 +344,8 @@ export const settingsMessages = {
         },
         accessInfoUrl: {
           label: "Access info URL",
-          description: "access/info URL used by the route guard and auth checks.",
+          description:
+            "access/info URL used by the route guard and auth checks.",
         },
         logoutUrl: {
           label: "Logout URL",
@@ -346,7 +353,8 @@ export const settingsMessages = {
         },
         jwtRefreshUrl: {
           label: "JWT refresh URL",
-          description: "URL used to refresh an expired access token with a refresh token.",
+          description:
+            "URL used to refresh an expired access token with a refresh token.",
         },
         jwtWithCredentials: {
           label: "Send JWT credentials",

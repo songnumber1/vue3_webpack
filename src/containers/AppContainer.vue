@@ -47,7 +47,7 @@ const platformName = computed(
 );
 
 /**
- * 현재 사용자 환경의 접속 웹 브라우저 종류(예: chrome, safari 등)를 안전하게 판별하는 반응형 변수입니다.
+ * 현재 사용자 환경의 접속 웹 브라우저 종류(Chrome/WebView 지원 여부)를 안전하게 판별하는 반응형 변수입니다.
  * @type {import("vue").ComputedRef<string>}
  */
 const browserName = computed(() => platformInfo.value.browser || "unknown");

@@ -163,7 +163,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
       if (isSharedPage.value) {
         messages.value = await loadSharedConversation(activeHistoryId.value);
         await nextTick();
-        await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
+        await ui.scrollBottom({
+          behavior: "auto",
+          force: true,
+          afterRender: true,
+        });
         return;
       }
 
@@ -172,7 +176,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
         messages.value = [];
         clearActiveSession();
         await nextTick();
-        await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
+        await ui.scrollBottom({
+          behavior: "auto",
+          force: true,
+          afterRender: true,
+        });
         return;
       }
 

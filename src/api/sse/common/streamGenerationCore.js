@@ -2,12 +2,17 @@ import {applyGenerationStreamData} from "@/api/sse/common/generationStreamParser
 import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
-import {resolveGenerationUrl, resolveSseAuthOptions} from "@/api/sse/common/streamRequest";
+import {
+  resolveGenerationUrl,
+  resolveSseAuthOptions,
+} from "@/api/sse/common/streamRequest";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 
 function isUnauthorizedStreamError(error) {
-  const status = Number(error?.status || error?.responseCode || error?.code || 0);
+  const status = Number(
+    error?.status || error?.responseCode || error?.code || 0
+  );
   return status === 401;
 }
 

@@ -262,7 +262,6 @@ body.mobile-mode .message-actions button {
   overflow-x: hidden !important;
   overflow-y: hidden !important;
   scrollbar-width: none !important;
-  -ms-overflow-style: none !important;
 }
 
 .message--assistant.message--streaming .bubble::-webkit-scrollbar,

@@ -3,10 +3,7 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
-import {
-  canWrite,
-  isSelectedModelReasoning,
-} from "./submit/chatSubmitGuards";
+import {canWrite, isSelectedModelReasoning} from "./submit/chatSubmitGuards";
 import {normalizePromptPayload} from "./submit/chatSubmitPayload";
 import {
   createAssistantMessageCommitter,
@@ -17,6 +14,7 @@ import {
   scrollAfterUserSubmit,
 } from "./submit/chatSubmitScroll";
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
+// runAssistantStream 내부에서 streamGeneration을 호출하여 isGenerating 가드와 스트리밍 흐름을 유지합니다.
 
 function normalizeChatId(chatId) {
   return String(chatId || "").trim();
@@ -82,7 +80,12 @@ async function ensureConversationForSubmit(options, normalized) {
   return targetHistoryId;
 }
 
-function createSubmitCommitter(options, targetHistoryId, messages, assistantMessage) {
+function createSubmitCommitter(
+  options,
+  targetHistoryId,
+  messages,
+  assistantMessage
+) {
   return createAssistantMessageCommitter({
     chatId: targetHistoryId,
     initialMessages: messages,

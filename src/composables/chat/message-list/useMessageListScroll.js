@@ -202,7 +202,6 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-
   function applyBottomScrollAfterRender() {
     const options = pendingAfterRenderOptions || {};
     clearAfterRenderScrollState();

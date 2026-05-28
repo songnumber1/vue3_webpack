@@ -90,9 +90,7 @@ const {handleMarkdownClick: handleReasoningClick} =
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 
-const hasReasoning = computed(() =>
-  Boolean(props.message.isReasoning && props.message.reasoningContent)
-);
+const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
 const showMessageActions = computed(
   () =>
     !isInteractionBlocked.value &&
@@ -108,13 +106,12 @@ const reasoningTitle = computed(() =>
     : t("chat.reasoning.completed")
 );
 
-
 function escapeHtml(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
     .replace(/\n/g, "<br>");
 }

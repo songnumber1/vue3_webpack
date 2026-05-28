@@ -20,7 +20,6 @@ export function createAbortError(reason) {
   return error;
 }
 
-
 export function abortGenerationController(controller, reason) {
   if (!controller || controller.signal.aborted) return;
 

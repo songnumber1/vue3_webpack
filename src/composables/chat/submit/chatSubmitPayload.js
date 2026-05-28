@@ -53,7 +53,9 @@ export function createGenerationPayload(options, normalized, chatId) {
   const resolvedChatId = normalizeChatId(chatId);
 
   if (!resolvedChatId) {
-    throw new Error("generation.do payload requires chatId from new.do or current route.");
+    throw new Error(
+      "generation.do payload requires chatId from new.do or current route."
+    );
   }
 
   const settings = resolvePromptToolSettings();

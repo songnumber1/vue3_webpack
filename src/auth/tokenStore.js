@@ -23,11 +23,20 @@ function readBridgeValue(name) {
 }
 
 export function getAccessToken() {
-  return String(readBridgeValue("getAccessToken") || readBridgeValue("getToken") || getStorage()?.getItem(ACCESS_TOKEN_KEY) || "").trim();
+  return String(
+    readBridgeValue("getAccessToken") ||
+      readBridgeValue("getToken") ||
+      getStorage()?.getItem(ACCESS_TOKEN_KEY) ||
+      ""
+  ).trim();
 }
 
 export function getRefreshToken() {
-  return String(readBridgeValue("getRefreshToken") || getStorage()?.getItem(REFRESH_TOKEN_KEY) || "").trim();
+  return String(
+    readBridgeValue("getRefreshToken") ||
+      getStorage()?.getItem(REFRESH_TOKEN_KEY) ||
+      ""
+  ).trim();
 }
 
 function callBridgeSetter(name, value) {

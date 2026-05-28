@@ -71,7 +71,10 @@ async function requestAccessInfo(authAxios, payload) {
   }
 
   // 준비된 인증용 Axios 인스턴스를 통해 백엔드 엔드포인트로 POST 비동기 요청을 전달합니다.
-  const response = await authAxios.post(resolveAuthPolicy().accessInfoUrl || API_ENDPOINTS.ACCESS_INFO, payload);
+  const response = await authAxios.post(
+    resolveAuthPolicy().accessInfoUrl || API_ENDPOINTS.ACCESS_INFO,
+    payload
+  );
 
   return response?.data || {};
 }

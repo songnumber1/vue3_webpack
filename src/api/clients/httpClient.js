@@ -13,7 +13,10 @@ import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
-import {applyAuthRequestConfig, handleAuthResponseError} from "@/auth/httpAuthInterceptor";
+import {
+  applyAuthRequestConfig,
+  handleAuthResponseError,
+} from "@/auth/httpAuthInterceptor";
 import {createId} from "@/utils/id";
 
 /**

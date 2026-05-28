@@ -36,7 +36,7 @@ import {
  */
 /**
  * 현재 모바일 브라우저 계열을 html/body class에 반영합니다.
- * CSS patch는 이 class를 기준으로 Chrome/Samsung/Firefox/WebView 차이를 보정합니다.
+ * CSS patch는 지원 대상인 Chrome/WebView 기준 class만 반영합니다.
  */
 function applyBrowserViewportClass(browserFamily) {
   if (typeof document === "undefined") return;
@@ -44,12 +44,11 @@ function applyBrowserViewportClass(browserFamily) {
   const body = document.body;
   root.classList.remove(...VIEWPORT_BROWSER_CLASSES);
   body?.classList.remove(...VIEWPORT_BROWSER_CLASSES);
-  const normalizedFamily = VIEWPORT_BROWSER_CLASSES.includes(
+  const className = VIEWPORT_BROWSER_CLASSES.includes(
     `mobile-browser-${browserFamily}`
   )
-    ? browserFamily
-    : "default";
-  const className = `mobile-browser-${normalizedFamily}`;
+    ? `mobile-browser-${browserFamily}`
+    : "mobile-browser-chrome";
   root.classList.add(className);
   body?.classList.add(className);
 }

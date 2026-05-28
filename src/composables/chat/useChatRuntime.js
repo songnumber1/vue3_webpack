@@ -244,7 +244,9 @@ export function useChatRuntime() {
    */
   async function createRemoteConversation({text, assistantId, modelId} = {}) {
     const chatId = createId(); // new.do 요청 시점에 채팅방 ID를 UUID로 선발급합니다.
-    const chatTitle = String(text || "").trim().slice(0, 20);
+    const chatTitle = String(text || "")
+      .trim()
+      .slice(0, 20);
     const assistant = assistantStore.assistantMap?.[assistantId] || null;
 
     // 백엔드 데이터베이스 엔드포인트에 룸 신규 영구 개설 API 패킷을 송출합니다.

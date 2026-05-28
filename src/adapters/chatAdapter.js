@@ -11,6 +11,13 @@ import {CHAT_KEYS, MESSAGE_KEYS} from "@/constants/apiKeys";
 import {MESSAGE_ROLES} from "@/constants/domain";
 import {toBoolean} from "@/utils/typeConvert";
 
+function firstText(...values) {
+  const found = values.find(
+    (value) => typeof value === "string" && value.trim() !== ""
+  );
+  return found || "";
+}
+
 /**
  * @function adaptChatHistory
  * @description 백엔드에서 전송된 개별 채팅방 원시 이력 객체를 프론트엔드 컴포넌트 표준 규격 데이터 구조로 반환(Adapting)합니다.
@@ -76,10 +83,22 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
  * @returns {Object} 뷰 인프라 및 마크다운 파서가 완벽하게 인지할 수 있는 정문화된 단일 메시지 객체
  */
 export function adaptMessage(raw = {}) {
-  const reasoningContent =
-    raw[MESSAGE_KEYS.REASONING_CONTENT] || raw.reasoning || "";
-  const content =
-    raw[MESSAGE_KEYS.CONTENT] || raw.answer || raw.body || reasoningContent || "";
+  const reasoningContent = firstText(
+    // 회사 이전 대화 목록 규격은 reasoningContent(camelCase)입니다.
+    raw[MESSAGE_KEYS.REASONING_CONTENT],
+    // 실시간 stream 또는 일부 백엔드/저장소가 snake_case를 그대로 저장한 경우도 흡수합니다.
+    raw.reasoning_content,
+    raw.reasoningContent,
+    raw.reasoning,
+    raw.reason,
+    raw.reasonContent
+  );
+  const content = firstText(
+    raw[MESSAGE_KEYS.CONTENT],
+    raw.answer,
+    raw.body,
+    reasoningContent
+  );
 
   return {
     id: raw[MESSAGE_KEYS.ID], // 말풍선 고유 고정 ID 키

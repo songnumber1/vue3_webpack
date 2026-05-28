@@ -27,19 +27,26 @@ export async function runAssistantStream({
   logPrefix,
 }) {
   try {
-    await streamGeneration(createGenerationPayload(options, normalized, chatId), {
-      onReasonChunk: async (reasoningContent) => {
-        commit({reasoningContent, reasoningStatus: "thinking"});
-        scheduleStreamScroll();
-      },
-      onChunk: async (content) => {
-        await commitFirstAnswerChunk({content, getAssistantMessage, commit});
-        scheduleStreamScroll();
-      },
-      onComplete: () => {
-        commit({status: "complete", reasoningStatus: "completed"});
-      },
-    });
+    await streamGeneration(
+      createGenerationPayload(options, normalized, chatId),
+      {
+        onReasonChunk: async (reasoningContent) => {
+          commit({
+            isReasoning: true,
+            reasoningContent,
+            reasoningStatus: "thinking",
+          });
+          scheduleStreamScroll();
+        },
+        onChunk: async (content) => {
+          await commitFirstAnswerChunk({content, getAssistantMessage, commit});
+          scheduleStreamScroll();
+        },
+        onComplete: () => {
+          commit({status: "complete", reasoningStatus: "completed"});
+        },
+      }
+    );
 
     commit({status: "complete", reasoningStatus: "completed"});
     await nextTick();
@@ -62,6 +69,10 @@ export async function runAssistantStream({
 
     commit({
       status: fallbackContent ? "complete" : "error",
+      isReasoning:
+        getAssistantMessage().isReasoning || Boolean(error.reasonAccumulated),
+      reasoningContent:
+        error.reasonAccumulated || getAssistantMessage().reasoningContent || "",
       reasoningStatus: "completed",
       content: fallbackContent,
     });

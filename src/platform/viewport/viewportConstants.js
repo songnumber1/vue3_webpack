@@ -28,7 +28,6 @@ export const VIEWPORT_GUARD_DELAY_MS = Object.freeze({
   default: 80,
 });
 export const VIEWPORT_BROWSER_CLASSES = Object.freeze([
-  "mobile-browser-default",
   "mobile-browser-chrome",
 ]);
 

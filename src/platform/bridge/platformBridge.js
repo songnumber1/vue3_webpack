@@ -159,7 +159,8 @@ export async function copyClipboardByPlatform(text) {
  * 외부 브라우저 열기는 WebView에서 native 위임이 필요하고, 일반 웹에서는 window.open fallback을 사용합니다.
  */
 export async function openExternalBrowser(url) {
-  if (isAndroidApp()) return callNativeWithLogging("OPEN_EXTERNAL_BROWSER", {url});
+  if (isAndroidApp())
+    return callNativeWithLogging("OPEN_EXTERNAL_BROWSER", {url});
   try {
     window.open(url, "_blank", "noopener,noreferrer");
     return webSuccess({opened: true});
@@ -169,7 +170,8 @@ export async function openExternalBrowser(url) {
   }
 }
 export async function openNativeFilePicker(options = {}) {
-  if (isAndroidApp()) return callNativeWithLogging("OPEN_FILE_PICKER", {options});
+  if (isAndroidApp())
+    return callNativeWithLogging("OPEN_FILE_PICKER", {options});
 
   return webSuccess(
     {opened: false, reason: "browser-file-input-required"},

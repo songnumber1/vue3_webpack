@@ -73,14 +73,14 @@ export function useRuntimeModeFlags() {
   );
 
   /**
-   * 현재 앱 환경이 iOS가 아닌 '안드로이드 네이티브 앱' 환경 기반인지 판별합니다.
+   * 현재 앱 환경이 안드로이드 네이티브 WebView 앱 환경 기반인지 판별합니다.
    * @type {import("vue").ComputedRef<boolean>}
    * @see {@link createAndroidConfig} 안드로이드 타깃 빌드 설정 레퍼런스
    */
   const isAndroidApp = computed(() => Boolean(platformInfo.value.isAndroidApp));
 
   /**
-   * 네이티브 앱이 아닌, 모바일 기기의 순수 모바일 웹 브라우저(Safari, Chrome Mobile 등) 환경인지 판별합니다.
+   * 네이티브 앱이 아닌, 모바일 기기의 지원 대상 Chrome 브라우저 환경인지 판별합니다.
    * 플랫폼 강제 설정은 런타임 테스트용으로만 사용하고, 레이아웃 전환은 실제 뷰포트/실제 모바일 런타임 기준을 따릅니다.
    * @type {import("vue").ComputedRef<boolean>}
    * @see {@link isAndroidChromeUserAgent} 순정 안드로이드 크롬 판단 로직 연동
@@ -101,7 +101,10 @@ export function useRuntimeModeFlags() {
   const shouldUseMobileLayout = computed(() =>
     // 반응형 변수들의 내부 프리미티브 값을 추출(.value)하여 결합 연산을 진행합니다.
     Boolean(
-      isCompactViewport.value || isAndroidApp.value || isMobileBrowser.value
+      isCompactViewport.value ||
+      isAndroidApp.value ||
+      isMobileBrowser.value ||
+      platformInfo.value.isAndroidWebView
     )
   );
 

@@ -29,7 +29,7 @@ function applyWebRequestInterceptor(instance) {
 /**
  * @description 하이브리드 네이티브 앱(Native App) 환경에서 작동하는 Axios 요청 인터셉터입니다. 네이티브 브릿지나 수임 정보에서 토큰을 추출하고 앱 환경 메타 헤더를 함께 주입합니다.
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
- * @param {object} bridge - 안드로이드/iOS 네이티브 OS 소켓 웹뷰 자바스크립트 인터페이스 브릿지 객체
+ * @param {object} bridge - 안드로이드 네이티브 WebView 자바스크립트 인터페이스 브릿지 객체
  * @param {object} appInfo - 애플리케이션 코어 빌드 및 버전 정보 구조체
  * @returns {void}
  */

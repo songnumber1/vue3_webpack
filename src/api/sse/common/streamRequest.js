@@ -11,7 +11,6 @@ import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 import {createId} from "@/utils/id";
 
-
 export async function resolveSseAuthOptions() {
   const policy = resolveAuthPolicy();
   const headers = {
@@ -66,14 +65,20 @@ export async function fetchGenerationResult(requestId) {
     },
   });
 
-  let response = await fetch(resolveGenerationResultUrl(requestId), buildOptions(authOptions.headers));
+  let response = await fetch(
+    resolveGenerationResultUrl(requestId),
+    buildOptions(authOptions.headers)
+  );
 
   if (response.status === 401 && authOptions.policy.isJwt) {
     try {
       const accessToken = await refreshAccessTokenOnce();
       response = await fetch(
         resolveGenerationResultUrl(requestId),
-        buildOptions({...authOptions.headers, Authorization: `Bearer ${accessToken}`})
+        buildOptions({
+          ...authOptions.headers,
+          Authorization: `Bearer ${accessToken}`,
+        })
       );
       if (response.status === 401) {
         resetAuthStateSafely();

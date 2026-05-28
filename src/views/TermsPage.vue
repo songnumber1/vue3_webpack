@@ -125,7 +125,7 @@ function confirmTerms() {
   margin-top: 28px;
   padding-bottom: 28px;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+
   overscroll-behavior: contain;
 }
 .legal-section {

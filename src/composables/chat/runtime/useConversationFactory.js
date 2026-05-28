@@ -21,7 +21,11 @@ export function createLocalHistory({text, assistant, model}) {
   };
 }
 
-export function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
+export function createSessionFromHistory(
+  history,
+  modelMap = {},
+  assistantMap = {}
+) {
   if (!history) return null;
 
   const model = modelMap[history.modelId] || null;

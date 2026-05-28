@@ -21,9 +21,13 @@ export const authApiLive = {
   },
 
   async tempLogin(payload = {}) {
-    const response = await httpClient.post(resolveAuthPolicy().tempLoginUrl, payload, {
-      apiKey: API_KEYS.LOGIN,
-    });
+    const response = await httpClient.post(
+      resolveAuthPolicy().tempLoginUrl,
+      payload,
+      {
+        apiKey: API_KEYS.LOGIN,
+      }
+    );
     const data = unwrapResponseData(response, {});
     setTokens({
       accessToken: data.accessToken || data.access_token,
@@ -34,9 +38,13 @@ export const authApiLive = {
 
   async logout() {
     try {
-      const response = await httpClient.post(resolveAuthPolicy().logoutUrl, undefined, {
-        apiKey: API_KEYS.LOGIN,
-      });
+      const response = await httpClient.post(
+        resolveAuthPolicy().logoutUrl,
+        undefined,
+        {
+          apiKey: API_KEYS.LOGIN,
+        }
+      );
       return unwrapResponseData(response, {});
     } finally {
       clearTokens();

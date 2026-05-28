@@ -102,7 +102,6 @@ function emitPreview(file) {
   overflow-x: auto;
   overflow-y: visible;
   scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
 }
 
 :global(body.mobile-mode) .attachment-preview-row::-webkit-scrollbar {

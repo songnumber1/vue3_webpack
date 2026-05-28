@@ -215,7 +215,9 @@ export async function bootstrapChatRuntime(options = {}) {
 
     if (examplePromptResult[0]?.status === "fulfilled") {
       examplePromptMap = {
-        [initialAssistant.id]: adaptExamplePromptList(examplePromptResult[0].value),
+        [initialAssistant.id]: adaptExamplePromptList(
+          examplePromptResult[0].value
+        ),
       };
     }
   }

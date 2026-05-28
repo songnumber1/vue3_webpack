@@ -4,7 +4,9 @@ import {resolveStreamRuntimeType} from "@/platform/runtime/runtimeDetector";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 
 function normalizeMode(value, fallback) {
-  return value === AUTH_MODES.JWT || value === AUTH_MODES.SESSION ? value : fallback;
+  return value === AUTH_MODES.JWT || value === AUTH_MODES.SESSION
+    ? value
+    : fallback;
 }
 
 function readSettings() {
@@ -17,7 +19,8 @@ function readSettings() {
 
 export function resolveClientPlatform() {
   const runtimeType = resolveStreamRuntimeType();
-  if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW) return "android-webview";
+  if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW)
+    return "android-webview";
   if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_CHROME) return "mobile-web";
   return "web";
 }
@@ -62,5 +65,7 @@ export function isAuthPublicUrl(url = "") {
     "/temp-login.do",
     "/logout.do",
     "/auth/refresh.do",
-  ].filter(Boolean).some((path) => value.includes(path));
+  ]
+    .filter(Boolean)
+    .some((path) => value.includes(path));
 }

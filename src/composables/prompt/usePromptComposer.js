@@ -294,6 +294,7 @@ export function usePromptComposer(props, emit) {
 
   // ── [생명주기 마운트] ────────────────────────────────────────────────────
   // 실제 DOM 트리가 기기 브라우저에 최종 활성화 안착한 시점에 최초 동기화 세팅을 구동합니다.
+  // orientationchange 및 window.visualViewport 이벤트 추적은 usePromptMenu의 syncViewportMode 리스너에서 전담합니다.
   onMounted(() => {
     syncViewportMode(); // 현재 접속한 해상도가 PC 규격인지 Mobile 규격인지 1차 분석 완료 고정
     resize(); // 초기 기본 1줄 상태 폼 레이아웃 드로잉 스펙 고정

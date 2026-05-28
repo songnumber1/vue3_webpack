@@ -175,7 +175,7 @@ export function usePromptMenu() {
     passive: true,
   }); // 모바일 화면 가로/세로 회전 대응
 
-  // iOS 사파리 및 안드로이드 하이브리드 크롬 웹뷰의 특수 가상 키보드 인입 메커니즘을 완벽 방어하기 위해
+  // 안드로이드 Chrome/WebView의 특수 가상 키보드 인입 메커니즘을 완벽 방어하기 위해
   // 표준 윈도우 리사이즈뿐만 아니라 `visualViewport` 인터페이스의 수축/팽창/스크롤 모션까지 이중 추적 바인딩 개통합니다.
   if (typeof window !== "undefined" && window.visualViewport) {
     useEventListener(window.visualViewport, "resize", syncViewportMode, {
