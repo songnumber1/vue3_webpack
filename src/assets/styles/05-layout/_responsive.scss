@@ -1,27 +1,27 @@
 /* Migrated from src/assets/styles/layouts/responsive/desktop-main-feedback-patch.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+   Stage 3 Sass migration: desktop/mobile wrappers now use ownership mixins while preserving cascade order. */
 @use "../00-abstracts/mixins" as *;
 
-body.desktop-mode .chat-container-root--mode-main .empty-center {
-  width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
+.chat-container-root--mode-main .empty-center {
+  @include desktop-mode {
+    width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
+    max-width: var(--layout-prompt-width, 820px) !important;
+  }
 }
 
-body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt {
-  width: min(var(--layout-prompt-width, 820px), 100%) !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
+.chat-container-root--mode-main .desktop-center-prompt {
+  @include desktop-mode {
+    width: min(var(--layout-prompt-width, 820px), 100%) !important;
+    max-width: var(--layout-prompt-width, 820px) !important;
+  }
 }
 
-body.desktop-mode
-  .chat-container-root--mode-main
-  .desktop-center-prompt
-  .prompt-box,
-body.desktop-mode
-  .chat-container-root--mode-main
-  .desktop-center-prompt
-  .prompt-box--gemini {
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
+.chat-container-root--mode-main .desktop-center-prompt .prompt-box,
+.chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini {
+  @include desktop-mode {
+    width: 100% !important;
+    max-width: var(--layout-prompt-width, 820px) !important;
+  }
 }
 
 .feedback-dialog-backdrop {
@@ -32,6 +32,12 @@ body.desktop-mode
   justify-items: center !important;
   padding: max(12px, env(safe-area-inset-top)) 12px
     max(12px, env(safe-area-inset-bottom)) !important;
+
+  @include mobile-mode {
+    place-items: center !important;
+    align-items: center !important;
+    justify-items: center !important;
+  }
 }
 
 .feedback-dialog {
@@ -42,27 +48,25 @@ body.desktop-mode
   ) !important;
   margin: auto !important;
   border-radius: 5px !important;
+
+  @include mobile-mode {
+    width: min(100%, 520px) !important;
+    border-radius: 5px !important;
+  }
 }
 
-body.mobile-mode .feedback-dialog-backdrop {
-  place-items: center !important;
-  align-items: center !important;
-  justify-items: center !important;
+.feedback-dialog-body {
+  @include mobile-mode {
+    max-height: calc(
+      var(--app-height, 100dvh) - 180px - env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+    );
+    overflow-y: auto;
+  }
 }
 
-body.mobile-mode .feedback-dialog {
-  width: min(100%, 520px) !important;
-  border-radius: 5px !important;
-}
-
-body.mobile-mode .feedback-dialog-body {
-  max-height: calc(
-    var(--app-height, 100dvh) - 180px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
-  );
-  overflow-y: auto;
-}
-
-body.mobile-mode .feedback-dialog-body textarea {
-  max-height: max(110px, calc(var(--app-height, 100dvh) - 320px)) !important;
+.feedback-dialog-body textarea {
+  @include mobile-mode {
+    max-height: max(110px, calc(var(--app-height, 100dvh) - 320px)) !important;
+  }
 }
