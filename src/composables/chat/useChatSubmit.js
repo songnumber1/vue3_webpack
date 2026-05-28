@@ -1,6 +1,7 @@
 import {nextTick, ref} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
+import {useChatStore} from "@/stores/chatStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -120,6 +121,7 @@ export function useChatSubmit(options) {
   const isGenerating = ref(false);
   const chatStreamStore = useChatStreamStore();
   const apiRequestStore = useApiRequestStore();
+  const chatStore = useChatStore();
 
   async function submitPrompt(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -150,6 +152,11 @@ export function useChatSubmit(options) {
         options,
         normalized
       );
+
+      if (isNewConversationSubmit) {
+        chatStore.promoteDraftPromptToolSettingsToChat(targetHistoryId);
+      }
+
       const {messages, assistantMessage} =
         options.appendUserAndAssistantMessages(targetHistoryId, normalized);
 

@@ -172,6 +172,33 @@ export const useChatStore = defineStore("chat", {
         [chatId]: clonePromptToolSettings(DEFAULT_PROMPT_TOOL_SETTINGS), // 불변 객체 딥 카피 주입 완료
       };
     },
+
+    /**
+     * 메인 화면(아직 chatId가 없는 새 대화)에서 선택한 툴 설정을
+     * 실제 생성된 채팅방 ID로 1회 승격합니다.
+     *
+     * 새 대화 첫 submit 흐름에서는 new.do 이후 setActiveSession()이 호출되면서
+     * 활성 chatId가 새 방으로 바뀌고 기본값 초기화가 수행됩니다. 이때 draft 키에
+     * 있던 지식 검색/웹 검색/템플릿 선택값이 사라지지 않도록 생성된 chatId 슬롯에
+     * 복사하고, 이후 다른 새 대화에 누수되지 않게 draft 슬롯은 즉시 초기화합니다.
+     */
+    promoteDraftPromptToolSettingsToChat(chatId) {
+      const id = String(chatId || "").trim();
+      if (!id) return;
+
+      const draftSettings = clonePromptToolSettings(
+        this.promptToolSettingsMap[DRAFT_PROMPT_TOOL_SETTINGS_KEY] ||
+          DEFAULT_PROMPT_TOOL_SETTINGS
+      );
+
+      this.promptToolSettingsMap = {
+        ...this.promptToolSettingsMap,
+        [id]: draftSettings,
+        [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: clonePromptToolSettings(
+          DEFAULT_PROMPT_TOOL_SETTINGS
+        ),
+      };
+    },
     /**
      * @function ensurePromptToolSettings
      * @description 특정 챗방 전용 툴바 옵션 적치 공간이 맵 내부에 부재하여 에러가 나는 현상을 차단하기 위해 고안된 안전 가드 초기화 보장식입니다.
