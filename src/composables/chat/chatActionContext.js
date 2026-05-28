@@ -59,6 +59,7 @@ export function createEmptyWorkspaceState() {
     messages: [],
     showScrollBottom: false,
     autoScrollOnAnswer: false,
+    isHistoryHydrating: false,
   };
 }
 
@@ -164,5 +165,6 @@ export function createEmptyWorkspaceActions() {
     handlePromptResize: () => {}, // 입력 텍스트 증가에 따른 높이 가변 보정 무동작 스텁
     handleMessageContentRendered: () => {}, // 실시간 마크다운 파싱 완수 시 스크롤 잠금 연동 무동작 스텁
     scrollBottom: () => {}, // 타임라인 최하단 스크롤 강제 하향 무동작 스텁
+    handleHistoryHydrated: () => {}, // 대화방 초기 렌더 완료 후 표시 전환 무동작 스텁
   };
 }

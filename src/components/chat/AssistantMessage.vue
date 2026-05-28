@@ -140,7 +140,7 @@ async function renderContent() {
     logWarn("[AssistantMessage] content render failed:", error);
     html.value = escapeHtml(props.message.content || "");
   } finally {
-    if (currentVersion === renderVersion) emit("rendered");
+    if (currentVersion === renderVersion) emit("rendered", "content");
   }
 }
 
@@ -164,7 +164,8 @@ async function renderReasoningContent() {
     logWarn("[AssistantMessage] reasoning render failed:", error);
     reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
   } finally {
-    if (currentVersion === reasoningRenderVersion) emit("rendered");
+    if (currentVersion === reasoningRenderVersion)
+      emit("rendered", "reasoning");
   }
 }
 

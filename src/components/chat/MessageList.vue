@@ -2,7 +2,9 @@
   <section
     ref="scrollRef"
     class="message-list"
+    :class="{'message-list--initial-hydrating': initialHydrating}"
     aria-live="polite"
+    :aria-busy="initialHydrating ? 'true' : 'false'"
     @scroll.passive="handleScroll"
     @touchstart.passive="handleUserScrollIntent"
     @wheel.passive="handleUserScrollIntent"
@@ -15,7 +17,7 @@
       :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
-      @rendered="handleMessageRendered(message.id)"
+      @rendered="handleMessageRendered(message.id, $event)"
       @regenerate="$emit('regenerate', $event)"
     />
     <div v-if="loading" class="typing-row">
@@ -39,9 +41,14 @@ const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
+  initialHydrating: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(["content-rendered", "regenerate"]);
+const emit = defineEmits([
+  "content-rendered",
+  "history-hydrated",
+  "regenerate",
+]);
 
 function isLastAssistantMessage(message) {
   if (!message || message.role !== "assistant") {
@@ -85,6 +92,10 @@ defineExpose({
 .message-list {
   min-width: 0;
   min-height: 0;
+}
+
+.message-list--initial-hydrating {
+  visibility: hidden;
 }
 
 .message-list-anchor {

@@ -44,7 +44,9 @@
       :messages="messages"
       :loading="isGenerating"
       :auto-scroll-on-answer="autoScrollOnAnswer"
+      :initial-hydrating="isHistoryHydrating"
       @content-rendered="handleMessageContentRendered"
+      @history-hydrated="handleHistoryHydrated"
       @regenerate="workspaceActions.regenerate($event)"
     />
     <button
@@ -135,6 +137,9 @@ const showScrollBottom = computed(() => workspaceState.value.showScrollBottom);
 const autoScrollOnAnswer = computed(
   () => workspaceState.value.autoScrollOnAnswer
 );
+const isHistoryHydrating = computed(
+  () => workspaceState.value.isHistoryHydrating
+);
 const isMainPage = computed(() => mode.value === "main");
 
 const mainAssistantIcon = computed(() =>
@@ -166,6 +171,11 @@ function scheduleComposerHeightUpdate() {
 
 function handleMessageContentRendered() {
   workspaceActions.handleMessageContentRendered();
+  scheduleComposerHeightUpdate();
+}
+
+function handleHistoryHydrated() {
+  workspaceActions.handleHistoryHydrated();
   scheduleComposerHeightUpdate();
 }
 
@@ -205,6 +215,7 @@ watch(
     showScrollBottom.value,
     isActiveModelUnavailable.value,
     isGenerating.value,
+    isHistoryHydrating.value,
     messages.value.length,
   ],
   async () => {

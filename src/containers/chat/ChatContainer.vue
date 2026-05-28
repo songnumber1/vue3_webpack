@@ -212,6 +212,8 @@ const {
   workspaceAssistantLabel,
   suggestions,
   isGenerating,
+  isHistoryHydrating,
+  finishHistoryHydration,
   autoScrollOnAnswer,
   closeImagePreview,
   handlePreviewLoad,
@@ -300,6 +302,7 @@ provide(
     messages: messages.value,
     showScrollBottom: showScrollBottom.value,
     autoScrollOnAnswer: autoScrollOnAnswer.value,
+    isHistoryHydrating: isHistoryHydrating.value,
   }))
 );
 
@@ -348,6 +351,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handlePromptResize: refreshPromptViewport,
   handleMessageContentRendered,
   scrollBottom: handleWorkspaceScrollBottom,
+  handleHistoryHydrated: finishHistoryHydration,
 });
 </script>
 

@@ -17,6 +17,7 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useApiRequestStore} from "@/stores/apiRequestStore";
 
 /**
  * [Route/Data controller]
@@ -41,6 +42,25 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   // 비즈니스 인프라 마스터 데이터 부트스트랩 패치가 최종 완료되었는지를 나타내는 트리거 플래그입니다.
   const runtimeReady = ref(false);
+  const isHistoryHydrating = ref(false);
+  const apiRequestStore = useApiRequestStore();
+  let historyHydrationOverlayActive = false;
+
+  function beginHistoryHydration() {
+    isHistoryHydrating.value = true;
+    if (!historyHydrationOverlayActive) {
+      apiRequestStore.startOverlay();
+      historyHydrationOverlayActive = true;
+    }
+  }
+
+  function finishHistoryHydration() {
+    isHistoryHydrating.value = false;
+    if (historyHydrationOverlayActive) {
+      apiRequestStore.stopOverlay();
+      historyHydrationOverlayActive = false;
+    }
+  }
 
   // ── 📌 [1. 화면 라우팅 상태 분석 및 권한 가드 파트] ──────────────────
   const currentMode = computed(() => props.mode);
@@ -153,6 +173,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
   async function loadRouteConversation() {
     // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
     if (isMainPage.value) {
+      finishHistoryHydration();
       messages.value = [];
       clearActiveSession();
       return;
@@ -161,42 +182,37 @@ export function useChatDataController({props, ui, runtime, messages}) {
     try {
       // 케이스 2: 공유 오픈방 열람 페이지인 경우 원격지의 전용 익명 오픈 조회 엔드포인트 파이프라인으로 우회 라우팅합니다.
       if (isSharedPage.value) {
+        beginHistoryHydration();
         messages.value = await loadSharedConversation(activeHistoryId.value);
         await nextTick();
-        await ui.scrollBottom({
-          behavior: "auto",
-          force: true,
-          afterRender: true,
-        });
         return;
       }
 
       // 케이스 3: 일반 채팅 모드인데 대상 방의 고유 ID가 식별되지 않는 예외 상황 처리
       if (!activeHistoryId.value) {
+        beginHistoryHydration();
         messages.value = [];
         clearActiveSession();
         await nextTick();
-        await ui.scrollBottom({
-          behavior: "auto",
-          force: true,
-          afterRender: true,
-        });
+        finishHistoryHydration();
         return;
       }
 
       // 케이스 4: 현재 메모리에 인덱싱된 대화 목록 서랍에서 타깃 방 객체를 검증 스캔합니다.
       const history = findHistory(activeHistoryId.value);
       if (!history) {
+        finishHistoryHydration();
         // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
         await router.replace({name: "main"}).catch(() => {});
         return;
       }
 
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
+      beginHistoryHydration();
       messages.value = await ensureConversation(history.id);
       await nextTick();
-      await ui.scrollBottom({behavior: "auto", force: true, afterRender: true});
     } catch (error) {
+      finishHistoryHydration();
       logWarn("[useChatDataController] loadRouteConversation 오류:", error);
     }
   }
@@ -332,6 +348,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
     workspaceAssistantLabel,
     suggestions,
     isGenerating,
+    isHistoryHydrating,
+    finishHistoryHydration,
     submit,
     regenerate,
     bindDataEvents,

@@ -4,7 +4,7 @@
     :data-message-id="messageDomId"
     :data-message-role="messageDomRole"
     :message="message"
-    @rendered="$emit('rendered')"
+    @rendered="$emit('rendered', $event)"
   />
   <AssistantMessage
     v-else
@@ -12,7 +12,7 @@
     :data-message-role="messageDomRole"
     :message="message"
     :show-regenerate="showRegenerate"
-    @rendered="$emit('rendered')"
+    @rendered="$emit('rendered', $event)"
     @regenerate="$emit('regenerate', $event)"
   />
 </template>

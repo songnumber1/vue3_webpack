@@ -81,6 +81,12 @@ export function useMessageListScroll({props, emit}) {
   let afterRenderScrollTimerId = 0;
   let pendingAfterRenderAssistantIds = null;
   let pendingAfterRenderOptions = null;
+  let hydrationRunId = 0;
+  let hydrationTimerId = 0;
+  let hydrationRafId = 0;
+  let hydrationResizeObserver = null;
+  let pendingHydrationAssistantIds = null;
+  let pendingHydrationAssistantParts = null;
 
   function getScrollElement() {
     return scrollRef.value;
@@ -138,9 +144,34 @@ export function useMessageListScroll({props, emit}) {
     pendingAfterRenderOptions = null;
   }
 
+  function clearHydrationState() {
+    hydrationRunId += 1;
+    if (hydrationTimerId) {
+      window.clearTimeout(hydrationTimerId);
+      hydrationTimerId = 0;
+    }
+    if (hydrationRafId) {
+      window.cancelAnimationFrame(hydrationRafId);
+      hydrationRafId = 0;
+    }
+    hydrationResizeObserver?.disconnect();
+    hydrationResizeObserver = null;
+    pendingHydrationAssistantIds = null;
+    pendingHydrationAssistantParts = null;
+  }
+
+  function getAssistantMessageIds() {
+    return (props.messages || [])
+      .filter((message) => message?.role === "assistant")
+      .map((message, index) => String(message.id ?? `assistant-${index}`));
+  }
+
   function handleUserScrollIntent() {
     clearStableTimers();
     clearAfterRenderScrollState();
+    if (!props.initialHydrating) {
+      clearHydrationState();
+    }
   }
 
   function applyBottomScroll(behavior = "auto") {
@@ -155,8 +186,20 @@ export function useMessageListScroll({props, emit}) {
       });
     }
 
-    el.scrollTop = el.scrollHeight;
+    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
     userIsAtBottom.value = true;
+  }
+
+  function applyHydrationBottomScroll() {
+    applyBottomScroll("auto");
+
+    const el = getScrollElement();
+    if (!el) return;
+
+    // Android Chrome/WebView에서는 VisualViewport, composer 높이, 폰트/마크다운 높이가
+    // 같은 프레임에서 순차 반영될 수 있습니다. 화면은 아직 hidden 상태이므로
+    // 사용자에게 스크롤 이동을 노출하지 않고 여러 프레임 안에서 최종 하단 위치만 확정합니다.
+    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
   }
 
   function applyElementScroll(target, options = {}) {
@@ -213,6 +256,121 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
+  function waitForStableLayout(runId, callback) {
+    const el = getScrollElement();
+    if (!el || typeof window === "undefined") {
+      callback();
+      return;
+    }
+
+    let stableFrameCount = 0;
+    let frameCount = 0;
+    let lastHeight = -1;
+    let lastClientHeight = -1;
+    const maxFrames = 90;
+    const requiredStableFrames = 3;
+
+    const cleanupObserver = () => {
+      hydrationResizeObserver?.disconnect();
+      hydrationResizeObserver = null;
+    };
+
+    if (typeof ResizeObserver !== "undefined") {
+      hydrationResizeObserver?.disconnect();
+      hydrationResizeObserver = new ResizeObserver(() => {
+        stableFrameCount = 0;
+      });
+      hydrationResizeObserver.observe(el);
+    }
+
+    const tick = () => {
+      if (runId !== hydrationRunId) {
+        cleanupObserver();
+        return;
+      }
+
+      const currentHeight = el.scrollHeight;
+      const currentClientHeight = el.clientHeight;
+      if (
+        currentHeight === lastHeight &&
+        currentClientHeight === lastClientHeight
+      ) {
+        stableFrameCount += 1;
+      } else {
+        stableFrameCount = 0;
+        lastHeight = currentHeight;
+        lastClientHeight = currentClientHeight;
+      }
+
+      frameCount += 1;
+      if (stableFrameCount >= requiredStableFrames || frameCount >= maxFrames) {
+        cleanupObserver();
+        callback();
+        return;
+      }
+
+      hydrationRafId = window.requestAnimationFrame(tick);
+    };
+
+    hydrationRafId = window.requestAnimationFrame(tick);
+  }
+
+  function completeInitialHydration(runId) {
+    if (runId !== hydrationRunId) return;
+    if (hydrationTimerId) {
+      window.clearTimeout(hydrationTimerId);
+      hydrationTimerId = 0;
+    }
+
+    waitForStableLayout(runId, () => {
+      if (runId !== hydrationRunId) return;
+      window.requestAnimationFrame(() => {
+        if (runId !== hydrationRunId) return;
+        applyHydrationBottomScroll();
+        window.requestAnimationFrame(() => {
+          if (runId !== hydrationRunId) return;
+          applyHydrationBottomScroll();
+          window.requestAnimationFrame(() => {
+            if (runId !== hydrationRunId) return;
+            applyHydrationBottomScroll();
+            pendingHydrationAssistantIds = null;
+            pendingHydrationAssistantParts = null;
+            emit("history-hydrated");
+          });
+        });
+      });
+    });
+  }
+
+  function scheduleInitialHydrationFallback(runId) {
+    if (hydrationTimerId) window.clearTimeout(hydrationTimerId);
+    hydrationTimerId = window.setTimeout(() => {
+      hydrationTimerId = 0;
+      completeInitialHydration(runId);
+    }, 1800);
+  }
+
+  async function startInitialHydration() {
+    if (!props.initialHydrating || typeof window === "undefined") return;
+
+    clearHydrationState();
+    const runId = hydrationRunId;
+    await nextTick();
+
+    if (runId !== hydrationRunId || !props.initialHydrating) return;
+
+    pendingHydrationAssistantIds = new Set(getAssistantMessageIds());
+    pendingHydrationAssistantParts = new Map(
+      Array.from(pendingHydrationAssistantIds).map((id) => [id, new Set()])
+    );
+    if (!pendingHydrationAssistantIds.size) {
+      completeInitialHydration(runId);
+      return;
+    }
+
+    scheduleInitialHydrationFallback(runId);
+  }
+
   function scheduleAfterRenderScrollFallback() {
     clearAfterRenderScrollTimer();
     afterRenderScrollTimerId = window.setTimeout(() => {
@@ -224,9 +382,7 @@ export function useMessageListScroll({props, emit}) {
     clearStableTimers();
     clearAfterRenderScrollState();
 
-    const assistantIds = (props.messages || [])
-      .filter((message) => message?.role === "assistant")
-      .map((message, index) => String(message.id ?? `assistant-${index}`));
+    const assistantIds = getAssistantMessageIds();
 
     pendingAfterRenderOptions = {...options, force: true, stable: false};
     pendingAfterRenderAssistantIds = new Set(assistantIds);
@@ -259,11 +415,28 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-  async function handleMessageRendered(messageId) {
+  async function handleMessageRendered(messageId, renderPart = "") {
     emit("content-rendered");
 
     await nextTick();
     recalculateFocusSpacerHeight();
+
+    if (pendingHydrationAssistantIds) {
+      const id = String(messageId ?? "");
+      const partSet = pendingHydrationAssistantParts?.get(id);
+      if (partSet) {
+        partSet.add(renderPart || "content");
+        if (partSet.has("content") && partSet.has("reasoning")) {
+          pendingHydrationAssistantIds.delete(id);
+          pendingHydrationAssistantParts.delete(id);
+        }
+      }
+      if (!pendingHydrationAssistantIds.size) {
+        const runId = hydrationRunId;
+        completeInitialHydration(runId);
+      }
+      return;
+    }
 
     if (pendingAfterRenderAssistantIds) {
       pendingAfterRenderAssistantIds.delete(String(messageId ?? ""));
@@ -293,9 +466,22 @@ export function useMessageListScroll({props, emit}) {
     }
   );
 
+  watch(
+    () => [props.initialHydrating, props.messages.length],
+    () => {
+      if (props.initialHydrating) {
+        startInitialHydration();
+      } else {
+        clearHydrationState();
+      }
+    },
+    {flush: "post"}
+  );
+
   onMounted(() => {
     if (typeof window === "undefined") return;
     recalculateFocusSpacerHeight();
+    if (props.initialHydrating) startInitialHydration();
     window.addEventListener("resize", recalculateFocusSpacerHeight, {
       passive: true,
     });
@@ -313,6 +499,7 @@ export function useMessageListScroll({props, emit}) {
   onBeforeUnmount(() => {
     clearStableTimers();
     clearAfterRenderScrollState();
+    clearHydrationState();
     if (typeof window === "undefined") return;
     window.removeEventListener("resize", recalculateFocusSpacerHeight);
     window.visualViewport?.removeEventListener(
