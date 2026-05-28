@@ -3,9 +3,29 @@ import {useMessageFocusSpacer} from "./useMessageFocusSpacer";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
+const HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520, 780];
+const ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS = [
+  0, 32, 80, 160, 320, 520, 780, 1100, 1450,
+];
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
 ];
+
+
+function isAndroidHydrationRuntime() {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return false;
+  }
+
+  const ua = navigator.userAgent || "";
+  const bodyClassList = document?.body?.classList;
+  return (
+    /Android/i.test(ua) ||
+    Boolean(window.AndroidBridge) ||
+    bodyClassList?.contains("android-webview") ||
+    bodyClassList?.contains("android-chrome")
+  );
+}
 
 function canElementScroll(element) {
   if (
@@ -85,6 +105,7 @@ export function useMessageListScroll({props, emit}) {
   let hydrationTimerId = 0;
   let hydrationRafId = 0;
   let hydrationResizeObserver = null;
+  let hydrationRevealTimerIds = [];
   let pendingHydrationAssistantIds = null;
   let pendingHydrationAssistantParts = null;
 
@@ -146,6 +167,8 @@ export function useMessageListScroll({props, emit}) {
 
   function clearHydrationState() {
     hydrationRunId += 1;
+    hydrationRevealTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    hydrationRevealTimerIds = [];
     if (hydrationTimerId) {
       window.clearTimeout(hydrationTimerId);
       hydrationTimerId = 0;
@@ -315,6 +338,34 @@ export function useMessageListScroll({props, emit}) {
     hydrationRafId = window.requestAnimationFrame(tick);
   }
 
+  function runHydrationRevealScrollSequence(runId) {
+    const delays = isAndroidHydrationRuntime()
+      ? ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS
+      : HYDRATION_REVEAL_SCROLL_DELAYS;
+    let completedCount = 0;
+
+    hydrationRevealTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    hydrationRevealTimerIds = [];
+
+    delays.forEach((delay) => {
+      const timerId = window.setTimeout(() => {
+        if (runId !== hydrationRunId) return;
+        window.requestAnimationFrame(() => {
+          if (runId !== hydrationRunId) return;
+          applyHydrationBottomScroll();
+          completedCount += 1;
+
+          if (completedCount < delays.length) return;
+          hydrationRevealTimerIds = [];
+          pendingHydrationAssistantIds = null;
+          pendingHydrationAssistantParts = null;
+          emit("history-hydrated");
+        });
+      }, delay);
+      hydrationRevealTimerIds.push(timerId);
+    });
+  }
+
   function completeInitialHydration(runId) {
     if (runId !== hydrationRunId) return;
     if (hydrationTimerId) {
@@ -324,21 +375,7 @@ export function useMessageListScroll({props, emit}) {
 
     waitForStableLayout(runId, () => {
       if (runId !== hydrationRunId) return;
-      window.requestAnimationFrame(() => {
-        if (runId !== hydrationRunId) return;
-        applyHydrationBottomScroll();
-        window.requestAnimationFrame(() => {
-          if (runId !== hydrationRunId) return;
-          applyHydrationBottomScroll();
-          window.requestAnimationFrame(() => {
-            if (runId !== hydrationRunId) return;
-            applyHydrationBottomScroll();
-            pendingHydrationAssistantIds = null;
-            pendingHydrationAssistantParts = null;
-            emit("history-hydrated");
-          });
-        });
-      });
+      runHydrationRevealScrollSequence(runId);
     });
   }
 

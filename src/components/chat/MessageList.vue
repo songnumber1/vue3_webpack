@@ -3,6 +3,7 @@
     ref="scrollRef"
     class="message-list"
     :class="{'message-list--initial-hydrating': initialHydrating}"
+    :inert="initialHydrating ? '' : null"
     aria-live="polite"
     :aria-busy="initialHydrating ? 'true' : 'false'"
     @scroll.passive="handleScroll"
@@ -95,7 +96,10 @@ defineExpose({
 }
 
 .message-list--initial-hydrating {
-  visibility: hidden;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  scroll-behavior: auto !important;
 }
 
 .message-list-anchor {
