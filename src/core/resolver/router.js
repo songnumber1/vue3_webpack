@@ -29,6 +29,7 @@ const GuidePage = () =>
 const SharedPage = () =>
   import(/* webpackChunkName: "shared" */ "@/views/SharedPage.vue");
 const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
+const StudioPage = () => import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
 const NotFoundPage = () =>
   import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
@@ -69,6 +70,12 @@ const baseRoutes = [
         component: ChatPage,
         props: true, // 패스 파라미터 :id를 컴포넌트의 props로 주입
         meta: {title: "Chat"},
+      },
+      {
+        path: "studio",
+        name: "studio",
+        component: StudioPage,
+        meta: {title: "Assistant Studio"},
       },
       {
         path: "swagger",

@@ -15,6 +15,36 @@ import {
   adaptExamplePromptList,
   adaptPromptTemplateList,
 } from "@/adapters/promptAdapter";
+import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
+
+const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
+
+function createAssistantStudioPortal() {
+  return {
+    id: ASSISTANT_STUDIO_PORTAL_ID,
+    sourceId: ASSISTANT_STUDIO_PORTAL_ID,
+    type: "studio",
+    label: "Assistant Studio",
+    name: "Assistant Studio",
+    description: "맞춤형 Assistant를 탐색하고 직접 만들 수 있습니다.",
+    order: 9999,
+    isStudio: true,
+    isAuthorized: true,
+    isDeleted: false,
+    isFixed: false,
+    isPrivate: false,
+    hasRag: false,
+    ...DEFAULT_ASSISTANT_IMAGE,
+    raw: {assistId: ASSISTANT_STUDIO_PORTAL_ID, studioYN: true},
+  };
+}
+
+function appendAssistantStudioPortal(assistants = []) {
+  if (assistants.some((item) => item.id === ASSISTANT_STUDIO_PORTAL_ID)) {
+    return assistants;
+  }
+  return [...assistants, createAssistantStudioPortal()];
+}
 
 /**
  * [순수 유틸리티] 객체 배열 리스트를 특정 ID 고유 키 기반의 인메모리 딕셔너리 맵 구조로 재가공 환원합니다.
@@ -164,10 +194,10 @@ export async function bootstrapChatRuntime(options = {}) {
   const promptTemplateRaw = readSettledValue(6, {list: []});
 
   // 4. [데이터 정형화 및 결합 단계] 일반 어시스턴트와 스튜디오 어시스턴트 원시 배열을 어댑터를 거쳐 단일 마스터 배열로 병합 융합합니다.
-  const assistants = [
+  const assistants = appendAssistantStudioPortal([
     ...adaptAssistantList(assistantRaw),
     ...adaptAssistantList(studioRaw),
-  ]
+  ])
     .filter((item) => item.isAuthorized && !item.isDeleted) // 보안상 사용 인가 필터 재차 정밀 검증
     .sort((a, b) => a.order - b.order); // 화면 가중치 배치 순 정렬 조율
 

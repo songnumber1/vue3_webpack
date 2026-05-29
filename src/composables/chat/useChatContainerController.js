@@ -54,7 +54,7 @@ export function useChatContainerController(props) {
     // 타인이 보낸 링크를 타고 들어온 공유된 대화 페이지 화면인지 판단합니다.
     isSharedPage: computed(() => currentMode.value === "shared"),
     // 메인 홈 화면을 제외한, 모든 형태의 '실질적 대화 컨텍스트가 존재하는 화면'인지 통합 판단합니다.
-    isConversationPage: computed(() => currentMode.value !== "main"),
+    isConversationPage: computed(() => currentMode.value === "chat" || currentMode.value === "shared"),
     // 공유 페이지와 같이 사용자가 추가적인 대화 전송을 할 수 없는 읽기 전용 상태 화면인지 판단합니다.
     isReadOnly: computed(() => currentMode.value === "shared"),
   };

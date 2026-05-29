@@ -4,7 +4,7 @@
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
   >
-    <ChatWorkspace ref="workspaceRef" />
+    <slot :set-workspace-ref="setWorkspaceRef" />
 
     <!-- 이미지 크게 보기 -->
     <ChatImagePreview
@@ -127,7 +127,7 @@
 
 import {computed, provide} from "vue";
 import {storeToRefs} from "pinia";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {
   CHAT_ACTIONS_KEY,
@@ -138,7 +138,6 @@ import {
 import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
-import ChatWorkspace from "@/components/chat/ChatWorkspace.vue";
 import LanguageSheet from "@/components/menu/LanguageSheet.vue";
 import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
@@ -159,10 +158,12 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
  */
 
 const route = useRoute();
+const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
+  if (route.name === "studio") return "studio";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
   return "main";
 });
@@ -249,6 +250,10 @@ const showVirtualKeyboardDebugButton = computed(
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleAssistantNewChat(assistantId) {
+  if (assistantId === "assistant-studio") {
+    router.push({name: "studio"});
+    return;
+  }
   startNewChat({assistantId});
 }
 
@@ -262,6 +267,11 @@ function handleWorkspaceScrollBottom() {
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
+
+function setWorkspaceRef(el) {
+  workspaceRef.value = el;
+}
+
 function handleMobileSettingsDesktopOpen(target) {
   mobileSettingsOpen.value = false;
   if (target === "notice") {

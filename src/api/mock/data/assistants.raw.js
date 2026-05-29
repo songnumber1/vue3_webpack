@@ -80,4 +80,18 @@ export const ASSISTANTS_RAW = [
     assistId: "assist-data",
     ...DEFAULT_ASSISTANT_IMAGE,
   },
+  {
+    delYN: false,
+    authYN: true,
+    isRagIndexesApi: false,
+    fixYN: false,
+    privateYN: false,
+    sharedStudioYN: false,
+    assistName: "Assistant Studio",
+    studioYN: true,
+    assistOrder: 9999,
+    ragYN: false,
+    assistId: "assistant-studio",
+    ...DEFAULT_ASSISTANT_IMAGE,
+  },
 ];
