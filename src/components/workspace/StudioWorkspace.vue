@@ -1,52 +1,36 @@
 <template>
   <section class="studio-workspace" aria-label="Assistant Studio">
-    <ChatHeader
-      v-if="isMobile && !mobileDetailStudio && !createOpen"
-      mode="studio"
-      :is-mobile="isMobile"
-      :assistant-label="assistantLabel"
-      :assistant="assistant"
-      conversation-title="Assistant Studio"
-      :theme-name="themeName"
-    />
-
-    <StudioCreatePage
+    <StudioCreateWorkspace
       v-if="createOpen"
-      :is-mobile="isMobile"
       :create-tab="createTab"
       :draft="draft"
       :preview="preview"
       :preview-initial="previewInitial"
       :preview-prompts="previewPrompts"
       :selected-category-label="selectedCategoryLabel"
+      :category-options="categoryOptions"
       :model-options="modelOptions"
       :rag-options="ragOptions"
       :mcp-options="mcpOptions"
       :selected-authorities="selectedAuthorities"
+      :available-authorities="availableAuthorities"
       :all-authorities-checked="allAuthoritiesChecked"
       @close="closeCreate"
       @apply-preview="applyPreview"
       @update-create-tab="createTab = $event"
       @update-draft-field="updateDraftField"
       @update-draft-prompt="updateDraftPrompt"
-      @open-category="openCategorySelector"
       @toggle-model="toggleModel"
       @update-rags="draft.rags = $event"
       @update-mcps="draft.mcps = $event"
       @update-scope="draft.scope = $event"
-      @open-authority-picker="authorityPickerOpen = true"
+      @add-authority="addAuthority"
       @delete-checked-authorities="deleteCheckedAuthorities"
       @toggle-all-authorities="toggleAllAuthorities"
       @toggle-authority="toggleAuthority"
     />
 
-    <StudioMobileDetailPage
-      v-else-if="isMobile && mobileDetailStudio"
-      :studio="mobileDetailStudio"
-      @close="mobileDetailStudio = null"
-    />
-
-    <StudioMainPage
+    <StudioMainWorkspace
       v-else
       :search-text="searchText"
       :active-tab="activeTab"
@@ -61,33 +45,8 @@
       @search="runSearch"
       @update-active-tab="activeTab = $event"
       @select-category="selectListCategory"
-      @open-category-picker="openListCategorySelector"
       @open-create="openCreate"
-      @open-detail="openDetail"
       @go-page="goPage"
-    />
-
-    <div v-if="selectedStudio && !isMobile" class="studio-dialog-backdrop" @click.self="selectedStudio = null">
-      <article class="studio-dialog" role="dialog" aria-modal="true" aria-label="Assistant Studio 상세">
-        <button class="studio-dialog__close" type="button" aria-label="닫기" @click="selectedStudio = null">×</button>
-        <StudioDetailContent :studio="selectedStudio" />
-      </article>
-    </div>
-
-    <StudioCategoryPicker
-      :open="categorySelectorOpen"
-      :categories="activeCategoryPickerOptions"
-      :selected-value="activeCategoryPickerValue"
-      :is-mobile="isMobile"
-      @close="closeCategorySelector"
-      @select="selectCategory"
-    />
-
-    <StudioAuthorityPicker
-      :open="authorityPickerOpen"
-      :authorities="availableAuthorities"
-      @close="authorityPickerOpen = false"
-      @add="addAuthority"
     />
   </section>
 </template>
@@ -98,19 +57,10 @@
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
-import {computed, inject, onMounted, reactive, ref, watch} from "vue";
-import ChatHeader from "@/components/chat/ChatHeader.vue";
-import StudioMainPage from "@/views/studio/components/StudioMainPage.vue";
-import StudioCreatePage from "@/views/studio/components/StudioCreatePage.vue";
-import StudioDetailContent from "@/views/studio/components/StudioDetailContent.vue";
-import StudioMobileDetailPage from "@/views/studio/components/StudioMobileDetailPage.vue";
-import StudioCategoryPicker from "@/views/studio/components/StudioCategoryPicker.vue";
-import StudioAuthorityPicker from "@/views/studio/components/StudioAuthorityPicker.vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
+import StudioMainWorkspace from "@/views/studio/components/StudioMainWorkspace.vue";
+import StudioCreateWorkspace from "@/views/studio/components/StudioCreateWorkspace.vue";
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -120,20 +70,7 @@ const pageSize = 6;
 const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
-const selectedStudio = ref(null);
-const mobileDetailStudio = ref(null);
-const categorySelectorOpen = ref(false);
-const categorySelectorMode = ref("create");
-const authorityPickerOpen = ref(false);
 
-const workspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const isMobile = computed(() => workspaceState.value.isMobile);
-const assistantLabel = computed(() => workspaceState.value.assistantLabel);
-const assistant = computed(() => workspaceState.value.assistant);
-const themeName = computed(() => workspaceState.value.themeName);
 
 const studioCategoryOptions = ref([
   {value: "ALL", label: "전체", description: "전체"},
@@ -189,8 +126,6 @@ const preview = reactive({name: "", description: "", prompts: []});
 
 const selectedCategoryLabel = computed(() => categoryOptions.value.find((item) => item.value === draft.category)?.label || "카테고리 선택");
 const selectedListCategoryLabel = computed(() => studioCategoryOptions.value.find((item) => item.value === activeCategory.value)?.label || "전체");
-const activeCategoryPickerOptions = computed(() => categorySelectorMode.value === "list" ? studioCategoryOptions.value : categoryOptions.value);
-const activeCategoryPickerValue = computed(() => categorySelectorMode.value === "list" ? activeCategory.value : draft.category);
 const studioCategoryChips = computed(() => studioCategoryOptions.value);
 const availableAuthorities = computed(() => {
   const selected = new Set(selectedAuthorities.value.map((item) => item.deptId));
@@ -229,19 +164,6 @@ watch(activeTab, () => {
 watch(activeCategory, () => {
   currentPage.value = 1;
 });
-watch(isMobile, (mobile) => {
-  if (mobile && selectedStudio.value) {
-    mobileDetailStudio.value = selectedStudio.value;
-    selectedStudio.value = null;
-    return;
-  }
-
-  if (!mobile && mobileDetailStudio.value) {
-    selectedStudio.value = mobileDetailStudio.value;
-    mobileDetailStudio.value = null;
-  }
-});
-
 onMounted(loadStudioData);
 
 async function loadStudioData() {
@@ -326,18 +248,12 @@ function selectListCategory(value) {
 function goPage(page) {
   currentPage.value = Math.min(maxPage.value, Math.max(1, page));
 }
-function openDetail(studio) {
-  if (isMobile.value) mobileDetailStudio.value = studio;
-  else selectedStudio.value = studio;
-}
 function openCreate() {
   createOpen.value = true;
   createTab.value = "basic";
 }
 function closeCreate() {
   createOpen.value = false;
-  categorySelectorOpen.value = false;
-  authorityPickerOpen.value = false;
 }
 function applyPreview() {
   preview.name = draft.name;
@@ -355,28 +271,8 @@ function toggleModel(value) {
     ? draft.models.filter((item) => item !== value)
     : [...draft.models, value];
 }
-function openCategorySelector() {
-  categorySelectorMode.value = "create";
-  categorySelectorOpen.value = true;
-}
-function openListCategorySelector() {
-  categorySelectorMode.value = "list";
-  categorySelectorOpen.value = true;
-}
-function closeCategorySelector() {
-  categorySelectorOpen.value = false;
-}
-function selectCategory(value) {
-  if (categorySelectorMode.value === "list") {
-    activeCategory.value = value;
-  } else {
-    draft.category = value;
-  }
-  categorySelectorOpen.value = false;
-}
 function addAuthority(auth) {
   selectedAuthorities.value = [...selectedAuthorities.value, {...auth, checked: false}];
-  authorityPickerOpen.value = false;
 }
 function deleteCheckedAuthorities() {
   selectedAuthorities.value = selectedAuthorities.value.filter((item) => !item.checked);

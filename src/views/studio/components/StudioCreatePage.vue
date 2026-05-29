@@ -66,10 +66,11 @@
 import StudioBasicInfoTab from "@/views/studio/components/StudioBasicInfoTab.vue";
 import StudioFeatureTab from "@/views/studio/components/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/views/studio/components/StudioShareScopeTab.vue";
+import {computed} from "vue";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import StudioPreview from "@/views/studio/components/StudioPreview.vue";
 
 defineProps({
-  isMobile: {type: Boolean, default: false},
   createTab: {type: String, default: "basic"},
   draft: {type: Object, required: true},
   preview: {type: Object, required: true},
@@ -82,6 +83,8 @@ defineProps({
   selectedAuthorities: {type: Array, default: () => []},
   allAuthoritiesChecked: {type: Boolean, default: false},
 });
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => responsiveContext.value.isMobile);
 const emit = defineEmits([
   "close",
   "apply-preview",
