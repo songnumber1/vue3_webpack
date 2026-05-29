@@ -1,6 +1,6 @@
 <template>
   <div v-if="open" class="studio-picker-backdrop" @click.self="$emit('close')">
-    <section class="studio-picker" role="dialog" aria-modal="true" aria-label="카테고리 선택">
+    <section class="studio-picker studio-picker--category" role="dialog" aria-modal="true" aria-label="카테고리 선택">
       <header class="studio-picker__head">
         <strong>카테고리 선택</strong>
         <button type="button" @click="$emit('close')">×</button>

@@ -51,6 +51,7 @@
       :search-text="searchText"
       :active-tab="activeTab"
       :active-category="activeCategory"
+      :active-category-label="selectedListCategoryLabel"
       :categories="studioCategoryChips"
       :studios="pagedStudios"
       :pages="paginationPages"
@@ -60,6 +61,7 @@
       @search="runSearch"
       @update-active-tab="activeTab = $event"
       @select-category="selectListCategory"
+      @open-category-picker="openListCategorySelector"
       @open-create="openCreate"
       @open-detail="openDetail"
       @go-page="goPage"
@@ -74,9 +76,9 @@
 
     <StudioCategoryPicker
       :open="categorySelectorOpen"
-      :categories="categoryOptions"
-      :selected-value="draft.category"
-      @close="categorySelectorOpen = false"
+      :categories="activeCategoryPickerOptions"
+      :selected-value="activeCategoryPickerValue"
+      @close="closeCategorySelector"
       @select="selectCategory"
     />
 
@@ -120,6 +122,7 @@ const createTab = ref("basic");
 const selectedStudio = ref(null);
 const mobileDetailStudio = ref(null);
 const categorySelectorOpen = ref(false);
+const categorySelectorMode = ref("create");
 const authorityPickerOpen = ref(false);
 
 const workspaceState = inject(
@@ -184,6 +187,9 @@ const draft = reactive({
 const preview = reactive({name: "", description: "", prompts: []});
 
 const selectedCategoryLabel = computed(() => categoryOptions.value.find((item) => item.value === draft.category)?.label || "카테고리 선택");
+const selectedListCategoryLabel = computed(() => studioCategoryOptions.value.find((item) => item.value === activeCategory.value)?.label || "전체");
+const activeCategoryPickerOptions = computed(() => categorySelectorMode.value === "list" ? studioCategoryOptions.value : categoryOptions.value);
+const activeCategoryPickerValue = computed(() => categorySelectorMode.value === "list" ? activeCategory.value : draft.category);
 const studioCategoryChips = computed(() => studioCategoryOptions.value);
 const availableAuthorities = computed(() => {
   const selected = new Set(selectedAuthorities.value.map((item) => item.deptId));
@@ -343,10 +349,22 @@ function toggleModel(value) {
     : [...draft.models, value];
 }
 function openCategorySelector() {
+  categorySelectorMode.value = "create";
   categorySelectorOpen.value = true;
 }
+function openListCategorySelector() {
+  categorySelectorMode.value = "list";
+  categorySelectorOpen.value = true;
+}
+function closeCategorySelector() {
+  categorySelectorOpen.value = false;
+}
 function selectCategory(value) {
-  draft.category = value;
+  if (categorySelectorMode.value === "list") {
+    activeCategory.value = value;
+  } else {
+    draft.category = value;
+  }
   categorySelectorOpen.value = false;
 }
 function addAuthority(auth) {

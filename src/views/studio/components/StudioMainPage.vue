@@ -29,6 +29,9 @@
         <button class="studio-tab" :class="{active: activeTab === 'mine'}" type="button" @click="$emit('update-active-tab', 'mine')">나의 Assistant</button>
       </div>
       <button class="studio-button studio-button--primary studio-create-entry" type="button" @click="$emit('open-create')">Assistant 만들기</button>
+      <button class="studio-create-icon-entry" type="button" aria-label="Assistant 만들기" title="Assistant 만들기" @click="$emit('open-create')">
+        <span class="studio-icon studio-icon--plus" aria-hidden="true"></span>
+      </button>
     </div>
 
     <div v-if="activeTab === 'all'" class="studio-category-chips" aria-label="Assistant Studio 카테고리">
@@ -42,6 +45,17 @@
         {{ category.label }}
       </button>
     </div>
+
+    <button
+      v-if="activeTab === 'all'"
+      class="studio-mobile-category-select"
+      type="button"
+      aria-label="카테고리 선택"
+      @click="$emit('open-category-picker')"
+    >
+      <span>{{ activeCategoryLabel }}</span>
+      <span aria-hidden="true">⌄</span>
+    </button>
 
     <div class="studio-list-shell">
       <div class="studio-list-area">
@@ -58,8 +72,9 @@
           </button>
         </div>
       </div>
+    </div>
 
-      <nav class="studio-pagination" aria-label="Assistant Studio pagination">
+    <nav class="studio-pagination" aria-label="Assistant Studio pagination">
         <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" aria-label="첫 페이지" @click="$emit('go-page', 1)">
           <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
         </button>
@@ -83,7 +98,6 @@
           <span class="studio-icon studio-icon--page-last" aria-hidden="true"></span>
         </button>
       </nav>
-    </div>
   </div>
 </template>
 
@@ -92,6 +106,7 @@ defineProps({
   searchText: {type: String, default: ""},
   activeTab: {type: String, default: "all"},
   activeCategory: {type: String, default: "ALL"},
+  activeCategoryLabel: {type: String, default: "전체"},
   categories: {type: Array, default: () => []},
   studios: {type: Array, default: () => []},
   pages: {type: Array, default: () => []},
@@ -103,6 +118,7 @@ defineEmits([
   "search",
   "update-active-tab",
   "select-category",
+  "open-category-picker",
   "open-create",
   "open-detail",
   "go-page",

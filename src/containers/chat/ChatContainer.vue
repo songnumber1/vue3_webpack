@@ -125,7 +125,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, provide} from "vue";
+import {computed, provide, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
@@ -163,6 +163,7 @@ const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
+const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
   if (route.name === "studio") return "studio";
@@ -174,6 +175,31 @@ const controllerProps = {
     return routeMode.value;
   },
 };
+
+function syncAssistantSelectionWithRoute() {
+  const studioAssistant = assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
+  if (route.name === "studio") {
+    if (studioAssistant && assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID) {
+      assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
+    }
+    return;
+  }
+
+  if (assistantStore.selectedAssistantId === ASSISTANT_STUDIO_PORTAL_ID) {
+    const fallbackAssistant = assistantStore.assistants.find(
+      (assistant) => assistant.id !== ASSISTANT_STUDIO_PORTAL_ID
+        && assistant.type !== "studio"
+        && !assistant.isStudio
+    );
+    if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);
+  }
+}
+
+watch(
+  [() => route.name, () => assistantStore.assistants.length],
+  syncAssistantSelectionWithRoute,
+  {immediate: true}
+);
 
 const {
   t,
