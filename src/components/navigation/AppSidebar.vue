@@ -170,6 +170,7 @@
 
 import {inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
+import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useEventListener} from "@vueuse/core";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
@@ -189,6 +190,7 @@ import {CHAT_ACTIONS_KEY, createEmptyChatActions} from "@/composables/chat/chatA
 
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 
+const router = useRouter();
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
@@ -225,6 +227,15 @@ function openAssistantSelector() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectAssistant(id) {
+  const assistant = assistantStore.assistantMap[id];
+  if (assistant?.type === "studio" || assistant?.isStudio) {
+    assistantStore.selectAssistant(id);
+    assistantMenuOpen.value = false;
+    navigationStore.setDrawerOpen(false);
+    router.push({name: "studio"}).catch(() => {});
+    return;
+  }
+
   chatActions.selectAssistant(id);
   assistantMenuOpen.value = false;
 }

@@ -149,6 +149,7 @@ import ChatHistoryDialog from "@/components/navigation/controls/ChatHistoryDialo
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useAssistantStore} from "@/stores/assistantStore";
 
 /**
  * [ChatContainer 연결 구조]
@@ -160,6 +161,7 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 const route = useRoute();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
+const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
@@ -251,7 +253,9 @@ const showVirtualKeyboardDebugButton = computed(
  */
 function handleAssistantNewChat(assistantId) {
   if (assistantId === "assistant-studio") {
-    router.push({name: "studio"});
+    assistantStore.selectAssistant(assistantId);
+    assistantSheetOpen.value = false;
+    router.push({name: "studio"}).catch(() => {});
     return;
   }
   startNewChat({assistantId});

@@ -17,33 +17,46 @@
             v-model="searchText"
             type="search"
             placeholder="Assistant 검색"
+            @keydown.enter.prevent="runSearch"
           />
         </label>
-        <button class="studio-button studio-button--primary" type="button" @click="openCreate">
+        <button
+          class="studio-search-button"
+          type="button"
+          aria-label="검색"
+          title="검색"
+          @click="runSearch"
+        >
+          <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <div class="studio-tabs-row">
+        <div class="studio-tabs" role="tablist" aria-label="Assistant Studio 목록 유형">
+          <button
+            class="studio-tab"
+            :class="{active: activeTab === 'all'}"
+            type="button"
+            @click="activeTab = 'all'"
+          >
+            Assistant 목록
+          </button>
+          <button
+            class="studio-tab"
+            :class="{active: activeTab === 'mine'}"
+            type="button"
+            @click="activeTab = 'mine'"
+          >
+            나의 Assistant
+          </button>
+        </div>
+        <button class="studio-button studio-button--primary studio-create-entry" type="button" @click="openCreate">
           Assistant 만들기
         </button>
       </div>
 
-      <div class="studio-tabs" role="tablist" aria-label="Assistant Studio 목록 유형">
-        <button
-          class="studio-tab"
-          :class="{active: activeTab === 'all'}"
-          type="button"
-          @click="activeTab = 'all'"
-        >
-          Assistant 목록
-        </button>
-        <button
-          class="studio-tab"
-          :class="{active: activeTab === 'mine'}"
-          type="button"
-          @click="activeTab = 'mine'"
-        >
-          나의 Assistant
-        </button>
-      </div>
-
-      <div class="studio-grid">
+      <div class="studio-list-area">
+        <div class="studio-grid">
         <button
           v-for="studio in pagedStudios"
           :key="studio.id"
@@ -59,23 +72,32 @@
           </span>
           <span class="studio-card__meta">좋아요 {{ studio.likes }} · 질문 {{ studio.views }}</span>
         </button>
+        </div>
       </div>
 
       <nav class="studio-pagination" aria-label="Assistant Studio pagination">
-        <button type="button" :disabled="currentPage === 1" @click="goPage(1)">&lt;&lt;</button>
-        <button type="button" :disabled="currentPage === 1" @click="goPage(currentPage - 1)">&lt;</button>
+        <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" aria-label="첫 페이지" @click="goPage(1)">
+          <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
+        </button>
+        <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" aria-label="이전 페이지" @click="goPage(currentPage - 1)">
+          <span class="studio-icon studio-icon--page-prev" aria-hidden="true"></span>
+        </button>
         <button
           v-for="page in paginationPages"
           :key="page.key"
           type="button"
           :disabled="page.ellipsis"
-          :class="{active: page.value === currentPage}"
+          :class="{active: page.value === currentPage, 'studio-pagination__ellipsis': page.ellipsis}"
           @click="!page.ellipsis && goPage(page.value)"
         >
           {{ page.label }}
         </button>
-        <button type="button" :disabled="currentPage === maxPage" @click="goPage(currentPage + 1)">&gt;</button>
-        <button type="button" :disabled="currentPage === maxPage" @click="goPage(maxPage)">&gt;&gt;</button>
+        <button class="studio-page-icon-button" type="button" :disabled="currentPage === maxPage" aria-label="다음 페이지" @click="goPage(currentPage + 1)">
+          <span class="studio-icon studio-icon--page-next" aria-hidden="true"></span>
+        </button>
+        <button class="studio-page-icon-button" type="button" :disabled="currentPage === maxPage" aria-label="마지막 페이지" @click="goPage(maxPage)">
+          <span class="studio-icon studio-icon--page-last" aria-hidden="true"></span>
+        </button>
       </nav>
     </div>
 
@@ -172,13 +194,14 @@
  * @file components/workspace/StudioWorkspace.vue
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  */
-import {computed, reactive, ref} from "vue";
+import {computed, reactive, ref, watch} from "vue";
 import StudioMultiSelect from "@/views/studio/StudioMultiSelect.vue";
 
 const searchText = ref("");
 const activeTab = ref("all");
 const currentPage = ref(1);
 const pageSize = 6;
+const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
 const selectedStudio = ref(null);
@@ -207,7 +230,7 @@ const ragOptions = ["논문", "Confluence", "Jira", "사내 규정", "기술 문
 const mcpOptions = ["메일", "캘린더", "파일 검색", "GitHub", "배포 조회"];
 
 const filteredStudios = computed(() => {
-  const keyword = searchText.value.trim().toLowerCase();
+  const keyword = submittedSearchText.value.trim().toLowerCase();
   return studios.value.filter((studio) => {
     const matchedTab = activeTab.value === "all" || studio.owner === "테스터1";
     const matchedKeyword = !keyword || `${studio.name} ${studio.description} ${studio.category}`.toLowerCase().includes(keyword);
@@ -228,6 +251,14 @@ const paginationPages = computed(() => {
 const previewInitial = computed(() => (preview.name || "A").slice(0, 1).toUpperCase());
 const previewPrompts = computed(() => preview.prompts.filter(Boolean).slice(0, 4));
 
+watch(activeTab, () => {
+  currentPage.value = 1;
+});
+
+function runSearch() {
+  submittedSearchText.value = searchText.value;
+  currentPage.value = 1;
+}
 function goPage(page) {
   currentPage.value = Math.min(maxPage.value, Math.max(1, page));
 }
