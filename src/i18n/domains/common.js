@@ -14,6 +14,14 @@ export const commonMessages = {
       unsupportedMessage:
         "지원 환경은 Chrome 브라우저와 Android WebView입니다.",
     },
+    application: {
+      title: "Chat App",
+      subtitle: "Application",
+      headerLabel: "애플리케이션 헤더",
+      footerLabel: "애플리케이션 푸터",
+      userMenuLabel: "사용자 메뉴",
+      footerText: "chat app",
+    },
     common: {
       back: "뒤로",
       home: "홈",
@@ -242,6 +250,14 @@ export const commonMessages = {
       unsupportedTitle: "Unsupported access environment.",
       unsupportedMessage:
         "Supported environments are Chrome browser and Android WebView.",
+    },
+    application: {
+      title: "Chat App",
+      subtitle: "Application",
+      headerLabel: "Application header",
+      footerLabel: "Application footer",
+      userMenuLabel: "User menu",
+      footerText: "chat app",
     },
     common: {
       back: "Back",

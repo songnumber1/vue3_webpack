@@ -1,5 +1,6 @@
 <template>
   <ChatHeader
+    v-if="showChatHeader"
     :mode="mode"
     :is-mobile="isMobile"
     :assistant-label="assistantLabel"
@@ -141,6 +142,7 @@ const isHistoryHydrating = computed(
   () => workspaceState.value.isHistoryHydrating
 );
 const isMainPage = computed(() => mode.value === "main");
+const showChatHeader = computed(() => isMobile.value || !isMainPage.value);
 
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
