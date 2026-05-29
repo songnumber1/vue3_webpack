@@ -1,5 +1,14 @@
 <template>
   <section class="studio-workspace" aria-label="Assistant Studio">
+    <ChatHeader
+      v-if="isMobile"
+      mode="studio"
+      :is-mobile="isMobile"
+      :assistant-label="assistantLabel"
+      :assistant="assistant"
+      conversation-title="Assistant Studio"
+      :theme-name="themeName"
+    />
     <div class="studio-workspace__scroll">
       <div class="studio-hero">
         <div class="studio-hero__mark">AS</div>
@@ -103,7 +112,11 @@
 
     <div v-if="selectedStudio" class="studio-dialog-backdrop" @click.self="selectedStudio = null">
       <article class="studio-dialog" role="dialog" aria-modal="true">
-        <button class="studio-dialog__close" type="button" @click="selectedStudio = null"><span class="studio-dialog__back-text">뒤로</span><span class="studio-dialog__close-text">×</span></button>
+        <header class="studio-dialog__mobile-header">
+          <button class="studio-dialog__mobile-back" type="button" aria-label="뒤로" @click="selectedStudio = null">‹</button>
+          <strong>{{ selectedStudio.name }}</strong>
+        </header>
+        <button class="studio-dialog__close" type="button" aria-label="닫기" @click="selectedStudio = null"><span class="studio-dialog__back-text">뒤로</span><span class="studio-dialog__close-text">×</span></button>
         <div class="studio-dialog__head">
           <div class="studio-dialog__image">{{ selectedStudio.initial }}</div>
           <div>
@@ -194,8 +207,13 @@
  * @file components/workspace/StudioWorkspace.vue
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  */
-import {computed, reactive, ref, watch} from "vue";
+import {computed, inject, reactive, ref, watch} from "vue";
+import ChatHeader from "@/components/chat/ChatHeader.vue";
 import StudioMultiSelect from "@/views/studio/StudioMultiSelect.vue";
+import {
+  CHAT_WORKSPACE_STATE_KEY,
+  createEmptyWorkspaceState,
+} from "@/composables/chat/chatActionContext";
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -205,6 +223,15 @@ const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
 const selectedStudio = ref(null);
+
+const workspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
+const isMobile = computed(() => workspaceState.value.isMobile);
+const assistantLabel = computed(() => workspaceState.value.assistantLabel);
+const assistant = computed(() => workspaceState.value.assistant);
+const themeName = computed(() => workspaceState.value.themeName);
 
 const studios = ref([
   {id: "s1", initial: "M", name: "마케팅 캠페인 Assistant", category: "마케팅", model: "GPT-OSS", description: "캠페인 기획과 문구 작성을 지원합니다.", likes: 24, views: 582, owner: "테스터1", knowledge: "마케팅 정책, 캠페인 가이드", scope: "전체 공개", prompts: ["신제품 캠페인 기획", "SNS 문구 작성", "타깃 분석", "성과 리포트 요약"]},

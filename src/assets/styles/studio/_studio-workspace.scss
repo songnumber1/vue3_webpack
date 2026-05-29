@@ -678,3 +678,105 @@ body.desktop-mode .studio-dialog-backdrop {
   inset: 0;
   z-index: 100000;
 }
+
+/* Studio detail positioning fixes: keep PC dialog centered and make mobile detail a page with header. */
+.studio-workspace {
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-workspace > .mobile-topbar {
+  flex: 0 0 auto;
+}
+
+.studio-workspace__scroll {
+  flex: 1 1 auto;
+}
+
+.studio-dialog-backdrop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.studio-dialog {
+  margin: 0;
+}
+
+.studio-dialog__mobile-header {
+  display: none;
+}
+
+.studio-dialog__mobile-back {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body.mobile-mode .studio-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  display: block;
+  padding: 0;
+  background: var(--studio-bg);
+  z-index: 10020;
+}
+
+body.mobile-mode .studio-dialog {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 0;
+}
+
+body.mobile-mode .studio-dialog__mobile-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: calc(48px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 14px 0;
+  border-bottom: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+body.mobile-mode .studio-dialog__mobile-header strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.mobile-mode .studio-dialog__close {
+  display: none;
+}
+
+body.mobile-mode .studio-dialog__head,
+body.mobile-mode .studio-dialog__desc,
+body.mobile-mode .studio-dialog > h3,
+body.mobile-mode .studio-dialog__box,
+body.mobile-mode .studio-dialog .studio-prompt-grid {
+  margin-left: 18px;
+  margin-right: 18px;
+}
+
+body.mobile-mode .studio-dialog__head {
+  margin-top: 20px;
+}
+
+body.mobile-mode .studio-dialog {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
