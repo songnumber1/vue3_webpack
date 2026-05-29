@@ -73,10 +73,10 @@
   max-width: 980px;
   width: 100%;
   margin: 0 auto 16px;
-  gap: 8px;
 }
 
 .studio-search {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
 }
@@ -96,13 +96,20 @@
   font: inherit;
 }
 
+.studio-search input {
+  padding-right: 48px;
+}
+
 .studio-search-button {
-  flex: 0 0 42px;
-  width: 42px;
-  min-height: 42px;
-  border: 1px solid var(--studio-border);
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 34px;
+  height: 34px;
+  min-height: 34px;
+  border: 0;
   border-radius: 5px;
-  background: var(--studio-control-bg);
+  background: transparent;
   color: var(--studio-text);
   cursor: pointer;
   display: inline-flex;
@@ -236,8 +243,8 @@
   gap: 6px;
   max-width: 980px;
   width: 100%;
-  margin: 16px auto 0;
-  padding-top: 12px;
+  margin: 14px auto 0;
+  padding: 14px 0 0;
   border-top: 1px solid
     color-mix(in srgb, var(--studio-border) 72%, transparent);
 }
@@ -311,7 +318,13 @@
   opacity: 1 !important;
 }
 
-.studio-dialog-backdrop,
+.studio-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  background: rgba(15, 23, 42, 0.42);
+}
+
 .studio-create-panel {
   position: absolute;
   inset: 0;
@@ -323,7 +336,7 @@
   width: min(760px, calc(100% - 32px));
   max-height: calc(100% - 48px);
   overflow-y: auto;
-  margin: 24px auto;
+  margin: max(40px, 8vh) auto 24px;
   border-radius: 5px;
   background: var(--studio-surface);
   color: inherit;
@@ -340,6 +353,14 @@
   height: 32px;
   border: 1px solid var(--studio-border);
   background: var(--studio-surface);
+}
+
+.studio-dialog__back-text {
+  display: none;
+}
+
+.studio-dialog__close-text {
+  display: inline;
 }
 
 .studio-dialog__head {
@@ -560,15 +581,38 @@ body.mobile-mode .studio-preview {
 }
 
 body.mobile-mode .studio-dialog-backdrop {
-  display: flex;
-  align-items: flex-end;
+  display: block;
+  background: var(--studio-bg);
 }
 
 body.mobile-mode .studio-dialog {
   width: 100%;
-  max-height: min(86dvh, 720px);
+  height: 100%;
+  max-height: none;
   margin: 0;
-  border-radius: 5px 5px 0 0;
+  border-radius: 0;
+  padding: 72px 18px 24px;
+}
+
+body.mobile-mode .studio-dialog__close {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  left: 12px;
+  right: auto;
+  width: auto;
+  min-width: 48px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  font-weight: 700;
+}
+
+body.mobile-mode .studio-dialog__back-text {
+  display: inline;
+}
+
+body.mobile-mode .studio-dialog__close-text {
+  display: none;
 }
 
 body.mobile-mode .studio-create-panel {
@@ -588,4 +632,49 @@ body.mobile-mode .studio-multi-select__panel {
   bottom: 0;
   border-radius: 5px 5px 0 0;
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Studio 화면에서 데스크톱 사이드바 축소 시 기존 68px/48px 충돌로 생기던 빈 세로 영역을 제거합니다. */
+body.desktop-mode
+  .chat-container-root--mode-studio.chat-container-root--sidebar-collapsed
+  .application-body {
+  grid-template-columns: 48px minmax(0, 1fr);
+}
+
+/* Studio workspace must fill the single router workspace slot inside the shared chat grid. */
+.chat-workspace > .studio-workspace {
+  grid-row: 1 / -1;
+  align-self: stretch;
+  justify-self: stretch;
+}
+
+body.desktop-mode .chat-workspace > .studio-workspace {
+  height: 100%;
+  max-height: 100%;
+}
+
+body.desktop-mode .studio-workspace__scroll {
+  height: 100%;
+  max-height: 100%;
+}
+
+body.desktop-mode .studio-list-area {
+  flex: 1 1 0;
+  min-height: 0;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+body.desktop-mode .studio-grid {
+  padding-bottom: 6px;
+}
+
+body.desktop-mode .studio-pagination {
+  flex: 0 0 auto;
+  margin-top: 10px;
+}
+
+body.desktop-mode .studio-dialog-backdrop {
+  inset: 0;
+  z-index: 100000;
 }

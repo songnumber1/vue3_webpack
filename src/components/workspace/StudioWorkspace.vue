@@ -10,8 +10,8 @@
       </div>
 
       <div class="studio-toolbar">
-        <label class="studio-search" for="studio-search-input">
-          <span class="sr-only">Assistant Studio 검색</span>
+        <div class="studio-search">
+          <label class="sr-only" for="studio-search-input">Assistant Studio 검색</label>
           <input
             id="studio-search-input"
             v-model="searchText"
@@ -19,16 +19,16 @@
             placeholder="Assistant 검색"
             @keydown.enter.prevent="runSearch"
           />
-        </label>
-        <button
-          class="studio-search-button"
-          type="button"
-          aria-label="검색"
-          title="검색"
-          @click="runSearch"
-        >
-          <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
-        </button>
+          <button
+            class="studio-search-button"
+            type="button"
+            aria-label="검색"
+            title="검색"
+            @click="runSearch"
+          >
+            <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
+          </button>
+        </div>
       </div>
 
       <div class="studio-tabs-row">
@@ -57,21 +57,21 @@
 
       <div class="studio-list-area">
         <div class="studio-grid">
-        <button
-          v-for="studio in pagedStudios"
-          :key="studio.id"
-          class="studio-card"
-          type="button"
-          @click="selectedStudio = studio"
-        >
-          <span class="studio-card__image">{{ studio.initial }}</span>
-          <span class="studio-card__body">
-            <strong>{{ studio.name }}</strong>
-            <small>{{ studio.category }} · {{ studio.model }}</small>
-            <span>{{ studio.description }}</span>
-          </span>
-          <span class="studio-card__meta">좋아요 {{ studio.likes }} · 질문 {{ studio.views }}</span>
-        </button>
+          <button
+            v-for="studio in pagedStudios"
+            :key="studio.id"
+            class="studio-card"
+            type="button"
+            @click="selectedStudio = studio"
+          >
+            <span class="studio-card__image">{{ studio.initial }}</span>
+            <span class="studio-card__body">
+              <strong>{{ studio.name }}</strong>
+              <small>{{ studio.category }} · {{ studio.model }}</small>
+              <span>{{ studio.description }}</span>
+            </span>
+            <span class="studio-card__meta">좋아요 {{ studio.likes }} · 질문 {{ studio.views }}</span>
+          </button>
         </div>
       </div>
 
@@ -103,7 +103,7 @@
 
     <div v-if="selectedStudio" class="studio-dialog-backdrop" @click.self="selectedStudio = null">
       <article class="studio-dialog" role="dialog" aria-modal="true">
-        <button class="studio-dialog__close" type="button" @click="selectedStudio = null">×</button>
+        <button class="studio-dialog__close" type="button" @click="selectedStudio = null"><span class="studio-dialog__back-text">뒤로</span><span class="studio-dialog__close-text">×</span></button>
         <div class="studio-dialog__head">
           <div class="studio-dialog__image">{{ selectedStudio.initial }}</div>
           <div>
