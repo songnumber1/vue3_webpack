@@ -1,7 +1,6 @@
 <template>
   <ResponsiveOverlay
     :open="noticeOpen"
-    :is-mobile="isMobile"
     :title="noticeTitle"
     :subtitle="noticeSubtitle"
     @close="$emit('close-notice')"
@@ -11,7 +10,6 @@
 
   <ResponsiveOverlay
     :open="privacyOpen"
-    :is-mobile="isMobile"
     :title="privacyTitle"
     :subtitle="privacySubtitle"
     @close="$emit('close-privacy')"
@@ -21,7 +19,6 @@
 
   <ResponsiveOverlay
     :open="personalizationOpen"
-    :is-mobile="isMobile"
     :title="personalizationTitle"
     :subtitle="personalizationSubtitle"
     @close="$emit('close-personalization')"
@@ -43,7 +40,6 @@
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 
 defineProps({
-  isMobile: {type: Boolean, default: false},
   noticeOpen: {type: Boolean, default: false},
   noticeTitle: {type: String, required: true},
   noticeSubtitle: {type: String, default: ""},

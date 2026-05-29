@@ -55,7 +55,7 @@ defineProps({
   preview: {type: Object, required: true},
   previewInitial: {type: String, default: "A"},
   previewPrompts: {type: Array, default: () => []},
-  selectedCategoryLabel: {type: String, default: "카테고리 선택"},
+  selectedCategoryLabel: {type: String, default: ""},
   categoryOptions: {type: Array, default: () => []},
   modelOptions: {type: Array, default: () => []},
   ragOptions: {type: Array, default: () => []},

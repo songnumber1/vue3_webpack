@@ -2,7 +2,7 @@
   <BaseBottomSheet
     v-if="isMobile"
     :open="open"
-    title="카테고리 선택"
+    :title="t('studio.categorySelect')"
     overlay-class="studio-category-bottom-sheet"
     initial-snap="content"
     :min-height="320"
@@ -26,10 +26,10 @@
   </BaseBottomSheet>
 
   <div v-else-if="open" class="studio-picker-backdrop" @click.self="$emit('close')">
-    <section class="studio-picker studio-picker--category" role="dialog" aria-modal="true" aria-label="카테고리 선택">
+    <section class="studio-picker studio-picker--category" role="dialog" aria-modal="true" :aria-label="t('studio.categorySelect')">
       <header class="studio-picker__head">
-        <strong>카테고리 선택</strong>
-        <button type="button" aria-label="닫기" @click="$emit('close')">×</button>
+        <strong>{{ t('studio.categorySelect') }}</strong>
+        <button type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
       </header>
       <div class="studio-picker__body">
         <button
@@ -50,10 +50,12 @@
 
 <script setup>
 import {computed} from "vue";
+import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 
+const {t} = useI18n();
 defineProps({
   open: {type: Boolean, default: false},
   categories: {type: Array, default: () => []},

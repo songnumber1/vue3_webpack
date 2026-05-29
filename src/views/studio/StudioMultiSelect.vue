@@ -6,25 +6,29 @@
         <span v-for="item in visibleValues" :key="item" class="studio-multi-select__chip">{{ item }}</span>
         <span v-if="hiddenCount > 0" class="studio-multi-select__chip">+{{ hiddenCount }}</span>
       </span>
-      <strong v-else>0개 선택</strong>
-      <span class="studio-multi-select__chevron" aria-hidden="true">⌄</span>
+      <strong v-else>{{ t('studio.selectedCount', {count: 0}) }}</strong>
+      <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
-    <div v-if="open" class="studio-multi-select__panel">
+    <div v-if="open" class="studio-multi-select__panel" role="dialog" :aria-label="title">
       <div class="studio-multi-select__head">
         <strong>{{ title }}</strong>
-        <button type="button" @click="open = false">×</button>
+        <button type="button" :aria-label="t('common.close')" @click="open = false">×</button>
       </div>
-      <label v-for="option in options" :key="option" class="studio-multi-select__option">
-        <input type="checkbox" :checked="modelValue.includes(option)" @change="toggle(option)" />
-        <span>{{ option }}</span>
-      </label>
-      <button class="studio-button studio-button--primary" type="button" @click="open = false">적용</button>
+      <div class="studio-multi-select__list">
+        <label v-for="option in options" :key="option" class="studio-multi-select__option">
+          <input type="checkbox" :checked="modelValue.includes(option)" @change="toggle(option)" />
+          <span>{{ option }}</span>
+        </label>
+      </div>
+      <button class="studio-button studio-button--primary" type="button" @click="open = false">{{ t('studio.createPage.apply') }}</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import {computed, ref} from "vue";
+import {useI18n} from "vue-i18n";
+const {t} = useI18n();
 const props = defineProps({
   modelValue: {type: Array, default: () => []},
   title: {type: String, required: true},

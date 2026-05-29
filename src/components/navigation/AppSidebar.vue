@@ -150,7 +150,6 @@
   <ChatHistoryActionMenu
     ref="historyMenuRef"
     :open="historyMenuOpen"
-    :is-mobile="isMobileSheet"
     :target="historyMenuTarget"
     :reference-el="historyMenuReferenceEl"
     @close="closeHistoryMenu"

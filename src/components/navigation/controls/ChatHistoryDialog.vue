@@ -1,7 +1,6 @@
 <template>
   <ResponsiveOverlay
     :open="open"
-    :is-mobile="isMobile"
     :title="title"
     mobile-mode="dialog"
     @close="$emit('cancel')"
@@ -63,7 +62,6 @@ const {t} = useI18n();
  */
 const props = defineProps({
   open: {type: Boolean, default: false},
-  isMobile: {type: Boolean, default: false},
   mode: {type: String, default: "rename"},
   title: {type: String, default: ""},
   message: {type: String, default: ""},

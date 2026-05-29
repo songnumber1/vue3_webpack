@@ -1,22 +1,26 @@
 <template>
   <div class="studio-form-stack studio-feature-tab">
     <fieldset class="studio-model-fieldset">
-      <legend>모델 선택</legend>
-      <label v-for="model in modelOptions" :key="model.value" class="studio-check-row studio-model-card">
-        <input :checked="selectedModels.includes(model.value)" type="checkbox" :value="model.value" @change="$emit('toggle-model', model.value)" />
-        <span>
-          <strong>{{ model.label }}</strong>
-          <small>{{ model.description }}</small>
-        </span>
-      </label>
+      <legend>{{ t('studio.feature.model') }}</legend>
+      <div class="studio-model-grid">
+        <label v-for="model in modelOptions" :key="model.value" class="studio-check-row studio-model-card" :class="{active: selectedModels.includes(model.value)}">
+          <input :checked="selectedModels.includes(model.value)" type="checkbox" :value="model.value" @change="$emit('toggle-model', model.value)" />
+          <span>
+            <strong>{{ model.label }}</strong>
+            <small>{{ model.description }}</small>
+          </span>
+        </label>
+      </div>
     </fieldset>
-    <StudioMultiSelect :model-value="selectedRags" title="RAG 데이터 선택" :options="ragOptions" @update:model-value="$emit('update-rags', $event)" />
-    <StudioMultiSelect :model-value="selectedMcps" title="MCP 플러그인 선택" :options="mcpOptions" @update:model-value="$emit('update-mcps', $event)" />
+    <StudioMultiSelect :model-value="selectedRags" :title="t('studio.feature.rag')" :options="ragOptions" @update:model-value="$emit('update-rags', $event)" />
+    <StudioMultiSelect :model-value="selectedMcps" :title="t('studio.feature.mcp')" :options="mcpOptions" @update:model-value="$emit('update-mcps', $event)" />
   </div>
 </template>
 
 <script setup>
+import {useI18n} from "vue-i18n";
 import StudioMultiSelect from "@/views/studio/StudioMultiSelect.vue";
+const {t} = useI18n();
 
 defineProps({
   modelOptions: {type: Array, default: () => []},

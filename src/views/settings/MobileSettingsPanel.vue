@@ -148,13 +148,13 @@ import systemIcon from "@/assets/img/settings/system.svg";
 import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
 import languageIcon from "@/assets/img/settings/language.svg";
 import playgroundIcon from "@/assets/img/settings/playground.svg";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
 const props = defineProps({
   open: {type: Boolean, default: false},
-  isMobile: {type: Boolean, default: true},
 });
 const emit = defineEmits(["close", "desktop-open", "applied"]);
 const {t, tm, locale} = useI18n();
@@ -162,6 +162,8 @@ const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const activeMenu = ref("");
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 
 const menuItems = computed(() =>
   [
@@ -282,9 +284,9 @@ watch(
 );
 
 watch(
-  () => [props.open, props.isMobile],
-  ([open, isMobile]) => {
-    if (!open || isMobile) return;
+  () => [props.open, isMobile.value],
+  ([open, currentIsMobile]) => {
+    if (!open || currentIsMobile) return;
     if (!activeMenu.value) {
       closePanel();
     } else {

@@ -67,17 +67,16 @@ import {computed, nextTick, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 
 /**
  * @description 상위 컴포넌트에서 주입되는 메뉴 상태 및 Floating UI 추적용 타깃 엘리먼트 정보 명세
  * @property {boolean} open - 메뉴 컴포넌트의 활성화(전체 노출) 여부 제어 플래그
- * @property {boolean} isMobile - 현재 브라우저 뷰포트 및 미디어 쿼리가 모바일 해상도 판정을 받았는지 여부
  * @property {object} target - 현재 선택된 채팅방 히스토리 모델의 로우 데이터 객체 (고유 ID, 제목, 고정 여부 등 캡슐화)
  * @property {HTMLElement|null} referenceEl - 데스크톱 렌더링 시 컨텍스트 메뉴가 부착될 기준점 컴포넌트 DOM 객체
  */
 const props = defineProps({
   open: {type: Boolean, default: false},
-  isMobile: {type: Boolean, default: false},
   target: {type: Object, default: null},
   referenceEl: {type: Object, default: null},
 });
@@ -89,6 +88,8 @@ const props = defineProps({
 defineEmits(["close", "select"]);
 
 const {t} = useI18n(); // 다국어 변환 인스턴스 초기화
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 const menuRef = ref(null); // 텔레포트 내부의 데스크톱 컨텍스트 메뉴 쉘 DOM 엘리먼트 바인딩 포인터
 const referenceRef = computed(() => props.referenceEl || null); // Floating UI가 감시할 타깃 기준점 엘리먼트의 컴퓨티드 래핑
 
@@ -106,9 +107,9 @@ const {floatingStyles, update, x, y} = useFloating(referenceRef, menuRef, {
 });
 
 // 모바일 바텀시트 최종 노출 타이밍 연산 조건 조합
-const mobileOpen = computed(() => props.open && props.isMobile);
+const mobileOpen = computed(() => props.open && isMobile.value);
 // 데스크톱 컨텍스트 팝업 최종 노출 타이밍 연산 조건 조합
-const desktopOpen = computed(() => props.open && !props.isMobile);
+const desktopOpen = computed(() => props.open && !isMobile.value);
 // Floating UI 연산이 완수되어 엘리먼트 배치가 물리적으로 마감되었음을 나타내는 트리거 플래그
 const positionReady = ref(false);
 // 해독된 x, y 좌표가 단순 null이나 언디파인드가 아닌 유효한 런타임 숫자 수치로 바인딩 완료되었는지 진단

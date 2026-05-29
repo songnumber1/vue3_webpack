@@ -92,13 +92,13 @@ import {
   CHAT_ACTIONS_KEY,
   createEmptyChatActions,
 } from "@/composables/chat/chatActionContext";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
 const props = defineProps({
   mode: {type: String, default: "main"},
-  isMobile: {type: Boolean, default: false},
   assistantLabel: {type: String, default: "Assistant"},
   assistant: {type: Object, default: null},
   conversationTitle: {type: String, default: ""},
@@ -107,6 +107,8 @@ const props = defineProps({
 
 const {t} = useI18n();
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 const desktopAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 48)
 );
@@ -118,10 +120,10 @@ const headerAssistantIcon = computed(() =>
 );
 
 const isMainPage = computed(() => props.mode === "main");
-const isDesktopMain = computed(() => isMainPage.value && !props.isMobile);
-const showMobileAssistant = computed(() => props.isMobile);
+const isDesktopMain = computed(() => isMainPage.value && !isMobile.value);
+const showMobileAssistant = computed(() => isMobile.value);
 const showDesktopConversationTitle = computed(
-  () => (props.mode === "chat" || props.mode === "shared") && !props.isMobile
+  () => (props.mode === "chat" || props.mode === "shared") && !isMobile.value
 );
 </script>
 

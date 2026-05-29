@@ -2,7 +2,6 @@
   <ChatHeader
     v-if="isMobile"
     mode="main"
-    :is-mobile="isMobile"
     :assistant-label="assistantLabel"
     :assistant="assistant"
     :conversation-title="conversationTitle"

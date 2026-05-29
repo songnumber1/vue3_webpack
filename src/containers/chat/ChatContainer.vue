@@ -26,7 +26,6 @@
       :notice-open="noticeOpen"
       :privacy-open="privacyOpen"
       :personalization-open="personalizationOpen"
-      :is-mobile="isMobile"
       :notice-title="t('notice.title')"
       :notice-subtitle="t('notice.subtitle')"
       :privacy-title="t('legal.privacy.title')"
@@ -50,7 +49,6 @@
 
     <ResponsiveOverlay
       :open="systemOpen"
-      :is-mobile="isMobile"
       :title="t('common.system')"
       :subtitle="t('menu.systemSummary')"
       panel-class="responsive-panel--system-settings"
@@ -69,7 +67,6 @@
 
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
-      :is-mobile="isMobile"
       @close="mobileSettingsOpen = false"
       @desktop-open="handleMobileSettingsDesktopOpen"
       @applied="handleSystemSettingsApplied"
@@ -79,7 +76,6 @@
 
     <ChatHistoryDialog
       :open="historyDialogOpen"
-      :is-mobile="isMobile"
       :mode="historyDialogMode"
       :title="historyDialogTitle"
       :message="historyDialogMessage"
@@ -90,7 +86,6 @@
 
     <ResponsiveOverlay
       :open="historyNoticeOpen"
-      :is-mobile="isMobile"
       :title="t('common.notice')"
       mobile-mode="dialog"
       @close="historyNoticeOpen = false"
@@ -125,7 +120,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, provide, watch, watchEffect} from "vue";
+import {computed, provide, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
@@ -150,10 +145,6 @@ import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {useViewportStore} from "@/stores/viewportStore";
-import {usePlatformStore} from "@/stores/platformStore";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
-import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
 
 /**
  * [ChatContainer 연결 구조]
@@ -166,9 +157,6 @@ const route = useRoute();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const assistantStore = useAssistantStore();
-const viewportStore = useViewportStore();
-const platformStore = usePlatformStore();
-const responsiveLayoutStore = useResponsiveLayoutStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
 const routeMode = computed(() => {
@@ -281,25 +269,7 @@ const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
-const responsiveContext = computed(() => {
-  const platformInfo = platformStore.info || {};
-  return {
-    isMobile: isMobile.value,
-    isDesktop: !isMobile.value,
-    isCompactViewport: Boolean(viewportStore.isCompact),
-    isMobileBrowser: Boolean(platformInfo.isMobileBrowser),
-    isAndroidApp: Boolean(platformInfo.isAndroidApp),
-    isAndroidWebView: Boolean(platformInfo.isAndroidWebView),
-    effectiveWidth: viewportStore.effectiveWidth || 0,
-    effectiveHeight: viewportStore.visualHeight || viewportStore.height || 0,
-  };
-});
 
-watchEffect(() => {
-  responsiveLayoutStore.setSnapshot(responsiveContext.value);
-});
-
-provide(RESPONSIVE_CONTEXT_KEY, responsiveContext);
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.

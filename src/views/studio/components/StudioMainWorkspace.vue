@@ -2,7 +2,6 @@
   <ChatHeader
     v-if="isMobile && !mobileDetailStudio"
     mode="studio"
-    :is-mobile="isMobile"
     :assistant-label="workspaceState.assistantLabel"
     :assistant="workspaceState.assistant"
     conversation-title="Assistant Studio"
@@ -37,8 +36,8 @@
   />
 
   <div v-if="selectedStudio && !isMobile" class="studio-dialog-backdrop" @click.self="selectedStudio = null">
-    <article class="studio-dialog" role="dialog" aria-modal="true" aria-label="Assistant Studio 상세">
-      <button class="studio-dialog__close" type="button" aria-label="닫기" @click="selectedStudio = null">×</button>
+    <article class="studio-dialog" role="dialog" aria-modal="true"  :aria-label="t('studio.detail.title')">
+      <button class="studio-dialog__close" type="button"  :aria-label="t('common.close')" @click="selectedStudio = null">×</button>
       <StudioDetailContent :studio="selectedStudio" />
     </article>
   </div>
@@ -54,6 +53,7 @@
 
 <script setup>
 import {computed, inject, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import StudioMainPage from "@/views/studio/components/StudioMainPage.vue";
 import StudioMobileDetailPage from "@/views/studio/components/StudioMobileDetailPage.vue";
@@ -65,11 +65,13 @@ import {
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
 
+const {t} = useI18n();
+
 const props = defineProps({
   searchText: {type: String, default: ""},
   activeTab: {type: String, default: "all"},
   activeCategory: {type: String, default: "ALL"},
-  activeCategoryLabel: {type: String, default: "전체"},
+  activeCategoryLabel: {type: String, default: ""},
   categories: {type: Array, default: () => []},
   studios: {type: Array, default: () => []},
   pages: {type: Array, default: () => []},

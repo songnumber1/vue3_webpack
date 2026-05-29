@@ -206,7 +206,6 @@
     <AppOverlayProvider
       :notice-open="noticeOpen"
       :personalization-open="personalizationOpen"
-      :is-mobile="isMobile"
       :notice-title="t('notice.title')"
       :notice-subtitle="t('notice.subtitle')"
       :personalization-title="t('personalization.title')"
@@ -224,7 +223,6 @@
 
     <ResponsiveOverlay
       :open="popupOpen"
-      :is-mobile="isMobile"
       mobile-mode="dialog"
       :title="activePopup.title"
       :subtitle="activePopup.subtitle"
@@ -323,7 +321,6 @@ const {
   isNativeRuntime,
   isAndroidApp: isAndroidRuntime,
   isMobileBrowser,
-  shouldUseMobileLayout,
 } = useRuntimeModeFlags();
 const noticeOpen = ref(false);
 const personalizationOpen = ref(false);
@@ -333,7 +330,6 @@ const activePopupType = ref("alert");
 const popupResult = ref(t("playground.popup.emptyResult"));
 const toastMessage = ref(t("playground.toast.sampleText"));
 
-const isMobile = computed(() => shouldUseMobileLayout.value);
 const containerMode = computed(() =>
   isAndroidRuntime.value ? "mobile" : "web"
 );

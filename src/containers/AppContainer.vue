@@ -18,9 +18,12 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed} from "vue";
+import {computed, provide, watchEffect} from "vue";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
+import {useViewportStore} from "@/stores/viewportStore";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
+import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
 
 /**
  * @component AppContainer
@@ -35,8 +38,10 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 const {appInfo} = useAppContext();
 
 // 2. 실시간 런타임 상태 플래그 훅을 호출하여 플랫폼 세부 정보 및 모바일 레이아웃 채택 여부를 구조 분해 할당으로 가져옵니다.
-const {platformInfo, shouldUseMobileLayout, isMobileBrowser} =
+const {platformInfo, shouldUseMobileLayout, isCompactViewport, isMobileBrowser} =
   useRuntimeModeFlags();
+const viewportStore = useViewportStore();
+const responsiveLayoutStore = useResponsiveLayoutStore();
 
 /**
  * 현재 애플리케이션이 구동 중인 실행 환경 명칭(env)을 우선 채택하고, 없을 경우 기기 플랫폼 명칭을 폴백으로 지정하는 반응형 변수입니다.
@@ -69,6 +74,24 @@ const isMobileContainer = computed(() => shouldUseMobileLayout.value);
  * 상기 계산된 개별 플랫폼 속성값들을 조합하여 템플릿의 컨테이너 Div에 실시간 매핑할 CSS 클래스 객체를 빌드합니다.
  * @type {import("vue").ComputedRef<Record<string, boolean>>}
  */
+
+const responsiveContext = computed(() => ({
+  isMobile: isMobileContainer.value,
+  isDesktop: !isMobileContainer.value,
+  isCompactViewport: Boolean(isCompactViewport.value),
+  isMobileBrowser: Boolean(platformInfo.value.isMobileBrowser),
+  isAndroidApp: Boolean(platformInfo.value.isAndroidApp),
+  isAndroidWebView: Boolean(platformInfo.value.isAndroidWebView),
+  effectiveWidth: viewportStore.effectiveWidth || 0,
+  effectiveHeight: viewportStore.visualHeight || viewportStore.height || 0,
+}));
+
+watchEffect(() => {
+  responsiveLayoutStore.setSnapshot(responsiveContext.value);
+});
+
+provide(RESPONSIVE_CONTEXT_KEY, responsiveContext);
+
 const containerClasses = computed(() => ({
   // 모바일 컨테이너 조건이 아닐 경우(일반 데스크톱 PC 화면인 경우) 전용 웹 스타일 클래스를 활성화합니다.
   "app-container--web": !isMobileContainer.value,

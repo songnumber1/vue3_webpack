@@ -64,6 +64,7 @@
 import {computed, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 
 const {t} = useI18n();
 
@@ -72,7 +73,6 @@ const {t} = useI18n();
  */
 const props = defineProps({
   open: {type: Boolean, default: false},
-  isMobile: {type: Boolean, default: false},
   title: {type: String, required: true},
   subtitle: {type: String, default: ""},
   mobileMode: {
@@ -84,12 +84,14 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close"]);
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 
 const isMobileFullscreen = computed(
-  () => props.isMobile && props.mobileMode === "fullscreen"
+  () => isMobile.value && props.mobileMode === "fullscreen"
 );
 const isMobileDialog = computed(
-  () => props.isMobile && props.mobileMode === "dialog"
+  () => isMobile.value && props.mobileMode === "dialog"
 );
 
 const overlayMode = computed(() => {
@@ -100,7 +102,7 @@ const overlayMode = computed(() => {
 });
 
 const overlayClasses = computed(() => ({
-  "responsive-overlay--desktop": !props.isMobile,
+  "responsive-overlay--desktop": !isMobile.value,
   "responsive-overlay--mobile": isMobileFullscreen.value,
   "responsive-overlay--mobile-dialog": isMobileDialog.value,
 }));
@@ -117,7 +119,7 @@ useOverlayRegistration({
 });
 
 watch(
-  () => [props.open, props.isMobile, props.mobileMode],
+  () => [props.open, isMobile.value, props.mobileMode],
   () => {
     if (typeof document === "undefined") return;
     if (props.open) {

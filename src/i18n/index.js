@@ -12,6 +12,7 @@ import {authMessages} from "@/i18n/domains/auth";
 import {chatMessages} from "@/i18n/domains/chat";
 import {commonMessages} from "@/i18n/domains/common";
 import {settingsMessages} from "@/i18n/domains/settings";
+import {studioMessages} from "@/i18n/domains/studio";
 
 export const SUPPORT_LOCALES = ["ko", "en"];
 
@@ -21,6 +22,7 @@ export const messages = SUPPORT_LOCALES.reduce((acc, locale) => {
     ...settingsMessages[locale],
     ...chatMessages[locale],
     ...authMessages[locale],
+    ...studioMessages[locale],
   };
   return acc;
 }, {});

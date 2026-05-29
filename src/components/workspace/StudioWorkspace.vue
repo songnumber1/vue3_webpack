@@ -58,9 +58,12 @@
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
 import {computed, onMounted, reactive, ref, watch} from "vue";
+import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/views/studio/components/StudioMainWorkspace.vue";
 import StudioCreateWorkspace from "@/views/studio/components/StudioCreateWorkspace.vue";
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+
+const {t, locale} = useI18n();
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -72,43 +75,15 @@ const createOpen = ref(false);
 const createTab = ref("basic");
 
 
-const studioCategoryOptions = ref([
-  {value: "ALL", label: "전체", description: "전체"},
-  {value: "MKT", label: "마케팅", description: "마케팅 설명"},
-  {value: "SALES", label: "판매", description: "판매 설명"},
-  {value: "DEV", label: "개발", description: "개발 설명"},
-  {value: "MFG", label: "제조", description: "제조 설명"},
-  {value: "QA", label: "품질", description: "품질 설명"},
-  {value: "MGMT", label: "경영관리", description: "경영관리 설명"},
-  {value: "PUR", label: "구매", description: "구매 설명"},
-  {value: "LOG", label: "물류", description: "물류 설명"},
-  {value: "INFRA", label: "인프라/환경안정", description: "인프라/환경안정 설명"},
-  {value: "COMMON", label: "공통/기타", description: "공통 설명"},
-]);
+const studioCategoryOptions = ref(createDefaultCategoryOptions());
 const categoryOptions = ref(studioCategoryOptions.value.filter((item) => item.value !== "ALL"));
-const modelOptions = ref([
-  {value: "gpt-oss", label: "GPT-OSS", description: "빠른 추론 결과 도출 가능"},
-  {value: "gemma-3", label: "Gemma 3", description: "문서 기반 요약과 분석에 적합"},
-  {value: "claude", label: "Claude", description: "긴 문맥 분석에 적합"},
-  {value: "internal-reasoning", label: "Internal Reasoning", description: "사내 추론 워크로드용"},
-]);
-const ragOptions = ref(["논문", "Confluence", "Jira", "사내 규정", "기술 문서"]);
-const mcpOptions = ref(["메일", "캘린더", "파일 검색", "GitHub", "배포 조회"]);
-const authorityOptions = ref([
-  {checked: false, deptId: "auth1", deptCode: "auth1", deptNameKo: "auth1 권한", description: "auth1 권한 설명"},
-]);
-const selectedAuthorities = ref([
-  {checked: false, deptId: "auth1", deptCode: "auth1", deptNameKo: "auth1 권한", description: "auth1 권한 설명"},
-]);
-
-const studios = ref([
-  {id: "s1", initial: "마", name: "마케팅 캠페인 Assistant", categoryCode: "MKT", category: "마케팅", model: "GPT-OSS", description: "캠페인 기획과 문구 작성을 지원합니다.", likes: 24, views: 582, owner: "테스터1", knowledge: "마케팅 정책, 캠페인 가이드", scope: "전체 공개", prompts: ["신제품 캠페인 기획", "SNS 문구 작성", "타깃 분석", "성과 리포트 요약"]},
-  {id: "s2", initial: "개", name: "개발 문서 Assistant", categoryCode: "DEV", category: "개발", model: "Gemma 3", description: "개발 표준과 API 문서 탐색을 지원합니다.", likes: 18, views: 311, owner: "테스터2", knowledge: "Confluence, Jira", scope: "개발 조직", prompts: ["API 요약", "장애 원인 정리", "PR 설명 작성", "릴리즈 노트"]},
-  {id: "s3", initial: "품", name: "품질 점검 Assistant", categoryCode: "QA", category: "품질", model: "GPT-OSS", description: "품질 기준과 체크리스트를 기반으로 점검합니다.", likes: 11, views: 214, owner: "테스터3", knowledge: "품질 매뉴얼", scope: "전체 공개", prompts: ["점검표 생성", "리스크 정리", "불량 유형 분석", "보고서 작성"]},
-  {id: "s4", initial: "경", name: "경영 KPI Assistant", categoryCode: "MGMT", category: "경영관리", model: "Claude", description: "경영 KPI 분석과 리포트 작성을 지원합니다.", likes: 15, views: 267, owner: "테스터1", knowledge: "경영 리포트", scope: "전체 공개", prompts: ["월간 KPI 요약", "실적 차이 분석", "임원 보고서 초안", "리스크 정리"]},
-  {id: "s5", initial: "구", name: "구매 견적 Assistant", categoryCode: "PUR", category: "구매", model: "GPT-OSS", description: "견적 비교 및 공급사 분석을 돕습니다.", likes: 9, views: 143, owner: "테스터4", knowledge: "구매 정책", scope: "구매 조직", prompts: ["견적 비교", "공급사 평가", "계약 조건 정리", "리스크 분석"]},
-  {id: "s6", initial: "물", name: "물류 운영 Assistant", categoryCode: "LOG", category: "물류", model: "Internal Reasoning", description: "물류 운영 이슈 해결과 최적화를 지원합니다.", likes: 8, views: 190, owner: "테스터5", knowledge: "물류 가이드", scope: "물류 조직", prompts: ["배송 지연 원인", "재고 이슈 정리", "운영 리포트", "비용 절감 아이디어"]},
-]);
+const modelOptions = ref(createDefaultModelOptions());
+const ragOptions = ref(createDefaultRagOptions());
+const mcpOptions = ref(createDefaultMcpOptions());
+const authorityOptions = ref(createDefaultAuthorityOptions());
+const selectedAuthorities = ref(createDefaultAuthorityOptions());
+const usesDefaultStudioData = ref(true);
+const studios = ref(createDefaultStudios());
 
 const draft = reactive({
   image: "",
@@ -124,8 +99,8 @@ const draft = reactive({
 });
 const preview = reactive({name: "", description: "", prompts: []});
 
-const selectedCategoryLabel = computed(() => categoryOptions.value.find((item) => item.value === draft.category)?.label || "카테고리 선택");
-const selectedListCategoryLabel = computed(() => studioCategoryOptions.value.find((item) => item.value === activeCategory.value)?.label || "전체");
+const selectedCategoryLabel = computed(() => categoryOptions.value.find((item) => item.value === draft.category)?.label || t("studio.defaults.selectCategory"));
+const selectedListCategoryLabel = computed(() => studioCategoryOptions.value.find((item) => item.value === activeCategory.value)?.label || t("studio.defaults.all"));
 const studioCategoryChips = computed(() => studioCategoryOptions.value);
 const availableAuthorities = computed(() => {
   const selected = new Set(selectedAuthorities.value.map((item) => item.deptId));
@@ -135,7 +110,7 @@ const allAuthoritiesChecked = computed(() => selectedAuthorities.value.length > 
 const filteredStudios = computed(() => {
   const keyword = submittedSearchText.value.trim().toLowerCase();
   return studios.value.filter((studio) => {
-    const matchedTab = activeTab.value === "all" || studio.owner === "테스터1";
+    const matchedTab = activeTab.value === "all" || Boolean(studio.isMine);
     const matchedCategory = activeTab.value !== "all" || activeCategory.value === "ALL" || studio.categoryCode === activeCategory.value;
     const matchedKeyword = !keyword || `${studio.name} ${studio.description} ${studio.category}`.toLowerCase().includes(keyword);
     return matchedTab && matchedCategory && matchedKeyword;
@@ -164,7 +139,93 @@ watch(activeTab, () => {
 watch(activeCategory, () => {
   currentPage.value = 1;
 });
+watch(locale, () => {
+  if (usesDefaultStudioData.value) {
+    studioCategoryOptions.value = createDefaultCategoryOptions();
+    categoryOptions.value = studioCategoryOptions.value.filter((item) => item.value !== "ALL");
+    if (!categoryOptions.value.some((item) => item.value === draft.category)) draft.category = categoryOptions.value[0]?.value || "";
+    modelOptions.value = createDefaultModelOptions();
+    ragOptions.value = createDefaultRagOptions();
+    mcpOptions.value = createDefaultMcpOptions();
+    authorityOptions.value = createDefaultAuthorityOptions();
+    selectedAuthorities.value = createDefaultAuthorityOptions();
+    studios.value = createDefaultStudios();
+  }
+});
 onMounted(loadStudioData);
+
+
+function createDefaultCategoryOptions() {
+  return [
+    {value: "ALL", label: t("studio.defaults.all"), description: t("studio.defaults.allDescription")},
+    {value: "MKT", label: locale.value === "en" ? "Marketing" : "마케팅", description: locale.value === "en" ? "Marketing description" : "마케팅 설명"},
+    {value: "SALES", label: locale.value === "en" ? "Sales" : "판매", description: locale.value === "en" ? "Sales description" : "판매 설명"},
+    {value: "DEV", label: locale.value === "en" ? "Development" : "개발", description: locale.value === "en" ? "Development description" : "개발 설명"},
+    {value: "MFG", label: locale.value === "en" ? "Manufacturing" : "제조", description: locale.value === "en" ? "Manufacturing description" : "제조 설명"},
+    {value: "QA", label: locale.value === "en" ? "Quality" : "품질", description: locale.value === "en" ? "Quality description" : "품질 설명"},
+    {value: "MGMT", label: locale.value === "en" ? "Management" : "경영관리", description: locale.value === "en" ? "Management description" : "경영관리 설명"},
+    {value: "PUR", label: locale.value === "en" ? "Purchasing" : "구매", description: locale.value === "en" ? "Purchasing description" : "구매 설명"},
+    {value: "LOG", label: locale.value === "en" ? "Logistics" : "물류", description: locale.value === "en" ? "Logistics description" : "물류 설명"},
+    {value: "INFRA", label: locale.value === "en" ? "Infra / Environment" : "인프라/환경안정", description: locale.value === "en" ? "Infra and environment description" : "인프라/환경안정 설명"},
+    {value: "COMMON", label: t("studio.defaults.common"), description: locale.value === "en" ? "Common description" : "공통 설명"},
+  ];
+}
+
+function createDefaultModelOptions() {
+  return [
+    {value: "gpt-oss", label: "GPT-OSS", description: locale.value === "en" ? "Enables rapid derivation of inference results" : "빠른 추론 결과 도출 가능"},
+    {value: "gemma-3", label: "Gemma 3", description: locale.value === "en" ? "Suitable for document-based summary and analysis" : "문서 기반 요약과 분석에 적합"},
+    {value: "claude", label: "Claude", description: locale.value === "en" ? "Suitable for long-context analysis" : "긴 문맥 분석에 적합"},
+    {value: "internal-reasoning", label: "Internal Reasoning", description: locale.value === "en" ? "For internal reasoning workloads" : "사내 추론 워크로드용"},
+  ];
+}
+
+function createDefaultRagOptions() {
+  return locale.value === "en" ? ["Papers", "Confluence", "Jira", "Internal policies", "Technical documents"] : ["논문", "Confluence", "Jira", "사내 규정", "기술 문서"];
+}
+
+function createDefaultMcpOptions() {
+  return locale.value === "en" ? ["Mail", "Calendar", "File search", "GitHub", "Deployment lookup"] : ["메일", "캘린더", "파일 검색", "GitHub", "배포 조회"];
+}
+
+function createDefaultAuthorityOptions() {
+  return [
+    {
+      checked: false,
+      deptId: "auth1",
+      deptCode: "auth1",
+      deptNameKo: locale.value === "en" ? "auth1 authority" : "auth1 권한",
+      description: locale.value === "en" ? "auth1 authority description" : "auth1 권한 설명",
+    },
+  ];
+}
+
+function createDefaultPromptExamples() {
+  return locale.value === "en"
+    ? ["Plan a new campaign", "Write social copy", "Analyze target users", "Summarize performance"]
+    : ["신제품 캠페인 기획", "SNS 문구 작성", "타깃 분석", "성과 리포트 요약"];
+}
+
+function createDefaultStudios() {
+  if (locale.value === "en") {
+    return [
+      {id: "s1", initial: "M", name: "Marketing Campaign Assistant", categoryCode: "MKT", category: "Marketing", model: "GPT-OSS", description: "Supports campaign planning and copywriting.", likes: 24, views: 582, owner: "Tester 1", isMine: true, knowledge: "Marketing policies, campaign guides", scope: t("studio.defaults.publicScope"), prompts: createDefaultPromptExamples()},
+      {id: "s2", initial: "D", name: "Development Docs Assistant", categoryCode: "DEV", category: "Development", model: "Gemma 3", description: "Helps explore development standards and API documents.", likes: 18, views: 311, owner: "Tester 2", isMine: false, knowledge: "Confluence, Jira", scope: "Development org", prompts: ["Summarize API", "Organize incident causes", "Write PR description", "Release notes"]},
+      {id: "s3", initial: "Q", name: "Quality Check Assistant", categoryCode: "QA", category: "Quality", model: "GPT-OSS", description: "Checks against quality standards and checklists.", likes: 11, views: 214, owner: "Tester 3", isMine: false, knowledge: "Quality manual", scope: t("studio.defaults.publicScope"), prompts: ["Create checklist", "Organize risks", "Analyze defect types", "Write report"]},
+      {id: "s4", initial: "K", name: "Management KPI Assistant", categoryCode: "MGMT", category: "Management", model: "Claude", description: "Supports KPI analysis and report drafting.", likes: 15, views: 267, owner: "Tester 1", isMine: true, knowledge: "Management reports", scope: t("studio.defaults.publicScope"), prompts: ["Monthly KPI summary", "Analyze performance gap", "Executive report draft", "Risk summary"]},
+      {id: "s5", initial: "P", name: "Purchasing Quote Assistant", categoryCode: "PUR", category: "Purchasing", model: "GPT-OSS", description: "Helps compare quotes and analyze suppliers.", likes: 9, views: 143, owner: "Tester 4", isMine: false, knowledge: "Purchasing policy", scope: "Purchasing org", prompts: ["Compare quotes", "Evaluate suppliers", "Organize contract terms", "Risk analysis"]},
+      {id: "s6", initial: "L", name: "Logistics Operations Assistant", categoryCode: "LOG", category: "Logistics", model: "Internal Reasoning", description: "Supports logistics issue resolution and optimization.", likes: 8, views: 190, owner: "Tester 5", isMine: false, knowledge: "Logistics guide", scope: "Logistics org", prompts: ["Cause of delivery delay", "Inventory issue summary", "Operations report", "Cost reduction ideas"]},
+    ];
+  }
+  return [
+    {id: "s1", initial: "마", name: "마케팅 캠페인 Assistant", categoryCode: "MKT", category: "마케팅", model: "GPT-OSS", description: "캠페인 기획과 문구 작성을 지원합니다.", likes: 24, views: 582, owner: "테스터1", isMine: true, knowledge: "마케팅 정책, 캠페인 가이드", scope: t("studio.defaults.publicScope"), prompts: createDefaultPromptExamples()},
+    {id: "s2", initial: "개", name: "개발 문서 Assistant", categoryCode: "DEV", category: "개발", model: "Gemma 3", description: "개발 표준과 API 문서 탐색을 지원합니다.", likes: 18, views: 311, owner: "테스터2", isMine: false, knowledge: "Confluence, Jira", scope: "개발 조직", prompts: ["API 요약", "장애 원인 정리", "PR 설명 작성", "릴리즈 노트"]},
+    {id: "s3", initial: "품", name: "품질 점검 Assistant", categoryCode: "QA", category: "품질", model: "GPT-OSS", description: "품질 기준과 체크리스트를 기반으로 점검합니다.", likes: 11, views: 214, owner: "테스터3", isMine: false, knowledge: "품질 매뉴얼", scope: t("studio.defaults.publicScope"), prompts: ["점검표 생성", "리스크 정리", "불량 유형 분석", "보고서 작성"]},
+    {id: "s4", initial: "경", name: "경영 KPI Assistant", categoryCode: "MGMT", category: "경영관리", model: "Claude", description: "경영 KPI 분석과 리포트 작성을 지원합니다.", likes: 15, views: 267, owner: "테스터1", isMine: true, knowledge: "경영 리포트", scope: t("studio.defaults.publicScope"), prompts: ["월간 KPI 요약", "실적 차이 분석", "임원 보고서 초안", "리스크 정리"]},
+    {id: "s5", initial: "구", name: "구매 견적 Assistant", categoryCode: "PUR", category: "구매", model: "GPT-OSS", description: "견적 비교 및 공급사 분석을 돕습니다.", likes: 9, views: 143, owner: "테스터4", isMine: false, knowledge: "구매 정책", scope: "구매 조직", prompts: ["견적 비교", "공급사 평가", "계약 조건 정리", "리스크 분석"]},
+    {id: "s6", initial: "물", name: "물류 운영 Assistant", categoryCode: "LOG", category: "물류", model: "Internal Reasoning", description: "물류 운영 이슈 해결과 최적화를 지원합니다.", likes: 8, views: 190, owner: "테스터5", isMine: false, knowledge: "물류 가이드", scope: "물류 조직", prompts: ["배송 지연 원인", "재고 이슈 정리", "운영 리포트", "비용 절감 아이디어"]},
+  ];
+}
 
 async function loadStudioData() {
   await Promise.allSettled([loadMainInfo(), loadAuthorityInfo(), loadStudioList()]);
@@ -177,7 +238,7 @@ async function loadMainInfo() {
       studioCategoryOptions.value = data.sysInfoList
         .filter((item) => item.studio_cat_use_yn !== false)
         .map((item) => ({value: item.studio_cat_code, label: item.studio_cat_name_ko || item.studio_cat_name_en || item.studio_cat_code, description: item.studio_cat_desc_ko || item.studio_cat_desc_en || ""}));
-      if (!studioCategoryOptions.value.some((item) => item.value === "ALL")) studioCategoryOptions.value = [{value: "ALL", label: "전체", description: "전체"}, ...studioCategoryOptions.value];
+      if (!studioCategoryOptions.value.some((item) => item.value === "ALL")) studioCategoryOptions.value = [{value: "ALL", label: t("studio.defaults.all"), description: t("studio.defaults.allDescription")}, ...studioCategoryOptions.value];
       categoryOptions.value = studioCategoryOptions.value.filter((item) => item.value !== "ALL");
       if (!categoryOptions.value.some((item) => item.value === draft.category)) draft.category = categoryOptions.value[0]?.value || "";
     }
@@ -194,7 +255,9 @@ async function loadAuthorityInfo() {
   try {
     const response = await httpClient.get("/studio/main/ssg/info");
     const data = unwrapResponseData(response, []);
-    if (Array.isArray(data) && data.length) authorityOptions.value = data.map((item) => ({...item, checked: false}));
+    if (Array.isArray(data) && data.length) {
+      authorityOptions.value = data.map((item) => ({...item, checked: false}));
+    }
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
@@ -203,7 +266,10 @@ async function loadStudioList() {
   try {
     const response = await httpClient.get("/studio/search/list.do", {params: {pageNo: 1, pagePerCnt: 20, categoryId: "", topCnt: 4}});
     const data = unwrapResponseData(response, []);
-    if (Array.isArray(data) && data.length) studios.value = data.map(normalizeStudioItem);
+    if (Array.isArray(data) && data.length) {
+      studios.value = data.map(normalizeStudioItem);
+      usesDefaultStudioData.value = false;
+    }
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
@@ -216,15 +282,16 @@ function normalizeStudioItem(item, index) {
     initial: name.slice(0, 1).toUpperCase(),
     name,
     categoryCode: item.studio_cat_code || "COMMON",
-    category: item.studio_cat_name_ko || item.studio_cat_name_en || item.studio_cat_code || "공통/기타",
+    category: item.studio_cat_name_ko || item.studio_cat_name_en || item.studio_cat_code || t("studio.defaults.common"),
     model,
-    description: item.studio_desc || "스튜디오 설명",
+    description: item.studio_desc || t("studio.defaults.studioDescription"),
     likes: Number(item.studio_like_cnt || 0),
     views: Number(item.studio_watch_cnt || 0),
-    owner: item.user_name || item.user_id || "사용자",
-    knowledge: item.assist_ssg_auth_arr || "학습 사내 지식 없음",
-    scope: item.assist_ssg_auth_yn ? "권한 공개" : "전체 공개",
-    prompts: ["신제품 캠페인 기획", "SNS 문구 작성", "타깃 분석", "성과 리포트 요약"],
+    owner: item.user_name || item.user_id || t("studio.defaults.user"),
+    isMine: Boolean(item.reg_yn || item.studio_member_yn),
+    knowledge: item.assist_ssg_auth_arr || t("studio.defaults.noKnowledge"),
+    scope: item.assist_ssg_auth_yn ? t("studio.defaults.authScope") : t("studio.defaults.publicScope"),
+    prompts: createDefaultPromptExamples(),
   };
 }
 function parseFirstModelName(value) {
