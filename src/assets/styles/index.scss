@@ -10,6 +10,7 @@
 @use "./05-layout/chat-core" as *;
 @use "./06-components/markdown/markdown" as *;
 @use "./06-components/bottom-sheet/bottom-sheet" as *;
+@use "./06-components/prompt/prompt-mobile-runtime" as *;
 @use "./07-pages/playground" as *;
 @use "./06-components/dialog/feedback-dialog" as *;
 @use "./03-runtime/keyboard" as *;

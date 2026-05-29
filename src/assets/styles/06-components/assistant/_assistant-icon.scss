@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/components/assistant/assistant-icon-binding.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+   Second Sass migration: shared sizing/truncation helpers extracted. */
+@use "../../00-abstracts/mixins" as *;
 
 .assistant-trigger {
   border-color: transparent !important;
@@ -16,8 +17,7 @@
 
 .empty-assistant-logo {
   display: block;
-  width: 48px;
-  height: 48px;
+  @include square(48px);
   object-fit: contain;
   flex: 0 0 auto;
   margin-bottom: -2px;
@@ -36,9 +36,7 @@
   border-radius: 5px;
   background: var(--control-bg);
   color: var(--text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   gap: 8px;
   padding: 0 16px;
   font-weight: 800;
@@ -49,16 +47,12 @@
 
 .assistant-trigger span,
 .prompt-model-trigger span {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  @include truncate-line;
 }
 
 .assistant-trigger svg,
 .prompt-model-trigger svg {
-  width: 15px;
-  height: 15px;
+  @include square(15px);
   flex: 0 0 auto;
   color: var(--text-muted);
 }
@@ -66,8 +60,5 @@
 .prompt-model-trigger span,
 .model-trigger span,
 .assistant-trigger span {
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  @include truncate-line;
 }

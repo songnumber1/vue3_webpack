@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/foundations/reset/base.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+   Second Sass migration: preserve selectors/output while extracting shared helpers. */
+@use "../00-abstracts/mixins" as *;
 
 * {
   box-sizing: border-box;
@@ -8,8 +9,7 @@
 html,
 body,
 #app {
-  width: 100%;
-  height: 100%;
+  @include square(100%);
   margin: 0;
 }
 body {
@@ -27,26 +27,28 @@ textarea {
 }
 button {
   cursor: pointer;
-}
-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.58;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+  }
 }
 .app-container {
   height: 100%;
   width: 100%;
-}
-body.mobile-mode .app-container {
-  max-width: none;
-  margin: 0;
-  background: var(--surface);
+
+  @include mobile-mode {
+    max-width: none;
+    margin: 0;
+    background: var(--surface);
+  }
 }
 
 :root {
   --app-height: 100vh;
   --app-width: 100vw;
 }
-@supports (height: 100dvh) {
+@include supports-height(100dvh) {
   :root {
     --app-height: 100dvh;
   }
@@ -63,9 +65,7 @@ body,
 .android-update-page,
 .not-found-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   padding: 24px;
   background: var(--app-bg, #0f172a);
   color: var(--app-text, #e5e7eb);
@@ -132,9 +132,7 @@ body,
 
 .android-update-button,
 .not-found-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   min-height: 44px;
   padding: 0 18px;
   border: 0;

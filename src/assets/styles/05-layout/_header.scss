@@ -1,13 +1,12 @@
 /* Migrated from src/assets/styles/layouts/header/chat-header-assistant-icon.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 .conversation-title-wrap--chat {
   gap: 8px;
 }
 
 .assistant-brand-logo--header {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
 }
 
 .conversation-title-wrap--chat .assistant-brand-logo--header + strong {

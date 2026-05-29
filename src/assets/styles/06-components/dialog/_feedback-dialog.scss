@@ -1,12 +1,11 @@
 /* Feedback dialog component styles extracted from pages/_playground.scss.
    Runtime viewport/keyboard/scroll-lock overrides remain in runtime layers. */
-
+@use "../../00-abstracts/mixins" as *;
 .feedback-dialog-backdrop {
   position: fixed;
   inset: 0;
   z-index: var(--z-feedback-dialog);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   padding: 20px;
   background: rgba(15, 23, 42, 0.36);
 }

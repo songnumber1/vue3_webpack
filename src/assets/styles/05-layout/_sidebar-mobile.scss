@@ -1,85 +1,98 @@
 /* Migrated from src/assets/styles/layouts/sidebar/mobile-drawer-footer-stability.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+   Stage 3 Sass migration: mobile drawer runtime ownership is expressed through mobile-mode mixins. */
+@use "../00-abstracts/mixins" as *;
 
 /* Mobile drawer footer stability rules isolated from sidebar visual polish. */
-body.mobile-mode .mobile-drawer,
-body.mobile-mode .mobile-drawer .sidebar-content--mobile {
-  height: var(--layout-viewport-height, var(--app-height, 100dvh)) !important;
-  max-height: var(
-    --layout-viewport-height,
-    var(--app-height, 100dvh)
-  ) !important;
-  overflow: hidden !important;
+.mobile-drawer,
+.mobile-drawer .sidebar-content--mobile {
+  @include mobile-mode {
+    @include viewport-height(var(--layout-viewport-height, var(--app-height, 100dvh)), true);
+    overflow: hidden !important;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-content--mobile,
-body.mobile-mode .sidebar-content--mobile {
-  display: flex;
-  flex-direction: column;
-  padding-bottom: 0;
+.mobile-drawer .sidebar-content--mobile,
+.sidebar-content--mobile {
+  @include mobile-mode {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-history,
-body.mobile-mode .sidebar-content--mobile .sidebar-history {
-  flex: 1 1 auto;
-  min-height: 0;
-  padding-bottom: 8px;
+.mobile-drawer .sidebar-history,
+.sidebar-content--mobile .sidebar-history {
+  @include mobile-mode {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-bottom: 8px;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-user--mobile,
-body.mobile-mode .sidebar-content--mobile .sidebar-user--mobile,
-body.mobile-mode .sidebar-content--mobile .sidebar-user {
-  flex: 0 0 auto;
-  margin-top: auto;
-  margin-bottom: 0;
-  padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom, 0px)));
-  border-top: 1px solid var(--control-border);
-  background: var(--sidebar-bg, var(--mobile-bg));
-  box-shadow: none;
+.mobile-drawer .sidebar-user--mobile,
+.sidebar-content--mobile .sidebar-user--mobile,
+.sidebar-content--mobile .sidebar-user {
+  @include mobile-mode {
+    flex: 0 0 auto;
+    margin-top: auto;
+    margin-bottom: 0;
+    padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom, 0px)));
+    border-top: 1px solid var(--control-border);
+    background: var(--sidebar-bg, var(--mobile-bg));
+    box-shadow: none;
+  }
 }
 
-body.mobile-mode .mobile-drawer {
-  height: var(--app-height, 100dvh) !important;
-  max-height: var(--app-height, 100dvh) !important;
-  min-height: 0 !important;
-  overflow: hidden !important;
+.mobile-drawer {
+  @include mobile-mode {
+    height: var(--app-height, 100dvh) !important;
+    max-height: var(--app-height, 100dvh) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-content--mobile {
-  height: 100% !important;
-  max-height: 100% !important;
-  min-height: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  overflow: hidden !important;
-  padding-bottom: 0 !important;
+.mobile-drawer .sidebar-content--mobile {
+  @include mobile-mode {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    padding-bottom: 0 !important;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-history {
-  flex: 1 1 auto !important;
-  min-height: 0 !important;
-  overflow-y: auto !important;
-
-  padding-bottom: 8px !important;
+.mobile-drawer .sidebar-content--mobile .sidebar-history {
+  @include mobile-mode {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    @include scroll-y-touch;
+    overflow-y: auto !important;
+    padding-bottom: 8px !important;
+  }
 }
 
-body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  flex: 0 0 auto !important;
-  width: 100% !important;
-  min-height: 0 !important;
-  height: auto !important;
-  max-height: none !important;
-  margin-top: auto !important;
-  margin-bottom: 0 !important;
-  padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom, 0px))) !important;
-  align-items: center !important;
-  border-top: 1px solid var(--control-border) !important;
-  background: var(--sidebar-bg, var(--mobile-bg)) !important;
-  box-shadow: none !important;
-  transform: none !important;
+.mobile-drawer .sidebar-content--mobile .sidebar-user,
+.mobile-drawer .sidebar-user--mobile {
+  @include mobile-mode {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom, 0px))) !important;
+    align-items: center !important;
+    border-top: 1px solid var(--control-border) !important;
+    background: var(--sidebar-bg, var(--mobile-bg)) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
 }

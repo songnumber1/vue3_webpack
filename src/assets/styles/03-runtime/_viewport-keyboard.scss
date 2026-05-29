@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-keyboard-patches.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 body.mobile-mode .feedback-dialog {
   width: 100% !important;
@@ -44,15 +45,9 @@ body.mobile-mode
 }
 
 .feedback-dialog-backdrop {
-  top: var(--visual-viewport-offset-top, 0px) !important;
-  bottom: auto !important;
-  min-height: 0 !important;
-  height: var(--app-height, 100dvh) !important;
-  display: grid !important;
-  place-items: center !important;
+  @include dialog-viewport-backdrop;
   padding: 20px !important;
   background: var(--overlay-backdrop) !important;
-  overflow-y: auto !important;
 }
 
 .feedback-dialog {
@@ -76,8 +71,7 @@ body.mobile-mode
 }
 
 .chat-bootstrap-loading__dot {
-  width: 10px;
-  height: 10px;
+  @include square(10px);
   border-radius: 999px;
   background: currentColor;
   opacity: 0.42;

@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/layouts/chat/core.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 .chat-container-root {
   height: 100%;
   display: grid;
@@ -44,8 +44,7 @@
   background: var(--control-bg);
   color: var(--text);
   cursor: pointer;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   font-size: var(--font-size-xl);
   font-weight: 900;
   transition:
@@ -67,8 +66,7 @@
 
 .document-toggle svg,
 .test-toggle svg {
-  width: 20px;
-  height: 20px;
+  @include square(20px);
   fill: none;
   stroke: currentColor;
   stroke-width: 1.9;
@@ -105,14 +103,12 @@
 .sidebar-round,
 .round-icon,
 .top-icon {
-  width: 40px;
-  height: 40px;
+  @include square(40px);
   border-radius: 999px;
   border: 1px solid var(--control-border);
   color: var(--text);
   background: var(--control-bg);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   font-size: var(--font-size-fixed-20);
   transition:
     background var(--duration-fast),
@@ -191,11 +187,9 @@
   gap: 10px;
 }
 .user-avatar {
-  width: 28px;
-  height: 28px;
+  @include square(28px);
   border-radius: 999px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--primary);
   color: #fff;
   font-size: var(--font-size-xs);
@@ -246,9 +240,7 @@
   border: 1px solid var(--control-border);
   background: var(--control-bg);
   color: var(--text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   gap: 8px;
   padding: 0 16px;
   font-weight: 800;
@@ -299,8 +291,7 @@
 .empty-stage {
   position: relative;
   min-height: 0;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   overflow: hidden;
 }
 .desktop-empty-actions {
@@ -331,9 +322,7 @@
   border: 0 !important;
 }
 .suggestion-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   gap: 12px;
   flex-wrap: wrap;
 }
@@ -393,8 +382,7 @@
   width: 38px;
   height: 38px;
   border-radius: 14px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--assistant-avatar-bg);
   color: var(--assistant-avatar-text);
   font-weight: 900;
@@ -504,8 +492,7 @@
   height: 38px;
   border-radius: 999px;
   border: none;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   font-weight: 900;
   font-size: var(--font-size-fixed-20);
 }
@@ -779,8 +766,7 @@ body.mobile-mode .send-button {
 }
 
 body.mobile-mode .send-button {
-  width: 48px;
-  height: 48px;
+  @include square(48px);
 }
 
 body.mobile-mode .mobile-drawer-backdrop {
@@ -1134,9 +1120,7 @@ body.mobile-mode .prompt-box--gemini .voice-button {
   min-height: var(--prompt-action-size);
   border: 0;
   border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0;
   line-height: 1;
   cursor: pointer;
@@ -1324,9 +1308,7 @@ body.mobile-mode .prompt-box--gemini .voice-button {
   min-height: var(--prompt-action-size);
   border: 0;
   border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   padding: 0;
   line-height: 1;
   cursor: pointer;
@@ -1390,9 +1372,7 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
 
 .attach-button,
 .send-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   line-height: 1;
   padding: 0;
   vertical-align: middle;
@@ -1432,8 +1412,7 @@ body.mobile-mode .topbar-actions {
 }
 
 body.mobile-mode .topbar-actions .round-icon {
-  width: 40px;
-  height: 40px;
+  @include square(40px);
 }
 
 .collapsed-icon-button,
@@ -1445,9 +1424,7 @@ body.mobile-mode .topbar-actions .round-icon {
   background: transparent;
   color: var(--text);
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   transition:
     background var(--duration-fast),
     color var(--duration-fast),
@@ -1615,9 +1592,7 @@ body.mobile-mode .send-button {
 .bottom-sheet-drag-area {
   flex: 0 0 auto;
   min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   touch-action: none;
   cursor: ns-resize;
 }
@@ -1707,8 +1682,7 @@ body.desktop-mode .bottom-sheet-backdrop {
   display: none;
 }
 body.mobile-mode .empty-stage {
-  display: grid;
-  place-items: center;
+  @include grid-center;
   padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
   overflow-y: auto !important;
 }

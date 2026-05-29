@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/pages/playground/playground-feedback.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../00-abstracts/mixins" as *;
 .chat-workspace > .mobile-topbar {
   width: 100%;
   min-width: 0;
@@ -75,11 +75,9 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
 }
 
 .playground-popup-icon {
-  width: 48px;
-  height: 48px;
+  @include square(48px);
   border-radius: var(--dialog-radius);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--control-bg);
   color: var(--primary);
   font-size: var(--font-size-fixed-24);
@@ -321,9 +319,7 @@ body.mobile-mode .markdown-body img {
 .option-selected-indicator,
 .bottom-sheet-selected-indicator {
   flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   width: 22px;
   height: 22px;
   border-radius: 999px;
@@ -486,8 +482,7 @@ body.mobile-mode .markdown-body img {
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--sidebar-hover);
   font-weight: 900;
 }
@@ -554,8 +549,7 @@ body.mobile-mode .markdown-body img {
   width: 32px;
   height: 32px;
   padding: 0 !important;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   font-size: var(--font-size-fixed-15) !important;
 }
 .feedback-reason-panel,

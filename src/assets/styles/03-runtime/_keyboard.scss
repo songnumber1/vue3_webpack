@@ -1,22 +1,9 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/keyboard/responsive-keyboard.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 :root {
-  --keyboard-font-size-2xs: var(--font-size-2xs);
-  --keyboard-font-size-xs: var(--font-size-xs);
-  --keyboard-font-size-sm: var(--font-size-sm);
-  --keyboard-font-size-md: var(--font-size-md);
-  --keyboard-font-size-base: var(--font-size-base);
-  --keyboard-font-size-lg: var(--font-size-lg);
-  --keyboard-font-size-xl: var(--font-size-xl);
-  --keyboard-font-size-2xl: var(--font-size-2xl);
-  --keyboard-font-size-3xl: var(--font-size-3xl);
-  --keyboard-font-size-11-5: calc(var(--font-size-xs) + 0.5px);
-  --keyboard-font-size-13-5: calc(var(--font-size-md) + 0.5px);
-  --keyboard-font-size-14-5: calc(var(--font-size-base) + 0.5px);
-  --keyboard-font-size-16-5: calc(var(--font-size-lg) + 1.5px);
-  --keyboard-font-size-26: calc(var(--font-size-3xl) + 2px);
-  --keyboard-font-size-28: calc(var(--font-size-3xl) + 4px);
+  @include keyboard-font-token-aliases;
 }
 
 /* Keyboard-owned rules end here. Non-keyboard migrated patches were moved to 99-legacy/_responsive-keyboard-extracted-patches.scss and are imported immediately after this file to preserve cascade order. */

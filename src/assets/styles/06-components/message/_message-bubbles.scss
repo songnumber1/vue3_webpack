@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/components/message/message-bubbles.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 .message--user {
   grid-template-columns: minmax(0, 1fr);
   justify-content: stretch;
@@ -133,8 +133,7 @@ body.mobile-mode .message:not(.message--user) {
 .message-file-icon {
   width: 38px;
   height: 38px;
-  display: grid;
-  place-items: center;
+  @include grid-center;
   flex: 0 0 auto;
   border-radius: 11px;
   background: var(--control-hover);
@@ -150,8 +149,7 @@ body.mobile-mode .message-image-card img {
 }
 
 .message-image-card {
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background:
     linear-gradient(45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),
     linear-gradient(-45deg, rgba(148, 163, 184, 0.12) 25%, transparent 25%),

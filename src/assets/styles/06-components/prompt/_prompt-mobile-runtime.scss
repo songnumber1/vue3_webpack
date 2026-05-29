@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-composer-patches.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 .shared-readonly-box--deleted-model {
   flex-direction: row;
   align-items: center;
@@ -148,8 +148,7 @@ body.mobile-mode .empty-stage--mobile-main .suggestion-row--between:empty {
 .chat-bootstrap-loading {
   width: 100%;
   height: var(--layout-viewport-height, 100dvh);
-  display: grid;
-  place-items: center;
+  @include grid-center;
   background: var(--chat-bg);
   color: var(--text-muted);
 }

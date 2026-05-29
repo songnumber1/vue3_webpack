@@ -1,6 +1,6 @@
 /* Migrated from src/assets/styles/components/markdown/markdown.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
-
+@use "../../00-abstracts/mixins" as *;
 .markdown-body {
   overflow-wrap: anywhere;
   word-break: break-word;
@@ -302,9 +302,7 @@ body.mobile-mode .md-table-wrapper table {
 }
 
 .md-mermaid-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  @include inline-center;
   width: 30px;
   height: 30px;
   border: 1px solid var(--border);

@@ -1,7 +1,8 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/mobile-layout/chat-mobile.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
-body.mobile-mode {
+@include mobile-root {
   --mobile-main-composer-space: 174px;
   --mobile-main-content-top: var(--mobile-header-height, 76px);
   --mobile-main-content-inline: var(--space-4, 16px);
@@ -102,13 +103,11 @@ body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap,
 body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt.prompt-wrap {
-  position: fixed !important;
+  @include fixed-horizontal(true);
   top: auto !important;
-  right: 0 !important;
   bottom: calc(
     var(--keyboard-height, 0px) + max(0px, env(safe-area-inset-bottom))
   ) !important;
-  left: 0 !important;
   z-index: var(--mobile-main-composer-z) !important;
   width: 100%;
   max-width: none;
@@ -116,11 +115,7 @@ body.mobile-mode
   padding: var(--space-3, 12px) var(--space-4, 16px)
     max(var(--space-3, 12px), env(safe-area-inset-bottom));
   transform: translate3d(0, 0, 0);
-  background: linear-gradient(
-    to top,
-    var(--mobile-bg, var(--chat-bg)) 86%,
-    color-mix(in srgb, var(--mobile-bg, var(--chat-bg)) 82%, transparent)
-  );
+  @include mobile-prompt-gradient;
   box-shadow: 0 -12px 28px rgba(15, 23, 42, 0.08);
   will-change: bottom;
   touch-action: manipulation;

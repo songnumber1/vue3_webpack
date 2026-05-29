@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-bottom-sheet-patches.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
+   Second Sass migration: mobile bottom-sheet row rules use nested wrappers. */
+@use "../00-abstracts/mixins" as *;
 
 .conversation-title-wrap,
 .model-trigger--assistant {
@@ -8,21 +9,27 @@
   box-shadow: none !important;
 }
 
-body.mobile-mode .bottom-sheet-option--row {
-  justify-content: flex-start !important;
+.bottom-sheet-option--row {
+  @include mobile-mode {
+    justify-content: flex-start !important;
+  }
 }
 
-body.mobile-mode .bottom-sheet-option--row > span[aria-hidden="true"] {
-  flex: 0 0 auto !important;
-  width: 24px !important;
-  text-align: center !important;
+.bottom-sheet-option--row > span[aria-hidden="true"] {
+  @include mobile-mode {
+    flex: 0 0 auto !important;
+    width: 24px !important;
+    text-align: center !important;
+  }
 }
 
-body.mobile-mode .bottom-sheet-option--row strong {
-  flex: 0 1 auto !important;
-  display: inline !important;
-  min-width: 0 !important;
-  margin: 0 !important;
+.bottom-sheet-option--row strong {
+  @include mobile-mode {
+    flex: 0 1 auto !important;
+    display: inline !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
 }
 
 .bottom-sheet-option--row {
@@ -48,14 +55,18 @@ body.mobile-mode .bottom-sheet-option--row strong {
   text-align: left !important;
 }
 
-body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch {
-  width: 38px !important;
-  min-width: 38px !important;
-  flex: 0 0 38px !important;
+.bottom-sheet-option--row .bottom-sheet-parent-switch {
+  @include mobile-mode {
+    width: 38px !important;
+    min-width: 38px !important;
+    flex: 0 0 38px !important;
+  }
 }
 
-body.mobile-mode .bottom-sheet-option--row .bottom-sheet-parent-switch > span {
-  width: 16px !important;
-  min-width: 16px !important;
-  flex: 0 0 16px !important;
+.bottom-sheet-option--row .bottom-sheet-parent-switch > span {
+  @include mobile-mode {
+    width: 16px !important;
+    min-width: 16px !important;
+    flex: 0 0 16px !important;
+  }
 }

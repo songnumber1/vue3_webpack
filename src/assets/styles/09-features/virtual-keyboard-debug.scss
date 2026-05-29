@@ -1,5 +1,6 @@
 /* Migrated from src/assets/styles/components/debug/virtual-keyboard-debug.css.
    First Sass migration rule: preserve selectors, declarations, and !important usage. */
+@use "../00-abstracts/mixins" as *;
 
 .virtual-keyboard-debug {
   display: none;
@@ -26,9 +27,7 @@ body.mobile-mode .virtual-keyboard-debug {
 }
 
 .virtual-keyboard-debug__panel {
-  position: fixed;
-  left: 0;
-  right: 0;
+  @include fixed-horizontal;
   bottom: 0;
   z-index: var(--z-virtual-keyboard-panel);
   min-height: 0;

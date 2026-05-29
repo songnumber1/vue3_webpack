@@ -1,30 +1,34 @@
 /* Migrated from src/assets/styles/platform/mobile-runtime/viewport/mobile-safe-area-patches.css.
-   Consolidated to remove repeated declarations while preserving the final computed values
-   produced by the original patch order. */
+   Second Sass migration: selector grouping preserved while mobile wrappers use mixins. */
+@use "../00-abstracts/mixins" as *;
 
-body.mobile-mode .sidebar-content--mobile,
-body.mobile-mode .mobile-drawer .sidebar-content--mobile {
-  min-height: 100%;
-  height: 100% !important;
-  padding-bottom: calc(
-    24px + var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
-  ) !important;
-  box-sizing: border-box !important;
+.sidebar-content--mobile,
+.mobile-drawer .sidebar-content--mobile {
+  @include mobile-mode {
+    min-height: 100%;
+    height: 100% !important;
+    padding-bottom: calc(
+      24px + var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
+    ) !important;
+    box-sizing: border-box !important;
+  }
 }
 
-body.mobile-mode .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .sidebar-user--mobile,
-body.mobile-mode .mobile-drawer .sidebar-content--mobile .sidebar-user,
-body.mobile-mode .mobile-drawer .sidebar-user--mobile {
-  position: relative !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  flex: 0 0 auto !important;
-  margin-top: auto !important;
-  margin-bottom: 0 !important;
-  padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom))) !important;
-  border-top: 1px solid var(--control-border) !important;
-  background: var(--sidebar-bg, var(--mobile-bg)) !important;
-  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04) !important;
+.sidebar-content--mobile .sidebar-user,
+.sidebar-user--mobile,
+.mobile-drawer .sidebar-content--mobile .sidebar-user,
+.mobile-drawer .sidebar-user--mobile {
+  @include mobile-mode {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    flex: 0 0 auto !important;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    padding: 12px 18px max(18px, calc(18px + env(safe-area-inset-bottom))) !important;
+    border-top: 1px solid var(--control-border) !important;
+    background: var(--sidebar-bg, var(--mobile-bg)) !important;
+    box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.04) !important;
+  }
 }
