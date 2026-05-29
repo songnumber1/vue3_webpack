@@ -1,7 +1,7 @@
 <template>
   <section class="studio-workspace" aria-label="Assistant Studio">
     <ChatHeader
-      v-if="isMobile"
+      v-if="isMobile && !mobileDetailStudio && !createOpen"
       mode="studio"
       :is-mobile="isMobile"
       :assistant-label="assistantLabel"
@@ -41,7 +41,7 @@
     />
 
     <StudioMobileDetailPage
-      v-else-if="mobileDetailStudio"
+      v-else-if="isMobile && mobileDetailStudio"
       :studio="mobileDetailStudio"
       @close="mobileDetailStudio = null"
     />
@@ -78,6 +78,7 @@
       :open="categorySelectorOpen"
       :categories="activeCategoryPickerOptions"
       :selected-value="activeCategoryPickerValue"
+      :is-mobile="isMobile"
       @close="closeCategorySelector"
       @select="selectCategory"
     />
@@ -232,6 +233,12 @@ watch(isMobile, (mobile) => {
   if (mobile && selectedStudio.value) {
     mobileDetailStudio.value = selectedStudio.value;
     selectedStudio.value = null;
+    return;
+  }
+
+  if (!mobile && mobileDetailStudio.value) {
+    selectedStudio.value = mobileDetailStudio.value;
+    mobileDetailStudio.value = null;
   }
 });
 

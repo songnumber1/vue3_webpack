@@ -1,10 +1,13 @@
 <template>
-  <article class="studio-mobile-page" aria-label="Assistant Studio 상세">
-    <header class="studio-mobile-page__head">
-      <button type="button" aria-label="뒤로" @click="$emit('close')">‹</button>
+  <article class="studio-mobile-page studio-mobile-page--detail" aria-label="Assistant Studio 상세">
+    <header class="studio-mobile-page__head studio-mobile-page__head--notice">
+      <button class="studio-mobile-page__back" type="button" aria-label="뒤로" @click="$emit('close')">‹</button>
       <strong>{{ studio.name }}</strong>
+      <button class="studio-mobile-page__close" type="button" aria-label="닫기" @click="$emit('close')">×</button>
     </header>
-    <StudioDetailContent :studio="studio" />
+    <div class="studio-mobile-page__content">
+      <StudioDetailContent :studio="studio" />
+    </div>
   </article>
 </template>
 

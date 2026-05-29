@@ -54,7 +54,7 @@
       @click="$emit('open-category-picker')"
     >
       <span>{{ activeCategoryLabel }}</span>
-      <span aria-hidden="true">⌄</span>
+      <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
     <div class="studio-list-shell">
