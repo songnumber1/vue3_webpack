@@ -2005,3 +2005,60 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
   position: relative;
   top: auto;
 }
+
+/* Android real-device keyboard fix for Studio create.
+   Keep this scoped to Studio create mobile mode only. The global viewport guard already
+   shrinks --app-height with visualViewport, so adding --keyboard-height again here can
+   double-count the keyboard height and push the focused input out of view. */
+body.mobile-mode .chat-container-root--mode-studio,
+body.mobile-mode .chat-container-root--mode-studio.chat-container-root--keyboard-open {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .chat-workspace,
+body.mobile-mode .chat-container-root--mode-studio.chat-container-root--keyboard-open .chat-workspace {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-create-page,
+body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-page {
+  height: var(--app-height, 100dvh) !important;
+  max-height: var(--app-height, 100dvh) !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-create-layout,
+body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-layout {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  touch-action: pan-y !important;
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-top: 72px !important;
+  scroll-padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-panel__head {
+  flex: 0 0 auto !important;
+  min-height: 48px !important;
+}
+
+body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-tabs {
+  position: static !important;
+  top: auto !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-form-stack label:focus-within,
+body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:focus-within {
+  scroll-margin-top: 80px !important;
+  scroll-margin-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+}

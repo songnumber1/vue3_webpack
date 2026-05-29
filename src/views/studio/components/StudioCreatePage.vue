@@ -1,5 +1,5 @@
 <template>
-  <section ref="createPageRef" class="studio-create-page" :aria-label="t('studio.createPage.title')" @focusin="handleCreateFocusIn">
+  <section ref="createPageRef" class="studio-create-page" :aria-label="t('studio.createPage.title')" @focusin="handleCreateFocusIn" @focusout="handleCreateFocusOut">
     <header class="studio-create-panel__head">
       <button
         v-if="isMobile"
@@ -87,7 +87,7 @@
 import StudioBasicInfoTab from "@/views/studio/components/StudioBasicInfoTab.vue";
 import StudioFeatureTab from "@/views/studio/components/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/views/studio/components/StudioShareScopeTab.vue";
-import {computed, ref} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import StudioPreview from "@/views/studio/components/StudioPreview.vue";
@@ -111,34 +111,122 @@ const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 
 const createPageRef = ref(null);
+const focusedEditor = ref(null);
 let focusScrollTimer = 0;
+let repeatedFocusTimers = [];
 
-function handleCreateFocusIn(event) {
+function isEditableField(element) {
+  return Boolean(
+    element instanceof HTMLElement &&
+      ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName)
+  );
+}
+
+function clearFocusScrollTimers() {
+  window.clearTimeout(focusScrollTimer);
+  focusScrollTimer = 0;
+  repeatedFocusTimers.forEach((timer) => window.clearTimeout(timer));
+  repeatedFocusTimers = [];
+}
+
+function getVisibleViewportBounds(scroller) {
+  const visualViewport = window.visualViewport;
+  const scrollerRect = scroller.getBoundingClientRect();
+  const viewportTop = Math.max(
+    scrollerRect.top,
+    Math.round(visualViewport?.offsetTop || 0)
+  );
+  const viewportBottom = Math.min(
+    scrollerRect.bottom,
+    Math.round((visualViewport?.offsetTop || 0) + (visualViewport?.height || window.innerHeight || scrollerRect.bottom))
+  );
+
+  return {
+    top: viewportTop + 14,
+    bottom: viewportBottom - 24,
+  };
+}
+
+function ensureFocusedEditorVisible(behavior = "smooth") {
   if (!isMobile.value) {
     return;
   }
-  const target = event.target;
-  if (!(target instanceof HTMLElement)) {
+  const target = focusedEditor.value;
+  const scroller = createPageRef.value?.querySelector?.(".studio-create-layout");
+  if (!target || !scroller) {
     return;
   }
-  if (!["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
+  const field = target.closest?.("label, fieldset") || target;
+  if (!(field instanceof HTMLElement)) {
     return;
   }
-  window.clearTimeout(focusScrollTimer);
-  focusScrollTimer = window.setTimeout(() => {
-    const scroller = createPageRef.value?.querySelector?.(".studio-create-layout");
-    const field = target.closest?.("label, fieldset") || target;
-    if (!field || !scroller) {
-      target.scrollIntoView({block: "center", inline: "nearest", behavior: "smooth"});
-      return;
-    }
-    const scrollerRect = scroller.getBoundingClientRect();
-    const fieldRect = field.getBoundingClientRect();
-    const desiredTop = scrollerRect.top + Math.max(72, scrollerRect.height * 0.34);
-    const delta = fieldRect.top - desiredTop;
-    scroller.scrollBy({top: delta, left: 0, behavior: "smooth"});
-  }, 180);
+
+  const bounds = getVisibleViewportBounds(scroller);
+  const fieldRect = field.getBoundingClientRect();
+  const fieldHeight = Math.max(fieldRect.height, 44);
+  const visibleHeight = Math.max(bounds.bottom - bounds.top, 120);
+  const targetTop = bounds.top + Math.max(12, (visibleHeight - fieldHeight) * 0.42);
+
+  let delta = 0;
+  if (fieldRect.bottom > bounds.bottom) {
+    delta = fieldRect.bottom - bounds.bottom;
+  }
+  if (fieldRect.top < bounds.top) {
+    delta = fieldRect.top - bounds.top;
+  }
+
+  // Android Chrome/WebView는 키보드 애니메이션 중 visualViewport 값이 단계적으로 바뀌기 때문에
+  // 하단 입력 필드는 단순 bottom 보정보다 목표 위치 보정이 안정적입니다.
+  if (Math.abs(delta) < 4 && fieldRect.top > targetTop + 24) {
+    delta = fieldRect.top - targetTop;
+  }
+
+  if (Math.abs(delta) > 3) {
+    scroller.scrollBy({top: delta, left: 0, behavior});
+  }
 }
+
+function scheduleFocusedEditorVisible() {
+  clearFocusScrollTimers();
+  const delays = [80, 180, 340, 560];
+  repeatedFocusTimers = delays.map((delay, index) =>
+    window.setTimeout(() => {
+      ensureFocusedEditorVisible(index === 0 ? "auto" : "smooth");
+    }, delay)
+  );
+}
+
+function handleCreateFocusIn(event) {
+  const target = event.target;
+  if (!isMobile.value || !isEditableField(target)) {
+    return;
+  }
+  focusedEditor.value = target;
+  nextTick(scheduleFocusedEditorVisible);
+}
+
+function handleCreateFocusOut(event) {
+  const target = event.target;
+  if (target === focusedEditor.value) {
+    focusedEditor.value = null;
+    clearFocusScrollTimers();
+  }
+}
+
+onMounted(() => {
+  window.visualViewport?.addEventListener("resize", scheduleFocusedEditorVisible, {
+    passive: true,
+  });
+  window.visualViewport?.addEventListener("scroll", scheduleFocusedEditorVisible, {
+    passive: true,
+  });
+});
+
+onBeforeUnmount(() => {
+  clearFocusScrollTimers();
+  window.visualViewport?.removeEventListener("resize", scheduleFocusedEditorVisible);
+  window.visualViewport?.removeEventListener("scroll", scheduleFocusedEditorVisible);
+});
 
 const emit = defineEmits([
   "close",
