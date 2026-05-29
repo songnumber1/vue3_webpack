@@ -1077,3 +1077,44 @@ body.mobile-mode .studio-create-page .studio-preview {
 body.mobile-mode .studio-category-chips {
   display: none;
 }
+
+/* Studio mobile typography follows the same mobile runtime scale as main/chat. */
+body.mobile-mode .chat-container-root--mode-studio .mobile-topbar {
+  height: 44px;
+  padding: 4px 12px;
+  box-sizing: border-box;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .mobile-topbar .round-icon {
+  width: 34px;
+  height: 34px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .mobile-topbar .model-trigger--assistant {
+  height: 34px;
+  min-width: 100px;
+  gap: 6px;
+  padding: 0 10px;
+  font-size: var(--text-size-title-sm);
+  line-height: 1.2;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-hero h1 {
+  font-size: var(--text-size-display-sm, 28px);
+  line-height: 1.25;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-hero p,
+body.mobile-mode .chat-container-root--mode-studio .studio-card__body span,
+body.mobile-mode .chat-container-root--mode-studio .studio-card__meta,
+body.mobile-mode .chat-container-root--mode-studio .studio-dialog__desc {
+  font-size: var(--text-size-body-sm, 14px);
+  line-height: 1.5;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-card__body strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-mobile-page__head strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-create-panel__head > strong {
+  font-size: var(--text-size-title-sm, 16px);
+  line-height: 1.35;
+}
