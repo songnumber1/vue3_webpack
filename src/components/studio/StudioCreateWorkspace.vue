@@ -45,9 +45,9 @@
 
 <script setup>
 import {ref} from "vue";
-import StudioCreatePage from "@/views/studio/components/StudioCreatePage.vue";
-import StudioCategoryPicker from "@/views/studio/components/StudioCategoryPicker.vue";
-import StudioAuthorityPicker from "@/views/studio/components/StudioAuthorityPicker.vue";
+import StudioCreatePage from "@/components/studio/StudioCreatePage.vue";
+import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
+import StudioAuthorityPicker from "@/components/studio/StudioAuthorityPicker.vue";
 
 defineProps({
   createTab: {type: String, default: "basic"},

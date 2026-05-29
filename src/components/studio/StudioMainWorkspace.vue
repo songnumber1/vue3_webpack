@@ -35,9 +35,25 @@
     @go-page="$emit('go-page', $event)"
   />
 
-  <div v-if="selectedStudio && !isMobile" class="studio-dialog-backdrop" @click.self="selectedStudio = null">
-    <article class="studio-dialog" role="dialog" aria-modal="true"  :aria-label="t('studio.detail.title')">
-      <button class="studio-dialog__close" type="button"  :aria-label="t('common.close')" @click="selectedStudio = null">×</button>
+  <div
+    v-if="selectedStudio && !isMobile"
+    class="studio-dialog-backdrop"
+    @click.self="selectedStudio = null"
+  >
+    <article
+      class="studio-dialog"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="t('studio.detail.title')"
+    >
+      <button
+        class="studio-dialog__close"
+        type="button"
+        :aria-label="t('common.close')"
+        @click="selectedStudio = null"
+      >
+        ×
+      </button>
       <StudioDetailContent :studio="selectedStudio" />
     </article>
   </div>
@@ -55,10 +71,10 @@
 import {computed, inject, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
-import StudioMainPage from "@/views/studio/components/StudioMainPage.vue";
-import StudioMobileDetailPage from "@/views/studio/components/StudioMobileDetailPage.vue";
-import StudioDetailContent from "@/views/studio/components/StudioDetailContent.vue";
-import StudioCategoryPicker from "@/views/studio/components/StudioCategoryPicker.vue";
+import StudioMainPage from "@/components/studio/StudioMainPage.vue";
+import StudioMobileDetailPage from "@/components/studio/StudioMobileDetailPage.vue";
+import StudioDetailContent from "@/components/studio/StudioDetailContent.vue";
+import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {
   CHAT_WORKSPACE_STATE_KEY,
@@ -93,7 +109,9 @@ const injectedWorkspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const workspaceState = computed(() => injectedWorkspaceState.value || createEmptyWorkspaceState());
+const workspaceState = computed(
+  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+);
 const selectedStudio = ref(null);
 const mobileDetailStudio = ref(null);
 const categorySelectorOpen = ref(false);

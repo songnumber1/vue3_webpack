@@ -29,7 +29,8 @@ const GuidePage = () =>
 const SharedPage = () =>
   import(/* webpackChunkName: "shared" */ "@/views/SharedPage.vue");
 const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
-const StudioPage = () => import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
+const StudioPage = () =>
+  import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
 const NotFoundPage = () =>
   import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
