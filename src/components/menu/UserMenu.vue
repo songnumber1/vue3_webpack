@@ -6,7 +6,7 @@
       :aria-label="t('common.user')"
       @click="toggleOpen"
     >
-      <span class="user-avatar user-avatar--header">{{ userInitial }}</span>
+      <span class="app-avatar app-avatar--header">{{ userInitial }}</span>
       <span class="user-menu-name">{{ displayName }}</span>
       <ChevronDownIcon class="user-menu-chevron-icon" />
     </button>

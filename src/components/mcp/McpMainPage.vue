@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-workspace__scroll">
+  <div class="studio-workspace__scroll flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[18px] pt-8 text-app-text desktop:px-[clamp(16px,4vw,56px)] mobile:overflow-y-auto mobile:px-4 mobile:pb-[calc(24px+env(safe-area-inset-bottom,0px))] mobile:pt-4">
     <div class="studio-hero">
       <div class="studio-hero__mark">CS</div>
       <h1>{{ t("mcp.title") }}</h1>
@@ -30,9 +30,9 @@
     </div>
 
     <div class="studio-tabs-row">
-      <div class="studio-tabs" role="tablist" :aria-label="t('mcp.tabsLabel')">
+      <div class="studio-tabs flex min-w-0 flex-wrap items-center gap-1 rounded-ui border border-app-border bg-app-muted p-1 shadow-inner mobile:flex-1 mobile:flex-nowrap" role="tablist" :aria-label="t('mcp.tabsLabel')">
         <button
-          class="studio-tab"
+          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
           :class="{active: activeTab === 'all'}"
           type="button"
           @click="$emit('update-active-tab', 'all')"
@@ -40,7 +40,7 @@
           {{ t("mcp.allConnectors") }}
         </button>
         <button
-          class="studio-tab"
+          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
           :class="{active: activeTab === 'mine'}"
           type="button"
           @click="$emit('update-active-tab', 'mine')"
@@ -98,9 +98,9 @@
       <span>{{ t("mcp.createdOnly") }}</span>
     </label>
 
-    <div class="studio-list-shell">
+    <div class="studio-list-shell mt-4 flex min-h-0 flex-1 overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:border-0 mobile:bg-transparent">
       <div ref="listAreaRef" class="studio-list-area">
-        <div class="studio-grid">
+        <div class="studio-grid grid grid-cols-2 gap-4 mobile:grid-cols-1 mobile:gap-3">
           <ResourceCard
             v-for="mcp in mcps"
             :key="mcp.id"

@@ -113,10 +113,10 @@
   .studio-search input { @apply min-w-0 flex-1 border-0 bg-transparent pr-10 text-[15px] text-app-text outline-none placeholder:text-app-subtle; }
   .studio-search-button { @apply absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-ui text-app-subtle hover:bg-app-hover hover:text-app-text; }
   .studio-tabs-row { @apply mt-4 flex items-center justify-between gap-3 mobile:mt-3; }
-  .studio-tabs { @apply flex min-w-0 flex-wrap items-center gap-2 rounded-ui bg-app-muted p-1 mobile:flex-1 mobile:flex-nowrap; }
-  .studio-tab { @apply rounded-ui px-4 py-2 text-sm font-extrabold text-app-subtle transition hover:text-app-text mobile:flex-1 mobile:px-3; }
-  .studio-tab.active { @apply bg-app-surface text-app-text shadow-sm; }
-  .studio-button { @apply inline-flex h-10 items-center justify-center gap-2 rounded-ui border border-app-border bg-app-surface px-4 text-sm font-extrabold text-app-text hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50; }
+  .studio-tabs { @apply flex min-w-0 flex-wrap items-center gap-1 rounded-ui border border-app-border bg-app-muted p-1 shadow-inner mobile:flex-1 mobile:flex-nowrap; }
+  .studio-tab { @apply rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3; }
+  .studio-tab.active { @apply border-app-border bg-app-surface text-app-primary shadow-sm; }
+  .studio-button { @apply inline-flex h-10 min-h-10 min-w-[86px] items-center justify-center gap-2 rounded-ui border border-app-border bg-app-surface px-4 text-sm font-extrabold leading-snug text-app-text transition-colors hover:bg-app-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary,#10a37f)] disabled:cursor-not-allowed disabled:opacity-50; }
   .studio-button--primary { @apply border-app-primary bg-app-primary text-white hover:bg-app-primaryStrong; }
   .studio-button--danger { @apply border-red-600 bg-red-600 text-white hover:bg-red-700; }
   .studio-button--primary-ghost { @apply border-app-primary bg-app-primarySoft text-app-primary; }
@@ -130,16 +130,16 @@
   .studio-list-shell { @apply mt-4 flex min-h-0 flex-1 overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:border-0 mobile:bg-transparent; }
   .studio-list-area { @apply studio-scrollbar-stable min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4 mobile:p-0; }
   .studio-grid { @apply grid grid-cols-2 gap-4 mobile:grid-cols-1 mobile:gap-3; }
-  .studio-card { @apply relative flex min-h-[190px] flex-col gap-3 rounded-ui border border-app-border bg-app-surface p-4 text-left text-app-text transition hover:border-app-primary hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-[var(--primary,#10a37f)] focus:ring-opacity-30 mobile:min-h-[168px]; }
+  .studio-card { @apply relative flex min-h-[190px] flex-col gap-3 rounded-ui border border-app-border bg-app-surface p-4 text-left text-app-text shadow-sm transition-colors hover:border-app-primary hover:bg-app-hover focus:outline-none focus:ring-2 focus:ring-[var(--primary,#10a37f)] focus:ring-opacity-30 mobile:min-h-[168px]; }
   .studio-card__image { @apply h-12 w-12 text-base; }
   .studio-card__body { @apply flex min-w-0 flex-1 flex-col gap-1; }
-  .studio-card__body > strong { @apply text-base font-extrabold; }
+  .studio-card__body > strong { @apply text-base font-extrabold leading-tight text-app-text; }
   .studio-card__body > small { @apply text-xs font-bold text-app-subtle; }
-  .studio-card__body > span { @apply text-sm leading-6 text-app-subtle; }
+  .studio-card__body > span { @apply studio-text-clamp-3 text-sm leading-6 text-app-subtle; }
   .studio-card__more { @apply absolute right-3 top-3 text-app-subtle; }
   .studio-card__meta { @apply mt-auto text-xs font-bold text-app-subtle; }
   .studio-pagination { @apply mx-auto mt-4 flex w-full max-w-[980px] shrink-0 items-center justify-center gap-1 mobile:mt-3; }
-  .studio-pagination button, .studio-page-icon-button { @apply flex h-9 min-w-9 items-center justify-center rounded-ui border border-app-border bg-app-surface px-2 text-sm font-extrabold text-app-subtle disabled:cursor-not-allowed disabled:opacity-40; }
+  .studio-pagination button, .studio-page-icon-button { @apply flex h-9 min-w-9 items-center justify-center rounded-ui border border-app-border bg-app-surface px-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-40; }
   .studio-pagination button.active { @apply border-app-primary bg-app-primary text-white; }
   .studio-pagination__ellipsis { @apply border-transparent bg-transparent; }
 

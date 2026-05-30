@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-workspace__scroll">
+  <div class="studio-workspace__scroll flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[18px] pt-8 text-app-text desktop:px-[clamp(16px,4vw,56px)] mobile:overflow-y-auto mobile:px-4 mobile:pb-[calc(24px+env(safe-area-inset-bottom,0px))] mobile:pt-4">
     <div class="studio-hero">
       <div class="studio-hero__mark">AS</div>
       <h1>{{ t("studio.title") }}</h1>
@@ -30,9 +30,9 @@
     </div>
 
     <div class="studio-tabs-row">
-      <div class="studio-tabs" role="tablist" :aria-label="t('studio.tabsLabel')">
+      <div class="studio-tabs flex min-w-0 flex-wrap items-center gap-1 rounded-ui border border-app-border bg-app-muted p-1 shadow-inner mobile:flex-1 mobile:flex-nowrap" role="tablist" :aria-label="t('studio.tabsLabel')">
         <button
-          class="studio-tab"
+          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
           :class="{active: activeTab === 'all'}"
           type="button"
           @click="$emit('update-active-tab', 'all')"
@@ -40,7 +40,7 @@
           {{ t("studio.allAssistants") }}
         </button>
         <button
-          class="studio-tab"
+          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
           :class="{active: activeTab === 'mine'}"
           type="button"
           @click="$emit('update-active-tab', 'mine')"
@@ -89,9 +89,9 @@
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
-    <div class="studio-list-shell">
+    <div class="studio-list-shell mt-4 flex min-h-0 flex-1 overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:border-0 mobile:bg-transparent">
       <div ref="listAreaRef" class="studio-list-area">
-        <div class="studio-grid">
+        <div class="studio-grid grid grid-cols-2 gap-4 mobile:grid-cols-1 mobile:gap-3">
           <ResourceCard
             v-for="studio in studios"
             :key="studio.id"

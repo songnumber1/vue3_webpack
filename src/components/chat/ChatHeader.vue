@@ -5,7 +5,7 @@
   >
     <div class="topbar-left">
       <button
-        class="round-icon menu-toggle"
+        class="app-icon-button app-icon-button--md menu-toggle mobile-header-icon"
         type="button"
         :aria-label="t('chat.openSidebar')"
         @click="chatActions.openDrawer()"
@@ -60,7 +60,7 @@
 
     <div v-if="isMobile" class="topbar-actions topbar-actions--mobile">
       <button
-        class="round-icon mobile-header-future-action"
+        class="app-icon-button app-icon-button--md mobile-header-future-action mobile-header-icon"
         type="button"
         :aria-label="t('common.settings')"
         :title="t('common.settings')"
@@ -135,7 +135,7 @@ const showDesktopConversationTitle = computed(
   padding-bottom: 4px;
 }
 
-:global(body.mobile-mode) .mobile-topbar .round-icon {
+:global(body.mobile-mode) .mobile-topbar .mobile-header-icon {
   width: 34px;
   height: 34px;
 }

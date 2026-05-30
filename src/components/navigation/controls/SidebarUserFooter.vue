@@ -1,12 +1,12 @@
 <template>
   <div class="sidebar-user sidebar-user--mobile">
     <button
-      class="sidebar-user-profile"
+      class="sidebar-user-profile min-w-0"
       type="button"
       :aria-label="t('common.settings')"
       @click="actions.openSettings()"
     >
-      <div class="user-avatar">{{ userInitial }}</div>
+      <div class="app-avatar app-avatar--sidebar">{{ userInitial }}</div>
       <div class="sidebar-user-main">
         <strong>{{ displayName }}</strong
         ><small>{{ t("common.plus") }}</small>
@@ -15,7 +15,7 @@
     <div class="sidebar-user-actions">
       <button
         v-if="systemSettings.showThemeButton"
-        class="sidebar-user-action"
+        class="app-icon-button app-icon-button--sm"
         type="button"
         :aria-label="t('common.theme')"
         @click="actions.toggleTheme()"
@@ -24,7 +24,7 @@
       </button>
       <button
         v-if="systemSettings.showPlaygroundMenu"
-        class="sidebar-user-action"
+        class="app-icon-button app-icon-button--sm"
         type="button"
         :aria-label="t('common.playground')"
         :title="t('common.playground')"
@@ -34,7 +34,7 @@
       </button>
       <button
         v-if="systemSettings.showSwaggerButton"
-        class="sidebar-user-action"
+        class="app-icon-button app-icon-button--sm"
         type="button"
         :aria-label="t('common.swagger')"
         @click="actions.openSwagger()"
@@ -43,7 +43,7 @@
       </button>
       <button
         v-if="systemSettings.showLogoutButton"
-        class="sidebar-user-action sidebar-user-action--logout"
+        class="app-icon-button app-icon-button--sm text-app-danger"
         type="button"
         :aria-label="t('common.logout')"
         :title="t('common.logout')"

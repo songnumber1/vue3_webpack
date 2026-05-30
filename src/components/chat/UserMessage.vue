@@ -1,6 +1,6 @@
 <template>
   <article class="message message--user">
-    <div class="bubble bubble--user">
+    <div class="bubble bubble--user ml-auto max-w-[min(720px,74%)] rounded-[22px] bg-[var(--message-user-bg)] px-[19px] pt-[17px] pb-[11px] text-[var(--message-user-text)] mobile:max-w-[88%] mobile:rounded-[18px] mobile:px-4 mobile:py-3">
       <div class="bubble-meta">You</div>
       <div
         v-if="hasAttachments"
