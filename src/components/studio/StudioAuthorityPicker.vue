@@ -12,7 +12,14 @@
           <span class="studio-icon studio-icon--back" aria-hidden="true"></span>
         </button>
         <strong>{{ t("studio.share.pickerTitle") }}</strong>
-        <button v-if="!isMobile" type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
+        <button
+          class="studio-picker__close"
+          type="button"
+          :aria-label="t('common.close')"
+          @click="$emit('close')"
+        >
+          ×
+        </button>
       </header>
       <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
         <div class="studio-authority-picker-grid__head" role="row">
