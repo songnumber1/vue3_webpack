@@ -60,16 +60,22 @@
     <div class="studio-list-shell">
       <div class="studio-list-area">
         <div class="studio-grid">
-          <button v-for="studio in studios" :key="studio.id" class="studio-card" type="button" @click="$emit('open-detail', studio)">
-            <span class="studio-card__image">{{ studio.initial }}</span>
-            <span class="studio-card__more" aria-hidden="true">•••</span>
-            <span class="studio-card__body">
-              <strong>{{ studio.name }}</strong>
-              <small>{{ studio.category }} · {{ studio.model }}</small>
-              <span>{{ studio.description }}</span>
-            </span>
-            <span class="studio-card__meta">{{ t('studio.likes') }} {{ studio.likes }} · {{ t('studio.questions') }} {{ studio.views }}</span>
-          </button>
+          <ResourceCard
+            v-for="studio in studios"
+            :key="studio.id"
+            :item="studio"
+            :title="studio.name"
+            :subtitle="`${studio.category} · ${studio.model}`"
+            :description="studio.description"
+            :meta="`${t('studio.likes')} ${studio.likes} · ${t('studio.questions')} ${studio.views}`"
+            :image-text="studio.initial"
+            card-class="studio-card"
+            image-class="studio-card__image"
+            body-class="studio-card__body"
+            more-class="studio-card__more"
+            meta-class="studio-card__meta"
+            @open="$emit('open-detail', $event)"
+          />
         </div>
       </div>
     </div>
@@ -103,6 +109,7 @@
 
 <script setup>
 import {useI18n} from "vue-i18n";
+import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
 
 defineProps({

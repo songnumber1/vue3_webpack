@@ -1,28 +1,38 @@
 <template>
-  <div class="studio-detail-content">
-    <header class="studio-dialog__head">
-      <div class="studio-dialog__image">{{ studio.initial }}</div>
-      <div>
-        <h2>{{ studio.name }}</h2>
-        <p>{{ t('studio.likes') }} {{ studio.likes }} · {{ t('studio.questions') }} {{ studio.views }} · {{ studio.owner }} · {{ studio.model }}</p>
-      </div>
-    </header>
-    <p class="studio-dialog__desc">{{ studio.description }}</p>
-
-    <h3>{{ t('studio.detail.prompts') }}</h3>
-    <div class="studio-prompt-grid">
-      <button v-for="prompt in studio.prompts" :key="prompt" type="button">{{ prompt }}</button>
-    </div>
-    <h3>{{ t('studio.detail.knowledge') }}</h3>
-    <p class="studio-dialog__box">{{ studio.knowledge }}</p>
-    <h3>{{ t('studio.detail.scope') }}</h3>
-    <p class="studio-dialog__box">{{ studio.scope }}</p>
-  </div>
+  <ResourceDetailContent
+    content-class="studio-detail-content"
+    head-class="studio-dialog__head"
+    image-class="studio-dialog__image"
+    description-class="studio-dialog__desc"
+    prompt-grid-class="studio-prompt-grid"
+    box-class="studio-dialog__box"
+    :title="studio.name"
+    :meta="detailMeta"
+    :description="studio.description"
+    :image-text="studio.initial"
+    :prompts="studio.prompts"
+    :knowledge="studio.knowledge"
+    :scope="studio.scope"
+    :labels="detailLabels"
+  />
 </template>
 
 <script setup>
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
+import ResourceDetailContent from "@/components/common/catalog/ResourceDetailContent.vue";
+
 const {t} = useI18n();
 
-defineProps({studio: {type: Object, required: true}});
+const props = defineProps({studio: {type: Object, required: true}});
+
+const detailMeta = computed(
+  () => `${t("studio.likes")} ${props.studio.likes} · ${t("studio.questions")} ${props.studio.views} · ${props.studio.owner} · ${props.studio.model}`
+);
+
+const detailLabels = computed(() => ({
+  prompts: t("studio.detail.prompts"),
+  knowledge: t("studio.detail.knowledge"),
+  scope: t("studio.detail.scope"),
+}));
 </script>
