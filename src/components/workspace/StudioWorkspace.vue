@@ -46,6 +46,8 @@
       @update-active-tab="activeTab = $event"
       @select-category="selectListCategory"
       @open-create="openCreate"
+      @edit-studio="openEdit"
+      @delete-studio="deleteStudio"
       @go-page="goPage"
     />
   </section>
@@ -73,6 +75,7 @@ const pageSize = 6;
 const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
+const editingStudioId = ref(null);
 
 const studioCategoryOptions = ref(createDefaultCategoryOptions());
 const categoryOptions = ref(
@@ -716,12 +719,73 @@ function selectListCategory(value) {
 function goPage(page) {
   currentPage.value = Math.min(maxPage.value, Math.max(1, page));
 }
+function createEmptyDraftState() {
+  return {
+    image: "",
+    category: categoryOptions.value[0]?.value || "MKT",
+    name: "",
+    instruction: "",
+    description: "",
+    prompts: Array.from({length: 8}, () => ""),
+    models: [],
+    rags: [],
+    mcps: [],
+    scope: "private",
+  };
+}
+function assignDraftState(nextDraft) {
+  Object.assign(draft, nextDraft);
+}
+function resetCreateDraft() {
+  editingStudioId.value = null;
+  assignDraftState(createEmptyDraftState());
+  selectedAuthorities.value = createDefaultAuthorityOptions();
+  preview.name = "";
+  preview.description = "";
+  preview.prompts = [];
+}
 function openCreate() {
+  resetCreateDraft();
+  createOpen.value = true;
+  createTab.value = "basic";
+}
+function openEdit(studio) {
+  if (!studio) return;
+  editingStudioId.value = studio.id;
+  assignDraftState(createDraftFromStudio(studio));
+  selectedAuthorities.value = createDefaultAuthorityOptions();
+  preview.name = studio.name || "";
+  preview.description = studio.description || "";
+  preview.prompts = Array.isArray(studio.prompts) ? [...studio.prompts] : [];
   createOpen.value = true;
   createTab.value = "basic";
 }
 function closeCreate() {
   createOpen.value = false;
+  editingStudioId.value = null;
+}
+function createDraftFromStudio(studio) {
+  const modelValue = modelOptions.value.find((model) => model.label === studio.model)?.value;
+  const prompts = Array.from({length: 8}, (_, index) => studio.prompts?.[index] || "");
+  return {
+    image: "",
+    category: studio.categoryCode || categoryOptions.value[0]?.value || "MKT",
+    name: studio.name || "",
+    instruction: "",
+    description: studio.description || "",
+    prompts,
+    models: modelValue ? [modelValue] : [],
+    rags: typeof studio.knowledge === "string" && studio.knowledge !== t("studio.defaults.noKnowledge")
+      ? studio.knowledge.split(",").map((item) => item.trim()).filter(Boolean)
+      : [],
+    mcps: [],
+    scope: String(studio.scope || "").includes(t("studio.defaults.publicScope")) ? "public" : "private",
+  };
+}
+function deleteStudio(studio) {
+  if (!studio) return;
+  studios.value = studios.value.filter((item) => item.id !== studio.id);
+  currentPage.value = Math.min(currentPage.value, maxPage.value);
 }
 function applyPreview() {
   preview.name = draft.name;

@@ -12,6 +12,8 @@
     v-if="isMobile && mobileDetailStudio"
     :studio="mobileDetailStudio"
     @close="mobileDetailStudio = null"
+    @edit="handleEditStudio"
+    @delete="requestDeleteStudio"
   />
 
   <StudioMainPage
@@ -46,18 +48,63 @@
       :aria-label="t('studio.detail.title')"
     >
       <button
+        v-if="selectedStudio.isMine"
+        ref="detailSettingsButtonRef"
+        class="studio-dialog__settings"
+        type="button"
+        :aria-label="t('studio.detail.settings')"
+        :title="t('studio.detail.settings')"
+        @click.stop="detailActionMenuOpen = !detailActionMenuOpen"
+      >
+        <span class="studio-icon studio-icon--settings" aria-hidden="true"></span>
+      </button>
+      <button
         class="studio-dialog__close"
         type="button"
         :aria-label="t('common.close')"
-        @click="selectedStudio = null"
+        @click="closeDetailDialog"
       >
         ×
       </button>
       <StudioDetailContent :studio="selectedStudio" />
       <footer class="studio-dialog__footer">
-        <button class="studio-button studio-button--primary" type="button" @click="selectedStudio = null">
+        <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
         </button>
+      </footer>
+    </article>
+  </div>
+
+  <teleport to="body">
+    <div
+      v-if="detailActionMenuOpen && selectedStudio && !isMobile"
+      ref="detailActionMenuRef"
+      class="studio-detail-context-menu-shell"
+      :style="detailActionMenuStyle"
+    >
+      <div class="studio-detail-context-menu" role="menu">
+        <button type="button" role="menuitem" @click="handleEditStudio(selectedStudio)">
+          <span aria-hidden="true">✎</span>
+          <span>{{ t('studio.detail.edit') }}</span>
+        </button>
+        <button class="studio-detail-context-menu__danger" type="button" role="menuitem" @click="requestDeleteStudio(selectedStudio)">
+          <span aria-hidden="true">🗑</span>
+          <span>{{ t('studio.detail.delete') }}</span>
+        </button>
+      </div>
+    </div>
+  </teleport>
+
+  <div v-if="deleteTarget" class="studio-confirm-backdrop">
+    <article class="studio-confirm-dialog" role="dialog" aria-modal="true" :aria-label="t('studio.detail.deleteConfirmTitle')">
+      <header class="studio-confirm-dialog__head">
+        <strong>{{ t('studio.detail.deleteConfirmTitle') }}</strong>
+        <button type="button" :aria-label="t('common.close')" @click="deleteTarget = null">×</button>
+      </header>
+      <p>{{ t('studio.detail.deleteConfirmMessage') }}</p>
+      <footer class="studio-confirm-dialog__footer">
+        <button class="studio-button" type="button" @click="deleteTarget = null">{{ t('common.close') }}</button>
+        <button class="studio-button studio-button--danger" type="button" @click="confirmDeleteStudio">{{ t('studio.detail.deleteConfirmAction') }}</button>
       </footer>
     </article>
   </div>
@@ -72,8 +119,9 @@
 </template>
 
 <script setup>
-import {computed, inject, ref, watch} from "vue";
+import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import StudioMainPage from "@/components/studio/StudioMainPage.vue";
 import StudioMobileDetailPage from "@/components/studio/StudioMobileDetailPage.vue";
@@ -104,6 +152,8 @@ const emit = defineEmits([
   "update-active-tab",
   "select-category",
   "open-create",
+  "edit-studio",
+  "delete-studio",
   "go-page",
 ]);
 
@@ -119,8 +169,31 @@ const workspaceState = computed(
 const selectedStudio = ref(null);
 const mobileDetailStudio = ref(null);
 const categorySelectorOpen = ref(false);
+const detailActionMenuOpen = ref(false);
+const detailSettingsButtonRef = ref(null);
+const detailActionMenuRef = ref(null);
+const deleteTarget = ref(null);
+
+const {floatingStyles, update: updateDetailMenu, x, y} = useFloating(
+  detailSettingsButtonRef,
+  detailActionMenuRef,
+  {
+    placement: "bottom-end",
+    strategy: "fixed",
+    transform: false,
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(8), flip({fallbackPlacements: ["bottom-start", "top-end"]}), shift({padding: 12})],
+  }
+);
+
+const detailActionMenuStyle = computed(() => ({
+  ...floatingStyles.value,
+  position: "fixed",
+  visibility: Number.isFinite(x.value) && Number.isFinite(y.value) ? "visible" : "hidden",
+}));
 
 watch(isMobile, (mobile) => {
+  detailActionMenuOpen.value = false;
   if (mobile && selectedStudio.value) {
     mobileDetailStudio.value = selectedStudio.value;
     selectedStudio.value = null;
@@ -140,9 +213,58 @@ watch(
   }
 );
 
+watch(detailActionMenuOpen, async (open) => {
+  if (!open) return;
+  await nextTick();
+  await updateDetailMenu?.();
+});
+
+function handleGlobalPointerDown(event) {
+  if (!detailActionMenuOpen.value) return;
+  const target = event.target;
+  if (detailActionMenuRef.value?.contains?.(target)) return;
+  if (detailSettingsButtonRef.value?.contains?.(target)) return;
+  detailActionMenuOpen.value = false;
+}
+
+onMounted(() => {
+  document.addEventListener("pointerdown", handleGlobalPointerDown, true);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("pointerdown", handleGlobalPointerDown, true);
+});
+
 function openDetail(studio) {
+  detailActionMenuOpen.value = false;
   if (isMobile.value) mobileDetailStudio.value = studio;
   else selectedStudio.value = studio;
+}
+
+function closeDetailDialog() {
+  detailActionMenuOpen.value = false;
+  selectedStudio.value = null;
+}
+
+function handleEditStudio(studio) {
+  detailActionMenuOpen.value = false;
+  selectedStudio.value = null;
+  mobileDetailStudio.value = null;
+  emit("edit-studio", studio);
+}
+
+function requestDeleteStudio(studio) {
+  detailActionMenuOpen.value = false;
+  deleteTarget.value = studio;
+}
+
+function confirmDeleteStudio() {
+  if (!deleteTarget.value) return;
+  const target = deleteTarget.value;
+  deleteTarget.value = null;
+  selectedStudio.value = null;
+  mobileDetailStudio.value = null;
+  emit("delete-studio", target);
 }
 
 function selectCategory(value) {
