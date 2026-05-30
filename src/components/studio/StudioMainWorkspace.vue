@@ -38,7 +38,6 @@
   <div
     v-if="selectedStudio && !isMobile"
     class="studio-dialog-backdrop"
-    @click.self="selectedStudio = null"
   >
     <article
       class="studio-dialog"
@@ -55,6 +54,11 @@
         ×
       </button>
       <StudioDetailContent :studio="selectedStudio" />
+      <footer class="studio-dialog__footer">
+        <button class="studio-button studio-button--primary" type="button" @click="selectedStudio = null">
+          {{ t("common.close") }}
+        </button>
+      </footer>
     </article>
   </div>
 

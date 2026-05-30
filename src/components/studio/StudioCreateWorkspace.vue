@@ -6,6 +6,7 @@
     :preview-initial="previewInitial"
     :preview-prompts="previewPrompts"
     :selected-category-label="selectedCategoryLabel"
+    :category-options="categoryOptions"
     :model-options="modelOptions"
     :rag-options="ragOptions"
     :mcp-options="mcpOptions"

@@ -105,6 +105,7 @@
           v-if="createTab === 'basic'"
           :draft="draft"
           :selected-category-label="selectedCategoryLabel"
+          :category-options="categoryOptions"
           @update-field="handleDraftField"
           @update-prompt="handleDraftPrompt"
           @open-category="$emit('open-category')"
@@ -162,6 +163,7 @@ defineProps({
   previewInitial: {type: String, default: "A"},
   previewPrompts: {type: Array, default: () => []},
   selectedCategoryLabel: {type: String, default: ""},
+  categoryOptions: {type: Array, default: () => []},
   modelOptions: {type: Array, default: () => []},
   ragOptions: {type: Array, default: () => []},
   mcpOptions: {type: Array, default: () => []},
