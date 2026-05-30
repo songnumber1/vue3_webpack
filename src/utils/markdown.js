@@ -12,12 +12,99 @@ import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
+import rehypeRaw from "rehype-raw";
+import rehypeSanitize, {defaultSchema} from "rehype-sanitize";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
+
+
+const COMMON_SAFE_ATTRIBUTES = [
+  "ariaDescribedBy",
+  "ariaHidden",
+  "ariaLabel",
+  "ariaLabelledBy",
+  "className",
+  "dataMdTableAction",
+  "dataMdMermaidAction",
+  "dataMdCodeAction",
+  "dataMdCodeLanguage",
+  "dataMdCodeSource",
+  "dataMermaidPending",
+  "dataMermaidSource",
+  "title",
+];
+
+const MARKDOWN_SAFE_CLASS_TAGS = [
+  "a",
+  "blockquote",
+  "code",
+  "del",
+  "details",
+  "div",
+  "em",
+  "h1",
+  "h2",
+  "h3",
+  "h4",
+  "h5",
+  "h6",
+  "hr",
+  "img",
+  "input",
+  "li",
+  "ol",
+  "p",
+  "pre",
+  "section",
+  "span",
+  "strong",
+  "table",
+  "tbody",
+  "td",
+  "tfoot",
+  "th",
+  "thead",
+  "tr",
+  "ul",
+];
+
+const markdownSanitizeSchema = {
+  ...defaultSchema,
+  tagNames: Array.from(
+    new Set([
+      ...(defaultSchema.tagNames || []),
+      "figure",
+      "figcaption",
+    ])
+  ),
+  attributes: {
+    ...(defaultSchema.attributes || {}),
+    "*": Array.from(
+      new Set([
+        ...(defaultSchema.attributes?.["*"] || []),
+        ...COMMON_SAFE_ATTRIBUTES,
+      ])
+    ),
+    ...MARKDOWN_SAFE_CLASS_TAGS.reduce((attributes, tagName) => {
+      attributes[tagName] = Array.from(
+        new Set([
+          ...(defaultSchema.attributes?.[tagName] || []),
+          ...COMMON_SAFE_ATTRIBUTES,
+        ])
+      );
+      return attributes;
+    }, {}),
+  },
+  protocols: {
+    ...(defaultSchema.protocols || {}),
+    href: ["http", "https", "irc", "ircs", "mailto", "xmpp"],
+    src: ["http", "https"],
+  },
+};
 
 /**
  * [Markdown render pipeline]
@@ -428,9 +515,11 @@ function rehypeCodeBlockWrapper() {
 function createProcessor({renderMermaid = true} = {}) {
   const nextProcessor = unified()
     .use(remarkParse)
-    .use(remarkGfm)
+    .use(remarkGfm, {singleTilde: false})
     .use(remarkMath)
-    .use(remarkRehype)
+    .use(remarkRehype, {allowDangerousHtml: true})
+    .use(rehypeRaw)
+    .use(rehypeSanitize, markdownSanitizeSchema)
     .use(rehypeKatex, {throwOnError: false, strict: false})
     .use(rehypeHighlight, {ignoreMissing: true, detect: false})
     .use(rehypeTableWrapper);
