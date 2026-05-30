@@ -19,7 +19,7 @@
         <span>{{ item.title }}</span>
       </button>
 
-      <div class="sidebar-history-actions">
+      <div v-if="showActions" class="sidebar-history-actions">
         <span
           v-if="item.isPinned"
           class="sidebar-history-pin"
@@ -29,6 +29,7 @@
           📌
         </span>
         <button
+          v-if="showMenu"
           class="sidebar-history-menu-button"
           type="button"
           :aria-label="t('chat.historyMenu.title')"
@@ -68,6 +69,8 @@ const props = defineProps({
   },
   itemClass: {type: String, default: "sidebar-history-item"},
   useOverlayScrollbar: {type: Boolean, default: false},
+  showActions: {type: Boolean, default: true},
+  showMenu: {type: Boolean, default: true},
 });
 
 defineEmits(["select", "open-menu"]);

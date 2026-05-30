@@ -1,6 +1,6 @@
 <template>
   <form class="system-settings-view" @submit.prevent="apply">
-    <div class="system-settings-scroll">
+    <div ref="settingsScrollRef" class="system-settings-scroll">
       <section class="system-settings-hero">
         <p class="system-settings-eyebrow">{{ t("systemSettings.eyebrow") }}</p>
         <h3>{{ t("systemSettings.title") }}</h3>
@@ -100,6 +100,7 @@
  */
 
 import {computed, reactive, ref, watch} from "vue";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
@@ -128,6 +129,8 @@ const {settings} = storeToRefs(systemSettingsStore);
 
 const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
 const applying = ref(false);
+const settingsScrollRef = ref(null);
+
 
 const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
 
@@ -154,6 +157,8 @@ function settingItem(key, extra = {}) {
     ...extra,
   };
 }
+
+useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}});
 
 const groups = computed(() => [
   {

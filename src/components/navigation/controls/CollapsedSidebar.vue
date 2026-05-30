@@ -28,7 +28,7 @@
         type="button"
         :title="t('chat.chatSearch')"
         :aria-label="t('chat.chatSearch')"
-        @click="$emit('set-recent-open', false)"
+        @click="$emit('chat-search')"
       >
         <Icon name="search" bare />
       </button>
@@ -55,6 +55,9 @@
           :selected-chat-id="selectedChatId"
           container-class="collapsed-recent-list"
           item-class="collapsed-recent-item"
+          use-overlay-scrollbar
+          :show-actions="false"
+          :show-menu="false"
           @select="$emit('select-history', $event)"
         />
       </section>
@@ -91,6 +94,7 @@ const emit = defineEmits([
   "expand",
   "new-chat",
   "set-recent-open",
+  "chat-search",
   "select-history",
 ]);
 

@@ -1,5 +1,5 @@
 <template>
-  <div ref="pageScrollRef" class="studio-workspace__scroll">
+  <div class="studio-workspace__scroll">
     <div class="studio-hero">
       <div class="studio-hero__mark">CS</div>
       <h1>{{ t("mcp.title") }}</h1>
@@ -66,7 +66,7 @@
       </button>
     </div>
 
-    <div v-if="activeTab === 'all'" class="studio-category-chips" :aria-label="t('mcp.categoryLabel')">
+    <div v-if="activeTab === 'all'" ref="categoryChipsRef" class="studio-category-chips" :aria-label="t('mcp.categoryLabel')">
       <button
         v-for="category in categories"
         :key="category.value"
@@ -154,13 +154,10 @@ import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
-const pageScrollRef = ref(null);
+const categoryChipsRef = ref(null);
 const listAreaRef = ref(null);
 
-useOverlayScrollbar(pageScrollRef, {overflow: {x: "hidden", y: "scroll"}});
-useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}});
-
-defineProps({
+const props = defineProps({
   searchText: {type: String, default: ""},
   activeTab: {type: String, default: "all"},
   activeCategory: {type: String, default: "ALL"},
@@ -172,6 +169,10 @@ defineProps({
   currentPage: {type: Number, default: 1},
   maxPage: {type: Number, default: 1},
 });
+
+useOverlayScrollbar(categoryChipsRef, {overflow: {x: "scroll", y: "hidden"}}, {watchSource: () => [props.activeTab, props.categories.length]});
+useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [props.activeTab, props.activeCategory, props.currentPage, props.mcps.length]});
+
 defineEmits([
   "update-search-text",
   "search",

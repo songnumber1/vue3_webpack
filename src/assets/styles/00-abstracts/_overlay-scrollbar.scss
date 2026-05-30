@@ -103,3 +103,39 @@ body.dark-mode .os-theme-chat-app,
   background: rgba(104, 113, 130, 0.34);
   border-radius: 999px;
 }
+
+/* Overlay scrollbar coverage fixes for collapsed history, mobile drawer, category chips and system settings. */
+.sidebar-history,
+.collapsed-recent-list,
+.mobile-drawer .sidebar-history,
+.studio-category-chips,
+.system-settings-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
+}
+
+.sidebar-history::-webkit-scrollbar,
+.collapsed-recent-list::-webkit-scrollbar,
+.mobile-drawer .sidebar-history::-webkit-scrollbar,
+.studio-category-chips::-webkit-scrollbar,
+.system-settings-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.sidebar-history::-webkit-scrollbar-track,
+.collapsed-recent-list::-webkit-scrollbar-track,
+.mobile-drawer .sidebar-history::-webkit-scrollbar-track,
+.studio-category-chips::-webkit-scrollbar-track,
+.system-settings-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-history::-webkit-scrollbar-thumb,
+.collapsed-recent-list::-webkit-scrollbar-thumb,
+.mobile-drawer .sidebar-history::-webkit-scrollbar-thumb,
+.studio-category-chips::-webkit-scrollbar-thumb,
+.system-settings-scroll::-webkit-scrollbar-thumb {
+  background: rgba(104, 113, 130, 0.34);
+  border-radius: 999px;
+}

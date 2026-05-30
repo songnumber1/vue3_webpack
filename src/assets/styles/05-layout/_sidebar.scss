@@ -698,3 +698,32 @@ body.mobile-mode .mobile-topbar .model-trigger--assistant,
 body.desktop-mode .mobile-topbar .model-trigger--assistant {
   border-radius: 5px !important;
 }
+
+/* Collapsed recent chat popover: the popover shell should not own native scroll;
+   the inner history list owns overlay scroll and the per-chat menu is hidden. */
+.collapsed-recent-popover {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.collapsed-recent-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.collapsed-recent-list .sidebar-history-row {
+  min-width: 0;
+}
+
+.collapsed-recent-list .sidebar-history-title-button {
+  width: 100%;
+  padding-right: 0;
+}
+
+.collapsed-recent-list .sidebar-history-actions {
+  display: none !important;
+}

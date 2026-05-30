@@ -61,6 +61,7 @@
       @expand="navigationStore.setSidebarCollapsed(false)"
       @new-chat="handleNewChat"
       @set-recent-open="navigationStore.setCollapsedRecentOpen"
+      @chat-search="handleChatSearch"
       @select-history="handleSelectHistoryCollapsed"
     />
   </aside>
@@ -120,6 +121,7 @@
         <SidebarHistoryList
           :histories="histories"
           :selected-chat-id="selectedChatId"
+          use-overlay-scrollbar
           @select="handleSelectHistory"
           @open-menu="openHistoryMenu"
         />
