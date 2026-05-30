@@ -3436,3 +3436,212 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--autho
   bottom: 0;
   padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
 }
+
+/* Studio authority picker follow-up: searchable, paged grid with stable desktop/mobile typography. */
+.studio-icon--more { mask-image: url("../img/studio/more.svg"); -webkit-mask-image: url("../img/studio/more.svg"); }
+
+.studio-create-panel__menu {
+  letter-spacing: 0 !important;
+  font-size: 0 !important;
+}
+
+.studio-create-panel__menu .studio-icon--more {
+  width: 22px;
+  height: 22px;
+}
+
+.studio-picker--authority {
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-authority-picker__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.studio-authority-picker__search {
+  flex: 0 0 auto;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.studio-authority-picker__search input {
+  min-height: 40px;
+  padding-left: 12px;
+  padding-right: 42px;
+  font-size: var(--text-size-body-sm, 14px);
+}
+
+.studio-authority-picker__search > .studio-icon--search {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--studio-muted);
+  pointer-events: none;
+}
+
+.studio-authority-picker__grid-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.studio-picker--authority .studio-authority-picker-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  align-content: start;
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head,
+.studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 52px minmax(170px, 0.85fr) minmax(280px, 1.45fr) !important;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head > div,
+.studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 50px;
+  padding: 10px 14px;
+  font-size: var(--text-size-body-sm, 14px);
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head > div {
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2) {
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  white-space: normal;
+}
+
+.studio-picker--authority .studio-picker__empty {
+  grid-column: 1 / -1;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--studio-border);
+  color: var(--studio-muted);
+  font-size: var(--text-size-body-sm, 14px);
+}
+
+.studio-picker--authority .studio-authority-pagination {
+  flex: 0 0 auto;
+  padding: 0 !important;
+}
+
+body.desktop-mode .studio-picker--authority {
+  width: min(780px, calc(100vw - 48px)) !important;
+  max-height: min(680px, calc(100vh - 48px)) !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
+  min-height: 310px;
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__footer--authority {
+  padding: 14px 16px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
+  height: 100% !important;
+  max-height: none !important;
+  background: var(--studio-surface) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority {
+  grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+  min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  padding: env(safe-area-inset-top, 0px) 10px 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority strong {
+  font-size: var(--text-size-title-sm, 16px) !important;
+  font-weight: 900 !important;
+  line-height: 1.3 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__body {
+  padding: 12px 16px 0 !important;
+  gap: 12px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__search input {
+  min-height: 44px;
+  font-size: var(--text-size-body-sm, 14px);
+  font-weight: 600;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__grid-shell {
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 48px minmax(128px, 0.9fr) minmax(180px, 1.25fr) !important;
+  min-width: 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+  font-size: var(--text-size-body-sm, 14px) !important;
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  font-weight: 700;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+  padding: 2px 0 12px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+  position: sticky;
+  bottom: 0;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority .studio-button {
+  min-width: 96px;
+  min-height: 44px;
+  font-size: var(--text-size-body-sm, 14px);
+  font-weight: 800;
+}

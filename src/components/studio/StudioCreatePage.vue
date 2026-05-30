@@ -77,7 +77,7 @@
         :title="t('studio.createPage.actionMenu')"
         @click="actionSheetOpen = true"
       >
-        <span aria-hidden="true">···</span>
+        <span class="studio-icon studio-icon--more" aria-hidden="true"></span>
       </button>
     </header>
 

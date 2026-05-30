@@ -22,52 +22,73 @@
         </button>
       </header>
 
-      <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
-        <div class="studio-authority-picker-grid__head" role="row">
-          <div role="columnheader">
-            <input
-              type="checkbox"
-              :checked="allPagedChecked"
-              :aria-label="t('studio.share.selectAll')"
-              @change="toggleAllPaged($event.target.checked)"
-            />
-          </div>
-          <div role="columnheader">{{ t("studio.share.authorityName") }}</div>
-          <div role="columnheader">{{ t("studio.share.description") }}</div>
+      <div class="studio-authority-picker__body">
+        <div class="studio-authority-picker__search studio-search">
+          <label class="sr-only" for="studio-authority-picker-search">
+            {{ t("studio.share.searchLabel") }}
+          </label>
+          <input
+            id="studio-authority-picker-search"
+            v-model="searchText"
+            type="search"
+            :placeholder="t('studio.share.searchPlaceholder')"
+            autocomplete="off"
+          />
+          <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
         </div>
-        <label
-          v-for="auth in pagedAuthorities"
-          :key="auth.deptId"
-          class="studio-authority-picker-grid__row"
-          role="row"
-        >
-          <div role="cell">
-            <input
-              type="checkbox"
-              :checked="selectedIds.includes(auth.deptId)"
-              :aria-label="auth.deptNameKo"
-              @change="toggleAuthority(auth.deptId, $event.target.checked)"
-            />
-          </div>
-          <div role="cell">{{ auth.deptNameKo }}</div>
-          <div role="cell">{{ auth.description }}</div>
-        </label>
-        <div v-if="!authorities.length" class="studio-picker__empty">{{ t("studio.share.pickerEmpty") }}</div>
-      </div>
 
-      <nav v-if="maxPage > 1" class="studio-authority-pagination" :aria-label="t('studio.share.pickerTitle')">
-        <button type="button" :disabled="page <= 1" @click="goPage(page - 1)">‹</button>
-        <button
-          v-for="item in pageItems"
-          :key="item"
-          type="button"
-          :class="{active: page === item}"
-          @click="goPage(item)"
-        >
-          {{ item }}
-        </button>
-        <button type="button" :disabled="page >= maxPage" @click="goPage(page + 1)">›</button>
-      </nav>
+        <div class="studio-authority-picker__grid-shell">
+          <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
+            <div class="studio-authority-picker-grid__head" role="row">
+              <div role="columnheader">
+                <input
+                  type="checkbox"
+                  :checked="allPagedChecked"
+                  :disabled="!pagedAuthorities.length"
+                  :aria-label="t('studio.share.selectAll')"
+                  @change="toggleAllPaged($event.target.checked)"
+                />
+              </div>
+              <div role="columnheader">{{ t("studio.share.authorityName") }}</div>
+              <div role="columnheader">{{ t("studio.share.description") }}</div>
+            </div>
+            <label
+              v-for="auth in pagedAuthorities"
+              :key="auth.deptId"
+              class="studio-authority-picker-grid__row"
+              role="row"
+            >
+              <div role="cell">
+                <input
+                  type="checkbox"
+                  :checked="selectedIds.includes(auth.deptId)"
+                  :aria-label="auth.deptNameKo"
+                  @change="toggleAuthority(auth.deptId, $event.target.checked)"
+                />
+              </div>
+              <div role="cell">{{ auth.deptNameKo }}</div>
+              <div role="cell">{{ auth.description }}</div>
+            </label>
+            <div v-if="!filteredAuthorities.length" class="studio-picker__empty">
+              {{ t("studio.share.pickerEmpty") }}
+            </div>
+          </div>
+        </div>
+
+        <nav class="studio-authority-pagination" :aria-label="t('studio.share.pickerTitle')">
+          <button type="button" :disabled="page <= 1" @click="goPage(page - 1)">‹</button>
+          <button
+            v-for="item in pageItems"
+            :key="item"
+            type="button"
+            :class="{active: page === item}"
+            @click="goPage(item)"
+          >
+            {{ item }}
+          </button>
+          <button type="button" :disabled="page >= maxPage" @click="goPage(page + 1)">›</button>
+        </nav>
+      </div>
 
       <footer class="studio-picker__footer studio-picker__footer--authority">
         <button class="studio-button" type="button" @click="$emit('close')">
@@ -101,9 +122,20 @@ const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 const page = ref(1);
 const selectedIds = ref([]);
-const pageSize = 6;
-const maxPage = computed(() => Math.max(1, Math.ceil(props.authorities.length / pageSize)));
-const pagedAuthorities = computed(() => props.authorities.slice((page.value - 1) * pageSize, page.value * pageSize));
+const searchText = ref("");
+const pageSize = computed(() => (isMobile.value ? 5 : 4));
+const normalizedSearchText = computed(() => searchText.value.trim().toLowerCase());
+const filteredAuthorities = computed(() => {
+  const keyword = normalizedSearchText.value;
+  if (!keyword) return props.authorities;
+  return props.authorities.filter((auth) => {
+    const name = String(auth.deptNameKo || "").toLowerCase();
+    const description = String(auth.description || "").toLowerCase();
+    return name.includes(keyword) || description.includes(keyword);
+  });
+});
+const maxPage = computed(() => Math.max(1, Math.ceil(filteredAuthorities.value.length / pageSize.value)));
+const pagedAuthorities = computed(() => filteredAuthorities.value.slice((page.value - 1) * pageSize.value, page.value * pageSize.value));
 const pageItems = computed(() => Array.from({length: maxPage.value}, (_, index) => index + 1));
 const selectedAuthorities = computed(() => props.authorities.filter((auth) => selectedIds.value.includes(auth.deptId)));
 const allPagedChecked = computed(() => pagedAuthorities.value.length > 0 && pagedAuthorities.value.every((auth) => selectedIds.value.includes(auth.deptId)));
@@ -111,10 +143,14 @@ watch(() => props.open, (open) => {
   if (open) {
     page.value = 1;
     selectedIds.value = [];
+    searchText.value = "";
   }
 });
-watch(maxPage, (next) => {
-  if (page.value > next) page.value = next;
+watch([filteredAuthorities, pageSize], () => {
+  if (page.value > maxPage.value) page.value = maxPage.value;
+});
+watch(searchText, () => {
+  page.value = 1;
 });
 function goPage(next) {
   page.value = Math.min(maxPage.value, Math.max(1, next));
