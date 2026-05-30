@@ -1,0 +1,164 @@
+/* Tailwind migration bridge for Studio.
+   Heavy Studio layout/form styling now lives in Vue utility classes.
+   This file keeps only behavior-oriented selectors and icon masks that cannot be
+   expressed safely with utilities alone. */
+
+@layer components {
+  .studio-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    background: currentColor;
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+  }
+
+  .studio-icon--search { mask-image: url("../img/studio/search.svg"); -webkit-mask-image: url("../img/studio/search.svg"); }
+  .studio-icon--page-first { mask-image: url("../img/studio/page-first.svg"); -webkit-mask-image: url("../img/studio/page-first.svg"); }
+  .studio-icon--page-prev { mask-image: url("../img/studio/page-prev.svg"); -webkit-mask-image: url("../img/studio/page-prev.svg"); }
+  .studio-icon--page-next { mask-image: url("../img/studio/page-next.svg"); -webkit-mask-image: url("../img/studio/page-next.svg"); }
+  .studio-icon--page-last { mask-image: url("../img/studio/page-last.svg"); -webkit-mask-image: url("../img/studio/page-last.svg"); }
+  .studio-icon--plus { mask-image: url("../img/studio/plus.svg"); -webkit-mask-image: url("../img/studio/plus.svg"); }
+  .studio-icon--chevron-down { mask-image: url("../img/studio/chevron-down.svg"); -webkit-mask-image: url("../img/studio/chevron-down.svg"); }
+  .studio-icon--back { mask-image: url("../img/studio/back.svg"); -webkit-mask-image: url("../img/studio/back.svg"); }
+  .studio-icon--apply { mask-image: url("../img/studio/apply.svg"); -webkit-mask-image: url("../img/studio/apply.svg"); }
+  .studio-icon--save { mask-image: url("../img/studio/save.svg"); -webkit-mask-image: url("../img/studio/save.svg"); }
+  .studio-icon--register { mask-image: url("../img/studio/register.svg"); -webkit-mask-image: url("../img/studio/register.svg"); }
+  .studio-icon--close { mask-image: url("../img/studio/close.svg"); -webkit-mask-image: url("../img/studio/close.svg"); }
+  .studio-icon--more { mask-image: url("../img/studio/more.svg"); -webkit-mask-image: url("../img/studio/more.svg"); }
+  .studio-icon--settings { mask-image: url("../img/studio/settings.svg"); -webkit-mask-image: url("../img/studio/settings.svg"); }
+
+  .studio-scrollbar-stable {
+    scrollbar-gutter: stable;
+  }
+
+  .studio-text-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .studio-text-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .studio-create-fixed-frame {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 38px;
+    left: 0;
+    z-index: var(--z-sticky-control, 100);
+  }
+
+  body.mobile-mode .studio-create-fixed-frame {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+  }
+}
+
+@layer components {
+  /* Compatibility classes for MCP/Search/remaining Studio dialogs while they are migrated. */
+  .studio-workspace { @apply flex h-full min-h-0 w-full flex-col overflow-hidden bg-app-bg text-app-text; }
+  .studio-workspace__scroll { @apply flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[18px] pt-8 text-app-text desktop:px-[clamp(16px,4vw,56px)] mobile:overflow-y-auto mobile:px-4 mobile:pb-[calc(24px+env(safe-area-inset-bottom,0px))] mobile:pt-4; }
+  .studio-hero { @apply mx-auto mb-6 max-w-[820px] shrink-0 text-center mobile:mb-4; }
+  .studio-hero__mark, .studio-card__image, .studio-dialog__image { @apply flex items-center justify-center rounded-ui bg-app-primary font-extrabold text-white; }
+  .studio-hero__mark { @apply mx-auto mb-3 h-14 w-14 text-lg mobile:h-12 mobile:w-12; }
+  .studio-hero h1 { @apply m-0 text-[clamp(24px,4vw,36px)] font-extrabold leading-tight mobile:text-[24px]; }
+  .studio-hero p { @apply mx-auto mt-2 max-w-[680px] text-[15px] leading-7 text-app-subtle mobile:text-sm mobile:leading-6; }
+  .studio-toolbar, .studio-tabs-row, .studio-list-shell { @apply mx-auto w-full max-w-[980px] shrink-0; }
+  .studio-toolbar { @apply mt-0; }
+  .studio-search { @apply relative flex h-12 items-center rounded-ui border border-app-border bg-app-surface px-3 shadow-none focus-within:border-app-primary mobile:h-11; }
+  .studio-search input { @apply min-w-0 flex-1 border-0 bg-transparent pr-10 text-[15px] text-app-text outline-none placeholder:text-app-subtle; }
+  .studio-search-button { @apply absolute right-2 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-ui text-app-subtle hover:bg-app-hover hover:text-app-text; }
+  .studio-tabs-row { @apply mt-4 flex items-center justify-between gap-3 mobile:mt-3; }
+  .studio-tabs { @apply flex min-w-0 flex-wrap items-center gap-2 rounded-ui bg-app-muted p-1 mobile:flex-1 mobile:flex-nowrap; }
+  .studio-tab { @apply rounded-ui px-4 py-2 text-sm font-extrabold text-app-subtle transition hover:text-app-text mobile:flex-1 mobile:px-3; }
+  .studio-tab.active { @apply bg-app-surface text-app-text shadow-sm; }
+  .studio-button { @apply inline-flex h-10 items-center justify-center gap-2 rounded-ui border border-app-border bg-app-surface px-4 text-sm font-extrabold text-app-text hover:bg-app-hover disabled:cursor-not-allowed disabled:opacity-50; }
+  .studio-button--primary { @apply border-app-primary bg-app-primary text-white hover:bg-app-primaryStrong; }
+  .studio-button--danger { @apply border-red-600 bg-red-600 text-white hover:bg-red-700; }
+  .studio-button--primary-ghost { @apply border-app-primary bg-app-primarySoft text-app-primary; }
+  .studio-button--danger-ghost { @apply border-red-200 bg-red-50 text-red-600; }
+  .studio-create-entry { @apply mobile:hidden; }
+  .studio-create-icon-entry { @apply hidden h-10 w-10 items-center justify-center rounded-ui bg-app-primary text-white mobile:inline-flex; }
+  .studio-category-chips { @apply mx-auto mt-3 flex w-full max-w-[980px] shrink-0 flex-wrap gap-2 overflow-visible mobile:hidden; }
+  .studio-category-chips button { @apply rounded-full border border-app-border bg-app-surface px-3 py-2 text-sm font-bold text-app-subtle transition hover:border-app-primary hover:text-app-text; }
+  .studio-category-chips button.active { @apply border-app-primary bg-app-primarySoft text-app-primary; }
+  .studio-mobile-category-select { @apply mx-auto mt-3 hidden h-11 w-full max-w-[980px] shrink-0 items-center justify-between rounded-ui border border-app-border bg-app-surface px-3 text-left text-sm font-extrabold text-app-text mobile:flex; }
+  .studio-list-shell { @apply mt-4 flex min-h-0 flex-1 overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:border-0 mobile:bg-transparent; }
+  .studio-list-area { @apply studio-scrollbar-stable min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-4 mobile:p-0; }
+  .studio-grid { @apply grid grid-cols-2 gap-4 mobile:grid-cols-1 mobile:gap-3; }
+  .studio-card { @apply relative flex min-h-[190px] flex-col gap-3 rounded-ui border border-app-border bg-app-surface p-4 text-left text-app-text transition hover:border-app-primary hover:shadow-soft focus:outline-none focus:ring-2 focus:ring-[var(--primary,#10a37f)] focus:ring-opacity-30 mobile:min-h-[168px]; }
+  .studio-card__image { @apply h-12 w-12 text-base; }
+  .studio-card__body { @apply flex min-w-0 flex-1 flex-col gap-1; }
+  .studio-card__body > strong { @apply text-base font-extrabold; }
+  .studio-card__body > small { @apply text-xs font-bold text-app-subtle; }
+  .studio-card__body > span { @apply text-sm leading-6 text-app-subtle; }
+  .studio-card__more { @apply absolute right-3 top-3 text-app-subtle; }
+  .studio-card__meta { @apply mt-auto text-xs font-bold text-app-subtle; }
+  .studio-pagination { @apply mx-auto mt-4 flex w-full max-w-[980px] shrink-0 items-center justify-center gap-1 mobile:mt-3; }
+  .studio-pagination button, .studio-page-icon-button { @apply flex h-9 min-w-9 items-center justify-center rounded-ui border border-app-border bg-app-surface px-2 text-sm font-extrabold text-app-subtle disabled:cursor-not-allowed disabled:opacity-40; }
+  .studio-pagination button.active { @apply border-app-primary bg-app-primary text-white; }
+  .studio-pagination__ellipsis { @apply border-transparent bg-transparent; }
+
+  .studio-dialog-backdrop, .studio-confirm-backdrop, .studio-picker-backdrop { @apply fixed inset-0 z-overlay flex items-center justify-center bg-black/35 p-6 mobile:p-0; }
+  .studio-dialog { @apply relative flex max-h-[86vh] w-full max-w-[720px] flex-col overflow-hidden rounded-ui border border-app-border bg-app-surface shadow-soft; }
+  .studio-dialog__settings { @apply absolute right-14 top-3 flex h-10 w-10 items-center justify-center rounded-ui text-app-subtle hover:bg-app-hover hover:text-app-text; }
+  .studio-dialog__close, .studio-picker__close { @apply absolute right-3 top-3 flex h-10 w-10 items-center justify-center rounded-ui text-xl text-app-subtle hover:bg-app-hover hover:text-app-text; }
+  .studio-dialog__footer { @apply flex shrink-0 justify-end gap-2 border-t border-app-border p-4; }
+  .studio-detail-content { @apply min-h-0 flex-1 overflow-y-auto p-5; }
+  .studio-dialog__head { @apply flex items-center gap-4; }
+  .studio-dialog__image { @apply h-14 w-14 shrink-0 text-lg; }
+  .studio-dialog__desc { @apply mt-4 text-sm leading-6 text-app-subtle; }
+  .studio-prompt-grid { @apply mt-4 grid grid-cols-2 gap-2 mobile:grid-cols-1; }
+  .studio-dialog__box { @apply rounded-ui border border-app-border bg-app-muted p-3 text-sm font-bold text-app-text; }
+  .studio-detail-context-menu-shell { @apply fixed inset-0 z-overlay; }
+  .studio-detail-context-menu { @apply absolute right-6 top-16 min-w-[160px] overflow-hidden rounded-ui border border-app-border bg-app-surface p-1 shadow-soft; }
+  .studio-detail-context-menu button { @apply flex w-full items-center rounded-ui px-3 py-2 text-left text-sm font-bold text-app-text hover:bg-app-hover; }
+  .studio-detail-context-menu__danger { @apply text-red-600; }
+  .studio-confirm-dialog { @apply w-full max-w-[420px] overflow-hidden rounded-ui border border-app-border bg-app-surface shadow-soft; }
+  .studio-confirm-dialog__head { @apply border-b border-app-border p-4 text-base font-black text-app-text; }
+  .studio-confirm-dialog__footer { @apply flex justify-end gap-2 p-4; }
+
+  .studio-picker { @apply flex max-h-[80vh] w-full max-w-[520px] flex-col overflow-hidden rounded-ui border border-app-border bg-app-surface shadow-soft; }
+  .studio-picker--authority { @apply max-w-[760px]; }
+  .studio-picker__head { @apply relative flex min-h-[54px] shrink-0 items-center justify-between border-b border-app-border px-4; }
+  .studio-picker__back { @apply flex h-10 w-10 items-center justify-center rounded-ui text-app-subtle hover:bg-app-hover; }
+  .studio-picker__body, .studio-authority-picker__body { @apply min-h-0 flex-1 overflow-y-auto p-4; }
+  .studio-picker__option { @apply flex w-full flex-col gap-1 rounded-ui px-3 py-3 text-left text-app-text hover:bg-app-hover; }
+  .studio-picker__option.active { @apply bg-app-primarySoft text-app-primary; }
+  .studio-picker__empty { @apply p-6 text-center text-sm font-bold text-app-subtle; }
+  .studio-picker__footer { @apply flex shrink-0 justify-end gap-2 border-t border-app-border p-4; }
+  .studio-authority-picker__search { @apply relative mb-3 flex h-11 items-center rounded-ui border border-app-border bg-app-surface px-3; }
+  .studio-authority-picker__search input { @apply min-w-0 flex-1 border-0 bg-transparent pr-9 text-sm outline-none; }
+  .studio-authority-picker__search .studio-icon--search { @apply absolute right-3 text-app-subtle; }
+  .studio-authority-picker__grid-shell { @apply overflow-hidden rounded-ui border border-app-border; }
+  .studio-authority-picker-grid { @apply min-w-full; }
+  .studio-authority-picker-grid__head, .studio-authority-picker-grid__row { @apply grid grid-cols-[48px_1fr_1fr] items-center; }
+  .studio-authority-picker-grid__head { @apply border-b border-app-border bg-app-muted text-xs font-black text-app-subtle; }
+  .studio-authority-picker-grid__row { @apply border-b border-app-border text-sm last:border-b-0; }
+  .studio-authority-picker-grid__head > div, .studio-authority-picker-grid__row > div { @apply min-h-[42px] px-3; }
+  .studio-authority-pagination { @apply mt-3 flex items-center justify-center gap-1; }
+  .studio-authority-pagination button { @apply h-8 min-w-8 rounded-ui border border-app-border bg-app-surface px-2 text-sm font-extrabold text-app-subtle disabled:opacity-40; }
+  .studio-authority-pagination button.active { @apply border-app-primary bg-app-primary text-white; }
+
+  .studio-mobile-page { @apply flex h-full min-h-0 w-full flex-col bg-app-bg text-app-text; }
+  .studio-mobile-page__head { @apply flex min-h-[52px] shrink-0 items-center gap-2 border-b border-app-border bg-app-surface px-3; }
+  .studio-mobile-page__back, .studio-mobile-page__settings, .studio-mobile-page__close { @apply flex h-10 w-10 items-center justify-center rounded-ui text-app-text hover:bg-app-hover; }
+  .studio-mobile-page__head strong { @apply min-w-0 flex-1 text-base font-black; }
+  .studio-mobile-page__content { @apply min-h-0 flex-1 overflow-y-auto p-4; }
+  .studio-detail-action-sheet__list { @apply flex flex-col gap-1; }
+  .studio-detail-action-sheet__option { @apply flex min-h-[48px] w-full items-center gap-3 rounded-ui px-3 text-left text-sm font-extrabold text-app-text hover:bg-app-hover; }
+  .studio-detail-action-sheet__option--danger { @apply text-red-600; }
+}

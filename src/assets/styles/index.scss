@@ -44,3 +44,7 @@
 @use "./studio/studio-workspace" as *;
 
 @use "./search/chat-search" as *;
+
+/* Tailwind utility layer: preflight is disabled in tailwind.config.js to avoid WebView/reset regressions. */
+@tailwind components;
+@tailwind utilities;
