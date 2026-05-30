@@ -98,7 +98,8 @@ function selectCategory(value) {
   categorySelectorOpen.value = false;
 }
 function addAuthority(auth) {
-  emit("add-authority", auth);
+  const items = Array.isArray(auth) ? auth : [auth];
+  items.forEach((item) => emit("add-authority", item));
   authorityPickerOpen.value = false;
 }
 </script>

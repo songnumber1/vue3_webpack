@@ -20,7 +20,7 @@
       <strong class="studio-create-panel__title">{{
         t("studio.createPage.title")
       }}</strong>
-      <div class="studio-create-actions">
+      <div v-if="!isMobile" class="studio-create-actions">
         <button
           class="studio-button studio-create-action-button"
           type="button"
@@ -69,6 +69,16 @@
           <span>{{ t("studio.createPage.close") }}</span>
         </button>
       </div>
+      <button
+        v-else
+        class="studio-create-panel__menu studio-create-icon-button"
+        type="button"
+        :aria-label="t('studio.createPage.actionMenu')"
+        :title="t('studio.createPage.actionMenu')"
+        @click="actionSheetOpen = true"
+      >
+        <span aria-hidden="true">···</span>
+      </button>
     </header>
 
     <div class="studio-create-layout">
@@ -142,6 +152,36 @@
         :prompts="previewPrompts"
       />
     </div>
+
+    <BaseBottomSheet
+      v-if="isMobile"
+      :open="actionSheetOpen"
+      :title="t('studio.createPage.actionMenu')"
+      overlay-class="studio-create-action-bottom-sheet"
+      initial-snap="content"
+      :min-height="300"
+      :max-ratio="0.75"
+      @close="actionSheetOpen = false"
+    >
+      <div class="studio-create-action-sheet__list">
+        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="handleMobileApply">
+          <span class="studio-icon studio-icon--apply" aria-hidden="true"></span>
+          <strong>{{ t("studio.createPage.apply") }}</strong>
+        </button>
+        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="actionSheetOpen = false">
+          <span class="studio-icon studio-icon--save" aria-hidden="true"></span>
+          <strong>{{ t("studio.createPage.save") }}</strong>
+        </button>
+        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="actionSheetOpen = false">
+          <span class="studio-icon studio-icon--register" aria-hidden="true"></span>
+          <strong>{{ t("studio.createPage.register") }}</strong>
+        </button>
+        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="handleMobileClose">
+          <span class="studio-icon studio-icon--close" aria-hidden="true"></span>
+          <strong>{{ t("studio.createPage.close") }}</strong>
+        </button>
+      </div>
+    </BaseBottomSheet>
   </section>
 </template>
 
@@ -152,6 +192,7 @@ import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 
 const {t} = useI18n();
@@ -175,6 +216,7 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 
 const createPageRef = ref(null);
 const focusedEditor = ref(null);
+const actionSheetOpen = ref(false);
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];
 
@@ -244,8 +286,6 @@ function ensureFocusedEditorVisible(behavior = "smooth") {
     delta = fieldRect.top - bounds.top;
   }
 
-  // Android Chrome/WebView는 키보드 애니메이션 중 visualViewport 값이 단계적으로 바뀌기 때문에
-  // 하단 입력 필드는 단순 bottom 보정보다 목표 위치 보정이 안정적입니다.
   if (Math.abs(delta) < 4 && fieldRect.top > targetTop + 24) {
     delta = fieldRect.top - targetTop;
   }
@@ -336,5 +376,13 @@ function handleDraftPrompt(index, value) {
 }
 function handleAuthorityToggle(deptId, checked) {
   emit("toggle-authority", deptId, checked);
+}
+function handleMobileApply() {
+  actionSheetOpen.value = false;
+  emit("apply-preview");
+}
+function handleMobileClose() {
+  actionSheetOpen.value = false;
+  emit("close");
 }
 </script>

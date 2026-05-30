@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-multi-select">
+  <div ref="rootRef" class="studio-multi-select">
     <button class="studio-multi-select__trigger" type="button" :aria-label="title" @click="open = true">
       <span v-if="modelValue.length" class="studio-multi-select__chips">
         <span v-for="item in visibleValues" :key="item" class="studio-multi-select__chip">{{ item }}</span>
@@ -56,6 +56,7 @@
 
 <script setup>
 import {computed, ref} from "vue";
+import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
@@ -67,10 +68,17 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 const open = ref(false);
+const rootRef = ref(null);
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 const visibleValues = computed(() => props.modelValue.slice(0, 2));
 const hiddenCount = computed(() => Math.max(0, props.modelValue.length - visibleValues.value.length));
+
+useOutsideClick(rootRef, () => {
+  if (!isMobile.value && open.value) {
+    open.value = false;
+  }
+});
 function toggle(option) {
   const next = props.modelValue.includes(option)
     ? props.modelValue.filter((item) => item !== option)

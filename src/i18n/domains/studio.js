@@ -41,6 +41,7 @@ export const studioMessages = {
         register: "등록",
         close: "닫기",
         back: "뒤로",
+        actionMenu: "작업 메뉴",
         basic: "기본 정보",
         feature: "주요 기능",
         share: "공유범위",
@@ -75,6 +76,7 @@ export const studioMessages = {
         description: "설명",
         empty: "추가된 공개 대상이 없습니다.",
         pickerTitle: "공개 대상 추가",
+        selectAll: "전체 선택",
         pickerEmpty: "추가 가능한 권한이 없습니다.",
       },
       preview: {
@@ -133,6 +135,7 @@ export const studioMessages = {
         register: "Register",
         close: "Close",
         back: "Back",
+        actionMenu: "Actions",
         basic: "Basic info",
         feature: "Core features",
         share: "Sharing scope",
@@ -167,6 +170,7 @@ export const studioMessages = {
         description: "Description",
         empty: "No visibility targets have been added.",
         pickerTitle: "Add visibility target",
+        selectAll: "Select all",
         pickerEmpty: "No authorities are available to add.",
       },
       preview: {

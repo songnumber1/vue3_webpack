@@ -2815,3 +2815,624 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   min-height: 48px;
   padding: 10px 12px;
 }
+
+/* Studio create final alignment pass: normalize feature/share tabs with existing project rhythm. */
+body.desktop-mode .studio-create-page .studio-model-fieldset,
+body.mobile-mode .chat-container-root--mode-studio .studio-model-fieldset,
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-model-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-section__head > strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-field-title {
+  display: block;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  color: var(--studio-text);
+  font-size: var(--text-size-title-sm, 16px);
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+/* PC model items need visible boxes, but not a nested fieldset box. */
+body.desktop-mode .studio-create-page .studio-model-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  align-items: center !important;
+  min-height: 56px !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  padding: 10px 12px !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card:hover {
+  border-color: var(--studio-primary) !important;
+  background: var(--studio-primary-soft) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card.active {
+  border-color: var(--studio-primary) !important;
+  background: color-mix(in srgb, var(--studio-primary-soft) 68%, transparent) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-model-card strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-radio-row span,
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-grid__row,
+body.desktop-mode .studio-create-page .studio-authority-picker-grid__head,
+body.desktop-mode .studio-create-page .studio-authority-picker-grid__row {
+  font-size: var(--text-size-body-sm, 14px);
+  line-height: 1.4;
+}
+
+/* Mobile model section: remove the outer model box and keep item boxes compact. */
+body.mobile-mode .chat-container-root--mode-studio .studio-model-grid {
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-model-card {
+  display: grid !important;
+  grid-template-columns: 28px minmax(0, 1fr) !important;
+  align-items: center !important;
+  min-height: 58px !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  padding: 10px 12px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-model-card.active {
+  border-color: var(--studio-primary) !important;
+  background: var(--studio-primary-soft) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-model-card small {
+  font-size: var(--text-size-caption, 12px);
+  line-height: 1.35;
+}
+
+/* Mobile share scope: no boxed group, and public/private stay on one line. */
+body.mobile-mode .chat-container-root--mode-studio .studio-share-tab {
+  gap: 18px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 18px !important;
+  flex-wrap: wrap;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset legend {
+  flex: 0 0 100%;
+  margin-bottom: 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-radio-row {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 8px !important;
+  border-radius: 5px;
+  background: transparent !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-radio-row.active,
+body.mobile-mode .chat-container-root--mode-studio .studio-radio-row:hover {
+  background: var(--studio-control-hover) !important;
+}
+
+/* Mobile authority actions need breathing room before the grid. */
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-section {
+  display: grid;
+  gap: 12px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-section__head {
+  display: grid !important;
+  gap: 12px !important;
+  margin: 0 0 2px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-actions {
+  display: flex !important;
+  align-items: center;
+  gap: 10px !important;
+  margin-bottom: 0;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-actions .studio-button {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: var(--text-size-body-sm, 14px);
+  font-weight: 800;
+}
+
+/* RAG/MCP BaseBottomSheet: match model sheet spacing, left alignment, and readable type scale. */
+body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet,
+body.mobile-mode .studio-multi-select-bottom-sheet.app-bottom-sheet-panel {
+  border-radius: var(--dialog-sheet-radius, 5px 5px 0 0) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-header {
+  min-height: 56px !important;
+  padding: 0 24px !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-header h2 {
+  font-size: var(--text-size-title-sm, 16px) !important;
+  font-weight: 900 !important;
+  line-height: 1.35 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-close {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  border-radius: 5px !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-body {
+  padding: 0 24px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__list {
+  display: grid !important;
+  gap: 4px !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option {
+  width: 100% !important;
+  min-height: 56px !important;
+  display: grid !important;
+  grid-template-columns: 22px minmax(0, 1fr) !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  column-gap: 12px !important;
+  box-sizing: border-box !important;
+  padding: 10px 12px !important;
+  border-radius: 5px !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option input {
+  grid-column: 1 !important;
+  justify-self: start !important;
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  accent-color: var(--studio-primary) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main {
+  grid-column: 2 !important;
+  min-width: 0 !important;
+  display: block !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main strong {
+  display: block !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: var(--studio-text) !important;
+  font-size: var(--text-size-title-sm, 16px) !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__footer {
+  padding-top: 10px !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__footer .studio-button {
+  min-height: 42px;
+  font-weight: 800;
+}
+
+/* Authority add popup: use the same modal rhythm as Assistant detail and the same grid rhythm as selected authority list. */
+body.desktop-mode .studio-picker-backdrop:has(.studio-picker--authority) {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+body.desktop-mode .studio-picker--authority {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-height: min(620px, calc(100vh - 48px)) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24) !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__head--authority {
+  min-height: 58px;
+  padding: 0 18px !important;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__head--authority strong {
+  font-size: var(--text-size-title-sm, 16px);
+  font-weight: 900;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid {
+  margin: 16px;
+  width: auto;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 44px minmax(130px, 0.9fr) minmax(220px, 1.4fr) 72px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head::before,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row::before {
+  content: "";
+  display: block;
+  min-height: 46px;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 46px;
+  padding: 10px 12px;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  justify-content: center;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-pagination {
+  padding: 0 16px 16px;
+}
+
+/* Mobile authority picker remains a page, with both back and close available. */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__close {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  font-size: 22px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  margin: 14px 12px !important;
+}
+
+/* Keep authority add columns meaningful: name / description / add, while matching selected-grid sizing. */
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: minmax(160px, 0.9fr) minmax(260px, 1.4fr) 78px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head::before,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row::before {
+  content: none !important;
+  display: none !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:last-child,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:last-child {
+  justify-content: center !important;
+}
+
+/* Studio create final polish follow-up: align RAG/MCP sheets with BaseBottomSheet defaults and keep desktop model card borders visible. */
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-header {
+  min-height: auto !important;
+  padding: 0 4px 10px !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-header h2 {
+  font-size: var(--font-size-fixed-17) !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.35 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-close {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: 5px !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-body {
+  padding: 4px 0 0 !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__list {
+  display: grid !important;
+  gap: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option {
+  width: 100% !important;
+  min-height: 58px !important;
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  box-sizing: border-box !important;
+  padding: 12px !important;
+  border-radius: var(--dialog-option-radius, 5px) !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option:hover,
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option:focus-within {
+  background: var(--control-hover) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option input {
+  grid-column: 1 !important;
+  justify-self: center !important;
+  flex: 0 0 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+  margin: 0 !important;
+  accent-color: var(--studio-primary) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main {
+  grid-column: 2 !important;
+  min-width: 0 !important;
+  display: block !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main strong {
+  display: block !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: var(--text, var(--studio-text)) !important;
+  font-size: var(--text-size-body, var(--font-size-base)) !important;
+  font-weight: 800 !important;
+  line-height: var(--line-height-title, 1.35) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__footer {
+  padding: 10px 0 0 !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card:last-child {
+  border: 1px solid var(--studio-border) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card.active:last-child,
+body.desktop-mode .studio-create-page .studio-model-card:hover:last-child {
+  border-color: var(--studio-primary) !important;
+}
+
+/* Studio create requested final pass: keep BaseBottomSheet header rhythm and replace mobile icon actions with a menu sheet. */
+body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet .bottom-sheet-header {
+  min-height: var(--dialog-header-min-height) !important;
+  padding: var(--dialog-header-padding) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet .bottom-sheet-header h2 {
+  font-size: var(--dialog-title-font-size) !important;
+  font-weight: var(--dialog-title-font-weight) !important;
+  line-height: var(--dialog-title-line-height) !important;
+  letter-spacing: normal !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet .bottom-sheet-close {
+  width: 38px !important;
+  height: 38px !important;
+  min-width: 38px !important;
+  border-radius: var(--dialog-close-radius) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet .bottom-sheet-body {
+  padding: var(--dialog-body-padding) !important;
+  padding-top: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__list {
+  gap: 0 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option {
+  min-height: 48px !important;
+  padding: 10px 0 !important;
+  border-radius: var(--dialog-option-radius) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main strong {
+  font-size: var(--dialog-action-font-size) !important;
+  font-weight: var(--dialog-action-font-weight) !important;
+  line-height: 1.35 !important;
+}
+
+.studio-create-panel__menu {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--studio-border);
+  border-radius: 5px;
+  background: var(--studio-surface);
+  color: var(--studio-text);
+  cursor: pointer;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.14em;
+  line-height: 1;
+}
+
+.studio-create-panel__menu:hover,
+.studio-create-panel__menu:focus-visible {
+  background: var(--studio-control-hover);
+}
+
+.studio-create-action-bottom-sheet .studio-create-action-sheet__list {
+  display: grid;
+  gap: 0;
+}
+
+.studio-create-action-bottom-sheet .studio-create-action-sheet__option {
+  width: 100%;
+  min-height: 50px;
+  border: 0;
+  border-radius: var(--dialog-option-radius);
+  background: transparent;
+  color: inherit;
+  padding: 10px 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.studio-create-action-bottom-sheet .studio-create-action-sheet__option:hover,
+.studio-create-action-bottom-sheet .studio-create-action-sheet__option:focus-visible {
+  background: var(--control-hover, var(--studio-control-hover));
+}
+
+.studio-create-action-bottom-sheet .studio-create-action-sheet__option .studio-icon {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  color: var(--studio-primary);
+}
+
+.studio-create-action-bottom-sheet .studio-create-action-sheet__option strong {
+  font-size: var(--dialog-action-font-size);
+  font-weight: var(--dialog-action-font-weight);
+}
+
+/* Authority add popup: selectable grid with footer confirm/close, matching the selected-authority grid. */
+.studio-picker--authority {
+  width: min(760px, calc(100vw - 48px)) !important;
+}
+
+.studio-picker--authority .studio-authority-picker-grid {
+  margin: 16px;
+  width: auto;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head,
+.studio-picker--authority .studio-authority-picker-grid__row {
+  display: grid !important;
+  grid-template-columns: 52px minmax(150px, 0.95fr) minmax(220px, 1.45fr) !important;
+  align-items: stretch !important;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__row {
+  margin: 0;
+  cursor: pointer;
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head > div,
+.studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head > div:first-child,
+.studio-picker--authority .studio-authority-picker-grid__row > div:first-child {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.studio-picker--authority .studio-authority-picker-grid input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--studio-primary);
+}
+
+.studio-picker--authority .studio-authority-picker-grid__head > div:last-child,
+.studio-picker--authority .studio-authority-picker-grid__row > div:last-child {
+  justify-content: flex-start !important;
+}
+
+.studio-picker__footer--authority {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+.studio-picker__footer--authority .studio-button {
+  min-width: 72px;
+}
+
+.studio-picker__footer--authority .studio-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
+  width: 100% !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 14px 12px !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 48px minmax(120px, 0.95fr) minmax(180px, 1.35fr) !important;
+  min-width: 360px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+}
