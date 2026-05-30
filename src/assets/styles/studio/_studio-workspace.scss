@@ -3746,3 +3746,52 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   word-break: keep-all !important;
   overflow-wrap: anywhere !important;
 }
+
+
+/* Authority picker mobile width final guard: keep the grid inside the viewport without horizontal scroll or right-edge clipping. */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__body {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__grid-shell {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  grid-template-columns: 42px minmax(78px, 0.68fr) minmax(0, 1.32fr) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  overflow: hidden !important;
+}
