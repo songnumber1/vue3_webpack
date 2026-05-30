@@ -2,7 +2,7 @@
   <Transition name="desktop-clipboard-note">
     <aside
       v-if="visible"
-      class="desktop-clipboard-note"
+      class="desktop-clipboard-note pointer-events-auto fixed right-6 top-[calc(var(--desktop-header-height,64px)+20px)] z-[calc(var(--z-toast,3000)+1)] flex w-[min(320px,calc(100vw-48px))] flex-col gap-1 rounded-ui border border-app-border bg-app-surface px-3.5 py-3 text-app-text shadow-[0_12px_28px_rgba(15,23,42,.18)] mobile:right-3 mobile:top-[calc(var(--mobile-header-height,56px)+12px)] mobile:w-[min(320px,calc(100vw-24px))] [&>span]:text-[var(--font-size-xs)] [&>span]:leading-[1.35] [&>span]:text-[var(--muted)] [&>strong]:text-[var(--font-size-sm)] [&>strong]:font-extrabold [&>strong]:leading-tight"
       role="status"
       aria-live="polite"
       @mouseenter="pauseTimer"
@@ -123,54 +123,3 @@ onBeforeUnmount(() => {
   window.removeEventListener(APP_TOAST_REQUESTED_EVENT, showNote);
 });
 </script>
-
-<style scoped lang="scss">
-.desktop-clipboard-note {
-  position: fixed;
-  top: calc(var(--desktop-header-height, 64px) + 20px);
-  right: 24px;
-  z-index: calc(var(--z-toast, 3000) + 1);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: min(320px, calc(100vw - 48px));
-  padding: 12px 14px;
-  border: 1px solid var(--control-border);
-  border-radius: 5px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-  pointer-events: auto;
-}
-
-.desktop-clipboard-note strong {
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  line-height: 1.25;
-}
-
-.desktop-clipboard-note span {
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.35;
-}
-
-.desktop-clipboard-note-enter-active,
-.desktop-clipboard-note-leave-active {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.desktop-clipboard-note-enter-from,
-.desktop-clipboard-note-leave-to {
-  opacity: 0;
-  transform: translateY(-6px);
-}
-
-:global(body.mobile-mode) .desktop-clipboard-note {
-  top: calc(var(--mobile-header-height, 56px) + 12px);
-  right: 12px;
-  width: min(320px, calc(100vw - 24px));
-}
-</style>

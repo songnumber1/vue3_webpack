@@ -2,7 +2,7 @@
   <Transition name="mobile-clipboard-toast">
     <aside
       v-if="visible"
-      class="mobile-clipboard-toast"
+      class="mobile-clipboard-toast pointer-events-none fixed bottom-[calc(var(--safe-area-bottom,0px)+24px)] left-1/2 z-[calc(var(--z-toast,3000)+2)] max-w-[min(320px,calc(100vw-32px))] -translate-x-1/2 rounded-full bg-slate-900/90 px-3.5 py-2.5 text-center text-[var(--font-size-sm)] font-bold leading-[1.35] text-white shadow-[0_12px_28px_rgba(15,23,42,.22)]"
       role="status"
       aria-live="polite"
     >
@@ -87,37 +87,3 @@ onBeforeUnmount(() => {
   window.removeEventListener(APP_TOAST_REQUESTED_EVENT, showToast);
 });
 </script>
-
-<style scoped lang="scss">
-.mobile-clipboard-toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--safe-area-bottom, 0px) + 24px);
-  z-index: calc(var(--z-toast, 3000) + 2);
-  max-width: min(320px, calc(100vw - 32px));
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.92);
-  color: #fff;
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  line-height: 1.35;
-  text-align: center;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.mobile-clipboard-toast-enter-active,
-.mobile-clipboard-toast-leave-active {
-  transition:
-    opacity 0.18s ease,
-    transform 0.18s ease;
-}
-
-.mobile-clipboard-toast-enter-from,
-.mobile-clipboard-toast-leave-to {
-  opacity: 0;
-  transform: translate(-50%, 8px);
-}
-</style>

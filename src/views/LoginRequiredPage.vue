@@ -1,23 +1,23 @@
 <template>
-  <main class="auth-required-page" role="main">
-    <section class="auth-required-card" aria-labelledby="auth-required-title">
-      <div class="auth-required-icon" aria-hidden="true">
+  <main class="flex min-h-screen min-h-[100dvh] items-center justify-center bg-app-bg px-5 py-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] text-app-text" role="main">
+    <section class="w-[min(100%,420px)] rounded-3xl border border-app-border bg-app-surface px-6 py-8 text-center shadow-soft" aria-labelledby="auth-required-title">
+      <div class="mx-auto mb-[18px] inline-flex size-14 items-center justify-center rounded-[18px] bg-blue-600/10 text-blue-600 [&>svg]:size-[30px] [&>svg]:fill-current" aria-hidden="true">
         <svg viewBox="0 0 24 24" focusable="false">
           <path
             d="M12 2.75a5.25 5.25 0 0 0-5.25 5.25v2.25H6A2.25 2.25 0 0 0 3.75 12.5v6.25A2.25 2.25 0 0 0 6 21h12a2.25 2.25 0 0 0 2.25-2.25V12.5A2.25 2.25 0 0 0 18 10.25h-.75V8A5.25 5.25 0 0 0 12 2.75Zm3.75 7.5h-7.5V8a3.75 3.75 0 1 1 7.5 0v2.25ZM12 14a1.25 1.25 0 0 1 .75 2.25v1a.75.75 0 0 1-1.5 0v-1A1.25 1.25 0 0 1 12 14Z"
           />
         </svg>
       </div>
-      <h1 id="auth-required-title">{{ t("loginRequired.title") }}</h1>
-      <p>{{ message }}</p>
+      <h1 id="auth-required-title" class="m-0 text-[var(--text-size-page-title)] font-bold leading-[1.3]">{{ t("loginRequired.title") }}</h1>
+      <p class="my-3 mb-6 text-[var(--text-size-body-strong)] leading-relaxed text-app-subtle">{{ message }}</p>
 
-      <p v-if="errorMessage" class="auth-required-error">
+      <p v-if="errorMessage" class="rounded-[10px] bg-red-600/10 px-3 py-2 text-red-700">
         {{ errorMessage }}
       </p>
 
       <button
         type="button"
-        class="auth-required-button"
+        class="mt-0 min-h-[46px] w-full cursor-pointer rounded-[14px] border-0 bg-slate-900 text-[var(--text-size-body-strong)] font-bold text-white active:translate-y-px disabled:cursor-not-allowed disabled:opacity-65"
         :disabled="isBusy"
         @click="tempLogin"
       >
@@ -28,7 +28,7 @@
 
       <button
         type="button"
-        class="auth-required-secondary-button"
+        class="mt-2.5 min-h-[46px] w-full cursor-pointer rounded-[14px] border border-slate-900/15 bg-transparent text-[var(--text-size-body-strong)] font-bold text-slate-900 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-65"
         :disabled="isBusy"
         @click="checkLogin"
       >
@@ -149,89 +149,3 @@ async function tempLogin() {
 
 onMounted(checkLogin);
 </script>
-
-<style scoped lang="scss">
-.auth-required-page {
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: max(24px, env(safe-area-inset-top)) 20px
-    max(24px, env(safe-area-inset-bottom));
-  background: var(--app-bg, #f7f7f8);
-  color: var(--text-primary, #111827);
-}
-.auth-required-card {
-  width: min(100%, 420px);
-  padding: 32px 24px;
-  border: 1px solid rgba(17, 24, 39, 0.08);
-  border-radius: 24px;
-  background: var(--surface-primary, #ffffff);
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
-  text-align: center;
-}
-.auth-required-icon {
-  width: 56px;
-  height: 56px;
-  margin: 0 auto 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px;
-  background: rgba(37, 99, 235, 0.1);
-  color: #2563eb;
-}
-.auth-required-icon svg {
-  width: 30px;
-  height: 30px;
-  fill: currentColor;
-}
-.auth-required-card h1 {
-  margin: 0;
-  font-size: var(--text-size-page-title);
-  line-height: 1.3;
-  font-weight: 700;
-}
-.auth-required-card p {
-  margin: 12px 0 24px;
-  font-size: var(--text-size-body-strong);
-  line-height: 1.6;
-  color: var(--text-secondary, #6b7280);
-}
-.auth-required-error {
-  padding: 10px 12px;
-  border-radius: 10px;
-  background: rgba(220, 38, 38, 0.08);
-  color: #b91c1c !important;
-}
-.auth-required-button,
-.auth-required-secondary-button {
-  width: 100%;
-  min-height: 46px;
-  border-radius: 14px;
-  font-size: var(--text-size-body-strong);
-  font-weight: 700;
-  cursor: pointer;
-}
-.auth-required-button {
-  border: 0;
-  background: #111827;
-  color: #ffffff;
-}
-.auth-required-secondary-button {
-  margin-top: 10px;
-  border: 1px solid rgba(17, 24, 39, 0.14);
-  background: transparent;
-  color: #111827;
-}
-.auth-required-button:disabled,
-.auth-required-secondary-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-.auth-required-button:active,
-.auth-required-secondary-button:active {
-  transform: translateY(1px);
-}
-</style>

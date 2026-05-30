@@ -1,11 +1,11 @@
 <template>
   <header
-    class="mobile-topbar"
+    class="mobile-topbar mobile:h-11 mobile:py-1"
     :class="{'mobile-topbar--desktop-main': isDesktopMain}"
   >
     <div class="topbar-left">
       <button
-        class="app-icon-button app-icon-button--md menu-toggle mobile-header-icon"
+        class="app-icon-button app-icon-button--header menu-toggle mobile-header-icon"
         type="button"
         :aria-label="t('chat.openSidebar')"
         @click="chatActions.openDrawer()"
@@ -15,7 +15,7 @@
 
       <button
         v-if="showMobileAssistant"
-        class="model-trigger model-trigger--assistant"
+        class="model-trigger model-trigger--assistant mobile:h-[34px] mobile:min-w-[100px] mobile:gap-1.5 mobile:px-2.5 mobile:text-[var(--text-size-title-sm)]"
         type="button"
         :aria-label="t('chat.assistantSelect')"
         @click="chatActions.openAssistant()"
@@ -58,9 +58,9 @@
       </div>
     </div>
 
-    <div v-if="isMobile" class="topbar-actions topbar-actions--mobile">
+    <div v-if="isMobile" class="topbar-actions topbar-actions--mobile mobile:ml-auto mobile:inline-flex mobile:items-center">
       <button
-        class="app-icon-button app-icon-button--md mobile-header-future-action mobile-header-icon"
+        class="app-icon-button app-icon-button--header mobile-header-future-action mobile-header-icon mobile:text-[var(--font-size-fixed-22)] mobile:font-black mobile:leading-none"
         type="button"
         :aria-label="t('common.settings')"
         :title="t('common.settings')"
@@ -126,39 +126,3 @@ const showDesktopConversationTitle = computed(
   () => (props.mode === "chat" || props.mode === "shared") && !isMobile.value
 );
 </script>
-
-<style scoped lang="scss">
-/* Compact mobile header sizing is local to ChatHeader. */
-:global(body.mobile-mode) .mobile-topbar {
-  height: 44px;
-  padding-top: 4px;
-  padding-bottom: 4px;
-}
-
-:global(body.mobile-mode) .mobile-topbar .mobile-header-icon {
-  width: 34px;
-  height: 34px;
-}
-
-:global(body.mobile-mode) .mobile-topbar .model-trigger,
-:global(body.mobile-mode) .mobile-topbar .model-trigger--assistant {
-  height: 34px;
-  min-width: 100px;
-  font-size: var(--text-size-title-sm);
-  gap: 6px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-:global(body.mobile-mode) .mobile-topbar .topbar-actions--mobile {
-  display: inline-flex;
-  align-items: center;
-  margin-left: auto;
-}
-
-:global(body.mobile-mode) .mobile-topbar .mobile-header-future-action {
-  font-size: var(--font-size-fixed-22);
-  font-weight: 900;
-  line-height: 1;
-}
-</style>

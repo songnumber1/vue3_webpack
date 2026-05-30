@@ -257,16 +257,3 @@ defineExpose({
   setText,
 });
 </script>
-
-<style scoped lang="scss">
-/* The base prompt border is component-owned; browser/keyboard patches remain global. */
-.prompt-box,
-.prompt-box--gemini {
-  border: 1px solid var(--prompt-border);
-}
-
-:global(body.mobile-mode) .prompt-box,
-:global(body.mobile-mode) .prompt-box--gemini {
-  border: 1px solid var(--prompt-border);
-}
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap">
+  <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap min-w-0">
     <button
       class="prompt-icon-action attach-button"
       :class="{'prompt-icon-action--active': attachMenuOpen}"
@@ -23,7 +23,7 @@
     <div
       v-if="attachMenuOpen && !isMobileSheet"
       ref="attachMenuRef"
-      class="prompt-popover attach-menu prompt-floating-menu"
+      class="prompt-popover attach-menu prompt-floating-menu box-border z-popover !inset-auto"
       :style="attachMenuStyle"
       role="menu"
     >
@@ -105,21 +105,3 @@ watch(
 
 defineExpose({attachRoot});
 </script>
-
-<style scoped lang="scss">
-.prompt-selector-wrap {
-  min-width: 0;
-}
-
-.prompt-popover {
-  box-sizing: border-box;
-}
-
-.prompt-floating-menu {
-  top: auto;
-  right: auto;
-  bottom: auto;
-  left: auto;
-  z-index: var(--z-popover);
-}
-</style>

@@ -1,18 +1,18 @@
 <template>
-  <div class="sidebar-user sidebar-user--mobile">
+  <div class="sidebar-user sidebar-user--mobile min-h-0 min-w-0 box-border">
     <button
-      class="sidebar-user-profile min-w-0"
+      class="sidebar-user-profile min-w-0 box-border"
       type="button"
       :aria-label="t('common.settings')"
       @click="actions.openSettings()"
     >
       <div class="app-avatar app-avatar--sidebar">{{ userInitial }}</div>
-      <div class="sidebar-user-main">
+      <div class="sidebar-user-main min-w-0 box-border">
         <strong>{{ displayName }}</strong
         ><small>{{ t("common.plus") }}</small>
       </div>
     </button>
-    <div class="sidebar-user-actions">
+    <div class="sidebar-user-actions min-w-0 box-border">
       <button
         v-if="systemSettings.showThemeButton"
         class="app-icon-button app-icon-button--sm"
@@ -90,18 +90,3 @@ const userInitial = computed(() => {
   return name ? name.charAt(0) : "U";
 });
 </script>
-
-<style scoped lang="scss">
-/* Scoped layout guard: keep component roots and flex/grid children shrink-safe. */
-.sidebar-user--mobile,
-.sidebar-user-profile,
-.sidebar-user-main,
-.sidebar-user-actions {
-  min-width: 0;
-  box-sizing: border-box;
-}
-
-.sidebar-user--mobile {
-  min-height: 0;
-}
-</style>

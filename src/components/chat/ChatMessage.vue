@@ -53,13 +53,3 @@ const isErrorMessage = computed(
     (props.message?.status === "error" || props.message?.error === true)
 );
 </script>
-
-<style scoped lang="scss">
-.message {
-  min-width: 0;
-}
-
-.bubble {
-  min-width: 0;
-}
-</style>

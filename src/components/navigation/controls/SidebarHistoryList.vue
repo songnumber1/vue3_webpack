@@ -1,7 +1,7 @@
 <template>
   <component
     :is="scrollContainerComponent"
-    :class="containerClass"
+    :class="[containerClass, 'min-w-0']"
     v-bind="scrollContainerAttrs"
   >
     <div
@@ -11,7 +11,7 @@
       :class="{selected: String(item.id) === String(selectedChatId)}"
     >
       <button
-        :class="[itemClass, 'sidebar-history-title-button']"
+        :class="[itemClass, 'sidebar-history-title-button min-w-0']"
         type="button"
         :title="item.title"
         @click="$emit('select', item)"
@@ -97,13 +97,3 @@ const scrollContainerAttrs = computed(() =>
     : {}
 );
 </script>
-
-<style scoped lang="scss">
-.sidebar-history {
-  min-width: 0;
-}
-
-.sidebar-history-item {
-  min-width: 0;
-}
-</style>

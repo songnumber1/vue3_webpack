@@ -12,14 +12,14 @@
       type="button"
       @click="$emit('select', assistant.id)"
     >
-      <span class="assistant-sheet-option-content">
+      <span class="assistant-sheet-option-content flex min-w-0 flex-auto items-center gap-2.5">
         <img
-          class="assistant-sheet-option-image"
+          class="assistant-sheet-option-image block size-5 shrink-0 rounded-[var(--dialog-radius)] object-cover"
           :src="getAssistantImageBySize(assistant, 20)"
           alt=""
           aria-hidden="true"
         />
-        <span class="bottom-sheet-option-main assistant-sheet-option-main">
+        <span class="bottom-sheet-option-main assistant-sheet-option-main min-w-0">
           <strong>{{ assistant.label }}</strong>
           <small>{{ assistant.description }}</small>
         </span>
@@ -61,26 +61,3 @@ defineProps({
 
 defineEmits(["close", "select"]);
 </script>
-
-<style scoped lang="scss">
-.assistant-sheet-option-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-.assistant-sheet-option-image {
-  width: 20px;
-  height: 20px;
-  flex: 0 0 20px;
-  display: block;
-  border-radius: var(--dialog-radius);
-  object-fit: cover;
-}
-
-.assistant-sheet-option-main {
-  min-width: 0;
-}
-</style>

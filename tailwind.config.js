@@ -11,12 +11,12 @@ module.exports = {
     extend: {
       colors: {
         app: {
-          bg: 'var(--chat-bg, var(--bg, #ffffff))',
-          surface: 'var(--surface, var(--control-bg, #ffffff))',
+          bg: 'var(--chat-bg, var(--app-bg, var(--bg, #ffffff)))',
+          surface: 'var(--surface, var(--surface-primary, var(--control-bg, #ffffff)))',
           muted: 'var(--surface-muted, var(--control-hover, #f7f7f8))',
-          border: 'var(--control-border, var(--border, #e5e7eb))',
-          text: 'var(--text, #202123)',
-          subtle: 'var(--text-muted, #6b7280)',
+          border: 'var(--control-border, var(--border, rgba(17,24,39,0.12)))',
+          text: 'var(--text, var(--text-primary, #202123))',
+          subtle: 'var(--text-muted, var(--text-secondary, #6b7280))',
           primary: 'var(--primary, #10a37f)',
           primaryStrong: 'var(--primary-strong, #0e8f71)',
           primarySoft: 'var(--primary-soft, rgba(16, 163, 127, 0.12))',

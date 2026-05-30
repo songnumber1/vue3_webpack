@@ -1,7 +1,7 @@
 <template>
-  <div ref="modelRoot" class="prompt-selector-wrap">
+  <div ref="modelRoot" class="prompt-selector-wrap min-w-0">
     <button
-      class="prompt-model-trigger"
+      class="prompt-model-trigger [&>span]:min-w-0"
       type="button"
       :disabled="disabled || modelReadonly"
       :title="modelReadonly ? readonlyTitle : undefined"
@@ -22,7 +22,7 @@
     </button>
     <div
       v-if="modelMenuOpen && !isMobileSheet"
-      class="prompt-popover model-menu prompt-model-menu"
+      class="prompt-popover model-menu prompt-model-menu box-border"
     >
       <button
         v-for="model in models"
@@ -32,7 +32,7 @@
         type="button"
         @click="$emit('select-model', model.id)"
       >
-        <span class="model-option-main">
+        <span class="model-option-main min-w-0">
           <strong>{{ model.label }}</strong>
           <small>{{ model.description }}</small>
         </span>
@@ -73,18 +73,3 @@ defineEmits(["open-model", "select-model"]);
 
 defineExpose({modelRoot});
 </script>
-
-<style scoped lang="scss">
-.prompt-selector-wrap {
-  min-width: 0;
-}
-
-.prompt-model-trigger span,
-.model-option-main {
-  min-width: 0;
-}
-
-.prompt-popover {
-  box-sizing: border-box;
-}
-</style>

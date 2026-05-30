@@ -1,9 +1,9 @@
 <template>
-  <div class="prompt-action-row">
-    <div class="prompt-left-actions">
-      <div ref="modelRoot" class="prompt-selector-wrap">
+  <div class="prompt-action-row min-w-0">
+    <div class="prompt-left-actions min-w-0">
+      <div ref="modelRoot" class="prompt-selector-wrap min-w-0">
         <button
-          class="prompt-model-trigger"
+          class="prompt-model-trigger [&>span]:min-w-0"
           type="button"
           :disabled="disabled || modelReadonly"
           :title="modelReadonly ? resolvedReadonlyTitle : undefined"
@@ -24,13 +24,12 @@
         </button>
       </div>
 
-      <div ref="toolRoot" class="prompt-selector-wrap">
+      <div ref="toolRoot" class="prompt-selector-wrap min-w-0">
         <button
-          class="prompt-icon-action prompt-tool-mobile-trigger"
+          class="prompt-icon-action prompt-tool-mobile-trigger [&>img]:size-[18px] [&>img]:object-contain"
           :class="{
             'prompt-icon-action--active': toolMenuOpen,
-            'prompt-tool-mobile-trigger--selected':
-              Boolean(selectedTemplateTool),
+            'border-app-border bg-transparent': Boolean(selectedTemplateTool),
           }"
           type="button"
           :disabled="disabled"
@@ -285,26 +284,3 @@ const showVoiceStopButton = computed(
 
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
-
-<style scoped lang="scss">
-.prompt-action-row,
-.prompt-left-actions,
-.prompt-selector-wrap {
-  min-width: 0;
-}
-
-.prompt-model-trigger span {
-  min-width: 0;
-}
-
-.prompt-tool-mobile-trigger img {
-  width: 18px;
-  height: 18px;
-  object-fit: contain;
-}
-
-.prompt-tool-mobile-trigger--selected {
-  background: transparent;
-  border-color: var(--control-border);
-}
-</style>

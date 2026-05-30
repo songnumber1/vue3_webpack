@@ -1,10 +1,10 @@
 <template>
   <div class="message-actions-wrap" :class="`message-actions-wrap--${role}`">
-    <div class="message-actions" :class="`message-actions--${role}`">
+    <div class="message-actions min-w-0" :class="`message-actions--${role}`">
       <template v-if="role === 'assistant'">
         <button
           type="button"
-          class="message-action-icon message-action-icon--svg"
+          class="message-action-icon message-action-icon--svg box-border"
           :class="{active: feedback === FEEDBACK_ACTIONS.LIKE}"
           :aria-label="t('feedback.like')"
           :title="t('feedback.like')"
@@ -23,7 +23,7 @@
         </button>
         <button
           type="button"
-          class="message-action-icon message-action-icon--svg"
+          class="message-action-icon message-action-icon--svg box-border"
           :class="{active: feedback === FEEDBACK_ACTIONS.DISLIKE}"
           :aria-label="t('feedback.dislike')"
           :title="t('feedback.dislike')"
@@ -43,14 +43,14 @@
         <button
           v-if="showRegenerate"
           type="button"
-          class="message-action-text-button"
+          class="message-action-text-button rounded-ui"
           @click="$emit('regenerate')"
         >
           {{ t("markdown.regenerate") }}
         </button>
         <button
           type="button"
-          class="message-action-text-button"
+          class="message-action-text-button rounded-ui"
           @click="openFeedbackDialog"
         >
           {{ t("feedback.send") }}
@@ -59,7 +59,7 @@
 
       <button
         type="button"
-        class="message-action-icon message-action-icon--svg"
+        class="message-action-icon message-action-icon--svg box-border"
         :aria-label="t('feedback.copy')"
         :title="t('feedback.copy')"
         @click="copy"
@@ -251,22 +251,3 @@ async function copy() {
   }
 }
 </script>
-
-<style scoped lang="scss">
-.message-actions {
-  min-width: 0;
-}
-
-.feedback-button,
-.copy-button {
-  box-sizing: border-box;
-}
-
-.message-action-text-button,
-.message-action-text-button:hover,
-.message-action-text-button:focus,
-.message-action-text-button:focus-visible,
-.message-action-text-button:active {
-  border-radius: 5px;
-}
-</style>
