@@ -8,35 +8,18 @@
     :theme-name="themeName"
   />
 
-  <section
+  <MainEmptyState
     v-if="isMainPage"
-    class="empty-stage empty-stage--main"
-    :class="{'empty-stage--mobile-main': isMobile}"
+    :is-mobile="isMobile"
+    :assistant-icon="mainAssistantIcon"
+    :assistant-label="assistantLabel"
+    :suggestions="suggestions"
+    @suggestion-click="handleSuggestionClick"
   >
-    <div class="empty-center">
-      <img
-        class="empty-assistant-logo"
-        :src="mainAssistantIcon"
-        :alt="assistantLabel"
-      />
-      <h1>{{ t("chat.startQuestion") }}</h1>
-      <div class="suggestion-row suggestion-row--between">
-        <button
-          v-for="item in suggestions"
-          :key="item.id || item.text"
-          class="suggestion-chip"
-          type="button"
-          :title="item.title || item.prompt"
-          :disabled="false"
-          @click="handleSuggestionClick(item)"
-        >
-          <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
-          <span class="suggestion-chip-text">{{ item.text }}</span>
-        </button>
-      </div>
+    <template #composer>
       <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
-    </div>
-  </section>
+    </template>
+  </MainEmptyState>
 
   <template v-else>
     <MessageList
@@ -89,6 +72,7 @@ import ChatHeader from "./ChatHeader.vue";
 import ChatReadonlyInput from "./ChatReadonlyInput.vue";
 import MessageList from "./MessageList.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
+import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,

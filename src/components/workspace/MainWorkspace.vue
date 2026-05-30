@@ -8,45 +8,29 @@
     :theme-name="themeName"
   />
 
-  <section
-    class="empty-stage empty-stage--main"
-    :class="{'empty-stage--mobile-main': isMobile}"
+  <MainEmptyState
+    :is-mobile="isMobile"
+    :assistant-icon="mainAssistantIcon"
+    :assistant-label="assistantLabel"
+    :suggestions="suggestions"
+    @suggestion-click="handleSuggestionClick"
   >
-    <div class="empty-center">
-      <img
-        class="empty-assistant-logo"
-        :src="mainAssistantIcon"
-        :alt="assistantLabel"
-      />
-      <h1>{{ t("chat.startQuestion") }}</h1>
-      <div class="suggestion-row suggestion-row--between">
-        <button
-          v-for="item in suggestions"
-          :key="item.id || item.text"
-          class="suggestion-chip"
-          type="button"
-          :title="item.title || item.prompt"
-          :disabled="false"
-          @click="handleSuggestionClick(item)"
-        >
-          <span v-if="item.icon" aria-hidden="true">{{ item.icon }}</span>
-          <span class="suggestion-chip-text">{{ item.text }}</span>
-        </button>
-      </div>
+    <template #composer>
       <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
-    </div>
-  </section>
+    </template>
+  </MainEmptyState>
 </template>
 
 <script setup>
 /**
  * @file components/workspace/MainWorkspace.vue
- * @description 기존 ChatWorkspace의 메인 화면 렌더링만 분리한 라우트 전용 workspace입니다.
+ * @description 실제 메인 라우트 전용 workspace입니다. 메인 빈 화면 UI는 MainEmptyState를 공유하고,
+ * 실제 PromptComposer만 slot으로 주입하여 Studio 미리보기와 UI를 함께 관리합니다.
  */
 import {computed, inject, ref} from "vue";
-import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
+import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,
@@ -56,7 +40,6 @@ import {
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 
-const {t} = useI18n();
 const mainPromptInputRef = ref(null);
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,

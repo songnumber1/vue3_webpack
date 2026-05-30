@@ -92,6 +92,7 @@ export const studioMessages = {
         fallbackName: "Assistant 이름",
         fallbackDescription: "설명을 입력하고 적용을 누르면 미리보기에 표시됩니다.",
         note: "미리보기는 실제 Assistant와 다를 수 있습니다.",
+        composerPlaceholder: "메시지를 입력하세요",
       },
       defaults: {
         all: "전체",
@@ -194,6 +195,7 @@ export const studioMessages = {
         fallbackName: "Assistant name",
         fallbackDescription: "Enter a description and click Apply to update the preview.",
         note: "The preview may differ from the actual Assistant.",
+        composerPlaceholder: "Message Assistant",
       },
       defaults: {
         all: "All",
