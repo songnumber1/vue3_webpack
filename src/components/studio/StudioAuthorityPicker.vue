@@ -123,7 +123,7 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 const page = ref(1);
 const selectedIds = ref([]);
 const searchText = ref("");
-const pageSize = computed(() => (isMobile.value ? 5 : 4));
+const pageSize = computed(() => (isMobile.value ? 8 : 8));
 const normalizedSearchText = computed(() => searchText.value.trim().toLowerCase());
 const filteredAuthorities = computed(() => {
   const keyword = normalizedSearchText.value;
