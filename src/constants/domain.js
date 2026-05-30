@@ -10,6 +10,7 @@
 export const ASSISTANT_TYPES = Object.freeze({
   ASSISTANT: "assistant",
   STUDIO: "studio",
+  MCP: "mcp",
 });
 
 export const MESSAGE_ROLES = Object.freeze({

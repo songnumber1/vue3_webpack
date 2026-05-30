@@ -148,3 +148,37 @@ body.mobile-mode .studio-picker__head {
   font-weight: 900;
   letter-spacing: 1px;
 }
+
+.mcp-created-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--studio-border, #e5e7eb);
+  border-radius: 8px;
+  background: var(--studio-panel, #fff);
+  color: var(--studio-text, #111827);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  cursor: pointer;
+  user-select: none;
+}
+
+.mcp-created-filter input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--studio-primary, #2563eb);
+}
+
+body.mobile-mode .mcp-created-filter {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+}

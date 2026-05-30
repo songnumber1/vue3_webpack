@@ -192,6 +192,7 @@ const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const router = useRouter();
 const route = useRoute();
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
+const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
@@ -229,19 +230,22 @@ function openAssistantSelector() {
  */
 function selectAssistant(id) {
   const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
+  const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
 
-  if (isStudioPortal) {
+  if (isStudioPortal || isConnectorPortal) {
     assistantStore.selectAssistant(id);
     assistantMenuOpen.value = false;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "studio"}).catch(() => {});
+    router
+      .push({name: isConnectorPortal ? "connector-store" : "studio"})
+      .catch(() => {});
     return;
   }
 
   chatActions.selectAssistant(id);
   assistantMenuOpen.value = false;
 
-  if (route.name === "studio") {
+  if (["studio", "connector-store"].includes(route.name)) {
     router.push({name: "main"}).catch(() => {});
   }
 }

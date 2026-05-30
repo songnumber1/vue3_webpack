@@ -159,9 +159,10 @@ const systemSettingsStore = useSystemSettingsStore();
 const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
+const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
-  if (route.name === "studio") return "studio";
+  if (["studio", "connector-store"].includes(route.name)) return "studio";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
   return "main";
 });
@@ -173,17 +174,25 @@ const controllerProps = {
 
 function syncAssistantSelectionWithRoute() {
   const studioAssistant = assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
+  const connectorAssistant = assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
   if (route.name === "studio") {
     if (studioAssistant && assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID) {
       assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
     }
     return;
   }
+  if (route.name === "connector-store") {
+    if (connectorAssistant && assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID) {
+      assistantStore.selectAssistant(CONNECTOR_STORE_PORTAL_ID);
+    }
+    return;
+  }
 
-  if (assistantStore.selectedAssistantId === ASSISTANT_STUDIO_PORTAL_ID) {
+  if ([ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(assistantStore.selectedAssistantId)) {
     const fallbackAssistant = assistantStore.assistants.find(
-      (assistant) => assistant.id !== ASSISTANT_STUDIO_PORTAL_ID
+      (assistant) => ![ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(assistant.id)
         && assistant.type !== "studio"
+        && assistant.type !== "mcp"
         && !assistant.isStudio
     );
     if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);

@@ -18,6 +18,7 @@ import {
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
 
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
+const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 
 function createAssistantStudioPortal() {
   return {
@@ -39,11 +40,35 @@ function createAssistantStudioPortal() {
   };
 }
 
+function createConnectorStorePortal() {
+  return {
+    id: CONNECTOR_STORE_PORTAL_ID,
+    sourceId: CONNECTOR_STORE_PORTAL_ID,
+    type: "mcp",
+    label: "Connector Store",
+    name: "Connector Store",
+    description: "MCP Connector를 탐색하고 구독할 수 있습니다.",
+    order: 10000,
+    isStudio: true,
+    isAuthorized: true,
+    isDeleted: false,
+    isFixed: false,
+    isPrivate: false,
+    hasRag: false,
+    ...DEFAULT_ASSISTANT_IMAGE,
+    raw: {assistId: CONNECTOR_STORE_PORTAL_ID, studioYN: true, mcpYN: true},
+  };
+}
+
 function appendAssistantStudioPortal(assistants = []) {
-  if (assistants.some((item) => item.id === ASSISTANT_STUDIO_PORTAL_ID)) {
-    return assistants;
+  const nextAssistants = [...assistants];
+  if (!nextAssistants.some((item) => item.id === ASSISTANT_STUDIO_PORTAL_ID)) {
+    nextAssistants.push(createAssistantStudioPortal());
   }
-  return [...assistants, createAssistantStudioPortal()];
+  if (!nextAssistants.some((item) => item.id === CONNECTOR_STORE_PORTAL_ID)) {
+    nextAssistants.push(createConnectorStorePortal());
+  }
+  return nextAssistants;
 }
 
 /**

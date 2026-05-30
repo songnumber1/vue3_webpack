@@ -31,6 +31,8 @@ const SharedPage = () =>
 const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
 const StudioPage = () =>
   import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
+const ConnectorStorePage = () =>
+  import(/* webpackChunkName: "connector-store" */ "@/views/mcp/ConnectorStorePage.vue");
 const NotFoundPage = () =>
   import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
@@ -77,6 +79,12 @@ const baseRoutes = [
         name: "studio",
         component: StudioPage,
         meta: {title: "Assistant Studio"},
+      },
+      {
+        path: "connector-store",
+        name: "connector-store",
+        component: ConnectorStorePage,
+        meta: {title: "Connector Store"},
       },
       {
         path: "swagger",

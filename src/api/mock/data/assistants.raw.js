@@ -94,4 +94,18 @@ export const ASSISTANTS_RAW = [
     assistId: "assistant-studio",
     ...DEFAULT_ASSISTANT_IMAGE,
   },
+  {
+    delYN: false,
+    authYN: true,
+    isRagIndexesApi: false,
+    fixYN: false,
+    privateYN: false,
+    sharedStudioYN: false,
+    assistName: "Connector Store",
+    studioYN: true,
+    assistOrder: 10000,
+    ragYN: false,
+    assistId: "connector-store",
+    ...DEFAULT_ASSISTANT_IMAGE,
+  },
 ];

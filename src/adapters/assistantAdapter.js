@@ -62,6 +62,7 @@ function resolveAssistantImage(raw, key, fallback) {
 export function adaptAssistant(raw = {}) {
   // 문자열 형태의 백엔드 불리언 대용 부호("Y"/"N", 1/0 등)를 자바스크립트 가상 머신에 최적화된 논리 원시값(`true`/`false`)으로 전격 안전 파싱
   const isStudio = toBoolean(raw[ASSISTANT_KEYS.STUDIO_YN]);
+  const isMcp = toBoolean(raw.mcpYN || raw.MCP_YN || raw.mcp_yn);
   const id = raw[ASSISTANT_KEYS.ID];
   const name = raw[ASSISTANT_KEYS.NAME] || "Assistant"; // 데이터 유실 사태 대비 폴백 타이틀 지정
 
@@ -70,16 +71,22 @@ export function adaptAssistant(raw = {}) {
     sourceId: id, // 원본 소스추적성 보존을 위한 미러링 바인딩
 
     // 1. 도메인 유형 정형화: 스튜디오 모드 여부에 맞게 미리 정의된 도메인 상수(Enums) 바인딩 수립
-    type: isStudio ? ASSISTANT_TYPES.STUDIO : ASSISTANT_TYPES.ASSISTANT,
+    type: isMcp
+      ? ASSISTANT_TYPES.MCP
+      : isStudio
+        ? ASSISTANT_TYPES.STUDIO
+        : ASSISTANT_TYPES.ASSISTANT,
     label: name,
     name,
 
     // 2. [설명란 문구 조건부 분기 정의] 백엔드가 주지 않는 뷰 레이어 전용 친절 가이드 메시지를 조건식에 매칭하여 동적 주입
-    description: isStudio
-      ? "사용자 정의 Studio Assistant"
-      : toBoolean(raw[ASSISTANT_KEYS.RAG_YN])
-        ? "RAG 기반 질의응답 Assistant"
-        : "일반 질의응답 Assistant",
+    description: isMcp
+      ? "MCP Connector를 탐색하고 구독할 수 있습니다."
+      : isStudio
+        ? "사용자 정의 Studio Assistant"
+        : toBoolean(raw[ASSISTANT_KEYS.RAG_YN])
+          ? "RAG 기반 질의응답 Assistant"
+          : "일반 질의응답 Assistant",
 
     // 3. 우선순위 정렬 인덱스 정수 파싱: 수치화할 수 없는 데이터가 올 경우 정렬 순위 최하위권(999)으로 안전 밀어내기 처리
     order: Number(raw[ASSISTANT_KEYS.ORDER] ?? 999),
