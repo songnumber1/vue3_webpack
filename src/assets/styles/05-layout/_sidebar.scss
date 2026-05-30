@@ -60,19 +60,22 @@ body.mobile-mode .model-trigger--assistant .assistant-brand-logo--mobile {
 }
 
 .chat-container-root--sidebar-collapsed {
-  grid-template-columns: 48px minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-collapsed-width, 48px) minmax(0, 1fr);
 }
 
 .desktop-sidebar--collapsed {
   position: relative;
   display: block;
+  width: var(--layout-sidebar-collapsed-width, 48px);
+  min-width: var(--layout-sidebar-collapsed-width, 48px);
+  max-width: var(--layout-sidebar-collapsed-width, 48px);
   overflow: visible;
   z-index: var(--z-sidebar-collapsed);
 }
 
 .collapsed-sidebar {
   position: relative;
-  width: 48px;
+  width: var(--layout-sidebar-collapsed-width, 48px);
   height: 100%;
   display: flex;
   flex-direction: column;

@@ -1,5 +1,5 @@
 <template>
-  <section class="flex h-full min-h-0 w-full flex-col overflow-hidden bg-app-bg text-app-text" aria-label="Assistant Studio">
+  <section class="studio-workspace" aria-label="Assistant Studio">
     <StudioCreateWorkspace
       v-if="createOpen"
       :create-tab="createTab"

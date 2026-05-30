@@ -68,6 +68,37 @@
 }
 
 @layer components {
+
+  /* Studio / Connector Store theme stabilization.
+     Keep visual tokens centralized so remaining Vue utility classes and legacy-compatible
+     MCP classes render with the same colors, borders and hover states. */
+  .studio-workspace,
+  .chat-container-root--mode-studio .studio-workspace,
+  .chat-container-root--mode-studio [class*="bg-app-bg"] {
+    background: var(--chat-bg, var(--bg, #ffffff));
+    color: var(--text, #202123);
+  }
+
+  .chat-container-root--mode-studio [class*="border-app-border"],
+  .studio-workspace [class*="border-app-border"] {
+    border-color: var(--control-border, var(--border, #e5e7eb));
+  }
+
+  .chat-container-root--mode-studio [class*="bg-app-surface"],
+  .studio-workspace [class*="bg-app-surface"] {
+    background-color: var(--surface, #ffffff);
+  }
+
+  .chat-container-root--mode-studio [class*="text-app-text"],
+  .studio-workspace [class*="text-app-text"] {
+    color: var(--text, #202123);
+  }
+
+  .chat-container-root--mode-studio [class*="text-app-subtle"],
+  .studio-workspace [class*="text-app-subtle"] {
+    color: var(--text-muted, #6b7280);
+  }
+
   /* Compatibility classes for MCP/Search/remaining Studio dialogs while they are migrated. */
   .studio-workspace { @apply flex h-full min-h-0 w-full flex-col overflow-hidden bg-app-bg text-app-text; }
   .studio-workspace__scroll { @apply flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[18px] pt-8 text-app-text desktop:px-[clamp(16px,4vw,56px)] mobile:overflow-y-auto mobile:px-4 mobile:pb-[calc(24px+env(safe-area-inset-bottom,0px))] mobile:pt-4; }
@@ -152,6 +183,15 @@
   .studio-authority-pagination { @apply mt-3 flex items-center justify-center gap-1; }
   .studio-authority-pagination button { @apply h-8 min-w-8 rounded-ui border border-app-border bg-app-surface px-2 text-sm font-extrabold text-app-subtle disabled:opacity-40; }
   .studio-authority-pagination button.active { @apply border-app-primary bg-app-primary text-white; }
+
+
+  .mcp-created-filter { @apply mx-auto mt-3 flex w-full max-w-[980px] shrink-0 items-center gap-2 rounded-ui border border-app-border bg-app-surface px-3 py-2 text-sm font-extrabold text-app-text; }
+  .mcp-created-filter input { @apply h-4 w-4 shrink-0 accent-[var(--primary,#10a37f)]; }
+  .mcp-created-filter span { @apply min-w-0 text-app-text; }
+
+  .studio-confirm-dialog p { @apply m-0 p-4 text-sm leading-6 text-app-subtle; }
+  .studio-confirm-dialog__head { @apply flex items-center justify-between gap-3; }
+  .studio-confirm-dialog__head button { @apply flex h-9 w-9 items-center justify-center rounded-ui text-xl text-app-subtle hover:bg-app-hover hover:text-app-text; }
 
   .studio-mobile-page { @apply flex h-full min-h-0 w-full flex-col bg-app-bg text-app-text; }
   .studio-mobile-page__head { @apply flex min-h-[52px] shrink-0 items-center gap-2 border-b border-app-border bg-app-surface px-3; }

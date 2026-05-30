@@ -73,14 +73,14 @@
 
     <footer class="system-settings-footer">
       <button
-        class="playground-button playground-button--secondary"
+        class="playground-button playground-button--secondary system-settings-action-button"
         type="button"
         @click="$emit('close')"
       >
         {{ t("systemSettings.close") }}
       </button>
       <button
-        class="playground-button playground-button--primary system-settings-apply-button"
+        class="playground-button playground-button--primary system-settings-action-button system-settings-action-button--primary system-settings-apply-button"
         type="submit"
       >
         {{ t("systemSettings.apply") }}

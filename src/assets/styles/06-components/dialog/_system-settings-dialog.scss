@@ -327,8 +327,9 @@ body.mobile-mode
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
 }
 
-body.desktop-mode .system-settings-footer .playground-button,
-body.mobile-mode .system-settings-footer .playground-button {
+/* System settings footer actions are shared by desktop/mobile.
+   Keep the mode-specific block only for the mobile size delta below. */
+.system-settings-footer .system-settings-action-button {
   min-width: 86px;
   min-height: 44px;
   border-radius: var(--dialog-action-square-radius, 5px);
@@ -339,37 +340,20 @@ body.mobile-mode .system-settings-footer .playground-button {
   letter-spacing: -0.01em;
 }
 
-body.desktop-mode .system-settings-footer .playground-button--primary,
-body.desktop-mode .system-settings-footer .system-settings-apply-button,
-body.mobile-mode .system-settings-footer .playground-button--primary,
-body.mobile-mode .system-settings-footer .system-settings-apply-button {
+.system-settings-footer .system-settings-action-button--primary {
   border-color: var(--primary);
   background: var(--primary);
   color: #fff;
 }
 
-body.desktop-mode .system-settings-footer .playground-button--primary:hover,
-body.desktop-mode
-  .system-settings-footer
-  .playground-button--primary:focus-visible,
-body.desktop-mode .system-settings-footer .system-settings-apply-button:hover,
-body.desktop-mode
-  .system-settings-footer
-  .system-settings-apply-button:focus-visible,
-body.mobile-mode .system-settings-footer .playground-button--primary:hover,
-body.mobile-mode
-  .system-settings-footer
-  .playground-button--primary:focus-visible,
-body.mobile-mode .system-settings-footer .system-settings-apply-button:hover,
-body.mobile-mode
-  .system-settings-footer
-  .system-settings-apply-button:focus-visible {
+.system-settings-footer .system-settings-action-button--primary:hover,
+.system-settings-footer .system-settings-action-button--primary:focus-visible {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #fff;
 }
 
-body.mobile-mode .system-settings-footer .playground-button {
+body.mobile-mode .system-settings-footer .system-settings-action-button {
   min-width: 96px;
   min-height: 48px;
   font-size: var(--text-size-body, 15px);

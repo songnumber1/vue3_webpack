@@ -22,7 +22,7 @@ body.desktop-mode .application-body {
 }
 
 body.desktop-mode .chat-container-root--sidebar-collapsed .application-body {
-  grid-template-columns: 68px minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-collapsed-width, 48px) minmax(0, 1fr);
 }
 
 body.desktop-mode .application-header,
