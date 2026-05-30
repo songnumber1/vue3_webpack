@@ -1,0 +1,105 @@
+/* OverlayScrollbars 공통 테마. Native scrollbar 폭으로 레이아웃이 흔들리지 않도록 얇고 auto-hide 되는 overlay 느낌으로 통일합니다. */
+.os-theme-chat-app {
+  --os-size: 8px;
+  --os-padding-perpendicular: 2px;
+  --os-padding-axis: 2px;
+  --os-track-bg: transparent;
+  --os-track-bg-hover: transparent;
+  --os-track-bg-active: transparent;
+  --os-handle-bg: rgba(104, 113, 130, 0.34);
+  --os-handle-bg-hover: rgba(104, 113, 130, 0.56);
+  --os-handle-bg-active: rgba(104, 113, 130, 0.72);
+  --os-handle-border-radius: 999px;
+}
+
+body.dark-mode .os-theme-chat-app,
+.theme-dark .os-theme-chat-app {
+  --os-handle-bg: rgba(210, 216, 228, 0.28);
+  --os-handle-bg-hover: rgba(210, 216, 228, 0.48);
+  --os-handle-bg-active: rgba(210, 216, 228, 0.64);
+}
+
+[data-overlay-scrollbar-enhanced="true"] {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
+}
+
+/* OverlayScrollbars가 붙지 않은 모바일/브라우저 fallback도 폭을 최소화합니다. */
+.message-list,
+.chat-search-list-area,
+.studio-workspace__scroll,
+.studio-list-area,
+.studio-dialog__body,
+.studio-create-body,
+.studio-mobile-page__content,
+.bottom-sheet-body,
+.app-dialog-body,
+.feedback-dialog__body,
+.system-settings-dialog__body,
+.md-table-wrapper,
+.md-code-pre,
+.md-mermaid,
+.markdown-body pre,
+.markdown-body .katex-display {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
+}
+
+.message-list::-webkit-scrollbar,
+.chat-search-list-area::-webkit-scrollbar,
+.studio-workspace__scroll::-webkit-scrollbar,
+.studio-list-area::-webkit-scrollbar,
+.studio-dialog__body::-webkit-scrollbar,
+.studio-create-body::-webkit-scrollbar,
+.studio-mobile-page__content::-webkit-scrollbar,
+.bottom-sheet-body::-webkit-scrollbar,
+.app-dialog-body::-webkit-scrollbar,
+.feedback-dialog__body::-webkit-scrollbar,
+.system-settings-dialog__body::-webkit-scrollbar,
+.md-table-wrapper::-webkit-scrollbar,
+.md-code-pre::-webkit-scrollbar,
+.md-mermaid::-webkit-scrollbar,
+.markdown-body pre::-webkit-scrollbar,
+.markdown-body .katex-display::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.message-list::-webkit-scrollbar-track,
+.chat-search-list-area::-webkit-scrollbar-track,
+.studio-workspace__scroll::-webkit-scrollbar-track,
+.studio-list-area::-webkit-scrollbar-track,
+.studio-dialog__body::-webkit-scrollbar-track,
+.studio-create-body::-webkit-scrollbar-track,
+.studio-mobile-page__content::-webkit-scrollbar-track,
+.bottom-sheet-body::-webkit-scrollbar-track,
+.app-dialog-body::-webkit-scrollbar-track,
+.feedback-dialog__body::-webkit-scrollbar-track,
+.system-settings-dialog__body::-webkit-scrollbar-track,
+.md-table-wrapper::-webkit-scrollbar-track,
+.md-code-pre::-webkit-scrollbar-track,
+.md-mermaid::-webkit-scrollbar-track,
+.markdown-body pre::-webkit-scrollbar-track,
+.markdown-body .katex-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.message-list::-webkit-scrollbar-thumb,
+.chat-search-list-area::-webkit-scrollbar-thumb,
+.studio-workspace__scroll::-webkit-scrollbar-thumb,
+.studio-list-area::-webkit-scrollbar-thumb,
+.studio-dialog__body::-webkit-scrollbar-thumb,
+.studio-create-body::-webkit-scrollbar-thumb,
+.studio-mobile-page__content::-webkit-scrollbar-thumb,
+.bottom-sheet-body::-webkit-scrollbar-thumb,
+.app-dialog-body::-webkit-scrollbar-thumb,
+.feedback-dialog__body::-webkit-scrollbar-thumb,
+.system-settings-dialog__body::-webkit-scrollbar-thumb,
+.md-table-wrapper::-webkit-scrollbar-thumb,
+.md-code-pre::-webkit-scrollbar-thumb,
+.md-mermaid::-webkit-scrollbar-thumb,
+.markdown-body pre::-webkit-scrollbar-thumb,
+.markdown-body .katex-display::-webkit-scrollbar-thumb {
+  background: rgba(104, 113, 130, 0.34);
+  border-radius: 999px;
+}

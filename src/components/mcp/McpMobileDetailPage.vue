@@ -22,16 +22,20 @@
         ×
       </button>
     </header>
-    <div class="studio-mobile-page__content">
+    <div ref="contentRef" class="studio-mobile-page__content">
       <McpDetailContent :mcp="mcp" />
     </div>
   </article>
 </template>
 
 <script setup>
+import {ref} from "vue";
 import {useI18n} from "vue-i18n";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import McpDetailContent from "@/components/mcp/McpDetailContent.vue";
 const {t} = useI18n();
+const contentRef = ref(null);
+useOverlayScrollbar(contentRef, {overflow: {x: "hidden", y: "scroll"}});
 defineProps({mcp: {type: Object, required: true}});
 defineEmits(["close"]);
 </script>

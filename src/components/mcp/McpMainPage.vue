@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-workspace__scroll">
+  <div ref="pageScrollRef" class="studio-workspace__scroll">
     <div class="studio-hero">
       <div class="studio-hero__mark">CS</div>
       <h1>{{ t("mcp.title") }}</h1>
@@ -99,7 +99,7 @@
     </label>
 
     <div class="studio-list-shell">
-      <div class="studio-list-area">
+      <div ref="listAreaRef" class="studio-list-area">
         <div class="studio-grid">
           <ResourceCard
             v-for="mcp in mcps"
@@ -149,9 +149,16 @@
 </template>
 
 <script setup>
+import {ref} from "vue";
 import {useI18n} from "vue-i18n";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
+const pageScrollRef = ref(null);
+const listAreaRef = ref(null);
+
+useOverlayScrollbar(pageScrollRef, {overflow: {x: "hidden", y: "scroll"}});
+useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}});
 
 defineProps({
   searchText: {type: String, default: ""},

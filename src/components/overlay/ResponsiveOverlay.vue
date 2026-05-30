@@ -42,7 +42,7 @@
               ×
             </button>
           </header>
-          <div class="responsive-panel-body app-dialog-body">
+          <div ref="bodyRef" class="responsive-panel-body app-dialog-body">
             <slot />
           </div>
         </section>
@@ -61,12 +61,14 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, toRef, watch} from "vue";
+import {computed, ref, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 
 const {t} = useI18n();
+const bodyRef = ref(null);
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -111,6 +113,12 @@ const panelRenderKey = computed(() => overlayMode.value);
 
 const showMobileBackButton = computed(() => isMobileFullscreen.value);
 const showCloseButton = computed(() => !isMobileFullscreen.value);
+
+useOverlayScrollbar(
+  bodyRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [props.open, overlayMode.value]}
+);
 
 useOverlayRegistration({
   open: toRef(props, "open"),

@@ -82,7 +82,7 @@
     </header>
 
     <div class="studio-create-layout">
-      <form class="studio-create-form" @submit.prevent>
+      <form ref="createFormRef" class="studio-create-form" @submit.prevent>
         <div
           class="studio-create-tabs"
           role="tablist"
@@ -192,6 +192,7 @@ import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
 import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 
@@ -215,8 +216,11 @@ const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 
 const createPageRef = ref(null);
+const createFormRef = ref(null);
 const focusedEditor = ref(null);
 const actionSheetOpen = ref(false);
+useOverlayScrollbar(createFormRef, {overflow: {x: "hidden", y: "scroll"}});
+
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];
 

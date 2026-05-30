@@ -42,6 +42,7 @@
     class="studio-dialog-backdrop"
   >
     <article
+      ref="detailDialogRef"
       class="studio-dialog"
       role="dialog"
       aria-modal="true"
@@ -128,6 +129,7 @@ import StudioMobileDetailPage from "@/components/studio/StudioMobileDetailPage.v
 import StudioDetailContent from "@/components/studio/StudioDetailContent.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
@@ -167,12 +169,14 @@ const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );
 const selectedStudio = ref(null);
+const detailDialogRef = ref(null);
 const mobileDetailStudio = ref(null);
 const categorySelectorOpen = ref(false);
 const detailActionMenuOpen = ref(false);
 const detailSettingsButtonRef = ref(null);
 const detailActionMenuRef = ref(null);
 const deleteTarget = ref(null);
+useOverlayScrollbar(detailDialogRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [Boolean(selectedStudio.value)]});
 
 const {floatingStyles, update: updateDetailMenu, x, y} = useFloating(
   detailSettingsButtonRef,

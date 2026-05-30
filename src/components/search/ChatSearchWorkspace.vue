@@ -39,7 +39,7 @@
             <span>{{ summaryText }}</span>
           </div>
 
-          <div class="chat-search-list-area">
+          <div ref="listAreaRef" class="chat-search-list-area">
             <div v-if="loading" class="chat-search-state">
               <span class="chat-search-loading-dot" aria-hidden="true"></span>
               <p>{{ t('chatSearch.loading') }}</p>
@@ -99,9 +99,11 @@
  */
 import {computed, inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
+import {useChatStore} from "@/stores/chatStore";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {resolveChatApis} from "@/api/runtime/chatApis";
 import {chatHistoryApiMock} from "@/api/mock/chatHistoryApi.mock";
 import {
@@ -111,6 +113,7 @@ import {
 
 const {t, locale} = useI18n();
 const router = useRouter();
+const chatStore = useChatStore();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 const injectedWorkspaceState = inject(
@@ -127,6 +130,7 @@ const allResults = ref([]);
 const loading = ref(false);
 const currentPage = ref(1);
 const debounceTimer = ref(null);
+const listAreaRef = ref(null);
 
 const pageSize = computed(() => (isMobile.value ? 10 : 12));
 const totalPages = computed(() => Math.max(1, Math.ceil(allResults.value.length / pageSize.value)));
@@ -137,6 +141,12 @@ const pagedResults = computed(() => {
 });
 const visiblePages = computed(() => createVisiblePages(currentPage.value, totalPages.value));
 const listTitle = computed(() => (isSearchMode.value ? t("chatSearch.resultsTitle") : t("chatSearch.recentTitle")));
+useOverlayScrollbar(
+  listAreaRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [pagedResults.value.length, loading.value, currentPage.value]}
+);
+
 const summaryText = computed(() => {
   if (loading.value) return t("chatSearch.searching");
   if (isSearchMode.value) {
@@ -231,9 +241,35 @@ function createVisiblePages(current, total) {
 }
 
 function openChat(result) {
-  const chatId = result.chatId || result.id;
+  const chatId = String(result?.chatId || result?.id || "").trim();
   if (!chatId) return;
+
+  ensureSearchResultHistory(result, chatId);
   router.push({name: "chat", params: {id: chatId}}).catch(() => {});
+}
+
+function ensureSearchResultHistory(result = {}, chatId = "") {
+  if (!chatId || chatStore.getHistory(chatId)) return;
+
+  chatStore.addHistory({
+    id: chatId,
+    title: result.title || result.chatTitle || t("chatSearch.untitled"),
+    preview: result.snippet || result.preview || result.title || result.chatTitle || "",
+    modelId: result.modelId || result.modeId || "",
+    assistantId: result.assistId || result.assistantId || "",
+    assistantType: result.assistantType || "",
+    assistantLabel: result.assistantLabel || "",
+    modelLabel: result.modelLabel || "",
+    isPinned: Boolean(result.isPinned || result.bookmarkYN),
+    endedAt: result.chatEndDt || result.endedAt || result.updatedAt || new Date().toISOString(),
+    userId: result.userId || "",
+    raw: {
+      ...result,
+      chatId,
+      chatTitle: result.chatTitle || result.title || t("chatSearch.untitled"),
+      chatEndDt: result.chatEndDt || result.endedAt || result.updatedAt || "",
+    },
+  });
 }
 
 function formatListDate(value) {

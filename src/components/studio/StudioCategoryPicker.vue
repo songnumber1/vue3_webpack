@@ -31,7 +31,7 @@
         <strong>{{ t('studio.categorySelect') }}</strong>
         <button type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
       </header>
-      <div class="studio-picker__body">
+      <div ref="pickerBodyRef" class="studio-picker__body">
         <button
           v-for="category in categories"
           :key="category.value"
@@ -49,13 +49,15 @@
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 
 const {t} = useI18n();
+const pickerBodyRef = ref(null);
 defineProps({
   open: {type: Boolean, default: false},
   categories: {type: Array, default: () => []},
@@ -64,4 +66,9 @@ defineProps({
 defineEmits(["close", "select"]);
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
+useOverlayScrollbar(
+  pickerBodyRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [isMobile.value]}
+);
 </script>

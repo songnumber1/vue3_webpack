@@ -64,6 +64,7 @@
 import {computed, nextTick, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {enhanceMarkdownScrollbars} from "@/utils/overlayScrollbar";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import {logWarn} from "@/utils/logger";
@@ -135,6 +136,7 @@ async function renderContent() {
     if (isMessageComplete.value) {
       await renderMermaidInElement(contentRef.value);
     }
+    enhanceMarkdownScrollbars(contentRef.value);
   } catch (error) {
     if (currentVersion !== renderVersion) return;
     logWarn("[AssistantMessage] content render failed:", error);
@@ -159,6 +161,7 @@ async function renderReasoningContent() {
     reasoningHtml.value = rendered;
     await nextTick();
     await renderMermaidInElement(reasoningRef.value);
+    enhanceMarkdownScrollbars(reasoningRef.value);
   } catch (error) {
     if (currentVersion !== reasoningRenderVersion) return;
     logWarn("[AssistantMessage] reasoning render failed:", error);

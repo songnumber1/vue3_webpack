@@ -39,6 +39,7 @@
 
   <div v-if="selectedMcp && !isMobile" class="studio-dialog-backdrop">
     <article
+      ref="detailDialogRef"
       class="studio-dialog"
       role="dialog"
       aria-modal="true"
@@ -79,6 +80,7 @@ import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
 import McpDetailContent from "@/components/mcp/McpDetailContent.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
@@ -117,8 +119,10 @@ const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );
 const selectedMcp = ref(null);
+const detailDialogRef = ref(null);
 const mobileDetailMcp = ref(null);
 const categorySelectorOpen = ref(false);
+useOverlayScrollbar(detailDialogRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [Boolean(selectedMcp.value)]});
 
 watch(isMobile, (mobile) => {
   if (mobile && selectedMcp.value) {

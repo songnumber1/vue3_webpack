@@ -73,7 +73,9 @@ const props = defineProps({
 defineEmits(["select", "open-menu"]);
 
 const overlayScrollbarOptions = {
+  overflow: {x: "hidden", y: "scroll"},
   scrollbars: {
+    theme: "os-theme-chat-app",
     autoHide: "leave",
     autoHideDelay: 450,
   },

@@ -1,5 +1,11 @@
 import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useMessageFocusSpacer} from "./useMessageFocusSpacer";
+import {
+  destroyOverlayScrollbar,
+  getOverlayScrollbarViewport,
+  initOverlayScrollbar,
+  updateOverlayScrollbar,
+} from "@/utils/overlayScrollbar";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
@@ -97,6 +103,8 @@ export function useMessageListScroll({props, emit}) {
   const scrollRef = ref(null);
   const bottomRef = ref(null);
   const userIsAtBottom = ref(true);
+  let overlayScrollViewport = null;
+  let overlayScrollSource = null;
   let stableScrollTimerIds = [];
   let afterRenderScrollTimerId = 0;
   let pendingAfterRenderAssistantIds = null;
@@ -110,7 +118,38 @@ export function useMessageListScroll({props, emit}) {
   let pendingHydrationAssistantParts = null;
 
   function getScrollElement() {
-    return scrollRef.value;
+    return overlayScrollViewport || scrollRef.value;
+  }
+
+  function setupOverlayScrollbar() {
+    const element = scrollRef.value;
+    if (!element || overlayScrollSource === element) return;
+
+    cleanupOverlayScrollbar();
+    overlayScrollSource = element;
+    initOverlayScrollbar(element, {
+      overflow: {x: "hidden", y: "scroll"},
+    });
+    overlayScrollViewport = getOverlayScrollbarViewport(element);
+    if (overlayScrollViewport && overlayScrollViewport !== element) {
+      overlayScrollViewport.addEventListener("scroll", handleScroll, {
+        passive: true,
+      });
+    }
+  }
+
+  function updateOverlayScrollbarFrame() {
+    if (!overlayScrollSource) return;
+    updateOverlayScrollbar(overlayScrollSource);
+  }
+
+  function cleanupOverlayScrollbar() {
+    if (overlayScrollViewport && overlayScrollViewport !== overlayScrollSource) {
+      overlayScrollViewport.removeEventListener("scroll", handleScroll);
+    }
+    if (overlayScrollSource) destroyOverlayScrollbar(overlayScrollSource);
+    overlayScrollViewport = null;
+    overlayScrollSource = null;
   }
 
   function getLatestUserMessageElement() {
@@ -456,6 +495,7 @@ export function useMessageListScroll({props, emit}) {
     emit("content-rendered");
 
     await nextTick();
+    updateOverlayScrollbarFrame();
     recalculateFocusSpacerHeight();
 
     if (pendingHydrationAssistantIds) {
@@ -499,6 +539,7 @@ export function useMessageListScroll({props, emit}) {
   watch(
     () => [props.loading, props.autoScrollOnAnswer, props.messages.length],
     () => {
+      updateOverlayScrollbarFrame();
       refreshFocusSpacerAfterRender();
     }
   );
@@ -517,6 +558,7 @@ export function useMessageListScroll({props, emit}) {
 
   onMounted(() => {
     if (typeof window === "undefined") return;
+    setupOverlayScrollbar();
     recalculateFocusSpacerHeight();
     if (props.initialHydrating) startInitialHydration();
     window.addEventListener("resize", recalculateFocusSpacerHeight, {
@@ -537,6 +579,7 @@ export function useMessageListScroll({props, emit}) {
     clearStableTimers();
     clearAfterRenderScrollState();
     clearHydrationState();
+    cleanupOverlayScrollbar();
     if (typeof window === "undefined") return;
     window.removeEventListener("resize", recalculateFocusSpacerHeight);
     window.visualViewport?.removeEventListener(

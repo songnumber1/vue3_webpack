@@ -37,7 +37,7 @@
           <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
         </div>
 
-        <div class="studio-authority-picker__grid-shell">
+        <div ref="gridShellRef" class="studio-authority-picker__grid-shell">
           <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
             <div class="studio-authority-picker-grid__head" role="row">
               <div role="columnheader">
@@ -111,6 +111,7 @@
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 const {t} = useI18n();
 
 const props = defineProps({
@@ -123,6 +124,7 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 const page = ref(1);
 const selectedIds = ref([]);
 const searchText = ref("");
+const gridShellRef = ref(null);
 const pageSize = computed(() => (isMobile.value ? 8 : 8));
 const normalizedSearchText = computed(() => searchText.value.trim().toLowerCase());
 const filteredAuthorities = computed(() => {
@@ -139,6 +141,11 @@ const pagedAuthorities = computed(() => filteredAuthorities.value.slice((page.va
 const pageItems = computed(() => Array.from({length: maxPage.value}, (_, index) => index + 1));
 const selectedAuthorities = computed(() => props.authorities.filter((auth) => selectedIds.value.includes(auth.deptId)));
 const allPagedChecked = computed(() => pagedAuthorities.value.length > 0 && pagedAuthorities.value.every((auth) => selectedIds.value.includes(auth.deptId)));
+useOverlayScrollbar(
+  gridShellRef,
+  {overflow: {x: "scroll", y: "scroll"}},
+  {watchSource: () => [props.open, pagedAuthorities.value.length, page.value]}
+);
 watch(() => props.open, (open) => {
   if (open) {
     page.value = 1;

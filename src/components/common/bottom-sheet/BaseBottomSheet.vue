@@ -82,6 +82,7 @@ import {toRef} from "vue";
 import {useI18n} from "vue-i18n";
 import {useBottomSheetSizing} from "@/composables/bottom-sheet/useBottomSheetSizing";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 
 const {t} = useI18n();
 
@@ -117,4 +118,11 @@ const {
   expand,
   collapse,
 } = useBottomSheetSizing(props, emit);
+
+useOverlayScrollbar(
+  bodyRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [props.open, currentSnap.value]}
+);
+
 </script>
