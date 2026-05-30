@@ -33,7 +33,12 @@
         <button class="quick-item active" type="button" @click="handleNewChat">
           <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
-        <button class="quick-item" type="button">
+        <button
+          class="quick-item"
+          :class="{active: route.name === 'chat-search'}"
+          type="button"
+          @click="handleChatSearch"
+        >
           <Icon name="search" />{{ t("chat.chatSearch") }}
         </button>
       </nav>
@@ -101,7 +106,12 @@
           >
             <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
-          <button class="quick-item" type="button">
+          <button
+            class="quick-item"
+            :class="{active: route.name === 'chat-search'}"
+            type="button"
+            @click="handleChatSearch"
+          >
             <Icon name="search" />{{ t("chat.chatSearch") }}
           </button>
         </nav>
@@ -257,6 +267,12 @@ function handleNewChat() {
   chatActions.newChat();
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
+}
+
+function handleChatSearch() {
+  navigationStore.setDrawerOpen(false);
+  navigationStore.setCollapsedRecentOpen(false);
+  router.push({name: "chat-search"}).catch(() => {});
 }
 
 /**

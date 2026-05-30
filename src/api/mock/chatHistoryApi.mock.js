@@ -10,6 +10,7 @@
 import {CHAT_KEYS} from "@/constants/apiKeys";
 import {CHAT_HISTORY_LIST_RAW} from "@/api/mock/data/chatHistoryList.raw";
 import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
+import {CHAT_SEARCH_SUGGESTIONS_RAW} from "@/api/mock/data/chatSearchSuggestions.raw";
 import {MODELS_RAW} from "@/api/mock/data/models.raw";
 import {createId} from "@/utils/id";
 import {resolveMock} from "./mockUtils";
@@ -24,6 +25,58 @@ function createChatTitle(input) {
   const value = String(input || "").trim();
   if (!value) return "새 대화";
   return value.length > 20 ? value.slice(0, 20) : value;
+}
+
+function normalizeSearchText(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function buildMessageSearchText(chatId) {
+  const messages = messageStore[chatId] || [];
+  return messages
+    .map((message) => String(message.content || message.answer || ""))
+    .join(" ");
+}
+
+function createSearchSnippet(text, keyword, fallback = "") {
+  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  if (!source) return "";
+  const lower = source.toLowerCase();
+  const index = keyword ? lower.indexOf(keyword) : -1;
+  if (index < 0) return source.length > 120 ? `${source.slice(0, 120)}...` : source;
+  const start = Math.max(0, index - 38);
+  const end = Math.min(source.length, index + keyword.length + 72);
+  return `${start > 0 ? "..." : ""}${source.slice(start, end)}${end < source.length ? "..." : ""}`;
+}
+
+function searchChatHistories(payload = {}) {
+  const keyword = normalizeSearchText(payload.keyword || payload.searchText || payload.query);
+  const limit = Math.max(1, Number(payload.limit || 30));
+  const source = historyStore.map((history) => {
+    const chatId = String(history[CHAT_KEYS.ID] || "");
+    const title = String(history[CHAT_KEYS.TITLE] || "");
+    const messageText = buildMessageSearchText(chatId);
+    const combined = `${title} ${messageText}`.toLowerCase();
+    const matched = !keyword || combined.includes(keyword);
+    return {history, chatId, title, messageText, matched};
+  });
+
+  return source
+    .filter((item) => item.matched)
+    .slice(0, limit)
+    .map((item) => ({
+      chatId: item.chatId,
+      id: item.chatId,
+      chatTitle: item.title,
+      title: item.title,
+      snippet: createSearchSnippet(item.messageText, keyword, item.title),
+      preview: createSearchSnippet(item.messageText, keyword, item.title),
+      chatEndDt: item.history[CHAT_KEYS.ENDED_AT] || "",
+      modelId: item.history[CHAT_KEYS.MODEL_ID] || item.history[CHAT_KEYS.LEGACY_MODEL_ID] || "",
+      assistId: item.history.assistId || item.history.assistantId || "",
+      bookmarkYN: item.history[CHAT_KEYS.BOOKMARK_YN],
+      matchCount: keyword ? Math.max(1, item.messageText.toLowerCase().split(keyword).length - 1) : 0,
+    }));
 }
 
 const SAMPLE_REASONING_CONTENTS = [
@@ -116,6 +169,13 @@ export const chatHistoryApiMock = {
       attachMockReasoning(messageStore[chatId] || [], chatId),
       180
     );
+  },
+  searchChats(payload = {}) {
+    return resolveMock({
+      keyword: payload.keyword || payload.searchText || payload.query || "",
+      suggestions: CHAT_SEARCH_SUGGESTIONS_RAW,
+      list: searchChatHistories(payload),
+    }, 180);
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

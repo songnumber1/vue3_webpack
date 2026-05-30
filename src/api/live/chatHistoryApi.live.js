@@ -77,10 +77,21 @@ async function deleteChat(payload = {}) {
   return unwrapResponseData(response, {});
 }
 
+/**
+ * 현재 저장된 채팅방 제목/메시지 본문을 검색합니다.
+ */
+async function searchChats(payload = {}) {
+  const response = await httpClient.post(API_ENDPOINTS.CHAT_SEARCH, payload, {
+    apiKey: API_KEYS.CHAT_HISTORY_SYNC,
+  });
+  return unwrapResponseData(response, []);
+}
+
 export const chatHistoryApiLive = {
   getChatHistoryList,
   createChat,
   getChatHistoryDetail,
+  searchChats,
   updateBookmark,
   renameChat,
   deleteChat,

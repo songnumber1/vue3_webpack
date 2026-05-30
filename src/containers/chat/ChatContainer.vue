@@ -163,6 +163,7 @@ const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
   if (["studio", "connector-store"].includes(route.name)) return "studio";
+  if (route.name === "chat-search") return "chat-search";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
   return "main";
 });

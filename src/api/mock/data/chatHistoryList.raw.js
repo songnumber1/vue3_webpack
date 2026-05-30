@@ -8,6 +8,43 @@
  */
 
 export const CHAT_HISTORY_LIST_RAW = [
+
+  {
+    chatTitle: "공동상속주택 1가구 2주택 양도세",
+    chatId: "chat-search-sample-inheritance-tax",
+    modeId: "model-ds-thinking",
+    bookmarkYN: false,
+    dayGroup: 0,
+    chatEndDt: "2026-05-29T11:00:00Z",
+    userId: "user-1234",
+  },
+  {
+    chatTitle: "Sass와 CSS의 차이점과 장점",
+    chatId: "chat-search-sample-sass-css",
+    modeId: "model-ds-fast",
+    bookmarkYN: false,
+    dayGroup: 0,
+    chatEndDt: "2026-05-28T10:00:00Z",
+    userId: "user-1234",
+  },
+  {
+    chatTitle: "JavaScript 코드 JSDoc 및 주석 추가",
+    chatId: "chat-search-sample-jsdoc",
+    modeId: "model-ds-fast",
+    bookmarkYN: false,
+    dayGroup: 0,
+    chatEndDt: "2026-05-26T10:00:00Z",
+    userId: "user-1234",
+  },
+  {
+    chatTitle: "개인 PC IP 노출 보안 위험",
+    chatId: "chat-search-sample-ip-security",
+    modeId: "model-ds-thinking",
+    bookmarkYN: false,
+    dayGroup: 1,
+    chatEndDt: "2026-05-21T10:00:00Z",
+    userId: "user-1234",
+  },
   {
     chatTitle: "오류 응답",
     chatId: "chat-error-response",
