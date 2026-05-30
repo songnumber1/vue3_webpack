@@ -22,18 +22,26 @@
         </label>
       </div>
     </fieldset>
-    <StudioMultiSelect
-      :model-value="selectedRags"
-      :title="t('studio.feature.rag')"
-      :options="ragOptions"
-      @update:model-value="$emit('update-rags', $event)"
-    />
-    <StudioMultiSelect
-      :model-value="selectedMcps"
-      :title="t('studio.feature.mcp')"
-      :options="mcpOptions"
-      @update:model-value="$emit('update-mcps', $event)"
-    />
+
+    <section class="studio-multi-select-field" :aria-label="t('studio.feature.rag')">
+      <strong class="studio-field-title">{{ t("studio.feature.rag") }}</strong>
+      <StudioMultiSelect
+        :model-value="selectedRags"
+        :title="t('studio.feature.rag')"
+        :options="ragOptions"
+        @update:model-value="$emit('update-rags', $event)"
+      />
+    </section>
+
+    <section class="studio-multi-select-field" :aria-label="t('studio.feature.mcp')">
+      <strong class="studio-field-title">{{ t("studio.feature.mcp") }}</strong>
+      <StudioMultiSelect
+        :model-value="selectedMcps"
+        :title="t('studio.feature.mcp')"
+        :options="mcpOptions"
+        @update:model-value="$emit('update-mcps', $event)"
+      />
+    </section>
   </div>
 </template>
 

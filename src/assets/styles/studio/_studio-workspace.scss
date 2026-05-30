@@ -2465,3 +2465,168 @@ body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__o
   justify-self: start;
   accent-color: var(--studio-primary);
 }
+
+/* Studio create refinement: RAG/MCP select owns only the item selector; titles live in the form section. */
+.studio-multi-select-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.studio-field-title {
+  display: block;
+  color: var(--studio-text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.studio-multi-select__trigger {
+  justify-content: flex-start;
+}
+
+.studio-multi-select__placeholder {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--studio-muted);
+  font-weight: 700;
+  text-align: left;
+}
+
+.studio-multi-select__trigger > .studio-icon--chevron-down {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--studio-muted);
+}
+
+.studio-multi-select__chips {
+  justify-content: flex-start;
+  margin-left: 0 !important;
+}
+
+/* Authority grids: align checkbox/add controls with text so rows look like one grid system. */
+.studio-authority-grid__head,
+.studio-authority-grid__row,
+.studio-authority-picker-grid__head,
+.studio-authority-picker-grid__row {
+  align-items: stretch;
+}
+
+.studio-authority-grid__head > div,
+.studio-authority-grid__row > div,
+.studio-authority-picker-grid__head > div,
+.studio-authority-picker-grid__row > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.studio-authority-grid__head > div:first-child,
+.studio-authority-grid__row > div:first-child {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.studio-authority-grid__head input,
+.studio-authority-grid__row input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--studio-primary);
+}
+
+.studio-authority-grid__head > div:not(:first-child),
+.studio-authority-grid__row > div:not(:first-child) {
+  justify-content: flex-start;
+}
+
+/* Authority add uses the same visual rhythm as the selected-authority grid. */
+.studio-authority-picker-grid__head,
+.studio-authority-picker-grid__row {
+  grid-template-columns: minmax(120px, 0.9fr) minmax(180px, 1.4fr) 72px;
+}
+
+.studio-authority-picker-grid__head > div:last-child,
+.studio-authority-picker-grid__row > div:last-child {
+  justify-content: center;
+}
+
+.studio-authority-picker-grid__add {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.studio-picker__head--authority {
+  min-height: 52px;
+  box-sizing: border-box;
+}
+
+.studio-picker__back {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  font-size: 0;
+}
+
+.studio-picker__back .studio-icon {
+  width: 22px;
+  height: 22px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority {
+  min-height: calc(52px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 12px 0;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority strong {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-size-title-sm, 16px);
+  font-weight: 900;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  flex: 0 0 auto;
+  margin: 12px;
+  overflow-x: auto;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: minmax(110px, 0.9fr) minmax(160px, 1.2fr) 64px;
+  min-width: 360px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+  flex: 0 0 auto;
+  padding: 4px 12px calc(18px + env(safe-area-inset-bottom, 0px));
+}

@@ -1,9 +1,18 @@
 <template>
   <div v-if="open" class="studio-picker-backdrop" @click.self="noop">
     <section class="studio-picker studio-picker--authority" role="dialog" aria-modal="true" :aria-label="t('studio.share.pickerTitle')">
-      <header class="studio-picker__head">
+      <header class="studio-picker__head studio-picker__head--authority">
+        <button
+          v-if="isMobile"
+          class="studio-picker__back"
+          type="button"
+          :aria-label="t('common.back')"
+          @click="$emit('close')"
+        >
+          <span class="studio-icon studio-icon--back" aria-hidden="true"></span>
+        </button>
         <strong>{{ t("studio.share.pickerTitle") }}</strong>
-        <button type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
+        <button v-if="!isMobile" type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
       </header>
       <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
         <div class="studio-authority-picker-grid__head" role="row">
@@ -20,7 +29,7 @@
           <div role="cell">{{ auth.deptNameKo }}</div>
           <div role="cell">{{ auth.description }}</div>
           <div role="cell">
-            <button class="studio-button studio-button--primary-ghost" type="button" @click="$emit('add', auth)">
+            <button class="studio-button studio-button--primary-ghost studio-authority-picker-grid__add" type="button" @click="$emit('add', auth)">
               +
             </button>
           </div>
@@ -47,6 +56,7 @@
 <script setup>
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 const {t} = useI18n();
 
 const props = defineProps({
@@ -54,6 +64,8 @@ const props = defineProps({
   authorities: {type: Array, default: () => []},
 });
 defineEmits(["close", "add"]);
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => responsiveContext.value.isMobile);
 const page = ref(1);
 const pageSize = 6;
 const maxPage = computed(() => Math.max(1, Math.ceil(props.authorities.length / pageSize)));

@@ -1,12 +1,11 @@
 <template>
   <div class="studio-multi-select">
-    <button class="studio-multi-select__trigger" type="button" @click="open = true">
-      <span class="studio-multi-select__title">{{ title }}</span>
+    <button class="studio-multi-select__trigger" type="button" :aria-label="title" @click="open = true">
       <span v-if="modelValue.length" class="studio-multi-select__chips">
         <span v-for="item in visibleValues" :key="item" class="studio-multi-select__chip">{{ item }}</span>
         <span v-if="hiddenCount > 0" class="studio-multi-select__chip">+{{ hiddenCount }}</span>
       </span>
-      <strong v-else>{{ t("studio.selectedCount", {count: 0}) }}</strong>
+      <strong v-else class="studio-multi-select__placeholder">{{ t("studio.selectedCount", {count: 0}) }}</strong>
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
@@ -44,10 +43,6 @@
     </BaseBottomSheet>
 
     <div v-else-if="open" class="studio-multi-select__panel" role="dialog" :aria-label="title">
-      <div class="studio-multi-select__head">
-        <strong>{{ title }}</strong>
-        <button type="button" :aria-label="t('common.close')" @click="open = false">×</button>
-      </div>
       <div class="studio-multi-select__list">
         <label v-for="option in options" :key="option" class="studio-multi-select__option">
           <input type="checkbox" :checked="modelValue.includes(option)" @change="toggle(option)" />
