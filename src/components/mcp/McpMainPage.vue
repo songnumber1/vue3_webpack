@@ -66,7 +66,7 @@
       </button>
     </div>
 
-    <div v-if="activeTab === 'all'" ref="categoryChipsRef" class="studio-category-chips" :aria-label="t('mcp.categoryLabel')">
+    <div v-if="activeTab === 'all'" class="studio-category-chips" :aria-label="t('mcp.categoryLabel')">
       <button
         v-for="category in categories"
         :key="category.value"
@@ -154,7 +154,6 @@ import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
-const categoryChipsRef = ref(null);
 const listAreaRef = ref(null);
 
 const props = defineProps({
@@ -170,7 +169,6 @@ const props = defineProps({
   maxPage: {type: Number, default: 1},
 });
 
-useOverlayScrollbar(categoryChipsRef, {overflow: {x: "scroll", y: "hidden"}}, {watchSource: () => [props.activeTab, props.categories.length]});
 useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [props.activeTab, props.activeCategory, props.currentPage, props.mcps.length]});
 
 defineEmits([

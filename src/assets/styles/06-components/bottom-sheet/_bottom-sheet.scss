@@ -1244,3 +1244,29 @@ html.is-prompt-menu-open .scroll-bottom-button {
   border-radius: 0;
   border: 0;
 }
+
+/* Regression guard: Prompt tool sheets must keep the same readable row layout after scrollbar refactoring. */
+body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main strong,
+body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main small {
+  width: 100% !important;
+  text-align: left !important;
+  white-space: normal;
+}
+
+body.mobile-mode .bottom-sheet-body .bottom-sheet-option--choice {
+  justify-content: flex-start;
+}

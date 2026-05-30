@@ -285,10 +285,12 @@ const showVirtualKeyboardDebugButton = computed(
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleAssistantNewChat(assistantId) {
-  if (assistantId === "assistant-studio") {
+  if (assistantId === "assistant-studio" || assistantId === "connector-store") {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
-    router.push({name: "studio"}).catch(() => {});
+    router
+      .push({name: assistantId === "connector-store" ? "connector-store" : "studio"})
+      .catch(() => {});
     return;
   }
   startNewChat({assistantId});

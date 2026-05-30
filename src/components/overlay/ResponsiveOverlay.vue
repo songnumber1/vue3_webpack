@@ -65,7 +65,6 @@ import {computed, ref, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
-import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 
 const {t} = useI18n();
 const bodyRef = ref(null);
@@ -113,12 +112,6 @@ const panelRenderKey = computed(() => overlayMode.value);
 
 const showMobileBackButton = computed(() => isMobileFullscreen.value);
 const showCloseButton = computed(() => !isMobileFullscreen.value);
-
-useOverlayScrollbar(
-  bodyRef,
-  {overflow: {x: "hidden", y: "scroll"}},
-  {watchSource: () => [props.open, overlayMode.value]}
-);
 
 useOverlayRegistration({
   open: toRef(props, "open"),
