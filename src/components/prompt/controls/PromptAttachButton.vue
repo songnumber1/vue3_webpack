@@ -1,7 +1,7 @@
 <template>
-  <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap">
+  <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0">
     <button
-      class="prompt-icon-action attach-button"
+      class="prompt-icon-action attach-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-controlBorder tw-bg-app-control tw-transition"
       :class="{'prompt-icon-action--active': attachMenuOpen}"
       type="button"
       :title="attachLabel"
@@ -23,7 +23,7 @@
     <div
       v-if="attachMenuOpen && !isMobileSheet"
       ref="attachMenuRef"
-      class="prompt-popover attach-menu prompt-floating-menu"
+      class="prompt-popover attach-menu prompt-floating-menu tw-absolute tw-z-popover tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
       :style="attachMenuStyle"
       role="menu"
     >

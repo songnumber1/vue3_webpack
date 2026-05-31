@@ -1,6 +1,6 @@
 <template>
-  <footer class="prompt-wrap" :class="{'prompt-wrap--floating': floating}">
-    <form class="prompt-box prompt-box--gemini" @submit.prevent="submit">
+  <footer class="prompt-wrap tw-w-full" :class="{'prompt-wrap--floating': floating}">
+    <form class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt" @submit.prevent="submit">
       <PromptAttachmentPreviewList
         :attachments="attachments"
         @preview="previewImage"
@@ -43,7 +43,7 @@
 
       <input
         ref="fileInputRef"
-        class="visually-hidden-file-input"
+        class="visually-hidden-file-input tw-sr-only"
         type="file"
         multiple
         :accept="fileAccept"
@@ -51,7 +51,7 @@
         @change="handleFileChange"
       />
     </form>
-    <p v-if="showHelp" class="prompt-help">
+    <p v-if="showHelp" class="prompt-help tw-mt-2 tw-text-center tw-text-xs tw-text-app-subtle">
       UI demo. Extend resolver/api.js for production integration.
     </p>
 

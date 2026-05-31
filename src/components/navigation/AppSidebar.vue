@@ -1,13 +1,13 @@
 <template>
   <aside
-    class="desktop-sidebar"
+    class="desktop-sidebar tw-flex tw-h-full tw-shrink-0 tw-flex-col tw-border-r tw-border-app-sidebarBorder tw-bg-app-sidebar tw-text-app-sidebarText"
     :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
   >
     <div
       v-if="!sidebarCollapsed"
-      class="sidebar-content sidebar-content--assistant"
+      class="sidebar-content sidebar-content--assistant tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-gap-3"
     >
-      <div class="sidebar-top">
+      <div class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2">
         <SidebarAssistantSelector
           ref="assistantSelectorRef"
           :assistants="assistants"
@@ -16,9 +16,9 @@
           @toggle="openAssistantSelector"
           @select="selectAssistant"
         />
-        <div class="sidebar-top-actions">
+        <div class="sidebar-top-actions tw-flex tw-items-center tw-gap-2">
           <button
-            class="sidebar-round"
+            class="sidebar-round tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
             type="button"
             :title="t('chat.hideSidebar')"
             :aria-label="t('chat.hideSidebar')"
@@ -29,12 +29,12 @@
         </div>
       </div>
 
-      <nav class="quick-menu quick-menu--assistant">
-        <button class="quick-item active" type="button" @click="handleNewChat">
+      <nav class="quick-menu quick-menu--assistant tw-flex tw-flex-col tw-gap-1">
+        <button class="quick-item active tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition" type="button" @click="handleNewChat">
           <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
         <button
-          class="quick-item"
+          class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
           :class="{active: route.name === 'chat-search'}"
           type="button"
           @click="handleChatSearch"
@@ -43,7 +43,7 @@
         </button>
       </nav>
 
-      <div class="section-label">{{ t("chat.conversations") }}</div>
+      <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
       <SidebarHistoryList
         :histories="histories"
         :selected-chat-id="selectedChatId"
@@ -69,26 +69,26 @@
   <transition name="drawer-fade">
     <div
       v-if="drawerOpen"
-      class="mobile-drawer-backdrop"
+      class="mobile-drawer-backdrop tw-fixed tw-inset-0 tw-bg-app-drawerOverlay"
       @click="navigationStore.setDrawerOpen(false)"
     ></div>
   </transition>
 
   <transition name="drawer-slide">
-    <aside v-if="drawerOpen" class="mobile-drawer">
+    <aside v-if="drawerOpen" class="mobile-drawer tw-fixed tw-inset-y-0 tw-left-0 tw-z-drawer tw-flex tw-h-full tw-w-mobileDrawer tw-flex-col tw-bg-app-sidebar">
       <div
-        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
+        class="sidebar-content sidebar-content--mobile sidebar-content--assistant tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-gap-3"
       >
-        <div class="sidebar-top">
+        <div class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2">
           <SidebarAssistantSelector
             :assistants="assistants"
             :selected-assistant-id="selectedAssistantId"
             mobile
             @toggle="openAssistantSelector"
           />
-          <div class="sidebar-top-actions">
+          <div class="sidebar-top-actions tw-flex tw-items-center tw-gap-2">
             <button
-              class="sidebar-round"
+              class="sidebar-round tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
               type="button"
               :title="t('common.close')"
               :aria-label="t('common.close')"
@@ -99,16 +99,16 @@
           </div>
         </div>
 
-        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
+        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search tw-flex tw-flex-col tw-gap-1">
           <button
-            class="quick-item active"
+            class="quick-item active tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
             type="button"
             @click="handleNewChat"
           >
             <Icon name="pencil" />{{ t("chat.newChat") }}
           </button>
           <button
-            class="quick-item"
+            class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
             :class="{active: route.name === 'chat-search'}"
             type="button"
             @click="handleChatSearch"
@@ -117,7 +117,7 @@
           </button>
         </nav>
 
-        <div class="section-label">{{ t("chat.conversations") }}</div>
+        <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
         <SidebarHistoryList
           :histories="histories"
           :selected-chat-id="selectedChatId"
@@ -139,18 +139,18 @@
     <button
       v-for="assistant in assistants"
       :key="assistant.id"
-      class="bottom-sheet-option"
+      class="bottom-sheet-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left"
       :class="{active: assistant.id === selectedAssistantId}"
       type="button"
       @click="selectAssistant(assistant.id)"
     >
-      <span class="bottom-sheet-option-main">
+      <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1">
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
       <span
         v-if="assistant.id === selectedAssistantId"
-        class="bottom-sheet-selected-indicator"
+        class="bottom-sheet-selected-indicator tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         :aria-label="t('chat.assistantSelected')"
       >
         <CheckIcon class="bottom-sheet-check" />

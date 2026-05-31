@@ -1,10 +1,10 @@
 <template>
   <div class="message-actions-wrap" :class="`message-actions-wrap--${role}`">
-    <div class="message-actions" :class="`message-actions--${role}`">
+    <div class="message-actions tw-flex tw-items-center tw-gap-1" :class="`message-actions--${role}`">
       <template v-if="role === 'assistant'">
         <button
           type="button"
-          class="message-action-icon message-action-icon--svg"
+          class="message-action-icon message-action-icon--svg tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
           :class="{active: feedback === FEEDBACK_ACTIONS.LIKE}"
           :aria-label="t('feedback.like')"
           :title="t('feedback.like')"
@@ -23,7 +23,7 @@
         </button>
         <button
           type="button"
-          class="message-action-icon message-action-icon--svg"
+          class="message-action-icon message-action-icon--svg tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
           :class="{active: feedback === FEEDBACK_ACTIONS.DISLIKE}"
           :aria-label="t('feedback.dislike')"
           :title="t('feedback.dislike')"
@@ -43,14 +43,14 @@
         <button
           v-if="showRegenerate"
           type="button"
-          class="message-action-text-button"
+          class="message-action-text-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
           @click="$emit('regenerate')"
         >
           {{ t("markdown.regenerate") }}
         </button>
         <button
           type="button"
-          class="message-action-text-button"
+          class="message-action-text-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
           @click="openFeedbackDialog"
         >
           {{ t("feedback.send") }}
@@ -59,7 +59,7 @@
 
       <button
         type="button"
-        class="message-action-icon message-action-icon--svg tw-message-action-icon"
+        class="message-action-icon message-action-icon--svg tw-message-action-icon tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
         :aria-label="t('feedback.copy')"
         :title="t('feedback.copy')"
         @click="copy"

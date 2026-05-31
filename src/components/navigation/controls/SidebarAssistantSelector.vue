@@ -1,7 +1,7 @@
 <template>
-  <div ref="rootRef" class="assistant-selector">
+  <div ref="rootRef" class="assistant-selector tw-relative tw-min-w-0 tw-flex-1">
     <button
-      class="assistant-trigger"
+      class="assistant-trigger tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-2 tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-left tw-transition"
       type="button"
       :aria-label="t('chat.assistantSelect')"
       @click="$emit('toggle')"
@@ -9,22 +9,22 @@
       <span>{{ currentAssistant.label }}</span>
       <ChevronDownIcon class="chevron chevron--selector" />
     </button>
-    <div v-if="open && !mobile" class="assistant-menu">
+    <div v-if="open && !mobile" class="assistant-menu tw-absolute tw-z-popover tw-mt-2 tw-w-full tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu">
       <button
         v-for="assistant in assistants"
         :key="assistant.id"
-        class="assistant-option"
+        class="assistant-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left tw-transition"
         :class="{active: assistant.id === selectedAssistantId}"
         type="button"
         @click="$emit('select', assistant.id)"
       >
-        <span class="assistant-option-main">
+        <span class="assistant-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1">
           <strong>{{ assistant.label }}</strong>
           <small>{{ assistant.description }}</small>
         </span>
         <span
           v-if="assistant.id === selectedAssistantId"
-          class="option-selected-indicator"
+          class="option-selected-indicator tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           :aria-label="t('chat.assistantSelected')"
         >
           <CheckIcon class="option-check" />

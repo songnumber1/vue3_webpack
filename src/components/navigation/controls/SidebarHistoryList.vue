@@ -7,11 +7,11 @@
     <div
       v-for="item in histories"
       :key="item.id"
-      class="sidebar-history-row"
+      class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
       :class="{selected: String(item.id) === String(selectedChatId)}"
     >
       <button
-        :class="[itemClass, 'sidebar-history-title-button']"
+        :class="[itemClass, 'sidebar-history-title-button tw-min-w-0 tw-flex-1 tw-rounded-control tw-text-left tw-transition']"
         type="button"
         :title="item.title"
         @click="$emit('select', item)"
@@ -19,10 +19,10 @@
         <span>{{ item.title }}</span>
       </button>
 
-      <div v-if="showActions" class="sidebar-history-actions">
+      <div v-if="showActions" class="sidebar-history-actions tw-flex tw-shrink-0 tw-items-center tw-gap-1">
         <span
           v-if="item.isPinned"
-          class="sidebar-history-pin"
+          class="sidebar-history-pin tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm"
           :aria-label="t('chat.historyMenu.pin')"
           :title="t('chat.historyMenu.pin')"
         >
@@ -30,7 +30,7 @@
         </span>
         <button
           v-if="showMenu"
-          class="sidebar-history-menu-button"
+          class="sidebar-history-menu-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm"
           type="button"
           :aria-label="t('chat.historyMenu.title')"
           :title="t('chat.historyMenu.title')"

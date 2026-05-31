@@ -1,12 +1,12 @@
 <template>
   <div
     ref="rootRef"
-    class="collapsed-sidebar"
+    class="collapsed-sidebar tw-flex tw-h-full tw-w-sidebarCollapsed tw-shrink-0 tw-flex-col tw-items-center tw-border-r tw-border-app-sidebarBorder tw-bg-app-sidebar"
     :aria-label="t('chat.collapsedSidebar')"
   >
-    <div class="collapsed-sidebar-actions">
+    <div class="collapsed-sidebar-actions tw-flex tw-flex-col tw-items-center tw-gap-2">
       <button
-        class="collapsed-icon-button"
+        class="collapsed-icon-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
         type="button"
         :title="t('chat.openSidebar')"
         :aria-label="t('chat.openSidebar')"
@@ -15,7 +15,7 @@
         <Icon name="panel" bare />
       </button>
       <button
-        class="collapsed-icon-button"
+        class="collapsed-icon-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
         type="button"
         :title="t('chat.newChat')"
         :aria-label="t('chat.newChat')"
@@ -24,7 +24,7 @@
         <Icon name="pencil" bare />
       </button>
       <button
-        class="collapsed-icon-button"
+        class="collapsed-icon-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
         type="button"
         :title="t('chat.chatSearch')"
         :aria-label="t('chat.chatSearch')"
@@ -33,7 +33,7 @@
         <Icon name="search" bare />
       </button>
       <button
-        class="collapsed-icon-button collapsed-icon-button--active"
+        class="collapsed-icon-button collapsed-icon-button--active tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-primary tw-bg-app-primarySoft tw-text-app-primary tw-transition"
         type="button"
         :title="t('chat.recentChats')"
         :aria-label="t('chat.recentChats')"
@@ -46,7 +46,7 @@
     <transition name="collapsed-popover-fade">
       <section
         v-if="open"
-        class="collapsed-recent-popover"
+        class="collapsed-recent-popover tw-absolute tw-z-popover tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
         :aria-label="t('chat.recentChats')"
       >
         <h2>{{ t("chat.recentChats") }}</h2>

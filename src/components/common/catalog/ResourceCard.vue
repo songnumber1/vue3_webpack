@@ -1,6 +1,6 @@
 <template>
   <button
-    :class="['resource-card', cardClass]"
+    :class="['resource-card tw-relative tw-flex tw-min-w-0 tw-rounded-studio tw-border tw-border-studio-border tw-bg-studio-surface tw-text-left tw-transition', cardClass]"
     type="button"
     @click="$emit('open', item)"
   >
@@ -32,10 +32,10 @@ defineProps({
   imageText: {type: String, default: ""},
   showMore: {type: Boolean, default: true},
   cardClass: {type: [String, Array, Object], default: ""},
-  imageClass: {type: [String, Array, Object], default: "resource-card__image"},
-  bodyClass: {type: [String, Array, Object], default: "resource-card__body"},
-  moreClass: {type: [String, Array, Object], default: "resource-card__more"},
-  metaClass: {type: [String, Array, Object], default: "resource-card__meta"},
+  imageClass: {type: [String, Array, Object], default: "resource-card__image tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-text-app-textOnPrimary"},
+  bodyClass: {type: [String, Array, Object], default: "resource-card__body tw-min-w-0 tw-flex-1"},
+  moreClass: {type: [String, Array, Object], default: "resource-card__more tw-absolute tw-inline-flex tw-items-center tw-justify-center"},
+  metaClass: {type: [String, Array, Object], default: "resource-card__meta tw-text-xs tw-text-studio-muted"},
 });
 
 defineEmits(["open"]);

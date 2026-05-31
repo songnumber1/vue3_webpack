@@ -1,13 +1,13 @@
 <template>
   <div
     v-if="attachments.length"
-    class="attachment-preview-row"
+    class="attachment-preview-row tw-flex tw-w-full tw-gap-2 tw-overflow-x-auto"
     :aria-label="t('chat.attachment.listLabel')"
   >
     <div
       v-for="file in attachments"
       :key="file.id"
-      class="attachment-preview-card"
+      class="attachment-preview-card tw-relative tw-flex tw-shrink-0 tw-items-center tw-gap-2 tw-rounded-control tw-border tw-border-app-border tw-bg-app-surface"
       :class="{'attachment-preview-card--image': file.kind === 'image'}"
       :role="file.kind === 'image' ? 'button' : undefined"
       :tabindex="file.kind === 'image' ? 0 : undefined"
@@ -22,7 +22,7 @@
     >
       <div
         v-if="file.kind === 'image'"
-        class="attachment-preview-thumb"
+        class="attachment-preview-thumb tw-block tw-shrink-0 tw-object-cover"
         aria-hidden="true"
       >
         <img
@@ -31,14 +31,14 @@
           @error="$emit('preview-error', file)"
         />
       </div>
-      <div v-else class="attachment-preview-file" aria-hidden="true">📄</div>
-      <div class="attachment-preview-info">
+      <div v-else class="attachment-preview-file tw-flex tw-shrink-0 tw-items-center tw-justify-center" aria-hidden="true">📄</div>
+      <div class="attachment-preview-info tw-min-w-0 tw-flex-1">
         <strong :title="file.name">{{ file.name }}</strong>
         <span>{{ formatFileSize(file.size) }}</span>
       </div>
       <button
         type="button"
-        class="attachment-preview-remove"
+        class="attachment-preview-remove tw-absolute tw-inline-flex tw-items-center tw-justify-center tw-rounded-full"
         :aria-label="t('chat.attachment.remove', {name: file.name})"
         @pointerdown.stop
         @mousedown.stop

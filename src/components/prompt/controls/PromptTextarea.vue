@@ -1,7 +1,7 @@
 <template>
   <textarea
     ref="textareaRef"
-    class="prompt-textarea"
+    class="prompt-textarea tw-block tw-w-full tw-resize-none tw-border-0 tw-bg-transparent tw-text-app-text tw-outline-none placeholder:tw-text-app-placeholder"
     :value="textareaValue"
     :disabled="isDisabled"
     :placeholder="resolvedPlaceholder"
