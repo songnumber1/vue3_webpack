@@ -3,7 +3,7 @@
     <transition name="sheet-fade">
       <div
         v-if="open"
-        :class="['bottom-sheet-backdrop', 'app-dialog-backdrop', overlayClass]"
+        :class="['bottom-sheet-backdrop', 'app-dialog-backdrop', 'tw-fixed', 'tw-inset-0', 'tw-z-bottomSheetBackdrop', 'tw-bg-app-drawerOverlay', overlayClass]"
         @click="emit('close')"
       ></div>
     </transition>
@@ -15,6 +15,20 @@
         :class="[
           'bottom-sheet',
           'app-bottom-sheet-panel',
+          'tw-fixed',
+          'tw-inset-x-0',
+          'tw-bottom-0',
+          'tw-z-bottomSheet',
+          'tw-flex',
+          'tw-min-h-0',
+          'tw-flex-col',
+          'tw-overflow-hidden',
+          'tw-rounded-t-dialog',
+          'tw-border',
+          'tw-border-app-border',
+          'tw-bg-app-menu',
+          'tw-text-app-text',
+          'tw-shadow-menu',
           overlayClass,
           {
             'bottom-sheet--dragging': dragging,

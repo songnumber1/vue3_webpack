@@ -576,7 +576,9 @@ body.mobile-mode .responsive-overlay--mobile {
 }
 
 body.mobile-mode .responsive-overlay--mobile .responsive-panel {
-  width: 100%;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
   height: 100dvh;
   max-height: none;
   border: 0;

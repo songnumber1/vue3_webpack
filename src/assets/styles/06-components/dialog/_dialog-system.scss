@@ -219,6 +219,11 @@ body.mobile-mode .message-action-text-button {
 }
 
 body.mobile-mode .responsive-overlay--mobile .responsive-panel {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  height: 100dvh !important;
+  max-height: none !important;
   border-radius: 0;
 }
 

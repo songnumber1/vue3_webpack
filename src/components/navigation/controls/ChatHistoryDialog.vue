@@ -5,13 +5,13 @@
     mobile-mode="dialog"
     @close="$emit('cancel')"
   >
-    <div class="chat-history-dialog">
-      <p v-if="message" class="chat-history-dialog__message">{{ message }}</p>
-      <label v-if="mode === 'rename'" class="chat-history-dialog__field">
+    <div class="chat-history-dialog tw-grid tw-gap-4">
+      <p v-if="message" class="chat-history-dialog__message tw-m-0 tw-text-sm tw-leading-relaxed tw-text-app-subtle">{{ message }}</p>
+      <label v-if="mode === 'rename'" class="chat-history-dialog__field tw-grid tw-gap-2">
         <span>{{ t("chat.historyDialog.titleField") }}</span>
         <input
           v-model="draftTitle"
-          class="chat-history-dialog__input"
+          class="chat-history-dialog__input tw-h-11 tw-w-full tw-rounded-dialogInput tw-border tw-border-app-controlBorder tw-bg-app-control tw-px-3 tw-text-base tw-text-app-text"
           type="text"
           name="chat-title-edit"
           maxlength="80"
@@ -25,7 +25,7 @@
           @keyup.enter="confirm"
         />
       </label>
-      <div class="chat-history-dialog__actions">
+      <div class="chat-history-dialog__actions tw-flex tw-items-center tw-justify-end tw-gap-2">
         <button
           class="playground-button playground-button--secondary"
           type="button"
