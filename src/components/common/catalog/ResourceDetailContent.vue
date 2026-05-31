@@ -1,24 +1,34 @@
 <template>
-  <div :class="['resource-detail-content', contentClass]">
-    <header :class="headClass">
-      <div :class="imageClass">{{ imageText }}</div>
-      <div>
-        <h2>{{ title }}</h2>
-        <p>{{ meta }}</p>
+  <div :class="['resource-detail-content', 'tw-flex-1 tw-min-h-0', contentClass]">
+    <header :class="[headClass, 'tw-flex tw-items-center tw-gap-4']">
+      <div
+        :class="[
+          imageClass,
+          'tw-inline-flex tw-h-16 tw-w-16 tw-flex-none tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-text-white tw-font-extrabold',
+        ]"
+      >{{ imageText }}</div>
+      <div class="tw-min-w-0">
+        <h2 class="tw-m-0 tw-text-xl tw-font-black tw-leading-tight tw-text-studio-text">{{ title }}</h2>
+        <p class="tw-mt-1 tw-mb-0 tw-text-sm tw-leading-relaxed tw-text-studio-muted">{{ meta }}</p>
       </div>
     </header>
-    <p v-if="description" :class="descriptionClass">{{ description }}</p>
+    <p v-if="description" :class="[descriptionClass, 'tw-mt-4 tw-mb-0 tw-leading-relaxed tw-text-studio-muted']">{{ description }}</p>
 
-    <h3>{{ labels.prompts }}</h3>
-    <div :class="promptGridClass">
-      <button v-for="prompt in prompts" :key="prompt" type="button">{{ prompt }}</button>
+    <h3 class="tw-mt-5 tw-mb-2 tw-text-sm tw-font-black tw-text-studio-text">{{ labels.prompts }}</h3>
+    <div :class="[promptGridClass, 'tw-grid tw-grid-cols-2 tw-gap-2.5']">
+      <button
+        v-for="prompt in prompts"
+        :key="prompt"
+        class="tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-p-3 tw-text-left tw-text-studio-text"
+        type="button"
+      >{{ prompt }}</button>
     </div>
 
-    <h3>{{ labels.knowledge }}</h3>
-    <p :class="boxClass">{{ knowledge }}</p>
+    <h3 class="tw-mt-5 tw-mb-2 tw-text-sm tw-font-black tw-text-studio-text">{{ labels.knowledge }}</h3>
+    <p :class="[boxClass, 'tw-m-0 tw-leading-relaxed tw-text-studio-muted']">{{ knowledge }}</p>
 
-    <h3>{{ labels.scope }}</h3>
-    <p :class="boxClass">{{ scope }}</p>
+    <h3 class="tw-mt-5 tw-mb-2 tw-text-sm tw-font-black tw-text-studio-text">{{ labels.scope }}</h3>
+    <p :class="[boxClass, 'tw-m-0 tw-leading-relaxed tw-text-studio-muted']">{{ scope }}</p>
   </div>
 </template>
 

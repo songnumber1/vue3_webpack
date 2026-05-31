@@ -1,4 +1,3 @@
-.studio-dialog-backdrop,
 .studio-create-backdrop,
 .studio-picker-backdrop {
   position: fixed;
@@ -12,7 +11,6 @@
   background: rgba(15, 23, 42, 0.42);
 }
 
-.studio-dialog,
 .studio-create-panel,
 .studio-picker {
   border-radius: 5px;
@@ -22,53 +20,9 @@
   box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24);
 }
 
-.studio-dialog {
-  width: min(760px, calc(100% - 32px));
-  max-height: calc(100% - 48px);
-  overflow-y: auto;
-  padding: 24px;
-  position: relative;
-}
-
-.studio-dialog__close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border: 1px solid var(--studio-border);
-  background: var(--studio-surface);
-}
-
-.studio-dialog__head {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.studio-dialog__image,
 .studio-preview__logo {
   width: 64px;
   height: 64px;
-}
-
-.studio-dialog__desc,
-.studio-dialog__box {
-  line-height: 1.6;
-}
-
-.studio-prompt-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.studio-prompt-grid button {
-  border: 1px solid var(--studio-border);
-  background: var(--studio-surface);
-  color: inherit;
-  padding: 12px;
-  text-align: left;
 }
 
 .studio-create-backdrop {

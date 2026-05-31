@@ -17,7 +17,6 @@
 }
 
 .studio-hero__mark,
-.studio-dialog__image,
 .studio-preview__logo {
   display: inline-flex;
   align-items: center;
@@ -64,10 +63,8 @@
 
 .studio-create-tabs button,
 .studio-button,
-.studio-prompt-grid button,
 .studio-multi-select__trigger,
 .studio-multi-select__head button,
-.studio-dialog__close,
 .studio-picker__head button,
 .studio-picker__option,
 .studio-select-like,
@@ -92,8 +89,6 @@
   color: #fff;
 }
 
-.studio-dialog__desc,
-.studio-dialog__box,
 .studio-preview p,
 .studio-radio-card small,
 .studio-check-row small,

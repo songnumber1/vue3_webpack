@@ -1,6 +1,6 @@
 <template>
   <article
-    class="studio-mobile-page studio-mobile-page--detail tw-min-h-0 tw-bg-studio-bg tw-text-studio-text"
+    class="studio-mobile-page studio-mobile-page--detail tw-flex tw-min-h-0 tw-flex-col tw-bg-studio-bg tw-text-studio-text"
     :aria-label="t('studio.detail.title')"
   >
     <header class="studio-mobile-page__head studio-mobile-page__head--notice tw-shrink-0 tw-items-center">
@@ -32,7 +32,7 @@
         ×
       </button>
     </header>
-    <div ref="contentRef" class="studio-mobile-page__content tw-min-h-0 tw-flex-1">
+    <div ref="contentRef" class="studio-mobile-page__content tw-min-h-0 tw-flex-1 tw-overflow-y-auto">
       <StudioDetailContent :studio="studio" />
     </div>
 

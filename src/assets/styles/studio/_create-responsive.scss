@@ -420,26 +420,6 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:f
   color: #fff !important;
 }
 
-.studio-dialog {
-  display: flex;
-  flex-direction: column;
-}
-
-.studio-detail-content {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-.studio-dialog__footer {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 20px -24px -24px;
-  padding: 14px 24px;
-  border-top: 1px solid var(--studio-border);
-  background: var(--studio-surface);
-}
 
 .studio-select-native {
   appearance: auto;

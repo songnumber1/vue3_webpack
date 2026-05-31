@@ -37,16 +37,16 @@
     @go-page="$emit('go-page', $event)"
   />
 
-  <div v-if="selectedMcp && !isMobile" class="studio-dialog-backdrop tw-fixed tw-inset-0 tw-z-modal">
+  <div v-if="selectedMcp && !isMobile" class="studio-dialog-backdrop tw-fixed tw-inset-0 tw-z-modal tw-box-border tw-flex tw-items-center tw-justify-center tw-bg-[rgba(15,23,42,0.42)] tw-p-6">
     <article
       ref="detailDialogRef"
-      class="studio-dialog tw-bg-studio-surface tw-text-studio-text"
+      class="studio-dialog tw-relative tw-box-border tw-flex tw-max-h-[calc(100vh-48px)] tw-w-[min(760px,calc(100vw-32px))] tw-flex-col tw-overflow-y-auto tw-rounded-dialog tw-bg-studio-surface tw-p-6 tw-text-studio-text tw-shadow-dialog"
       role="dialog"
       aria-modal="true"
       :aria-label="t('mcp.detail.title')"
     >
       <button
-        class="studio-dialog__close"
+        class="studio-dialog__close tw-absolute tw-right-3 tw-top-3 tw-inline-flex tw-h-8 tw-w-8 tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-studio-text"
         type="button"
         :aria-label="t('common.close')"
         @click="closeDetailDialog"
@@ -54,7 +54,7 @@
         ×
       </button>
       <McpDetailContent :mcp="selectedMcp" />
-      <footer class="studio-dialog__footer tw-shrink-0 tw-items-center tw-justify-end">
+      <footer class="studio-dialog__footer tw-mx-[-24px] tw-mb-[-24px] tw-mt-5 tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-border-t tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-6 tw-py-3.5">
         <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
         </button>
