@@ -34,14 +34,14 @@
     />
     <button
       v-if="showScrollBottom && !isInteractionBlocked"
-      class="scroll-bottom-button tw-scroll-bottom-button"
+      class="scroll-bottom-button"
       type="button"
       :aria-label="t('chat.scrollBottom')"
       @click="workspaceActions.scrollBottom()"
     >
       ↓
     </button>
-    <div ref="composerSlotRef" class="chat-composer-slot tw-chat-composer-slot">
+    <div ref="composerSlotRef" class="chat-composer-slot">
       <ChatReadonlyInput v-if="readonly" />
       <ChatReadonlyInput
         v-else-if="isActiveModelUnavailable"

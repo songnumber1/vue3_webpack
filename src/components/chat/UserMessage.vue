@@ -35,7 +35,7 @@
           </a>
         </template>
       </div>
-      <div v-if="message.content" class="bubble-content bubble-content--plain tw-bubble-content tw-bubble-content--plain tw-min-w-0 tw-whitespace-pre-wrap tw-break-words">
+      <div v-if="message.content" class="bubble-content bubble-content--plain tw-min-w-0 tw-whitespace-pre-wrap tw-break-words">
         {{ message.content }}
       </div>
       <MessageActions

@@ -59,7 +59,7 @@
 
       <button
         type="button"
-        class="message-action-icon message-action-icon--svg tw-message-action-icon tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
+        class="message-action-icon message-action-icon--svg tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm tw-transition"
         :aria-label="t('feedback.copy')"
         :title="t('feedback.copy')"
         @click="copy"
@@ -82,13 +82,13 @@
       </button>
     </div>
 
-    <section v-if="showDislikeReasons" class="feedback-reason-panel tw-feedback-reason-panel">
+    <section v-if="showDislikeReasons" class="feedback-reason-panel">
       <p>{{ t("feedback.hallucinationTitle") }}</p>
-      <div class="feedback-reason-list tw-feedback-reason-list">
+      <div class="feedback-reason-list">
         <button
           v-for="reason in visibleReasons"
           :key="reason.id"
-          class="feedback-reason-chip tw-feedback-reason-chip"
+          class="feedback-reason-chip"
           type="button"
           :class="{active: selectedReasons.includes(reason.id)}"
           @click="toggleReason(reason.id)"
@@ -98,7 +98,7 @@
       </div>
       <button
         v-if="hasMoreReasons"
-        class="feedback-more-button tw-feedback-more-button"
+        class="feedback-more-button"
         type="button"
         @click="showAllReasons = true"
       >
@@ -109,34 +109,34 @@
     <teleport to="body">
       <div
         v-if="feedbackDialogOpen"
-        class="feedback-dialog-backdrop app-dialog-backdrop tw-feedback-dialog-backdrop"
+        class="feedback-dialog-backdrop app-dialog-backdrop"
         role="presentation"
       >
         <section
-          class="feedback-dialog app-dialog-panel tw-feedback-dialog"
+          class="feedback-dialog app-dialog-panel"
           role="dialog"
           aria-modal="true"
           :aria-label="t('feedback.send')"
         >
-          <header class="feedback-dialog-header app-dialog-header tw-feedback-dialog-header">
+          <header class="feedback-dialog-header app-dialog-header">
             <strong>{{ t("feedback.send") }}</strong>
             <button
               type="button"
-              class="feedback-dialog-close app-dialog-close tw-feedback-dialog-close"
+              class="feedback-dialog-close app-dialog-close"
               :aria-label="t('common.close')"
               @click="closeFeedbackDialog"
             >
               ×
             </button>
           </header>
-          <div class="feedback-dialog-body app-dialog-body tw-feedback-dialog-body">
+          <div class="feedback-dialog-body app-dialog-body">
             <p>{{ t("feedback.sendDescription") }}</p>
             <textarea
               v-model="feedbackText"
               :placeholder="t('feedback.placeholder')"
             />
           </div>
-          <footer class="feedback-dialog-footer app-dialog-footer tw-feedback-dialog-footer">
+          <footer class="feedback-dialog-footer app-dialog-footer">
             <button type="button" @click="submitFeedback">
               {{ t("common.confirm") }}
             </button>

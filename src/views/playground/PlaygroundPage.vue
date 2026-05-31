@@ -228,27 +228,27 @@
       :subtitle="activePopup.subtitle"
       @close="closePopup(t('common.close'))"
     >
-      <div class="playground-popup-content tw-playground-popup-content">
-        <div class="playground-popup-icon tw-playground-popup-icon" aria-hidden="true">
+      <div class="playground-popup-content">
+        <div class="playground-popup-icon" aria-hidden="true">
           {{ activePopup.icon }}
         </div>
-        <p class="playground-popup-message tw-playground-popup-message">
+        <p class="playground-popup-message">
           {{ activePopup.message }}
         </p>
-        <p class="playground-popup-detail tw-playground-popup-detail">
+        <p class="playground-popup-detail">
           {{ activePopup.detail }}
         </p>
-        <div class="playground-dialog-actions tw-playground-dialog-actions">
+        <div class="playground-dialog-actions">
           <button
             v-if="activePopup.type === 'confirm'"
-            class="playground-button playground-button--secondary tw-playground-button tw-playground-button--secondary"
+            class="playground-button playground-button--secondary"
             type="button"
             @click="closePopup(t('common.cancel'))"
           >
             {{ t("common.cancel") }}
           </button>
           <button
-            class="playground-button tw-playground-button"
+            class="playground-button"
             type="button"
             @click="
               closePopup(
@@ -273,11 +273,11 @@
       :title="t('playground.bottomSheet.sheetTitle')"
       @close="sheetOpen = false"
     >
-      <div class="playground-sheet-body tw-playground-sheet-body">
+      <div class="playground-sheet-body">
         <button
           v-for="item in sheetItems"
           :key="item.id"
-          class="bottom-sheet-option tw-bottom-sheet-option"
+          class="bottom-sheet-option"
           type="button"
           @click="sheetOpen = false"
         >
