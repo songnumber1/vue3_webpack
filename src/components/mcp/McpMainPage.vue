@@ -1,13 +1,13 @@
 <template>
-  <div class="studio-workspace__scroll tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text">
-    <div class="studio-hero tw-shrink-0 tw-text-studio-text">
-      <div class="studio-hero__mark tw-inline-flex tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-text-app-textOnPrimary">CS</div>
+  <div class="studio-workspace__scroll tw-box-border tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-p-[32px_clamp(16px,4vw,56px)_18px] tw-text-studio-text">
+    <div class="studio-hero tw-mx-auto tw-mb-6 tw-shrink-0 tw-max-w-studioHero tw-text-center tw-text-studio-text">
+      <div class="studio-hero__mark tw-mb-[14px] tw-inline-flex tw-h-14 tw-w-14 tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-font-extrabold tw-text-app-textOnPrimary">CS</div>
       <h1>{{ t("mcp.title") }}</h1>
       <p>{{ t("mcp.heroDescription") }}</p>
     </div>
 
-    <div class="studio-toolbar tw-shrink-0">
-      <div class="studio-search tw-relative tw-min-w-0">
+    <div class="studio-toolbar tw-mx-auto tw-mb-4 tw-flex tw-w-full tw-max-w-studio tw-shrink-0">
+      <div class="studio-search tw-relative tw-min-w-0 tw-flex-1">
         <label class="sr-only" for="mcp-search-input">{{ t("mcp.searchLabel") }}</label>
         <input
           id="mcp-search-input"
@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <div class="studio-tabs-row tw-shrink-0">
-      <div class="studio-tabs tw-min-w-0" role="tablist" :aria-label="t('mcp.tabsLabel')">
+    <div class="studio-tabs-row tw-mx-auto tw-mb-4 tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-items-end tw-justify-between tw-gap-3 tw-border-b tw-border-studio-border">
+      <div class="studio-tabs tw-flex tw-min-w-0" role="tablist" :aria-label="t('mcp.tabsLabel')">
         <button
           class="studio-tab tw-shrink-0"
           :class="{active: activeTab === 'all'}"
@@ -49,7 +49,7 @@
         </button>
       </div>
       <button
-        class="studio-button studio-button--primary studio-create-entry tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
+        class="studio-button studio-button--primary studio-create-entry tw-mb-2 tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         @click="$emit('open-create')"
       >
@@ -98,9 +98,9 @@
       <span>{{ t("mcp.createdOnly") }}</span>
     </label>
 
-    <div class="studio-list-shell tw-min-h-0 tw-flex-1">
-      <div ref="listAreaRef" class="studio-list-area tw-min-h-0">
-        <div class="studio-grid tw-min-w-0">
+    <div class="studio-list-shell tw-mx-auto tw-flex tw-min-h-0 tw-w-full tw-max-w-studio tw-flex-1 tw-flex-col tw-overflow-hidden">
+      <div ref="listAreaRef" class="studio-list-area tw-min-h-0 tw-flex-1 tw-overflow-y-auto tw-overflow-x-hidden tw-pr-0.5">
+        <div class="studio-grid tw-grid tw-min-w-0 tw-grid-cols-2 tw-gap-[14px] tw-pb-1.5">
           <ResourceCard
             v-for="mcp in mcps"
             :key="mcp.id"
@@ -121,7 +121,7 @@
       </div>
     </div>
 
-    <nav class="studio-pagination tw-shrink-0 tw-items-center tw-justify-center" :aria-label="t('mcp.pagination.label')">
+    <nav class="studio-pagination tw-mx-auto tw-mt-[14px] tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-center tw-gap-1.5 tw-border-t tw-border-studio-border tw-pt-[14px]" :aria-label="t('mcp.pagination.label')">
       <button class="studio-page-icon-button tw-inline-flex tw-items-center tw-justify-center" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.first')" @click="$emit('go-page', 1)">
         <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
       </button>

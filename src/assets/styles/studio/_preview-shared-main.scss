@@ -1,34 +1,11 @@
-/* Studio create preview shares the real main empty-state UI, but keeps composer/actions preview-only. */
-body.desktop-mode .studio-create-page .studio-preview .studio-preview__main-empty {
-  flex: 1 1 auto;
-  min-height: 0;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center {
-  gap: 14px;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-assistant-logo {
-  width: 56px;
-  height: 56px;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center h1 {
-  margin: 6px 0 0;
-  font-size: 28px;
-  line-height: 1.25;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-row--between {
-  margin-top: 8px;
-}
-
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-chip {
-  pointer-events: none;
-}
+/*
+ * Step 5-2: selector-level responsibility split completed.
+ *
+ * This file intentionally keeps no active selectors. The former rules were
+ * StudioPreview-specific despite the shared filename and were moved to
+ * src/components/studio/StudioPreview.vue to prevent MainEmptyState changes
+ * from unintentionally changing the Studio create preview.
+ *
+ * Keep this placeholder until the Studio/MCP migration is fully stabilized,
+ * then remove the file and any remaining references in a final cleanup step.
+ */

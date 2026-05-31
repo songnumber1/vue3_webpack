@@ -53,3 +53,46 @@ const previewSuggestions = computed(() =>
     }))
 );
 </script>
+
+
+<style lang="scss">
+/*
+ * Studio create preview-specific overrides.
+ * These rules were moved from studio/_preview-shared-main.scss so that
+ * MainEmptyState and the Studio preview do not share mutable visual rules.
+ * Keep these selectors scoped to .studio-create-page .studio-preview only.
+ */
+body.desktop-mode .studio-create-page .studio-preview .studio-preview__main-empty {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center {
+  gap: 14px;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-assistant-logo {
+  width: 56px;
+  height: 56px;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center h1 {
+  margin: 6px 0 0;
+  font-size: 28px;
+  line-height: 1.25;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-row--between {
+  margin-top: 8px;
+}
+
+body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-chip {
+  pointer-events: none;
+}
+</style>

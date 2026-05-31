@@ -1,5 +1,5 @@
 <template>
-  <section class="studio-workspace tw-min-h-0 tw-bg-studio-bg tw-text-studio-text" aria-label="Connector Store">
+  <section class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text" aria-label="Connector Store">
     <McpMainWorkspace
       :search-text="searchText"
       :active-tab="activeTab"

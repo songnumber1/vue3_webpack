@@ -1,10 +1,5 @@
 .studio-workspace {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+  /* Studio/MCP design tokens remain in SCSS while the shell layout is owned by Tailwind utilities. */
   --studio-bg: var(--chat-bg, var(--bg, #ffffff));
   --studio-surface: var(--surface, #ffffff);
   --studio-surface-muted: var(--surface-muted, #f7f7f8);
@@ -15,30 +10,10 @@
   --studio-primary-strong: var(--primary-strong, #0e8f71);
   --studio-primary-soft: var(--primary-soft, rgba(16, 163, 127, 0.12));
   --studio-control-hover: var(--control-hover, var(--surface-muted, #f3f4f6));
-  background: var(--studio-bg);
-  color: var(--studio-text);
-  overflow: hidden;
 }
 
 .studio-workspace > .mobile-topbar {
   flex: 0 0 auto;
-}
-
-.studio-workspace__scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 32px clamp(16px, 4vw, 56px) 18px;
-  box-sizing: border-box;
-}
-
-.studio-hero {
-  flex: 0 0 auto;
-  max-width: 820px;
-  margin: 0 auto 24px;
-  text-align: center;
 }
 
 .studio-hero__mark,
@@ -54,12 +29,6 @@
   font-weight: 800;
 }
 
-.studio-hero__mark {
-  width: 56px;
-  height: 56px;
-  margin-bottom: 14px;
-}
-
 .studio-hero h1 {
   margin: 0 0 8px;
   font-size: clamp(24px, 4vw, 36px);
@@ -70,27 +39,6 @@
   margin: 0;
   color: var(--studio-muted);
   line-height: 1.6;
-}
-
-.studio-toolbar,
-.studio-tabs-row,
-.studio-list-shell {
-  max-width: 980px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.studio-toolbar {
-  flex: 0 0 auto;
-  display: flex;
-  margin-bottom: 16px;
-}
-
-.studio-search {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
 }
 
 .studio-search input,
@@ -138,22 +86,6 @@
   background: var(--studio-control-hover);
 }
 
-.studio-tabs-row {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid var(--studio-border);
-}
-
-.studio-tabs,
-.studio-create-tabs {
-  display: flex;
-  min-width: 0;
-}
-
 .studio-tab,
 .studio-create-tabs button,
 .studio-button,
@@ -198,36 +130,6 @@
   color: #fff;
 }
 
-.studio-create-entry {
-  flex: 0 0 auto;
-  margin-bottom: 8px;
-}
-
-.studio-list-shell {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.studio-list-area {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
-  padding-right: 2px;
-}
-
-.studio-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  width: 100%;
-  padding-bottom: 6px;
-}
-
 .studio-card {
   display: grid;
   grid-template-columns: 52px 1fr;
@@ -267,17 +169,6 @@
 .studio-card__meta {
   grid-column: 1 / -1;
   font-size: 12px;
-}
-
-.studio-pagination {
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  margin: 14px auto 0;
-  padding: 14px 0 0;
-  border-top: 1px solid color-mix(in srgb, var(--studio-border) 72%, transparent);
 }
 
 .studio-pagination button {
