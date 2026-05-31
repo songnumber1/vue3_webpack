@@ -1,27 +1,27 @@
 <template>
   <section
-    class="empty-stage empty-stage--main main-empty-state"
+    class="empty-stage empty-stage--main main-empty-state tw-flex tw-h-full tw-min-h-0 tw-w-full tw-items-center tw-justify-center tw-overflow-hidden tw-bg-app-chat tw-px-6 tw-py-8"
     :class="{
       'empty-stage--mobile-main': isMobile,
       'main-empty-state--preview': preview,
     }"
   >
-    <div class="empty-center main-empty-state__center">
+    <div class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[820px] tw-flex-col tw-items-center tw-gap-4 tw-text-center">
       <img
-        class="empty-assistant-logo main-empty-state__logo"
+        class="empty-assistant-logo main-empty-state__logo tw-h-12 tw-w-12 tw-rounded-2xl tw-object-contain tw-shadow-control"
         :src="assistantIcon"
         :alt="assistantLabel"
       />
       <h1>{{ resolvedTitle }}</h1>
-      <p v-if="subtitle" class="main-empty-state__subtitle">{{ subtitle }}</p>
+      <p v-if="subtitle" class="main-empty-state__subtitle tw-mx-auto tw-max-w-[420px] tw-text-sm tw-leading-6 tw-text-app-subtle">{{ subtitle }}</p>
       <div
         v-if="normalizedSuggestions.length"
-        class="suggestion-row suggestion-row--between main-empty-state__suggestions"
+        class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
       >
         <button
           v-for="item in normalizedSuggestions"
           :key="item.id || item.text"
-          class="suggestion-chip"
+          class="suggestion-chip tw-inline-flex tw-max-w-full tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-app-controlBorder tw-bg-app-control tw-px-4 tw-py-2 tw-text-sm tw-font-medium tw-text-app-text tw-shadow-control tw-transition hover:tw-bg-app-controlHover"
           type="button"
           :title="item.title || item.prompt || item.text"
           :aria-disabled="disableInteractions ? 'true' : undefined"

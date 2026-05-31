@@ -1,6 +1,6 @@
 <template>
   <div
-    class="chat-container chat-container-root"
+    class="chat-container chat-container-root tw-grid tw-h-full tw-min-h-0 tw-w-full tw-grid-cols-[minmax(0,1fr)] tw-grid-rows-[56px_minmax(0,1fr)_38px] tw-overflow-hidden tw-bg-app-chat tw-text-app-text"
     :class="{
       'chat-container-root--keyboard-open': keyboardOpen,
       [`chat-container-root--mode-${mode}`]: true,
@@ -9,9 +9,9 @@
   >
     <ApplicationHeader />
 
-    <div class="application-body" aria-label="Application body">
+    <div class="application-body tw-min-h-0 tw-min-w-0 tw-overflow-hidden tw-bg-app-chat" aria-label="Application body">
       <AppSidebar />
-      <main class="chat-workspace">
+      <main class="chat-workspace tw-min-h-0 tw-min-w-0 tw-overflow-hidden">
         <slot />
       </main>
     </div>

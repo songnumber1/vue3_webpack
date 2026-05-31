@@ -2,7 +2,7 @@
   <Transition name="mobile-clipboard-toast">
     <aside
       v-if="visible"
-      class="mobile-clipboard-toast"
+      class="mobile-clipboard-toast tw-fixed tw-left-1/2 tw-bottom-[calc(var(--safe-area-bottom,0px)+24px)] tw-z-[calc(var(--z-toast,3000)+2)] tw-max-w-[min(320px,calc(100vw-32px))] tw-rounded-full tw-bg-slate-900/90 tw-px-3.5 tw-py-2.5 tw-text-center tw-text-sm tw-font-bold tw-leading-[1.35] tw-text-white tw-shadow-menu"
       role="status"
       aria-live="polite"
     >

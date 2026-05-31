@@ -2,7 +2,7 @@
   <Transition name="desktop-clipboard-note">
     <aside
       v-if="visible"
-      class="desktop-clipboard-note"
+      class="desktop-clipboard-note tw-fixed tw-right-6 tw-top-[calc(var(--desktop-header-height,64px)+20px)] tw-z-[calc(var(--z-toast,3000)+1)] tw-flex tw-w-[min(320px,calc(100vw-48px))] tw-flex-col tw-gap-1 tw-rounded-dialog tw-border tw-border-app-controlBorder tw-bg-app-surface tw-px-3.5 tw-py-3 tw-text-app-text tw-shadow-menu"
       role="status"
       aria-live="polite"
       @mouseenter="pauseTimer"
