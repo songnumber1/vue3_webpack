@@ -1,6 +1,6 @@
 <template>
-  <aside class="studio-preview tw-min-h-0 tw-bg-studio-surface tw-text-studio-text" :aria-label="t('studio.preview.label')">
-    <div class="studio-preview__label tw-shrink-0 tw-text-studio-muted">{{ t("studio.preview.label") }}</div>
+  <aside class="studio-preview tw-relative tw-min-h-0 tw-overflow-y-auto tw-border tw-border-solid tw-border-studio-border tw-rounded-studio tw-bg-studio-surface tw-p-4 tw-text-studio-text" :aria-label="t('studio.preview.label')">
+    <div class="studio-preview__label tw-absolute tw-left-4 tw-top-4 tw-shrink-0 tw-text-sm tw-font-extrabold tw-text-studio-muted">{{ t("studio.preview.label") }}</div>
     <MainEmptyState
       preview
       class="studio-preview__main-empty tw-min-h-0"

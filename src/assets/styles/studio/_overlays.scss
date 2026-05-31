@@ -37,16 +37,6 @@
   overflow: hidden;
 }
 
-.studio-create-panel__head {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid var(--studio-border);
-  background: var(--studio-surface);
-  padding: 12px 16px;
-}
 
 .studio-create-actions {
   display: flex;
@@ -55,31 +45,8 @@
   justify-content: flex-end;
 }
 
-.studio-create-layout {
-  flex: 1 1 auto;
-  min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(340px, 0.95fr) minmax(360px, 1.05fr);
-  gap: 16px;
-  padding: 16px;
-  overflow: hidden;
-  background: var(--studio-surface-muted);
-}
 
-.studio-create-form,
-.studio-preview {
-  min-height: 0;
-  overflow-y: auto;
-  border: 1px solid var(--studio-border);
-  border-radius: 5px;
-  background: var(--studio-surface);
-  padding: 16px;
-}
 
-.studio-create-tabs {
-  gap: 8px;
-  margin-bottom: 16px;
-}
 
 .studio-create-tabs button {
   border: 1px solid var(--studio-border);
@@ -168,12 +135,6 @@
   color: var(--studio-muted);
 }
 
-.studio-preview {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
 
 .studio-preview__card {
   width: min(520px, 100%);

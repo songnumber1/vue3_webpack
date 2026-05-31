@@ -1,12 +1,12 @@
 <template>
   <section
     ref="createPageRef"
-    class="studio-create-page tw-min-h-0 tw-bg-studio-bg tw-text-studio-text"
+    :class="createPageClass"
     :aria-label="t('studio.createPage.title')"
     @focusin="handleCreateFocusIn"
     @focusout="handleCreateFocusOut"
   >
-    <header class="studio-create-panel__head tw-shrink-0 tw-items-center">
+    <header :class="createHeaderClass">
       <button
         v-if="isMobile"
         class="studio-create-panel__back studio-create-icon-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
@@ -17,10 +17,10 @@
       >
         <span class="studio-icon studio-icon--back" aria-hidden="true"></span>
       </button>
-      <strong class="studio-create-panel__title">{{
+      <strong class="studio-create-panel__title tw-min-w-0 tw-truncate tw-text-lg tw-font-black">{{
         t("studio.createPage.title")
       }}</strong>
-      <div v-if="!isMobile" class="studio-create-actions tw-shrink-0 tw-items-center">
+      <div v-if="!isMobile" class="studio-create-actions tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-flex-wrap">
         <button
           class="studio-button studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           type="button"
@@ -81,10 +81,10 @@
       </button>
     </header>
 
-    <div class="studio-create-layout tw-min-h-0 tw-flex-1">
-      <form ref="createFormRef" class="studio-create-form tw-min-h-0" @submit.prevent>
+    <div :class="createLayoutClass">
+      <form ref="createFormRef" :class="createFormClass" @submit.prevent>
         <div
-          class="studio-create-tabs tw-shrink-0 tw-overflow-x-auto"
+          :class="createTabsClass"
           role="tablist"
           :aria-label="t('studio.createPage.settingsLabel')"
         >
@@ -219,6 +219,41 @@ const createPageRef = ref(null);
 const createFormRef = ref(null);
 const focusedEditor = ref(null);
 const actionSheetOpen = ref(false);
+
+const createPageClass = computed(() => [
+  "studio-create-page tw-min-h-0 tw-bg-studio-bg tw-text-studio-text tw-flex tw-flex-col",
+  isMobile.value
+    ? "tw-flex-1 tw-h-full tw-overflow-hidden"
+    : "tw-fixed tw-left-0 tw-right-0 tw-top-appHeader tw-bottom-appFooter tw-z-stickyControl",
+]);
+
+const createHeaderClass = computed(() => [
+  "studio-create-panel__head tw-flex tw-shrink-0 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-solid tw-border-studio-border tw-bg-studio-surface",
+  isMobile.value
+    ? "tw-min-h-[calc(52px+env(safe-area-inset-top,0px))] tw-px-2 tw-pt-[env(safe-area-inset-top,0px)] tw-pb-0"
+    : "tw-min-h-[58px] tw-px-[clamp(18px,3vw,32px)] tw-py-0",
+]);
+
+const createLayoutClass = computed(() => [
+  "studio-create-layout tw-flex-1 tw-min-h-0",
+  isMobile.value
+    ? "tw-block tw-overflow-y-auto tw-overflow-x-hidden tw-p-3 tw-pb-[calc(24px+env(safe-area-inset-bottom,0px)+var(--keyboard-height,0px))]"
+    : "tw-grid tw-grid-cols-[minmax(480px,0.95fr)_minmax(420px,0.85fr)] tw-items-stretch tw-gap-4 tw-overflow-hidden tw-px-[clamp(18px,3vw,32px)] tw-pt-4 tw-pb-[18px]",
+]);
+
+const createFormClass = computed(() => [
+  "studio-create-form tw-min-h-0 tw-border tw-border-solid tw-border-studio-border tw-rounded-studio tw-bg-studio-surface tw-p-4",
+  isMobile.value
+    ? "tw-overflow-visible"
+    : "tw-flex tw-w-full tw-flex-col tw-overflow-y-auto",
+]);
+
+const createTabsClass = computed(() => [
+  "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-border-b tw-border-solid tw-border-studio-border tw-bg-studio-surface",
+  isMobile.value
+    ? "tw-sticky tw-top-[-14px] tw-z-[3] tw-mx-[-14px] tw-mt-[-14px] tw-mb-[14px] tw-flex tw-gap-[6px] tw-px-[14px] tw-pt-3 tw-pb-0"
+    : "tw-sticky tw-top-[-16px] tw-z-[2] tw-mx-[-16px] tw-mt-[-16px] tw-mb-4 tw-flex tw-gap-2 tw-px-4 tw-pt-[14px] tw-pb-0",
+]);
 useOverlayScrollbar(createFormRef, {overflow: {x: "hidden", y: "scroll"}});
 
 let focusScrollTimer = 0;
