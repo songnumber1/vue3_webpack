@@ -403,3 +403,10 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handleHistoryHydrated: finishHistoryHydration,
 });
 </script>
+
+<style scoped lang="scss">
+.chat-container-root {
+  min-width: 0;
+  min-height: 0;
+}
+</style>

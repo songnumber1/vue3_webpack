@@ -60,7 +60,9 @@ const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );
 const mainPromptClass = computed(() =>
-  isMobile.value ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
+  isMobile.value
+    ? "mobile-main-fixed-prompt !fixed !inset-x-0 !bottom-0 !z-[var(--z-prompt)] !box-border !w-[100dvw] !max-w-[100dvw] !overflow-hidden !bg-transparent !px-3 !pb-[max(12px,env(safe-area-inset-bottom))] !pt-2 !shadow-none"
+    : "desktop-center-prompt !w-[min(var(--layout-prompt-width,820px),100%)] !max-w-[var(--layout-prompt-width,820px)] !border-0 !p-0"
 );
 
 function handleSuggestionClick(item) {
@@ -69,3 +71,48 @@ function handleSuggestionClick(item) {
   mainPromptInputRef.value?.setText(prompt, {focus: true});
 }
 </script>
+
+<style scoped lang="scss">
+/* 기존 메인 composer 모바일 보정은 메인 workspace가 소유합니다. */
+:global(body.mobile-mode) .mobile-main-fixed-prompt {
+  width: 100%;
+  max-width: none;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt,
+:global(body.mobile-mode) .mobile-main-fixed-prompt.prompt-wrap {
+  background: transparent;
+  box-shadow: none;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-box--gemini) {
+  align-items: stretch;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-action-row) {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-left-actions) {
+  display: flex;
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+}
+
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.send-button),
+:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.voice-button) {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+</style>

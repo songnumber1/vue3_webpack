@@ -1,1 +1,14 @@
-@use "./tailwind-bridge" as *;
+/* Studio styles are split by ownership to keep Studio and future MCP work maintainable.
+   Import order intentionally matches the previous monolithic cascade. */
+@use "./core" as *;
+@use "./overlays" as *;
+@use "./responsive-foundation" as *;
+@use "./create-base" as *;
+@use "./mobile-main" as *;
+@use "./create-responsive" as *;
+@use "./create-controls" as *;
+@use "./create-polish" as *;
+@use "./authority-picker" as *;
+@use "./detail-actions" as *;
+@use "./preview-shared-main" as *;
+@use "./overlay-pagination-fixes" as *;

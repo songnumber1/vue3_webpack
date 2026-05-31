@@ -1,13 +1,13 @@
 <template>
   <aside
-    class="desktop-sidebar min-w-0"
+    class="desktop-sidebar"
     :class="{'desktop-sidebar--collapsed': sidebarCollapsed}"
   >
     <div
       v-if="!sidebarCollapsed"
-      class="sidebar-content sidebar-content--assistant min-w-0"
+      class="sidebar-content sidebar-content--assistant"
     >
-      <div class="sidebar-top min-w-0">
+      <div class="sidebar-top">
         <SidebarAssistantSelector
           ref="assistantSelectorRef"
           :assistants="assistants"
@@ -29,7 +29,7 @@
         </div>
       </div>
 
-      <nav class="quick-menu quick-menu--assistant min-w-0">
+      <nav class="quick-menu quick-menu--assistant">
         <button class="quick-item active" type="button" @click="handleNewChat">
           <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
@@ -75,11 +75,11 @@
   </transition>
 
   <transition name="drawer-slide">
-    <aside v-if="drawerOpen" class="mobile-drawer box-border">
+    <aside v-if="drawerOpen" class="mobile-drawer">
       <div
-        class="sidebar-content sidebar-content--mobile sidebar-content--assistant min-w-0"
+        class="sidebar-content sidebar-content--mobile sidebar-content--assistant"
       >
-        <div class="sidebar-top min-w-0">
+        <div class="sidebar-top">
           <SidebarAssistantSelector
             :assistants="assistants"
             :selected-assistant-id="selectedAssistantId"
@@ -99,7 +99,7 @@
           </div>
         </div>
 
-        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search min-w-0">
+        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search">
           <button
             class="quick-item active"
             type="button"
@@ -144,7 +144,7 @@
       type="button"
       @click="selectAssistant(assistant.id)"
     >
-      <span class="bottom-sheet-option-main min-w-0">
+      <span class="bottom-sheet-option-main">
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
@@ -370,3 +370,38 @@ useEventListener(
   {passive: true}
 );
 </script>
+
+<style scoped lang="scss">
+/*
+ * AppSidebar local guard styles.
+ * Shared mobile drawer/browser fallback rules stay in global CSS because they
+ * intentionally target teleported/viewport-level states.
+ */
+.desktop-sidebar {
+  min-width: 0;
+}
+
+.sidebar-content--assistant {
+  min-width: 0;
+}
+
+.sidebar-top {
+  min-width: 0;
+}
+
+.quick-menu--assistant {
+  min-width: 0;
+}
+
+.mobile-drawer {
+  box-sizing: border-box;
+}
+
+.mobile-drawer .sidebar-content--assistant {
+  min-width: 0;
+}
+
+.bottom-sheet-option-main {
+  min-width: 0;
+}
+</style>

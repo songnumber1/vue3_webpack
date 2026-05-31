@@ -46,6 +46,7 @@
  */
 
 import {computed, ref} from "vue";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useI18n} from "vue-i18n";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
@@ -64,11 +65,19 @@ defineEmits(["toggle", "select"]);
 
 const {t} = useI18n();
 const rootRef = ref(null);
+const menuRef = ref(null);
 const currentAssistant = computed(
   () =>
     props.assistants.find((item) => item.id === props.selectedAssistantId) ||
     props.assistants[0] || {label: "Assistant"}
 );
+
+useOverlayScrollbar(
+  menuRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [props.open, props.mobile, props.assistants.length], enabled: () => props.open && !props.mobile}
+);
+
 
 defineExpose({rootRef});
 </script>

@@ -1,7 +1,7 @@
 <template>
   <textarea
     ref="textareaRef"
-    class="prompt-textarea block min-h-[38px] w-full min-w-0 flex-none"
+    class="prompt-textarea"
     :value="textareaValue"
     :disabled="isDisabled"
     :placeholder="resolvedPlaceholder"
@@ -95,3 +95,13 @@ function handleShiftEnter(event) {
 
 defineExpose({textareaRef});
 </script>
+
+<style scoped lang="scss">
+.prompt-textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 38px;
+  flex: 0 0 auto;
+}
+</style>

@@ -1,0 +1,11 @@
+/*
+ * Step 2 Tailwind entry.
+ *
+ * This file intentionally exposes only Tailwind tokens and generated utilities.
+ * It must not own app/base/layout/component/runtime styles yet because before_front
+ * SCSS remains the visual source of truth until each component is migrated.
+ */
+@tailwind base;
+@tailwind utilities;
+
+@import "./tokens";

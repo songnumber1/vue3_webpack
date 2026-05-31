@@ -1,11 +1,11 @@
 <template>
   <article class="message message--assistant message--error">
     <div class="avatar">AI</div>
-    <div class="bubble bubble--assistant bubble--error border-[color-mix(in_srgb,#dc2626_28%,var(--prompt-border))] bg-[color-mix(in_srgb,#dc2626_4%,var(--surface))]">
+    <div class="bubble bubble--assistant bubble--error">
       <div class="bubble-meta">Assistant</div>
-      <section class="assistant-error-card flex items-start gap-3 rounded-ui border border-[color-mix(in_srgb,#dc2626_24%,var(--control-border))] bg-[color-mix(in_srgb,#dc2626_7%,var(--surface))] p-3.5 text-app-text" role="alert">
-        <div class="assistant-error-icon inline-flex size-6 min-w-6 items-center justify-center rounded-full bg-red-600 font-black leading-none text-white" aria-hidden="true">!</div>
-        <div class="assistant-error-body min-w-0 [&>strong]:mb-[5px] [&>strong]:block [&>strong]:text-[var(--font-size-base)] [&>strong]:font-extrabold [&>p]:m-0 [&>p]:whitespace-pre-wrap [&>p]:text-[var(--font-size-sm)] [&>p]:leading-[1.55] [&>p]:text-[var(--muted)]">
+      <section class="assistant-error-card" role="alert">
+        <div class="assistant-error-icon" aria-hidden="true">!</div>
+        <div class="assistant-error-body">
           <strong>{{ errorTitle }}</strong>
           <p>{{ errorMessage }}</p>
         </div>
@@ -35,3 +35,54 @@ const errorMessage = computed(
 
 onMounted(() => emit("rendered", "error"));
 </script>
+
+<style scoped lang="scss">
+.bubble--error {
+  border-color: color-mix(in srgb, #dc2626 28%, var(--prompt-border));
+  background: color-mix(in srgb, #dc2626 4%, var(--surface));
+}
+
+.assistant-error-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, #dc2626 24%, var(--control-border));
+  border-radius: 5px;
+  background: color-mix(in srgb, #dc2626 7%, var(--surface));
+  color: var(--text);
+}
+
+.assistant-error-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.assistant-error-body {
+  min-width: 0;
+}
+
+.assistant-error-body strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: var(--font-size-base);
+  font-weight: 800;
+}
+
+.assistant-error-body p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+</style>

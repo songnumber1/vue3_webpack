@@ -1,17 +1,17 @@
 <template>
-  <div class="swagger-page h-[var(--app-height,100vh)] w-full overflow-auto bg-white text-slate-900">
-    <div class="swagger-toolbar sticky top-0 z-[var(--z-content-raised)] flex items-center justify-between gap-4 border-b border-slate-200 bg-white/95 px-6 py-3.5 backdrop-blur mobile:flex-col mobile:items-stretch mobile:px-3.5 mobile:py-3">
+  <div class="swagger-page">
+    <div class="swagger-toolbar">
       <div>
-        <strong class="mb-1 block text-[var(--text-size-body-strong)] text-slate-900">Contract Category</strong>
-        <p class="m-0 text-[var(--text-size-helper)] text-slate-500">
+        <strong>Contract Category</strong>
+        <p>
           Swagger 화면에서 REST/Web API, JS → Android, Android → JS 명세를
           전환합니다.
         </p>
       </div>
 
-      <div class="toolbar-actions flex flex-wrap items-center justify-end gap-2.5 mobile:w-full mobile:justify-stretch">
+      <div class="toolbar-actions">
         <RouterLink
-          class="toolbar-link inline-flex h-9 items-center justify-center gap-[7px] rounded-full border border-slate-300 bg-white px-3 text-[var(--text-size-helper)] font-extrabold text-slate-900 no-underline transition hover:-translate-y-px hover:border-slate-400 hover:bg-slate-100 mobile:flex-1 [&>svg]:size-[17px] [&>svg]:fill-none [&>svg]:stroke-current [&>svg]:stroke-2"
+          class="toolbar-link"
           to="/"
           :title="t('swagger.goHome')"
           :aria-label="t('swagger.goHome')"
@@ -25,7 +25,7 @@
         </RouterLink>
         <select
           v-model="selectedCategory"
-          class="category-select h-9 min-w-[220px] rounded-lg border border-slate-300 bg-white px-3 text-[var(--text-size-body)] text-slate-900 mobile:w-full mobile:flex-1"
+          class="category-select"
           @change="renderSwagger"
         >
           <option
@@ -39,12 +39,12 @@
       </div>
     </div>
 
-    <div v-if="renderError" class="swagger-error mx-6 mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 text-red-800 [&>p]:m-0 [&>p]:break-words [&>p]:leading-normal [&>strong]:mb-1.5 [&>strong]:block">
+    <div v-if="renderError" class="swagger-error">
       <strong>{{ t("swagger.renderError") }}</strong>
       <p>{{ renderError }}</p>
     </div>
 
-    <div ref="swaggerRoot" class="swagger-root min-h-[calc(var(--app-height,100vh)-72px)] bg-white mobile:min-h-[calc(var(--app-height,100vh)-132px)]"></div>
+    <div ref="swaggerRoot" class="swagger-root"></div>
   </div>
 </template>
 
@@ -156,6 +156,122 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.swagger-page {
+  width: 100%;
+  height: var(--app-height, 100vh);
+  overflow: auto;
+
+  background: #ffffff;
+  color: #111827;
+}
+
+.swagger-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-content-raised);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+}
+
+.swagger-toolbar strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: var(--text-size-body-strong);
+  color: #111827;
+}
+
+.swagger-toolbar p {
+  margin: 0;
+  font-size: var(--text-size-helper);
+  color: #6b7280;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-link {
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: var(--text-size-helper);
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.toolbar-link:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+}
+
+.toolbar-link svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.category-select {
+  min-width: 220px;
+  height: 36px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font-size: var(--text-size-body);
+}
+
+.swagger-root {
+  min-height: calc(var(--app-height, 100vh) - 72px);
+  background: #ffffff;
+}
+
+.swagger-error {
+  margin: 16px 24px 0;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.swagger-error strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.swagger-error p {
+  margin: 0;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
 :deep(.swagger-ui) {
   color: #111827;
 }
@@ -167,5 +283,31 @@ onBeforeUnmount(() => {
 :deep(.curl),
 :deep(.request-url) {
   display: none !important;
+}
+
+@media (max-width: 640px) {
+  .swagger-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px 14px;
+  }
+
+  .toolbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .toolbar-link,
+  .category-select {
+    flex: 1 1 auto;
+  }
+
+  .category-select {
+    width: 100%;
+  }
+
+  .swagger-root {
+    min-height: calc(var(--app-height, 100vh) - 132px);
+  }
 }
 </style>

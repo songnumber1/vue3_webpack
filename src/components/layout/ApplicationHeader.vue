@@ -8,7 +8,7 @@
     <nav class="application-header__actions" :aria-label="t('application.userMenuLabel')">
       <button
         v-if="systemSettings.showGuideButton"
-        class="app-icon-button app-icon-button--md guide-link guide-link--icon"
+        class="round-icon guide-link guide-link--icon"
         type="button"
         :aria-label="t('common.guide')"
         :title="t('common.guide')"
@@ -18,7 +18,7 @@
       </button>
       <button
         v-if="systemSettings.showThemeButton"
-        class="app-icon-button app-icon-button--md theme-toggle"
+        class="round-icon theme-toggle"
         type="button"
         :aria-label="t('common.theme')"
         :title="t('common.theme')"
@@ -31,7 +31,7 @@
       </button>
       <button
         v-if="systemSettings.showSwaggerButton"
-        class="app-icon-button app-icon-button--md document-toggle"
+        class="round-icon document-toggle"
         type="button"
         :aria-label="t('common.swagger')"
         :title="t('common.swagger')"

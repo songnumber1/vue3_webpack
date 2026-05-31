@@ -13,8 +13,9 @@ function assert(condition, message) {
 
 const indexScss = read('src/assets/styles/index.scss');
 const main = read('src/main.js');
-const typography = read('src/assets/styles/02-foundation/_typography.scss');
-const sidebar = read('src/assets/styles/05-layout/_sidebar.scss');
+const tailwindTokens = read('src/assets/styles/tailwind/_tokens.scss');
+const tailwindBase = read('src/assets/styles/tailwind/_base.scss');
+const tailwindComponents = read('src/assets/styles/tailwind/_components.scss');
 
 assert(
   !indexScss.includes('virtual-keyboard-debug.scss'),
@@ -26,22 +27,30 @@ assert(
   'virtual keyboard debug SCSS should be loaded only in development from main.js'
 );
 assert(
-  !typography.includes('.system-settings-view') &&
-    !typography.includes('.responsive-overlay--mobile-dialog') &&
-    !typography.includes('.mobile-api-progress-overlay'),
-  'responsive typography must remain focused on font tokens and base text rules'
+  tailwindTokens.includes('Step 5-9: typography tokens') &&
+    tailwindTokens.includes('--dialog-radius') &&
+    tailwindBase.includes('--app-height: 100vh'),
+  'base typography and dialog tokens must be owned by Tailwind token/base layers after Step 5-9'
 );
 assert(
-  !sidebar.includes('env(safe-area-inset-bottom, 0px)') &&
-    !sidebar.includes('height: var(--app-height, 100dvh) !important;'),
-  'mobile drawer footer stability rules must stay isolated outside sidebar visual polish'
+  tailwindComponents.includes('Step 5-7 header/sidebar cleanup') &&
+    indexScss.includes('High fidelity visual parity layer from the pre-Tailwind baseline') &&
+    indexScss.includes('./05-layout/sidebar"') &&
+    indexScss.includes('./05-layout/header"') &&
+    !indexScss.includes('./05-layout/application-frame"'),
+  'header/sidebar visual parity may be restored through the high fidelity layer, but application-frame must remain excluded'
 );
 assert(
   indexScss.includes('sidebar-mobile') &&
+    indexScss.includes('bottom-sheet') &&
+    indexScss.includes('markdown') &&
     indexScss.includes('dialog-control') &&
     indexScss.includes('dialog-viewport') &&
-    indexScss.includes('system-settings-dialog'),
-  'freeze Sass split files must be imported explicitly'
+    indexScss.includes('system-settings-dialog') &&
+    !indexScss.includes('./studio/studio-workspace') &&
+    tailwindComponents.includes('Step 5-9: final legacy import cleanup') &&
+    tailwindComponents.includes('Step 5-11: Studio/MCP/RAG Tailwind-owned visual parity'),
+  'runtime/platform imports must stay in index.scss, while Studio/MCP visual parity must be owned by Tailwind component layer'
 );
 
 console.log('freeze Sass policy checks passed');

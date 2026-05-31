@@ -1,31 +1,31 @@
 <template>
-  <main class="legal-page legal-page--terms flex h-[var(--app-height,100vh)] min-h-0 w-full flex-col items-center justify-center overflow-hidden overscroll-contain bg-app-bg px-[18px] py-[max(24px,env(safe-area-inset-top))] pb-[max(24px,env(safe-area-inset-bottom))] text-app-text" role="main">
-    <section class="legal-card my-auto flex max-h-full min-h-0 w-[min(100%,860px)] flex-col overflow-hidden rounded-3xl border border-app-border bg-app-surface px-7 pt-7 shadow-soft mobile:px-5 mobile:pt-5" aria-labelledby="terms-title">
-      <header class="legal-header flex-none">
-        <p class="mb-2 mt-0 text-[var(--text-size-caption)] font-extrabold uppercase tracking-[.08em] text-app-primary">{{ t("legal.terms.eyebrow") }}</p>
-        <h1 id="terms-title" class="m-0 text-[var(--text-size-page-title)] font-extrabold leading-tight">{{ t("legal.terms.title") }}</h1>
-        <p class="mb-0 mt-3 text-[var(--text-size-body-strong)] leading-[1.7] text-app-subtle">{{ t("legal.terms.description") }}</p>
+  <main class="legal-page legal-page--terms" role="main">
+    <section class="legal-card" aria-labelledby="terms-title">
+      <header class="legal-header">
+        <p class="legal-eyebrow">{{ t("legal.terms.eyebrow") }}</p>
+        <h1 id="terms-title">{{ t("legal.terms.title") }}</h1>
+        <p class="legal-description">{{ t("legal.terms.description") }}</p>
       </header>
 
-      <div class="legal-content app-scroll-area mt-7 grid gap-[18px] pb-7">
+      <div class="legal-content">
         <section
           v-for="section in termsSections"
           :key="section.title"
-          class="legal-section app-section-card p-[18px]"
+          class="legal-section"
         >
-          <h2 class="mb-2 mt-0 text-[var(--text-size-title)] leading-[1.35]">{{ section.title }}</h2>
-          <p class="m-0 text-[var(--text-size-body)] leading-[1.75] text-app-subtle">{{ section.body }}</p>
+          <h2>{{ section.title }}</h2>
+          <p>{{ section.body }}</p>
         </section>
       </div>
 
-      <footer class="terms-agreement relative z-[1] -mx-7 flex flex-none items-center justify-between gap-4 rounded-b-3xl border-t border-app-border bg-app-surface/95 px-7 py-[18px] backdrop-blur mobile:-mx-5 mobile:flex-col mobile:items-stretch mobile:px-5" aria-label="terms agreement">
-        <label class="terms-check flex min-w-0 items-center gap-2 text-[var(--text-size-body)] font-bold text-app-text">
-          <input v-model="agreed" class="size-[18px] accent-[var(--primary,#10a37f)]" type="checkbox" />
+      <footer class="terms-agreement" aria-label="terms agreement">
+        <label class="terms-check">
+          <input v-model="agreed" type="checkbox" />
           <span>{{ t("legal.terms.agreeLabel") }}</span>
         </label>
         <button
           type="button"
-          class="legal-primary-button min-h-[44px] rounded-[14px] border-0 bg-slate-900 px-6 text-[var(--text-size-body-strong)] font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-50 mobile:w-full"
+          class="legal-primary-button"
           :disabled="!agreed"
           @click="confirmTerms"
         >
@@ -63,3 +63,156 @@ function confirmTerms() {
   router.replace({path: "/"});
 }
 </script>
+
+<style scoped lang="scss">
+.legal-page {
+  width: 100%;
+  height: var(--app-height, 100vh);
+  min-height: 0;
+  padding: max(24px, env(safe-area-inset-top)) 18px
+    max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-bg, #f7f7f8);
+  color: var(--text-primary, #111827);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+.legal-card {
+  width: min(100%, 860px);
+  max-height: 100%;
+  min-height: 0;
+  margin-block: auto;
+  padding: 28px 28px 0;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 24px;
+  background: var(--surface-primary, #ffffff);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+}
+.legal-eyebrow {
+  margin: 0 0 8px;
+  font-size: var(--text-size-caption);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--accent-primary, #10a37f);
+  text-transform: uppercase;
+}
+.legal-header h1 {
+  margin: 0;
+  font-size: var(--text-size-page-title);
+  line-height: 1.25;
+  font-weight: 800;
+}
+.legal-description {
+  margin: 12px 0 0;
+  color: var(--text-secondary, #6b7280);
+  font-size: var(--text-size-body-strong);
+  line-height: 1.7;
+}
+.legal-header {
+  flex: 0 0 auto;
+}
+.legal-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  gap: 18px;
+  margin-top: 28px;
+  padding-bottom: 28px;
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+}
+.legal-section {
+  padding: 18px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.78);
+}
+.legal-section h2 {
+  margin: 0 0 8px;
+  font-size: var(--text-size-title);
+  line-height: 1.35;
+}
+.legal-section p {
+  margin: 0;
+  color: var(--text-secondary, #4b5563);
+  font-size: var(--text-size-body);
+  line-height: 1.75;
+}
+.terms-agreement {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 -28px;
+  padding: 18px 28px;
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+  border-radius: 0 0 24px 24px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(10px);
+}
+.terms-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-primary, #111827);
+  font-size: var(--text-size-body);
+  font-weight: 700;
+  cursor: pointer;
+}
+.terms-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-primary, #10a37f);
+}
+.legal-primary-button {
+  min-width: 120px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  background: #111827;
+  color: #ffffff;
+  font-size: var(--text-size-body);
+  font-weight: 800;
+  cursor: pointer;
+}
+.legal-primary-button:disabled {
+  background: #d1d5db;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+@media (max-width: 720px) {
+  .legal-page {
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: max(18px, env(safe-area-inset-top)) 14px
+      max(18px, env(safe-area-inset-bottom));
+  }
+  .legal-card {
+    width: 100%;
+    max-height: 100%;
+    margin-block: 0;
+    padding: 22px 16px 0;
+    border-radius: 20px;
+  }
+  .terms-agreement {
+    align-items: stretch;
+    flex-direction: column;
+    margin: 0 -16px;
+    padding: 16px;
+    border-radius: 0 0 20px 20px;
+  }
+  .legal-primary-button {
+    width: 100%;
+  }
+}
+</style>

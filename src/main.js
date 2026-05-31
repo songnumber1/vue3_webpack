@@ -9,6 +9,9 @@
 
 import "katex/dist/katex.min.css";
 import "highlight.js/styles/github-dark.css";
+// Tailwind is loaded before the legacy SCSS baseline.
+// preflight is disabled in tailwind.config.js, so before_front reset/keyboard/scroll behavior remains the source of truth.
+import "@/assets/styles/tailwind/index.scss";
 import {bootstrap} from "@/core/bootstrap";
 import "@/assets/styles/index.scss";
 

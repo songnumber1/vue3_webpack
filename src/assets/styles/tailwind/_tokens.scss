@@ -1,0 +1,302 @@
+/*
+ * Tailwind design-token bridge for before_front parity.
+ *
+ * Purpose of step 2:
+ * - Keep the restored before_front SCSS as the runtime source of truth.
+ * - Expose the same SCSS variables through --tw-* aliases so Vue templates can
+ *   move to Tailwind utilities in later steps without changing visual output.
+ * - Do not own keyboard, safe-area, root height, scrollbar or portal behavior here.
+ */
+@layer base {
+  :root {
+    --breakpoint-mobile-max: 767px;
+    --breakpoint-wide: 1280px;
+
+    /* App/theme color aliases. */
+    --tw-color-bg: var(--bg, #ffffff);
+    --tw-color-chat: var(--chat-bg, #ffffff);
+    --tw-color-mobile: var(--mobile-bg, #ffffff);
+    --tw-color-surface: var(--surface, #ffffff);
+    --tw-color-surface-strong: var(--surface-strong, #ffffff);
+    --tw-color-surface-muted: var(--surface-muted, #f3f4f6);
+    --tw-color-border: var(--border, #e5e7eb);
+    --tw-color-text: var(--text, #202123);
+    --tw-color-subtle: var(--text-muted, #6b7280);
+    --tw-color-placeholder: var(--placeholder, #6b7280);
+    --tw-color-primary: var(--primary, #10a37f);
+    --tw-color-primary-strong: var(--primary-strong, #0e8f71);
+    --tw-color-primary-soft: var(--primary-soft, rgba(16, 163, 127, 0.12));
+    --tw-color-accent: var(--accent, #5b5bd6);
+    --tw-color-danger: var(--danger, #ef4444);
+    --tw-color-control: var(--control-bg, #ffffff);
+    --tw-color-control-border: var(--control-border, #d9d9e3);
+    --tw-color-control-hover: var(--control-hover, #f3f4f6);
+    --tw-color-menu: var(--menu-bg, #ffffff);
+    --tw-color-prompt: var(--prompt-bg, #ffffff);
+    --tw-color-prompt-outer: var(--prompt-outer-bg, #ffffff);
+    --tw-color-prompt-border: var(--prompt-border, #d9d9e3);
+    --tw-color-sidebar: var(--sidebar-bg, #f7f7f8);
+    --tw-color-sidebar-text: var(--sidebar-text, #202123);
+    --tw-color-sidebar-icon: var(--sidebar-icon, #4b5563);
+    --tw-color-sidebar-section: var(--sidebar-section, #6b7280);
+    --tw-color-sidebar-border: var(--sidebar-border, #e5e5e5);
+    --tw-color-sidebar-hover: var(--sidebar-hover, #ececf1);
+    --tw-color-overlay: var(--overlay-backdrop, rgba(15, 23, 42, 0.36));
+    --tw-color-drawer-overlay: var(--drawer-backdrop, rgba(0, 0, 0, 0.45));
+    --tw-color-send: var(--send-bg, #111827);
+    --tw-color-send-text: var(--send-text, #ffffff);
+    --tw-color-code: var(--code-bg, #0f172a);
+    --tw-color-code-text: var(--code-text, #e2e8f0);
+
+    /* Message/mobile aliases. */
+    --tw-color-mobile-pill: var(--mobile-pill-bg, #ffffff);
+    --tw-color-mobile-pill-border: var(--mobile-pill-border, #d9d9e3);
+    --tw-color-mobile-prompt: var(--mobile-prompt-bg, #ffffff);
+    --tw-color-mobile-user-bubble: var(--mobile-user-bubble, #f4f4f4);
+    --tw-color-fab: var(--fab-bg, #111827);
+    --tw-color-fab-text: var(--fab-text, #ffffff);
+    --tw-color-bubble-user: var(--bubble-user, #f4f4f4);
+    --tw-color-bubble-user-text: var(--bubble-user-text, #202123);
+    --tw-color-bubble-assistant: var(--bubble-assistant, #ffffff);
+    --tw-color-message-user: var(--message-user-bg, var(--bubble-user, #f4f4f4));
+    --tw-color-message-user-text: var(--message-user-text, var(--bubble-user-text, #202123));
+    --tw-color-message-border: var(--message-border, #ececf1);
+    --tw-color-assistant-avatar: var(--assistant-avatar-bg, #10a37f);
+    --tw-color-assistant-avatar-text: var(--assistant-avatar-text, #ffffff);
+    --tw-color-text-on-primary: var(--text-on-primary, #ffffff);
+    --tw-color-exception-muted: var(--exception-muted, #64748b);
+    --tw-color-exception-button: var(--exception-button-bg, #111827);
+    --tw-color-exception-button-hover: var(--exception-button-hover, #1f2937);
+    --tw-color-exception-button-text: var(--exception-button-text, #ffffff);
+    --tw-color-reasoning: var(--reasoning-bg, var(--control-bg, #ffffff));
+    --tw-color-reasoning-border: var(--reasoning-border, var(--message-border, #ececf1));
+
+    /* Studio aliases. */
+    --tw-color-studio-bg: var(--studio-bg, var(--bg, #ffffff));
+    --tw-color-studio-surface: var(--studio-surface, var(--surface, #ffffff));
+    --tw-color-studio-surface-muted: var(--studio-surface-muted, var(--surface-muted, #f7f7f8));
+    --tw-color-studio-panel: var(--studio-surface, var(--surface, #ffffff));
+    --tw-color-studio-text: var(--studio-text, var(--text, #202123));
+    --tw-color-studio-muted: var(--studio-muted, var(--text-muted, #6b7280));
+    --tw-color-studio-border: var(--studio-border, var(--border, #e5e7eb));
+    --tw-color-studio-primary: var(--studio-primary, var(--primary, #10a37f));
+    --tw-color-studio-primary-strong: var(--studio-primary-strong, var(--primary-strong, #0e8f71));
+    --tw-color-studio-primary-soft: var(--studio-primary-soft, var(--primary-soft, rgba(16, 163, 127, 0.12)));
+    --tw-color-studio-control-hover: var(--studio-control-hover, var(--control-hover, #f3f4f6));
+
+    /* Radius aliases. before_front uses 5px heavily for dialog/studio controls. */
+    --tw-radius-xs: var(--radius-xs, 6px);
+    --tw-radius-sm: var(--radius-sm, 10px);
+    --tw-radius-md: var(--radius-md, 16px);
+    --tw-radius-lg: var(--radius-lg, 24px);
+    --tw-radius-app: var(--radius-md, 16px);
+    --tw-radius-control: var(--control-radius, var(--radius-md, 12px));
+    --tw-radius-control-sm: var(--control-radius-sm, 5px);
+    --tw-radius-prompt: var(--prompt-radius, 28px);
+    --tw-radius-studio: var(--studio-radius, 5px);
+    --tw-radius-dialog: var(--dialog-radius, 5px);
+    --tw-radius-dialog-input: var(--dialog-input-radius, 5px);
+    --tw-radius-dialog-option: var(--dialog-option-radius, 5px);
+    --tw-radius-message-user: var(--message-user-radius, 22px);
+
+    /* Shadow aliases. */
+    --tw-shadow-app: var(--shadow-card, 0 8px 22px rgba(15, 23, 42, 0.06));
+    --tw-shadow-control: var(--shadow-control, 0 2px 8px rgba(15, 23, 42, 0.08));
+    --tw-shadow-menu: var(--shadow-menu, 0 18px 56px rgba(15, 23, 42, 0.16));
+    --tw-shadow-prompt: var(--shadow-prompt, 0 8px 26px rgba(15, 23, 42, 0.1));
+    --tw-shadow-dialog: var(--dialog-panel-shadow, var(--shadow-menu, 0 22px 80px rgba(15, 23, 42, 0.2)));
+
+    /* Layout/spacing aliases. */
+    --tw-space-1: var(--space-1, 4px);
+    --tw-space-2: var(--space-2, 8px);
+    --tw-space-3: var(--space-3, 12px);
+    --tw-space-4: var(--space-4, 16px);
+    --tw-space-5: var(--space-5, 20px);
+    --tw-space-6: var(--space-6, 24px);
+    --tw-size-sidebar: var(--layout-sidebar-width, 260px);
+    --tw-size-sidebar-collapsed: var(--layout-sidebar-collapsed-width, 68px);
+    --tw-size-collapsed-rail: var(--layout-sidebar-collapsed-width, 68px);
+    --tw-size-mobile-drawer: var(--layout-mobile-drawer-width, min(86vw, 360px));
+    --tw-size-prompt: var(--layout-prompt-width, 820px);
+    --tw-size-message: var(--layout-message-width, 840px);
+    --tw-size-app-header: var(--application-header-height, 56px);
+    --tw-size-app-footer: var(--application-footer-height, 38px);
+    --tw-size-control-xs: var(--control-size-xs, 28px);
+    --tw-size-control-sm: var(--control-size-sm, 32px);
+    --tw-size-control-md: var(--control-size-md, 36px);
+    --tw-size-control-lg: var(--control-size-lg, 40px);
+    --tw-size-control-xl: var(--control-size-xl, 44px);
+    --tw-size-close: var(--close-button-size, 36px);
+    --tw-size-mobile-close: var(--mobile-close-button-size, 40px);
+
+    /* z-index aliases. */
+    --tw-z-content-raised: var(--z-content-raised, 20);
+    --tw-z-prompt: var(--z-prompt, 70);
+    --tw-z-prompt-floating: var(--z-prompt-floating, 90);
+    --tw-z-sidebar-collapsed: var(--z-sidebar-collapsed, 80);
+    --tw-z-sticky-control: var(--z-sticky-control, 100);
+    --tw-z-drawer-backdrop: var(--z-drawer-backdrop, 800);
+    --tw-z-drawer: var(--z-drawer, 810);
+    --tw-z-popover: var(--z-popover, 900);
+    --tw-z-overlay-backdrop: var(--z-overlay-backdrop, 1200);
+    --tw-z-overlay-panel: var(--z-overlay-panel, 1210);
+    --tw-z-modal-backdrop: var(--z-modal-backdrop, 1300);
+    --tw-z-bottom-sheet-backdrop: var(--z-bottom-sheet-backdrop, 1300);
+    --tw-z-bottom-sheet: var(--z-bottom-sheet, 1310);
+    --tw-z-modal: var(--z-modal, 1320);
+    --tw-z-image-preview-backdrop: var(--z-image-preview-backdrop, 1500);
+    --tw-z-image-preview-control: var(--z-image-preview-control, 1510);
+    --tw-z-feedback-dialog: var(--z-feedback-dialog, 1600);
+    --tw-z-toast: var(--z-toast, 3000);
+    --tw-z-chat-history-menu-backdrop: var(--z-chat-history-menu-backdrop, 2147482990);
+    --tw-z-virtual-keyboard-panel: var(--z-virtual-keyboard-panel, 2147482999);
+    --tw-z-chat-history-menu: var(--z-chat-history-menu, 2147483000);
+    --tw-z-virtual-keyboard-fab: var(--z-virtual-keyboard-fab, 2147483000);
+    --tw-z-app-dialog: var(--z-app-dialog, 2147482500);
+    --tw-z-app-dialog-front: var(--z-app-dialog-front, 2147483100);
+
+    /* Attachment/image preview runtime sizing tokens retained for migration targets. */
+    --attachment-mobile-size: 72px;
+    --attachment-mobile-radius: 14px;
+    --attachment-mobile-thumb-radius: 10px;
+    --attachment-mobile-remove-size: 30px;
+    --attachment-mobile-remove-offset: -10px;
+
+    --prompt-action-size: 38px;
+    --prompt-action-icon-size: 20px;
+    --voice-stop-bg: #ef4444;
+    --voice-stop-text: #fff;
+    --voice-stop-ring: rgba(239, 68, 68, 0.14);
+    --voice-stop-icon-size: 13px;
+
+    /* Typography tokens mirrored from before_front foundation. */
+    --font-family:
+      "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    --font-size-2xs: 11px;
+    --font-size-xs: 12px;
+    --font-size-sm: 13px;
+    --font-size-md: 14px;
+    --font-size-base: 15px;
+    --font-size-lg: 16px;
+    --font-size-xl: 18px;
+    --font-size-2xl: 22px;
+    --font-size-3xl: 24px;
+    --font-size-hero: clamp(34px, 6vw, 64px);
+
+    --font-size-fixed-10: 10px;
+    --font-size-fixed-11: 11px;
+    --font-size-fixed-12: 12px;
+    --font-size-fixed-13: 13px;
+    --font-size-fixed-14: 14px;
+    --font-size-fixed-15: 15px;
+    --font-size-fixed-16: 16px;
+    --font-size-fixed-17: 17px;
+    --font-size-fixed-18: 18px;
+    --font-size-fixed-20: 20px;
+    --font-size-fixed-22: 22px;
+    --font-size-fixed-23: 23px;
+    --font-size-fixed-24: 24px;
+    --font-size-fixed-25: 25px;
+    --font-size-fixed-26: 26px;
+    --font-size-fixed-27: 27px;
+    --font-size-fixed-28: 28px;
+    --font-size-fixed-29: 29px;
+    --font-size-fixed-30: 30px;
+    --font-size-fixed-32: 32px;
+    --font-size-fixed-34: 34px;
+    --font-size-fixed-36: 36px;
+    --font-size-fixed-38: 38px;
+
+    --line-height-tight: 1.25;
+    --line-height-title: 1.35;
+    --line-height-body: 1.55;
+    --line-height-relaxed: 1.65;
+
+    --text-size-caption: var(--font-size-xs);
+    --text-size-helper: var(--font-size-sm);
+    --text-size-body: var(--font-size-md);
+    --text-size-body-strong: var(--font-size-base);
+    --text-size-action: var(--font-size-sm);
+    --text-size-title-sm: var(--font-size-base);
+    --text-size-title: var(--font-size-lg);
+    --text-size-title-lg: var(--font-size-xl);
+    --text-size-page-title: var(--font-size-2xl);
+    --text-size-icon-sm: var(--font-size-lg);
+    --text-size-icon: var(--font-size-xl);
+    --text-size-icon-lg: var(--font-size-2xl);
+
+    --control-size-xs: 28px;
+    --control-size-sm: 32px;
+    --control-size-md: 36px;
+    --control-size-lg: 40px;
+    --control-size-xl: 44px;
+    --close-button-size: 36px;
+    --close-button-font-size: var(--font-size-fixed-20);
+    --close-button-icon-size: 18px;
+    --mobile-close-button-size: 40px;
+    --mobile-close-button-font-size: var(--font-size-fixed-22);
+
+    /* Dialog aliases remain available for Tailwind class migration. */
+    --dialog-radius: 5px;
+    --dialog-sheet-radius: 5px 5px 0 0;
+    --dialog-backdrop: var(--overlay-backdrop, rgba(15, 23, 42, 0.36));
+    --dialog-backdrop-strong: rgba(0, 0, 0, 0.45);
+    --dialog-panel-bg: var(--menu-bg, var(--surface, #fff));
+    --dialog-panel-text: var(--text, #202123);
+    --dialog-panel-border: var(--control-border, var(--border, #e5e7eb));
+    --dialog-panel-shadow: var(--shadow-menu, 0 22px 80px rgba(15, 23, 42, 0.2));
+    --dialog-header-min-height: 58px;
+    --dialog-header-padding: 14px 16px;
+    --dialog-body-padding: 16px;
+    --dialog-action-radius: 5px;
+    --dialog-action-square-radius: 5px;
+    --dialog-input-radius: 5px;
+    --dialog-option-radius: 5px;
+    --dialog-close-radius: 5px;
+    --dialog-font-family: inherit;
+    --dialog-title-font-size: var(--text-size-title-sm);
+    --dialog-title-font-weight: 800;
+    --dialog-title-line-height: 1.35;
+    --dialog-body-font-size: var(--text-size-body);
+    --dialog-body-line-height: 1.5;
+    --dialog-caption-font-size: var(--text-size-caption);
+    --dialog-caption-line-height: 1.35;
+    --dialog-action-font-size: var(--text-size-action);
+    --dialog-action-font-weight: 700;
+  }
+
+  body.mobile-mode {
+    --font-size-2xs: 10.5px;
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-md: 13px;
+    --font-size-base: 14px;
+    --font-size-lg: 15px;
+    --font-size-xl: 17px;
+    --font-size-2xl: 21px;
+    --font-size-3xl: 23px;
+    --font-size-hero: clamp(24px, 8vw, 34px);
+    --text-size-caption: var(--font-size-xs);
+    --text-size-helper: var(--font-size-sm);
+    --text-size-body: var(--font-size-md);
+    --text-size-body-strong: var(--font-size-base);
+    --text-size-action: var(--font-size-sm);
+    --text-size-title-sm: var(--font-size-base);
+    --text-size-title: var(--font-size-lg);
+    --text-size-title-lg: var(--font-size-xl);
+    --text-size-page-title: var(--font-size-2xl);
+    --text-size-icon-sm: var(--font-size-base);
+    --text-size-icon: var(--font-size-lg);
+    --text-size-icon-lg: var(--font-size-xl);
+    --dialog-header-min-height: 52px;
+    --dialog-header-padding: 12px 14px;
+    --dialog-body-padding: 14px;
+    --dialog-title-font-size: var(--text-size-title-sm);
+    --dialog-body-font-size: var(--text-size-body);
+    --dialog-caption-font-size: var(--text-size-caption);
+    --dialog-action-font-size: var(--text-size-action);
+  }
+}

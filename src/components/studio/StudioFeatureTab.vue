@@ -1,31 +1,30 @@
 <template>
-  <div class="flex flex-col gap-5">
-    <fieldset class="m-0 rounded-ui border border-app-border bg-app-surface p-4">
-      <legend class="px-1 text-sm font-black text-app-text">{{ t("studio.feature.model") }}</legend>
-      <div class="grid grid-cols-2 gap-3 mobile:grid-cols-1">
+  <div class="studio-form-stack studio-feature-tab">
+    <fieldset class="studio-model-fieldset">
+      <legend>{{ t("studio.feature.model") }}</legend>
+      <div class="studio-model-grid">
         <label
           v-for="model in modelOptions"
           :key="model.value"
-          class="flex cursor-pointer items-start gap-3 rounded-ui border border-app-border bg-app-surface p-3 text-app-text transition hover:border-app-primary"
-          :class="selectedModels.includes(model.value) ? 'border-app-primary bg-app-primarySoft' : ''"
+          class="studio-check-row studio-model-card"
+          :class="{active: selectedModels.includes(model.value)}"
         >
           <input
-            class="mt-1 h-4 w-4 shrink-0 accent-[var(--primary,#10a37f)]"
             :checked="selectedModels.includes(model.value)"
             type="checkbox"
             :value="model.value"
             @change="$emit('toggle-model', model.value)"
           />
-          <span class="flex min-w-0 flex-col gap-1">
-            <strong class="text-sm font-black">{{ model.label }}</strong>
-            <small class="text-xs leading-5 text-app-subtle">{{ model.description }}</small>
+          <span>
+            <strong>{{ model.label }}</strong>
+            <small>{{ model.description }}</small>
           </span>
         </label>
       </div>
     </fieldset>
 
-    <section class="flex flex-col gap-2" :aria-label="t('studio.feature.rag')">
-      <strong class="text-sm font-black text-app-text">{{ t("studio.feature.rag") }}</strong>
+    <section class="studio-multi-select-field" :aria-label="t('studio.feature.rag')">
+      <strong class="studio-field-title">{{ t("studio.feature.rag") }}</strong>
       <StudioMultiSelect
         :model-value="selectedRags"
         :title="t('studio.feature.rag')"
@@ -34,8 +33,8 @@
       />
     </section>
 
-    <section class="flex flex-col gap-2" :aria-label="t('studio.feature.mcp')">
-      <strong class="text-sm font-black text-app-text">{{ t("studio.feature.mcp") }}</strong>
+    <section class="studio-multi-select-field" :aria-label="t('studio.feature.mcp')">
+      <strong class="studio-field-title">{{ t("studio.feature.mcp") }}</strong>
       <StudioMultiSelect
         :model-value="selectedMcps"
         :title="t('studio.feature.mcp')"

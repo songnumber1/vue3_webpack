@@ -12,36 +12,36 @@
     <button
       v-for="category in categories"
       :key="category.value"
-      class="flex min-h-[56px] w-full items-center gap-3 rounded-ui px-3 text-left hover:bg-app-hover"
-      :class="selectedValue === category.value ? 'bg-app-primarySoft text-app-primary' : 'text-app-text'"
+      class="bottom-sheet-option bottom-sheet-option--row studio-category-sheet-option"
+      :class="{active: selectedValue === category.value}"
       type="button"
       @click="$emit('select', category.value)"
     >
-      <span class="flex min-w-0 flex-1 flex-col gap-1">
-        <strong class="text-sm font-black">{{ category.label }}</strong>
-        <small class="text-xs leading-5 text-app-subtle">{{ category.description }}</small>
+      <span class="bottom-sheet-option-main">
+        <strong>{{ category.label }}</strong>
+        <small>{{ category.description }}</small>
       </span>
-      <CheckIcon v-if="selectedValue === category.value" class="h-5 w-5 shrink-0" />
+      <CheckIcon v-if="selectedValue === category.value" class="bottom-sheet-check" />
     </button>
   </BaseBottomSheet>
 
-  <div v-else-if="open" class="fixed inset-0 z-overlay flex items-center justify-center bg-black/35 p-6" @click.self="$emit('close')">
-    <section class="flex max-h-[80vh] w-full max-w-[460px] flex-col overflow-hidden rounded-ui border border-app-border bg-app-surface shadow-soft" role="dialog" aria-modal="true" :aria-label="t('studio.categorySelect')">
-      <header class="flex min-h-[52px] shrink-0 items-center justify-between border-b border-app-border px-4">
-        <strong class="text-base font-black text-app-text">{{ t('studio.categorySelect') }}</strong>
-        <button class="flex h-9 w-9 items-center justify-center rounded-ui text-xl text-app-subtle hover:bg-app-hover" type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
+  <div v-else-if="open" class="studio-picker-backdrop" @click.self="$emit('close')">
+    <section class="studio-picker studio-picker--category" role="dialog" aria-modal="true" :aria-label="t('studio.categorySelect')">
+      <header class="studio-picker__head">
+        <strong>{{ t('studio.categorySelect') }}</strong>
+        <button type="button" :aria-label="t('common.close')" @click="$emit('close')">×</button>
       </header>
-      <div ref="pickerBodyRef" class="studio-scrollbar-stable min-h-0 flex-1 overflow-y-auto p-2">
+      <div ref="pickerBodyRef" class="studio-picker__body">
         <button
           v-for="category in categories"
           :key="category.value"
-          class="flex w-full flex-col gap-1 rounded-ui px-3 py-3 text-left hover:bg-app-hover"
-          :class="selectedValue === category.value ? 'bg-app-primarySoft text-app-primary' : 'text-app-text'"
+          class="studio-picker__option"
+          :class="{active: selectedValue === category.value}"
           type="button"
           @click="$emit('select', category.value)"
         >
-          <span class="text-sm font-black">{{ category.label }}</span>
-          <small class="text-xs leading-5 text-app-subtle">{{ category.description }}</small>
+          <span>{{ category.label }}</span>
+          <small>{{ category.description }}</small>
         </button>
       </div>
     </section>

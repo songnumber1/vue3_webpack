@@ -475,3 +475,270 @@ const attachRoot = computed(
 
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
+
+<style scoped lang="scss">
+.prompt-action-row {
+  min-width: 0;
+}
+
+.prompt-left-actions {
+  min-width: 0;
+}
+
+.prompt-selector-wrap {
+  min-width: 0;
+}
+
+.prompt-popover {
+  box-sizing: border-box;
+}
+
+.prompt-tool-menu-parent {
+  position: relative;
+}
+
+.prompt-tool-menu-parent.active {
+  background: var(--control-hover);
+}
+
+.prompt-submenu-arrow {
+  margin-left: auto;
+  width: auto;
+  color: var(--muted);
+  font-size: var(--font-size-lg);
+  line-height: 1;
+}
+
+.prompt-tool-submenu {
+  top: 0;
+  bottom: auto;
+  min-width: 220px;
+}
+
+.prompt-tool-submenu--right {
+  left: calc(100% + 8px);
+  right: auto;
+}
+
+.prompt-tool-submenu--left {
+  right: calc(100% + 8px);
+  left: auto;
+}
+
+.prompt-floating-menu {
+  top: auto;
+  right: auto;
+  bottom: auto;
+  left: auto;
+  z-index: var(--z-popover);
+}
+
+.prompt-menu-active-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  margin-left: auto;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+}
+
+.prompt-menu-active-badge + .prompt-submenu-arrow,
+.prompt-tool-parent-switch + .prompt-submenu-arrow {
+  margin-left: 6px;
+}
+
+.prompt-tool-parent-switch {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  width: 34px;
+  height: 20px;
+  min-width: 34px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--control-border);
+  transition: background 0.18s ease;
+}
+
+.prompt-tool-parent-switch span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.16);
+  transition: transform 0.18s ease;
+}
+
+.prompt-tool-parent-switch.is-active {
+  background: var(--accent);
+}
+
+.prompt-tool-parent-switch.is-active span {
+  transform: translateX(14px);
+}
+
+.prompt-tool-child-option {
+  gap: 12px;
+  min-height: 44px;
+}
+
+.prompt-tool-child-option p {
+  flex: 1;
+  min-width: 0;
+}
+
+.prompt-tool-child-option--selectedRow.is-active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--control-hover));
+  color: var(--text);
+}
+
+.prompt-tool-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 5px;
+  background: var(--surface);
+  color: var(--surface);
+  font-size: var(--font-size-fixed-12);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.prompt-tool-child-option.is-active .prompt-tool-checkbox {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--surface);
+}
+
+.prompt-tool-parent-switch > span {
+  min-width: 14px;
+  flex: 0 0 14px;
+  text-align: initial;
+  font-size: 0;
+}
+
+.prompt-tool-child-option--selectedRow.is-active {
+  background: var(--control-hover);
+}
+
+.prompt-tool-menu button.is-template-tool {
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 5px;
+}
+
+.prompt-tool-menu button.is-template-tool + button.is-template-tool {
+  margin-top: 4px;
+}
+
+.prompt-tool-menu button.is-template-tool.active {
+  background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+  color: var(--text);
+  box-shadow: none;
+}
+
+.prompt-tool-icon {
+  width: 24px !important;
+  text-align: center;
+}
+
+.prompt-tool-dot {
+  display: none;
+}
+
+.prompt-tool-text {
+  display: flex;
+  width: auto !important;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+}
+
+.prompt-tool-menu button.is-template-tool .prompt-tool-text small {
+  display: none;
+}
+
+.prompt-tool-text strong,
+.prompt-tool-text small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prompt-tool-text strong {
+  font-size: var(--font-size-md);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.prompt-tool-text small {
+  color: var(--muted);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.prompt-tool-menu button.is-template-tool.active .prompt-tool-text small {
+  color: var(--muted);
+}
+
+.prompt-selected-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  max-width: 128px;
+  padding: 0 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.prompt-selected-tool-chip--active {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--control-border));
+  color: var(--accent);
+}
+
+.prompt-selected-tool-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.prompt-selected-tool-chip img,
+.prompt-tool-icon-img {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  object-fit: contain;
+}
+
+.prompt-selected-tool-chip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

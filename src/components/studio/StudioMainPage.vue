@@ -1,14 +1,14 @@
 <template>
-  <div class="studio-workspace__scroll flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[18px] pt-8 text-app-text desktop:px-[clamp(16px,4vw,56px)] mobile:overflow-y-auto mobile:px-4 mobile:pb-[calc(24px+env(safe-area-inset-bottom,0px))] mobile:pt-4">
+  <div class="studio-workspace__scroll">
     <div class="studio-hero">
       <div class="studio-hero__mark">AS</div>
-      <h1>{{ t("studio.title") }}</h1>
-      <p>{{ t("studio.heroDescription") }}</p>
+      <h1>{{ t('studio.title') }}</h1>
+      <p>{{ t('studio.heroDescription') }}</p>
     </div>
 
     <div class="studio-toolbar">
       <div class="studio-search">
-        <label class="sr-only" for="studio-search-input">{{ t("studio.searchLabel") }}</label>
+        <label class="sr-only" for="studio-search-input">{{ t('studio.searchLabel') }}</label>
         <input
           id="studio-search-input"
           :value="searchText"
@@ -17,51 +17,19 @@
           @input="$emit('update-search-text', $event.target.value)"
           @keydown.enter.prevent="$emit('search')"
         />
-        <button
-          class="studio-search-button"
-          type="button"
-          :aria-label="t('studio.searchAction')"
-          :title="t('studio.searchAction')"
-          @click="$emit('search')"
-        >
+        <button class="studio-search-button" type="button" :aria-label="t('studio.searchAction')" :title="t('studio.searchAction')" @click="$emit('search')">
           <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
         </button>
       </div>
     </div>
 
     <div class="studio-tabs-row">
-      <div class="studio-tabs flex min-w-0 flex-wrap items-center gap-1 rounded-ui border border-app-border bg-app-muted p-1 shadow-inner mobile:flex-1 mobile:flex-nowrap" role="tablist" :aria-label="t('studio.tabsLabel')">
-        <button
-          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
-          :class="{active: activeTab === 'all'}"
-          type="button"
-          @click="$emit('update-active-tab', 'all')"
-        >
-          {{ t("studio.allAssistants") }}
-        </button>
-        <button
-          class="studio-tab rounded-ui border border-transparent px-4 py-2 text-sm font-extrabold text-app-subtle transition-colors hover:bg-app-hover hover:text-app-text mobile:flex-1 mobile:px-3"
-          :class="{active: activeTab === 'mine'}"
-          type="button"
-          @click="$emit('update-active-tab', 'mine')"
-        >
-          {{ t("studio.myAssistants") }}
-        </button>
+      <div class="studio-tabs" role="tablist" :aria-label="t('studio.tabsLabel')">
+        <button class="studio-tab" :class="{active: activeTab === 'all'}" type="button" @click="$emit('update-active-tab', 'all')">{{ t('studio.allAssistants') }}</button>
+        <button class="studio-tab" :class="{active: activeTab === 'mine'}" type="button" @click="$emit('update-active-tab', 'mine')">{{ t('studio.myAssistants') }}</button>
       </div>
-      <button
-        class="studio-button studio-button--primary studio-create-entry"
-        type="button"
-        @click="$emit('open-create')"
-      >
-        {{ t("studio.create") }}
-      </button>
-      <button
-        class="studio-create-icon-entry"
-        type="button"
-        :aria-label="t('studio.create')"
-        :title="t('studio.create')"
-        @click="$emit('open-create')"
-      >
+      <button class="studio-button studio-button--primary studio-create-entry" type="button" @click="$emit('open-create')">{{ t('studio.create') }}</button>
+      <button class="studio-create-icon-entry" type="button" :aria-label="t('studio.create')" :title="t('studio.create')" @click="$emit('open-create')">
         <span class="studio-icon studio-icon--plus" aria-hidden="true"></span>
       </button>
     </div>
@@ -89,9 +57,9 @@
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
-    <div class="studio-list-shell mt-4 flex min-h-0 flex-1 overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:border-0 mobile:bg-transparent">
+    <div class="studio-list-shell">
       <div ref="listAreaRef" class="studio-list-area">
-        <div class="studio-grid grid grid-cols-2 gap-4 mobile:grid-cols-1 mobile:gap-3">
+        <div class="studio-grid">
           <ResourceCard
             v-for="studio in studios"
             :key="studio.id"

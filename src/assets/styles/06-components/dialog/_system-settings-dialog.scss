@@ -196,11 +196,11 @@ body.mobile-mode .chat-container-root--mode-chat-search .mobile-topbar {
   padding: 4px 12px;
 }
 
-body.mobile-mode .chat-container-root--mode-main .mobile-topbar .mobile-header-icon,
-body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .mobile-header-icon,
-body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .mobile-header-icon,
-body.mobile-mode .chat-container-root--mode-studio .mobile-topbar .mobile-header-icon,
-body.mobile-mode .chat-container-root--mode-chat-search .mobile-topbar .mobile-header-icon {
+body.mobile-mode .chat-container-root--mode-main .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-studio .mobile-topbar .round-icon,
+body.mobile-mode .chat-container-root--mode-chat-search .mobile-topbar .round-icon {
   width: 34px;
   height: 34px;
 }
@@ -327,9 +327,8 @@ body.mobile-mode
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
 }
 
-/* System settings footer actions are shared by desktop/mobile.
-   Keep the mode-specific block only for the mobile size delta below. */
-.system-settings-footer .system-settings-action-button {
+body.desktop-mode .system-settings-footer .playground-button,
+body.mobile-mode .system-settings-footer .playground-button {
   min-width: 86px;
   min-height: 44px;
   border-radius: var(--dialog-action-square-radius, 5px);
@@ -340,20 +339,37 @@ body.mobile-mode
   letter-spacing: -0.01em;
 }
 
-.system-settings-footer .system-settings-action-button--primary {
+body.desktop-mode .system-settings-footer .playground-button--primary,
+body.desktop-mode .system-settings-footer .system-settings-apply-button,
+body.mobile-mode .system-settings-footer .playground-button--primary,
+body.mobile-mode .system-settings-footer .system-settings-apply-button {
   border-color: var(--primary);
   background: var(--primary);
   color: #fff;
 }
 
-.system-settings-footer .system-settings-action-button--primary:hover,
-.system-settings-footer .system-settings-action-button--primary:focus-visible {
+body.desktop-mode .system-settings-footer .playground-button--primary:hover,
+body.desktop-mode
+  .system-settings-footer
+  .playground-button--primary:focus-visible,
+body.desktop-mode .system-settings-footer .system-settings-apply-button:hover,
+body.desktop-mode
+  .system-settings-footer
+  .system-settings-apply-button:focus-visible,
+body.mobile-mode .system-settings-footer .playground-button--primary:hover,
+body.mobile-mode
+  .system-settings-footer
+  .playground-button--primary:focus-visible,
+body.mobile-mode .system-settings-footer .system-settings-apply-button:hover,
+body.mobile-mode
+  .system-settings-footer
+  .system-settings-apply-button:focus-visible {
   border-color: var(--primary-strong, var(--primary));
   background: var(--primary-strong, var(--primary));
   color: #fff;
 }
 
-body.mobile-mode .system-settings-footer .system-settings-action-button {
+body.mobile-mode .system-settings-footer .playground-button {
   min-width: 96px;
   min-height: 48px;
   font-size: var(--text-size-body, 15px);

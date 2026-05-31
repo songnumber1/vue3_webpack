@@ -1,9 +1,9 @@
 <template>
-  <aside class="flex min-h-0 flex-col overflow-hidden rounded-ui border border-app-border bg-app-surface mobile:mt-3 mobile:min-h-[520px]" :aria-label="t('studio.preview.label')">
-    <div class="shrink-0 border-b border-app-border px-4 py-3 text-sm font-black text-app-text">{{ t("studio.preview.label") }}</div>
+  <aside class="studio-preview" :aria-label="t('studio.preview.label')">
+    <div class="studio-preview__label">{{ t("studio.preview.label") }}</div>
     <MainEmptyState
       preview
-      class="min-h-0 flex-1 overflow-y-auto p-4"
+      class="studio-preview__main-empty"
       :assistant-icon="previewAssistantIcon"
       :assistant-label="resolvedAssistantLabel"
       :title="t('chat.startQuestion')"

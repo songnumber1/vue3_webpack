@@ -28,7 +28,8 @@
     "depcruise:json": "depcruise src --no-config --output-type json > depcruise-report.json",
     "madge:all": "madge --image madge-graph.png src && madge --image madge-chat.svg src/components/chat && madge --image madge-stores.svg src/stores && madge --image madge-composables.svg src/composables && madge --image madge-overlay.svg src/components/overlay && madge --image madge-platform.svg src/platform && madge --circular src && madge --orphans src",
     "depcruise:all": "depcruise src --no-config --include-only \"^src\" --output-type html > dependency-report.html && depcruise src --no-config --output-type err && depcruise src/composables --no-config --output-type html > depcruise-composables-report.html && depcruise src/stores --no-config --output-type html > depcruise-stores-report.html && depcruise src/components/chat --no-config --output-type html > depcruise-chat-report.html && depcruise src --no-config --output-type json > depcruise-report.json",
-    "analyze:all": "npm run madge:all && npm run depcruise:all"
+    "analyze:all": "npm run madge:all && npm run depcruise:all",
+    "test:regression": "node tests/run-all.cjs"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",
@@ -71,8 +72,9 @@
     "prettier": "^3.3.3",
     "sass": "^1.100.0",
     "sass-loader": "^12.6.0",
-    "autoprefixer": "10.5.0",
-    "postcss": "8.5.15",
-    "tailwindcss": "3.4.19"
+    "tailwindcss": "^3.4.17",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20",
+    "@tailwindcss/forms": "^0.5.10"
   }
 }

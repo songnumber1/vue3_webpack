@@ -2,11 +2,11 @@
   <teleport to="body">
     <div
       v-if="visible"
-      class="fixed inset-0 z-toast flex items-center justify-center bg-white/[.08] backdrop-blur-sm touch-none pointer-events-auto"
+      class="mobile-api-progress-overlay"
       role="status"
       aria-live="polite"
     >
-      <span class="size-11 rounded-full border-4 border-black/[.18] border-t-[var(--primary,#10a37f)] animate-spin-fast" aria-hidden="true"></span>
+      <span class="mobile-api-progress-spinner" aria-hidden="true"></span>
       <span class="sr-only">{{ t("overlayProgress.apiProcessing") }}</span>
     </div>
   </teleport>
