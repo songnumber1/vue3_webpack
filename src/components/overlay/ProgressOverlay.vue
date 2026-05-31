@@ -6,7 +6,7 @@
       role="status"
       aria-live="polite"
     >
-      <span class="mobile-api-progress-spinner tw-inline-flex tw-h-11 tw-w-11 tw-animate-spin tw-rounded-full tw-border-4 tw-border-slate-900/20 tw-border-t-app-primary" aria-hidden="true"></span>
+      <span class="mobile-api-progress-spinner tw-inline-flex tw-h-11 tw-w-11 tw-animate-spin tw-rounded-full tw-border-4 tw-border-solid tw-border-slate-900/20 tw-border-t-app-primary" aria-hidden="true"></span>
       <span class="sr-only">{{ t("overlayProgress.apiProcessing") }}</span>
     </div>
   </teleport>
