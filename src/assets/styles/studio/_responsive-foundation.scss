@@ -106,19 +106,6 @@ body.mobile-mode .studio-picker__head {
 }
 
 /* Assistant Studio PC refinements: category chips, page-style create screen, and form polish. */
-.studio-card {
-  position: relative;
-}
-
-.studio-card__more {
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  color: var(--studio-muted);
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
 body.mobile-mode .mcp-created-filter {
   width: 100%;
   box-sizing: border-box;

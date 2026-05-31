@@ -17,7 +17,6 @@
 }
 
 .studio-hero__mark,
-.studio-card__image,
 .studio-dialog__image,
 .studio-preview__logo {
   display: inline-flex;
@@ -57,7 +56,6 @@
 
 
 
-.studio-card:hover,
 .studio-button:hover,
 .studio-create-tabs button:hover,
 .studio-picker__option:hover {
@@ -94,33 +92,6 @@
   color: #fff;
 }
 
-.studio-card {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 12px;
-  text-align: left;
-  border: 1px solid var(--studio-border);
-  border-radius: 5px;
-  background: var(--studio-surface);
-  color: inherit;
-  padding: 16px;
-  cursor: pointer;
-}
-
-.studio-card__image {
-  width: 52px;
-  height: 52px;
-}
-
-.studio-card__body {
-  display: grid;
-  gap: 5px;
-  min-width: 0;
-}
-
-.studio-card__body small,
-.studio-card__body span,
-.studio-card__meta,
 .studio-dialog__desc,
 .studio-dialog__box,
 .studio-preview p,
@@ -128,11 +99,6 @@
 .studio-check-row small,
 .studio-picker__option small {
   color: var(--studio-muted);
-}
-
-.studio-card__meta {
-  grid-column: 1 / -1;
-  font-size: 12px;
 }
 
 

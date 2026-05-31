@@ -81,11 +81,11 @@
             :description="studio.description"
             :meta="`${t('studio.likes')} ${studio.likes} · ${t('studio.questions')} ${studio.views}`"
             :image-text="studio.initial"
-            card-class="studio-card"
-            image-class="studio-card__image"
-            body-class="studio-card__body"
-            more-class="studio-card__more"
-            meta-class="studio-card__meta"
+            card-class="studio-card tw-grid tw-grid-cols-[52px_minmax(0,1fr)] tw-gap-3 tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-p-4 tw-text-inherit tw-cursor-pointer hover:tw-bg-studio-controlHover"
+            image-class="studio-card__image tw-inline-flex tw-h-[52px] tw-w-[52px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-font-extrabold tw-text-app-textOnPrimary"
+            body-class="studio-card__body tw-grid tw-min-w-0 tw-gap-[5px]"
+            more-class="studio-card__more tw-absolute tw-right-[14px] tw-top-3 tw-inline-flex tw-items-center tw-justify-center tw-text-studio-muted tw-font-black tw-tracking-[1px]"
+            meta-class="studio-card__meta tw-col-span-full tw-text-xs tw-text-studio-muted"
             @open="$emit('open-detail', $event)"
           />
         </div>
