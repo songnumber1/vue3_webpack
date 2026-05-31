@@ -9,6 +9,9 @@ const appSize = (name, legacy, fallback) => cssVar(`--tw-size-${name}`, cssVar(l
 const appZ = (name, legacy, fallback) => cssVar(`--tw-z-${name}`, cssVar(legacy, fallback));
 
 module.exports = {
+  // Step 2에서는 기존 legacy class명(flex, hidden, fixed 등)과 Tailwind utility 충돌을 막기 위해
+  // 모든 Tailwind utility를 tw- prefix로만 생성합니다.
+  prefix: 'tw-',
   darkMode: ['class', '[data-theme="dark"]'],
   content: ['./public/index.html', './src/**/*.{vue,js}'],
   corePlugins: {
