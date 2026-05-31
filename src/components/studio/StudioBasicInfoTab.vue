@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-form-stack">
+  <div class="studio-form-stack tw-min-w-0">
     <label>{{ t("studio.basic.image") }}<input :value="draft.image" :placeholder="t('studio.basic.imagePlaceholder')" @input="updateField('image', $event.target.value)" /></label>
     <label class="studio-category-field">
       {{ t("studio.basic.category") }}

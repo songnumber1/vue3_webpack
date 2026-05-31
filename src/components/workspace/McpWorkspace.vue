@@ -1,5 +1,5 @@
 <template>
-  <section class="studio-workspace" aria-label="Connector Store">
+  <section class="studio-workspace tw-min-h-0 tw-bg-studio-bg tw-text-studio-text" aria-label="Connector Store">
     <McpMainWorkspace
       :search-text="searchText"
       :active-tab="activeTab"
@@ -20,8 +20,8 @@
       @go-page="goPage"
     />
 
-    <div v-if="readyDialogOpen" class="studio-confirm-backdrop">
-      <article class="studio-confirm-dialog" role="dialog" aria-modal="true" :aria-label="t('mcp.ready.title')">
+    <div v-if="readyDialogOpen" class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal">
+      <article class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text" role="dialog" aria-modal="true" :aria-label="t('mcp.ready.title')">
         <header class="studio-confirm-dialog__head">
           <strong>{{ t("mcp.ready.title") }}</strong>
           <button type="button" :aria-label="t('common.close')" @click="readyDialogOpen = false">×</button>

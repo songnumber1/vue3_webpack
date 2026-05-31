@@ -1,6 +1,6 @@
 <template>
-  <div ref="rootRef" class="studio-multi-select">
-    <button class="studio-multi-select__trigger" type="button" :aria-label="title" @click="open = true">
+  <div ref="rootRef" class="studio-multi-select tw-relative tw-min-w-0">
+    <button class="studio-multi-select__trigger tw-min-w-0 tw-items-center tw-justify-between" type="button" :aria-label="title" @click="open = true">
       <span v-if="modelValue.length" class="studio-multi-select__chips">
         <span v-for="item in visibleValues" :key="item" class="studio-multi-select__chip">{{ item }}</span>
         <span v-if="hiddenCount > 0" class="studio-multi-select__chip">+{{ hiddenCount }}</span>

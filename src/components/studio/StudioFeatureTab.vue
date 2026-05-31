@@ -1,8 +1,8 @@
 <template>
-  <div class="studio-form-stack studio-feature-tab">
+  <div class="studio-form-stack studio-feature-tab tw-min-w-0">
     <fieldset class="studio-model-fieldset">
       <legend>{{ t("studio.feature.model") }}</legend>
-      <div class="studio-model-grid">
+      <div class="studio-model-grid tw-min-w-0">
         <label
           v-for="model in modelOptions"
           :key="model.value"

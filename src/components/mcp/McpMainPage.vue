@@ -1,13 +1,13 @@
 <template>
-  <div class="studio-workspace__scroll">
-    <div class="studio-hero">
-      <div class="studio-hero__mark">CS</div>
+  <div class="studio-workspace__scroll tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text">
+    <div class="studio-hero tw-shrink-0 tw-text-studio-text">
+      <div class="studio-hero__mark tw-inline-flex tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-text-app-textOnPrimary">CS</div>
       <h1>{{ t("mcp.title") }}</h1>
       <p>{{ t("mcp.heroDescription") }}</p>
     </div>
 
-    <div class="studio-toolbar">
-      <div class="studio-search">
+    <div class="studio-toolbar tw-shrink-0">
+      <div class="studio-search tw-relative tw-min-w-0">
         <label class="sr-only" for="mcp-search-input">{{ t("mcp.searchLabel") }}</label>
         <input
           id="mcp-search-input"
@@ -18,7 +18,7 @@
           @keydown.enter.prevent="$emit('search')"
         />
         <button
-          class="studio-search-button"
+          class="studio-search-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           type="button"
           :aria-label="t('mcp.searchAction')"
           :title="t('mcp.searchAction')"
@@ -29,10 +29,10 @@
       </div>
     </div>
 
-    <div class="studio-tabs-row">
-      <div class="studio-tabs" role="tablist" :aria-label="t('mcp.tabsLabel')">
+    <div class="studio-tabs-row tw-shrink-0">
+      <div class="studio-tabs tw-min-w-0" role="tablist" :aria-label="t('mcp.tabsLabel')">
         <button
-          class="studio-tab"
+          class="studio-tab tw-shrink-0"
           :class="{active: activeTab === 'all'}"
           type="button"
           @click="$emit('update-active-tab', 'all')"
@@ -49,14 +49,14 @@
         </button>
       </div>
       <button
-        class="studio-button studio-button--primary studio-create-entry"
+        class="studio-button studio-button--primary studio-create-entry tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         @click="$emit('open-create')"
       >
         {{ t("mcp.create") }}
       </button>
       <button
-        class="studio-create-icon-entry"
+        class="studio-create-icon-entry tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         :aria-label="t('mcp.create')"
         :title="t('mcp.create')"
@@ -66,7 +66,7 @@
       </button>
     </div>
 
-    <div v-if="activeTab === 'all'" class="studio-category-chips" :aria-label="t('mcp.categoryLabel')">
+    <div v-if="activeTab === 'all'" class="studio-category-chips tw-shrink-0 tw-overflow-x-auto" :aria-label="t('mcp.categoryLabel')">
       <button
         v-for="category in categories"
         :key="category.value"
@@ -80,7 +80,7 @@
 
     <button
       v-if="activeTab === 'all'"
-      class="studio-mobile-category-select"
+      class="studio-mobile-category-select tw-shrink-0 tw-items-center tw-justify-between"
       type="button"
       :aria-label="t('mcp.categorySelect')"
       @click="$emit('open-category-picker')"
@@ -89,7 +89,7 @@
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
-    <label v-if="activeTab === 'mine'" class="mcp-created-filter">
+    <label v-if="activeTab === 'mine'" class="mcp-created-filter tw-shrink-0 tw-items-center">
       <input
         :checked="createdOnly"
         type="checkbox"
@@ -98,9 +98,9 @@
       <span>{{ t("mcp.createdOnly") }}</span>
     </label>
 
-    <div class="studio-list-shell">
-      <div ref="listAreaRef" class="studio-list-area">
-        <div class="studio-grid">
+    <div class="studio-list-shell tw-min-h-0 tw-flex-1">
+      <div ref="listAreaRef" class="studio-list-area tw-min-h-0">
+        <div class="studio-grid tw-min-w-0">
           <ResourceCard
             v-for="mcp in mcps"
             :key="mcp.id"
@@ -121,8 +121,8 @@
       </div>
     </div>
 
-    <nav class="studio-pagination" :aria-label="t('mcp.pagination.label')">
-      <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.first')" @click="$emit('go-page', 1)">
+    <nav class="studio-pagination tw-shrink-0 tw-items-center tw-justify-center" :aria-label="t('mcp.pagination.label')">
+      <button class="studio-page-icon-button tw-inline-flex tw-items-center tw-justify-center" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.first')" @click="$emit('go-page', 1)">
         <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
       </button>
       <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.previous')" @click="$emit('go-page', currentPage - 1)">

@@ -1,13 +1,13 @@
 <template>
-  <div class="studio-workspace__scroll">
-    <div class="studio-hero">
-      <div class="studio-hero__mark">AS</div>
+  <div class="studio-workspace__scroll tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text">
+    <div class="studio-hero tw-shrink-0 tw-text-studio-text">
+      <div class="studio-hero__mark tw-inline-flex tw-items-center tw-justify-center tw-rounded-studio tw-bg-studio-primary tw-text-app-textOnPrimary">AS</div>
       <h1>{{ t('studio.title') }}</h1>
       <p>{{ t('studio.heroDescription') }}</p>
     </div>
 
-    <div class="studio-toolbar">
-      <div class="studio-search">
+    <div class="studio-toolbar tw-shrink-0">
+      <div class="studio-search tw-relative tw-min-w-0">
         <label class="sr-only" for="studio-search-input">{{ t('studio.searchLabel') }}</label>
         <input
           id="studio-search-input"
@@ -17,24 +17,24 @@
           @input="$emit('update-search-text', $event.target.value)"
           @keydown.enter.prevent="$emit('search')"
         />
-        <button class="studio-search-button" type="button" :aria-label="t('studio.searchAction')" :title="t('studio.searchAction')" @click="$emit('search')">
+        <button class="studio-search-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center" type="button" :aria-label="t('studio.searchAction')" :title="t('studio.searchAction')" @click="$emit('search')">
           <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
         </button>
       </div>
     </div>
 
-    <div class="studio-tabs-row">
-      <div class="studio-tabs" role="tablist" :aria-label="t('studio.tabsLabel')">
-        <button class="studio-tab" :class="{active: activeTab === 'all'}" type="button" @click="$emit('update-active-tab', 'all')">{{ t('studio.allAssistants') }}</button>
+    <div class="studio-tabs-row tw-shrink-0">
+      <div class="studio-tabs tw-min-w-0" role="tablist" :aria-label="t('studio.tabsLabel')">
+        <button class="studio-tab tw-shrink-0" :class="{active: activeTab === 'all'}" type="button" @click="$emit('update-active-tab', 'all')">{{ t('studio.allAssistants') }}</button>
         <button class="studio-tab" :class="{active: activeTab === 'mine'}" type="button" @click="$emit('update-active-tab', 'mine')">{{ t('studio.myAssistants') }}</button>
       </div>
-      <button class="studio-button studio-button--primary studio-create-entry" type="button" @click="$emit('open-create')">{{ t('studio.create') }}</button>
-      <button class="studio-create-icon-entry" type="button" :aria-label="t('studio.create')" :title="t('studio.create')" @click="$emit('open-create')">
+      <button class="studio-button studio-button--primary studio-create-entry tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center" type="button" @click="$emit('open-create')">{{ t('studio.create') }}</button>
+      <button class="studio-create-icon-entry tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center" type="button" :aria-label="t('studio.create')" :title="t('studio.create')" @click="$emit('open-create')">
         <span class="studio-icon studio-icon--plus" aria-hidden="true"></span>
       </button>
     </div>
 
-    <div v-if="activeTab === 'all'" class="studio-category-chips" :aria-label="t('studio.categoryLabel')">
+    <div v-if="activeTab === 'all'" class="studio-category-chips tw-shrink-0 tw-overflow-x-auto" :aria-label="t('studio.categoryLabel')">
       <button
         v-for="category in categories"
         :key="category.value"
@@ -48,7 +48,7 @@
 
     <button
       v-if="activeTab === 'all'"
-      class="studio-mobile-category-select"
+      class="studio-mobile-category-select tw-shrink-0 tw-items-center tw-justify-between"
       type="button"
       :aria-label="t('studio.categorySelect')"
       @click="$emit('open-category-picker')"
@@ -57,9 +57,9 @@
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
-    <div class="studio-list-shell">
-      <div ref="listAreaRef" class="studio-list-area">
-        <div class="studio-grid">
+    <div class="studio-list-shell tw-min-h-0 tw-flex-1">
+      <div ref="listAreaRef" class="studio-list-area tw-min-h-0">
+        <div class="studio-grid tw-min-w-0">
           <ResourceCard
             v-for="studio in studios"
             :key="studio.id"
@@ -80,8 +80,8 @@
       </div>
     </div>
 
-    <nav class="studio-pagination" :aria-label="t('studio.pagination.label')">
-      <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" :aria-label="t('studio.pagination.first')" @click="$emit('go-page', 1)">
+    <nav class="studio-pagination tw-shrink-0 tw-items-center tw-justify-center" :aria-label="t('studio.pagination.label')">
+      <button class="studio-page-icon-button tw-inline-flex tw-items-center tw-justify-center" type="button" :disabled="currentPage === 1" :aria-label="t('studio.pagination.first')" @click="$emit('go-page', 1)">
         <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
       </button>
       <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" :aria-label="t('studio.pagination.previous')" @click="$emit('go-page', currentPage - 1)">

@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-form-stack studio-share-tab">
+  <div class="studio-form-stack studio-share-tab tw-min-w-0">
     <fieldset class="studio-scope-fieldset">
       <legend>{{ t("studio.share.target") }}</legend>
       <label class="studio-radio-row" :class="{active: scope === 'public'}">
@@ -22,15 +22,15 @@
       </label>
     </fieldset>
 
-    <section class="studio-authority-section" :aria-label="t('studio.share.listLabel')">
-      <div class="studio-authority-section__head">
+    <section class="studio-authority-section tw-min-w-0" :aria-label="t('studio.share.listLabel')">
+      <div class="studio-authority-section__head tw-items-center">
         <strong>{{ t("studio.share.listLabel") }}</strong>
-        <div class="studio-authority-actions">
+        <div class="studio-authority-actions tw-shrink-0">
           <button class="studio-button studio-button--primary-ghost" type="button" @click="$emit('open-authority-picker')">+ {{ t("studio.share.add") }}</button>
           <button class="studio-button studio-button--danger-ghost" type="button" @click="$emit('delete-checked-authorities')">{{ t("studio.share.delete") }}</button>
         </div>
       </div>
-      <div class="studio-authority-grid" role="table" :aria-label="t('studio.share.listLabel')">
+      <div class="studio-authority-grid tw-min-w-0" role="table" :aria-label="t('studio.share.listLabel')">
         <div class="studio-authority-grid__head" role="row">
           <div role="columnheader"><input type="checkbox" :checked="allAuthoritiesChecked" @change="$emit('toggle-all-authorities', $event.target.checked)" /></div>
           <div role="columnheader">{{ t("studio.share.authorityName") }}</div>
@@ -43,7 +43,7 @@
         </div>
         <div v-if="!authorities.length" class="studio-authority-grid__empty">{{ t("studio.share.empty") }}</div>
       </div>
-      <nav class="studio-authority-pagination" :aria-label="t('studio.share.listLabel')">
+      <nav class="studio-authority-pagination tw-shrink-0 tw-items-center tw-justify-center" :aria-label="t('studio.share.listLabel')">
         <button type="button" disabled>‹</button>
         <button type="button" class="active">1</button>
         <button type="button" disabled>›</button>

@@ -1,9 +1,9 @@
 <template>
-  <aside class="studio-preview" :aria-label="t('studio.preview.label')">
-    <div class="studio-preview__label">{{ t("studio.preview.label") }}</div>
+  <aside class="studio-preview tw-min-h-0 tw-bg-studio-surface tw-text-studio-text" :aria-label="t('studio.preview.label')">
+    <div class="studio-preview__label tw-shrink-0 tw-text-studio-muted">{{ t("studio.preview.label") }}</div>
     <MainEmptyState
       preview
-      class="studio-preview__main-empty"
+      class="studio-preview__main-empty tw-min-h-0"
       :assistant-icon="previewAssistantIcon"
       :assistant-label="resolvedAssistantLabel"
       :title="t('chat.startQuestion')"

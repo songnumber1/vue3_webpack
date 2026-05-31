@@ -37,10 +37,10 @@
     @go-page="$emit('go-page', $event)"
   />
 
-  <div v-if="selectedMcp && !isMobile" class="studio-dialog-backdrop">
+  <div v-if="selectedMcp && !isMobile" class="studio-dialog-backdrop tw-fixed tw-inset-0 tw-z-modal">
     <article
       ref="detailDialogRef"
-      class="studio-dialog"
+      class="studio-dialog tw-bg-studio-surface tw-text-studio-text"
       role="dialog"
       aria-modal="true"
       :aria-label="t('mcp.detail.title')"
@@ -54,7 +54,7 @@
         ×
       </button>
       <McpDetailContent :mcp="selectedMcp" />
-      <footer class="studio-dialog__footer">
+      <footer class="studio-dialog__footer tw-shrink-0 tw-items-center tw-justify-end">
         <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
         </button>

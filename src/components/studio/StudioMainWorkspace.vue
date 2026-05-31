@@ -39,11 +39,11 @@
 
   <div
     v-if="selectedStudio && !isMobile"
-    class="studio-dialog-backdrop"
+    class="studio-dialog-backdrop tw-fixed tw-inset-0 tw-z-modal"
   >
     <article
       ref="detailDialogRef"
-      class="studio-dialog"
+      class="studio-dialog tw-bg-studio-surface tw-text-studio-text"
       role="dialog"
       aria-modal="true"
       :aria-label="t('studio.detail.title')"
@@ -68,7 +68,7 @@
         ×
       </button>
       <StudioDetailContent :studio="selectedStudio" />
-      <footer class="studio-dialog__footer">
+      <footer class="studio-dialog__footer tw-shrink-0 tw-items-center tw-justify-end">
         <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
         </button>
@@ -96,8 +96,8 @@
     </div>
   </teleport>
 
-  <div v-if="deleteTarget" class="studio-confirm-backdrop">
-    <article class="studio-confirm-dialog" role="dialog" aria-modal="true" :aria-label="t('studio.detail.deleteConfirmTitle')">
+  <div v-if="deleteTarget" class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal">
+    <article class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text" role="dialog" aria-modal="true" :aria-label="t('studio.detail.deleteConfirmTitle')">
       <header class="studio-confirm-dialog__head">
         <strong>{{ t('studio.detail.deleteConfirmTitle') }}</strong>
         <button type="button" :aria-label="t('common.close')" @click="deleteTarget = null">×</button>

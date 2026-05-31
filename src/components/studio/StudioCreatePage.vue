@@ -1,15 +1,15 @@
 <template>
   <section
     ref="createPageRef"
-    class="studio-create-page"
+    class="studio-create-page tw-min-h-0 tw-bg-studio-bg tw-text-studio-text"
     :aria-label="t('studio.createPage.title')"
     @focusin="handleCreateFocusIn"
     @focusout="handleCreateFocusOut"
   >
-    <header class="studio-create-panel__head">
+    <header class="studio-create-panel__head tw-shrink-0 tw-items-center">
       <button
         v-if="isMobile"
-        class="studio-create-panel__back studio-create-icon-button"
+        class="studio-create-panel__back studio-create-icon-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         :aria-label="t('studio.createPage.back')"
         :title="t('studio.createPage.back')"
@@ -20,9 +20,9 @@
       <strong class="studio-create-panel__title">{{
         t("studio.createPage.title")
       }}</strong>
-      <div v-if="!isMobile" class="studio-create-actions">
+      <div v-if="!isMobile" class="studio-create-actions tw-shrink-0 tw-items-center">
         <button
-          class="studio-button studio-create-action-button"
+          class="studio-button studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           type="button"
           :aria-label="t('studio.createPage.apply')"
           :title="t('studio.createPage.apply')"
@@ -44,7 +44,7 @@
           <span>{{ t("studio.createPage.save") }}</span>
         </button>
         <button
-          class="studio-button studio-button--primary studio-create-action-button"
+          class="studio-button studio-button--primary studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           type="button"
           :aria-label="t('studio.createPage.register')"
           :title="t('studio.createPage.register')"
@@ -71,7 +71,7 @@
       </div>
       <button
         v-else
-        class="studio-create-panel__menu studio-create-icon-button"
+        class="studio-create-panel__menu studio-create-icon-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         :aria-label="t('studio.createPage.actionMenu')"
         :title="t('studio.createPage.actionMenu')"
@@ -81,10 +81,10 @@
       </button>
     </header>
 
-    <div class="studio-create-layout">
-      <form ref="createFormRef" class="studio-create-form" @submit.prevent>
+    <div class="studio-create-layout tw-min-h-0 tw-flex-1">
+      <form ref="createFormRef" class="studio-create-form tw-min-h-0" @submit.prevent>
         <div
-          class="studio-create-tabs"
+          class="studio-create-tabs tw-shrink-0 tw-overflow-x-auto"
           role="tablist"
           :aria-label="t('studio.createPage.settingsLabel')"
         >

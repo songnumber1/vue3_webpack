@@ -1,6 +1,6 @@
 <template>
-  <div v-if="open" class="studio-picker-backdrop" @click.self="noop">
-    <section class="studio-picker studio-picker--authority" role="dialog" aria-modal="true" :aria-label="t('studio.share.pickerTitle')">
+  <div v-if="open" class="studio-picker-backdrop tw-fixed tw-inset-0 tw-z-modal" @click.self="noop">
+    <section class="studio-picker studio-picker--authority tw-bg-studio-surface tw-text-studio-text" role="dialog" aria-modal="true" :aria-label="t('studio.share.pickerTitle')">
       <header class="studio-picker__head studio-picker__head--authority">
         <button
           v-if="isMobile"
@@ -22,7 +22,7 @@
         </button>
       </header>
 
-      <div class="studio-authority-picker__body">
+      <div class="studio-authority-picker__body tw-min-h-0">
         <div class="studio-authority-picker__search studio-search">
           <label class="sr-only" for="studio-authority-picker-search">
             {{ t("studio.share.searchLabel") }}
@@ -37,7 +37,7 @@
           <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
         </div>
 
-        <div ref="gridShellRef" class="studio-authority-picker__grid-shell">
+        <div ref="gridShellRef" class="studio-authority-picker__grid-shell tw-min-h-0">
           <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
             <div class="studio-authority-picker-grid__head" role="row">
               <div role="columnheader">
