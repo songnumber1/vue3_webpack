@@ -196,6 +196,39 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button 
 
 
 
+
+/* Step 5-7 hotfix: mobile Assistant create tabs/content scroll parity.
+   Keep tab header as a tab strip with a single bottom border and make the
+   tab content scroll through OverlayScrollbars on the layout container. */
+body.mobile-mode .chat-container-root--mode-studio .studio-create-form {
+  min-height: auto;
+  overflow: visible !important;
+  padding: 14px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs {
+  position: sticky;
+  top: -14px;
+  z-index: 3;
+  display: flex;
+  gap: 0 !important;
+  margin: -14px -14px 14px;
+  padding: 12px 14px 0;
+  border-bottom: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-create-layout.os-host,
+body.mobile-mode .chat-container-root--mode-studio .studio-create-layout[data-overlayscrollbars-initialize] {
+  overflow: hidden !important;
+}
+
 body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs button {
   flex: 0 0 auto;
   min-height: 38px;

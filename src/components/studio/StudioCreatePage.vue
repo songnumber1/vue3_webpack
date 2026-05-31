@@ -81,7 +81,7 @@
       </button>
     </header>
 
-    <div :class="createLayoutClass">
+    <div ref="createLayoutRef" :class="createLayoutClass">
       <form ref="createFormRef" :class="createFormClass" @submit.prevent>
         <div
           :class="createTabsClass"
@@ -217,6 +217,7 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 
 const createPageRef = ref(null);
 const createFormRef = ref(null);
+const createLayoutRef = ref(null);
 const focusedEditor = ref(null);
 const actionSheetOpen = ref(false);
 
@@ -242,19 +243,24 @@ const createLayoutClass = computed(() => [
 ]);
 
 const createFormClass = computed(() => [
-  "studio-create-form tw-min-h-0 tw-border tw-border-solid tw-border-studio-border tw-rounded-studio tw-bg-studio-surface tw-p-4",
+  // Keep the panel border/padding/radius owned by Studio SCSS.
+  // Tailwind shell classes here should only provide sizing/scroll behavior;
+  // adding tw-border/tw-rounded/tw-p-* duplicates the legacy tab panel border,
+  // making the create tabs look thicker on desktop and boxed on mobile.
+  "studio-create-form tw-min-h-0 tw-bg-studio-surface",
   isMobile.value
     ? "tw-overflow-visible"
     : "tw-flex tw-w-full tw-flex-col tw-overflow-y-auto",
 ]);
 
 const createTabsClass = computed(() => [
-  "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-border-b tw-border-solid tw-border-studio-border tw-bg-studio-surface",
-  isMobile.value
-    ? "tw-sticky tw-top-[-14px] tw-z-[3] tw-mx-[-14px] tw-mt-[-14px] tw-mb-[14px] tw-flex tw-gap-[6px] tw-px-[14px] tw-pt-3 tw-pb-0"
-    : "tw-sticky tw-top-[-16px] tw-z-[2] tw-mx-[-16px] tw-mt-[-16px] tw-mb-4 tw-flex tw-gap-2 tw-px-4 tw-pt-[14px] tw-pb-0",
+  // The tab header has desktop/mobile-specific SCSS guards for border, spacing,
+  // sticky offsets and active underline. Avoid Tailwind border/negative-margin
+  // utilities here so the before_front tab header remains visually identical.
+  "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-bg-studio-surface",
 ]);
-useOverlayScrollbar(createFormRef, {overflow: {x: "hidden", y: "scroll"}});
+useOverlayScrollbar(createFormRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => !isMobile.value, watchSource: isMobile});
+useOverlayScrollbar(createLayoutRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => isMobile.value, watchSource: isMobile});
 
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];

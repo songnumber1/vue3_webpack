@@ -6,6 +6,44 @@
 
 
 
+
+/* Step 5-7 hotfix: restore before_front Assistant create tab/form chrome.
+   Tailwind owns only coarse page shell here; panel border, tab underline,
+   and inner spacing remain SCSS-owned to keep PC/mobile parity. */
+body.desktop-mode .studio-create-page .studio-create-form,
+body.desktop-mode .studio-create-page .studio-preview {
+  min-height: 0;
+  border: 1px solid var(--studio-border);
+  border-radius: 5px;
+  background: var(--studio-surface);
+  box-shadow: none;
+}
+
+body.desktop-mode .studio-create-page .studio-create-form {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+body.desktop-mode .studio-create-page .studio-create-tabs {
+  position: sticky;
+  top: -16px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  margin: -16px -16px 16px;
+  padding: 14px 16px 0;
+  border-bottom: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+body.desktop-mode .studio-create-page .studio-create-tabs::-webkit-scrollbar {
+  display: none;
+}
+
 body.desktop-mode .studio-create-page .studio-create-tabs button {
   border: 0;
   border-radius: 0;

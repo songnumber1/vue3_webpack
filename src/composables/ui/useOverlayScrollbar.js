@@ -56,6 +56,10 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     watch(
       config.watchSource,
       async () => {
+        if (!resolveEnabled()) {
+          destroy();
+          return;
+        }
         await setup();
         update();
       },

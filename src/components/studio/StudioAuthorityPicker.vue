@@ -23,7 +23,7 @@
       </header>
 
       <div class="studio-authority-picker__body tw-min-h-0">
-        <div class="studio-authority-picker__search studio-search">
+        <div class="studio-authority-picker__search studio-search tw-relative tw-w-full tw-min-w-0 tw-flex-none">
           <label class="sr-only" for="studio-authority-picker-search">
             {{ t("studio.share.searchLabel") }}
           </label>
@@ -33,8 +33,9 @@
             type="search"
             :placeholder="t('studio.share.searchPlaceholder')"
             autocomplete="off"
+            class="tw-box-border tw-min-h-[44px] tw-w-full tw-min-w-0 tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-py-2.5 tw-pl-3 tw-pr-12 tw-text-inherit"
           />
-          <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
+          <span class="studio-icon studio-icon--search tw-pointer-events-none tw-absolute tw-right-4 tw-top-1/2 tw-h-[18px] tw-w-[18px] -tw-translate-y-1/2 tw-text-studio-muted" aria-hidden="true"></span>
         </div>
 
         <div ref="gridShellRef" class="studio-authority-picker__grid-shell tw-min-h-0">
