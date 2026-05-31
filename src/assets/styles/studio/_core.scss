@@ -41,7 +41,6 @@
   line-height: 1.6;
 }
 
-.studio-search input,
 .studio-form-stack input,
 .studio-form-stack textarea,
 .studio-select-like {
@@ -56,40 +55,17 @@
   font: inherit;
 }
 
-.studio-search input {
-  padding-right: 48px;
-}
 
-.studio-search-button {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 34px;
-  height: 34px;
-  min-height: 34px;
-  border: 0;
-  border-radius: 5px;
-  background: transparent;
-  color: var(--studio-text);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.studio-search-button:hover,
 .studio-card:hover,
 .studio-button:hover,
-.studio-tab:hover,
 .studio-create-tabs button:hover,
 .studio-picker__option:hover {
   background: var(--studio-control-hover);
 }
 
-.studio-tab,
 .studio-create-tabs button,
 .studio-button,
-.studio-pagination button,
 .studio-prompt-grid button,
 .studio-multi-select__trigger,
 .studio-multi-select__head button,
@@ -101,18 +77,6 @@
   border-radius: 5px;
 }
 
-.studio-tab {
-  border: 0;
-  background: transparent;
-  color: var(--studio-muted);
-  padding: 12px 14px;
-  cursor: pointer;
-}
-
-.studio-tab.active {
-  color: var(--studio-text);
-  box-shadow: inset 0 -2px 0 var(--studio-primary);
-}
 
 .studio-button {
   min-height: 38px;
@@ -171,30 +135,6 @@
   font-size: 12px;
 }
 
-.studio-pagination button {
-  min-width: 34px;
-  height: 34px;
-  border: 1px solid var(--studio-border);
-  background: var(--studio-surface);
-  color: inherit;
-}
-
-.studio-pagination button.active {
-  border-color: var(--studio-primary);
-  color: var(--studio-primary);
-  font-weight: 700;
-}
-
-.studio-pagination button:disabled {
-  cursor: not-allowed;
-  opacity: 0.45;
-}
-
-.studio-pagination__ellipsis {
-  border-color: transparent !important;
-  background: transparent !important;
-  opacity: 1 !important;
-}
 
 .studio-icon {
   width: 18px;
@@ -215,9 +155,4 @@
 .studio-icon--page-next { mask-image: url("../img/studio/page-next.svg"); -webkit-mask-image: url("../img/studio/page-next.svg"); }
 .studio-icon--page-last { mask-image: url("../img/studio/page-last.svg"); -webkit-mask-image: url("../img/studio/page-last.svg"); }
 
-.studio-page-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
 

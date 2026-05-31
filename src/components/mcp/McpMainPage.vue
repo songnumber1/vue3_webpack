@@ -15,10 +15,11 @@
           type="search"
           :placeholder="t('mcp.searchPlaceholder')"
           @input="$emit('update-search-text', $event.target.value)"
+          class="tw-box-border tw-min-h-[42px] tw-w-full tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-py-2.5 tw-pl-3 tw-pr-12 tw-font-[inherit] tw-text-inherit"
           @keydown.enter.prevent="$emit('search')"
         />
         <button
-          class="studio-search-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
+          class="studio-search-button tw-absolute tw-right-1 tw-top-1 tw-inline-flex tw-h-[34px] tw-min-h-[34px] tw-w-[34px] tw-shrink-0 tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-studio tw-border-0 tw-bg-transparent tw-text-studio-text hover:tw-bg-studio-controlHover"
           type="button"
           :aria-label="t('mcp.searchAction')"
           :title="t('mcp.searchAction')"
@@ -32,16 +33,16 @@
     <div class="studio-tabs-row tw-mx-auto tw-mb-4 tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-items-end tw-justify-between tw-gap-3 tw-border-b tw-border-studio-border">
       <div class="studio-tabs tw-flex tw-min-w-0" role="tablist" :aria-label="t('mcp.tabsLabel')">
         <button
-          class="studio-tab tw-shrink-0"
-          :class="{active: activeTab === 'all'}"
+          class="studio-tab tw-shrink-0 tw-cursor-pointer tw-border-0 tw-bg-transparent tw-px-3.5 tw-py-3 tw-text-studio-muted hover:tw-bg-studio-controlHover"
+          :class="{active: activeTab === 'all', 'tw-text-studio-text tw-shadow-[inset_0_-2px_0_var(--studio-primary)]': activeTab === 'all'}"
           type="button"
           @click="$emit('update-active-tab', 'all')"
         >
           {{ t("mcp.allConnectors") }}
         </button>
         <button
-          class="studio-tab"
-          :class="{active: activeTab === 'mine'}"
+          class="studio-tab tw-cursor-pointer tw-border-0 tw-bg-transparent tw-px-3.5 tw-py-3 tw-text-studio-muted hover:tw-bg-studio-controlHover"
+          :class="{active: activeTab === 'mine', 'tw-text-studio-text tw-shadow-[inset_0_-2px_0_var(--studio-primary)]': activeTab === 'mine'}"
           type="button"
           @click="$emit('update-active-tab', 'mine')"
         >
@@ -66,12 +67,13 @@
       </button>
     </div>
 
-    <div v-if="activeTab === 'all'" class="studio-category-chips tw-shrink-0 tw-overflow-x-auto" :aria-label="t('mcp.categoryLabel')">
+    <div v-if="activeTab === 'all'" class="studio-category-chips tw-mx-auto tw-mb-3 tw-mt-[-4px] tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-visible" :aria-label="t('mcp.categoryLabel')">
       <button
         v-for="category in categories"
         :key="category.value"
         type="button"
-        :class="{active: activeCategory === category.value}"
+        class="tw-min-h-8 tw-shrink-0 tw-cursor-pointer tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-[13px] tw-font-bold tw-text-studio-muted hover:tw-bg-studio-controlHover"
+        :class="{active: activeCategory === category.value, 'tw-border-studio-primary tw-bg-studio-primary tw-text-app-textOnPrimary': activeCategory === category.value}"
         @click="$emit('select-category', category.value)"
       >
         {{ category.label }}
@@ -89,9 +91,10 @@
       <span class="studio-icon studio-icon--chevron-down" aria-hidden="true"></span>
     </button>
 
-    <label v-if="activeTab === 'mine'" class="mcp-created-filter tw-shrink-0 tw-items-center">
+    <label v-if="activeTab === 'mine'" class="mcp-created-filter tw-inline-flex tw-shrink-0 tw-cursor-pointer tw-select-none tw-items-center tw-gap-2 tw-self-start tw-rounded-[8px] tw-border tw-border-solid tw-border-studio-border tw-bg-studio-panel tw-px-3 tw-py-[9px] tw-text-[14px] tw-font-semibold tw-leading-[1.35] tw-text-studio-text">
       <input
         :checked="createdOnly"
+        class="tw-m-0 tw-h-4 tw-w-4 tw-shrink-0 tw-accent-studio-primary"
         type="checkbox"
         @change="$emit('update-created-only', $event.target.checked)"
       />
@@ -122,26 +125,27 @@
     </div>
 
     <nav class="studio-pagination tw-mx-auto tw-mt-[14px] tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-center tw-gap-1.5 tw-border-t tw-border-studio-border tw-pt-[14px]" :aria-label="t('mcp.pagination.label')">
-      <button class="studio-page-icon-button tw-inline-flex tw-items-center tw-justify-center" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.first')" @click="$emit('go-page', 1)">
+      <button class="studio-page-icon-button tw-inline-flex tw-h-[34px] tw-min-w-[34px] tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-inherit disabled:tw-cursor-not-allowed disabled:tw-opacity-45" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.first')" @click="$emit('go-page', 1)">
         <span class="studio-icon studio-icon--page-first" aria-hidden="true"></span>
       </button>
-      <button class="studio-page-icon-button" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.previous')" @click="$emit('go-page', currentPage - 1)">
+      <button class="studio-page-icon-button tw-inline-flex tw-h-[34px] tw-min-w-[34px] tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-inherit disabled:tw-cursor-not-allowed disabled:tw-opacity-45" type="button" :disabled="currentPage === 1" :aria-label="t('mcp.pagination.previous')" @click="$emit('go-page', currentPage - 1)">
         <span class="studio-icon studio-icon--page-prev" aria-hidden="true"></span>
       </button>
       <button
         v-for="page in pages"
         :key="page.key"
         type="button"
+        class="tw-h-[34px] tw-min-w-[34px] tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-inherit disabled:tw-cursor-not-allowed disabled:tw-opacity-45"
         :disabled="page.ellipsis"
-        :class="{active: page.value === currentPage, 'studio-pagination__ellipsis': page.ellipsis}"
+        :class="{active: page.value === currentPage, 'studio-pagination__ellipsis': page.ellipsis, 'tw-border-studio-primary tw-font-bold tw-text-studio-primary': page.value === currentPage, 'tw-border-transparent tw-bg-transparent tw-opacity-100 disabled:tw-cursor-default disabled:tw-opacity-100': page.ellipsis}"
         @click="!page.ellipsis && $emit('go-page', page.value)"
       >
         {{ page.label }}
       </button>
-      <button class="studio-page-icon-button" type="button" :disabled="currentPage === maxPage" :aria-label="t('mcp.pagination.next')" @click="$emit('go-page', currentPage + 1)">
+      <button class="studio-page-icon-button tw-inline-flex tw-h-[34px] tw-min-w-[34px] tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-inherit disabled:tw-cursor-not-allowed disabled:tw-opacity-45" type="button" :disabled="currentPage === maxPage" :aria-label="t('mcp.pagination.next')" @click="$emit('go-page', currentPage + 1)">
         <span class="studio-icon studio-icon--page-next" aria-hidden="true"></span>
       </button>
-      <button class="studio-page-icon-button" type="button" :disabled="currentPage === maxPage" :aria-label="t('mcp.pagination.last')" @click="$emit('go-page', maxPage)">
+      <button class="studio-page-icon-button tw-inline-flex tw-h-[34px] tw-min-w-[34px] tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-inherit disabled:tw-cursor-not-allowed disabled:tw-opacity-45" type="button" :disabled="currentPage === maxPage" :aria-label="t('mcp.pagination.last')" @click="$emit('go-page', maxPage)">
         <span class="studio-icon studio-icon--page-last" aria-hidden="true"></span>
       </button>
     </nav>
