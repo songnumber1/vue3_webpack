@@ -2,7 +2,7 @@
   <Transition name="mobile-clipboard-toast">
     <aside
       v-if="visible"
-      class="mobile-clipboard-toast tw-fixed tw-left-1/2 tw-bottom-[calc(var(--safe-area-bottom,0px)+24px)] tw-z-[calc(var(--z-toast,3000)+2)] tw-max-w-[min(320px,calc(100vw-32px))] tw-rounded-full tw-bg-slate-900/90 tw-px-3.5 tw-py-2.5 tw-text-center tw-text-sm tw-font-bold tw-leading-[1.35] tw-text-white tw-shadow-menu"
+      class="mobile-clipboard-toast tw-fixed tw-left-1/2 tw-bottom-[calc(var(--safe-area-bottom,0px)+24px)] tw-z-[calc(var(--z-toast,3000)+2)] tw-max-w-[min(320px,calc(100vw-32px))] -tw-translate-x-1/2 tw-rounded-full tw-bg-slate-900/90 tw-px-3.5 tw-py-2.5 tw-text-center tw-text-sm tw-font-bold tw-leading-[1.35] tw-text-white tw-shadow-menu tw-pointer-events-none"
       role="status"
       aria-live="polite"
     >
@@ -89,25 +89,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.mobile-clipboard-toast {
-  position: fixed;
-  left: 50%;
-  bottom: calc(var(--safe-area-bottom, 0px) + 24px);
-  z-index: calc(var(--z-toast, 3000) + 2);
-  max-width: min(320px, calc(100vw - 32px));
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.92);
-  color: #fff;
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  line-height: 1.35;
-  text-align: center;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.22);
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
+/* Layout/visual shell is owned by tw-* utilities in the template.
+   Only Vue transition states remain here. */
 .mobile-clipboard-toast-enter-active,
 .mobile-clipboard-toast-leave-active {
   transition:

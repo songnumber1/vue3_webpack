@@ -54,12 +54,3 @@ const isErrorMessage = computed(
 );
 </script>
 
-<style scoped lang="scss">
-.message {
-  min-width: 0;
-}
-
-.bubble {
-  min-width: 0;
-}
-</style>

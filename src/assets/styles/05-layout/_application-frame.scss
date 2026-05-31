@@ -33,65 +33,9 @@ body.desktop-mode .application-footer {
   color: var(--text);
 }
 
-body.desktop-mode .application-header {
-  min-height: 0;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 18px 0 20px;
-  border-bottom: 1px solid var(--sidebar-border);
-  z-index: var(--z-popover);
-  position: relative;
-  overflow: visible;
-}
-
-body.desktop-mode .application-header__brand {
-  min-width: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  overflow: hidden;
-}
-
-body.desktop-mode .application-header__title {
-  flex: 0 0 auto;
-  font-size: var(--font-size-lg);
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  white-space: nowrap;
-}
-
-body.desktop-mode .application-header__subtitle {
-  min-width: 0;
-  color: var(--text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-body.desktop-mode .application-header__actions {
-  flex: 0 0 auto;
-  min-width: max-content;
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-left: auto;
-  position: relative;
-  z-index: var(--z-popover);
-}
-
-body.desktop-mode .application-header .round-icon {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
-  min-height: 40px;
-}
-
+/* Header/footer visual shells are now owned by ApplicationHeader.vue and
+   ApplicationFooter.vue tw-* utilities. Keep only grid placement and menu
+   layering that is coupled to the application frame. */
 body.desktop-mode .application-header .user-menu,
 body.desktop-mode .application-header .user-menu--open {
   position: relative;
@@ -103,20 +47,6 @@ body.desktop-mode .application-header .user-menu-panel {
   max-height: calc(100vh - 72px);
   overflow-y: auto;
   overscroll-behavior: contain;
-}
-
-body.desktop-mode .application-footer {
-  min-height: 0;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
-  border-top: 1px solid var(--sidebar-border);
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 700;
-  letter-spacing: -0.02em;
 }
 
 body.desktop-mode .application-body > .desktop-sidebar,

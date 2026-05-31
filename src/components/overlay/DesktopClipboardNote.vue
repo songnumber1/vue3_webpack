@@ -8,8 +8,8 @@
       @mouseenter="pauseTimer"
       @mouseleave="resumeTimer"
     >
-      <strong>{{ title }}</strong>
-      <span>{{ message }}</span>
+      <strong class="tw-text-sm tw-font-extrabold tw-leading-tight">{{ title }}</strong>
+      <span class="tw-text-xs tw-leading-[1.35] tw-text-app-subtle">{{ message }}</span>
     </aside>
   </Transition>
 </template>
@@ -125,36 +125,8 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
-.desktop-clipboard-note {
-  position: fixed;
-  top: calc(var(--desktop-header-height, 64px) + 20px);
-  right: 24px;
-  z-index: calc(var(--z-toast, 3000) + 1);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: min(320px, calc(100vw - 48px));
-  padding: 12px 14px;
-  border: 1px solid var(--control-border);
-  border-radius: 5px;
-  background: var(--surface);
-  color: var(--text);
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
-  pointer-events: auto;
-}
-
-.desktop-clipboard-note strong {
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  line-height: 1.25;
-}
-
-.desktop-clipboard-note span {
-  color: var(--muted);
-  font-size: var(--font-size-xs);
-  line-height: 1.35;
-}
-
+/* Layout/visual shell is owned by tw-* utilities in the template.
+   Only Vue transition states and the mobile fallback offset remain here. */
 .desktop-clipboard-note-enter-active,
 .desktop-clipboard-note-leave-active {
   transition:

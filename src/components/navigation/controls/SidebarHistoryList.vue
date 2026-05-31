@@ -1,7 +1,7 @@
 <template>
   <component
     :is="scrollContainerComponent"
-    :class="containerClass"
+    :class="[containerClass, 'tw-min-w-0']"
     v-bind="scrollContainerAttrs"
   >
     <div
@@ -98,12 +98,3 @@ const scrollContainerAttrs = computed(() =>
 );
 </script>
 
-<style scoped lang="scss">
-.sidebar-history {
-  min-width: 0;
-}
-
-.sidebar-history-item {
-  min-width: 0;
-}
-</style>
