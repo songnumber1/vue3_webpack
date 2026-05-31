@@ -111,38 +111,40 @@
           </button>
         </div>
 
-        <StudioBasicInfoTab
-          v-if="createTab === 'basic'"
-          :draft="draft"
-          :selected-category-label="selectedCategoryLabel"
-          :category-options="categoryOptions"
-          @update-field="handleDraftField"
-          @update-prompt="handleDraftPrompt"
-          @open-category="$emit('open-category')"
-        />
-        <StudioFeatureTab
-          v-else-if="createTab === 'feature'"
-          :model-options="modelOptions"
-          :selected-models="draft.models"
-          :selected-rags="draft.rags"
-          :selected-mcps="draft.mcps"
-          :rag-options="ragOptions"
-          :mcp-options="mcpOptions"
-          @toggle-model="$emit('toggle-model', $event)"
-          @update-rags="$emit('update-rags', $event)"
-          @update-mcps="$emit('update-mcps', $event)"
-        />
-        <StudioShareScopeTab
-          v-else
-          :scope="draft.scope"
-          :authorities="selectedAuthorities"
-          :all-authorities-checked="allAuthoritiesChecked"
-          @update-scope="$emit('update-scope', $event)"
-          @open-authority-picker="$emit('open-authority-picker')"
-          @delete-checked-authorities="$emit('delete-checked-authorities')"
-          @toggle-all-authorities="$emit('toggle-all-authorities', $event)"
-          @toggle-authority="handleAuthorityToggle"
-        />
+        <div ref="createContentRef" class="studio-create-content tw-min-h-0 tw-min-w-0 tw-flex-1 tw-overflow-y-auto">
+          <StudioBasicInfoTab
+            v-if="createTab === 'basic'"
+            :draft="draft"
+            :selected-category-label="selectedCategoryLabel"
+            :category-options="categoryOptions"
+            @update-field="handleDraftField"
+            @update-prompt="handleDraftPrompt"
+            @open-category="$emit('open-category')"
+          />
+          <StudioFeatureTab
+            v-else-if="createTab === 'feature'"
+            :model-options="modelOptions"
+            :selected-models="draft.models"
+            :selected-rags="draft.rags"
+            :selected-mcps="draft.mcps"
+            :rag-options="ragOptions"
+            :mcp-options="mcpOptions"
+            @toggle-model="$emit('toggle-model', $event)"
+            @update-rags="$emit('update-rags', $event)"
+            @update-mcps="$emit('update-mcps', $event)"
+          />
+          <StudioShareScopeTab
+            v-else
+            :scope="draft.scope"
+            :authorities="selectedAuthorities"
+            :all-authorities-checked="allAuthoritiesChecked"
+            @update-scope="$emit('update-scope', $event)"
+            @open-authority-picker="$emit('open-authority-picker')"
+            @delete-checked-authorities="$emit('delete-checked-authorities')"
+            @toggle-all-authorities="$emit('toggle-all-authorities', $event)"
+            @toggle-authority="handleAuthorityToggle"
+          />
+        </div>
       </form>
 
       <StudioPreview
@@ -218,6 +220,7 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 const createPageRef = ref(null);
 const createFormRef = ref(null);
 const createLayoutRef = ref(null);
+const createContentRef = ref(null);
 const focusedEditor = ref(null);
 const actionSheetOpen = ref(false);
 
@@ -238,7 +241,7 @@ const createHeaderClass = computed(() => [
 const createLayoutClass = computed(() => [
   "studio-create-layout tw-flex-1 tw-min-h-0",
   isMobile.value
-    ? "tw-block tw-overflow-y-auto tw-overflow-x-hidden tw-p-3 tw-pb-[calc(24px+env(safe-area-inset-bottom,0px)+var(--keyboard-height,0px))]"
+    ? "tw-block tw-overflow-hidden tw-p-3"
     : "tw-grid tw-grid-cols-[minmax(480px,0.95fr)_minmax(420px,0.85fr)] tw-items-stretch tw-gap-4 tw-overflow-hidden tw-px-[clamp(18px,3vw,32px)] tw-pt-4 tw-pb-[18px]",
 ]);
 
@@ -249,8 +252,8 @@ const createFormClass = computed(() => [
   // making the create tabs look thicker on desktop and boxed on mobile.
   "studio-create-form tw-min-h-0 tw-bg-studio-surface",
   isMobile.value
-    ? "tw-overflow-visible"
-    : "tw-flex tw-w-full tw-flex-col tw-overflow-y-auto",
+    ? "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden"
+    : "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden",
 ]);
 
 const createTabsClass = computed(() => [
@@ -259,8 +262,7 @@ const createTabsClass = computed(() => [
   // utilities here so the before_front tab header remains visually identical.
   "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-bg-studio-surface",
 ]);
-useOverlayScrollbar(createFormRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => !isMobile.value, watchSource: isMobile});
-useOverlayScrollbar(createLayoutRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => isMobile.value, watchSource: isMobile});
+const contentScrollbar = useOverlayScrollbar(createContentRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => !isMobile.value, watchSource: isMobile});
 
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];
@@ -300,14 +302,16 @@ function getVisibleViewportBounds(scroller) {
   };
 }
 
+function isTextareaField(element) {
+  return Boolean(element instanceof HTMLElement && element.tagName === "TEXTAREA");
+}
+
 function ensureFocusedEditorVisible(behavior = "smooth") {
   if (!isMobile.value) {
     return;
   }
   const target = focusedEditor.value;
-  const scroller = createPageRef.value?.querySelector?.(
-    ".studio-create-layout"
-  );
+  const scroller = contentScrollbar.getViewport();
   if (!target || !scroller) {
     return;
   }
@@ -355,6 +359,17 @@ function handleCreateFocusIn(event) {
   if (!isMobile.value || !isEditableField(target)) {
     return;
   }
+
+  // Android Chrome/WebView has a native textarea keyboard scroll behavior.
+  // Running our repeated VisualViewport scroll correction on top of that can
+  // repaint the textarea border/height incorrectly, especially on the first
+  // Instruction focus. Inputs/selects still use the custom correction.
+  if (isTextareaField(target)) {
+    focusedEditor.value = null;
+    clearFocusScrollTimers();
+    return;
+  }
+
   focusedEditor.value = target;
   nextTick(scheduleFocusedEditorVisible);
 }

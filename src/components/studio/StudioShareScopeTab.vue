@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-form-stack studio-share-tab tw-min-w-0">
+  <div class="studio-form-stack studio-share-tab tw-grid tw-min-w-0 tw-gap-3">
     <fieldset class="studio-scope-fieldset">
       <legend>{{ t("studio.share.target") }}</legend>
       <label class="studio-radio-row" :class="{active: scope === 'public'}">

@@ -1,5 +1,5 @@
 <template>
-  <div class="studio-form-stack studio-feature-tab tw-min-w-0">
+  <div class="studio-form-stack studio-feature-tab tw-grid tw-min-w-0 tw-gap-3">
     <fieldset class="studio-model-fieldset">
       <legend>{{ t("studio.feature.model") }}</legend>
       <div class="studio-model-grid tw-min-w-0">
