@@ -1,4 +1,17 @@
-/* Sass entrypoint generated from the previous CSS import chain. */
+/*
+ * Global Sass entrypoint.
+ *
+ * E-2 freeze baseline rule:
+ * - Do not delete or rename active imports in this file during freeze.
+ * - Runtime, platform, dialog, bottom-sheet and Studio/MCP imports are kept
+ *   intentionally because they protect PC dialog sizing, Android native scroll,
+ *   PC OverlayScrollbars fallback, mobile bottom sheets and Studio/MCP screens.
+ * - Deletion candidates are documented in
+ *   doc/tailwind-migration/E2_FREEZE_SCSS_BASELINE_REPORT.md and must be removed
+ *   only in E-3 after screen-level verification.
+ */
+
+/* 1. Foundation tokens/themes/base: visual source of truth while Tailwind migration is incomplete. */
 @use "./02-foundation/tokens/z-index.tokens" as *;
 @use "./02-foundation/tokens/radius.tokens" as *;
 @use "./02-foundation/themes/themes" as *;
@@ -7,13 +20,10 @@
 @use "./02-foundation/themes/autumn.theme" as *;
 @use "./02-foundation/themes/winter.theme" as *;
 @use "./01-base/base" as *;
+@use "./02-foundation/typography" as *;
+
+/* 2. Scroll/runtime/platform guards: PC OverlayScrollbars + Android Chrome/WebView native scroll/keyboard baseline. */
 @use "./00-abstracts/overlay-scrollbar" as *;
-@use "./05-layout/chat-core" as *;
-@use "./06-components/markdown/markdown" as *;
-@use "./06-components/bottom-sheet/bottom-sheet" as *;
-@use "./06-components/prompt/prompt-mobile-runtime" as *;
-@use "./07-pages/playground" as *;
-@use "./06-components/dialog/feedback-dialog" as *;
 @use "./03-runtime/keyboard" as *;
 @use "./99-legacy/responsive-keyboard-extracted-patches" as *;
 @use "./03-runtime/mobile-mode" as *;
@@ -22,24 +32,36 @@
 @use "./03-runtime/scroll-lock" as *;
 @use "./03-runtime/bottom-sheet-runtime" as *;
 @use "./04-platform/android-chrome-webview" as *;
-@use "./05-layout/chat-mobile" as *;
-@use "./06-components/message/message-bubbles" as *;
+
+/* 3. Application/chat layout baseline. */
+@use "./05-layout/application-frame" as *;
+@use "./05-layout/header" as *;
 @use "./05-layout/sidebar" as *;
 @use "./05-layout/sidebar-mobile" as *;
-@use "./06-components/attachment/attachment-preview" as *;
-@use "./08-state/reasoning" as *;
-@use "./08-state/error" as *;
-@use "./06-components/assistant/assistant-icon" as *;
-@use "./08-state/interaction" as *;
-@use "./05-layout/header" as *;
-@use "./07-pages/chat" as *;
 @use "./05-layout/responsive" as *;
+@use "./05-layout/chat-core" as *;
+@use "./05-layout/chat-mobile" as *;
+
+/* 4. Shared components: dialog/system popup, bottom sheet, markdown, prompt, message and states. */
+@use "./06-components/markdown/markdown" as *;
+@use "./06-components/bottom-sheet/bottom-sheet" as *;
+@use "./06-components/prompt/prompt-mobile-runtime" as *;
+@use "./06-components/dialog/feedback-dialog" as *;
+@use "./06-components/message/message-bubbles" as *;
+@use "./06-components/attachment/attachment-preview" as *;
+@use "./06-components/assistant/assistant-icon" as *;
 @use "./06-components/dialog/dialog-system" as *;
-@use "./02-foundation/typography" as *;
 @use "./06-components/dialog/dialog-control" as *;
 @use "./06-components/dialog/dialog-viewport" as *;
 @use "./06-components/dialog/system-settings-dialog" as *;
-@use "./05-layout/application-frame" as *;
-@use "./studio/studio-workspace" as *;
 
+/* 5. Pages/features. */
+@use "./07-pages/playground" as *;
+@use "./07-pages/chat" as *;
+@use "./08-state/reasoning" as *;
+@use "./08-state/error" as *;
+@use "./08-state/interaction" as *;
 @use "./search/chat-search" as *;
+
+/* 6. Studio/MCP freeze hold: keep through E-2; delete only selector-by-selector in E-3. */
+@use "./studio/studio-workspace" as *;
