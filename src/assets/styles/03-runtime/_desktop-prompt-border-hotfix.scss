@@ -1,0 +1,90 @@
+/*
+ * E-3.1 PC prompt consistency hotfix.
+ *
+ * Scope:
+ * - PC/web layout only.
+ * - Main/chat prompt border geometry only.
+ *
+ * Why this exists:
+ * - After the terms page returns to `/`, mobile/main composer guards can briefly
+ *   leave a stale prompt class on the desktop main screen.
+ * - The chat route used a rounded composer surface that no longer matched the
+ *   main route prompt border after the mobile freeze guards were introduced.
+ *
+ * Keep this file after mobile-cascade-hotfix so it can safely normalize desktop
+ * prompt geometry without changing mobile, Android WebView, bottom sheet, Studio,
+ * MCP, or OverlayScrollbars behavior.
+ */
+
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt,
+body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
+.app-container--web .chat-container-root--mode-main .desktop-center-prompt,
+.app-container--web .chat-container-root--mode-main .mobile-main-fixed-prompt {
+  position: static !important;
+  inset: auto !important;
+  box-sizing: border-box;
+  width: min(var(--layout-prompt-width, 820px), 100%) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
+body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini,
+body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini,
+.app-container--web .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
+.app-container--web .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini,
+.app-container--web .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+.app-container--web .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  border: 1px solid var(--prompt-border, var(--control-border)) !important;
+  border-radius: var(--prompt-panel-radius, 5px) !important;
+  background: var(--prompt-bg) !important;
+  box-shadow: var(--shadow-prompt) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot,
+body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot,
+.app-container--web .chat-container-root--mode-chat .chat-composer-slot,
+.app-container--web .chat-container-root--mode-shared .chat-composer-slot {
+  width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  margin-inline: auto !important;
+  margin-block-end: var(--desktop-chat-composer-footer-gap, 12px) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap,
+body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap,
+.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap,
+.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-box,
+body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
+body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-box,
+body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini,
+.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-box,
+.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
+.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-box,
+.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  border: 1px solid var(--prompt-border, var(--control-border)) !important;
+  border-radius: var(--prompt-panel-radius, 5px) !important;
+  background: var(--prompt-bg) !important;
+  box-shadow: var(--shadow-prompt) !important;
+}
