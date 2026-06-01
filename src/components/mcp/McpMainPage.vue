@@ -102,7 +102,7 @@
     </label>
 
     <div class="studio-list-shell tw-mx-auto tw-flex tw-min-h-0 tw-w-full tw-max-w-studio tw-flex-1 tw-flex-col tw-overflow-hidden">
-      <div ref="listAreaRef" class="studio-list-area tw-min-h-0 tw-flex-1 tw-overflow-y-auto tw-overflow-x-hidden tw-pr-0.5">
+      <div ref="listAreaRef" data-studio-list-scroll="true" class="studio-list-area tw-min-h-0 tw-flex-1 tw-overflow-y-auto tw-overflow-x-hidden tw-pr-0.5">
         <div class="studio-grid tw-grid tw-min-w-0 tw-grid-cols-2 tw-gap-[14px] tw-pb-1.5">
           <ResourceCard
             v-for="mcp in mcps"
@@ -173,7 +173,7 @@ const props = defineProps({
   maxPage: {type: Number, default: 1},
 });
 
-useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [props.activeTab, props.activeCategory, props.currentPage, props.mcps.length]});
+useOverlayScrollbar(listAreaRef, {overflow: {x: "hidden", y: "scroll"}}, {disableOnMobile: false, watchSource: () => [props.activeTab, props.activeCategory, props.currentPage, props.mcps.length]});
 
 defineEmits([
   "update-search-text",

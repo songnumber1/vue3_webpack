@@ -14,6 +14,7 @@ import {
 export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   let instance = null;
   let resizeObserver = null;
+  let removeWindowResizeListener = null;
   const enabled = config.enabled ?? true;
   const disableOnMobile = config.disableOnMobile ?? true;
   const reserveScrollbarGap = config.reserveScrollbarGap ?? true;
@@ -50,6 +51,7 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     if (instance && reserveScrollbarGap && element?.dataset) {
       element.dataset.overlayScrollbarGap = "true";
     }
+    if (instance) bindWindowResizeUpdate();
     if (typeof ResizeObserver !== "undefined" && instance) {
       resizeObserver?.disconnect?.();
       resizeObserver = new ResizeObserver(() => update());
@@ -70,6 +72,7 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   function destroy() {
     resizeObserver?.disconnect?.();
     resizeObserver = null;
+    removeWindowResizeListener?.();
     if (targetRef.value) {
       if (targetRef.value.dataset) delete targetRef.value.dataset.overlayScrollbarGap;
       destroyOverlayScrollbar(targetRef.value);
@@ -77,7 +80,20 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     instance = null;
   }
 
-  onMounted(setup);
+  function bindWindowResizeUpdate() {
+    if (removeWindowResizeListener || typeof window === "undefined") return;
+    const handleResize = () => update();
+    window.addEventListener("resize", handleResize, {passive: true});
+    removeWindowResizeListener = () => {
+      window.removeEventListener("resize", handleResize);
+      removeWindowResizeListener = null;
+    };
+  }
+
+  onMounted(async () => {
+    await setup();
+    bindWindowResizeUpdate();
+  });
   onBeforeUnmount(destroy);
 
   watch(

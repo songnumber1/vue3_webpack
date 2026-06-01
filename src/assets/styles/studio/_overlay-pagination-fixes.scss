@@ -187,3 +187,73 @@ body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-st
   overflow: visible !important;
   align-content: start !important;
 }
+
+/* Studio/MCP list scroll hardening.
+   PC runtime must keep the card list as the only scroll viewport even when the
+   browser is resized into mobile layout. The selector is scoped to Studio/MCP
+   list pages to avoid changing dialogs, create screens, or chat scroll areas. */
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scroll,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scroll {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area {
+  position: relative !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlayscrollbars],
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlay-scrollbar-enhanced="true"],
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlayscrollbars],
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlay-scrollbar-enhanced="true"] {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area [data-overlayscrollbars-viewport],
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area [data-overlayscrollbars-viewport] {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-pagination,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-pagination {
+  flex: 0 0 auto !important;
+}
