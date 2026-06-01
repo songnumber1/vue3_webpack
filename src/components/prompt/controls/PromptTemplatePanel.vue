@@ -1,23 +1,28 @@
 <template>
   <section
     v-if="visible"
-    class="prompt-template-panel"
+    class="prompt-template-panel tw-mt-0 tw-mb-[2px] tw-w-full tw-border-0 tw-bg-transparent tw-p-0"
     :class="{'prompt-template-panel--mobile': isMobileSheet}"
     aria-label="Prompt template options"
   >
-    <div class="prompt-template-desktop-options">
+    <div
+      class="prompt-template-desktop-options tw-w-full tw-min-w-0 tw-items-center tw-gap-[10px] tw-overflow-x-auto tw-overflow-y-hidden tw-pb-[2px] tw-[scrollbar-width:none] [&::-webkit-scrollbar]:tw-hidden"
+      :class="isMobileSheet ? 'tw-hidden' : 'tw-flex'"
+    >
       <div
         v-for="group in groups"
         :key="group.id"
-        class="prompt-template-group"
+        class="prompt-template-group tw-inline-flex tw-min-w-max tw-flex-none tw-items-center tw-gap-[6px]"
       >
-        <strong class="prompt-template-group-title">{{ group.label }}</strong>
-        <div class="prompt-template-chip-row">
+        <strong class="prompt-template-group-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text">{{ group.label }}</strong>
+        <div class="prompt-template-chip-row tw-inline-flex tw-min-w-0 tw-items-center tw-gap-1">
           <button
             v-for="option in group.options"
             :key="option.tag"
-            class="prompt-template-chip"
-            :class="{'is-active': isOptionActive(group, option)}"
+            class="prompt-template-chip tw-inline-flex tw-min-h-[30px] tw-cursor-pointer tw-items-center tw-justify-center tw-gap-[6px] tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-px-[9px] tw-py-[5px] tw-font-app tw-text-fixed12 tw-font-extrabold tw-transition-colors tw-duration-fast"
+            :class="isOptionActive(group, option)
+              ? 'is-active tw-border-[color-mix(in_srgb,var(--accent)_54%,var(--control-border))] tw-bg-[color-mix(in_srgb,var(--accent)_9%,var(--surface))] tw-text-app-accent'
+              : 'tw-border-app-controlBorder tw-bg-app-surface tw-text-app-text hover:tw-bg-app-controlHover'"
             type="button"
             @click="$emit('select-option', group.id, option.tag)"
           >
@@ -27,15 +32,18 @@
       </div>
     </div>
 
-    <div class="prompt-template-mobile-options">
+    <div
+      class="prompt-template-mobile-options tw-w-full tw-min-w-0 tw-items-center tw-gap-2 tw-overflow-x-auto tw-overflow-y-hidden tw-pb-[2px] tw-[scrollbar-width:none] [&::-webkit-scrollbar]:tw-hidden"
+      :class="isMobileSheet ? 'tw-flex' : 'tw-hidden'"
+    >
       <div
         v-for="group in groups"
         :key="group.id"
-        class="prompt-template-mobile-group"
+        class="prompt-template-mobile-group tw-inline-flex tw-min-w-0 tw-flex-none tw-items-center tw-gap-[5px]"
       >
-        <span class="prompt-template-mobile-title">{{ group.label }}</span>
+        <span class="prompt-template-mobile-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text">{{ group.label }}</span>
         <button
-          class="prompt-template-mobile-chip"
+          class="prompt-template-mobile-chip tw-inline-flex tw-min-h-8 tw-flex-none tw-cursor-pointer tw-items-center tw-justify-center tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder tw-bg-app-surface tw-px-[10px] tw-py-[6px] tw-font-app tw-text-sm tw-font-extrabold tw-leading-[1.2] tw-text-app-text"
           type="button"
           :aria-label="`${group.label}: ${group.selectedLabel}`"
           @click="$emit('open-mobile-group', group.id)"
@@ -94,100 +102,12 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
 </script>
 
 <style scoped lang="scss">
-.prompt-template-panel {
-  width: 100%;
-  margin: 0 0 2px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
-
-.prompt-template-desktop-options {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0 0 2px;
-}
-
-:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-desktop-options) {
-  scrollbar-width: none;
-}
-
-:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-desktop-options::-webkit-scrollbar) {
-  display: none;
-}
-
-.prompt-template-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: max-content;
-  flex: 0 0 auto;
-}
-
-.prompt-template-group-title {
-  color: var(--text);
-  font-size: var(--font-size-sm);
-  font-weight: 900;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.prompt-template-chip-row {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 0;
-}
-
-.prompt-template-chip {
-  min-height: 30px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 5px 9px;
-  border: 1px solid var(--control-border);
-  border-radius: 5px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--font-size-fixed-12);
-  font-weight: 800;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background 0.16s ease,
-    border-color 0.16s ease,
-    color 0.16s ease;
-}
-
-.prompt-template-chip:hover {
-  background: var(--control-hover);
-}
-
-.prompt-template-chip.is-active {
-  border-color: color-mix(in srgb, var(--accent) 54%, var(--control-border));
-  background: color-mix(in srgb, var(--accent) 9%, var(--surface));
-  color: var(--accent);
-}
-
-.prompt-template-mobile-options {
-  display: none;
-}
-
-.prompt-template-panel--mobile .prompt-template-desktop-options {
-  display: none;
-}
-
-.prompt-template-panel--mobile .prompt-template-mobile-options {
-  display: flex;
-}
-
+/*
+ * C-2 note:
+ * Desktop/mobile chip presentation is now owned by tw-* utilities in the template.
+ * Keep only the bottom-sheet option rules here because BaseBottomSheet option rows are
+ * intentionally excluded from this migration step.
+ */
 .prompt-template-sheet-option {
   justify-content: flex-start;
   text-align: left;
@@ -215,86 +135,5 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   font-size: var(--font-size-md) !important;
   font-weight: 900;
   text-align: right !important;
-}
-
-:global(body.mobile-mode) .prompt-template-desktop-options {
-  display: none;
-}
-
-@media (max-width: 767px) {
-  .prompt-template-desktop-options {
-    display: none;
-  }
-}
-
-:global(body.mobile-mode) .prompt-template-mobile-options {
-  display: flex;
-}
-
-@media (max-width: 767px) {
-  .prompt-template-mobile-options {
-    display: flex;
-  }
-}
-
-.prompt-template-mobile-options {
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0 0 2px;
-}
-
-:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options) {
-  scrollbar-width: none;
-}
-
-.prompt-template-mobile-group {
-  display: inline-flex;
-  align-items: center;
-  flex: 0 0 auto;
-  gap: 5px;
-  min-width: 0;
-}
-
-.prompt-template-mobile-title {
-  color: var(--text);
-  font-size: var(--font-size-sm);
-  font-weight: 900;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options) {
-  scrollbar-width: none;
-}
-
-:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options::-webkit-scrollbar) {
-  display: none;
-}
-
-:global(body.mobile-mode) .prompt-template-panel {
-  margin-bottom: 4px;
-}
-
-.prompt-template-mobile-chip {
-  min-height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 auto;
-  padding: 6px 10px;
-  border: 1px solid var(--control-border);
-  border-radius: 5px;
-  background: var(--surface);
-  color: var(--text);
-  font: inherit;
-  font-size: var(--font-size-sm);
-  font-weight: 800;
-  line-height: 1.2;
-  cursor: pointer;
-  white-space: nowrap;
 }
 </style>
