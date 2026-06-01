@@ -113,11 +113,11 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   padding: 0 0 2px;
 }
 
-:global(.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options) {
+:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-desktop-options) {
   scrollbar-width: none;
 }
 
-:global(.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options::-webkit-scrollbar) {
+:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-desktop-options::-webkit-scrollbar) {
   display: none;
 }
 
@@ -247,7 +247,7 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   padding: 0 0 2px;
 }
 
-:global(.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options) {
+:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options) {
   scrollbar-width: none;
 }
 
@@ -267,11 +267,11 @@ defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
   white-space: nowrap;
 }
 
-:global(.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options) {
+:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options) {
   scrollbar-width: none;
 }
 
-:global(.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options::-webkit-scrollbar) {
+:global(.app-container:not(.app-container--native-scroll-runtime) .prompt-template-mobile-options::-webkit-scrollbar) {
   display: none;
 }
 

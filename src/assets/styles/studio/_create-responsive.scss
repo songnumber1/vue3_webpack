@@ -220,11 +220,11 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs {
   scrollbar-width: thin;
 }
 
-body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .chat-container-root--mode-studio .studio-create-tabs {
+body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-create-tabs {
   scrollbar-width: none;
 }
 
-body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
+body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
   display: none;
 }
 

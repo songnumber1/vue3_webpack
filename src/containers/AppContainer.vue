@@ -72,12 +72,14 @@ const isMobileContainer = computed(() => shouldUseMobileLayout.value);
 
 const isActualAndroidRuntime = computed(() => {
   const info = platformInfo.value || {};
+  const userAgent = String(info.userAgent || "");
   return Boolean(
     info.actualEnv === "android" ||
+      info.actualDevice === "android" ||
       info.actualDevice === "android-webview" ||
+      info.actualBrowser === "android-webview" ||
       info.isAndroidApp ||
-      (!info.isPlatformForced &&
-        (info.isMobileBrowser || info.isAndroidWebView))
+      /Android/i.test(userAgent)
   );
 });
 
@@ -124,6 +126,10 @@ const containerClasses = computed(() => ({
 
   // 실제 런타임 기준 스크롤 정책 분기용 클래스입니다. 화면 크기(mobile-mode)가 아니라 실제 기기 환경 기준입니다.
   "app-container--actual-android-runtime": isActualAndroidRuntime.value,
+  "app-container--native-scroll-runtime": isActualAndroidRuntime.value,
   "app-container--actual-pc-runtime": !isActualAndroidRuntime.value,
+  [`app-container--actual-env-${platformInfo.value.actualEnv || "unknown"}`]: true,
+  [`app-container--actual-device-${platformInfo.value.actualDevice || "unknown"}`]: true,
+  [`app-container--actual-browser-${platformInfo.value.actualBrowser || "unknown"}`]: true,
 }));
 </script>

@@ -88,11 +88,14 @@ const overlayScrollbarOptions = {
 
 const isActualAndroidRuntime = computed(() => {
   const info = platformStore.info || {};
+  const userAgent = String(info.userAgent || "");
   return Boolean(
     info.actualEnv === "android" ||
+      info.actualDevice === "android" ||
       info.actualDevice === "android-webview" ||
+      info.actualBrowser === "android-webview" ||
       info.isAndroidApp ||
-      (!info.isPlatformForced && (info.isMobileBrowser || info.isAndroidWebView))
+      /Android/i.test(userAgent)
   );
 });
 

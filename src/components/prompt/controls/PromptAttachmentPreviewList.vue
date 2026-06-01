@@ -104,11 +104,11 @@ function emitPreview(file) {
   scrollbar-width: thin;
 }
 
-:global(body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row) {
+:global(body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .attachment-preview-row) {
   scrollbar-width: none;
 }
 
-:global(body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar) {
+:global(body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .attachment-preview-row::-webkit-scrollbar) {
   display: none;
 }
 
