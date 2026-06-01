@@ -1,9 +1,9 @@
 <template>
-  <div class="prompt-action-row">
-    <div class="prompt-left-actions">
-      <div ref="modelRoot" class="prompt-selector-wrap">
+  <div class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2">
+    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
+      <div ref="modelRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
         <button
-          class="prompt-model-trigger"
+          class="prompt-model-trigger tw-inline-flex tw-min-w-0 tw-items-center tw-justify-center tw-gap-1.5 tw-rounded-control tw-border tw-border-solid tw-border-app-controlBorder"
           type="button"
           :disabled="disabled || modelReadonly"
           :title="modelReadonly ? resolvedReadonlyTitle : undefined"
@@ -24,9 +24,9 @@
         </button>
       </div>
 
-      <div ref="toolRoot" class="prompt-selector-wrap">
+      <div ref="toolRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
         <button
-          class="prompt-icon-action prompt-tool-mobile-trigger"
+          class="prompt-icon-action prompt-tool-mobile-trigger tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-transition"
           :class="{
             'prompt-icon-action--active': toolMenuOpen,
             'prompt-tool-mobile-trigger--selected':
@@ -50,9 +50,9 @@
         </button>
       </div>
 
-      <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap">
+      <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0">
         <button
-          class="prompt-icon-action attach-button"
+          class="prompt-icon-action attach-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-transition"
           :class="{'prompt-icon-action--active': attachMenuOpen}"
           type="button"
           :title="attachLabel"
@@ -76,7 +76,7 @@
 
     <button
       v-if="showVoiceStartButton"
-      class="voice-button voice-button--start"
+      class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
       type="button"
       :disabled="disabled || !isSpeechSupported"
       :title="voiceStartLabel"
@@ -105,7 +105,7 @@
 
     <button
       v-else-if="showVoiceStopButton"
-      class="voice-button voice-button--stop"
+      class="voice-button voice-button--stop tw-inline-flex tw-items-center tw-justify-center"
       type="button"
       :disabled="disabled"
       :title="voiceStopLabel"
@@ -117,7 +117,7 @@
 
     <button
       v-else
-      class="send-button"
+      class="send-button tw-inline-flex tw-items-center tw-justify-center"
       :class="{'send-button--loading': generating}"
       type="submit"
       :disabled="disabled || generating || !canSubmit"

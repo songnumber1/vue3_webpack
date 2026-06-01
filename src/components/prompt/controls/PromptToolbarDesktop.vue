@@ -1,6 +1,6 @@
 <template>
-  <div class="prompt-action-row">
-    <div class="prompt-left-actions">
+  <div class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2">
+    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
       <PromptModelSelector
         ref="modelSelectorRef"
         :disabled="disabled"
@@ -16,10 +16,10 @@
         @select-model="$emit('select-model', $event)"
       />
 
-      <div ref="toolRoot" class="prompt-selector-wrap">
+      <div ref="toolRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
         <button
           v-if="!selectedTemplateTool"
-          class="prompt-icon-action"
+          class="prompt-icon-action tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-transition"
           :class="{'prompt-icon-action--active': toolMenuOpen}"
           type="button"
           :disabled="disabled"
@@ -30,7 +30,7 @@
         </button>
         <button
           v-else
-          class="prompt-selected-tool-chip prompt-selected-tool-chip--desktop"
+          class="prompt-selected-tool-chip prompt-selected-tool-chip--desktop tw-inline-flex tw-h-8 tw-max-w-[128px] tw-items-center tw-gap-1.5 tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-bg-app-surface tw-px-2.5 tw-text-sm tw-font-bold tw-leading-none"
           :class="{'prompt-selected-tool-chip--active': toolMenuOpen}"
           type="button"
           :disabled="disabled"
@@ -49,7 +49,7 @@
         <div
           v-if="toolMenuOpen && !isMobileSheet"
           ref="toolMenuRef"
-          class="prompt-popover prompt-tool-menu prompt-floating-menu"
+          class="prompt-popover prompt-tool-menu prompt-floating-menu tw-box-border tw-rounded-control tw-border tw-border-solid tw-border-app-border tw-bg-app-menu tw-shadow-menu"
           :style="toolMenuStyle"
         >
           <button
@@ -57,9 +57,9 @@
             :key="tool.id"
             type="button"
             :class="{
-              'prompt-tool-menu-parent': hasChildren(tool),
+              'prompt-tool-menu-parent tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-control tw-px-2.5 tw-text-left': hasChildren(tool),
               active: activeToolGroupId === tool.id || tool.active,
-              'is-template-tool': Boolean(tool.promptTemplateKey),
+              'is-template-tool tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-controlSm tw-px-2.5 tw-text-left': Boolean(tool.promptTemplateKey),
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
             :aria-expanded="
@@ -69,30 +69,30 @@
           >
             <img
               v-if="tool.iconSrc"
-              class="prompt-tool-icon-img"
+              class="prompt-tool-icon-img tw-h-[18px] tw-w-[18px] tw-shrink-0 tw-object-contain"
               :src="tool.iconSrc"
               alt=""
               aria-hidden="true"
             />
             <span
               v-else-if="!tool.promptTemplateKey"
-              class="prompt-tool-icon"
+              class="prompt-tool-icon tw-shrink-0"
               aria-hidden="true"
               >{{ tool.icon }}</span
             >
-            <span class="prompt-tool-text">
+            <span class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left">
               <strong>{{ tool.label }}</strong>
             </span>
             <span
               v-if="hasChildren(tool) && tool.active && !isSwitchParent(tool)"
-              class="prompt-menu-active-badge"
+              class="prompt-menu-active-badge tw-ml-auto tw-inline-flex tw-items-center tw-justify-center tw-rounded-full"
               aria-hidden="true"
             >
               {{ tool.activeCount }}
             </span>
             <span
               v-if="hasChildren(tool) && isSwitchParent(tool)"
-              class="prompt-tool-parent-switch"
+              class="prompt-tool-parent-switch tw-ml-auto tw-shrink-0 tw-rounded-full"
               :class="{'is-active': tool.active}"
               role="switch"
               tabindex="0"
@@ -106,7 +106,7 @@
             </span>
             <span
               v-if="hasChildren(tool)"
-              class="prompt-submenu-arrow"
+              class="prompt-submenu-arrow tw-ml-auto tw-shrink-0"
               aria-hidden="true"
             >
               ›
@@ -115,14 +115,14 @@
 
           <div
             v-if="activeToolGroup"
-            class="prompt-popover prompt-tool-submenu"
+            class="prompt-popover prompt-tool-submenu tw-box-border tw-rounded-control tw-border tw-border-solid tw-border-app-border tw-bg-app-menu tw-shadow-menu"
             :class="`prompt-tool-submenu--${submenuPlacement}`"
             role="menu"
           >
             <button
               v-for="child in activeToolGroup.children"
               :key="child.id"
-              class="prompt-tool-child-option"
+              class="prompt-tool-child-option tw-flex tw-w-full tw-items-center tw-gap-3 tw-rounded-control tw-px-2.5 tw-text-left"
               :class="[
                 `prompt-tool-child-option--${child.controlType || activeToolGroup.childControlType || 'default'}`,
                 {'is-active': child.active},
@@ -134,7 +134,7 @@
             >
               <span
                 v-if="isCheckboxChild(child)"
-                class="prompt-tool-checkbox"
+                class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
                 aria-hidden="true"
               >
                 <span v-if="child.active">✓</span>
@@ -159,7 +159,7 @@
 
     <button
       v-if="showVoiceStartButton"
-      class="voice-button voice-button--start"
+      class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
       type="button"
       :disabled="disabled || !isSpeechSupported"
       :title="voiceStartLabel"
@@ -188,7 +188,7 @@
 
     <button
       v-else-if="showVoiceStopButton"
-      class="voice-button voice-button--stop"
+      class="voice-button voice-button--stop tw-inline-flex tw-items-center tw-justify-center"
       type="button"
       :disabled="disabled"
       :title="voiceStopLabel"
@@ -200,7 +200,7 @@
 
     <button
       v-else
-      class="send-button"
+      class="send-button tw-inline-flex tw-items-center tw-justify-center"
       :class="{'send-button--loading': generating}"
       type="submit"
       :disabled="disabled || generating || !canSubmit"

@@ -7,17 +7,17 @@
     <button
       v-for="model in models"
       :key="model.id"
-      class="bottom-sheet-option"
+      class="bottom-sheet-option tw-flex tw-w-full tw-items-center tw-gap-3 tw-text-left"
       :class="{active: model.id === modelValue}"
       type="button"
       @click="$emit('select-model', model.id)"
     >
-      <span class="bottom-sheet-option-main">
+      <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
         <strong>{{ model.label }}</strong>
         <small>{{ model.description }}</small>
       </span>
 
-      <CheckIcon v-if="model.id === modelValue" class="bottom-sheet-check" />
+      <CheckIcon v-if="model.id === modelValue" class="bottom-sheet-check tw-ml-auto tw-shrink-0" />
     </button>
   </BaseBottomSheet>
 
@@ -33,7 +33,7 @@
       <button
         v-for="tool in tools"
         :key="tool.id"
-        class="bottom-sheet-option bottom-sheet-option--row"
+        class="bottom-sheet-option bottom-sheet-option--row tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-text-left"
         :class="{
           'is-active': tool.active,
           'bottom-sheet-option--template': Boolean(tool.promptTemplateKey),
@@ -43,7 +43,7 @@
       >
         <img
           v-if="tool.iconSrc"
-          class="bottom-sheet-tool-icon"
+          class="bottom-sheet-tool-icon tw-h-[22px] tw-w-[22px] tw-shrink-0 tw-object-contain"
           :src="tool.iconSrc"
           alt=""
           aria-hidden="true"
@@ -52,7 +52,7 @@
           {{ tool.icon }}
         </span>
 
-        <span class="bottom-sheet-option-main">
+        <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
           <strong>
             {{ tool.label }}
           </strong>
@@ -61,7 +61,7 @@
 
         <span
           v-if="hasChildren(tool) && tool.activeCount > 0"
-          class="bottom-sheet-active-badge"
+          class="bottom-sheet-active-badge tw-ml-auto tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full"
           aria-hidden="true"
         >
           {{ tool.activeCount }}
@@ -69,7 +69,7 @@
 
         <span
           v-if="hasChildren(tool) && isSwitchParent(tool)"
-          class="bottom-sheet-parent-switch"
+          class="bottom-sheet-parent-switch tw-ml-auto tw-shrink-0 tw-rounded-full"
           :class="{'is-active': tool.active}"
           role="switch"
           tabindex="0"
@@ -84,7 +84,7 @@
 
         <span
           v-if="hasChildren(tool)"
-          class="bottom-sheet-submenu-arrow"
+          class="bottom-sheet-submenu-arrow tw-ml-auto tw-shrink-0"
           aria-hidden="true"
         >
           ›
@@ -96,7 +96,7 @@
       <button
         v-for="child in activeToolGroup.children"
         :key="child.id"
-        class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice"
+        class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice tw-flex tw-w-full tw-items-center tw-gap-3 tw-text-left"
         :class="[
           `bottom-sheet-option--${child.controlType || activeToolGroup.childControlType || 'default'}`,
           {'is-active': child.active},
@@ -108,7 +108,7 @@
       >
         <span
           v-if="isCheckboxChild(child)"
-          class="bottom-sheet-checkbox"
+          class="bottom-sheet-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
           aria-hidden="true"
         >
           <span v-if="child.active">✓</span>
@@ -129,7 +129,7 @@
     <button
       v-for="option in attachOptions"
       :key="option.id"
-      class="bottom-sheet-option bottom-sheet-option--row"
+      class="bottom-sheet-option bottom-sheet-option--row tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-text-left"
       type="button"
       @click="$emit('open-file-picker', option.id)"
     >
