@@ -65,3 +65,6 @@
 
 /* 6. Studio/MCP freeze hold: keep through E-2; delete only selector-by-selector in E-3. */
 @use "./studio/studio-workspace" as *;
+
+/* 7. E-2.5 final mobile cascade guard: keep last so legacy mobile overrides cannot win. */
+@use "./03-runtime/mobile-cascade-hotfix" as *;

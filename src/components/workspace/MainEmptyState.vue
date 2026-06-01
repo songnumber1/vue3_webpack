@@ -31,6 +31,13 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
+      <slot v-if="!isMobile" name="composer"></slot>
+    </div>
+    <div
+      v-if="isMobile"
+      class="main-empty-state__composer-dock"
+      aria-label="Mobile main prompt"
+    >
       <slot name="composer"></slot>
     </div>
   </section>
@@ -96,6 +103,53 @@ function handleSuggestionClick(item) {
 </script>
 
 <style scoped lang="scss">
+
+/*
+ * Mobile main composer owns a separate dock outside .empty-center.
+ * This prevents the prompt from staying in the desktop empty-state flow when
+ * body.mobile-mode, viewportStore, or Tailwind utility timing briefly disagree.
+ */
+.empty-stage--mobile-main {
+  position: relative;
+}
+
+.empty-stage--mobile-main .main-empty-state__center {
+  padding-bottom: calc(var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px));
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock {
+  position: fixed;
+  right: 0;
+  bottom: calc(var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px));
+  left: 0;
+  z-index: var(--mobile-main-composer-z, var(--z-prompt-floating, 90));
+  box-sizing: border-box;
+  width: 100dvw;
+  max-width: 100dvw;
+  padding: 8px 12px max(12px, env(safe-area-inset-bottom, 0px));
+  overflow: visible;
+  background: transparent;
+  pointer-events: none;
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock > * {
+  pointer-events: auto;
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock .mobile-main-fixed-prompt,
+.empty-stage--mobile-main .main-empty-state__composer-dock .desktop-center-prompt {
+  position: static !important;
+  inset: auto !important;
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
 .main-empty-state--preview {
   width: 100%;
   height: 100%;

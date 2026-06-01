@@ -81,6 +81,7 @@ import {
 } from "@/composables/chat/chatActionContext";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
+import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
 
 const {t} = useI18n();
 const listRef = ref(null);
@@ -101,7 +102,8 @@ const {isInteractionBlocked} = useInteractionGuard();
 
 const mode = computed(() => workspaceState.value.mode);
 const readonly = computed(() => workspaceState.value.readonly);
-const isMobile = computed(() => workspaceState.value.isMobile);
+const injectedIsMobile = computed(() => workspaceState.value.isMobile);
+const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
@@ -132,7 +134,9 @@ const mainAssistantIcon = computed(() =>
 );
 
 const mainPromptClass = computed(() =>
-  isMobile.value ? "mobile-main-fixed-prompt" : "desktop-center-prompt"
+  isMobile.value
+    ? "mobile-main-fixed-prompt main-empty-state__prompt"
+    : "desktop-center-prompt"
 );
 
 function updateComposerHeight() {

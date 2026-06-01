@@ -39,6 +39,7 @@ import {
 } from "@/composables/chat/chatActionContext";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
+import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
 
 const mainPromptInputRef = ref(null);
 const workspaceState = inject(
@@ -48,7 +49,8 @@ const workspaceState = inject(
 inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
 const {isInteractionBlocked} = useInteractionGuard();
 
-const isMobile = computed(() => workspaceState.value.isMobile);
+const injectedIsMobile = computed(() => workspaceState.value.isMobile);
+const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
@@ -61,8 +63,8 @@ const mainAssistantIcon = computed(() =>
 );
 const mainPromptClass = computed(() =>
   isMobile.value
-    ? "mobile-main-fixed-prompt !fixed !inset-x-0 !bottom-0 !z-[var(--z-prompt)] !box-border !w-[100dvw] !max-w-[100dvw] !overflow-hidden !bg-transparent !px-3 !pb-[max(12px,env(safe-area-inset-bottom))] !pt-2 !shadow-none"
-    : "desktop-center-prompt !w-[min(var(--layout-prompt-width,820px),100%)] !max-w-[var(--layout-prompt-width,820px)] !border-0 !p-0"
+    ? "mobile-main-fixed-prompt main-empty-state__prompt tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-prompt tw-box-border tw-w-[100dvw] tw-max-w-[100dvw] tw-overflow-hidden tw-bg-transparent tw-px-3 tw-pb-[max(12px,env(safe-area-inset-bottom))] tw-pt-2 tw-shadow-none"
+    : "desktop-center-prompt tw-w-[min(var(--layout-prompt-width,820px),100%)] tw-max-w-[var(--layout-prompt-width,820px)] tw-border-0 tw-p-0"
 );
 
 function handleSuggestionClick(item) {
