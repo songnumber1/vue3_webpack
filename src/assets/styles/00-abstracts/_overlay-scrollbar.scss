@@ -24,124 +24,237 @@ body.dark-mode .os-theme-chat-app,
   scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
 }
 
-/* OverlayScrollbars가 붙지 않은 모바일/브라우저 fallback도 폭을 최소화합니다. */
-.message-list,
-.chat-search-list-area,
-.studio-workspace__scroll,
-.studio-list-area,
-.studio-dialog__body,
-.studio-create-body,
-.studio-mobile-page__content,
-.bottom-sheet-body,
-.app-dialog-body,
-.feedback-dialog__body,
-.system-settings-dialog__body,
-.md-table-wrapper,
-.md-code-pre,
-.md-mermaid,
-.markdown-body pre,
-.markdown-body .katex-display {
+/*
+  PC 런타임 fallback scrollbar.
+  - 화면 폭이 mobile-mode로 전환되어도 실제 PC 런타임이면 overlay-style scrollbar를 유지합니다.
+  - 실제 Android Chrome/WebView 런타임에서는 아래 fallback을 적용하지 않고 native scroll로 둡니다.
+*/
+.app-container:not(.app-container--actual-android-runtime) .message-list,
+.app-container:not(.app-container--actual-android-runtime) .chat-search-list-area,
+.app-container:not(.app-container--actual-android-runtime) .studio-workspace__scroll,
+.app-container:not(.app-container--actual-android-runtime) .studio-list-area,
+.app-container:not(.app-container--actual-android-runtime) .studio-dialog__body,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-body,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-content,
+.app-container:not(.app-container--actual-android-runtime) .studio-mobile-page__content,
+.app-container:not(.app-container--actual-android-runtime) .bottom-sheet-body,
+.app-container:not(.app-container--actual-android-runtime) .app-dialog-body,
+.app-container:not(.app-container--actual-android-runtime) .feedback-dialog__body,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-dialog__body,
+.app-container:not(.app-container--actual-android-runtime) .md-table-wrapper,
+.app-container:not(.app-container--actual-android-runtime) .md-code-pre,
+.app-container:not(.app-container--actual-android-runtime) .md-mermaid,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body pre,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body .katex-display {
   scrollbar-width: thin;
   scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
 }
 
-.message-list::-webkit-scrollbar,
-.chat-search-list-area::-webkit-scrollbar,
-.studio-workspace__scroll::-webkit-scrollbar,
-.studio-list-area::-webkit-scrollbar,
-.studio-dialog__body::-webkit-scrollbar,
-.studio-create-body::-webkit-scrollbar,
-.studio-mobile-page__content::-webkit-scrollbar,
-.bottom-sheet-body::-webkit-scrollbar,
-.app-dialog-body::-webkit-scrollbar,
-.feedback-dialog__body::-webkit-scrollbar,
-.system-settings-dialog__body::-webkit-scrollbar,
-.md-table-wrapper::-webkit-scrollbar,
-.md-code-pre::-webkit-scrollbar,
-.md-mermaid::-webkit-scrollbar,
-.markdown-body pre::-webkit-scrollbar,
-.markdown-body .katex-display::-webkit-scrollbar {
+.app-container:not(.app-container--actual-android-runtime) .message-list::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .chat-search-list-area::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-workspace__scroll::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-list-area::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-dialog__body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-content::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-mobile-page__content::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .bottom-sheet-body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .app-dialog-body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .feedback-dialog__body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-dialog__body::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .md-table-wrapper::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .md-code-pre::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .md-mermaid::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body pre::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body .katex-display::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.message-list::-webkit-scrollbar-track,
-.chat-search-list-area::-webkit-scrollbar-track,
-.studio-workspace__scroll::-webkit-scrollbar-track,
-.studio-list-area::-webkit-scrollbar-track,
-.studio-dialog__body::-webkit-scrollbar-track,
-.studio-create-body::-webkit-scrollbar-track,
-.studio-mobile-page__content::-webkit-scrollbar-track,
-.bottom-sheet-body::-webkit-scrollbar-track,
-.app-dialog-body::-webkit-scrollbar-track,
-.feedback-dialog__body::-webkit-scrollbar-track,
-.system-settings-dialog__body::-webkit-scrollbar-track,
-.md-table-wrapper::-webkit-scrollbar-track,
-.md-code-pre::-webkit-scrollbar-track,
-.md-mermaid::-webkit-scrollbar-track,
-.markdown-body pre::-webkit-scrollbar-track,
-.markdown-body .katex-display::-webkit-scrollbar-track {
+.app-container:not(.app-container--actual-android-runtime) .message-list::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .chat-search-list-area::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-workspace__scroll::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-list-area::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-dialog__body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-content::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-mobile-page__content::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .bottom-sheet-body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .app-dialog-body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .feedback-dialog__body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-dialog__body::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .md-table-wrapper::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .md-code-pre::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .md-mermaid::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body pre::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body .katex-display::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.message-list::-webkit-scrollbar-thumb,
-.chat-search-list-area::-webkit-scrollbar-thumb,
-.studio-workspace__scroll::-webkit-scrollbar-thumb,
-.studio-list-area::-webkit-scrollbar-thumb,
-.studio-dialog__body::-webkit-scrollbar-thumb,
-.studio-create-body::-webkit-scrollbar-thumb,
-.studio-mobile-page__content::-webkit-scrollbar-thumb,
-.bottom-sheet-body::-webkit-scrollbar-thumb,
-.app-dialog-body::-webkit-scrollbar-thumb,
-.feedback-dialog__body::-webkit-scrollbar-thumb,
-.system-settings-dialog__body::-webkit-scrollbar-thumb,
-.md-table-wrapper::-webkit-scrollbar-thumb,
-.md-code-pre::-webkit-scrollbar-thumb,
-.md-mermaid::-webkit-scrollbar-thumb,
-.markdown-body pre::-webkit-scrollbar-thumb,
-.markdown-body .katex-display::-webkit-scrollbar-thumb {
+.app-container:not(.app-container--actual-android-runtime) .message-list::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .chat-search-list-area::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-workspace__scroll::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-list-area::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-dialog__body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-create-content::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-mobile-page__content::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .bottom-sheet-body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .app-dialog-body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .feedback-dialog__body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-dialog__body::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .md-table-wrapper::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .md-code-pre::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .md-mermaid::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body pre::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .markdown-body .katex-display::-webkit-scrollbar-thumb {
   background: rgba(104, 113, 130, 0.34);
   border-radius: 999px;
 }
 
 /* Overlay scrollbar coverage fixes for collapsed history, mobile drawer, category chips and system settings. */
-.sidebar-history,
-.collapsed-recent-list,
-.mobile-drawer .sidebar-history,
-.system-settings-scroll {
+.app-container:not(.app-container--actual-android-runtime) .sidebar-history,
+.app-container:not(.app-container--actual-android-runtime) .collapsed-recent-list,
+.app-container:not(.app-container--actual-android-runtime) .mobile-drawer .sidebar-history,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-scroll,
+.app-container:not(.app-container--actual-android-runtime) .studio-category-chips,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options,
+.app-container:not(.app-container--actual-android-runtime) .attachment-preview-row {
   scrollbar-width: thin;
   scrollbar-color: rgba(104, 113, 130, 0.34) transparent;
 }
 
-.sidebar-history::-webkit-scrollbar,
-.collapsed-recent-list::-webkit-scrollbar,
-.mobile-drawer .sidebar-history::-webkit-scrollbar,
-.system-settings-scroll::-webkit-scrollbar {
+.app-container:not(.app-container--actual-android-runtime) .sidebar-history::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .collapsed-recent-list::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .mobile-drawer .sidebar-history::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-scroll::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .studio-category-chips::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options::-webkit-scrollbar,
+.app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-.sidebar-history::-webkit-scrollbar-track,
-.collapsed-recent-list::-webkit-scrollbar-track,
-.mobile-drawer .sidebar-history::-webkit-scrollbar-track,
-.system-settings-scroll::-webkit-scrollbar-track {
+.app-container:not(.app-container--actual-android-runtime) .sidebar-history::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .collapsed-recent-list::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .mobile-drawer .sidebar-history::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-scroll::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .studio-category-chips::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options::-webkit-scrollbar-track,
+.app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.sidebar-history::-webkit-scrollbar-thumb,
-.collapsed-recent-list::-webkit-scrollbar-thumb,
-.mobile-drawer .sidebar-history::-webkit-scrollbar-thumb,
-.system-settings-scroll::-webkit-scrollbar-thumb {
+.app-container:not(.app-container--actual-android-runtime) .sidebar-history::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .collapsed-recent-list::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .mobile-drawer .sidebar-history::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .system-settings-scroll::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .studio-category-chips::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-desktop-options::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .prompt-template-mobile-options::-webkit-scrollbar-thumb,
+.app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar-thumb {
   background: rgba(104, 113, 130, 0.34);
   border-radius: 999px;
 }
 
-/* Step scroll-policy v2:
+/* 실제 Android Chrome/WebView에서는 native scrollbar를 방해하지 않습니다. */
+.app-container--actual-android-runtime [data-overlay-scrollbar-enhanced="true"],
+.app-container--actual-android-runtime .message-list,
+.app-container--actual-android-runtime .chat-search-list-area,
+.app-container--actual-android-runtime .studio-workspace__scroll,
+.app-container--actual-android-runtime .studio-list-area,
+.app-container--actual-android-runtime .studio-dialog__body,
+.app-container--actual-android-runtime .studio-create-body,
+.app-container--actual-android-runtime .studio-create-content,
+.app-container--actual-android-runtime .studio-mobile-page__content,
+.app-container--actual-android-runtime .bottom-sheet-body,
+.app-container--actual-android-runtime .app-dialog-body,
+.app-container--actual-android-runtime .feedback-dialog__body,
+.app-container--actual-android-runtime .system-settings-dialog__body,
+.app-container--actual-android-runtime .sidebar-history,
+.app-container--actual-android-runtime .collapsed-recent-list,
+.app-container--actual-android-runtime .mobile-drawer .sidebar-history,
+.app-container--actual-android-runtime .system-settings-scroll,
+.app-container--actual-android-runtime .studio-category-chips,
+.app-container--actual-android-runtime .prompt-template-desktop-options,
+.app-container--actual-android-runtime .prompt-template-mobile-options,
+.app-container--actual-android-runtime .attachment-preview-row,
+.app-container--actual-android-runtime .md-table-wrapper,
+.app-container--actual-android-runtime .md-code-pre,
+.app-container--actual-android-runtime .md-mermaid,
+.app-container--actual-android-runtime .markdown-body pre,
+.app-container--actual-android-runtime .markdown-body .katex-display {
+  scrollbar-width: auto;
+  scrollbar-color: auto;
+}
+
+.app-container--actual-android-runtime .message-list::-webkit-scrollbar,
+.app-container--actual-android-runtime .chat-search-list-area::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-workspace__scroll::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-list-area::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-dialog__body::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-create-body::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-create-content::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-mobile-page__content::-webkit-scrollbar,
+.app-container--actual-android-runtime .bottom-sheet-body::-webkit-scrollbar,
+.app-container--actual-android-runtime .app-dialog-body::-webkit-scrollbar,
+.app-container--actual-android-runtime .feedback-dialog__body::-webkit-scrollbar,
+.app-container--actual-android-runtime .system-settings-dialog__body::-webkit-scrollbar,
+.app-container--actual-android-runtime .sidebar-history::-webkit-scrollbar,
+.app-container--actual-android-runtime .collapsed-recent-list::-webkit-scrollbar,
+.app-container--actual-android-runtime .mobile-drawer .sidebar-history::-webkit-scrollbar,
+.app-container--actual-android-runtime .system-settings-scroll::-webkit-scrollbar,
+.app-container--actual-android-runtime .studio-category-chips::-webkit-scrollbar,
+.app-container--actual-android-runtime .prompt-template-desktop-options::-webkit-scrollbar,
+.app-container--actual-android-runtime .prompt-template-mobile-options::-webkit-scrollbar,
+.app-container--actual-android-runtime .attachment-preview-row::-webkit-scrollbar,
+.app-container--actual-android-runtime .md-table-wrapper::-webkit-scrollbar,
+.app-container--actual-android-runtime .md-code-pre::-webkit-scrollbar,
+.app-container--actual-android-runtime .md-mermaid::-webkit-scrollbar,
+.app-container--actual-android-runtime .markdown-body pre::-webkit-scrollbar,
+.app-container--actual-android-runtime .markdown-body .katex-display::-webkit-scrollbar {
+  width: initial;
+  height: initial;
+}
+
+.app-container--actual-android-runtime .message-list::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .chat-search-list-area::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-workspace__scroll::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-list-area::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-dialog__body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-create-body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-create-content::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-mobile-page__content::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .bottom-sheet-body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .app-dialog-body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .feedback-dialog__body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .system-settings-dialog__body::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .sidebar-history::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .collapsed-recent-list::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .mobile-drawer .sidebar-history::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .system-settings-scroll::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .studio-category-chips::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .prompt-template-desktop-options::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .prompt-template-mobile-options::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .attachment-preview-row::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .md-table-wrapper::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .md-code-pre::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .md-mermaid::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .markdown-body pre::-webkit-scrollbar-thumb,
+.app-container--actual-android-runtime .markdown-body .katex-display::-webkit-scrollbar-thumb {
+  background: initial;
+  border-radius: initial;
+}
+
+/* Step scroll-policy v3:
    OverlayScrollbars 활성화 여부는 화면 폭(mobile-mode)이 아니라 실제 플랫폼 기준입니다.
-   실제 Android Chrome/WebView에서는 JS에서 OverlayScrollbars 인스턴스를 만들지 않고 native scroll을 사용합니다.
+   실제 Android Chrome/WebView에서는 JS 인스턴스와 CSS scrollbar 커스터마이징을 모두 비활성화합니다.
    PC에서는 모바일 사이즈로 줄어들어도 OverlayScrollbars가 유지되므로 input/textarea/select와 겹치지 않게
    활성화된 스크롤 컨테이너에만 우측 여백을 예약합니다. */
-[data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
+.app-container:not(.app-container--actual-android-runtime) [data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
   --overlay-scrollbar-content-gap: 12px;
   padding-inline-end: max(var(--overlay-scrollbar-content-gap), env(safe-area-inset-right, 0px));
   box-sizing: border-box;

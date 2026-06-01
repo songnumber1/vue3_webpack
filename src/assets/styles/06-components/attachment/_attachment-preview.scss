@@ -444,9 +444,12 @@ body.mobile-mode .attachment-preview-row {
   overflow-x: auto;
   overflow-y: visible;
   padding: 18px 18px 12px 4px;
+  scrollbar-width: thin;
+}
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row {
   scrollbar-width: none;
 }
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar {
   display: none;
 }
 body.mobile-mode .attachment-preview-card,
@@ -552,7 +555,10 @@ body.mobile-mode .attachment-preview-card--image .attachment-preview-remove {
   font-weight: 500 !important;
 }
 
-body.mobile-mode .attachment-preview-row::-webkit-scrollbar {
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row {
+  scrollbar-width: none !important;
+}
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar {
   display: none !important;
 }
 
@@ -720,5 +726,7 @@ body.mobile-mode .attachment-preview-row {
   padding: 10px 38px 8px 2px !important;
   overflow-x: auto !important;
   overflow-y: visible !important;
+}
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row {
   scrollbar-width: none !important;
 }

@@ -217,10 +217,14 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs {
   border-bottom: 1px solid var(--studio-border);
   background: var(--studio-surface);
   overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .chat-container-root--mode-studio .studio-create-tabs {
   scrollbar-width: none;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
+body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
   display: none;
 }
 

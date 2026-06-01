@@ -101,10 +101,14 @@ function emitPreview(file) {
   padding: 10px 38px 8px 2px;
   overflow-x: auto;
   overflow-y: visible;
+  scrollbar-width: thin;
+}
+
+:global(body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row) {
   scrollbar-width: none;
 }
 
-:global(body.mobile-mode) .attachment-preview-row::-webkit-scrollbar {
+:global(body.mobile-mode .app-container:not(.app-container--actual-android-runtime) .attachment-preview-row::-webkit-scrollbar) {
   display: none;
 }
 

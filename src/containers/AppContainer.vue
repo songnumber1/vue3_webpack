@@ -70,6 +70,17 @@ const deviceName = computed(() => platformInfo.value.device || "unknown");
  */
 const isMobileContainer = computed(() => shouldUseMobileLayout.value);
 
+const isActualAndroidRuntime = computed(() => {
+  const info = platformInfo.value || {};
+  return Boolean(
+    info.actualEnv === "android" ||
+      info.actualDevice === "android-webview" ||
+      info.isAndroidApp ||
+      (!info.isPlatformForced &&
+        (info.isMobileBrowser || info.isAndroidWebView))
+  );
+});
+
 /**
  * 상기 계산된 개별 플랫폼 속성값들을 조합하여 템플릿의 컨테이너 Div에 실시간 매핑할 CSS 클래스 객체를 빌드합니다.
  * @type {import("vue").ComputedRef<Record<string, boolean>>}
@@ -110,5 +121,9 @@ const containerClasses = computed(() => ({
 
   // 현재 접속한 하드웨어 디바이스 종류 명칭에 매칭되는 동적 클래스를 항상 true 상태로 바인딩합니다. (예: app-container--device-pc)
   [`app-container--device-${deviceName.value}`]: true,
+
+  // 실제 런타임 기준 스크롤 정책 분기용 클래스입니다. 화면 크기(mobile-mode)가 아니라 실제 기기 환경 기준입니다.
+  "app-container--actual-android-runtime": isActualAndroidRuntime.value,
+  "app-container--actual-pc-runtime": !isActualAndroidRuntime.value,
 }));
 </script>
