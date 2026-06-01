@@ -1,5 +1,5 @@
 <template>
-  <header class="application-header tw-relative tw-z-popover tw-flex tw-h-[56px] tw-min-h-0 tw-w-full tw-min-w-0 tw-items-center tw-justify-between tw-gap-4 tw-overflow-visible tw-border-b tw-border-app-sidebarBorder tw-bg-app-chat tw-pl-5 tw-pr-[18px] tw-text-app-text" :aria-label="t('application.headerLabel')">
+  <header class="application-header tw-relative tw-z-popover tw-flex tw-h-[56px] tw-min-h-0 tw-w-full tw-min-w-0 tw-items-center tw-justify-between tw-gap-4 tw-overflow-visible tw-border-b tw-border-solid tw-border-app-sidebarBorder tw-bg-app-chat tw-pl-5 tw-pr-[18px] tw-text-app-text" :aria-label="t('application.headerLabel')">
     <div class="application-header__brand tw-flex tw-min-w-0 tw-items-baseline tw-gap-2.5 tw-overflow-hidden">
       <strong class="application-header__title tw-shrink-0 tw-whitespace-nowrap tw-text-lg tw-font-black tw-tracking-[-0.04em]">{{ t("application.title") }}</strong>
       <span class="application-header__subtitle tw-min-w-0 tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-sm tw-font-bold tw-text-app-subtle">{{ t("application.subtitle") }}</span>

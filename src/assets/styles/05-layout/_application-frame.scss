@@ -91,3 +91,15 @@ body.mobile-mode .application-body {
 body.mobile-mode .application-body > .chat-workspace {
   height: 100%;
 }
+
+/* Runtime boundary guard: header/footer must remain visually separated from the app body.
+   Tailwind preflight is disabled, so border-style is declared here as a stable fallback. */
+body.desktop-mode .application-header {
+  border-bottom: 1px solid var(--control-border, var(--sidebar-border, #d8dee8)) !important;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--control-border, #d8dee8) 55%, transparent);
+}
+
+body.desktop-mode .application-footer {
+  border-top: 1px solid var(--control-border, var(--sidebar-border, #d8dee8)) !important;
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--control-border, #d8dee8) 55%, transparent);
+}

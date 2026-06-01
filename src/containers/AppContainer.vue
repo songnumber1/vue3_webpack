@@ -105,6 +105,22 @@ watchEffect(() => {
 
 provide(RESPONSIVE_CONTEXT_KEY, responsiveContext);
 
+function syncActualScrollRuntimeClasses(isAndroidRuntime) {
+  if (typeof document === "undefined") return;
+  const roots = [document.documentElement, document.body].filter(Boolean);
+  roots.forEach((root) => {
+    root.classList.toggle("actual-android-runtime", isAndroidRuntime);
+    root.classList.toggle("native-scroll-runtime", isAndroidRuntime);
+    root.classList.toggle("actual-pc-runtime", !isAndroidRuntime);
+    root.classList.toggle("overlay-scroll-runtime", !isAndroidRuntime);
+    root.dataset.actualRuntimeScroll = isAndroidRuntime ? "native" : "overlay";
+  });
+}
+
+watchEffect(() => {
+  syncActualScrollRuntimeClasses(isActualAndroidRuntime.value);
+});
+
 const containerClasses = computed(() => ({
   // 모바일 컨테이너 조건이 아닐 경우(일반 데스크톱 PC 화면인 경우) 전용 웹 스타일 클래스를 활성화합니다.
   "app-container--web": !isMobileContainer.value,
@@ -128,6 +144,7 @@ const containerClasses = computed(() => ({
   "app-container--actual-android-runtime": isActualAndroidRuntime.value,
   "app-container--native-scroll-runtime": isActualAndroidRuntime.value,
   "app-container--actual-pc-runtime": !isActualAndroidRuntime.value,
+  "app-container--overlay-scroll-runtime": !isActualAndroidRuntime.value,
   [`app-container--actual-env-${platformInfo.value.actualEnv || "unknown"}`]: true,
   [`app-container--actual-device-${platformInfo.value.actualDevice || "unknown"}`]: true,
   [`app-container--actual-browser-${platformInfo.value.actualBrowser || "unknown"}`]: true,
