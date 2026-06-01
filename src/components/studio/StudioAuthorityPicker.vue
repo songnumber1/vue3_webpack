@@ -38,11 +38,16 @@
           <span class="studio-icon studio-icon--search tw-pointer-events-none tw-absolute tw-right-4 tw-top-1/2 tw-h-[18px] tw-w-[18px] -tw-translate-y-1/2 tw-text-studio-muted" aria-hidden="true"></span>
         </div>
 
-        <div ref="gridShellRef" class="studio-authority-picker__grid-shell tw-min-h-0">
-          <div class="studio-authority-picker-grid" role="table" :aria-label="t('studio.share.pickerTitle')">
-            <div class="studio-authority-picker-grid__head" role="row">
-              <div role="columnheader">
+        <div ref="gridShellRef" class="studio-authority-picker__grid-shell tw-flex tw-min-h-0 tw-flex-1 tw-overflow-hidden">
+          <div
+            class="studio-authority-picker-grid tw-grid tw-min-h-0 tw-flex-1 tw-content-start tw-overflow-hidden tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface"
+            role="table"
+            :aria-label="t('studio.share.pickerTitle')"
+          >
+            <div class="studio-authority-picker-grid__head" :class="gridRowClass" role="row">
+              <div :class="[gridCellClass, checkboxCellClass]" role="columnheader">
                 <input
+                  :class="checkboxClass"
                   type="checkbox"
                   :checked="allPagedChecked"
                   :disabled="!pagedAuthorities.length"
@@ -50,44 +55,46 @@
                   @change="toggleAllPaged($event.target.checked)"
                 />
               </div>
-              <div role="columnheader">{{ t("studio.share.authorityName") }}</div>
-              <div role="columnheader">{{ t("studio.share.description") }}</div>
+              <div :class="[gridCellClass, headerCellClass, nameCellClass]" role="columnheader">{{ t("studio.share.authorityName") }}</div>
+              <div :class="[gridCellClass, headerCellClass, descriptionCellClass]" role="columnheader">{{ t("studio.share.description") }}</div>
             </div>
             <label
               v-for="auth in pagedAuthorities"
               :key="auth.deptId"
-              class="studio-authority-picker-grid__row"
+              class="studio-authority-picker-grid__row tw-m-0 tw-cursor-pointer"
+              :class="gridRowClass"
               role="row"
             >
-              <div role="cell">
+              <div :class="[gridCellClass, checkboxCellClass]" role="cell">
                 <input
+                  :class="checkboxClass"
                   type="checkbox"
                   :checked="selectedIds.includes(auth.deptId)"
                   :aria-label="auth.deptNameKo"
                   @change="toggleAuthority(auth.deptId, $event.target.checked)"
                 />
               </div>
-              <div role="cell">{{ auth.deptNameKo }}</div>
-              <div role="cell">{{ auth.description }}</div>
+              <div :class="[gridCellClass, nameCellClass]" role="cell">{{ auth.deptNameKo }}</div>
+              <div :class="[gridCellClass, descriptionCellClass]" role="cell">{{ auth.description }}</div>
             </label>
-            <div v-if="!filteredAuthorities.length" class="studio-picker__empty">
+            <div v-if="!filteredAuthorities.length" class="studio-picker__empty" :class="emptyClass">
               {{ t("studio.share.pickerEmpty") }}
             </div>
           </div>
         </div>
 
-        <nav class="studio-authority-pagination" :aria-label="t('studio.share.pickerTitle')">
-          <button type="button" :disabled="page <= 1" @click="goPage(page - 1)">‹</button>
+        <nav class="studio-authority-pagination" :class="paginationClass" :aria-label="t('studio.share.pickerTitle')">
+          <button :class="paginationButtonClass" type="button" :disabled="page <= 1" @click="goPage(page - 1)">‹</button>
           <button
             v-for="item in pageItems"
             :key="item"
+            :class="[paginationButtonClass, {active: page === item}]"
             type="button"
-            :class="{active: page === item}"
             @click="goPage(item)"
           >
             {{ item }}
           </button>
-          <button type="button" :disabled="page >= maxPage" @click="goPage(page + 1)">›</button>
+          <button :class="paginationButtonClass" type="button" :disabled="page >= maxPage" @click="goPage(page + 1)">›</button>
         </nav>
       </div>
 
@@ -142,6 +149,17 @@ const pagedAuthorities = computed(() => filteredAuthorities.value.slice((page.va
 const pageItems = computed(() => Array.from({length: maxPage.value}, (_, index) => index + 1));
 const selectedAuthorities = computed(() => props.authorities.filter((auth) => selectedIds.value.includes(auth.deptId)));
 const allPagedChecked = computed(() => pagedAuthorities.value.length > 0 && pagedAuthorities.value.every((auth) => selectedIds.value.includes(auth.deptId)));
+const gridRowClass = "tw-grid tw-grid-cols-[52px_minmax(170px,0.85fr)_minmax(280px,1.45fr)] tw-items-stretch";
+const gridCellClass = "tw-box-border tw-flex tw-min-h-[50px] tw-items-center tw-border-b tw-border-solid tw-border-studio-border tw-px-3.5 tw-py-2.5 tw-text-sm tw-leading-[1.45]";
+const headerCellClass = "tw-whitespace-nowrap tw-font-extrabold";
+const checkboxCellClass = "tw-justify-center tw-px-0";
+const nameCellClass = "tw-min-w-0 tw-justify-start tw-whitespace-nowrap";
+const descriptionCellClass = "tw-min-w-0 tw-justify-start tw-whitespace-normal tw-break-keep";
+const checkboxClass = "tw-m-0 tw-h-[18px] tw-w-[18px] tw-accent-studio-primary";
+const emptyClass = "tw-col-span-full tw-flex tw-min-h-[120px] tw-items-center tw-justify-center tw-border-b tw-border-solid tw-border-studio-border tw-p-5 tw-text-sm tw-text-studio-muted";
+const paginationClass = "tw-flex tw-w-full tw-flex-none tw-items-center tw-justify-center tw-gap-2 tw-box-border";
+const paginationButtonClass = "tw-inline-flex tw-h-[34px] tw-min-w-[34px] tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-2.5 tw-text-sm tw-font-bold tw-leading-none tw-text-studio-text";
+
 useOverlayScrollbar(
   gridShellRef,
   {overflow: {x: "scroll", y: "scroll"}},
