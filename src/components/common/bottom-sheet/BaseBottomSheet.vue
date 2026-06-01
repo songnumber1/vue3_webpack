@@ -25,6 +25,7 @@
           'tw-overflow-hidden',
           'tw-rounded-t-dialog',
           'tw-border',
+          'tw-border-solid',
           'tw-border-app-border',
           'tw-bg-app-menu',
           'tw-text-app-text',

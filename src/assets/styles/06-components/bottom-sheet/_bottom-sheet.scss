@@ -1272,3 +1272,50 @@ body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-op
 body.mobile-mode .bottom-sheet-body .bottom-sheet-option--choice {
   justify-content: flex-start;
 }
+
+
+/* Stage D-2 guard: preserve readable bottom-sheet option rows while Tailwind
+   utilities are progressively added to individual sheets. This keeps checkbox,
+   icon, text and active-badge rows left aligned without changing BaseBottomSheet
+   header/body structure. */
+.bottom-sheet-body .bottom-sheet-option--row {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  text-align: left;
+}
+
+.bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main {
+  min-width: 0;
+  flex: 1 1 auto;
+  text-align: left;
+}
+
+.bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main strong,
+.bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main small {
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+}
+
+.bottom-sheet-body .bottom-sheet-option--row > span[aria-hidden="true"],
+.bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-checkbox {
+  flex: 0 0 auto;
+}
+
+.bottom-sheet-header {
+  min-width: 0;
+}
+
+.bottom-sheet-header h2 {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.bottom-sheet-close,
+.bottom-sheet-back {
+  flex: 0 0 auto;
+}

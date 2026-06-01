@@ -11,7 +11,7 @@
         <span>{{ t("chat.historyDialog.titleField") }}</span>
         <input
           v-model="draftTitle"
-          class="chat-history-dialog__input tw-h-11 tw-w-full tw-rounded-dialogInput tw-border tw-border-app-controlBorder tw-bg-app-control tw-px-3 tw-text-base tw-text-app-text"
+          class="chat-history-dialog__input tw-h-11 tw-w-full tw-rounded-dialogInput tw-border tw-border-solid tw-border-app-controlBorder tw-bg-app-control tw-px-3 tw-text-base tw-text-app-text"
           type="text"
           name="chat-title-edit"
           maxlength="80"
