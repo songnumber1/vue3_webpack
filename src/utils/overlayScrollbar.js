@@ -25,8 +25,14 @@ function canUseDom() {
   return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
+function isActualAndroidRuntime() {
+  if (!canUseDom()) return false;
+  return Boolean(window.AndroidBridge || /Android/i.test(navigator.userAgent || ""));
+}
+
 function isUnsafeTarget(element) {
   if (!element || !canUseDom()) return true;
+  if (isActualAndroidRuntime()) return true;
   const tagName = String(element.tagName || "").toLowerCase();
   return (
     element === document.body ||

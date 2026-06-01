@@ -135,3 +135,14 @@ body.dark-mode .os-theme-chat-app,
   background: rgba(104, 113, 130, 0.34);
   border-radius: 999px;
 }
+
+/* Step scroll-policy v2:
+   OverlayScrollbars 활성화 여부는 화면 폭(mobile-mode)이 아니라 실제 플랫폼 기준입니다.
+   실제 Android Chrome/WebView에서는 JS에서 OverlayScrollbars 인스턴스를 만들지 않고 native scroll을 사용합니다.
+   PC에서는 모바일 사이즈로 줄어들어도 OverlayScrollbars가 유지되므로 input/textarea/select와 겹치지 않게
+   활성화된 스크롤 컨테이너에만 우측 여백을 예약합니다. */
+[data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
+  --overlay-scrollbar-content-gap: 12px;
+  padding-inline-end: max(var(--overlay-scrollbar-content-gap), env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+}

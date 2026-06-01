@@ -262,7 +262,7 @@ const createTabsClass = computed(() => [
   // utilities here so the before_front tab header remains visually identical.
   "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-bg-studio-surface",
 ]);
-const contentScrollbar = useOverlayScrollbar(createContentRef, {overflow: {x: "hidden", y: "scroll"}}, {enabled: () => !isMobile.value, watchSource: isMobile});
+const contentScrollbar = useOverlayScrollbar(createContentRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: isMobile});
 
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];

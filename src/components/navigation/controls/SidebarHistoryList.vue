@@ -54,11 +54,13 @@
  */
 
 import {computed} from "vue";
+import {usePlatformStore} from "@/stores/platformStore";
 import {OverlayScrollbarsComponent} from "overlayscrollbars-vue";
 import "overlayscrollbars/overlayscrollbars.css";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
+const platformStore = usePlatformStore();
 
 const props = defineProps({
   histories: {type: Array, default: () => []},
@@ -84,12 +86,26 @@ const overlayScrollbarOptions = {
   },
 };
 
+const isActualAndroidRuntime = computed(() => {
+  const info = platformStore.info || {};
+  return Boolean(
+    info.actualEnv === "android" ||
+      info.actualDevice === "android-webview" ||
+      info.isAndroidApp ||
+      (!info.isPlatformForced && (info.isMobileBrowser || info.isAndroidWebView))
+  );
+});
+
+const shouldUseOverlayScrollbar = computed(
+  () => props.useOverlayScrollbar && !isActualAndroidRuntime.value
+);
+
 const scrollContainerComponent = computed(() =>
-  props.useOverlayScrollbar ? OverlayScrollbarsComponent : "div"
+  shouldUseOverlayScrollbar.value ? OverlayScrollbarsComponent : "div"
 );
 
 const scrollContainerAttrs = computed(() =>
-  props.useOverlayScrollbar
+  shouldUseOverlayScrollbar.value
     ? {
         defer: true,
         options: overlayScrollbarOptions,
