@@ -86,18 +86,6 @@
   gap: 3px;
 }
 
-.studio-authority-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.studio-authority-grid {
-  display: grid;
-  border: 1px solid var(--studio-border);
-  border-radius: 5px;
-  overflow: hidden;
-}
-
 .studio-authority-grid__head,
 .studio-authority-grid__row {
   display: grid;
@@ -114,10 +102,6 @@
 .studio-authority-grid__empty {
   padding: 10px;
   border-bottom: 1px solid var(--studio-border);
-}
-
-.studio-authority-grid__empty {
-  color: var(--studio-muted);
 }
 
 

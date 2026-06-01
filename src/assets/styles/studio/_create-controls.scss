@@ -107,19 +107,6 @@ body.desktop-mode .studio-create-page .studio-scope-fieldset legend {
   accent-color: var(--studio-primary);
 }
 
-body.desktop-mode .studio-create-page .studio-authority-section {
-  display: grid;
-  gap: 10px;
-}
-
-.studio-authority-section__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-
-body.desktop-mode .studio-create-page .studio-authority-grid,
 .studio-authority-picker-grid {
   border: 1px solid var(--studio-border);
   border-radius: 5px;
@@ -148,33 +135,6 @@ body.desktop-mode .studio-create-page .studio-authority-grid,
 .studio-authority-picker-grid__row:nth-child(odd),
 body.desktop-mode .studio-create-page .studio-authority-grid__row:nth-child(even) {
   background: color-mix(in srgb, var(--studio-primary-soft) 32%, transparent);
-}
-
-.studio-authority-pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding-top: 10px;
-}
-
-.studio-authority-pagination button {
-  min-width: 32px;
-  height: 32px;
-  border: 1px solid var(--studio-border);
-  border-radius: 5px;
-  background: var(--studio-surface);
-  color: inherit;
-}
-
-.studio-authority-pagination button.active {
-  border-color: var(--studio-primary);
-  color: var(--studio-primary);
-  font-weight: 800;
-}
-
-.studio-authority-pagination button:disabled {
-  opacity: 0.45;
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs button {
