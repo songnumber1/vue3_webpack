@@ -88,3 +88,68 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-
   background: var(--prompt-bg) !important;
   box-shadow: var(--shadow-prompt) !important;
 }
+
+/* PC chat lane alignment guard.
+   Keep mobile untouched. The chat message lane and input lane share the same
+   880px token so the conversation remains centered now, and can be split later
+   when a right-side preview/code panel is introduced. */
+body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-chat .chat-workspace,
+body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-shared .chat-workspace {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-chat .message-list,
+body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-shared .message-list {
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  padding-left: 24px !important;
+  padding-right: 24px !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .message,
+body.desktop-mode .chat-container-root--mode-shared .message,
+body.desktop-mode .chat-container-root--mode-chat .typing-row,
+body.desktop-mode .chat-container-root--mode-shared .typing-row {
+  width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
+  max-width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .message:not(.message--user),
+body.desktop-mode .chat-container-root--mode-shared .message:not(.message--user) {
+  grid-template-columns: var(--layout-message-avatar-width, 38px) minmax(0, 1fr) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .message--user,
+body.desktop-mode .chat-container-root--mode-shared .message--user {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .message--user .bubble,
+body.desktop-mode .chat-container-root--mode-shared .message--user .bubble {
+  grid-column: 1 !important;
+  justify-self: end !important;
+  max-width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .message--assistant .bubble,
+body.desktop-mode .chat-container-root--mode-shared .message--assistant .bubble,
+body.desktop-mode .chat-container-root--mode-chat .message:not(.message--user) .bubble,
+body.desktop-mode .chat-container-root--mode-shared .message:not(.message--user) .bubble {
+  width: 100% !important;
+  max-width: 100% !important;
+  justify-self: stretch !important;
+}
+
+body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot,
+body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot {
+  justify-self: center !important;
+  width: min(var(--layout-prompt-width, 880px), calc(100% - 48px)) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+

@@ -70,7 +70,7 @@
       </button>
     </div>
 
-    <div v-else class="topbar-actions topbar-actions--desktop topbar-actions--desktop-chat" aria-hidden="true"></div>
+    <div v-else class="topbar-actions topbar-actions--desktop topbar-actions--desktop-chat"></div>
   </header>
 </template>
 
@@ -161,4 +161,12 @@ const showDesktopConversationTitle = computed(
   font-weight: 900;
   line-height: 1;
 }
+
+:global(body.desktop-mode) .topbar-actions--desktop-chat {
+  width: auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+}
+
 </style>

@@ -4,7 +4,7 @@
 .chat-container-root {
   height: 100%;
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-width, 260px) minmax(0, 1fr);
   background: var(--chat-bg);
   color: var(--text);
   overflow: hidden;
@@ -18,7 +18,7 @@
 }
 
 .chat-container-root--sidebar-collapsed {
-  grid-template-columns: 68px minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-collapsed-width, 68px) minmax(0, 1fr);
 }
 
 .desktop-sidebar--collapsed {

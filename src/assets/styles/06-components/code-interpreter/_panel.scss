@@ -1,0 +1,233 @@
+/* PC-only code interpreter side panel.
+   Goal: behave like a right-side Claude-style panel without changing mobile.
+   - Closed: normal chat page/browser scroll remains owned by existing chat CSS.
+   - Open on PC: chat workspace becomes a 2-column responsive grid.
+     Left column = current chat + input, right column = interpreter panel.
+   - When there is not enough PC width, the workspace owns horizontal scroll.
+   - Mobile / Android never render or reserve space for the panel. */
+
+:root {
+  --code-interpreter-panel-width: clamp(380px, 30vw, 520px);
+  --code-interpreter-panel-min-width: 360px;
+  --code-interpreter-chat-min-width: 420px;
+  --code-interpreter-chat-width: min(var(--layout-chat-lane-width, 880px), 100%);
+  --code-interpreter-panel-gap: 24px;
+  --code-interpreter-shell-padding-x: 24px;
+  --code-interpreter-shell-padding-y: 18px;
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-workspace,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-workspace {
+  display: grid !important;
+  grid-template-columns:
+    minmax(var(--code-interpreter-chat-min-width), var(--code-interpreter-chat-width))
+    minmax(var(--code-interpreter-panel-min-width), var(--code-interpreter-panel-width));
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  align-items: stretch;
+  justify-content: safe center;
+  column-gap: var(--code-interpreter-panel-gap);
+  row-gap: 0;
+  width: 100%;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  overscroll-behavior-x: contain;
+  padding: 0 var(--code-interpreter-shell-padding-x) var(--code-interpreter-shell-padding-y);
+  box-sizing: border-box;
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-workspace > .mobile-topbar,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-workspace > .mobile-topbar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  min-width: calc(
+    var(--code-interpreter-chat-min-width) +
+      var(--code-interpreter-panel-gap) +
+      var(--code-interpreter-panel-min-width)
+  );
+  margin-right: calc(-1 * var(--code-interpreter-shell-padding-x));
+  margin-left: calc(-1 * var(--code-interpreter-shell-padding-x));
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .message-list,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .message-list {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: stretch !important;
+  align-items: stretch !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .message,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .message,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .typing-row,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .typing-row {
+  width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
+  max-width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-composer-slot,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-composer-slot {
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: center !important;
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  margin-bottom: 0 !important;
+}
+
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .scroll-bottom-button,
+body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .scroll-bottom-button {
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: center !important;
+  align-self: start !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  bottom: auto !important;
+  margin: 0 !important;
+  transform: translateY(-54px) translateZ(0) !important;
+}
+
+body.desktop-mode.code-interpreter-panel-open .code-interpreter-preview-panel {
+  grid-column: 2;
+  grid-row: 2 / 4;
+  position: relative !important;
+  inset: auto !important;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  height: 100%;
+  z-index: var(--z-content-raised);
+}
+
+body:not(.desktop-mode) .code-interpreter-preview-panel,
+body.mobile-mode .code-interpreter-preview-panel,
+body.actual-android-runtime .code-interpreter-preview-panel {
+  display: none !important;
+}
+
+body.mobile-mode.code-interpreter-panel-open,
+body.actual-android-runtime.code-interpreter-panel-open {
+  overflow-x: hidden !important;
+}
+
+.code-interpreter-preview-panel,
+.code-interpreter-preview-panel * {
+  box-sizing: border-box;
+}
+
+.code-interpreter-preview-panel__body {
+  max-width: 100%;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.code-interpreter-preview-panel__body .os-viewport {
+  overflow-x: hidden !important;
+}
+
+.code-interpreter-sample {
+  min-width: 0;
+  max-width: 100%;
+  white-space: normal;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.code-interpreter-sample * {
+  max-width: 100%;
+}
+
+.code-interpreter-sample h2,
+.code-interpreter-sample h3,
+.code-interpreter-sample h4 {
+  margin: 0 0 10px;
+  color: var(--text);
+  letter-spacing: -0.04em;
+  word-break: keep-all;
+}
+
+.code-interpreter-sample h2 {
+  margin-top: 4px;
+  font-size: var(--font-size-fixed-22);
+  font-weight: 900;
+}
+
+.code-interpreter-sample h3 {
+  margin-top: 22px;
+  font-size: var(--font-size-fixed-18);
+  font-weight: 900;
+}
+
+.code-interpreter-sample h4 {
+  margin-top: 18px;
+  font-size: var(--font-size-base);
+  font-weight: 900;
+}
+
+.code-interpreter-sample p,
+.code-interpreter-sample li {
+  color: var(--text);
+  font-size: var(--font-size-sm);
+  line-height: 1.72;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.code-interpreter-sample ul,
+.code-interpreter-sample ol {
+  margin: 0 0 12px 20px;
+  padding: 0;
+}
+
+.code-interpreter-sample code:not(.code-interpreter-sample__code code) {
+  border-radius: 6px;
+  background: var(--code-inline-bg, rgba(100, 116, 139, 0.14));
+  padding: 1px 5px;
+  font-size: var(--font-size-xs);
+}
+
+.code-interpreter-sample__code {
+  width: 100%;
+  max-width: 100%;
+  margin: 8px 0 18px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--code-bg, #0f172a);
+  color: var(--code-text, #e5e7eb);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 14px;
+  white-space: pre;
+}
+
+.code-interpreter-sample__code code {
+  display: block;
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: var(--font-size-fixed-13);
+  line-height: 1.55;
+}

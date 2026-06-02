@@ -294,6 +294,7 @@ function mermaidActionButton(action, label) {
  * highlight 결과와 별도로 원본 코드는 dataMdCodeSource에 보관됩니다.
  */
 function codeActionButton(action, label) {
+  const labelClassName = ["sr-only"];
   return {
     type: "element",
     tagName: "button",
@@ -316,7 +317,7 @@ function codeActionButton(action, label) {
       {
         type: "element",
         tagName: "span",
-        properties: {className: ["sr-only"]},
+        properties: {className: labelClassName},
         children: [{type: "text", value: label}],
       },
     ],
@@ -484,6 +485,7 @@ function rehypeCodeBlockWrapper() {
                 tagName: "div",
                 properties: {className: ["md-code-actions"]},
                 children: [
+                  codeActionButton("interpreter", mdLabel("markdown.codeInterpreter")),
                   codeActionButton("copy", mdLabel("markdown.copyCode")),
                 ],
               },

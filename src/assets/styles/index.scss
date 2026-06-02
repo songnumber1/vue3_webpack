@@ -86,3 +86,4 @@
 
 /* 8. PC prompt consistency guard: main/chat prompt border alignment only. */
 @use "./06-components/prompt/desktop-prompt-border" as *;
+@use "./06-components/code-interpreter/panel" as *;
