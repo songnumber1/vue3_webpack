@@ -264,10 +264,12 @@ export function useMessageListScroll({props, emit}) {
       window.cancelAnimationFrame(hydrationRafId);
       hydrationRafId = 0;
     }
-    if (hydrationMermaidRafId) {
-      window.cancelAnimationFrame(hydrationMermaidRafId);
-      hydrationMermaidRafId = 0;
-    }
+    // 주의: hydration 완료 직후 부모가 initialHydrating=false로 바꾸면
+    // clearHydrationState()가 호출됩니다. 여기서 mermaid RAF까지 취소하면
+    // 이력 메시지의 `.md-mermaid[data-mermaid-pending]` 후처리가 실행되지 않아
+    // 채팅방 입장 시 Mermaid가 원문 코드로 남는 회귀가 발생합니다.
+    // 방 전환/언마운트 시에도 예약 작업은 현재 scrollRef를 기준으로 pending 노드만
+    // 처리하므로 별도 취소하지 않고, 함수 내부의 root/null 체크에 맡깁니다.
     hydrationResizeObserver?.disconnect();
     hydrationResizeObserver = null;
     pendingHydrationAssistantIds = null;
@@ -406,12 +408,16 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
+  function clearHydrationMermaidScheduler() {
+    if (!hydrationMermaidRafId || typeof window === "undefined") return;
+    window.cancelAnimationFrame(hydrationMermaidRafId);
+    hydrationMermaidRafId = 0;
+  }
+
   function scheduleHydrationMermaidEnhancement() {
     if (typeof window === "undefined") return;
 
-    if (hydrationMermaidRafId) {
-      window.cancelAnimationFrame(hydrationMermaidRafId);
-    }
+    clearHydrationMermaidScheduler();
 
     hydrationMermaidRafId = window.requestAnimationFrame(() => {
       hydrationMermaidRafId = 0;
@@ -730,6 +736,7 @@ export function useMessageListScroll({props, emit}) {
     clearStableTimers();
     clearAfterRenderScrollState();
     clearHydrationState();
+    clearHydrationMermaidScheduler();
     clearResizeRecalculateScheduler();
     cleanupOverlayScrollbar();
     if (typeof window === "undefined") return;

@@ -8,6 +8,7 @@
  */
 
 import {logWarn} from "@/utils/logger";
+import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
 
 /**
  * [Mermaid 후처리 렌더러]
@@ -200,6 +201,84 @@ function markMermaidCardState(target, state) {
   }
 }
 
+function normalizeMermaidSource(value = "") {
+  return String(value || "").replace(/\r\n?/g, "\n").trim();
+}
+
+function getMermaidSource(target) {
+  return normalizeMermaidSource(
+    target?.getAttribute?.("data-mermaid-source") || target?.textContent || ""
+  );
+}
+
+function resetMermaidTargetToSource(target, source = getMermaidSource(target)) {
+  if (!target) return;
+
+  // PC에서는 OverlayScrollbars가 `.md-mermaid` 내부에 viewport/scrollbar DOM을 삽입합니다.
+  // 그 상태에서 Mermaid가 element.innerHTML을 읽으면 실제 다이어그램 코드가 아니라
+  // OverlayScrollbars wrapper HTML까지 함께 파싱하여 UnknownDiagramError가 발생합니다.
+  // 렌더 직전에는 반드시 scrollbar 인스턴스를 제거하고 원본 source text만 남깁니다.
+  destroyOverlayScrollbar(target);
+  target.textContent = source || "";
+}
+
+function showMermaidSourceAsCode(target, source = getMermaidSource(target)) {
+  if (!target) return;
+
+  resetMermaidTargetToSource(target, source);
+  target.removeAttribute("data-processed");
+  target.removeAttribute("data-mermaid-pending");
+  target.setAttribute("data-mermaid-error", "true");
+  markMermaidCardState(target, "error");
+}
+
+function createMermaidRenderId() {
+  const random = Math.random().toString(36).slice(2);
+  return `ds-mermaid-${Date.now()}-${random}`;
+}
+
+async function renderMermaidTargetWithRenderApi(mermaid, target) {
+  if (!mermaid?.render || !target?.isConnected) return false;
+
+  const source = getMermaidSource(target);
+  if (!source) return false;
+
+  resetMermaidTargetToSource(target, source);
+
+  const renderId = createMermaidRenderId();
+  const result = await mermaid.render(renderId, source);
+  if (!target.isConnected) return false;
+
+  target.innerHTML = result?.svg || "";
+  target.setAttribute("data-processed", "true");
+  target.removeAttribute("data-mermaid-pending");
+  target.removeAttribute("data-mermaid-error");
+
+  if (typeof result?.bindFunctions === "function") {
+    result.bindFunctions(target);
+  }
+
+  return Boolean(target.querySelector("svg"));
+}
+
+async function renderMermaidTargetsWithRenderApi(mermaid, targets) {
+  for (const target of targets) {
+    if (!target.isConnected) continue;
+
+    try {
+      const rendered = await renderMermaidTargetWithRenderApi(mermaid, target);
+      if (rendered) {
+        markMermaidCardState(target, "rendered");
+      } else {
+        showMermaidSourceAsCode(target);
+      }
+    } catch (error) {
+      showMermaidSourceAsCode(target);
+      logWarn("Mermaid rendering failed. The source code block will remain visible.", error);
+    }
+  }
+}
+
 /**
  * 이미 렌더된 mermaid SVG를 원본 source text로 되돌립니다.
  * theme 변경이나 stream 완료 후 force render 시 같은 노드를 다시 렌더하기 위해 사용합니다.
@@ -216,7 +295,7 @@ function resetRenderedMermaid(root) {
     target.removeAttribute("data-processed");
     target.setAttribute("data-mermaid-pending", "true");
     markMermaidCardState(target, "pending");
-    target.textContent = source;
+    resetMermaidTargetToSource(target, source);
   });
 }
 /**
@@ -242,39 +321,27 @@ async function renderMermaidTargets(root, options = {}) {
 
   targets.forEach((target) => {
     if (!target.getAttribute("data-mermaid-source")) {
-      target.setAttribute("data-mermaid-source", target.textContent || "");
+      target.setAttribute("data-mermaid-source", getMermaidSource(target));
     }
   });
 
   const mermaid = await ensureMermaid();
-  if (!mermaid?.run) return;
+  if (!mermaid?.render) return;
 
   const liveTargets = targets.filter((target) => target.isConnected);
   if (!liveTargets.length) return;
 
   liveTargets.forEach((target) => {
+    const source = getMermaidSource(target);
+    if (source) {
+      target.setAttribute("data-mermaid-source", source);
+    }
     target.removeAttribute("data-mermaid-pending");
     target.removeAttribute("data-mermaid-error");
     markMermaidCardState(target, "pending");
   });
 
-  try {
-    await mermaid.run({nodes: liveTargets});
-    liveTargets.forEach((target) => {
-      const hasRenderedSvg = Boolean(target.querySelector("svg"));
-      markMermaidCardState(target, hasRenderedSvg ? "rendered" : "error");
-    });
-  } catch (error) {
-    logWarn("Mermaid rendering failed.", error);
-    liveTargets.forEach((target) => {
-      const source =
-        target.getAttribute("data-mermaid-source") || target.textContent || "";
-      target.setAttribute("data-mermaid-error", "true");
-      target.setAttribute("data-mermaid-pending", "true");
-      markMermaidCardState(target, "error");
-      target.textContent = source;
-    });
-  }
+  await renderMermaidTargetsWithRenderApi(mermaid, liveTargets);
 }
 
 export function renderMermaidInElement(root, options = {}) {

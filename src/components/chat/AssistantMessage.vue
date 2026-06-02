@@ -236,6 +236,34 @@ watch(() => props.message.reasoningContent, renderReasoningContent, {
   immediate: true,
 });
 watch(
+  () => props.deferMermaidEnhancement,
+  async (deferMermaidEnhancement, previousDeferMermaidEnhancement) => {
+    if (deferMermaidEnhancement || !previousDeferMermaidEnhancement) return;
+    if (!isMessageComplete.value) return;
+
+    await nextTick();
+
+    const currentContentVersion = renderVersion;
+    void enhanceRenderedMarkdown({
+      root: contentRef.value,
+      source: props.message.content,
+      currentVersion: currentContentVersion,
+      getVersion: () => renderVersion,
+      renderMermaid: true,
+    });
+
+    const currentReasoningVersion = reasoningRenderVersion;
+    void enhanceRenderedMarkdown({
+      root: reasoningRef.value,
+      source: props.message.reasoningContent,
+      currentVersion: currentReasoningVersion,
+      getVersion: () => reasoningRenderVersion,
+      renderMermaid: true,
+    });
+  },
+  {flush: "post"}
+);
+watch(
   () => locale.value,
   () => {
     renderContent();
