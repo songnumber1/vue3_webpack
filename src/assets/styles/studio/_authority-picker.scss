@@ -1,13 +1,422 @@
-/* Aggregator: keeps the original Studio cascade slot while role files own the declarations. */
-@use "./authority/authority-picker-01" as *;
-@use "./mobile/authority-picker-02" as *;
-@use "./authority/authority-picker-03" as *;
-@use "./create/authority-picker-04" as *;
-@use "./authority/authority-picker-05" as *;
-@use "./mobile/authority-picker-06" as *;
-@use "./authority/authority-picker-07" as *;
-@use "./mobile/authority-picker-08" as *;
-@use "./authority/authority-picker-09" as *;
-@use "./mobile/authority-picker-10" as *;
-@use "./pagination/authority-picker-11" as *;
-@use "./mobile/authority-picker-12" as *;
+/* Consolidated from Step 7-C split files.
+   This file keeps the original Studio cascade slot and preserves declaration order. */
+
+
+/* --- authority/_authority-picker-01.scss --- */
+/* Authority add popup: selectable grid with footer confirm/close, matching the selected-authority grid. */
+.studio-picker--authority {
+  width: min(760px, calc(100vw - 48px)) !important;
+}
+
+.studio-picker__footer--authority {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+.studio-picker__footer--authority .studio-button {
+  min-width: 72px;
+}
+
+.studio-picker__footer--authority .studio-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+
+/* --- mobile/_authority-picker-02.scss --- */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
+  width: 100% !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 14px 12px !important;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 48px minmax(120px, 0.95fr) minmax(180px, 1.35fr) !important;
+  min-width: 360px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+  position: sticky;
+  bottom: 0;
+  padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
+}
+
+
+/* --- authority/_authority-picker-03.scss --- */
+/* Studio authority picker follow-up: searchable, paged grid with stable desktop/mobile typography. */
+.studio-icon--more { mask-image: url("../img/studio/more.svg"); -webkit-mask-image: url("../img/studio/more.svg"); }
+
+
+/* --- create/_authority-picker-04.scss --- */
+.studio-create-panel__menu {
+  letter-spacing: 0 !important;
+  font-size: 0 !important;
+}
+
+.studio-create-panel__menu .studio-icon--more {
+  width: 22px;
+  height: 22px;
+}
+
+
+/* --- authority/_authority-picker-05.scss --- */
+.studio-picker--authority {
+  display: flex;
+  flex-direction: column;
+}
+
+.studio-authority-picker__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+
+/* --- mobile/_authority-picker-06.scss --- */
+.studio-authority-picker__search {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}
+
+
+/* --- authority/_authority-picker-07.scss --- */
+.studio-authority-picker__search input {
+  min-height: 40px;
+  padding-left: 12px;
+  padding-right: 42px;
+  font-size: var(--text-size-body-sm, 14px);
+}
+
+.studio-authority-picker__search > .studio-icon--search {
+  position: absolute;
+  top: 50%;
+  right: 13px;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--studio-muted);
+  pointer-events: none;
+}
+
+body.desktop-mode .studio-picker--authority {
+  width: min(780px, calc(100vw - 48px)) !important;
+  max-height: min(680px, calc(100vh - 48px)) !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
+  min-height: 310px;
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__footer--authority {
+  padding: 14px 16px !important;
+}
+
+
+/* --- mobile/_authority-picker-08.scss --- */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
+  height: 100% !important;
+  max-height: none !important;
+  background: var(--studio-surface) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority {
+  grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+  min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
+  padding: env(safe-area-inset-top, 0px) 10px 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority strong {
+  font-size: var(--text-size-title-sm, 16px) !important;
+  font-weight: 900 !important;
+  line-height: 1.3 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__body {
+  padding: 12px 16px 0 !important;
+  gap: 12px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__search input {
+  min-height: 44px;
+  font-size: var(--text-size-body-sm, 14px);
+  font-weight: 600;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__grid-shell {
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 48px minmax(128px, 0.9fr) minmax(180px, 1.25fr) !important;
+  min-width: 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 52px !important;
+  padding: 10px 12px !important;
+  font-size: var(--text-size-body-sm, 14px) !important;
+  font-weight: 800;
+  line-height: 1.35;
+  word-break: keep-all;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  font-weight: 700;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+  padding: 2px 0 12px !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+  position: sticky;
+  bottom: 0;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority .studio-button {
+  min-width: 96px;
+  min-height: 44px;
+  font-size: var(--text-size-body-sm, 14px);
+  font-weight: 800;
+}
+
+
+/* --- authority/_authority-picker-09.scss --- */
+/* Authority picker grid sizing fix: avoid mobile horizontal scroll and give desktop description enough room. */
+body.desktop-mode .studio-picker--authority {
+  width: min(860px, calc(100vw - 48px)) !important;
+  max-height: min(820px, calc(100vh - 48px)) !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
+  min-height: 520px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker__grid-shell {
+  min-height: 420px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 48px minmax(96px, 0.55fr) minmax(360px, 2.45fr) !important;
+  min-width: 0 !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 52px !important;
+  padding: 10px 14px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:first-child,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:first-child {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2) {
+  justify-content: flex-start !important;
+  white-space: nowrap !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  justify-content: flex-start !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: anywhere !important;
+}
+
+
+/* --- mobile/_authority-picker-10.scss --- */
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__body {
+  padding: 12px 16px 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__grid-shell {
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 42px minmax(88px, 0.75fr) minmax(0, 1.25fr) !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-width: 0 !important;
+  min-height: 52px !important;
+  padding: 9px 10px !important;
+  box-sizing: border-box !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:first-child,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:first-child {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2) {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  white-space: normal !important;
+  word-break: keep-all !important;
+  overflow-wrap: anywhere !important;
+}
+
+
+/* Authority picker mobile width final guard: keep the grid inside the viewport without horizontal scroll or right-edge clipping. */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__body {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__grid-shell {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  grid-template-columns: 42px minmax(78px, 0.68fr) minmax(0, 1.32fr) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  overflow: hidden !important;
+}
+
+
+/* --- pagination/_authority-picker-11.scss --- */
+/* A-stage hotfix: authority picker pagination belongs to the picker layout, not the share-tab shell.
+   Keep it centered above the footer on both desktop dialogs and mobile picker pages. */
+.studio-picker--authority .studio-authority-pagination {
+  flex: 0 0 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 12px 16px 14px !important;
+  box-sizing: border-box !important;
+}
+
+.studio-picker--authority .studio-authority-pagination button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 34px !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: var(--studio-radius-sm, 5px) !important;
+  background: var(--studio-surface) !important;
+  color: var(--studio-text) !important;
+  font-size: var(--text-size-body-sm, 14px) !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.studio-picker--authority .studio-authority-pagination button.active {
+  border-color: var(--studio-primary) !important;
+  color: var(--studio-primary) !important;
+  font-weight: 900 !important;
+}
+
+.studio-picker--authority .studio-authority-pagination button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.45 !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-pagination {
+  padding: 12px 16px 16px !important;
+}
+
+
+/* --- mobile/_authority-picker-12.scss --- */
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+  padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+}

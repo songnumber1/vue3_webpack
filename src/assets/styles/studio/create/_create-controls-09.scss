@@ -1,9 +1,0 @@
-/* Studio create targeted refinement: keep requested UI only, do not affect main/chat. */
-body.desktop-mode .studio-create-page .studio-model-fieldset,
-body.desktop-mode .studio-create-page .studio-scope-fieldset {
-  border: 0 !important;
-  background: transparent !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
