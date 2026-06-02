@@ -237,6 +237,35 @@ function createMermaidRenderId() {
   return `ds-mermaid-${Date.now()}-${random}`;
 }
 
+function isMermaidErrorSvg(svg = "") {
+  const normalized = String(svg || "").toLowerCase();
+
+  return (
+    !normalized ||
+    normalized.includes("syntax error in text") ||
+    normalized.includes("unknown diagram error") ||
+    normalized.includes("no diagram type detected") ||
+    normalized.includes("mermaid version")
+  );
+}
+
+async function isMermaidSourceRenderable(mermaid, source) {
+  if (!mermaid?.parse) return true;
+
+  try {
+    const result = await mermaid.parse(source, {suppressErrors: true});
+
+    return result !== false;
+  } catch (error) {
+    logWarn(
+      "Mermaid syntax validation failed. The source code block will remain visible.",
+      error
+    );
+
+    return false;
+  }
+}
+
 async function renderMermaidTargetWithRenderApi(mermaid, target) {
   if (!mermaid?.render || !target?.isConnected) return false;
 
@@ -245,9 +274,16 @@ async function renderMermaidTargetWithRenderApi(mermaid, target) {
 
   resetMermaidTargetToSource(target, source);
 
+  const isRenderable = await isMermaidSourceRenderable(mermaid, source);
+  if (!isRenderable || !target.isConnected) return false;
+
   const renderId = createMermaidRenderId();
   const result = await mermaid.render(renderId, source);
   if (!target.isConnected) return false;
+
+  if (isMermaidErrorSvg(result?.svg)) {
+    return false;
+  }
 
   target.innerHTML = result?.svg || "";
   target.setAttribute("data-processed", "true");
