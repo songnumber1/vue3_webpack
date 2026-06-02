@@ -68,6 +68,7 @@ const listRef = ref(null);
 const composerSlotRef = ref(null);
 let composerResizeObserver = null;
 let composerHeightTimerIds = [];
+let composerHeightRafId = 0;
 
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
@@ -112,13 +113,30 @@ function updateComposerHeight() {
   );
 }
 
+function clearComposerHeightSchedule() {
+  composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  composerHeightTimerIds = [];
+  if (composerHeightRafId) {
+    window.cancelAnimationFrame(composerHeightRafId);
+    composerHeightRafId = 0;
+  }
+}
+
 function scheduleComposerHeightUpdate() {
   if (typeof window === "undefined") {
     updateComposerHeight();
     return;
   }
-  composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-  composerHeightTimerIds = [0, 32, 80, 160].map((delay) =>
+
+  // 긴 대화방에서 창 크기 변경 시 composer ResizeObserver와 watch가 동시에
+  // 연쇄 실행되면 reflow가 누적됩니다. 마지막 프레임 근처에서만 높이를
+  // 갱신하고, streaming/hydration 상태 변화는 짧은 보정 타이머로 유지합니다.
+  clearComposerHeightSchedule();
+  composerHeightRafId = window.requestAnimationFrame(() => {
+    composerHeightRafId = 0;
+    updateComposerHeight();
+  });
+  composerHeightTimerIds = [80, 160].map((delay) =>
     window.setTimeout(updateComposerHeight, delay)
   );
 }
@@ -137,14 +155,13 @@ function observeComposerHeight() {
   if (!composerSlotRef.value) return;
   updateComposerHeight();
   if (typeof ResizeObserver !== "undefined") {
-    composerResizeObserver = new ResizeObserver(updateComposerHeight);
+    composerResizeObserver = new ResizeObserver(scheduleComposerHeightUpdate);
     composerResizeObserver.observe(composerSlotRef.value);
   }
 }
 
 function cleanupComposerHeightObserver() {
-  composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-  composerHeightTimerIds = [];
+  clearComposerHeightSchedule();
   composerResizeObserver?.disconnect();
   composerResizeObserver = null;
 }

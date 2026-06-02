@@ -240,12 +240,25 @@ export function useChatSubmit(options) {
     });
     const scheduleStreamScroll = createStreamScrollScheduler(options);
 
-    committer.commit();
-    await nextTick();
-    await options.scrollBottom({force: true, stable: true, autoAnswer: true});
-
+    // 자동 스크롤 OFF 재생성에서는 질문 박스를 화면 상단에 배치하기 위한
+    // 하단 spacer 계산이 필요합니다. 이 계산은 MessageList의 loading=true 조건에서만
+    // 동작하므로 commit/scroll 전에 생성 상태를 먼저 열어 둡니다.
     isGenerating.value = true;
     chatStreamStore.start();
+
+    committer.commit();
+    await nextTick();
+    if (options.autoScrollOnAnswer?.value) {
+      await options.scrollBottom({force: true, stable: true, autoAnswer: true});
+    } else {
+      await options.scrollLatestUserMessage?.({
+        behavior: "auto",
+        stable: false,
+        initialOnly: true,
+        offset: 16,
+        pageFallback: false,
+      });
+    }
 
     try {
       await runAssistantStream({

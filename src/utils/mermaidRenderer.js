@@ -17,6 +17,7 @@ import {logWarn} from "@/utils/logger";
  */
 
 let mermaidLoader = null;
+let mermaidRenderQueue = Promise.resolve();
 
 const MERMAID_CDN =
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
@@ -227,7 +228,7 @@ function resetRenderedMermaid(root) {
  * @param {Element|Document|null} root 검색할 DOM root
  * @param {{force?: boolean}} options force=true면 기존 렌더 결과를 source text로 되돌린 뒤 재렌더합니다.
  */
-export async function renderMermaidInElement(root, options = {}) {
+async function renderMermaidTargets(root, options = {}) {
   if (!root) return;
 
   if (options.force) {
@@ -236,7 +237,7 @@ export async function renderMermaidInElement(root, options = {}) {
 
   const targets = Array.from(
     root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
-  );
+  ).filter((target) => target.isConnected);
   if (targets.length === 0) return;
 
   targets.forEach((target) => {
@@ -248,26 +249,41 @@ export async function renderMermaidInElement(root, options = {}) {
   const mermaid = await ensureMermaid();
   if (!mermaid?.run) return;
 
-  targets.forEach((target) => {
+  const liveTargets = targets.filter((target) => target.isConnected);
+  if (!liveTargets.length) return;
+
+  liveTargets.forEach((target) => {
     target.removeAttribute("data-mermaid-pending");
     target.removeAttribute("data-mermaid-error");
     markMermaidCardState(target, "pending");
   });
 
   try {
-    await mermaid.run({nodes: targets});
-    targets.forEach((target) => {
+    await mermaid.run({nodes: liveTargets});
+    liveTargets.forEach((target) => {
       const hasRenderedSvg = Boolean(target.querySelector("svg"));
       markMermaidCardState(target, hasRenderedSvg ? "rendered" : "error");
     });
   } catch (error) {
     logWarn("Mermaid rendering failed.", error);
-    targets.forEach((target) => {
+    liveTargets.forEach((target) => {
       const source =
         target.getAttribute("data-mermaid-source") || target.textContent || "";
       target.setAttribute("data-mermaid-error", "true");
+      target.setAttribute("data-mermaid-pending", "true");
       markMermaidCardState(target, "error");
       target.textContent = source;
     });
   }
+}
+
+export function renderMermaidInElement(root, options = {}) {
+  if (!root) return Promise.resolve();
+
+  const job = mermaidRenderQueue
+    .catch(() => {})
+    .then(() => renderMermaidTargets(root, options));
+
+  mermaidRenderQueue = job.catch(() => {});
+  return job;
 }

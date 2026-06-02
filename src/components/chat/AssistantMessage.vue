@@ -76,6 +76,7 @@ import MessageActions from "./MessageActions.vue";
 const props = defineProps({
   message: {type: Object, required: true},
   showRegenerate: {type: Boolean, default: true},
+  deferMermaidEnhancement: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
 const emit = defineEmits(["rendered", "regenerate"]);
@@ -180,7 +181,7 @@ async function renderContent() {
       source: props.message.content,
       currentVersion,
       getVersion: () => renderVersion,
-      renderMermaid: isMessageComplete.value,
+      renderMermaid: isMessageComplete.value && !props.deferMermaidEnhancement,
     });
   } catch (error) {
     if (currentVersion !== renderVersion) return;

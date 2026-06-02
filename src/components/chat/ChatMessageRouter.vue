@@ -19,6 +19,7 @@
     :data-message-role="messageDomRole"
     :message="message"
     :show-regenerate="showRegenerate"
+    :defer-mermaid-enhancement="deferMermaidEnhancement"
     @rendered="$emit('rendered', $event)"
     @regenerate="$emit('regenerate', $event)"
   />
@@ -44,6 +45,7 @@ const props = defineProps({
   messageDomId: {type: String, default: ""},
   messageDomRole: {type: String, default: ""},
   showRegenerate: {type: Boolean, default: true},
+  deferMermaidEnhancement: {type: Boolean, default: false},
 });
 defineEmits(["rendered", "regenerate"]);
 

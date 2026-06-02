@@ -360,6 +360,7 @@
   gap: 12px;
   margin-bottom: 22px;
   animation: slideUp 220ms ease-out;
+  contain: layout paint;
 }
 .message--user {
   grid-template-columns: minmax(0, 1fr) 38px;

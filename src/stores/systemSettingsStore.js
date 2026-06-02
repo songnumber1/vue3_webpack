@@ -64,7 +64,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showPlaygroundMenu: (state) => state.settings.showPlaygroundMenu,
     // 세션 종료 로그아웃 단추 UI 기식화 플래그
     showLogoutButton: (state) => state.settings.showLogoutButton,
-    // 네트워크 대역폭이 좁은 모바일 웹뷰 가동 시 인프라 트랜잭션 프로그레스 진행 인디케이터 배지를 강제 점등 노출할지 여부
+    // API 호출과 채팅방 이력 로딩/렌더링 중 전역 진행 표시를 노출할지 여부
     showMobileApiProgress: (state) => state.settings.showMobileApiProgress,
     // AI의 답변 토큰이 실시간 분출 타이핑 출력될 때 메인 대화 스크롤바 영역을 화면 하단 꼬리로 완전 자동 연속 동적 추적 다운시킬지 판별식
     autoScrollOnAnswer: (state) => state.settings.autoScrollOnAnswer,

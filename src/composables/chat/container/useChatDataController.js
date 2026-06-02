@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
@@ -18,6 +18,7 @@ import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 
 /**
@@ -45,23 +46,71 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const runtimeReady = ref(false);
   const isHistoryHydrating = ref(false);
   const apiRequestStore = useApiRequestStore();
+  const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
   let historyHydrationOverlayActive = false;
+  let historyHydrationOverlayStartedAt = 0;
+  let historyHydrationOverlayStopTimerId = 0;
+  const HISTORY_HYDRATION_OVERLAY_MIN_MS = 160;
+
+  function clearHistoryHydrationOverlayStopTimer() {
+    if (!historyHydrationOverlayStopTimerId || typeof window === "undefined") {
+      historyHydrationOverlayStopTimerId = 0;
+      return;
+    }
+    window.clearTimeout(historyHydrationOverlayStopTimerId);
+    historyHydrationOverlayStopTimerId = 0;
+  }
+
+  function stopHistoryHydrationOverlayAfterPaint(delay = 0) {
+    if (!historyHydrationOverlayActive) return;
+
+    const stop = () => {
+      if (!historyHydrationOverlayActive) return;
+      apiRequestStore.stopOverlay();
+      historyHydrationOverlayActive = false;
+      historyHydrationOverlayStartedAt = 0;
+    };
+
+    if (typeof window === "undefined") {
+      stop();
+      return;
+    }
+
+    clearHistoryHydrationOverlayStopTimer();
+    historyHydrationOverlayStopTimerId = window.setTimeout(() => {
+      historyHydrationOverlayStopTimerId = 0;
+      window.requestAnimationFrame(stop);
+    }, Math.max(0, delay));
+  }
 
   function beginHistoryHydration() {
+    clearHistoryHydrationOverlayStopTimer();
     isHistoryHydrating.value = true;
-    if (!historyHydrationOverlayActive) {
+    if (
+      systemSettingsStore.showMobileApiProgress &&
+      !historyHydrationOverlayActive
+    ) {
       apiRequestStore.startOverlay();
       historyHydrationOverlayActive = true;
+      historyHydrationOverlayStartedAt =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
     }
   }
 
   function finishHistoryHydration() {
     isHistoryHydrating.value = false;
-    if (historyHydrationOverlayActive) {
-      apiRequestStore.stopOverlay();
-      historyHydrationOverlayActive = false;
-    }
+    if (!historyHydrationOverlayActive) return;
+
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const elapsed = Math.max(0, now - historyHydrationOverlayStartedAt);
+    const remaining = Math.max(0, HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed);
+
+    // MessageList가 history-hydrated를 emit하는 시점은 하단 스크롤 1차 고정이
+    // 완료된 직후입니다. 바로 카운터를 내리면 빠른 mock/cache 경로에서 스피너가
+    // 브라우저에 그려지기 전에 사라질 수 있으므로, 최소 표시 시간과 다음 paint를
+    // 보장한 뒤 overlay를 닫습니다.
+    stopHistoryHydrationOverlayAfterPaint(remaining);
   }
 
   // ── 📌 [1. 화면 라우팅 상태 분석 및 권한 가드 파트] ──────────────────
@@ -237,14 +286,19 @@ export function useChatDataController({props, ui, runtime, messages}) {
    */
   async function renderAfterStream() {
     try {
-      ui.markForceBottom(1000); // 연산 및 컴포넌트 확장 팽창 시간을 고려하여 1000ms 동안 하단 스크롤 잠금 유지
+      if (ui.autoScrollOnAnswer.value) {
+        ui.markForceBottom(1000); // 연산 및 컴포넌트 확장 팽창 시간을 고려하여 1000ms 동안 하단 스크롤 잠금 유지
+      }
 
       // 마크다운 컨테이너 내부의 텍스트 코드를 실제 시각적 플로우차트 그래픽 SVG 구조체로 드로잉 치환 렌더링합니다.
       await renderMermaidInElement(document.querySelector(".message-list"), {
         force: true,
       });
 
-      // 유저가 임의로 스크롤을 위로 올리는 행위를 하지 않은 정상 추적 상태라면 마감 앵커를 하단 끝단으로 최종 정렬합니다.
+      // 자동 스크롤 ON은 기존처럼 하단을 추적합니다.
+      // OFF 상태에서는 질문 직후 1회만 사용자 질문으로 이동하고, 스트림/마크다운/머메이드
+      // 후처리 단계에서는 더 이상 위치를 강제하지 않습니다. 그래야 답변 생성 중 사용자가
+      // 아래로 스크롤했을 때 다시 질문 위치로 끌려 올라가지 않습니다.
       if (ui.autoScrollOnAnswer.value) {
         ui.scrollBottom({force: true, stable: true, autoAnswer: true});
       }
@@ -337,6 +391,14 @@ export function useChatDataController({props, ui, runtime, messages}) {
       }
       await loadRouteConversation(); // 3단계: 현재 주소창에 박제되어 있는 대화 내역 원격 자동 동기화 복원
       runtimeReady.value = true; // 4단계: 전체 프로세스 정상 가동 청신호 개통 선언
+    });
+
+    onBeforeUnmount(() => {
+      clearHistoryHydrationOverlayStopTimer();
+      if (historyHydrationOverlayActive) {
+        apiRequestStore.stopOverlay();
+        historyHydrationOverlayActive = false;
+      }
     });
   }
 

@@ -1,3 +1,5 @@
+import {PERFORMANCE_CHAT_MESSAGES_RAW} from "@/api/mock/data/performanceChatMessages.raw";
+
 /**
  * @file api/mock/data/chatMessages.raw.js
  * @description 채팅 목록 mock 데이터의 chatId와 1:1 매칭되는 상세 대화 mock 데이터입니다.
@@ -193,7 +195,7 @@ export const CHAT_MESSAGES_RAW = {
   "chat-search-sample-007": [
     {
       "role": "user",
-      "content": "삭제된 모델로 생성된 이전 대화 확인 내용을 이전 대화 상세 화면에서 확인할 수 있게 샘플로 정리해줘",
+      "content": "삭제된 모델 채팅방 확인 내용을 이전 대화 상세 화면에서 확인할 수 있게 샘플로 정리해줘",
       "id": "chat-search-sample-007-user-1",
       "isSend": true,
       "isRAG": false,
@@ -205,7 +207,7 @@ export const CHAT_MESSAGES_RAW = {
     },
     {
       "role": "assistant",
-      "content": "# 삭제된 모델로 생성된 이전 대화 확인\n\n요청하신 **수식** 관점으로 샘플 대화 내용을 구성했습니다.\n\n인라인 수식과 블록 수식이 KaTeX/MathML 파이프라인에서 깨지지 않는지 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n인라인 수식 예시는 $E = mc^2$ 입니다.\n\n블록 수식은 아래와 같습니다.\n\n$$\nrender\\_cost = api\\_time + normalize\\_time + dom\\_paint\\_time\n$$\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+      "content": "# 삭제된 모델 채팅방 확인\n\n요청하신 **수식** 관점으로 샘플 대화 내용을 구성했습니다.\n\n인라인 수식과 블록 수식이 KaTeX/MathML 파이프라인에서 깨지지 않는지 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n인라인 수식 예시는 $E = mc^2$ 입니다.\n\n블록 수식은 아래와 같습니다.\n\n$$\nrender\\_cost = api\\_time + normalize\\_time + dom\\_paint\\_time\n$$\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       "id": "chat-search-sample-007-assistant-1",
       "isSend": true,
       "isRAG": false,
@@ -3195,5 +3197,6 @@ export const CHAT_MESSAGES_RAW = {
       ],
       "refreences": []
     }
-  ]
+  ],
+  ...PERFORMANCE_CHAT_MESSAGES_RAW
 };

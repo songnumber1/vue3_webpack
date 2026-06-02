@@ -63,11 +63,19 @@ export function createStreamScrollScheduler(options) {
         await nextTick();
         if (isDocumentHidden()) return;
 
-        await options.scrollBottom({
-          force: true,
-          stable: true,
-          autoAnswer: true,
-        });
+        if (options.autoScrollOnAnswer?.value) {
+          await options.scrollBottom({
+            force: true,
+            stable: true,
+            autoAnswer: true,
+          });
+          return;
+        }
+
+        // 자동 스크롤 OFF 상태에서는 답변 chunk 수신마다 위치를 다시 보정하지 않습니다.
+        // 질문 직후 1회만 사용자 질문으로 이동하고, 이후에는 사용자의 수동 스크롤을 존중해야
+        // 긴 답변 생성 중 화면이 위아래로 흔들리거나 사용자가 내린 스크롤이 다시 올라가지 않습니다.
+        options.onManualStreamScrollSkipped?.();
       })
       .catch((error) => {
         pending = false;
@@ -91,7 +99,8 @@ export async function scrollAfterUserSubmit(options, normalized = {}) {
 
   await options.scrollLatestUserMessage?.({
     behavior: "auto",
-    stable: true,
+    stable: false,
+    initialOnly: true,
     offset: 16,
     pageFallback: normalized.keyboardOpenOnSubmit === true,
     keyboardOpenOnSubmit: normalized.keyboardOpenOnSubmit === true,

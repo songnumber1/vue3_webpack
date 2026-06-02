@@ -1,9 +1,12 @@
+import {PERFORMANCE_CHAT_HISTORY_RAW} from "@/api/mock/data/performanceChatHistory.raw";
+
 /**
  * @file api/mock/data/chatHistoryList.raw.js
  * @description 채팅 검색/대화 이력 개발용 mock 데이터입니다. API 미사용 시에도 검색, 페이징, 상세 이동 흐름을 검증할 수 있도록 100개 샘플을 제공합니다.
  */
 
 export const CHAT_HISTORY_LIST_RAW = [
+  ...PERFORMANCE_CHAT_HISTORY_RAW,
   {
     chatTitle: "공동상속주택 1가구 2주택 양도세",
     chatId: "chat-search-sample-001",
@@ -59,9 +62,9 @@ export const CHAT_HISTORY_LIST_RAW = [
     userId: "user-1234",
   },
   {
-    chatTitle: "삭제된 모델로 생성된 이전 대화 확인",
+    chatTitle: "삭제된 모델 채팅방 확인",
     chatId: "chat-search-sample-007",
-    modeId: "studio-model-ops-a",
+    modeId: "model-ds-retired",
     bookmarkYN: false,
     dayGroup: 0,
     chatEndDt: "2026-05-28T16:49:00Z",

@@ -111,7 +111,7 @@ export const settingsMessages = {
         showMobileApiProgress: {
           label: "API 진행 표시",
           description:
-            "모바일 API 통신 중 전체 화면 터치를 막는 진행 표시 사용 여부입니다.",
+            "API 호출 및 채팅방 로딩/렌더링 중 전체 화면 진행 표시를 사용합니다.",
         },
         bottomSheetMinHeight: {
           label: "최소 높이",
@@ -396,9 +396,9 @@ export const settingsMessages = {
             "Controls whether the voice button is shown in the prompt input.",
         },
         showMobileApiProgress: {
-          label: "Show API progress",
+          label: "API progress indicator",
           description:
-            "Use a mobile full-screen progress blocker during API calls.",
+            "Show full-screen progress during API calls and chat history loading/rendering.",
         },
         bottomSheetMinHeight: {
           label: "Minimum height",

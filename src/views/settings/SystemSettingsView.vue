@@ -166,6 +166,7 @@ const groups = computed(() => [
     title: t("systemSettings.groups.api"),
     items: [
       settingItem("useRealApi"),
+      settingItem("showMobileApiProgress"),
       settingItem("platformOverride", {
         type: "select",
         label: t("systemSettings.items.platformOverride.labelWithActual", {
@@ -219,7 +220,6 @@ const groups = computed(() => [
         step: 1,
       }),
       settingItem("useMicrophone"),
-      settingItem("showMobileApiProgress"),
       settingItem("abortChatOnMobileBackground"),
     ],
   },

@@ -147,7 +147,7 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showPersonalizationMenu: "showPersonalizationMenu", // 개인화 마이페이지 환경설정 노출 플래그
   showPlaygroundMenu: "showPlaygroundMenu", // 프롬프트 실험실 메뉴 가시성 플래그
   showLogoutButton: "showLogoutButton", // 인증 세션 로그아웃 버튼 노출 여부
-  showMobileApiProgress: "showMobileApiProgress", // 모바일 화면 상단에 미세 API 게이지 바 노출 처리 여부
+  showMobileApiProgress: "showMobileApiProgress", // API 호출 및 채팅방 이력 로딩/렌더링 진행 표시 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
   abortChatOnMobileBackground: "abortChatOnMobileBackground", // 모바일 환경에서 사용자가 홈 화면으로 빠져나가 백그라운드로 전환될 때 통신 파괴 여부
   webAuthMode: "webAuthMode", // 웹/PC 환경 기본 인증 방식(session/jwt)

@@ -180,7 +180,20 @@ export function useChatScrollController({
     // 1회차 즉시 실행 시도: 만약 레이아웃 돔이 이미 완성되어 성공했다면 하위 백오프 타이머 큐를 굳이 가동하지 않고 조기 종결 탈출
     if (apply()) return;
 
-    // 2회차 안전 보정 가드 큐: 0ms(마이크로태스크 다음 프레임), 32ms, 80ms, 160ms, 320ms의 정밀 시차 시차 간격을 두고 돔 구조 변화를 끝까지 추적하며 끈질기게 최신 유저 메시지 박스를 시야각 내로 앵커링 조작
+    // 질문/재생성 직후 수동 앵커 이동은 "최초 1회" 정책이어야 합니다.
+    // 여기서 여러 단계 백오프를 길게 걸어두면 사용자가 답변을 읽기 위해 아래로 내린 뒤에도
+    // 남은 타이머가 다시 질문 박스로 끌어올리는 사이드 이펙트가 생깁니다.
+    if (options.initialOnly) {
+      const timerId = window.setTimeout(() => {
+        apply();
+        clearLatestUserScrollTimers();
+      }, 0);
+      latestUserScrollTimerIds.push(timerId);
+      return;
+    }
+
+    // 대화방 이력 진입 또는 키보드 안정화처럼 명시적 안정 보정이 필요한 경우에만
+    // 짧은 백오프 큐를 사용합니다. 실시간 답변 수신 중에는 호출하지 않습니다.
     [0, 32, 80, 160, 320].forEach((delay) => {
       const timerId = window.setTimeout(apply, delay);
       latestUserScrollTimerIds.push(timerId); // 컴포넌트 언마운트 시 일괄 청소를 위해 버스 배열에 티켓 적재

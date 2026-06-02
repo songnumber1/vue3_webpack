@@ -2,7 +2,10 @@
   <section
     ref="scrollRef"
     class="message-list"
-    :class="{'message-list--initial-hydrating': initialHydrating}"
+    :class="{
+      'message-list--initial-hydrating': initialHydrating,
+      'message-list--manual-stream': loading && !autoScrollOnAnswer,
+    }"
     :inert="initialHydrating ? '' : null"
     aria-live="polite"
     :aria-busy="initialHydrating ? 'true' : 'false'"
@@ -18,6 +21,7 @@
       :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
+      :defer-mermaid-enhancement="initialHydrating"
       @rendered="handleMessageRendered(message.id, $event)"
       @regenerate="$emit('regenerate', $event)"
     />
@@ -100,6 +104,17 @@ defineExpose({
   opacity: 0 !important;
   pointer-events: none !important;
   scroll-behavior: auto !important;
+}
+
+.message-list--manual-stream {
+  scroll-behavior: auto !important;
+  overflow-anchor: none;
+}
+
+.message-list--manual-stream .typing-row,
+.message-list--manual-stream .stream-focus-spacer,
+.message-list--manual-stream .message-list-anchor {
+  overflow-anchor: none;
 }
 
 .message-list-anchor {
