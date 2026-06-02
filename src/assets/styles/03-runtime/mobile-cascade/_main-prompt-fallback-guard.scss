@@ -1,0 +1,48 @@
+/*
+ * Step 7-A mobile cascade split: Mobile main prompt desktop-class fallback guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+/*
+ * E-2.6 high-risk mobile fallback guard.
+ * This block intentionally sits after the E-2.5 guard. It covers the case
+ * where Vue render state briefly keeps desktop prompt classes while the
+ * global runtime/body is already mobile-mode.
+ */
+body.mobile-mode .chat-container-root--mode-main .desktop-center-prompt,
+body.mobile-mode .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap,
+body.mobile-mode .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--floating {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: calc(var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
+  left: 0 !important;
+  z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
+  box-sizing: border-box !important;
+  width: 100dvw !important;
+  max-width: 100dvw !important;
+  margin: 0 !important;
+  padding: 8px 12px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: translate3d(0, 0, 0) !important;
+}
+
+body.mobile-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
+body.mobile-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini,
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini {
+  width: 100% !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+
+body.mobile-mode .chat-container-root--mode-main .empty-center > .desktop-center-prompt,
+body.mobile-mode .chat-container-root--mode-main .empty-center > .mobile-main-fixed-prompt {
+  flex: 0 0 auto !important;
+}
+

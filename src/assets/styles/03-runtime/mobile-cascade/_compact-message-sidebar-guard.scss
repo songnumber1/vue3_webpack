@@ -1,0 +1,73 @@
+/*
+ * Step 7-A mobile cascade split: AppContainer compact message/sidebar typography guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+.app-container--compact .chat-container-root--mode-chat .message-list,
+.app-container--compact .chat-container-root--mode-shared .message-list,
+.app-container--compact .message--assistant .bubble-content,
+.app-container--compact .bubble-content.markdown-body,
+.app-container--compact .markdown-body {
+  font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15)) !important;
+  line-height: 1.58 !important;
+}
+
+.app-container--compact .message--assistant .bubble,
+.app-container--compact .message--assistant .bubble-content,
+.app-container--compact .message--assistant .bubble-content.markdown-body {
+  font-weight: 500 !important;
+}
+
+.app-container--compact .message--assistant .markdown-body p,
+.app-container--compact .message--assistant .markdown-body li,
+.app-container--compact .message--assistant .markdown-body ul,
+.app-container--compact .message--assistant .markdown-body ol,
+.app-container--compact .message--assistant .markdown-body blockquote {
+  font-size: var(--message-plain-mobile-font-size, 15px) !important;
+  line-height: 1.58 !important;
+  font-weight: 500 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.68em !important;
+}
+
+.app-container--compact .message--assistant .markdown-body h1 {
+  font-size: 22px !important;
+  line-height: 1.32 !important;
+  font-weight: 780 !important;
+  letter-spacing: -0.035em !important;
+  margin: 0.72em 0 0.45em !important;
+}
+
+.app-container--compact .message--assistant .markdown-body h2 {
+  font-size: 19px !important;
+  line-height: 1.35 !important;
+  font-weight: 760 !important;
+  letter-spacing: -0.03em !important;
+  margin: 0.7em 0 0.42em !important;
+}
+
+.app-container--compact .message--assistant .markdown-body h3,
+.app-container--compact .message--assistant .markdown-body h4 {
+  font-size: 17px !important;
+  line-height: 1.42 !important;
+  font-weight: 740 !important;
+  letter-spacing: -0.025em !important;
+  margin: 0.68em 0 0.38em !important;
+}
+
+.app-container--compact .sidebar-content--mobile .sidebar-title {
+  font-size: var(--font-size-fixed-22) !important;
+  line-height: 1.2 !important;
+  font-weight: 800 !important;
+}
+
+.app-container--compact .sidebar-content--mobile .quick-item,
+.app-container--compact .sidebar-content--mobile .project-item,
+.app-container--compact .sidebar-content--mobile .sidebar-history-item {
+  min-height: 42px !important;
+  padding: 8px 18px !important;
+  font-size: var(--font-size-fixed-15) !important;
+  line-height: 1.25 !important;
+  font-weight: 500 !important;
+}

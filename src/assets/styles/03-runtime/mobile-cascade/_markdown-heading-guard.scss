@@ -1,0 +1,31 @@
+/*
+ * Step 7-A mobile cascade split: Mobile markdown base heading typography guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+/* 3. Mobile chat markdown typography: fix em-based headings after parent size drift. */
+body.mobile-mode .message--assistant .bubble-content,
+body.mobile-mode .bubble-content.markdown-body,
+body.mobile-mode .markdown-body {
+  font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15)) !important;
+  line-height: 1.62 !important;
+}
+
+body.mobile-mode .markdown-body h1 {
+  font-size: var(--font-size-fixed-24) !important;
+  line-height: 1.3 !important;
+  margin: 0.8em 0 0.45em !important;
+}
+
+body.mobile-mode .markdown-body h2 {
+  font-size: var(--font-size-fixed-20) !important;
+  line-height: 1.35 !important;
+  margin: 0.75em 0 0.4em !important;
+}
+
+body.mobile-mode .markdown-body h3 {
+  font-size: var(--font-size-fixed-18) !important;
+  line-height: 1.4 !important;
+}
+

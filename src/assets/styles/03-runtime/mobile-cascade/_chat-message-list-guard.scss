@@ -1,0 +1,14 @@
+/*
+ * Step 7-A mobile cascade split: Mobile chat message-list fallback guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+/* Mobile chat typography guard should also work when Vue marks the workspace
+ * as mobile before body.mobile-mode is fully synchronized. */
+.chat-container-root--mode-chat .mobile-chat-prompt ~ *,
+body.mobile-mode .chat-container-root--mode-chat .message-list,
+body.mobile-mode .chat-container-root--mode-shared .message-list {
+  font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15));
+}
+

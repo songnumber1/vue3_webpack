@@ -1,0 +1,85 @@
+/*
+ * Step 7-A mobile cascade split: Mobile chat message and markdown detail typography guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+/* Mobile chat detail typography ownership. Keep body text readable without the
+   oversized/over-bold desktop markdown hierarchy bleeding into mobile. */
+body.mobile-mode .message-list {
+  font-size: var(--message-plain-mobile-font-size, 15px) !important;
+  line-height: 1.58 !important;
+}
+
+body.mobile-mode .message,
+body.mobile-mode .message .bubble,
+body.mobile-mode .message--assistant,
+body.mobile-mode .message--assistant .bubble,
+body.mobile-mode .message--assistant .bubble-content,
+body.mobile-mode .message--assistant .bubble-content.markdown-body,
+body.mobile-mode .message--assistant .reasoning-content.markdown-body {
+  font-size: var(--message-plain-mobile-font-size, 15px) !important;
+  line-height: 1.58 !important;
+  letter-spacing: -0.012em !important;
+}
+
+body.mobile-mode .message--assistant .bubble,
+body.mobile-mode .message--assistant .bubble-content,
+body.mobile-mode .message--assistant .bubble-content.markdown-body {
+  font-weight: 500 !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body p,
+body.mobile-mode .message--assistant .markdown-body li,
+body.mobile-mode .message--assistant .markdown-body ul,
+body.mobile-mode .message--assistant .markdown-body ol,
+body.mobile-mode .message--assistant .markdown-body blockquote {
+  font-size: var(--message-plain-mobile-font-size, 15px) !important;
+  line-height: 1.58 !important;
+  font-weight: 500 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.68em !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body strong,
+body.mobile-mode .message--assistant .markdown-body b {
+  font-weight: 750 !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body h1 {
+  font-size: 22px !important;
+  line-height: 1.32 !important;
+  font-weight: 780 !important;
+  letter-spacing: -0.035em !important;
+  margin: 0.72em 0 0.45em !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body h2 {
+  font-size: 19px !important;
+  line-height: 1.35 !important;
+  font-weight: 760 !important;
+  letter-spacing: -0.03em !important;
+  margin: 0.7em 0 0.42em !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body h3,
+body.mobile-mode .message--assistant .markdown-body h4 {
+  font-size: 17px !important;
+  line-height: 1.42 !important;
+  font-weight: 740 !important;
+  letter-spacing: -0.025em !important;
+  margin: 0.68em 0 0.38em !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body code:not(pre code) {
+  font-size: 0.9em !important;
+  font-weight: 700 !important;
+}
+
+body.mobile-mode .message--assistant .markdown-body pre,
+body.mobile-mode .message--assistant .markdown-body pre code {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  font-weight: 400 !important;
+}
+

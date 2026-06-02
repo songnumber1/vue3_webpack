@@ -1,0 +1,79 @@
+/*
+ * Step 7-A mobile cascade split: Mobile main composer dock structure guard.
+ * Source: 03-runtime/_mobile-cascade-hotfix.scss.
+ * Keep import order through _mobile-cascade-hotfix.scss to preserve cascade.
+ */
+
+/*
+ * E-2.7 mobile composer structure guard.
+ * The mobile main prompt is now rendered in .main-empty-state__composer-dock,
+ * outside the desktop .empty-center flow. These rules intentionally do not
+ * require body.mobile-mode only; the Vue mobile class on MainEmptyState is the
+ * primary ownership marker and body.mobile-mode remains a compatibility guard.
+ */
+.empty-stage--mobile-main .main-empty-state__composer-dock,
+body.mobile-mode .main-empty-state__composer-dock,
+body.mobile-mode .chat-container-root--mode-main .main-empty-state__composer-dock {
+  position: fixed !important;
+  top: auto !important;
+  right: 0 !important;
+  bottom: calc(var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
+  left: 0 !important;
+  z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
+  box-sizing: border-box !important;
+  width: 100dvw !important;
+  max-width: 100dvw !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 8px 12px max(12px, env(safe-area-inset-bottom, 0px)) !important;
+  overflow: visible !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: translate3d(0, 0, 0) !important;
+  pointer-events: none !important;
+  touch-action: manipulation !important;
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock > *,
+body.mobile-mode .main-empty-state__composer-dock > * {
+  pointer-events: auto !important;
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock .mobile-main-fixed-prompt,
+.empty-stage--mobile-main .main-empty-state__composer-dock .desktop-center-prompt,
+body.mobile-mode .main-empty-state__composer-dock .mobile-main-fixed-prompt,
+body.mobile-mode .main-empty-state__composer-dock .desktop-center-prompt,
+body.mobile-mode .chat-container-root--mode-main .main-empty-state__composer-dock .mobile-main-fixed-prompt,
+body.mobile-mode .chat-container-root--mode-main .main-empty-state__composer-dock .desktop-center-prompt {
+  position: static !important;
+  inset: auto !important;
+  z-index: auto !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  height: auto !important;
+  max-height: none !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.empty-stage--mobile-main .main-empty-state__composer-dock .prompt-box,
+.empty-stage--mobile-main .main-empty-state__composer-dock .prompt-box--gemini,
+body.mobile-mode .main-empty-state__composer-dock .prompt-box,
+body.mobile-mode .main-empty-state__composer-dock .prompt-box--gemini {
+  width: 100% !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  margin: 0 auto !important;
+}
+
+.empty-stage--mobile-main .main-empty-state__center,
+body.mobile-mode .empty-stage--mobile-main .main-empty-state__center {
+  padding-bottom: calc(var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px)) !important;
+}
+
