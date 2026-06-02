@@ -1,0 +1,130 @@
+/* Split from 06-components/bottom-sheet/_bottom-sheet.scss: Markdown table card styles only. */
+.md-table-card {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 14px 0;
+  background: var(--surface);
+}
+.md-table-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+.md-table-title {
+  font-size: var(--font-size-fixed-13);
+  font-weight: 900;
+}
+.md-table-actions {
+  display: inline-flex;
+  gap: 6px;
+}
+.md-table-action {
+  min-height: 30px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 0 10px;
+  font-size: var(--font-size-fixed-12);
+  font-weight: 800;
+}
+.md-table-action:hover {
+  background: var(--control-hover);
+}
+.md-table-card .md-table-wrapper {
+  border: 0;
+  border-radius: 0;
+  margin: 0;
+}
+
+body.mobile-mode .md-table-toolbar {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+body.mobile-mode .md-table-actions {
+  width: 100%;
+}
+
+body.mobile-mode .md-table-action {
+  flex: 1 1 auto;
+}
+
+.md-table-actions {
+  gap: 8px;
+}
+.md-table-action {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+}
+.md-table-action-icon {
+  width: 17px;
+  height: 17px;
+  display: block;
+  position: relative;
+}
+.md-table-action-icon::before,
+.md-table-action-icon::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+}
+.md-table-action-icon--copy::before {
+  width: 11px;
+  height: 12px;
+  right: 1px;
+  bottom: 1px;
+  border: 1.8px solid currentColor;
+  border-radius: 3px;
+}
+.md-table-action-icon--copy::after {
+  width: 11px;
+  height: 12px;
+  left: 1px;
+  top: 1px;
+  border: 1.8px solid currentColor;
+  border-radius: 3px;
+  opacity: 0.65;
+}
+.md-table-action-icon--csv::before {
+  left: 3px;
+  top: 1px;
+  width: 11px;
+  height: 15px;
+  border: 1.8px solid currentColor;
+  border-radius: 3px;
+}
+.md-table-action-icon--csv::after {
+  left: 5px;
+  top: 7px;
+  width: 7px;
+  height: 7px;
+  border-right: 1.8px solid currentColor;
+  border-bottom: 1.8px solid currentColor;
+  transform: rotate(45deg);
+}
+
+body.mobile-mode .md-table-toolbar {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+body.mobile-mode .md-table-actions {
+  width: auto !important;
+  flex: 0 0 auto;
+}
+
+body.mobile-mode .md-table-action {
+  flex: 0 0 34px !important;
+}

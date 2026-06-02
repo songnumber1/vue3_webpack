@@ -1,0 +1,55 @@
+/* Split from 06-components/bottom-sheet/_bottom-sheet.scss: chat Markdown Mermaid card toolbar styles only. */
+.md-mermaid-card {
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 14px 0;
+  background: var(--surface);
+}
+.md-mermaid-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-muted);
+}
+.md-mermaid-title {
+  min-width: 0;
+  font-size: var(--font-size-fixed-13);
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.md-mermaid-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 6px;
+}
+.md-mermaid-action {
+  min-height: 30px;
+  min-width: 34px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 0 10px;
+  font-size: var(--font-size-fixed-12);
+  font-weight: 800;
+}
+.md-mermaid-action:hover {
+  background: var(--control-hover);
+}
+.md-mermaid-action-icon--copy::before {
+  content: "⧉";
+}
+.md-mermaid-action-icon--svg::before {
+  content: "◇";
+}
+.md-mermaid-action-icon--code::before {
+  content: "</>";
+  font-size: var(--font-size-fixed-10);
+}
