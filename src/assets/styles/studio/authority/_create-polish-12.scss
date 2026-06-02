@@ -1,0 +1,17 @@
+/* Keep authority add columns meaningful: name / description / add, while matching selected-grid sizing. */
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: minmax(160px, 0.9fr) minmax(260px, 1.4fr) 78px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head::before,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row::before {
+  content: none !important;
+  display: none !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:last-child,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:last-child {
+  justify-content: center !important;
+}
+

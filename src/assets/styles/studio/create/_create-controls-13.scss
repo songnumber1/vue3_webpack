@@ -1,0 +1,38 @@
+/* Studio create refinement: RAG/MCP select owns only the item selector; titles live in the form section. */
+.studio-multi-select-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.studio-field-title {
+  display: block;
+  color: var(--studio-text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.studio-multi-select__trigger {
+  justify-content: flex-start;
+}
+
+.studio-multi-select__placeholder {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--studio-muted);
+  font-weight: 700;
+  text-align: left;
+}
+
+.studio-multi-select__trigger > .studio-icon--chevron-down {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--studio-muted);
+}
+
+.studio-multi-select__chips {
+  justify-content: flex-start;
+  margin-left: 0 !important;
+}
+

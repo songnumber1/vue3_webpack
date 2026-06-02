@@ -1,0 +1,12 @@
+body.desktop-mode .studio-create-page .studio-multi-select__chip {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 5px;
+  background: var(--studio-surface-muted);
+  padding: 3px 8px;
+  color: var(--studio-muted);
+  font-size: 12px;
+}
+

@@ -1,0 +1,9 @@
+body.desktop-mode .studio-create-page .studio-model-card:last-child {
+  border: 1px solid var(--studio-border) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card.active:last-child,
+body.desktop-mode .studio-create-page .studio-model-card:hover:last-child {
+  border-color: var(--studio-primary) !important;
+}
+

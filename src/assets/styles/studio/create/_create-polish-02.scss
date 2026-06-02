@@ -1,0 +1,20 @@
+body.desktop-mode .studio-create-page .studio-multi-select__list {
+  gap: 2px !important;
+  max-height: 196px;
+}
+
+body.desktop-mode .studio-create-page .studio-multi-select__option {
+  min-height: 32px !important;
+  padding: 5px 8px !important;
+  line-height: 1.35;
+}
+
+body.desktop-mode .studio-create-page .studio-multi-select__option input {
+  flex: 0 0 18px;
+  margin: 0;
+}
+
+body.desktop-mode .studio-create-page .studio-multi-select__panel .studio-button {
+  min-height: 36px;
+}
+

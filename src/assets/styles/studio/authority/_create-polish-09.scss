@@ -1,0 +1,56 @@
+/* Authority add popup: use the same modal rhythm as Assistant detail and the same grid rhythm as selected authority list. */
+body.desktop-mode .studio-picker-backdrop:has(.studio-picker--authority) {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+body.desktop-mode .studio-picker--authority {
+  width: min(760px, calc(100vw - 48px)) !important;
+  max-height: min(620px, calc(100vh - 48px)) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.24) !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__head--authority {
+  min-height: 58px;
+  padding: 0 18px !important;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+body.desktop-mode .studio-picker--authority .studio-picker__head--authority strong {
+  font-size: var(--text-size-title-sm, 16px);
+  font-weight: 900;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid {
+  margin: 16px;
+  width: auto;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: 44px minmax(130px, 0.9fr) minmax(220px, 1.4fr) 72px !important;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head::before,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row::before {
+  content: "";
+  display: block;
+  min-height: 46px;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 46px;
+  padding: 10px 12px;
+}
+
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
+body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+  justify-content: center;
+}
+

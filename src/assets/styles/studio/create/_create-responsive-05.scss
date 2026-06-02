@@ -1,0 +1,9 @@
+body.desktop-mode .studio-create-page .studio-prompt-grid--preview {
+  width: min(100%, 520px);
+  margin: 0 auto;
+}
+
+body.desktop-mode .studio-create-page .studio-prompt-grid--preview:empty {
+  display: none;
+}
+

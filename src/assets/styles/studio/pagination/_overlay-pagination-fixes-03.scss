@@ -1,0 +1,54 @@
+/* Regression guard: Studio / Connector Store categories must wrap like chips, not become a horizontal scroller. */
+body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-category-chips,
+body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips,
+.app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  overflow: visible !important;
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+  scrollbar-width: none;
+  padding-bottom: 0;
+}
+
+body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-category-chips::-webkit-scrollbar,
+body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips::-webkit-scrollbar,
+.app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Regression guard: keep the list viewport visible on desktop and keep pagination anchored. */
+body.desktop-mode .chat-container-root--mode-studio .studio-workspace,
+body.desktop-mode .chat-container-root--mode-studio .studio-workspace__scroll {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.desktop-mode .chat-container-root--mode-studio .studio-workspace__scroll {
+  display: flex;
+  flex-direction: column;
+}
+
+body.desktop-mode .chat-container-root--mode-studio .studio-list-shell {
+  flex: 1 1 0;
+  min-height: 180px;
+  overflow: hidden;
+}
+
+body.desktop-mode .chat-container-root--mode-studio .studio-list-area {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body.desktop-mode .chat-container-root--mode-studio .studio-pagination {
+  flex: 0 0 auto;
+  margin-top: 14px;
+}
+

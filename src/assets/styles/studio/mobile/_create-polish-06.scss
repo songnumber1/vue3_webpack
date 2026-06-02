@@ -1,0 +1,61 @@
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority strong {
+  text-align: left;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__close {
+  justify-self: end;
+  border: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+  grid-template-columns: minmax(118px, 0.9fr) minmax(170px, 1.25fr) 64px !important;
+  min-width: 380px;
+}
+
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
+body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+  min-height: 48px;
+  padding: 10px 12px;
+}
+
+/* Studio create final alignment pass: normalize feature/share tabs with existing project rhythm. */
+body.desktop-mode .studio-create-page .studio-model-fieldset,
+body.mobile-mode .chat-container-root--mode-studio .studio-model-fieldset,
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-model-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-scope-fieldset legend,
+body.mobile-mode .chat-container-root--mode-studio .studio-authority-section__head > strong,
+body.mobile-mode .chat-container-root--mode-studio .studio-field-title {
+  display: block;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  color: var(--studio-text);
+  font-size: var(--text-size-title-sm, 16px);
+  font-weight: 900;
+  line-height: 1.35;
+}
+

@@ -1,0 +1,24 @@
+/* Authority add popup: selectable grid with footer confirm/close, matching the selected-authority grid. */
+.studio-picker--authority {
+  width: min(760px, calc(100vw - 48px)) !important;
+}
+
+.studio-picker__footer--authority {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+.studio-picker__footer--authority .studio-button {
+  min-width: 72px;
+}
+
+.studio-picker__footer--authority .studio-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+

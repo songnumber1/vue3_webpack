@@ -1,0 +1,15 @@
+.studio-multi-select-bottom-sheet .studio-multi-select-sheet__list {
+  display: grid;
+}
+
+.studio-multi-select-bottom-sheet .studio-multi-select-sheet__option {
+  min-height: 54px;
+  text-align: left;
+}
+
+.studio-multi-select-bottom-sheet .studio-multi-select-sheet__option input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--studio-primary);
+}
+

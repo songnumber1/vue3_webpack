@@ -1,0 +1,67 @@
+/* Authority grids: align checkbox/add controls with text so rows look like one grid system. */
+.studio-authority-grid__head,
+.studio-authority-grid__row,
+.studio-authority-picker-grid__head,
+.studio-authority-picker-grid__row {
+  align-items: stretch;
+}
+
+.studio-authority-grid__head > div,
+.studio-authority-grid__row > div,
+.studio-authority-picker-grid__head > div,
+.studio-authority-picker-grid__row > div {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+.studio-authority-grid__head > div:first-child,
+.studio-authority-grid__row > div:first-child {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.studio-authority-grid__head input,
+.studio-authority-grid__row input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--studio-primary);
+}
+
+.studio-authority-grid__head > div:not(:first-child),
+.studio-authority-grid__row > div:not(:first-child) {
+  justify-content: flex-start;
+}
+
+/* Authority add uses the same visual rhythm as the selected-authority grid. */
+.studio-authority-picker-grid__head,
+.studio-authority-picker-grid__row {
+  grid-template-columns: minmax(120px, 0.9fr) minmax(180px, 1.4fr) 72px;
+}
+
+.studio-authority-picker-grid__head > div:last-child,
+.studio-authority-picker-grid__row > div:last-child {
+  justify-content: center;
+}
+
+.studio-authority-picker-grid__add {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  min-height: 38px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+
+.studio-picker__head--authority {
+  min-height: 52px;
+  box-sizing: border-box;
+}
+

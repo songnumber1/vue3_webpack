@@ -1,0 +1,55 @@
+body.desktop-mode .studio-create-page .studio-share-tab {
+  gap: 14px;
+}
+
+body.desktop-mode .studio-create-page .studio-model-fieldset,
+body.desktop-mode .studio-create-page .studio-scope-fieldset {
+  border: 1px solid var(--studio-border);
+  background: var(--studio-surface);
+}
+
+body.desktop-mode .studio-create-page .studio-model-grid {
+  display: grid;
+  grid-template-columns: 1fr !important;
+  gap: 0;
+  border: 1px solid var(--studio-border);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card {
+  min-height: 52px;
+  border: 0 !important;
+  border-bottom: 1px solid var(--studio-border) !important;
+  border-radius: 0 !important;
+  background: var(--studio-surface) !important;
+  padding: 10px 12px;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card:last-child {
+  border-bottom: 0 !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card.active {
+  background: color-mix(in srgb, var(--studio-primary-soft) 42%, transparent) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card:hover {
+  background: var(--studio-control-hover) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-multi-select__trigger {
+  min-height: 46px;
+  padding: 0 14px;
+  background: var(--studio-surface);
+}
+
+body.desktop-mode .studio-create-page .studio-multi-select__chips {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-left: auto;
+  margin-right: 10px;
+}
+

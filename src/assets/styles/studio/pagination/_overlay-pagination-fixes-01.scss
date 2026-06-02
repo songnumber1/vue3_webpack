@@ -1,0 +1,48 @@
+/* Final Studio / Connector Store layout fixes after mobile legacy patches.
+   Pagination stays anchored; only card list and category strip scroll. */
+.studio-workspace .studio-workspace__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.studio-workspace .studio-list-shell {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.studio-workspace .studio-list-area {
+  flex: 1 1 0;
+  min-height: 0;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.studio-workspace .studio-grid {
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
+  align-content: start;
+}
+
+.studio-workspace .studio-pagination {
+  position: static;
+  flex: 0 0 auto;
+  width: 100%;
+  margin: 14px auto 0;
+}
+
+.studio-category-chips {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  padding-bottom: 4px;
+}
+

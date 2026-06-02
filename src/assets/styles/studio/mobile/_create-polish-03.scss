@@ -1,0 +1,56 @@
+body.mobile-mode .studio-multi-select-bottom-sheet .bottom-sheet-body {
+  padding: 0 20px calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__list {
+  display: grid !important;
+  gap: 4px !important;
+  width: 100% !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option {
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 12px !important;
+  min-height: 48px !important;
+  box-sizing: border-box;
+  padding: 10px 12px !important;
+  border-radius: 5px;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option input {
+  flex: 0 0 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__option .bottom-sheet-option-main strong {
+  width: auto !important;
+  max-width: 100%;
+  display: inline-block !important;
+  margin: 0 !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35 !important;
+}
+
+body.mobile-mode .studio-multi-select-bottom-sheet .studio-multi-select-sheet__footer {
+  padding: 10px 0 0 !important;
+}
+

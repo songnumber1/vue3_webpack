@@ -1,0 +1,30 @@
+.studio-authority-picker-grid {
+  border: 1px solid var(--studio-border);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--studio-surface);
+}
+
+.studio-authority-picker-grid__head,
+.studio-authority-picker-grid__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(180px, 1.4fr) 72px;
+}
+
+.studio-authority-picker-grid__head {
+  background: var(--studio-surface-muted);
+  font-weight: 800;
+}
+
+.studio-authority-picker-grid__head div,
+.studio-authority-picker-grid__row div {
+  min-width: 0;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--studio-border);
+}
+
+.studio-authority-picker-grid__row:nth-child(odd),
+body.desktop-mode .studio-create-page .studio-authority-grid__row:nth-child(even) {
+  background: color-mix(in srgb, var(--studio-primary-soft) 32%, transparent);
+}
+

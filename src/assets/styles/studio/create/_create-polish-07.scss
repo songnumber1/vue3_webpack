@@ -1,0 +1,32 @@
+/* PC model items need visible boxes, but not a nested fieldset box. */
+body.desktop-mode .studio-create-page .studio-model-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  overflow: visible !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card {
+  display: grid !important;
+  grid-template-columns: 24px minmax(0, 1fr) !important;
+  align-items: center !important;
+  min-height: 56px !important;
+  border: 1px solid var(--studio-border) !important;
+  border-radius: 5px !important;
+  background: var(--studio-surface) !important;
+  padding: 10px 12px !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card:hover {
+  border-color: var(--studio-primary) !important;
+  background: var(--studio-primary-soft) !important;
+}
+
+body.desktop-mode .studio-create-page .studio-model-card.active {
+  border-color: var(--studio-primary) !important;
+  background: color-mix(in srgb, var(--studio-primary-soft) 68%, transparent) !important;
+}
+

@@ -1,0 +1,14 @@
+/* Studio/MCP list scroll hardening.
+   PC runtime must keep the card list as the only scroll viewport even when the
+   browser is resized into mobile layout. The selector is scoped to Studio/MCP
+   list pages to avoid changing dialogs, create screens, or chat scroll areas. */
+.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace,
+body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+

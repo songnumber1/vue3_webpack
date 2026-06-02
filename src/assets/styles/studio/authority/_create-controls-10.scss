@@ -1,0 +1,12 @@
+body.desktop-mode .studio-create-page .studio-model-fieldset legend,
+body.desktop-mode .studio-create-page .studio-scope-fieldset legend,
+body.desktop-mode .studio-create-page .studio-authority-section__head > strong {
+  display: block;
+  margin: 0 0 8px !important;
+  padding: 0 !important;
+  color: var(--studio-text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
