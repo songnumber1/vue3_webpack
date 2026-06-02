@@ -14,7 +14,7 @@
       @error="handlePreviewError"
     />
 
-    <AssistantSheet
+    <AssistantSelectSheet
       :open="assistantSheetOpen"
       :assistants="assistants"
       :selected-assistant-id="selectedAssistantId"
@@ -22,7 +22,7 @@
       @select="handleAssistantNewChat"
     />
 
-    <AppOverlayProvider
+    <OverlayPortalProvider
       :notice-open="noticeOpen"
       :privacy-open="privacyOpen"
       :personalization-open="personalizationOpen"
@@ -45,7 +45,7 @@
       <template #personalization>
         <PersonalizationView />
       </template>
-    </AppOverlayProvider>
+    </OverlayPortalProvider>
 
     <ResponsiveOverlay
       :open="systemOpen"
@@ -60,7 +60,7 @@
       />
     </ResponsiveOverlay>
 
-    <LanguageSheet
+    <LanguageSelectSheet
       :open="languageSheetOpen"
       @close="languageSheetOpen = false"
     />
@@ -74,7 +74,7 @@
 
     <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
 
-    <ChatHistoryDialog
+    <ChatHistoryActionDialog
       :open="historyDialogOpen"
       :mode="historyDialogMode"
       :title="historyDialogTitle"
@@ -130,17 +130,17 @@ import {
   PROMPT_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,
 } from "@/composables/chat/chatActionContext";
-import AssistantSheet from "@/components/assistant/AssistantSheet.vue";
+import AssistantSelectSheet from "@/components/assistant/AssistantSelectSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
-import LanguageSheet from "@/components/menu/LanguageSheet.vue";
-import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
+import LanguageSelectSheet from "@/components/menu/LanguageSelectSheet.vue";
+import OverlayPortalProvider from "@/components/overlay/OverlayPortalProvider.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
-import ChatHistoryDialog from "@/components/navigation/controls/ChatHistoryDialog.vue";
+import ChatHistoryActionDialog from "@/components/navigation/controls/ChatHistoryActionDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";

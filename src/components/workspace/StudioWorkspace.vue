@@ -1,6 +1,6 @@
 <template>
   <section class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text" aria-label="Assistant Studio">
-    <StudioCreateWorkspace
+    <StudioCreateContainer
       v-if="createOpen"
       :create-tab="createTab"
       :draft="draft"
@@ -62,7 +62,7 @@
 import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
-import StudioCreateWorkspace from "@/components/studio/StudioCreateWorkspace.vue";
+import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 
 const {t, locale} = useI18n();

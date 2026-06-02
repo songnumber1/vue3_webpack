@@ -21,7 +21,7 @@ export const WORKSPACE_ACTIONS_KEY = "WORKSPACE_ACTIONS";
 
 /**
  * @constant {String} CHAT_WORKSPACE_STATE_KEY
- * @description ChatWorkspace 화면 렌더링에 필요한 상태를 props 대신 provide/inject로 공유하기 위한 키입니다.
+ * @description 채팅 화면 렌더링에 필요한 상태를 props 대신 provide/inject로 공유하기 위한 키입니다.
  */
 export const CHAT_WORKSPACE_STATE_KEY = "CHAT_WORKSPACE_STATE";
 

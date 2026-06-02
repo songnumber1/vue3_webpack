@@ -9,10 +9,12 @@ import {
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
-const HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520, 780];
-const ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS = [
-  0, 32, 80, 160, 320, 520, 780, 1100, 1450,
-];
+const HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 120];
+const ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 160, 240];
+const POST_REVEAL_SCROLL_DELAYS = [80, 180, 320];
+const ANDROID_POST_REVEAL_SCROLL_DELAYS = [80, 180, 320, 520];
+const HYDRATION_REVEAL_FALLBACK_MS = 180;
+const ANDROID_HYDRATION_REVEAL_FALLBACK_MS = 320;
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
 ];
@@ -115,7 +117,6 @@ export function useMessageListScroll({props, emit}) {
   let hydrationResizeObserver = null;
   let hydrationRevealTimerIds = [];
   let pendingHydrationAssistantIds = null;
-  let pendingHydrationAssistantParts = null;
 
   function getScrollElement() {
     return overlayScrollViewport || scrollRef.value;
@@ -219,7 +220,6 @@ export function useMessageListScroll({props, emit}) {
     hydrationResizeObserver?.disconnect();
     hydrationResizeObserver = null;
     pendingHydrationAssistantIds = null;
-    pendingHydrationAssistantParts = null;
   }
 
   function getAssistantMessageIds() {
@@ -318,63 +318,21 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-  function waitForStableLayout(runId, callback) {
-    const el = getScrollElement();
-    if (!el || typeof window === "undefined") {
-      callback();
-      return;
-    }
+  function schedulePostRevealBottomCorrection() {
+    const delays = isAndroidHydrationRuntime()
+      ? ANDROID_POST_REVEAL_SCROLL_DELAYS
+      : POST_REVEAL_SCROLL_DELAYS;
 
-    let stableFrameCount = 0;
-    let frameCount = 0;
-    let lastHeight = -1;
-    let lastClientHeight = -1;
-    const maxFrames = 90;
-    const requiredStableFrames = 3;
-
-    const cleanupObserver = () => {
-      hydrationResizeObserver?.disconnect();
-      hydrationResizeObserver = null;
-    };
-
-    if (typeof ResizeObserver !== "undefined") {
-      hydrationResizeObserver?.disconnect();
-      hydrationResizeObserver = new ResizeObserver(() => {
-        stableFrameCount = 0;
-      });
-      hydrationResizeObserver.observe(el);
-    }
-
-    const tick = () => {
-      if (runId !== hydrationRunId) {
-        cleanupObserver();
-        return;
-      }
-
-      const currentHeight = el.scrollHeight;
-      const currentClientHeight = el.clientHeight;
-      if (
-        currentHeight === lastHeight &&
-        currentClientHeight === lastClientHeight
-      ) {
-        stableFrameCount += 1;
-      } else {
-        stableFrameCount = 0;
-        lastHeight = currentHeight;
-        lastClientHeight = currentClientHeight;
-      }
-
-      frameCount += 1;
-      if (stableFrameCount >= requiredStableFrames || frameCount >= maxFrames) {
-        cleanupObserver();
-        callback();
-        return;
-      }
-
-      hydrationRafId = window.requestAnimationFrame(tick);
-    };
-
-    hydrationRafId = window.requestAnimationFrame(tick);
+    delays.forEach((delay) => {
+      const timerId = window.setTimeout(() => {
+        window.requestAnimationFrame(() => {
+          if (!userIsAtBottom.value) return;
+          updateOverlayScrollbarFrame();
+          applyBottomScroll("auto");
+        });
+      }, delay);
+      stableScrollTimerIds.push(timerId);
+    });
   }
 
   function runHydrationRevealScrollSequence(runId) {
@@ -397,8 +355,8 @@ export function useMessageListScroll({props, emit}) {
           if (completedCount < delays.length) return;
           hydrationRevealTimerIds = [];
           pendingHydrationAssistantIds = null;
-          pendingHydrationAssistantParts = null;
           emit("history-hydrated");
+          schedulePostRevealBottomCorrection();
         });
       }, delay);
       hydrationRevealTimerIds.push(timerId);
@@ -412,18 +370,23 @@ export function useMessageListScroll({props, emit}) {
       hydrationTimerId = 0;
     }
 
-    waitForStableLayout(runId, () => {
+    window.requestAnimationFrame(() => {
       if (runId !== hydrationRunId) return;
+      applyHydrationBottomScroll();
       runHydrationRevealScrollSequence(runId);
     });
   }
 
   function scheduleInitialHydrationFallback(runId) {
     if (hydrationTimerId) window.clearTimeout(hydrationTimerId);
+    const fallbackDelay = isAndroidHydrationRuntime()
+      ? ANDROID_HYDRATION_REVEAL_FALLBACK_MS
+      : HYDRATION_REVEAL_FALLBACK_MS;
+
     hydrationTimerId = window.setTimeout(() => {
       hydrationTimerId = 0;
       completeInitialHydration(runId);
-    }, 1800);
+    }, fallbackDelay);
   }
 
   async function startInitialHydration() {
@@ -436,9 +399,6 @@ export function useMessageListScroll({props, emit}) {
     if (runId !== hydrationRunId || !props.initialHydrating) return;
 
     pendingHydrationAssistantIds = new Set(getAssistantMessageIds());
-    pendingHydrationAssistantParts = new Map(
-      Array.from(pendingHydrationAssistantIds).map((id) => [id, new Set()])
-    );
     if (!pendingHydrationAssistantIds.size) {
       completeInitialHydration(runId);
       return;
@@ -500,18 +460,18 @@ export function useMessageListScroll({props, emit}) {
 
     if (pendingHydrationAssistantIds) {
       const id = String(messageId ?? "");
-      const partSet = pendingHydrationAssistantParts?.get(id);
-      if (partSet) {
-        partSet.add(renderPart || "content");
-        if (partSet.has("content") && partSet.has("reasoning")) {
-          pendingHydrationAssistantIds.delete(id);
-          pendingHydrationAssistantParts.delete(id);
-        }
-      }
+      const isLayoutReady =
+        !renderPart || renderPart === "content" || renderPart === "layout-ready";
+      if (isLayoutReady) pendingHydrationAssistantIds.delete(id);
       if (!pendingHydrationAssistantIds.size) {
         const runId = hydrationRunId;
         completeInitialHydration(runId);
       }
+      return;
+    }
+
+    if (renderPart === "enhanced" && userIsAtBottom.value) {
+      window.requestAnimationFrame(() => applyBottomScroll("auto"));
       return;
     }
 

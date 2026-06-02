@@ -8,7 +8,7 @@
 
 <script setup>
 /**
- * @file views/mcp/ConnectorStorePage.vue
+ * @file views/mcp/McpConnectorListPage.vue
  * @description 공통 AppShell(ChatContainer) 안에서 Connector Store workspace를 마운트합니다.
  */
 import {watch} from "vue";

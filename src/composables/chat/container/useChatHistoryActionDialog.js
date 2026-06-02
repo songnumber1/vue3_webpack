@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatHistoryDialog.js
+ * @file composables/chat/container/useChatHistoryActionDialog.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
  *
  * 프리징 코드 주석 기준:
@@ -12,7 +12,7 @@ import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 /**
- * @typedef {object} ChatHistoryDialogDependencies
+ * @typedef {object} ChatHistoryActionDialogDependencies
  * @property {function(string, object=): string} t - 다국어 번역 언어팩 인터페이스 핸들러 함수
  * @property {object} router - 페이지 전환 및 주소창 조작을 위한 Vue Router 인스턴스
  * @property {import('vue').Ref<Array>} messages - 현재 활성화된 채팅방의 메시지 타임라인 데이터 배열 반응형 모델
@@ -25,10 +25,10 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 
 /**
  * @description 채팅방 관리 액션 메뉴(수정, 삭제, 고정, 공유 등)에 대응하여, 사용자 확인 유도 다이얼로그 모달 상태 및 동기화 비동기 파이프라인 흐름을 격리 관리하는 비즈니스 로직 제어 훅입니다.
- * @param {ChatHistoryDialogDependencies} dependencies - 도메인 상위 및 서비스 레이어에서 주입해 주는 비동기 제어 함수 묶음
+ * @param {ChatHistoryActionDialogDependencies} dependencies - 도메인 상위 및 서비스 레이어에서 주입해 주는 비동기 제어 함수 묶음
  * @returns {object} 다이얼로그 및 토스트 알림 템플릿 영역에 유선 바인딩할 상태 제어 패키지
  */
-export function useChatHistoryDialog({
+export function useChatHistoryActionDialog({
   t,
   router,
   messages,
@@ -115,14 +115,14 @@ export function useChatHistoryDialog({
         }
       }
     } catch (error) {
-      logWarn("[useChatHistoryDialog] confirmHistoryDialog 오류:", error); // 트래킹 및 모니터링을 위한 개발 경고 로깅
+      logWarn("[useChatHistoryActionDialog] confirmHistoryDialog 오류:", error); // 트래킹 및 모니터링을 위한 개발 경고 로깅
     } finally {
       closeHistoryDialog(); // 정상 완수든 서버 크래시든 최종 단계에서는 예외 없이 다이얼로그 모달 오버레이 차단 락 탈거
     }
   }
 
   /**
-   * @description 하부 자식 컨텍스트 메뉴 컴포넌트(`ChatHistoryActionMenu.vue`) 단에서 실시간 클릭 전파되어 올라온 최종 액션 키와 타깃 모델을 해독하여 알맞은 모달 및 상태 팩토리로 트래픽 라우팅을 집행합니다.
+   * @description 하부 자식 컨텍스트 메뉴 컴포넌트(`ChatHistoryContextMenu.vue`) 단에서 실시간 클릭 전파되어 올라온 최종 액션 키와 타깃 모델을 해독하여 알맞은 모달 및 상태 팩토리로 트래픽 라우팅을 집행합니다.
    * @param {object} [param0={}] - 디스트럭처링 수신 패킷 객체
    * @param {string} param0.action - 구동하고자 하는 기능 명칭 코드 식별자 ("pin" | "unpin" | "rename" | "share" | "delete")
    * @param {object} param0.history - 사용자가 마우스를 올리거나 지정한 타깃 채팅방 엔티티 로우 원본 객체
@@ -141,7 +141,7 @@ export function useChatHistoryDialog({
       try {
         await toggleHistoryBookmark(history);
       } catch (error) {
-        logWarn("[useChatHistoryDialog] toggleHistoryBookmark 오류:", error);
+        logWarn("[useChatHistoryActionDialog] toggleHistoryBookmark 오류:", error);
       }
       return; // 단발성 상태 스위칭이므로 핸들러 조기 종결
     }

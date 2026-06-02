@@ -38,7 +38,7 @@
 
 <script setup>
 /**
- * @file components/assistant/AssistantSheet.vue
+ * @file components/assistant/AssistantSelectSheet.vue
  * @description 재사용 UI 컴포넌트입니다. 화면 상태는 상위 props/action에서 받고 내부에서는 렌더와 사용자 이벤트만 처리합니다.
  *
  * 프리징 코드 주석 기준:

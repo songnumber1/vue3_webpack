@@ -203,7 +203,7 @@
       </article>
     </section>
 
-    <AppOverlayProvider
+    <OverlayPortalProvider
       :notice-open="noticeOpen"
       :personalization-open="personalizationOpen"
       :notice-title="t('notice.title')"
@@ -219,7 +219,7 @@
       <template #personalization>
         <PersonalizationView />
       </template>
-    </AppOverlayProvider>
+    </OverlayPortalProvider>
 
     <ResponsiveOverlay
       :open="popupOpen"
@@ -308,7 +308,7 @@ import {
   copyClipboardByPlatform,
   showToastByPlatform,
 } from "@/platform/bridge/platformBridge";
-import AppOverlayProvider from "@/components/overlay/AppOverlayProvider.vue";
+import OverlayPortalProvider from "@/components/overlay/OverlayPortalProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";

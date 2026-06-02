@@ -8,7 +8,7 @@
  */
 
 import {AUTH_FAILURE_REASONS} from "@/constants/auth";
-import {toBoolean} from "@/utils/typeConvert";
+import {toBoolean} from "@/utils/booleanUtils";
 
 /** 로그인 재요청 판별을 위한 문자열 상태 집합 (Set) */
 const LOGIN_STATUSES = new Set(["login", "login_required", "login-required"]);

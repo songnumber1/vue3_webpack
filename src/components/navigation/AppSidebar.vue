@@ -159,7 +159,7 @@
     </button>
   </BaseBottomSheet>
 
-  <ChatHistoryActionMenu
+  <ChatHistoryContextMenu
     ref="historyMenuRef"
     :open="historyMenuOpen"
     :target="historyMenuTarget"
@@ -186,11 +186,11 @@ import {useI18n} from "vue-i18n";
 import {useEventListener} from "@vueuse/core";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
-import Icon from "@/components/navigation/SidebarIcon.vue";
+import Icon from "@/components/navigation/NavigationIcon.vue";
 import CollapsedSidebar from "@/components/navigation/controls/CollapsedSidebar.vue";
 import SidebarAssistantSelector from "@/components/navigation/controls/SidebarAssistantSelector.vue";
 import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
-import ChatHistoryActionMenu from "@/components/navigation/controls/ChatHistoryActionMenu.vue";
+import ChatHistoryContextMenu from "@/components/navigation/controls/ChatHistoryContextMenu.vue";
 import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFooter.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";

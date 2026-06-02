@@ -8,7 +8,7 @@
  */
 
 import {MODEL_KEYS} from "@/constants/apiKeys";
-import {toBoolean} from "@/utils/typeConvert";
+import {toBoolean} from "@/utils/booleanUtils";
 
 /**
  * @typedef {object} NormalizedModel

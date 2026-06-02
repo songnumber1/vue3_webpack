@@ -1,5 +1,5 @@
 /**
- * @file composables/app/chatBootstrap.js
+ * @file composables/app/chatRuntimeBootstrap.js
  * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
  *
  * 프리징 코드 주석 기준:
@@ -338,7 +338,7 @@ export async function deleteChatHistory(payload = {}) {
 /**
  * [원격 API 브릿지 - R 세부 대화 정보] 특정 방 내부로 입장했을 때 과거에 유저와 AI가 주고받았던 시간순 대화 말풍선 히스토리 리스트를 완벽하게 정형화 추출합니다.
  */
-export async function loadChatMessages(payload = {}) {
+export async function loadChatMessageRouters(payload = {}) {
   const {chatHistoryApi} = resolveChatApis();
   const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);
   return adaptMessageList(rawMessages);

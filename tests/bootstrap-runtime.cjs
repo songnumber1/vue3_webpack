@@ -11,7 +11,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const bootstrap = read('src/composables/app/chatBootstrap.js');
+const bootstrap = read('src/composables/app/chatRuntimeBootstrap.js');
 const chatRuntime = read('src/composables/chat/useChatRuntime.js');
 const chatSubmit = read('src/composables/chat/useChatSubmit.js');
 const chatContainerController = read('src/composables/chat/useChatContainerController.js');

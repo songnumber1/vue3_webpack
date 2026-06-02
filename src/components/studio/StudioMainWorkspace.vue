@@ -67,7 +67,7 @@
       >
         ×
       </button>
-      <StudioDetailContent :studio="selectedStudio" />
+      <StudioInfoPanel :studio="selectedStudio" />
       <footer class="studio-dialog__footer tw-mx-[-24px] tw-mb-[-24px] tw-mt-5 tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-border-t tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-6 tw-py-3.5">
         <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
@@ -126,7 +126,7 @@ import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import StudioMainPage from "@/components/studio/StudioMainPage.vue";
 import StudioMobileDetailPage from "@/components/studio/StudioMobileDetailPage.vue";
-import StudioDetailContent from "@/components/studio/StudioDetailContent.vue";
+import StudioInfoPanel from "@/components/studio/StudioInfoPanel.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";

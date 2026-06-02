@@ -33,7 +33,7 @@
       </button>
     </header>
     <div ref="contentRef" class="studio-mobile-page__content tw-min-h-0 tw-flex-1 tw-overflow-y-auto">
-      <StudioDetailContent :studio="studio" />
+      <StudioInfoPanel :studio="studio" />
     </div>
 
     <BaseBottomSheet
@@ -72,7 +72,7 @@ import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import StudioDetailContent from "@/components/studio/StudioDetailContent.vue";
+import StudioInfoPanel from "@/components/studio/StudioInfoPanel.vue";
 const {t} = useI18n();
 const contentRef = ref(null);
 useOverlayScrollbar(contentRef, {overflow: {x: "hidden", y: "scroll"}});

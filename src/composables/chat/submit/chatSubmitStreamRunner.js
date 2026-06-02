@@ -3,7 +3,7 @@ import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
 import {fetchGenerationResult} from "@/api/sse/common/streamRequest";
 import {logWarn} from "@/utils/logger";
 import {createGenerationPayload} from "./chatSubmitPayload";
-import {commitFirstAnswerChunk} from "./chatSubmitCommitter";
+import {commitFirstAnswerChunk} from "./streamingMessageCommitter";
 
 async function resolveGenerationResultContent(requestId) {
   try {

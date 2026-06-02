@@ -23,7 +23,7 @@
       </button>
     </header>
     <div ref="contentRef" class="studio-mobile-page__content tw-min-h-0 tw-flex-1 tw-overflow-y-auto">
-      <McpDetailContent :mcp="mcp" />
+      <McpInfoPanel :mcp="mcp" />
     </div>
   </article>
 </template>
@@ -32,7 +32,7 @@
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import McpDetailContent from "@/components/mcp/McpDetailContent.vue";
+import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 const {t} = useI18n();
 const contentRef = ref(null);
 useOverlayScrollbar(contentRef, {overflow: {x: "hidden", y: "scroll"}});

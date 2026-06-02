@@ -1,5 +1,5 @@
 /**
- * @file utils/typeConvert.js
+ * @file utils/booleanUtils.js
  * @description 여러 영역에서 공유하는 유틸리티입니다. DOM/Markdown/feedback/viewport 보정 등 공통 처리를 담당합니다.
  *
  * 프리징 코드 주석 기준:

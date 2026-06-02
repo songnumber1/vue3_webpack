@@ -26,7 +26,7 @@
 
 <script setup>
 /**
- * @file components/chat/ChatMessage.vue
+ * @file components/chat/ChatMessageRouter.vue
  * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
  *
  * 프리징 코드 주석 기준:

@@ -61,7 +61,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, onMounted, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {enhanceMarkdownScrollbars} from "@/utils/overlayScrollbar";
@@ -107,6 +107,43 @@ const reasoningTitle = computed(() =>
     : t("chat.reasoning.completed")
 );
 
+
+function hasMermaidContent(value = "") {
+  return /```\s*mermaid|class=["'][^"']*\bmd-mermaid\b|data-mermaid-pending/i.test(
+    String(value || "")
+  );
+}
+
+function reservePendingMermaidHeight(root) {
+  if (!root) return;
+  root
+    .querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
+    .forEach((element) => {
+      if (!element.style.minHeight) {
+        element.style.minHeight = "160px";
+      }
+    });
+}
+
+async function enhanceRenderedMarkdown({
+  root,
+  source,
+  currentVersion,
+  getVersion,
+  renderMermaid = false,
+}) {
+  try {
+    if (renderMermaid && hasMermaidContent(source)) {
+      await renderMermaidInElement(root);
+    }
+    if (currentVersion !== getVersion()) return;
+    enhanceMarkdownScrollbars(root);
+    emit("rendered", "enhanced");
+  } catch (error) {
+    logWarn("[AssistantMessage] markdown enhancement failed:", error);
+  }
+}
+
 function escapeHtml(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -133,16 +170,23 @@ async function renderContent() {
     if (currentVersion !== renderVersion) return;
     html.value = rendered;
     await nextTick();
-    if (isMessageComplete.value) {
-      await renderMermaidInElement(contentRef.value);
-    }
-    enhanceMarkdownScrollbars(contentRef.value);
+    if (currentVersion !== renderVersion) return;
+
+    reservePendingMermaidHeight(contentRef.value);
+    emit("rendered", "content");
+
+    void enhanceRenderedMarkdown({
+      root: contentRef.value,
+      source: props.message.content,
+      currentVersion,
+      getVersion: () => renderVersion,
+      renderMermaid: isMessageComplete.value,
+    });
   } catch (error) {
     if (currentVersion !== renderVersion) return;
     logWarn("[AssistantMessage] content render failed:", error);
     html.value = escapeHtml(props.message.content || "");
-  } finally {
-    if (currentVersion === renderVersion) emit("rendered", "content");
+    emit("rendered", "content");
   }
 }
 
@@ -153,22 +197,34 @@ async function renderReasoningContent() {
   const currentVersion = ++reasoningRenderVersion;
 
   try {
+    if (!props.message.reasoningContent) {
+      reasoningHtml.value = "";
+      emit("rendered", "reasoning");
+      return;
+    }
+
     const {renderMarkdown} = await import("@/utils/markdown");
-    const rendered = props.message.reasoningContent
-      ? await renderMarkdown(props.message.reasoningContent)
-      : "";
+    const rendered = await renderMarkdown(props.message.reasoningContent);
     if (currentVersion !== reasoningRenderVersion) return;
     reasoningHtml.value = rendered;
     await nextTick();
-    await renderMermaidInElement(reasoningRef.value);
-    enhanceMarkdownScrollbars(reasoningRef.value);
+    if (currentVersion !== reasoningRenderVersion) return;
+
+    reservePendingMermaidHeight(reasoningRef.value);
+    emit("rendered", "reasoning");
+
+    void enhanceRenderedMarkdown({
+      root: reasoningRef.value,
+      source: props.message.reasoningContent,
+      currentVersion,
+      getVersion: () => reasoningRenderVersion,
+      renderMermaid: true,
+    });
   } catch (error) {
     if (currentVersion !== reasoningRenderVersion) return;
     logWarn("[AssistantMessage] reasoning render failed:", error);
     reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
-  } finally {
-    if (currentVersion === reasoningRenderVersion)
-      emit("rendered", "reasoning");
+    emit("rendered", "reasoning");
   }
 }
 
@@ -185,9 +241,5 @@ watch(
     renderReasoningContent();
   }
 );
-onMounted(() => {
-  renderContent();
-  renderReasoningContent();
-});
 </script>
 

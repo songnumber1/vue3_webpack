@@ -8,7 +8,7 @@
  */
 
 import {createRouter, createWebHistory} from "vue-router";
-import AssistantRoot from "@/views/AssistantRoot.vue";
+import AssistantRouterView from "@/views/AssistantRouterView.vue";
 import MainPage from "@/views/MainPage.vue";
 import {isAndroidApp} from "@/core/config";
 import {isVersionLowerThan} from "@/core/config/version";
@@ -31,8 +31,8 @@ const SharedPage = () =>
 const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
 const StudioPage = () =>
   import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
-const ConnectorStorePage = () =>
-  import(/* webpackChunkName: "connector-store" */ "@/views/mcp/ConnectorStorePage.vue");
+const McpConnectorListPage = () =>
+  import(/* webpackChunkName: "connector-store" */ "@/views/mcp/McpConnectorListPage.vue");
 const ChatSearchPage = () =>
   import(/* webpackChunkName: "chat-search" */ "@/views/search/ChatSearchPage.vue");
 const NotFoundPage = () =>
@@ -53,7 +53,7 @@ const LOGIN_REQUIRED_ROUTE_NAME = "login-required";
 const baseRoutes = [
   {
     path: "/",
-    component: AssistantRoot,
+    component: AssistantRouterView,
     meta: {requireAuth: true}, // 자식 라우트들에게 인증 필요 속성을 전파하기 위한 마킹
     children: [
       {
@@ -91,7 +91,7 @@ const baseRoutes = [
       {
         path: "connector-store",
         name: "connector-store",
-        component: ConnectorStorePage,
+        component: McpConnectorListPage,
         meta: {title: "Connector Store"},
       },
       {

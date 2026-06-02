@@ -19,8 +19,8 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useViewportStore} from "@/stores/viewportStore";
-import {syncViewportSettings} from "@/utils/viewportSettingsSync";
-import {useChatHistoryDialog} from "@/composables/chat/container/useChatHistoryDialog";
+import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
+import {useChatHistoryActionDialog} from "@/composables/chat/container/useChatHistoryActionDialog";
 import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
 import {useChatPromptActions} from "@/composables/chat/container/useChatPromptActions";
@@ -135,7 +135,7 @@ export function useChatUIController({
     closeHistoryDialog,
     confirmHistoryDialog,
     handleHistoryMenuAction,
-  } = useChatHistoryDialog({
+  } = useChatHistoryActionDialog({
     t,
     router,
     messages,

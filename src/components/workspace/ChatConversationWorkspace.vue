@@ -1,6 +1,5 @@
 <template>
   <ChatHeader
-    v-if="showChatHeader"
     :mode="mode"
     :assistant-label="assistantLabel"
     :assistant="assistant"
@@ -8,56 +7,40 @@
     :theme-name="themeName"
   />
 
-  <MainEmptyState
-    v-if="isMainPage"
-    :is-mobile="isMobile"
-    :assistant-icon="mainAssistantIcon"
-    :assistant-label="assistantLabel"
-    :suggestions="suggestions"
-    @suggestion-click="handleSuggestionClick"
+  <MessageList
+    ref="listRef"
+    :messages="messages"
+    :loading="isGenerating"
+    :auto-scroll-on-answer="autoScrollOnAnswer"
+    :initial-hydrating="isHistoryHydrating"
+    @content-rendered="handleMessageContentRendered"
+    @history-hydrated="handleHistoryHydrated"
+    @regenerate="workspaceActions.regenerate($event)"
+  />
+  <button
+    v-if="showScrollBottom && !isInteractionBlocked"
+    class="scroll-bottom-button"
+    type="button"
+    :aria-label="t('chat.scrollBottom')"
+    @click="workspaceActions.scrollBottom()"
   >
-    <template #composer>
-      <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
-    </template>
-  </MainEmptyState>
-
-  <template v-else>
-    <MessageList
-      ref="listRef"
-      :messages="messages"
-      :loading="isGenerating"
-      :auto-scroll-on-answer="autoScrollOnAnswer"
-      :initial-hydrating="isHistoryHydrating"
-      @content-rendered="handleMessageContentRendered"
-      @history-hydrated="handleHistoryHydrated"
-      @regenerate="workspaceActions.regenerate($event)"
+    ↓
+  </button>
+  <div ref="composerSlotRef" class="chat-composer-slot">
+    <ChatReadonlyInput v-if="readonly" />
+    <ChatReadonlyInput
+      v-else-if="isActiveModelUnavailable"
+      :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
     />
-    <button
-      v-if="showScrollBottom && !isInteractionBlocked"
-      class="scroll-bottom-button"
-      type="button"
-      :aria-label="t('chat.scrollBottom')"
-      @click="workspaceActions.scrollBottom()"
-    >
-      ↓
-    </button>
-    <div ref="composerSlotRef" class="chat-composer-slot">
-      <ChatReadonlyInput v-if="readonly" />
-      <ChatReadonlyInput
-        v-else-if="isActiveModelUnavailable"
-        :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
-      />
-      <PromptComposer v-else :class="{'mobile-chat-prompt': isMobile}" />
-    </div>
-  </template>
+    <PromptComposer v-else :class="{'mobile-chat-prompt': isMobile}" />
+  </div>
 </template>
 
 <script setup>
 /**
- * @file components/chat/ChatWorkspace.vue
- * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
+ * @file components/workspace/ChatConversationWorkspace.vue
+ * @description 기존 통합 채팅 workspace의 대화방 렌더링만 분리한 라우트 전용 workspace입니다.
  */
-
 import {
   computed,
   inject,
@@ -68,25 +51,21 @@ import {
   watch,
 } from "vue";
 import {useI18n} from "vue-i18n";
-import ChatHeader from "./ChatHeader.vue";
-import ChatReadonlyInput from "./ChatReadonlyInput.vue";
-import MessageList from "./MessageList.vue";
+import ChatHeader from "@/components/chat/ChatHeader.vue";
+import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
+import MessageList from "@/components/chat/MessageList.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
-import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,
   createEmptyWorkspaceActions,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
-import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
-import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
 
 const {t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
-const mainPromptInputRef = ref(null);
 let composerResizeObserver = null;
 let composerHeightTimerIds = [];
 
@@ -102,15 +81,13 @@ const {isInteractionBlocked} = useInteractionGuard();
 
 const mode = computed(() => workspaceState.value.mode);
 const readonly = computed(() => workspaceState.value.readonly);
-const injectedIsMobile = computed(() => workspaceState.value.isMobile);
-const isMobile = useResolvedMobileMode(injectedIsMobile);
+const isMobile = computed(() => workspaceState.value.isMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
   () => workspaceState.value.conversationTitle
 );
 const themeName = computed(() => workspaceState.value.themeName);
-const suggestions = computed(() => workspaceState.value.suggestions || []);
 const isActiveModelDeleted = computed(
   () => workspaceState.value.isActiveModelDeleted
 );
@@ -125,18 +102,6 @@ const autoScrollOnAnswer = computed(
 );
 const isHistoryHydrating = computed(
   () => workspaceState.value.isHistoryHydrating
-);
-const isMainPage = computed(() => mode.value === "main");
-const showChatHeader = computed(() => isMobile.value || !isMainPage.value);
-
-const mainAssistantIcon = computed(() =>
-  getAssistantImageBySize(assistant.value, 48)
-);
-
-const mainPromptClass = computed(() =>
-  isMobile.value
-    ? "mobile-main-fixed-prompt main-empty-state__prompt"
-    : "desktop-center-prompt"
 );
 
 function updateComposerHeight() {
@@ -191,12 +156,6 @@ onMounted(async () => {
 
 onBeforeUnmount(cleanupComposerHeightObserver);
 
-function handleSuggestionClick(item) {
-  if (isInteractionBlocked.value) return;
-  const prompt = item?.prompt || item?.title || item?.text || "";
-  mainPromptInputRef.value?.setText(prompt, {focus: true});
-}
-
 watch(
   () => [
     readonly.value,
@@ -219,27 +178,17 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-/* Mobile main/chat composer geometry is owned by ChatWorkspace because this
-   component decides whether the shared prompt composer is rendered as main or chat. */
-:global(body.mobile-mode) .mobile-chat-prompt,
-:global(body.mobile-mode) .mobile-main-fixed-prompt {
+/* 기존 대화방 composer 모바일 보정은 대화방 workspace가 소유합니다. */
+:global(body.mobile-mode) .mobile-chat-prompt {
   width: 100%;
   max-width: none;
 }
 
-:global(body.mobile-mode) .mobile-main-fixed-prompt,
-:global(body.mobile-mode) .mobile-main-fixed-prompt.prompt-wrap {
-  background: transparent;
-  box-shadow: none;
-}
-
-:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-box--gemini),
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-box--gemini) {
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-box--gemini) {
   align-items: stretch;
 }
 
-:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-action-row),
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-action-row) {
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-action-row) {
   display: flex;
   width: 100%;
   min-width: 0;
@@ -249,10 +198,7 @@ defineExpose({
   gap: 8px;
 }
 
-:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-left-actions),
-:global(body.mobile-mode)
-  .mobile-main-fixed-prompt
-  :deep(.prompt-left-actions) {
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-left-actions) {
   display: flex;
   flex: 0 1 auto;
   width: auto;
@@ -264,9 +210,7 @@ defineExpose({
 }
 
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.send-button),
-:global(body.mobile-mode) .mobile-chat-prompt :deep(.voice-button),
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.send-button),
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.voice-button) {
+:global(body.mobile-mode) .mobile-chat-prompt :deep(.voice-button) {
   flex: 0 0 auto;
   margin-left: auto;
 }

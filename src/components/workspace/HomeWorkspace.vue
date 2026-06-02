@@ -23,7 +23,7 @@
 
 <script setup>
 /**
- * @file components/workspace/MainWorkspace.vue
+ * @file components/workspace/HomeWorkspace.vue
  * @description 실제 메인 라우트 전용 workspace입니다. 메인 빈 화면 UI는 MainEmptyState를 공유하고,
  * 실제 PromptComposer만 slot으로 주입하여 Studio 미리보기와 UI를 함께 관리합니다.
  */

@@ -3,9 +3,9 @@ import {
   loadChatHistoryList,
   renameChatHistory,
   updateChatBookmark,
-} from "@/composables/app/chatBootstrap";
+} from "@/composables/app/chatRuntimeBootstrap";
 import {logWarn} from "@/utils/logger";
-import {notifyChatHistorySyncFailed} from "@/utils/chatHistorySyncFeedback";
+import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
 
 export function createChatHistoryRuntime({assistantStore, chatStore}) {
   async function refreshHistories({notifyOnError = false} = {}) {

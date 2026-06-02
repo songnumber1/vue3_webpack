@@ -11,7 +11,7 @@
     @wheel.passive="handleUserScrollIntent"
     @pointerdown.passive="handleUserScrollIntent"
   >
-    <ChatMessage
+    <ChatMessageRouter
       v-for="message in messages"
       :key="message.id"
       :message="message"
@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import ChatMessage from "./ChatMessage.vue";
+import ChatMessageRouter from "./ChatMessageRouter.vue";
 import {useMessageListScroll} from "@/composables/chat/message-list/useMessageListScroll";
 
 const props = defineProps({

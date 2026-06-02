@@ -33,7 +33,7 @@
 
 <script setup>
 /**
- * @file components/menu/LanguageSheet.vue
+ * @file components/menu/LanguageSelectSheet.vue
  * @description 언어/사용자 메뉴 등 전역 메뉴 UI입니다. 선택 이벤트를 store 또는 상위 action에 전달합니다.
  *
  * 프리징 코드 주석 기준:

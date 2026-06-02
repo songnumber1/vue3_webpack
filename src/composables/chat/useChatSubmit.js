@@ -10,7 +10,7 @@ import {normalizePromptPayload} from "./submit/chatSubmitPayload";
 import {
   createAssistantMessageCommitter,
   createAssistantStreamingPatch,
-} from "./submit/chatSubmitCommitter";
+} from "./submit/streamingMessageCommitter";
 import {
   createStreamScrollScheduler,
   scrollAfterUserSubmit,

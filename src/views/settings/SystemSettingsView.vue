@@ -109,7 +109,7 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {useAuthStore} from "@/stores/authStore";
 import {authApiLive} from "@/api/live/authApi.live";
 import {logWarn} from "@/utils/logger";
-import {syncViewportSettings} from "@/utils/viewportSettingsSync";
+import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   KEYBOARD_MODE_OPTIONS,

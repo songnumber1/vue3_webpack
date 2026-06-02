@@ -146,7 +146,7 @@
 
 <script setup>
 /**
- * @file components/prompt/controls/PromptMobileSheets.vue
+ * @file components/prompt/controls/PromptMobileBottomSheets.vue
  * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
  *
  * 프리징 코드 주석 기준:

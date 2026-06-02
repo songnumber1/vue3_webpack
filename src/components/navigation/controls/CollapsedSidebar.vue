@@ -77,7 +77,7 @@
 
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
-import Icon from "@/components/navigation/SidebarIcon.vue";
+import Icon from "@/components/navigation/NavigationIcon.vue";
 import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 

@@ -1,5 +1,5 @@
 /**
- * @file utils/chatHistorySyncFeedback.js
+ * @file utils/chatHistoryErrorNotifier.js
  * @description 여러 영역에서 공유하는 유틸리티입니다. DOM/Markdown/feedback/viewport 보정 등 공통 처리를 담당합니다.
  *
  * 프리징 코드 주석 기준:
@@ -34,10 +34,10 @@ export async function notifyChatHistorySyncFailed(error) {
       window.alert(message);
     }
   } catch (notifyError) {
-    logWarn("[chatHistorySyncFeedback] 알림 표시 실패:", notifyError);
+    logWarn("[chatHistoryErrorNotifier] 알림 표시 실패:", notifyError);
   } finally {
     if (error) {
-      logWarn("[chatHistorySyncFeedback] 대화방 목록 갱신 실패:", error);
+      logWarn("[chatHistoryErrorNotifier] 대화방 목록 갱신 실패:", error);
     }
   }
 }

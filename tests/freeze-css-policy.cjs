@@ -132,7 +132,7 @@ for (const archiveName of step44StyleArchives) {
 }
 const step44StyleOwners = [
   'src/components/chat/ChatLayout.vue',
-  'src/components/chat/ChatMessage.vue',
+  'src/components/chat/ChatMessageRouter.vue',
   'src/components/chat/UserMessage.vue',
   'src/components/chat/AssistantMessage.vue',
   'src/components/navigation/controls/SidebarHistoryList.vue',

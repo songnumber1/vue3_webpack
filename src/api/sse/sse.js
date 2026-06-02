@@ -4,7 +4,7 @@ import {streamText} from "@/api/mock/fakeStream";
 import {isGenerationAbortError} from "@/api/sse/common/sseErrors";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {runSseGenerationStream} from "@/api/sse/common/streamGenerationCore";
-import {createSseRuntimeContext} from "@/api/sse/platforms/streamRuntimeContext";
+import {createSseRuntimeContext} from "@/api/sse/platforms/sseRuntimeContextFactory";
 
 export {isGenerationAbortError};
 

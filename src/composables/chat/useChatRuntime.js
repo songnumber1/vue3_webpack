@@ -14,9 +14,9 @@ import {logWarn} from "@/utils/logger";
 import {
   bootstrapChatRuntime,
   createChatHistory,
-  loadChatMessages,
+  loadChatMessageRouters,
   loadExamplePrompts,
-} from "@/composables/app/chatBootstrap";
+} from "@/composables/app/chatRuntimeBootstrap";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
@@ -25,7 +25,7 @@ import {adaptChatHistory} from "@/adapters/chatAdapter";
 import {
   createLocalHistory,
   createSessionFromHistory,
-} from "@/composables/chat/runtime/useConversationFactory";
+} from "@/composables/chat/runtime/chatSessionFactory";
 import {
   appendUserAndAssistantMessages as appendMessagesToChat,
   revokeMessageAttachments,
@@ -225,7 +225,7 @@ export function useChatRuntime() {
 
     // 3. 만약 해당 방의 대화 말풍선 메시지 내용물들이 로컬 메모리 배열 맵에 로드된 적이 없는 순수 미개봉 상태라면 비동기 API 요청을 통해 긁어옵니다.
     if (!chatStore.messageMap[history.id]) {
-      const messages = await loadChatMessages({
+      const messages = await loadChatMessageRouters({
         chatId: history.id,
         assistId: session?.assistantId || history.assistantId,
         modelId: session?.modelId || history.modelId,

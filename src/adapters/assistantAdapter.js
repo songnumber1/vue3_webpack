@@ -9,7 +9,7 @@
 
 import {ASSISTANT_KEYS} from "@/constants/apiKeys";
 import {ASSISTANT_TYPES} from "@/constants/domain";
-import {toBoolean} from "@/utils/typeConvert";
+import {toBoolean} from "@/utils/booleanUtils";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
 
 /**

@@ -9,7 +9,7 @@
 
 import {CHAT_KEYS, MESSAGE_KEYS} from "@/constants/apiKeys";
 import {MESSAGE_ROLES} from "@/constants/domain";
-import {toBoolean} from "@/utils/typeConvert";
+import {toBoolean} from "@/utils/booleanUtils";
 
 function firstText(...values) {
   const found = values.find(

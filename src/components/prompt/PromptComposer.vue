@@ -55,7 +55,7 @@
       UI demo. Extend resolver/api.js for production integration.
     </p>
 
-    <PromptMobileSheets
+    <PromptMobileBottomSheets
       :model-open="modelMenuOpen && isMobileSheet"
       :tool-open="toolMenuOpen && isMobileSheet"
       :attach-open="attachMenuOpen && isMobileSheet"
@@ -87,7 +87,7 @@ import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
-import PromptMobileSheets from "@/components/prompt/controls/PromptMobileSheets.vue";
+import PromptMobileBottomSheets from "@/components/prompt/controls/PromptMobileBottomSheets.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
 import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePanel.vue";
 import {

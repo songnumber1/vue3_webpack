@@ -53,7 +53,7 @@
       >
         ×
       </button>
-      <McpDetailContent :mcp="selectedMcp" />
+      <McpInfoPanel :mcp="selectedMcp" />
       <footer class="studio-dialog__footer tw-mx-[-24px] tw-mb-[-24px] tw-mt-5 tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-border-t tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-6 tw-py-3.5">
         <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
           {{ t("common.close") }}
@@ -77,7 +77,7 @@ import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import McpMainPage from "@/components/mcp/McpMainPage.vue";
 import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
-import McpDetailContent from "@/components/mcp/McpDetailContent.vue";
+import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
