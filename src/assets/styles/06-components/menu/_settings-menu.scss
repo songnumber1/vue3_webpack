@@ -1,0 +1,158 @@
+/* Settings menu styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+.settings-menu {
+  border-radius: 14px;
+  background: transparent;
+}
+.settings-menu-summary {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 9px 12px !important;
+}
+.settings-menu-summary-text {
+  min-width: 0;
+  display: grid !important;
+  gap: 2px;
+}
+.settings-menu-summary-text strong {
+  font-size: var(--font-size-fixed-14);
+  line-height: 1.25;
+  font-weight: 800;
+}
+.settings-menu-summary-text small {
+  margin: 0 !important;
+  font-size: var(--font-size-fixed-11);
+  line-height: 1.25;
+}
+.settings-menu .app-icon--chevron {
+  flex: 0 0 auto;
+  transition: transform 160ms ease;
+  color: var(--text-muted);
+}
+.settings-menu[open] .app-icon--chevron {
+  transform: rotate(180deg);
+}
+.settings-menu .service-menu-list {
+  padding: 2px 8px 8px;
+}
+.settings-menu .service-menu-item {
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+.settings-menu .service-menu-item strong {
+  font-size: var(--font-size-fixed-13);
+  font-weight: 750;
+  line-height: 1.25;
+}
+.settings-menu .service-menu-item small {
+  font-size: var(--font-size-fixed-11);
+  line-height: 1.25;
+}
+body.mobile-mode .mobile-drawer .service-menu.settings-menu,
+body.mobile-mode .service-menu.settings-menu {
+  margin: 0 12px 8px !important;
+  border-color: var(--sidebar-border) !important;
+}
+.mobile-drawer .settings-menu,
+body.mobile-mode .settings-menu {
+  margin: 4px 0 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.mobile-drawer .settings-menu-summary,
+body.mobile-mode .settings-menu-summary {
+  min-height: 42px;
+  padding: 8px 10px !important;
+  border-radius: 10px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.mobile-drawer .settings-menu-summary::-webkit-details-marker,
+body.mobile-mode .settings-menu-summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-drawer .settings-menu-summary:hover,
+body.mobile-mode .settings-menu-summary:hover {
+  background: var(--sidebar-hover);
+}
+
+.mobile-drawer .settings-menu-summary-text,
+body.mobile-mode .settings-menu-summary-text {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-drawer .settings-menu-summary-text strong,
+body.mobile-mode .settings-menu-summary-text strong {
+  font-size: var(--font-size-fixed-14) !important;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.mobile-drawer .settings-menu-summary-text small,
+body.mobile-mode .settings-menu-summary-text small {
+  display: none;
+}
+
+.mobile-drawer .settings-menu .app-icon--chevron,
+body.mobile-mode .settings-menu .app-icon--chevron {
+  width: 18px;
+  height: 18px;
+  color: var(--text-muted);
+}
+
+.mobile-drawer .settings-menu .service-menu-list,
+body.mobile-mode .settings-menu .service-menu-list {
+  padding: 2px 0 2px 12px;
+  display: grid;
+  gap: 2px;
+}
+
+.mobile-drawer .settings-menu .service-menu-item,
+body.mobile-mode .settings-menu .service-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.mobile-drawer .settings-menu .service-menu-item:hover,
+body.mobile-mode .settings-menu .service-menu-item:hover {
+  background: var(--sidebar-hover);
+}
+
+.mobile-drawer .settings-menu .service-menu-item strong,
+body.mobile-mode .settings-menu .service-menu-item strong {
+  display: block;
+  font-size: var(--font-size-fixed-14) !important;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.mobile-drawer .settings-menu .service-menu-item small,
+body.mobile-mode .settings-menu .service-menu-item small {
+  display: none;
+}
+
+.mobile-drawer .settings-menu .service-menu-item .app-icon,
+body.mobile-mode .settings-menu .service-menu-item .app-icon {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  color: var(--text-muted);
+}

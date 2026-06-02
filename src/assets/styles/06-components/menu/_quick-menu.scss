@@ -1,0 +1,45 @@
+/* Quick menu mobile search guards styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+.quick-menu--mobile-search {
+  margin-bottom: 4px;
+}
+.quick-menu--mobile-search .quick-item {
+  min-height: 40px;
+  font-size: var(--font-size-fixed-14);
+}
+
+
+body.mobile-mode
+  .mobile-drawer
+  .quick-menu--assistant.quick-menu--mobile-search,
+body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search {
+  gap: 0 !important;
+  padding: 4px 12px 2px !important;
+}
+
+body.mobile-mode
+  .mobile-drawer
+  .quick-menu--assistant.quick-menu--mobile-search
+  .quick-item,
+body.mobile-mode .quick-menu--assistant.quick-menu--mobile-search .quick-item {
+  font-size: var(--font-size-fixed-14) !important;
+  font-weight: 750 !important;
+  min-height: 40px !important;
+  justify-content: flex-start !important;
+}
+body.mobile-mode .mobile-drawer .mobile-new-chat-fab,
+body.mobile-mode .mobile-new-chat-fab {
+  display: none !important;
+}
+.mobile-drawer .quick-menu--mobile-search,
+body.mobile-mode .quick-menu--mobile-search {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.mobile-drawer .quick-menu--mobile-search .quick-item,
+body.mobile-mode .quick-menu--mobile-search .quick-item {
+  min-height: 42px;
+  font-size: var(--font-size-fixed-14);
+  border-radius: 10px;
+}

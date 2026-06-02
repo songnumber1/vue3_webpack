@@ -1,0 +1,59 @@
+/* Service menu styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+.service-menu {
+  margin: 0 10px;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 16px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+.service-menu summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  color: var(--sidebar-text);
+}
+.service-menu summary::-webkit-details-marker {
+  display: none;
+}
+.service-menu summary span,
+.service-menu summary small {
+  display: block;
+}
+.service-menu summary span {
+  font-weight: 900;
+}
+.service-menu summary small {
+  margin-top: 3px;
+  color: var(--text-muted);
+  line-height: 1.32;
+}
+.service-menu-list {
+  display: grid;
+  gap: 4px;
+  padding: 0 8px 8px;
+}
+.service-menu-item {
+  width: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--sidebar-text);
+  padding: 10px;
+  text-align: left;
+}
+.service-menu-item:hover {
+  background: var(--sidebar-hover);
+}
+.service-menu-item strong,
+.service-menu-item small {
+  display: block;
+}
+.service-menu-item small {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: var(--font-size-fixed-12);
+  line-height: 1.35;
+}
+body.mobile-mode .service-menu {
+  margin: 0 12px;
+}

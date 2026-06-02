@@ -1,0 +1,41 @@
+/* Menu glyph styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+.playground-glyph {
+  font-size: var(--font-size-fixed-16);
+  font-weight: 900;
+  line-height: 1;
+}
+
+.logout-glyph {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  color: currentColor;
+}
+
+.logout-glyph::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  width: 2px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.logout-glyph::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1px;
+  width: 14px;
+  height: 14px;
+  box-sizing: border-box;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}

@@ -1,0 +1,45 @@
+/* Sidebar user area styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+@use "../../00-abstracts/mixins" as *;
+
+.sidebar-user--mobile {
+  border-top: 1px solid var(--sidebar-border);
+}
+.sidebar-user-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.sidebar-user-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sidebar-user-action {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--text);
+  @include grid-center;
+}
+
+body.desktop-mode .desktop-sidebar .sidebar-user,
+body.desktop-mode .desktop-sidebar .collapsed-user-button {
+  display: none !important;
+}
+body.mobile-mode .sidebar-content--mobile {
+  padding-bottom: 0 !important;
+}
+body.mobile-mode .sidebar-content--mobile .sidebar-user {
+  position: sticky !important;
+  bottom: 0 !important;
+  margin-top: auto !important;
+  padding: 8px 16px max(8px, env(safe-area-inset-bottom)) !important;
+  background: var(--mobile-bg) !important;
+  border-top: 1px solid var(--sidebar-border);
+}
+body.mobile-mode .mobile-drawer .sidebar-history--main,
+body.mobile-mode .sidebar-history--main {
+  flex: 1 1 auto;
+}

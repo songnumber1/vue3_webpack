@@ -1,3 +1,52 @@
+/* Markdown table wrapper base styles split from _markdown.scss during Step 5. */
+.md-table-wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.md-table-wrapper table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 0.94em;
+}
+.md-table-wrapper th,
+.md-table-wrapper td {
+  border-bottom: 1px solid var(--border);
+  padding: 9px 11px;
+  vertical-align: top;
+  text-align: left;
+}
+.md-table-wrapper th {
+  background: var(--surface-muted);
+  font-weight: 800;
+}
+.md-table-wrapper tr:last-child td {
+  border-bottom: 0;
+}
+body.mobile-mode .md-table-wrapper table {
+  min-width: 520px;
+}
+.md-table-wrapper {
+  width: 100%;
+  border-radius: 14px;
+  margin: 14px 0;
+}
+.md-table-wrapper table {
+  min-width: 520px;
+  margin: 0;
+}
+.md-table-wrapper th,
+.md-table-wrapper td {
+  padding: 10px 12px;
+}
+.md-table-wrapper th {
+}
+.md-table-wrapper tr:last-child td {
+}
+
 /* Split from 06-components/bottom-sheet/_bottom-sheet.scss: Markdown table card styles only. */
 .md-table-card {
   max-width: 100%;

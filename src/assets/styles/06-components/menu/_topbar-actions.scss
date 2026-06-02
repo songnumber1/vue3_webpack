@@ -1,0 +1,43 @@
+/* Topbar desktop action and guide link styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+@use "../../00-abstracts/mixins" as *;
+
+.topbar-actions--desktop {
+  margin-left: auto;
+}
+.guide-link {
+  min-height: 38px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 0 16px;
+  font-weight: 800;
+}
+.guide-link:hover {
+  background: var(--control-hover);
+}
+body.desktop-mode .mobile-topbar .theme-toggle {
+  position: static !important;
+}
+
+body.mobile-mode .topbar-actions--desktop {
+  display: none !important;
+}
+body.desktop-mode .chat-workspace > .mobile-topbar,
+body.desktop-mode .mobile-topbar,
+body.desktop-mode .app-container--desktop .mobile-topbar {
+  border-bottom: 1px solid var(--sidebar-border) !important;
+}
+
+.guide-link.guide-link--icon {
+  @include square(44px);
+  min-height: 44px;
+  padding: 0;
+  border-radius: 999px;
+}
+
+.guide-link.guide-link--icon .app-icon--guide,
+.round-icon .app-icon--guide {
+  width: 22px;
+  height: 22px;
+}

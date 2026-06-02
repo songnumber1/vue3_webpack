@@ -1,0 +1,112 @@
+/* User menu styles split from _menu-shell.scss during Step 5. Preserve selectors and declarations. */
+@use "../../00-abstracts/mixins" as *;
+
+.user-menu {
+  position: relative;
+}
+.user-menu-trigger {
+  min-height: 40px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 12px 5px 6px;
+  font-weight: 800;
+}
+.user-avatar--header {
+  @include square(28px);
+  flex: 0 0 28px;
+}
+.user-menu-name {
+  max-width: 92px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.user-menu-chevron {
+  color: var(--text-muted);
+}
+.user-menu-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 292px;
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--menu-bg);
+  box-shadow: var(--shadow-menu);
+  padding: 8px;
+  z-index: var(--z-popover);
+}
+.user-menu-item {
+  width: 100%;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+}
+.user-menu-item:hover {
+  background: var(--control-hover);
+}
+.user-menu-item strong,
+.user-menu-item small {
+  display: block;
+}
+.user-menu-item small {
+  margin-top: 4px;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+.user-menu-item--language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.user-menu-item--language > span {
+  min-width: 0;
+}
+.user-menu-language-options {
+  margin: 0 4px 6px 4px;
+  padding: 6px;
+  border-radius: 14px;
+  background: var(--surface-muted);
+  display: grid;
+  gap: 4px;
+}
+.user-menu-language-option {
+  width: 100%;
+  min-height: 38px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 10px;
+  font-weight: 800;
+}
+.user-menu-language-option:hover,
+.user-menu-language-option.active {
+  background: var(--control-bg);
+}
+.user-menu-trigger .user-menu-chevron-icon,
+.user-menu-trigger .app-icon--chevron {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  color: var(--text-muted);
+  transition: transform 160ms ease;
+}
+
+.user-menu.user-menu--open .user-menu-trigger .user-menu-chevron-icon,
+.user-menu.user-menu--open .user-menu-trigger .app-icon--chevron {
+  transform: rotate(180deg);
+}
