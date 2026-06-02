@@ -1,0 +1,93 @@
+/* Mobile drawer/sidebar sizing and spacing guard.
+   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .mobile-drawer {
+  display: block;
+  position: fixed;
+  inset: 0 auto 0 0;
+  background: var(--mobile-bg);
+  z-index: var(--z-drawer);
+  box-shadow: 30px 0 60px rgba(0, 0, 0, 0.42);
+  width: min(86vw, 360px);
+}
+
+body.mobile-mode .sidebar-content--mobile {
+  height: 100dvh;
+  overflow: hidden;
+  padding: calc(10px + env(safe-area-inset-top)) 0
+      calc(8px + env(safe-area-inset-bottom));
+  gap: 6px;
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-top {
+  flex: 0 0 auto;
+  padding: 0 16px 7px;
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-title {
+  font-size: var(--keyboard-font-size-2xl);
+  letter-spacing: -0.045em;
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-round {
+  width: 36px;
+  height: 36px;
+  font-size: var(--keyboard-font-size-2xl);
+}
+
+body.mobile-mode .sidebar-content--mobile .quick-menu {
+  flex: 0 0 auto;
+  max-height: 170px;
+}
+
+body.mobile-mode .sidebar-content--mobile .project-list {
+  flex: 0 0 auto;
+  max-height: 220px;
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-history {
+  flex: 1 1 auto;
+  min-height: 80px;
+  padding-bottom: 64px;
+}
+
+body.mobile-mode .sidebar-content--mobile .quick-item span,
+body.mobile-mode .sidebar-content--mobile .project-item span {
+  width: 23px;
+  font-size: var(--keyboard-font-size-xl);
+}
+
+body.mobile-mode .sidebar-content--mobile .section-label {
+  padding: 10px 17px 2px;
+  font-size: var(--keyboard-font-size-md);
+}
+
+body.mobile-mode .mobile-new-chat-fab {
+  right: 20px;
+  bottom: calc(64px + env(safe-area-inset-bottom));
+  height: 50px;
+  padding: 0 19px;
+  gap: 8px;
+  font-size: var(--keyboard-font-size-lg);
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-user {
+  position: static;
+  margin-top: 0;
+  flex: 0 0 auto;
+  padding: 8px 17px calc(7px + env(safe-area-inset-bottom));
+}
+
+body.mobile-mode .sidebar-content--mobile .user-avatar {
+  width: 30px;
+  height: 30px;
+  font-size: var(--keyboard-font-size-xs);
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-user strong {
+  font-size: var(--keyboard-font-size-base);
+}
+
+body.mobile-mode .sidebar-content--mobile .sidebar-user small {
+  font-size: var(--keyboard-font-size-2xs);
+}

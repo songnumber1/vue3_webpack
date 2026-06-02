@@ -1,0 +1,70 @@
+/* Mobile message bubble layout and typography guard.
+   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .message {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-left: 0;
+  margin-right: 0;
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+  margin-bottom: 16px;
+}
+
+body.mobile-mode .message--user {
+  grid-template-columns: minmax(0, 1fr) 30px;
+}
+
+body.mobile-mode .avatar {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
+  font-size: var(--keyboard-font-size-2xs);
+}
+
+body.mobile-mode .bubble {
+  grid-column: 2;
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid var(--message-border);
+  background: var(--bubble-assistant);
+  border-radius: 17px;
+  padding: 12px 13px;
+  box-shadow: var(--shadow-card);
+}
+
+body.mobile-mode .message--user .avatar {
+  grid-column: 2;
+  background: var(--primary);
+  color: #fff;
+}
+
+body.mobile-mode .message--user .bubble {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  max-width: 88%;
+  background: var(--bubble-user);
+  color: var(--bubble-user-text);
+  border-color: transparent;
+  border-radius: 17px;
+  padding: 9px 12px;
+  margin-left: 0;
+}
+
+body.mobile-mode .bubble-meta {
+  font-weight: 800;
+  display: block;
+  font-size: var(--keyboard-font-size-2xs);
+  margin-bottom: 5px;
+  color: var(--text-muted);
+}
+
+body.mobile-mode .bubble-content {
+  font-size: var(--keyboard-font-size-base);
+  line-height: 1.58;
+}

@@ -1,0 +1,88 @@
+/* Shared legacy message/prompt/icon baseline extracted from responsive keyboard patches.
+   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+@use "../../00-abstracts/mixins" as *;
+.message--user .avatar {
+  background: var(--primary);
+  color: #fff;
+}
+
+.message--user .bubble-meta {
+  color: var(--text-muted);
+}
+
+.prompt-box {
+  grid-template-columns: 38px minmax(0, 1fr) 44px;
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+  transition: transform var(--duration-fast),
+      color var(--duration-fast);
+}
+
+.model-trigger:hover .chevron {
+  color: var(--text);
+}
+
+.icon-lines,
+.icon-lines::before,
+.icon-lines::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  content: "";
+}
+
+.icon-lines {
+  position: relative;
+}
+
+.icon-lines::before {
+  position: absolute;
+  transform: translateY(-6px);
+}
+
+.icon-lines::after {
+  position: absolute;
+  transform: translateY(6px);
+}
+
+.theme-glyph {
+  @include square(20px);
+  border-radius: 999px;
+  border: 2px solid currentColor;
+  background: linear-gradient(90deg, currentColor 50%, transparent 50%);
+}
+
+.theme-glyph--dark {
+  background: linear-gradient(90deg, transparent 50%, currentColor 50%);
+}
+
+.bubble-content p {
+  margin: 0 0 10px;
+}
+
+.bubble-content p:last-child {
+  margin-bottom: 0;
+}
+
+.bubble-content ul,
+.bubble-content ol {
+  margin: 10px 0 10px 20px;
+  padding: 0;
+}
+
+.bubble-content li {
+  margin: 4px 0;
+}
+
+.bubble-content code:not(pre code) {
+  padding: 2px 5px;
+  border-radius: 6px;
+  background: var(--surface-muted);
+}

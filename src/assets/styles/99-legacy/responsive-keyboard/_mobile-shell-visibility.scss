@@ -1,0 +1,46 @@
+/* Mobile shell visibility, floating prompt and drawer backdrop guard.
+   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .sidebar-content--mobile .quick-menu,
+body.mobile-mode .sidebar-content--mobile .project-list,
+body.mobile-mode .sidebar-content--mobile .sidebar-history {
+  overflow-y: auto;
+  padding-right: 0;
+}
+
+body.mobile-mode .sidebar-content--mobile .quick-menu,
+body.mobile-mode .sidebar-content--mobile .project-list {
+  gap: 2px;
+}
+
+body.mobile-mode .desktop-sidebar {
+  display: none;
+}
+
+body.mobile-mode .desktop-empty-actions,
+body.mobile-mode .empty-center {
+  display: none;
+}
+
+body.mobile-mode .avatar,
+body.mobile-mode .bubble-meta {
+  display: none;
+}
+
+body.mobile-mode .prompt-wrap--floating,
+body.mobile-mode .mobile-bottom-prompt {
+  display: block;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: var(--z-content-raised);
+}
+
+body.mobile-mode .mobile-drawer-backdrop {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: var(--z-drawer-backdrop);
+}

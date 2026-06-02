@@ -1,0 +1,166 @@
+/* Mobile app width, icon and project home/recent card guard.
+   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+@use "../../00-abstracts/mixins" as *;
+html,
+body,
+#app,
+.app-container,
+body.mobile-mode .app-container,
+.chat-container-root {
+  width: 100%;
+}
+
+body.mobile-mode .app-container {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.icon-wrap {
+  @include inline-center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  color: var(--sidebar-icon);
+}
+
+.nav-icon {
+  width: 18px;
+  height: 18px;
+  display: block;
+  color: currentColor;
+}
+
+.project-item.new-project .icon-wrap .nav-icon {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.4;
+}
+
+.project-item.selected .icon-wrap,
+.project-item:hover .icon-wrap,
+.quick-item:hover .icon-wrap,
+.quick-item.active .icon-wrap {
+  color: var(--text);
+}
+
+.folder-icon.nav-icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  color: var(--text);
+  stroke-width: 2.15;
+}
+
+.mobile-project-home {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+body.mobile-mode .app-container,
+body.mobile-mode .chat-container-root,
+body.mobile-mode .chat-workspace,
+body.mobile-mode .empty-stage {
+  width: 100vw;
+  max-width: none;
+}
+
+body.mobile-mode .mobile-project-home {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+body.mobile-mode .project-title {
+  margin-top: 4px;
+  gap: 8px;
+  width: 100%;
+  max-width: none;
+}
+
+body.mobile-mode .mobile-recent-list {
+  margin-top: 22px;
+  gap: 15px;
+  width: 100%;
+  max-width: none;
+}
+
+body.mobile-mode .folder-icon.nav-icon {
+  @include square(20px);
+  flex-basis: 20px;
+}
+
+body.mobile-mode .icon-wrap {
+  @include square(20px);
+  flex-basis: 20px;
+}
+
+body.mobile-mode .nav-icon {
+  width: 16px;
+  height: 16px;
+}
+
+body.mobile-mode .sidebar-content--mobile .quick-item,
+body.mobile-mode .sidebar-content--mobile .project-item,
+body.mobile-mode .sidebar-content--mobile .sidebar-history-item {
+  border-radius: 0;
+  min-height: 39px;
+  padding: 8px 17px;
+  font-size: var(--keyboard-font-size-lg);
+  gap: 11px;
+  align-items: center;
+}
+
+.mobile-project-home,
+.mobile-recent-list,
+.mobile-recent-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.mobile-recent-list {
+  align-self: stretch;
+}
+
+.mobile-recent-card {
+  display: block;
+  box-sizing: border-box;
+}
+
+.mobile-recent-card strong,
+.mobile-recent-card span {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+body.mobile-mode .message--user .bubble-meta {
+  color: var(--text-muted);
+}
+
+body.mobile-mode .mobile-project-home,
+body.mobile-mode .mobile-recent-list,
+body.mobile-mode .mobile-recent-card {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+body.mobile-mode .mobile-recent-card {
+  width: 100%;
+  display: block;
+}
+
+body.mobile-mode .mobile-recent-card strong,
+body.mobile-mode .mobile-recent-card span {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
