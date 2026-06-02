@@ -52,84 +52,6 @@ body.mobile-mode .shared-readonly-box span {
   font-size: var(--font-size-fixed-12);
 }
 
-:root {
-  --chat-message-bottom-gap: 18px;
-  --chat-scroll-button-bottom: calc(92px + env(safe-area-inset-bottom));
-}
-
-.message-list,
-body.mobile-mode .message-list {
-  padding-bottom: var(--chat-message-bottom-gap) !important;
-  scroll-padding-bottom: var(--chat-message-bottom-gap);
-}
-
-.message-list-anchor {
-  height: 1px !important;
-  margin: 0 !important;
-}
-
-.scroll-bottom-button {
-  bottom: var(--chat-scroll-button-bottom) !important;
-  display: inline-grid;
-  place-items: center;
-  box-sizing: border-box;
-  line-height: 1;
-  padding: 0 0 2px;
-  overflow: visible;
-}
-
-body.mobile-mode {
-  --chat-message-bottom-gap: 14px;
-  --chat-scroll-button-bottom: calc(86px + env(safe-area-inset-bottom));
-}
-body.mobile-mode .chat-container-root--keyboard-open .message-list {
-  padding-bottom: 12px !important;
-  scroll-padding-bottom: 12px;
-}
-
-body.mobile-mode .scroll-bottom-button {
-  right: 16px !important;
-  @include square(44px);
-}
-
-:root {
-  --chat-composer-height: 96px;
-  --chat-scroll-button-gap: 12px;
-}
-
-.chat-composer-slot {
-  position: relative;
-  z-index: var(--z-content-raised);
-  min-width: 0;
-}
-
-.scroll-bottom-button {
-  position: absolute !important;
-  left: 50% !important;
-  right: auto !important;
-  bottom: calc(
-    var(--chat-composer-height, 96px) + var(--chat-scroll-button-gap, 12px)
-  ) !important;
-  z-index: var(--z-prompt) !important;
-  display: inline-grid !important;
-  place-items: center !important;
-  flex: 0 0 auto;
-  overflow: visible !important;
-  transform: translateX(-50%) translateZ(0) !important;
-}
-
-body.mobile-mode {
-  --chat-scroll-button-gap: 10px;
-}
-body.mobile-mode .scroll-bottom-button {
-  left: 50% !important;
-  right: auto !important;
-  bottom: calc(
-    var(--chat-composer-height, 84px) + var(--chat-scroll-button-gap, 10px)
-  ) !important;
-  z-index: var(--z-prompt) !important;
-  transform: translateX(-50%) translateZ(0) !important;
-}
 
 .topbar-actions--desktop {
   margin-left: auto;
@@ -1047,10 +969,6 @@ body.mobile-mode .playground-header {
 
 body.mobile-mode .playground-grid {
   grid-template-columns: 1fr;
-}
-
-html.is-prompt-menu-open .scroll-bottom-button {
-  display: none !important;
 }
 
 
