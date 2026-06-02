@@ -1319,3 +1319,74 @@ body.mobile-mode .bottom-sheet-body .bottom-sheet-option--choice {
 .bottom-sheet-back {
   flex: 0 0 auto;
 }
+
+/*
+ * G8.1 PC chat code-block color hotfix.
+ *
+ * PC 답변 코드 블록에서 rehype-highlight/github-dark 색상과 legacy markdown
+ * code 배경 규칙이 겹치면 실제 코드 영역이 밝게 보이면서 토큰 대비가 낮아질 수 있다.
+ * 모바일 코드 블록은 현재 정상이라 body.mobile-mode는 건드리지 않고, PC 채팅 답변의
+ * md-code-card 내부 pre/code/hljs 색상만 고정한다.
+ */
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card {
+  background: var(--code-bg) !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .md-code-pre,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card pre.md-code-pre {
+  background: var(--code-bg) !important;
+  color: var(--code-text) !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .md-code-pre code,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .md-code-pre code.hljs,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .md-code-pre .hljs {
+  background: transparent !important;
+  color: var(--code-text) !important;
+  text-shadow: none !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-keyword,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-selector-tag,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-literal,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-section,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-link {
+  color: #ff7b72 !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-title,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-title.function_,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-function .hljs-title,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-params {
+  color: #d2a8ff !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-string,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-attr,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-symbol,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-bullet,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-addition {
+  color: #a5d6ff !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-number,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-variable,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-template-variable,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-type {
+  color: #79c0ff !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-comment,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-quote,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-deletion {
+  color: #8b949e !important;
+}
+
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-built_in,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-class .hljs-title,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-property,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-tag,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-name,
+body:not(.mobile-mode) .message--assistant .markdown-body .md-code-card .hljs-attribute {
+  color: #ffa657 !important;
+}
