@@ -1,0 +1,39 @@
+/* Mobile message baseline extracted from 05-layout/_chat-core.scss.
+   Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .message-list {
+  padding: 14px 18px 118px;
+}
+
+body.mobile-mode .message {
+  display: block;
+  margin-bottom: 24px;
+}
+
+body.mobile-mode .avatar,
+body.mobile-mode .bubble-meta {
+  display: none;
+}
+
+body.mobile-mode .bubble {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  max-width: 100%;
+}
+
+body.mobile-mode .message--user .bubble {
+  background: var(--mobile-user-bubble);
+  color: var(--text);
+  border-radius: 22px;
+  padding: 12px 16px;
+  max-width: 88%;
+  margin-left: auto;
+}
+
+body.mobile-mode .bubble-content {
+  font-size: var(--font-size-fixed-17);
+  line-height: 1.66;
+}

@@ -1,0 +1,106 @@
+/* Message list, bubble, avatar and typing baseline extracted from 05-layout/_chat-core.scss.
+   Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
+@use "../../00-abstracts/mixins" as *;
+.message-list {
+  overflow: auto;
+  padding: 22px min(8vw, 130px) 28px;
+  scroll-behavior: smooth;
+}
+.message {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+  animation: slideUp 220ms ease-out;
+  contain: layout paint;
+}
+.message--user {
+  grid-template-columns: minmax(0, 1fr) 38px;
+}
+.message--user .avatar {
+  grid-column: 2;
+  background: var(--bubble-user);
+  color: var(--message-user-text);
+}
+.message--user .bubble {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  background: var(--message-user-bg);
+  color: var(--message-user-text);
+  max-width: min(720px, 92%);
+  border-color: transparent;
+}
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  @include grid-center;
+  background: var(--assistant-avatar-bg);
+  color: var(--assistant-avatar-text);
+  font-weight: 900;
+  font-size: var(--font-size-sm);
+}
+.bubble {
+  max-width: min(780px, 100%);
+  border: 1px solid var(--message-border);
+  background: var(--bubble-assistant);
+  border-radius: 20px;
+  padding: 15px 16px;
+  box-shadow: var(--shadow-card);
+}
+.bubble-meta {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  font-weight: 800;
+}
+.message--user .bubble-meta {
+  color: var(--message-user-meta);
+}
+.bubble-content {
+  line-height: 1.72;
+  font-size: var(--font-size-base);
+  word-break: break-word;
+}
+.bubble-content pre {
+  margin: 12px 0;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--code-bg);
+  color: var(--code-text);
+  overflow: auto;
+}
+.bubble-content code {
+  font-family: var(--font-family-mono);
+}
+.bubble-tools {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+}
+.bubble-tools button {
+  border: 1px solid var(--control-border);
+  color: var(--text-muted);
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+.typing-row {
+  display: flex;
+  gap: 6px;
+  padding-left: 52px;
+}
+.typing-row span {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--text-muted);
+  animation: blink 1s infinite ease-in-out;
+}
+.typing-row span:nth-child(2) {
+  animation-delay: 120ms;
+}
+.typing-row span:nth-child(3) {
+  animation-delay: 240ms;
+}

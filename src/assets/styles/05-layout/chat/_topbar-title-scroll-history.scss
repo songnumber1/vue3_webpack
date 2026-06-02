@@ -1,0 +1,168 @@
+/* Topbar title, scroll button and chat-history dialog rules extracted from 05-layout/_chat-core.scss.
+   Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
+@use "../../00-abstracts/mixins" as *;
+.topbar-left {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mobile-topbar--desktop-main .topbar-left {
+  flex: 1 1 auto;
+}
+
+.mobile-topbar--desktop-main .model-trigger--assistant {
+  display: none;
+}
+
+.conversation-title-wrap {
+  min-width: 0;
+  max-width: min(720px, 62vw);
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  box-shadow: var(--shadow-control);
+}
+
+.conversation-title-wrap strong {
+  flex: 0 0 auto;
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.conversation-title-wrap span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+  font-size: var(--font-size-md);
+}
+
+.empty-stage--main {
+  min-height: 0;
+}
+
+.scroll-bottom-button {
+  position: absolute;
+  right: 32px;
+  bottom: 116px;
+  z-index: var(--z-content-raised);
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--control-border);
+  background: var(--control-bg);
+  color: var(--text);
+  box-shadow: var(--shadow-control);
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.scroll-bottom-button:hover {
+  background: var(--control-hover);
+}
+
+.assistant-trigger {
+  max-width: 100%;
+}
+
+body.desktop-mode .settings-toggle {
+  display: none;
+}
+
+body.desktop-mode .chat-workspace > .mobile-topbar {
+  border-bottom: 0;
+}
+
+body.mobile-mode .chat-container-root {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+body.mobile-mode .topbar-left {
+  flex: 1 1 auto;
+  gap: 8px;
+}
+
+body.mobile-mode .model-trigger--assistant {
+  min-width: 0;
+  max-width: 190px;
+  height: 42px;
+  font-size: var(--font-size-xl);
+  padding: 0 14px;
+}
+
+body.mobile-mode .topbar-actions {
+  flex: 0 0 auto;
+  gap: 6px;
+}
+
+body.mobile-mode .topbar-actions .round-icon {
+  width: 42px;
+  height: 42px;
+}
+
+body.mobile-mode .scroll-bottom-button {
+  right: 18px;
+  bottom: 112px;
+}
+
+.chat-history-sheet-options {
+  display: grid;
+  gap: 8px;
+}
+
+.chat-history-action-option {
+  justify-content: flex-start;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog
+  .responsive-overlay-backdrop {
+  z-index: 0;
+}
+
+.responsive-overlay.responsive-overlay--mobile-dialog .responsive-panel {
+  z-index: 1;
+}
+
+.chat-history-dialog {
+  display: grid;
+  gap: 18px;
+}
+
+.chat-history-dialog__field {
+  display: grid;
+  gap: 8px;
+  font-size: var(--font-size-md);
+}
+
+.chat-history-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chat-history-dialog__input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--border-color, rgba(127, 127, 127, 0.28));
+  border-radius: var(--dialog-input-radius);
+  background: var(--input-bg, transparent);
+  color: inherit;
+  font: inherit;
+}
+
+.chat-history-dialog__input:focus {
+  border-color: var(--accent-color, #2563eb);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}

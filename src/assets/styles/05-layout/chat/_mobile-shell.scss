@@ -1,0 +1,133 @@
+/* Mobile chat shell and empty-stage baseline extracted from 05-layout/_chat-core.scss.
+   Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .chat-container-root {
+  grid-template-columns: 1fr;
+  background: var(--mobile-bg);
+}
+
+body.mobile-mode .desktop-sidebar {
+  display: none;
+}
+
+body.mobile-mode .chat-workspace {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background: var(--mobile-bg);
+}
+
+body.mobile-mode .mobile-topbar {
+  height: 76px;
+  padding: calc(12px + env(safe-area-inset-top)) 28px 10px;
+  background: var(--mobile-bg);
+}
+
+body.mobile-mode .round-icon {
+  width: 58px;
+  height: 58px;
+  font-size: var(--font-size-fixed-29);
+  background: var(--mobile-pill-bg);
+  border-color: var(--mobile-pill-border);
+  box-shadow: var(--shadow-control);
+}
+
+body.mobile-mode .model-trigger {
+  height: 58px;
+  min-width: 160px;
+  background: var(--mobile-pill-bg);
+  border-color: var(--mobile-pill-border);
+  font-size: var(--font-size-fixed-26);
+}
+
+body.mobile-mode .mobile-actions {
+  gap: 10px;
+}
+
+body.mobile-mode .model-menu {
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(310px, calc(100vw - 42px));
+  border-radius: 24px;
+}
+
+body.mobile-mode .desktop-empty-actions,
+body.mobile-mode .empty-center {
+  display: none;
+}
+
+body.mobile-mode .empty-stage {
+  display: block;
+  overflow: auto;
+  padding: 22px 28px 120px;
+}
+
+body.mobile-mode .mobile-project-home {
+  display: block;
+}
+
+body.mobile-mode .project-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+body.mobile-mode .project-title h1 {
+  margin: 0;
+  font-size: var(--font-size-fixed-38);
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+
+body.mobile-mode .folder-icon {
+  font-size: var(--font-size-fixed-36);
+  color: var(--text);
+}
+
+body.mobile-mode .source-chip {
+  margin-top: 22px;
+  height: 58px;
+  border-radius: 999px;
+  border: 1px solid var(--control-border);
+  background: transparent;
+  color: var(--text);
+  padding: 0 24px;
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+}
+
+body.mobile-mode .mobile-recent-list {
+  margin-top: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+body.mobile-mode .mobile-recent-card {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  padding: 0;
+}
+
+body.mobile-mode .mobile-recent-card strong {
+  display: block;
+  font-size: var(--font-size-fixed-27);
+  font-weight: 550;
+  letter-spacing: -0.04em;
+  margin-bottom: 7px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.mobile-mode .mobile-recent-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: var(--font-size-2xl);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

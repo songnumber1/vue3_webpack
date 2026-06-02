@@ -1,0 +1,113 @@
+/* Topbar/collapsed sidebar chat shell controls extracted from 05-layout/_chat-core.scss.
+   Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
+@use "../../00-abstracts/mixins" as *;
+body.mobile-mode .topbar-actions {
+  gap: 6px;
+}
+
+body.mobile-mode .topbar-actions .round-icon {
+  width: 46px;
+  height: 46px;
+  font-size: var(--font-size-fixed-20);
+}
+
+body.mobile-mode .document-toggle svg,
+body.mobile-mode .test-toggle svg {
+  width: 19px;
+  height: 19px;
+}
+
+body.mobile-mode .topbar-actions {
+  gap: 4px;
+}
+
+body.mobile-mode .topbar-actions .round-icon {
+  @include square(40px);
+}
+
+.collapsed-icon-button,
+.collapsed-user-button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  @include inline-center;
+  transition:
+    background var(--duration-fast),
+    color var(--duration-fast),
+    transform var(--duration-fast);
+}
+
+.collapsed-icon-button:hover,
+.collapsed-icon-button--active,
+.collapsed-user-button:hover {
+  background: var(--control-hover);
+}
+
+.collapsed-user-button {
+  margin-bottom: 2px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: #fff;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.collapsed-recent-popover h2 {
+  margin: 0 0 12px;
+  color: var(--text);
+  font-size: var(--font-size-base);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.collapsed-recent-item {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 9px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-size: var(--font-size-md);
+  line-height: 1.35;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collapsed-recent-item:hover {
+  color: var(--primary);
+}
+
+.collapsed-popover-fade-enter-active,
+.collapsed-popover-fade-leave-active {
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+}
+
+.collapsed-popover-fade-enter-from,
+.collapsed-popover-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-6px);
+}
+
+.mobile-topbar .topbar-actions {
+  margin-left: auto;
+  position: relative;
+  z-index: 2;
+}
+
+.mobile-topbar .theme-toggle,
+.mobile-topbar .document-toggle,
+.mobile-topbar .test-toggle {
+  position: static !important;
+  inset: auto !important;
+}

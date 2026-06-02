@@ -84,5 +84,5 @@
 /* 7. E-2.5 final mobile cascade guard: keep last so legacy mobile overrides cannot win. */
 @use "./03-runtime/mobile-cascade-hotfix" as *;
 
-/* 8. E-3.1 PC prompt consistency guard: main/chat prompt border alignment only. */
-@use "./03-runtime/desktop-prompt-border-hotfix" as *;
+/* 8. PC prompt consistency guard: main/chat prompt border alignment only. */
+@use "./06-components/prompt/desktop-prompt-border" as *;
