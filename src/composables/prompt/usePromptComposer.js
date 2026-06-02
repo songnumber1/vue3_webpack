@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, onMounted, toRef, watch} from "vue";
+import {computed, nextTick, onMounted, ref, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
@@ -61,6 +61,8 @@ export function usePromptComposer(props, emit) {
 
   // ── [텍스트 입력 + 리사이즈] ────────────────────────────────────────────
   // 사용자가 한 줄 혹은 여러 줄의 텍스트를 기재할 때 textarea 요소의 렌더링 물리 상태를 핸들링합니다.
+  const isPromptExpanded = ref(false);
+
   const {
     text, // 사용자가 작성 중인 순수 텍스트 문자열 반응형 참조 객체 (Ref)
     textareaComponentRef, // 가변 textarea DOM 컴포넌트 인스턴스 참조용 Ref
@@ -70,8 +72,9 @@ export function usePromptComposer(props, emit) {
     handlePaste: getRawPastedFiles, // 붙여넣기 이벤트 시 텍스트 속에 섞인 원본 파일 오브젝트만 필터 추출하는 핸들러
     getLastHeight, // 이전 시점에 기록되었던 텍스트 창의 최종 높이 픽셀값을 반환하는 유틸 함수
     focusTextarea, // 텍스트 입력창으로 포커스 커서를 강제 이동(주입)시키는 제어 함수
+    restoreTextareaAutoGrow, // 최대화 해제 후 textarea inline style을 기존 auto-grow 상태로 복원하는 함수
     clearText, // 전송 직후 반응형 값과 실제 textarea DOM 값을 함께 비우는 함수
-  } = usePromptText({isMobileSheet, emit});
+  } = usePromptText({isMobileSheet, emit, isExpanded: isPromptExpanded});
 
   // ── [첨부 파일] ─────────────────────────────────────────────────────────
   // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
@@ -309,6 +312,21 @@ export function usePromptComposer(props, emit) {
     if (files && files.length) addFiles(files);
   }
 
+  function togglePromptExpanded() {
+    isPromptExpanded.value = !isPromptExpanded.value;
+    closeMenus();
+
+    nextTick(() => {
+      if (isPromptExpanded.value) {
+        resize();
+      } else {
+        restoreTextareaAutoGrow();
+      }
+      emit("height-change", getLastHeight());
+    });
+  }
+
+
   // ── [생명주기 마운트] ────────────────────────────────────────────────────
   // 실제 DOM 트리가 기기 브라우저에 최종 활성화 안착한 시점에 최초 동기화 세팅을 구동합니다.
   // orientationchange 및 window.visualViewport 이벤트 추적은 usePromptMenu의 syncViewportMode 리스너에서 전담합니다.
@@ -371,6 +389,8 @@ export function usePromptComposer(props, emit) {
     toolMenuOpen,
     attachMenuOpen,
     isMobileSheet,
+    isPromptExpanded,
+    togglePromptExpanded,
     // submit 최종 전송 제어 파트
     canSubmit,
     actionDisabled,

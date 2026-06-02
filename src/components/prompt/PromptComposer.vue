@@ -1,6 +1,16 @@
 <template>
-  <footer class="prompt-wrap tw-w-full" :class="{'prompt-wrap--floating': floating}">
-    <form class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt" @submit.prevent="submit">
+  <footer
+    class="prompt-wrap tw-w-full"
+    :class="{
+      'prompt-wrap--floating': floating,
+      'prompt-wrap--expanded': isPromptExpanded,
+    }"
+  >
+    <form
+      class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt"
+      :class="{'prompt-box--expanded': isPromptExpanded}"
+      @submit.prevent="submit"
+    >
       <PromptAttachmentPreviewList
         :attachments="attachments"
         @preview="previewImage"
@@ -18,6 +28,36 @@
         @open-mobile-group="openTemplateOptionSheet"
         @close-mobile-group="closeTemplateOptionSheet"
       />
+
+      <button
+        class="prompt-expand-toggle"
+        type="button"
+        :title="promptExpandToggleLabel"
+        :aria-label="promptExpandToggleLabel"
+        :aria-pressed="isPromptExpanded"
+        @click="togglePromptExpanded"
+      >
+        <svg v-if="!isPromptExpanded" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <svg v-else viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
 
       <PromptTextarea
         ref="textareaComponentRef"
@@ -82,7 +122,7 @@
  * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
-import {computed, inject, provide, reactive} from "vue";
+import {computed, inject, nextTick, onBeforeUnmount, provide, reactive, watch} from "vue";
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
@@ -168,6 +208,8 @@ const {
   fileAccept,
   captureMode,
   isMobileSheet,
+  isPromptExpanded,
+  togglePromptExpanded,
   isMicEnabled,
   isVoiceListening,
   hasVoiceStopped,
@@ -210,6 +252,29 @@ const floating = computed(() => props.floating);
 const showHelp = computed(() => props.showHelp);
 const placeholder = computed(() => props.placeholder);
 const modelValue = computed(() => props.modelValue);
+const promptExpandToggleLabel = computed(() =>
+  isPromptExpanded.value ? t("chat.inputCollapse") : t("chat.inputExpand")
+);
+
+watch(
+  isPromptExpanded,
+  async (expanded) => {
+    if (typeof document !== "undefined") {
+      document.body.classList.toggle("prompt-input-expanded", expanded);
+    }
+
+    await nextTick();
+    workspaceActions.handlePromptResize();
+  },
+  {flush: "post"}
+);
+
+onBeforeUnmount(() => {
+  if (typeof document !== "undefined") {
+    document.body.classList.remove("prompt-input-expanded");
+  }
+});
+
 const resolvedToolbarComponent = computed(() =>
   isMobileSheet.value ? PromptToolbarMobile : PromptToolbarDesktop
 );
@@ -220,6 +285,7 @@ provide(PROMPT_TEXTAREA_STATE_KEY, {
   disabled: computed(() => Boolean(props.disabled)),
   generating: computed(() => Boolean(props.generating)),
   canSubmit,
+  expanded: computed(() => Boolean(isPromptExpanded.value)),
 });
 
 provide(

@@ -1,0 +1,197 @@
+/*
+ * G47 mobile-only expanded prompt height fix.
+ *
+ * Keep this file imported after the final mobile-cascade guard. G46's expanded
+ * prompt rules live in _prompt-composer.scss, but the legacy mobile cascade is
+ * intentionally imported later and re-applies the normal bottom-docked prompt
+ * geometry. These selectors only run while the prompt is expanded and
+ * body.mobile-mode is active, so the PC expanded layout and collapsed mobile
+ * prompt remain unchanged.
+ */
+
+body.mobile-mode.prompt-input-expanded {
+  --prompt-expanded-mobile-shell-top: var(--mobile-header-height, 44px);
+  --prompt-expanded-mobile-shell-gap: 8px;
+  --prompt-expanded-mobile-shell-inline: 12px;
+  --prompt-expanded-mobile-shell-bottom: max(
+    12px,
+    env(safe-area-inset-bottom, 0px)
+  );
+}
+
+/* Main screen: the expanded composer should replace the guide/suggestion area.
+   Hide, rather than reflow, the empty-state content so only the overlay prompt
+   owns touch and visual space while expanded. */
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .main-empty-state__center {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Main screen composer dock owns the mobile visual viewport below the app
+   header. Height is based on --app-height so Android Chrome/WebView keyboard
+   resize immediately reduces the editable area. */
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .main-empty-state__composer-dock:has(.prompt-wrap--expanded) {
+  position: fixed !important;
+  top: var(--prompt-expanded-mobile-shell-top) !important;
+  right: 0 !important;
+  bottom: auto !important;
+  left: 0 !important;
+  z-index: var(--z-prompt-floating, var(--z-prompt, 90)) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  width: 100dvw !important;
+  max-width: 100dvw !important;
+  height: max(
+    240px,
+    calc(var(--app-height, 100dvh) - var(--prompt-expanded-mobile-shell-top))
+  ) !important;
+  max-height: max(
+    240px,
+    calc(var(--app-height, 100dvh) - var(--prompt-expanded-mobile-shell-top))
+  ) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--prompt-expanded-mobile-shell-gap)
+    var(--prompt-expanded-mobile-shell-inline)
+    var(--prompt-expanded-mobile-shell-bottom) !important;
+  overflow: hidden !important;
+  background: var(--mobile-bg, var(--chat-bg)) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+
+/* Chat screen: cover the gap area with background and start the prompt after a
+   small header gap. This matches the PC expanded chat behavior: a visual gap is
+   kept, but the old conversation never shows behind it. */
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-chat
+  .chat-composer-slot:has(.prompt-wrap--expanded),
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-shared
+  .chat-composer-slot:has(.prompt-wrap--expanded) {
+  position: fixed !important;
+  top: var(--prompt-expanded-mobile-shell-top) !important;
+  right: 0 !important;
+  bottom: auto !important;
+  left: 0 !important;
+  z-index: var(--z-prompt-floating, var(--z-prompt, 90)) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  width: 100dvw !important;
+  max-width: 100dvw !important;
+  height: max(
+    240px,
+    calc(var(--app-height, 100dvh) - var(--prompt-expanded-mobile-shell-top))
+  ) !important;
+  max-height: max(
+    240px,
+    calc(var(--app-height, 100dvh) - var(--prompt-expanded-mobile-shell-top))
+  ) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: var(--prompt-expanded-mobile-shell-gap)
+    var(--prompt-expanded-mobile-shell-inline)
+    var(--prompt-expanded-mobile-shell-bottom) !important;
+  overflow: hidden !important;
+  background: var(--mobile-bg, var(--chat-bg)) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  touch-action: none !important;
+}
+
+/* While expanded on mobile, the prompt wrapper becomes a normal flex child of
+   the viewport-sized dock/slot. This intentionally beats the normal fixed
+   bottom composer and prevents the "slightly larger only" state from returning. */
+body.mobile-mode.prompt-input-expanded
+  .main-empty-state__composer-dock:has(.prompt-wrap--expanded)
+  > .prompt-wrap--expanded,
+body.mobile-mode.prompt-input-expanded
+  .chat-composer-slot:has(.prompt-wrap--expanded)
+  > .prompt-wrap--expanded,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .main-empty-state__composer-dock
+  > .mobile-main-fixed-prompt.prompt-wrap--expanded,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  > .mobile-chat-prompt.prompt-wrap--expanded,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  > .mobile-chat-prompt.prompt-wrap--expanded {
+  position: static !important;
+  inset: auto !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+
+body.mobile-mode.prompt-input-expanded
+  .prompt-wrap--expanded
+  .prompt-box--expanded,
+body.mobile-mode.prompt-input-expanded.actual-android-runtime
+  .prompt-wrap--expanded
+  .prompt-box--expanded {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+}
+
+body.mobile-mode.prompt-input-expanded
+  .prompt-box--expanded
+  > .prompt-textarea--expanded,
+body.mobile-mode.prompt-input-expanded.actual-android-runtime
+  .prompt-box--expanded
+  > .prompt-textarea--expanded {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y !important;
+}
+
+body.mobile-mode.prompt-input-expanded
+  .prompt-box--expanded
+  .prompt-action-row {
+  flex: 0 0 auto !important;
+}

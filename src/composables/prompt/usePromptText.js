@@ -19,7 +19,7 @@ import {PROMPT_TEXTAREA_HEIGHT} from "@/constants/promptComposer";
  * @param {Function} context.emit - 높이 변동, 포커스 등 실시간 DOM 이벤트를 부모 입력 컴포넌트 밖으로 송출하기 위한 에미터
  * @returns {Object} 템플릿 마크업 텍스트박스 인풋 폼에 바인딩할 반응형 변수, 엘리먼트 Refs 및 이벤트 가드 핸들러 팩
  */
-export function usePromptText({emit}) {
+export function usePromptText({emit, isExpanded}) {
   // 사용자가 타이핑 중인 인풋 텍스트 본문 문자열을 저장하는 메인 데이터 모델 (v-model="text")
   const text = ref("");
 
@@ -52,6 +52,19 @@ export function usePromptText({emit}) {
   function resize() {
     const el = textareaRef.value;
     if (!el) return; // 사용자가 대화창 화면을 급격히 이탈하여 대상 돔 엘리먼트가 언마운트된 경우 가드 탈출
+
+    if (isExpanded?.value) {
+      el.style.height = "100%";
+      el.style.maxHeight = "none";
+      el.style.overflowY = "auto";
+
+      const expandedHeight = el.offsetHeight || el.clientHeight || 0;
+      if (expandedHeight && expandedHeight !== lastHeight) {
+        lastHeight = expandedHeight;
+        emit("height-change", expandedHeight);
+      }
+      return;
+    }
 
     // ⚡ [오토-그로우 스크롤 스왑 메커니즘의 정석]
     // 엘리먼트의 height 값을 일시적으로 'auto'로 초기화 축소시켜야만,
@@ -139,6 +152,17 @@ export function usePromptText({emit}) {
   /**
    * 팝업 창을 닫거나 파일 첨부를 마친 뒤, 사용자 타이핑 연속성 유지를 위해 인풋 커서(Focus)를 강제로 복원 점등시킵니다.
    */
+  function restoreTextareaAutoGrow() {
+    const el = textareaRef.value;
+    if (!el) return;
+
+    el.style.height = "auto";
+    el.style.maxHeight = "";
+    el.style.overflowY = "";
+    lastHeight = 0;
+    nextTick(resize);
+  }
+
   function focusTextarea() {
     textareaRef.value?.focus();
   }
@@ -168,6 +192,7 @@ export function usePromptText({emit}) {
     handlePaste,
     getLastHeight,
     focusTextarea,
+    restoreTextareaAutoGrow,
     clearText,
   };
 }

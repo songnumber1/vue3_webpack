@@ -2,6 +2,7 @@
   <textarea
     ref="textareaRef"
     class="prompt-textarea tw-block tw-w-full tw-min-w-0 tw-min-h-[38px] tw-flex-none tw-resize-none tw-border-0 tw-bg-transparent tw-text-app-text tw-outline-none placeholder:tw-text-app-placeholder"
+    :class="{'prompt-textarea--expanded': isExpanded}"
     :value="textareaValue"
     :disabled="isDisabled"
     :placeholder="resolvedPlaceholder"
@@ -44,6 +45,7 @@ const resolvedPlaceholder = computed(
 const isDisabled = computed(() => Boolean(textareaState?.disabled?.value));
 const isGenerating = computed(() => Boolean(textareaState?.generating?.value));
 const canSubmit = computed(() => Boolean(textareaState?.canSubmit?.value));
+const isExpanded = computed(() => Boolean(textareaState?.expanded?.value));
 
 const emit = defineEmits(["focus", "blur", "input", "submit", "paste"]);
 /**
