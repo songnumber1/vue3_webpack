@@ -158,30 +158,31 @@ body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-ca
   color: #ffa657 !important;
 }
 
-/* G33: PC-only code interpreter action belongs to the markdown code block toolbar. */
+/* PC-only code interpreter action belongs to the markdown code block toolbar. */
 .md-code-action--interpreter {
   display: none;
 }
+
 body.desktop-mode:not(.mobile-mode):not(.actual-android-runtime) .md-code-action--interpreter {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
+  min-width: 34px;
+  height: 30px;
+  padding: 0;
 }
+
 body.mobile-mode .md-code-action--interpreter,
 body.actual-android-runtime .md-code-action--interpreter {
   display: none !important;
 }
+
 .md-code-action-icon--interpreter::before {
   content: "</>";
   font-size: var(--font-size-fixed-11);
   font-weight: 900;
   letter-spacing: -0.08em;
-}
-body.desktop-mode:not(.mobile-mode):not(.actual-android-runtime) .md-code-action--interpreter {
-  width: 34px;
-  min-width: 34px;
-  height: 30px;
-  padding: 0;
 }
 .md-code-action-label {
   position: absolute;

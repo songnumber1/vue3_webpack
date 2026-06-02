@@ -253,8 +253,6 @@ function buildCodeInterpreterPreviewHtml() {
   </article>`;
 }
 
-const previewMarkdown = computed(() => `${selectedInterpreterLanguage.value}:${selectedInterpreterCode.value}:${locale.value}`);
-
 function openCodeInterpreterPanel(event) {
   syncCodeInterpreterPanelWithViewport();
   if (!canUseDesktopCodeInterpreter.value) return;
@@ -492,7 +490,12 @@ watch(
 );
 
 watch(
-  () => [previewMarkdown.value, showCodeInterpreterPanel.value],
+  () => [
+    selectedInterpreterLanguage.value,
+    selectedInterpreterCode.value,
+    locale.value,
+    showCodeInterpreterPanel.value,
+  ],
   async () => {
     syncCodeInterpreterBodyClass();
     if (!showCodeInterpreterPanel.value) return;
@@ -531,101 +534,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-/* Component-local guards only. The split panel layout is owned by
-   06-components/code-interpreter/_panel.scss so mobile chat keeps the
-   pre-existing normal MessageList/PromptComposer DOM path. */
-
-.code-interpreter-preview-panel {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  border: 1px solid var(--control-border);
-  border-radius: 18px;
-  background: var(--control-bg);
-  box-shadow: var(--shadow-panel, var(--shadow-prompt));
-  overflow: hidden;
-}
-
-.code-interpreter-preview-panel__header {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border-bottom: 1px solid var(--control-border);
-  padding: 14px 16px;
-}
-
-.code-interpreter-preview-panel__header strong,
-.code-interpreter-preview-panel__eyebrow {
-  display: block;
-  min-width: 0;
-}
-
-.code-interpreter-preview-panel__header strong {
-  margin-top: 2px;
-  color: var(--text);
-  font-size: var(--font-size-base);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-}
-
-.code-interpreter-preview-panel__eyebrow {
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
-  font-weight: 800;
-}
-
-.code-interpreter-preview-panel__close {
-  width: 30px;
-  height: 30px;
-  flex: 0 0 auto;
-  border: 1px solid var(--control-border);
-  border-radius: 999px;
-  background: var(--chat-bg);
-  color: var(--text-muted);
-  font-size: var(--font-size-fixed-18);
-  font-weight: 800;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.code-interpreter-preview-panel__close:hover,
-.code-interpreter-preview-panel__close:focus-visible {
-  background: var(--control-hover);
-  color: var(--text);
-}
-
-.code-interpreter-preview-panel__body {
-  min-width: 0;
-  min-height: 0;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding: 18px;
-}
-
-.code-interpreter-markdown-body {
-  overflow-wrap: break-word;
-  word-break: normal;
-  line-height: 1.68;
-}
-
-.code-interpreter-markdown-body :deep(p),
-.code-interpreter-markdown-body :deep(li),
-.code-interpreter-markdown-body :deep(blockquote) {
-  word-break: keep-all;
-  overflow-wrap: break-word;
-}
-
-.code-interpreter-preview-panel__body :deep(.md-code-actions),
-.code-interpreter-preview-panel__body :deep(.md-mermaid-actions),
-.code-interpreter-preview-panel__body :deep(.md-code-toolbar),
-.code-interpreter-preview-panel__body :deep(.md-mermaid-toolbar) {
-  display: none !important;
-}
-
 /* 기존 대화방 composer 모바일 보정은 대화방 workspace가 소유합니다. */
 :global(body.mobile-mode) .mobile-chat-prompt {
   width: 100%;

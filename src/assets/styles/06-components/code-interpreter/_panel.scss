@@ -129,16 +129,105 @@ body.actual-android-runtime.code-interpreter-panel-open {
   overflow-x: hidden !important;
 }
 
+.code-interpreter-preview-panel {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--control-bg);
+  box-shadow: var(--shadow-panel, var(--shadow-prompt));
+  overflow: hidden;
+}
+
+.code-interpreter-preview-panel__header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--control-border);
+  padding: 14px 16px;
+}
+
+.code-interpreter-preview-panel__header strong,
+.code-interpreter-preview-panel__eyebrow {
+  display: block;
+  min-width: 0;
+}
+
+.code-interpreter-preview-panel__header strong {
+  margin-top: 2px;
+  color: var(--text);
+  font-size: var(--font-size-base);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.code-interpreter-preview-panel__eyebrow {
+  color: var(--text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+}
+
+.code-interpreter-preview-panel__close {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--chat-bg);
+  color: var(--text-muted);
+  font-size: var(--font-size-fixed-18);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.code-interpreter-preview-panel__close:hover,
+.code-interpreter-preview-panel__close:focus-visible {
+  background: var(--control-hover);
+  color: var(--text);
+}
+
 .code-interpreter-preview-panel,
 .code-interpreter-preview-panel * {
   box-sizing: border-box;
 }
 
 .code-interpreter-preview-panel__body {
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-wrap: break-word;
+  word-break: keep-all;
   white-space: normal;
+  padding: 18px;
+}
+
+.code-interpreter-markdown-body {
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.68;
+}
+
+.code-interpreter-markdown-body p,
+.code-interpreter-markdown-body li,
+.code-interpreter-markdown-body blockquote {
   word-break: keep-all;
   overflow-wrap: break-word;
+}
+
+.code-interpreter-preview-panel__body .md-code-actions,
+.code-interpreter-preview-panel__body .md-mermaid-actions,
+.code-interpreter-preview-panel__body .md-code-toolbar,
+.code-interpreter-preview-panel__body .md-mermaid-toolbar {
+  display: none !important;
 }
 
 .code-interpreter-preview-panel__body .os-viewport {
