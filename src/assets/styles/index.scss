@@ -45,6 +45,9 @@
 /* 4. Shared components: dialog/system popup, bottom sheet, markdown, prompt, message and states. */
 @use "./06-components/markdown/markdown" as *;
 @use "./06-components/bottom-sheet/bottom-sheet" as *;
+@use "./06-components/overlay/responsive-overlay" as *;
+@use "./07-pages/guide-shell" as *;
+@use "./07-pages/playground-shell" as *;
 @use "./06-components/menu/menu-shell" as *;
 @use "./06-components/chat/message-scroll" as *;
 @use "./06-components/markdown/table" as *;

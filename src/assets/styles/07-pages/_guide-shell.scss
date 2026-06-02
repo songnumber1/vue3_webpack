@@ -1,0 +1,136 @@
+/* Split from 06-components/bottom-sheet/_bottom-sheet.scss during Step 4.
+   Preserve selectors, declarations, and cascade position. */
+
+.notice-view,
+.personalization-view {
+  display: grid;
+  gap: 14px;
+}
+.notice-card,
+.personal-card,
+.guide-card {
+  border: 1px solid var(--control-border);
+  border-radius: 20px;
+  background: var(--surface);
+  padding: 18px;
+  box-shadow: var(--shadow-card);
+}
+.notice-card span,
+.personal-eyebrow,
+.guide-card span {
+  color: var(--primary-strong);
+  font-size: var(--font-size-fixed-12);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.notice-card h3,
+.personal-card h3,
+.guide-card h2 {
+  margin: 8px 0 8px;
+  font-size: var(--font-size-fixed-18);
+  letter-spacing: -0.035em;
+}
+.notice-card p,
+.personal-card p,
+.guide-card p {
+  margin: 0;
+  color: var(--text-muted);
+  line-height: 1.58;
+}
+.personalization-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.switch-row input {
+  display: none;
+}
+.switch-row span {
+  width: 50px;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  position: relative;
+  display: block;
+}
+.switch-row span::after {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: white;
+  left: 3px;
+  top: 3px;
+  transition: transform 160ms ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+.switch-row input:checked + span {
+  background: var(--primary);
+}
+.switch-row input:checked + span::after {
+  transform: translateX(20px);
+}
+.style-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.style-chip,
+.secondary-action {
+  min-height: 38px;
+  border: 1px solid var(--control-border);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  padding: 0 14px;
+  font-weight: 800;
+}
+.style-chip.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.guide-page {
+  min-height: 100%;
+  overflow: auto;
+  padding: 32px;
+  background: var(--chat-bg);
+  color: var(--text);
+}
+.guide-hero {
+  width: min(960px, 100%);
+  margin: 0 auto 24px;
+}
+.guide-back {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 800;
+}
+.guide-hero h1 {
+  margin: 22px 0 8px;
+  font-size: clamp(34px, 6vw, 64px);
+  letter-spacing: -0.07em;
+}
+.guide-hero p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--font-size-fixed-18);
+}
+.guide-grid {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+body.mobile-mode .guide-page {
+  padding: calc(20px + env(safe-area-inset-top)) 18px 28px;
+}
+
+body.mobile-mode .guide-grid {
+  grid-template-columns: 1fr;
+}
