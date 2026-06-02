@@ -113,3 +113,13 @@ body.mobile-mode .mcp-created-filter {
   padding: 10px 12px;
   font-size: 14px;
 }
+
+/* G26 MCP desktop spacing hotfix: keep the "My MCP" created filter aligned with
+   the Connector category chip row without changing mobile/tablet runtime styles. */
+body.desktop-mode .chat-container-root--mode-studio .mcp-created-filter,
+body.desktop-mode .studio-workspace .mcp-created-filter {
+  min-height: 32px;
+  box-sizing: border-box;
+  margin: -4px 0 12px;
+  padding: 0 13px;
+}
