@@ -552,7 +552,49 @@ export function useMessageListScroll({props, emit}) {
   function hasRenderedMarkdownElement(element, selector) {
     const target = element?.querySelector?.(selector);
     if (!target) return false;
+
+    // AssistantMessage는 최초 mount 시점에 빈 placeholder DOM이 먼저 존재할 수 있습니다.
+    // Android 최초 진입에서는 이 placeholder를 실제 Markdown 완료로 오판하면
+    // Mermaid target이 생성되기 전에 history render가 끝나므로, 명시적인 완료 플래그를 우선 확인합니다.
+    if (target.getAttribute("data-markdown-rendered") !== "true") {
+      return false;
+    }
+
     return target.childNodes.length > 0 || target.textContent.trim().length > 0;
+  }
+
+  function countMermaidBlocksInText(value = "") {
+    const matches = String(value || "").match(/```\s*mermaid/gi);
+    return matches ? matches.length : 0;
+  }
+
+  function getExpectedHistoryRenderMermaidCount() {
+    return (props.messages || []).reduce((count, message) => {
+      if (
+        !message ||
+        message.role !== "assistant" ||
+        isAssistantErrorMessage(message)
+      ) {
+        return count;
+      }
+
+      return (
+        count +
+        countMermaidBlocksInText(message.content) +
+        countMermaidBlocksInText(message.reasoningContent)
+      );
+    }, 0);
+  }
+
+  function isHistoryRenderMermaidDomReady(root = scrollRef.value) {
+    const expectedCount = getExpectedHistoryRenderMermaidCount();
+    if (expectedCount <= 0) return true;
+    if (!root?.isConnected) return false;
+
+    const mermaidNodes = root.querySelectorAll(
+      ".md-mermaid[data-mermaid-pending], .md-mermaid[data-processed], .md-mermaid[data-mermaid-error]"
+    );
+    return mermaidNodes.length >= expectedCount;
   }
 
   function isAssistantErrorMessage(message) {
@@ -601,9 +643,26 @@ export function useMessageListScroll({props, emit}) {
     return true;
   }
 
+  function isHistoryRenderRootLayoutReady(root) {
+    if (!root?.isConnected) return false;
+
+    const scrollElement = getScrollElement();
+    const layoutTarget = scrollElement || root;
+    const rect = layoutTarget.getBoundingClientRect?.();
+
+    return Boolean(
+      rect &&
+      rect.width > 0 &&
+      rect.height > 0 &&
+      layoutTarget.clientWidth > 0 &&
+      layoutTarget.clientHeight > 0
+    );
+  }
+
   function isHistoryRenderDomReady(domIndex = createHistoryRenderDomIndex()) {
     const {root, messages, messageElements} = domIndex;
     if (!root?.isConnected) return false;
+    if (!isHistoryRenderRootLayoutReady(root)) return false;
     if (!props.historyMessagesReady) return false;
     if (messageElements.length < messages.length) return false;
 
@@ -652,7 +711,8 @@ export function useMessageListScroll({props, emit}) {
       const domIndex = createHistoryRenderDomIndex();
       const ready =
         isHistoryRenderDomReady(domIndex) &&
-        isHistoryRenderContentReady(domIndex);
+        isHistoryRenderContentReady(domIndex) &&
+        isHistoryRenderMermaidDomReady(domIndex.root);
       if (ready) {
         stableFrames += 1;
         if (stableFrames >= HISTORY_RENDER_READY_STABLE_FRAMES) return true;
@@ -665,7 +725,11 @@ export function useMessageListScroll({props, emit}) {
 
     // 비정상 메시지/마크다운 이벤트 누락이 있어도 progress가 고착되지 않도록
     // 현재 DOM 기준으로 가능한 후처리만 수행하고 finally에서 화면을 해제합니다.
-    return isHistoryRenderDomReady(createHistoryRenderDomIndex());
+    const fallbackIndex = createHistoryRenderDomIndex();
+    return (
+      isHistoryRenderDomReady(fallbackIndex) &&
+      isHistoryRenderMermaidDomReady(fallbackIndex.root)
+    );
   }
 
   async function renderHistoryRoomPendingMermaidSequentially(runId) {
@@ -691,6 +755,11 @@ export function useMessageListScroll({props, emit}) {
       // DOM 순서대로 한 번 처리합니다. Mermaid 내부 함수는 전역 queue를 사용하지 않고,
       // 각 target 실패 시 원본 코드 fallback으로 확정합니다.
       await renderMermaidInElement(root, {
+        // Android 최초 로그인/최초 채팅방 진입에서는 번들 Mermaid가 준비되어 있어도
+        // 첫 paint 직후 render API가 일시 실패하는 경우가 있어, setTimeout 없이 RAF 기반으로만
+        // 같은 target을 짧게 재시도한 뒤 최종 실패 시 code fallback으로 확정합니다.
+        renderRetryCount: isAndroidHistoryRenderRuntime() ? 3 : 1,
+        renderRetryFrameGap: isAndroidHistoryRenderRuntime() ? 2 : 1,
         onTargetComplete: async (_target, processedCount) => {
           if (runId !== historyRenderRunId || !props.historyRendering) return;
           await updateHistoryRenderFrameAfterBatch(processedCount);

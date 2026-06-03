@@ -11,6 +11,32 @@ import mermaid from "mermaid";
 import {logWarn} from "@/utils/logger";
 import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
 
+const DEFAULT_MERMAID_RENDER_RETRY_COUNT = 0;
+const DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP = 1;
+
+function waitAnimationFrames(frameCount = 1) {
+  const count = Math.max(1, Number(frameCount) || 1);
+  if (
+    typeof window === "undefined" ||
+    typeof window.requestAnimationFrame !== "function"
+  ) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve) => {
+    let remaining = count;
+    const step = () => {
+      remaining -= 1;
+      if (remaining <= 0) {
+        resolve();
+        return;
+      }
+      window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+  });
+}
+
 /**
  * [Mermaid 후처리 렌더러]
  * Markdown 단계에서 mermaid code block이 생성된 뒤 실제 SVG 변환을 수행합니다.
@@ -256,6 +282,40 @@ async function renderMermaidTargetWithRenderApi(mermaid, target) {
   return Boolean(target.querySelector("svg"));
 }
 
+async function renderMermaidTargetWithRetries(mermaid, target, options = {}) {
+  const retryCount = Math.max(
+    DEFAULT_MERMAID_RENDER_RETRY_COUNT,
+    Number(options.renderRetryCount) || 0
+  );
+  const retryFrameGap = Math.max(
+    DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP,
+    Number(options.renderRetryFrameGap) ||
+      DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP
+  );
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+    if (!target?.isConnected) return false;
+
+    try {
+      const rendered = await renderMermaidTargetWithRenderApi(mermaid, target);
+      if (rendered) return true;
+    } catch (error) {
+      lastError = error;
+    }
+
+    if (attempt < retryCount) {
+      await waitAnimationFrames(retryFrameGap);
+    }
+  }
+
+  if (lastError) {
+    throw lastError;
+  }
+
+  return false;
+}
+
 async function renderMermaidTargetsWithRenderApi(
   mermaid,
   targets,
@@ -266,7 +326,11 @@ async function renderMermaidTargetsWithRenderApi(
     if (!target.isConnected) continue;
 
     try {
-      const rendered = await renderMermaidTargetWithRenderApi(mermaid, target);
+      const rendered = await renderMermaidTargetWithRetries(
+        mermaid,
+        target,
+        options
+      );
       if (rendered) {
         markMermaidCardState(target, "rendered");
       } else {
@@ -346,7 +410,8 @@ async function renderMermaidTargets(root, options = {}) {
     if (source) {
       target.setAttribute("data-mermaid-source", source);
     }
-    target.removeAttribute("data-mermaid-pending");
+    // Android 최초 진입에서는 첫 render 시도만 일시적으로 실패할 수 있습니다.
+    // 성공이 확정되기 전까지 pending 상태를 유지하여 재시도 후에만 code fallback을 결정합니다.
     target.removeAttribute("data-mermaid-error");
     markMermaidCardState(target, "pending");
   });

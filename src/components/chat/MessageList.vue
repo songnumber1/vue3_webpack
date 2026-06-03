@@ -103,14 +103,18 @@ defineExpose({
 }
 
 .message-list--history-rendering {
-  visibility: hidden !important;
+  /*
+   * Android 최초 진입 시 Mermaid는 실제 DOM 레이아웃을 참조해 SVG를 계산합니다.
+   * visibility:hidden / overflow:hidden / contain:paint 조합은 Android Chrome/WebView에서
+   * 최초 1회 Mermaid 크기 계산이 실패하는 원인이 될 수 있어 사용하지 않습니다.
+   * 화면 노출은 opacity로만 막고, DOM은 정상 레이아웃 상태로 유지합니다.
+   */
   opacity: 0 !important;
   pointer-events: none !important;
   scroll-behavior: auto !important;
-  overflow: hidden !important;
   overscroll-behavior: none !important;
   scrollbar-width: none !important;
-  contain: paint;
+  overflow-anchor: none;
 }
 
 .message-list--manual-stream {
