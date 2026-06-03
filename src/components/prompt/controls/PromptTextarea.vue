@@ -14,6 +14,8 @@
     @compositionend="handleCompositionEnd"
     @keydown.enter.exact="handleEnterSubmit"
     @keydown.shift.enter="handleShiftEnter"
+    @keydown.ctrl.enter.prevent="handleModifiedEnterSubmit"
+    @keydown.meta.enter.prevent="handleModifiedEnterSubmit"
     @paste="$emit('paste', $event)"
   />
 </template>
@@ -76,13 +78,32 @@ function handleCompositionEnd(event) {
 }
 
 /**
- * Enter 단독 입력은 전송 단축키입니다. 답변 생성 중이거나 전송 조건이 맞지 않을 때는
- * textarea는 활성 상태로 유지하되 submit 이벤트만 상위로 올리지 않습니다.
+ * Enter 단독 입력은 기본 상태에서는 전송 단축키입니다.
+ * 최대화 상태에서는 긴 글 작성 흐름을 우선하여 브라우저 기본 개행을 유지합니다.
  */
 function handleEnterSubmit(event) {
   if (event?.isComposing || isComposing.value) return;
 
+  if (isExpanded.value) {
+    nextTick(() => emit("input", event));
+    return;
+  }
+
   event?.preventDefault?.();
+  submitFromKeyboard();
+}
+
+/**
+ * 최대화 상태의 전송 단축키입니다. 긴 글 작성 중 실수 전송을 줄이기 위해
+ * Enter는 개행으로 두고 Ctrl/⌘+Enter만 전송으로 처리합니다.
+ */
+function handleModifiedEnterSubmit(event) {
+  if (event?.isComposing || isComposing.value) return;
+
+  submitFromKeyboard();
+}
+
+function submitFromKeyboard() {
   if (isDisabled.value || isGenerating.value || !canSubmit.value) return;
 
   emit("submit");

@@ -284,6 +284,7 @@ export function usePromptComposer(props, emit) {
       return;
 
     const keyboardOpenOnSubmit = blurTextareaForMobileSubmit();
+    const shouldCollapseAfterSubmit = isPromptExpanded.value;
 
     // 상위 부모 뷰(View) 인터페이스를 향해 수집된 핵심 프롬프트 메타데이터 세트를 실어 올립니다.
     emit("submit", {
@@ -298,6 +299,18 @@ export function usePromptComposer(props, emit) {
     clearAttachments(); // 첨부파일 큐 초기화
     speech.resetToMic(); // STT 마이크 모드 정상 상태 원복
     closeMenus(); // 열려 있던 모든 도구창 닫기 처리
+
+    // 최대화 상태에서 전송한 경우에는 전송 접수 직후 입력창을 자동 최소화합니다.
+    // 최소화 복구는 기존 auto-grow 복원 루틴을 재사용해 일반 입력창 높이/스크롤 규칙으로 되돌립니다.
+    if (shouldCollapseAfterSubmit) {
+      isPromptExpanded.value = false;
+      nextTick(() => {
+        restoreTextareaAutoGrow();
+        nextTick(() => emit("height-change", getLastHeight()));
+      });
+      return;
+    }
+
     nextTick(resize); // 늘어나 있던 입력창 높이를 원래 1줄 규격 스타일로 깔끔하게 복원
   }
 
