@@ -99,27 +99,28 @@ async function callNativeWithLogging(type, payload = {}) {
  * Android/Web 분기만 공통화합니다.
  * 기존 named export의 payload 정규화, toast/note, store side effect는 각 함수에 그대로 둡니다.
  */
-async function executeBridgeApi(
-  type,
-  payload = {},
-  browserFallback,
-  options = {}
-) {
+async function executeBridgeApi(type, payload = {}, options = {}) {
+  const {browserFallback, afterNative} = options;
+
   if (isAndroidApp()) {
     const response = await callNativeWithLogging(type, payload);
 
-    if (typeof options.afterNative === "function") {
-      await options.afterNative(response);
+    if (typeof afterNative === "function") {
+      await afterNative(response);
     }
 
     return response;
   }
 
   if (typeof browserFallback === "function") {
-    return browserFallback();
+    return browserFallback(payload);
   }
 
   return webSuccess({handled: false, reason: "no-browser-fallback"});
+}
+
+function createBrowserSuccessFallback(data = {}, message) {
+  return () => webSuccess(data, message);
 }
 
 /**
@@ -155,10 +156,8 @@ export async function copyClipboardByPlatform(text) {
   const successMessage = t("clipboardNote.message");
   const toastMessage = t("clipboardNote.toastMessage");
 
-  return executeBridgeApi(
-    "COPY_CLIPBOARD",
-    {text, message: successMessage},
-    async () => {
+  return executeBridgeApi("COPY_CLIPBOARD", {text, message: successMessage}, {
+    browserFallback: async () => {
       try {
         const copied = await copyWebText(text);
         const message = copied ? successMessage : t("clipboardNote.fail");
@@ -171,117 +170,121 @@ export async function copyClipboardByPlatform(text) {
         return webSuccess({copied: false}, t("clipboardNote.fail"));
       }
     },
-    {
-      afterNative: async (response) => {
-        if (response?.isSuccess !== false) {
-          await showToastByPlatform(toastMessage, {
-            title: t("clipboardNote.title"),
-          });
-        }
-      },
-    }
-  );
+    afterNative: async (response) => {
+      if (response?.isSuccess !== false) {
+        await showToastByPlatform(toastMessage, {
+          title: t("clipboardNote.title"),
+        });
+      }
+    },
+  });
 }
 /**
  * 외부 브라우저 열기는 WebView에서 native 위임이 필요하고, 일반 웹에서는 window.open fallback을 사용합니다.
  */
 export async function openExternalBrowser(url) {
-  return executeBridgeApi("OPEN_EXTERNAL_BROWSER", {url}, async () => {
-    try {
-      window.open(url, "_blank", "noopener,noreferrer");
-      return webSuccess({opened: true});
-    } catch (error) {
-      logWarn("[platformBridge] browser external open failed:", error);
-      return webSuccess({opened: false});
-    }
+  return executeBridgeApi("OPEN_EXTERNAL_BROWSER", {url}, {
+    browserFallback: () => {
+      try {
+        window.open(url, "_blank", "noopener,noreferrer");
+        return webSuccess({opened: true});
+      } catch (error) {
+        logWarn("[platformBridge] browser external open failed:", error);
+        return webSuccess({opened: false});
+      }
+    },
   });
 }
 export async function openNativeFilePicker(options = {}) {
-  return executeBridgeApi("OPEN_FILE_PICKER", {options}, () =>
-    webSuccess(
+  return executeBridgeApi("OPEN_FILE_PICKER", {options}, {
+    browserFallback: createBrowserSuccessFallback(
       {opened: false, reason: "browser-file-input-required"},
       t("platformBridge.browserFileInputRequired")
-    )
-  );
+    ),
+  });
 }
 export async function getPushToken() {
-  return executeBridgeApi(
-    "GET_PUSH_TOKEN",
-    {},
-    () => webSuccess({token: ""}, t("platformBridge.browserFcmUnavailable")),
-    {
-      afterNative: (res) => {
-        getStore().setPushToken(res.data?.token);
-      },
-    }
-  );
+  return executeBridgeApi("GET_PUSH_TOKEN", {}, {
+    browserFallback: createBrowserSuccessFallback(
+      {token: ""},
+      t("platformBridge.browserFcmUnavailable")
+    ),
+    afterNative: (res) => {
+      getStore().setPushToken(res.data?.token);
+    },
+  });
 }
 export async function getAppVersion() {
-  return executeBridgeApi(
-    "GET_APP_VERSION",
-    {},
-    () => webSuccess(getStore().info),
-    {
-      afterNative: (res) => {
-        getStore().setAppVersionInfo(res.data);
-      },
-    }
-  );
+  return executeBridgeApi("GET_APP_VERSION", {}, {
+    browserFallback: () => webSuccess(getStore().info),
+    afterNative: (res) => {
+      getStore().setAppVersionInfo(res.data);
+    },
+  });
 }
 /**
  * 공유 기능은 Android native share sheet와 Web Share API를 동일한 호출 형태로 감쌉니다.
  */
 export async function shareByPlatform(data) {
-  return executeBridgeApi("SHARE", {data}, async () => {
-    if (navigator.share) {
-      await navigator.share(data);
+  return executeBridgeApi("SHARE", {data}, {
+    browserFallback: async () => {
+      if (navigator.share) {
+        await navigator.share(data);
 
-      return webSuccess({shared: true});
-    }
-    throw new Error(t("platformBridge.shareUnsupported"));
+        return webSuccess({shared: true});
+      }
+      throw new Error(t("platformBridge.shareUnsupported"));
+    },
   });
 }
 /**
  * 네트워크 상태 확인은 Android native 값과 browser navigator.onLine 값을 같은 응답 형태로 정규화합니다.
  */
 export async function checkNetworkByPlatform() {
-  return executeBridgeApi("CHECK_NETWORK", {}, () =>
-    webSuccess({online: navigator.onLine, type: "browser"})
-  );
+  return executeBridgeApi("CHECK_NETWORK", {}, {
+    browserFallback: () =>
+      webSuccess({online: navigator.onLine, type: "browser"}),
+  });
 }
 /**
  * 스토리지 API는 Android native storage와 browser localStorage를 동일한 key/value 인터페이스로 맞춥니다.
  */
 export async function getNativeStorage(key) {
-  return executeBridgeApi("GET_STORAGE", {key}, () => {
-    const value = window.localStorage?.getItem(key) ?? null;
+  return executeBridgeApi("GET_STORAGE", {key}, {
+    browserFallback: () => {
+      const value = window.localStorage?.getItem(key) ?? null;
 
-    return webSuccess({key, value});
+      return webSuccess({key, value});
+    },
   });
 }
 export async function setNativeStorage(key, value) {
-  return executeBridgeApi("SET_STORAGE", {key, value}, () => {
-    window.localStorage?.setItem(key, String(value));
+  return executeBridgeApi("SET_STORAGE", {key, value}, {
+    browserFallback: () => {
+      window.localStorage?.setItem(key, String(value));
 
-    return webSuccess({key, saved: true});
+      return webSuccess({key, saved: true});
+    },
   });
 }
 export async function removeNativeStorage(key) {
-  return executeBridgeApi("REMOVE_STORAGE", {key}, () => {
-    window.localStorage?.removeItem(key);
+  return executeBridgeApi("REMOVE_STORAGE", {key}, {
+    browserFallback: () => {
+      window.localStorage?.removeItem(key);
 
-    return webSuccess({key, removed: true});
+      return webSuccess({key, removed: true});
+    },
   });
 }
 export async function cancelNativeRequest(id) {
-  return executeBridgeApi("CANCEL_REQUEST", {id}, () =>
-    webSuccess({id, cancelled: true})
-  );
+  return executeBridgeApi("CANCEL_REQUEST", {id}, {
+    browserFallback: createBrowserSuccessFallback({id, cancelled: true}),
+  });
 }
 export async function setBackHandler(enable) {
-  return executeBridgeApi("SET_BACK_HANDLER", {enable}, () =>
-    webSuccess({enabled: false})
-  );
+  return executeBridgeApi("SET_BACK_HANDLER", {enable}, {
+    browserFallback: createBrowserSuccessFallback({enabled: false}),
+  });
 }
 /**
  * 플랫폼별 toast 요청 facade입니다.
@@ -302,11 +305,13 @@ export async function showToastByPlatform(message, options = {}) {
     return webSuccess({shown: false, reason: "empty-message"});
   }
 
-  return executeBridgeApi("SHOW_TOAST", {message: normalizedMessage}, () => {
-    notifyToastRequested(normalizedMessage, options);
-    logInfo("[toast]", normalizedMessage);
+  return executeBridgeApi("SHOW_TOAST", {message: normalizedMessage}, {
+    browserFallback: () => {
+      notifyToastRequested(normalizedMessage, options);
+      logInfo("[toast]", normalizedMessage);
 
-    return webSuccess({shown: true, channel: getFeedbackChannel()});
+      return webSuccess({shown: true, channel: getFeedbackChannel()});
+    },
   });
 }
 
@@ -314,21 +319,25 @@ export async function showToastByPlatform(message, options = {}) {
  * Android 앱이면 네이티브 기기 정보를 요청하고, 웹이면 platformStore의 탐지 정보를 반환합니다.
  */
 export async function getDeviceInfo() {
-  return executeBridgeApi("GET_DEVICE_INFO", {}, () =>
-    webSuccess(getStore().info)
-  );
+  return executeBridgeApi("GET_DEVICE_INFO", {}, {
+    browserFallback: () => webSuccess(getStore().info),
+  });
 }
 export async function writeNativeLog(data) {
-  return executeBridgeApi("WRITE_LOG", {data}, () => {
-    logInfo("[native-log]", data);
+  return executeBridgeApi("WRITE_LOG", {data}, {
+    browserFallback: () => {
+      logInfo("[native-log]", data);
 
-    return webSuccess({written: true});
+      return webSuccess({written: true});
+    },
   });
 }
 export async function closeApp() {
-  return executeBridgeApi("CLOSE_APP", {}, () => {
-    window.close();
+  return executeBridgeApi("CLOSE_APP", {}, {
+    browserFallback: () => {
+      window.close();
 
-    return webSuccess({closed: false});
+      return webSuccess({closed: false});
+    },
   });
 }
