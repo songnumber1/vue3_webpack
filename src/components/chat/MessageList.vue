@@ -48,11 +48,13 @@ const props = defineProps({
   autoScrollOnAnswer: {type: Boolean, default: false},
   historyRendering: {type: Boolean, default: false},
   historyMessagesReady: {type: Boolean, default: false},
+  hasPreviousHistoryMessages: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
   "content-rendered",
   "history-rendered",
+  "load-previous-history",
   "regenerate",
 ]);
 

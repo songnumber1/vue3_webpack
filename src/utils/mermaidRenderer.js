@@ -7,6 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+import mermaid from "mermaid";
 import {logWarn} from "@/utils/logger";
 import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
 
@@ -15,13 +16,10 @@ import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
  * Markdown 단계에서 mermaid code block이 생성된 뒤 실제 SVG 변환을 수행합니다.
  * 스트림 중간 렌더는 문법이 완성되지 않은 상태일 수 있어 실패 가능성이 높으므로,
  * 보통 assistant message status가 complete 된 뒤 force 렌더로 다시 처리합니다.
+ *
+ * Mermaid는 npm dependency를 webpack bundle에 포함하여 사용합니다.
  */
 
-let mermaidLoader = null;
-
-const MERMAID_LOAD_TIMEOUT_MS = 8000;
-const MERMAID_CDN =
-  "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
 /**
  * 현재 document theme를 기준으로 mermaid themeVariables를 선택합니다.
  * 다크 테마에서 mermaid 기본 색상이 보이지 않는 문제를 방지합니다.
@@ -120,138 +118,18 @@ function getMermaidConfig() {
   };
 }
 /**
- * mermaid CDN script를 한 번만 주입합니다.
- * 이미 script tag가 있으면 기존 load/error 이벤트를 재사용합니다.
+ * 번들에 포함된 Mermaid 모듈을 현재 테마 설정으로 초기화합니다.
+ * 외부 script 주입이나 원격 fallback은 사용하지 않습니다.
  */
-function loadScript(src, options = {}) {
-  return new Promise((resolve, reject) => {
-    let settled = false;
-    let timerId = 0;
-    let rafId = 0;
-    let rafFrames = 0;
-    const useAnimationFrameTimeout = options.loadWaitMode === "animation-frame";
-    const maxRafFrames = Math.max(1, Number(options.loadMaxFrames) || 360);
-
-    const cleanup = (script, handleLoad, handleError) => {
-      script.removeEventListener("load", handleLoad);
-      script.removeEventListener("error", handleError);
-      if (timerId) {
-        window.clearTimeout(timerId);
-        timerId = 0;
-      }
-      if (rafId) {
-        window.cancelAnimationFrame(rafId);
-        rafId = 0;
-      }
-    };
-
-    const settle = (script, handleLoad, handleError, callback) => {
-      if (settled) return;
-      settled = true;
-      cleanup(script, handleLoad, handleError);
-      callback();
-    };
-
-    const attachListeners = (script) => {
-      const handleLoad = () => settle(script, handleLoad, handleError, resolve);
-      const handleError = () =>
-        settle(script, handleLoad, handleError, () =>
-          reject(new Error(`Failed to load ${src}`))
-        );
-
-      script.addEventListener("load", handleLoad, {once: true});
-      script.addEventListener("error", handleError, {once: true});
-
-      if (useAnimationFrameTimeout) {
-        const tick = () => {
-          if (settled) return;
-          rafFrames += 1;
-          if (rafFrames >= maxRafFrames) {
-            settle(script, handleLoad, handleError, () =>
-              reject(new Error(`Timed out loading ${src}`))
-            );
-            return;
-          }
-          rafId = window.requestAnimationFrame(tick);
-        };
-        rafId = window.requestAnimationFrame(tick);
-        return;
-      }
-
-      timerId = window.setTimeout(
-        () =>
-          settle(script, handleLoad, handleError, () =>
-            reject(new Error(`Timed out loading ${src}`))
-          ),
-        MERMAID_LOAD_TIMEOUT_MS
-      );
-    };
-
-    const existing = document.querySelector(`script[src="${src}"]`);
-    if (existing) {
-      if (window.mermaid) {
-        resolve();
-        return;
-      }
-      attachListeners(existing);
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    attachListeners(script);
-    document.head.appendChild(script);
-  });
-}
-/**
- * window.mermaid를 보장하고 현재 테마 설정으로 initialize합니다.
- * CDN 로딩 실패 시 raw mermaid code block을 그대로 유지하기 위해 null을 반환합니다.
- */
-async function ensureMermaid(options = {}) {
-  if (window.mermaid) {
-    window.mermaid.initialize(getMermaidConfig());
-
-    return window.mermaid;
-  }
-
-  if (options.skipDynamicLoadWhenUnavailable) {
+async function ensureMermaid() {
+  if (!mermaid?.initialize) {
     return null;
   }
 
-  if (options.loadWaitMode === "animation-frame") {
-    const mermaid = await loadScript(MERMAID_CDN, options)
-      .then(() => window.mermaid)
-      .catch((error) => {
-        logWarn(
-          "Mermaid could not be loaded during history render. The source code block will remain visible.",
-          error
-        );
-        return null;
-      });
-    mermaid?.initialize?.(getMermaidConfig());
-    return mermaid;
-  }
-
-  if (!mermaidLoader) {
-    mermaidLoader = loadScript(MERMAID_CDN, options)
-      .then(() => window.mermaid)
-      .catch((error) => {
-        logWarn(
-          "Mermaid could not be loaded. The source code block will remain visible.",
-          error
-        );
-        mermaidLoader = null;
-
-        return null;
-      });
-  }
-
-  const mermaid = await mermaidLoader;
-  mermaid?.initialize?.(getMermaidConfig());
-
+  mermaid.initialize(getMermaidConfig());
   return mermaid;
 }
+
 /**
  * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
  */
@@ -378,8 +256,13 @@ async function renderMermaidTargetWithRenderApi(mermaid, target) {
   return Boolean(target.querySelector("svg"));
 }
 
-async function renderMermaidTargetsWithRenderApi(mermaid, targets) {
-  for (const target of targets) {
+async function renderMermaidTargetsWithRenderApi(
+  mermaid,
+  targets,
+  options = {}
+) {
+  for (let index = 0; index < targets.length; index += 1) {
+    const target = targets[index];
     if (!target.isConnected) continue;
 
     try {
@@ -395,6 +278,10 @@ async function renderMermaidTargetsWithRenderApi(mermaid, targets) {
         "Mermaid rendering failed. The source code block will remain visible.",
         error
       );
+    } finally {
+      if (typeof options.onTargetComplete === "function") {
+        await options.onTargetComplete(target, index + 1, targets.length);
+      }
     }
   }
 }
@@ -464,7 +351,7 @@ async function renderMermaidTargets(root, options = {}) {
     markMermaidCardState(target, "pending");
   });
 
-  await renderMermaidTargetsWithRenderApi(mermaid, liveTargets);
+  await renderMermaidTargetsWithRenderApi(mermaid, liveTargets, options);
 }
 
 export function fallbackPendingMermaidToCode(root) {
@@ -482,6 +369,18 @@ function isRenderableRoot(root) {
   if (typeof Node !== "undefined" && root.nodeType === Node.DOCUMENT_NODE)
     return true;
   return root.isConnected !== false;
+}
+
+/**
+ * 채팅방 최초 진입 전에 번들 Mermaid 모듈을 현재 테마로 초기화합니다.
+ * 외부 네트워크 로딩은 없으며, 실제 렌더링은 MessageList의 DOM 순서 처리에서 수행합니다.
+ */
+export function warmupMermaidForHistoryRender() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.resolve(null);
+  }
+
+  return ensureMermaid();
 }
 
 export function renderMermaidInElement(root, options = {}) {

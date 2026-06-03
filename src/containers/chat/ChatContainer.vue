@@ -259,6 +259,8 @@ const {
   isGenerating,
   isHistoryRendering,
   historyMessagesLoaded,
+  hasPreviousHistoryMessages,
+  loadPreviousHistoryMessages,
   finishHistoryRender,
   autoScrollOnAnswer,
   closeImagePreview,
@@ -365,6 +367,7 @@ provide(
     autoScrollOnAnswer: autoScrollOnAnswer.value,
     isHistoryRendering: isHistoryRendering.value,
     historyMessagesLoaded: historyMessagesLoaded.value,
+    hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
   }))
 );
 
@@ -418,6 +421,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handleMessageContentRendered,
   scrollBottom: handleWorkspaceScrollBottom,
   handleHistoryRendered: finishHistoryRender,
+  loadPreviousHistoryMessages,
 });
 </script>
 

@@ -15,8 +15,10 @@
     :auto-scroll-on-answer="autoScrollOnAnswer"
     :history-rendering="isHistoryRendering"
     :history-messages-ready="historyMessagesLoaded"
+    :has-previous-history-messages="hasPreviousHistoryMessages"
     @content-rendered="handleMessageContentRendered"
     @history-rendered="handleHistoryRendered"
+    @load-previous-history="handleLoadPreviousHistory"
     @regenerate="workspaceActions.regenerate($event)"
   />
   <button
@@ -164,6 +166,9 @@ const isHistoryRendering = computed(
 );
 const historyMessagesLoaded = computed(
   () => workspaceState.value.historyMessagesLoaded
+);
+const hasPreviousHistoryMessages = computed(
+  () => workspaceState.value.hasPreviousHistoryMessages
 );
 const canUseDesktopCodeInterpreter = computed(
   () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"
@@ -473,6 +478,10 @@ function handleMessageContentRendered() {
 function handleHistoryRendered() {
   workspaceActions.handleHistoryRendered();
   scheduleComposerHeightUpdate();
+}
+
+function handleLoadPreviousHistory() {
+  return workspaceActions.loadPreviousHistoryMessages();
 }
 
 function observeComposerHeight() {

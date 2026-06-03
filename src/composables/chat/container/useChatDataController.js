@@ -13,7 +13,10 @@ import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
 import {loadSharedConversation} from "@/composables/chat/useSharedChat";
-import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {
+  renderMermaidInElement,
+  warmupMermaidForHistoryRender,
+} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
@@ -46,6 +49,12 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const runtimeReady = ref(false);
   const isHistoryRendering = ref(false);
   const historyMessagesLoaded = ref(false);
+  const HISTORY_LAZY_CHUNK_SIZE = 100;
+  const fullHistoryMessages = ref([]);
+  const historyVisibleStartIndex = ref(0);
+  const hasPreviousHistoryMessages = computed(
+    () => isChatPage.value && historyVisibleStartIndex.value > 0
+  );
   const apiRequestStore = useApiRequestStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
@@ -71,6 +80,156 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
     await nextTick();
     await waitForNextPaint();
+  }
+
+  function clearLazyHistoryMessages() {
+    fullHistoryMessages.value = [];
+    historyVisibleStartIndex.value = 0;
+  }
+
+  function getInitialLazyHistorySlice(sourceMessages = []) {
+    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    const start = Math.max(list.length - HISTORY_LAZY_CHUNK_SIZE, 0);
+    return {start, visibleMessages: list.slice(start)};
+  }
+
+  function setHistoryMessagesForInitialRender(sourceMessages = []) {
+    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    fullHistoryMessages.value = list;
+    const {start, visibleMessages} = getInitialLazyHistorySlice(list);
+    historyVisibleStartIndex.value = start;
+    messages.value = visibleMessages;
+  }
+
+  function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
+    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    if (!isChatPage.value || !fullHistoryMessages.value.length) {
+      fullHistoryMessages.value = list;
+      return false;
+    }
+
+    const currentVisibleCount = Math.max(
+      messages.value.length,
+      Math.min(HISTORY_LAZY_CHUNK_SIZE, list.length)
+    );
+    const isShowingLatest =
+      historyVisibleStartIndex.value + messages.value.length >=
+      fullHistoryMessages.value.length;
+
+    fullHistoryMessages.value = list;
+
+    if (isShowingLatest) {
+      const count = Math.max(currentVisibleCount, HISTORY_LAZY_CHUNK_SIZE);
+      historyVisibleStartIndex.value = Math.max(list.length - count, 0);
+    } else {
+      historyVisibleStartIndex.value = Math.min(
+        historyVisibleStartIndex.value,
+        Math.max(list.length - 1, 0)
+      );
+    }
+
+    const end = isShowingLatest
+      ? list.length
+      : Math.min(
+          historyVisibleStartIndex.value + currentVisibleCount,
+          list.length
+        );
+    messages.value = list.slice(historyVisibleStartIndex.value, end);
+    return true;
+  }
+
+  function hasMermaidInHistoryMessages(sourceMessages = []) {
+    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    return list.some((message) => {
+      const content = `${message?.content || ""}
+${message?.reasoningContent || ""}`;
+      return /```\s*mermaid/i.test(content);
+    });
+  }
+
+  function loadPreviousHistoryMessages() {
+    if (!isChatPage.value) return false;
+    const list = fullHistoryMessages.value;
+    if (!Array.isArray(list) || !list.length) return false;
+    if (historyVisibleStartIndex.value <= 0) return false;
+
+    const previousStart = historyVisibleStartIndex.value;
+    const nextStart = Math.max(previousStart - HISTORY_LAZY_CHUNK_SIZE, 0);
+    if (nextStart === previousStart) return false;
+
+    historyVisibleStartIndex.value = nextStart;
+    messages.value = list.slice(nextStart);
+    return true;
+  }
+
+  function isLazyHistoryActiveForChat(chatId) {
+    return (
+      isChatPage.value &&
+      String(activeHistoryId.value || "") === String(chatId || "") &&
+      Array.isArray(fullHistoryMessages.value) &&
+      fullHistoryMessages.value.length > 0
+    );
+  }
+
+  function mergeVisibleMessagesIntoFullHistory(nextVisibleMessages = []) {
+    const existing = Array.isArray(fullHistoryMessages.value)
+      ? fullHistoryMessages.value
+      : [];
+    const start = Math.max(0, historyVisibleStartIndex.value);
+    const visible = Array.isArray(nextVisibleMessages)
+      ? nextVisibleMessages
+      : [];
+
+    const merged = [...existing.slice(0, start), ...visible];
+    fullHistoryMessages.value = merged;
+    messages.value = visible;
+    return merged;
+  }
+
+  function setConversationPreservingLazyHistory(chatId, nextMessages) {
+    if (isLazyHistoryActiveForChat(chatId)) {
+      const merged = mergeVisibleMessagesIntoFullHistory(nextMessages);
+      setMessages(chatId, merged);
+      return;
+    }
+
+    setMessages(chatId, nextMessages);
+  }
+
+  function appendUserAndAssistantMessagesPreservingLazyHistory(
+    chatId,
+    normalized
+  ) {
+    const result = appendUserAndAssistantMessages(chatId, normalized);
+
+    if (!isLazyHistoryActiveForChat(chatId)) {
+      return result;
+    }
+
+    fullHistoryMessages.value = Array.isArray(result.messages)
+      ? result.messages
+      : [];
+
+    const visibleCount = Math.max(
+      HISTORY_LAZY_CHUNK_SIZE,
+      Math.min(
+        fullHistoryMessages.value.length,
+        (messages.value?.length || 0) + 2
+      )
+    );
+    historyVisibleStartIndex.value = Math.max(
+      fullHistoryMessages.value.length - visibleCount,
+      0
+    );
+    const visibleMessages = fullHistoryMessages.value.slice(
+      historyVisibleStartIndex.value
+    );
+    messages.value = visibleMessages;
+
+    return {
+      messages: visibleMessages,
+      assistantMessage: result.assistantMessage,
+    };
   }
 
   function clearPendingSelectedIfMatched(chatId) {
@@ -270,6 +429,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
     if (isMainPage.value) {
       finishHistoryRender();
+      clearLazyHistoryMessages();
       messages.value = [];
       chatStore.pruneInactiveMessageCache(null);
       clearActiveSession();
@@ -286,6 +446,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
           activeHistoryId.value
         );
         if (!isCurrentLoad()) return;
+        clearLazyHistoryMessages();
         messages.value = sharedMessages;
         historyMessagesLoaded.value = true;
         await nextTick();
@@ -297,6 +458,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
         beginHistoryRender();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
+        clearLazyHistoryMessages();
         clearActiveSession();
         finishHistoryRender();
         return;
@@ -318,6 +480,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       if (chatStore.consumePendingNewSubmitChat(history.id)) {
         finishHistoryRender();
         clearPendingSelectedIfMatched(history.id);
+        clearLazyHistoryMessages();
         messages.value = runtime.conversations.value?.[history.id] || [];
         historyMessagesLoaded.value = true;
         await nextTick();
@@ -327,12 +490,18 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
       chatStore.setPendingSelectedChatId(history.id);
       beginHistoryRender();
+      const mermaidWarmupPromise = warmupMermaidForHistoryRender().catch(
+        () => null
+      );
       await flushConversationSwitchPaint();
       if (!isCurrentLoad()) return;
       chatStore.pruneInactiveMessageCache(history.id);
       const loadedMessages = await ensureConversation(history.id);
+      if (hasMermaidInHistoryMessages(loadedMessages)) {
+        await mermaidWarmupPromise;
+      }
       if (!isCurrentLoad()) return;
-      messages.value = loadedMessages;
+      setHistoryMessagesForInitialRender(loadedMessages);
       historyMessagesLoaded.value = true;
       clearPendingSelectedIfMatched(history.id);
       await nextTick();
@@ -390,8 +559,9 @@ export function useChatDataController({props, ui, runtime, messages}) {
     messages,
     createRemoteConversation,
     createLocalConversation,
-    appendUserAndAssistantMessages,
-    setConversation: setMessages,
+    appendUserAndAssistantMessages:
+      appendUserAndAssistantMessagesPreservingLazyHistory,
+    setConversation: setConversationPreservingLazyHistory,
     selectedAssistantId,
     selectedModel,
     models,
@@ -440,6 +610,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
         if (!Array.isArray(nextMessages)) return;
         if (isHistoryRendering.value) return;
         if (messages.value === nextMessages) return; // 메모리 참조 포인터가 완벽하게 일치한다면 중복 할당 연산을 무시 차단합니다.
+
+        if (syncVisibleHistoryMessagesFromFull(nextMessages)) {
+          return;
+        }
+
         messages.value = nextMessages;
       },
       {deep: true}
@@ -496,6 +671,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
     isGenerating,
     isHistoryRendering,
     historyMessagesLoaded,
+    hasPreviousHistoryMessages,
+    loadPreviousHistoryMessages,
     finishHistoryRender,
     submit,
     regenerate,
