@@ -313,18 +313,18 @@ function selectHistoryMenuAction(action) {
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function handleSelectHistory(item) {
-  if (item?.id) chatStore.setPendingSelectedChatId(item.id);
-  chatActions.selectHistory(item);
+async function handleSelectHistory(item) {
+  const moved = await chatActions.selectHistory(item);
+  if (moved === false) return;
   navigationStore.setDrawerOpen(false);
 }
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function handleSelectHistoryCollapsed(item) {
-  if (item?.id) chatStore.setPendingSelectedChatId(item.id);
-  chatActions.selectHistory(item);
+async function handleSelectHistoryCollapsed(item) {
+  const moved = await chatActions.selectHistory(item);
+  if (moved === false) return;
   navigationStore.setCollapsedRecentOpen(false);
 }
 

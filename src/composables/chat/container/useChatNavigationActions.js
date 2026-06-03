@@ -13,6 +13,7 @@ import {logWarn} from "@/utils/logger";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -65,6 +66,7 @@ export function useChatNavigationActions({
 }) {
   // AI 답변 타이핑 도중 부가 기능 조작 난입을 통제하기 위해 실시간 스트리밍 스토어 마운트
   const chatStreamStore = useChatStreamStore();
+  const chatStore = useChatStore();
 
   /**
    * @description 현재 백엔드 LLM과 실시간 스트리밍 패킷 수신이 진행 중인지 감지하는 무결성 검증 세이프 가드입니다.
@@ -113,9 +115,14 @@ export function useChatNavigationActions({
    * @param {object} item - 라우팅 타깃이 된 특정 대화방 히스토리 로우 오브젝트
    */
   async function openHistory(item) {
-    if (isBlockedByStream()) return;
+    if (isBlockedByStream()) return false;
+    const historyId = String(item?.id || "").trim();
+    if (!historyId) return false;
+
+    chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels(); // 대화 맥락이 바뀌므로 열려 있던 우측 정보 패널들 강제 셧다운
-    await router.push({name: "chat", params: {id: item.id}}).catch(() => {});
+    await router.push({name: "chat", params: {id: historyId}}).catch(() => {});
+    return true;
   }
 
   /**
