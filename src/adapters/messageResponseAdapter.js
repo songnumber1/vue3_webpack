@@ -26,7 +26,9 @@ function readArray(...values) {
 }
 
 function normalizeRole(value) {
-  return value === MESSAGE_ROLES.USER ? MESSAGE_ROLES.USER : MESSAGE_ROLES.ASSISTANT;
+  return value === MESSAGE_ROLES.USER
+    ? MESSAGE_ROLES.USER
+    : MESSAGE_ROLES.ASSISTANT;
 }
 
 /**
@@ -56,7 +58,11 @@ export function adaptMessageItem(raw = {}) {
     status: status || (error ? "error" : "complete"),
     error,
     errorTitle: firstText(raw.errorTitle, raw.error_title),
-    errorMessage: firstText(raw.errorMessage, raw.error_message, raw[R.ERROR_MESSAGE]),
+    errorMessage: firstText(
+      raw.errorMessage,
+      raw.error_message,
+      raw[R.ERROR_MESSAGE]
+    ),
     reasoningContent,
     reasoningStatus:
       raw[M.REASONING_STATUS] || (reasoningContent ? "completed" : ""),

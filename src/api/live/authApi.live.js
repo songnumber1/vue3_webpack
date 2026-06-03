@@ -11,7 +11,10 @@ import {httpClient} from "@/api/clients/httpClient";
 import {API_KEYS} from "@/constants/apiConfig";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {setTokens, clearTokens} from "@/auth/tokenStore";
-import {adaptAuthApiResponse, adaptAuthTokens} from "@/adapters/authResponseAdapter";
+import {
+  adaptAuthApiResponse,
+  adaptAuthTokens,
+} from "@/adapters/authResponseAdapter";
 
 export const authApiLive = {
   async checkLogin() {

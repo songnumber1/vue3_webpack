@@ -4,7 +4,9 @@
     class="collapsed-sidebar tw-flex tw-h-full tw-w-sidebarCollapsed tw-shrink-0 tw-flex-col tw-items-center tw-border-r tw-border-app-sidebarBorder tw-bg-app-sidebar"
     :aria-label="t('chat.collapsedSidebar')"
   >
-    <div class="collapsed-sidebar-actions tw-flex tw-flex-col tw-items-center tw-gap-2">
+    <div
+      class="collapsed-sidebar-actions tw-flex tw-flex-col tw-items-center tw-gap-2"
+    >
       <button
         class="collapsed-icon-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-app-sidebarIcon tw-transition"
         type="button"

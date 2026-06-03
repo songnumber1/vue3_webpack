@@ -31,7 +31,13 @@
           @error="$emit('preview-error', file)"
         />
       </div>
-      <div v-else class="attachment-preview-file tw-flex tw-shrink-0 tw-items-center tw-justify-center" aria-hidden="true">📄</div>
+      <div
+        v-else
+        class="attachment-preview-file tw-flex tw-shrink-0 tw-items-center tw-justify-center"
+        aria-hidden="true"
+      >
+        📄
+      </div>
       <div class="attachment-preview-info tw-min-w-0 tw-flex-1">
         <strong :title="file.name">{{ file.name }}</strong>
         <span>{{ formatFileSize(file.size) }}</span>
@@ -104,11 +110,19 @@ function emitPreview(file) {
   scrollbar-width: thin;
 }
 
-:global(body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .attachment-preview-row) {
+:global(
+  body.mobile-mode
+    .app-container:not(.app-container--native-scroll-runtime)
+    .attachment-preview-row
+) {
   scrollbar-width: none;
 }
 
-:global(body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .attachment-preview-row::-webkit-scrollbar) {
+:global(
+  body.mobile-mode
+    .app-container:not(.app-container--native-scroll-runtime)
+    .attachment-preview-row::-webkit-scrollbar
+) {
   display: none;
 }
 

@@ -9,7 +9,10 @@
 .app-container--compact .message--assistant .bubble-content,
 .app-container--compact .bubble-content.markdown-body,
 .app-container--compact .markdown-body {
-  font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15)) !important;
+  font-size: var(
+    --message-plain-mobile-font-size,
+    var(--font-size-fixed-15)
+  ) !important;
   line-height: 1.58 !important;
 }
 

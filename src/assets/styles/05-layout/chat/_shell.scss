@@ -18,7 +18,10 @@
 }
 
 .chat-container-root--sidebar-collapsed {
-  grid-template-columns: var(--layout-sidebar-collapsed-width, 68px) minmax(0, 1fr);
+  grid-template-columns: var(--layout-sidebar-collapsed-width, 68px) minmax(
+      0,
+      1fr
+    );
 }
 
 .desktop-sidebar--collapsed {

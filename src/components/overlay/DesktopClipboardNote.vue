@@ -8,8 +8,12 @@
       @mouseenter="pauseTimer"
       @mouseleave="resumeTimer"
     >
-      <strong class="tw-text-sm tw-font-extrabold tw-leading-tight">{{ title }}</strong>
-      <span class="tw-text-xs tw-leading-[1.35] tw-text-app-subtle">{{ message }}</span>
+      <strong class="tw-text-sm tw-font-extrabold tw-leading-tight">{{
+        title
+      }}</strong>
+      <span class="tw-text-xs tw-leading-[1.35] tw-text-app-subtle">{{
+        message
+      }}</span>
     </aside>
   </Transition>
 </template>

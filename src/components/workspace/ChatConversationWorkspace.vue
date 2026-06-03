@@ -35,9 +35,13 @@
   <div
     v-show="!isHistoryHydrating"
     ref="composerSlotRef"
-    :class="{'chat-composer-slot--history-finalizing': isHistoryRevealFinalizing}"
+    :class="{
+      'chat-composer-slot--history-finalizing': isHistoryRevealFinalizing,
+    }"
     class="chat-composer-slot"
-    :aria-hidden="isHistoryHydrating || isHistoryRevealFinalizing ? 'true' : null"
+    :aria-hidden="
+      isHistoryHydrating || isHistoryRevealFinalizing ? 'true' : null
+    "
   >
     <ChatReadonlyInput v-if="readonly" />
     <ChatReadonlyInput
@@ -80,7 +84,6 @@
     ></div>
   </aside>
 </template>
-
 
 <script setup>
 /**
@@ -197,9 +200,12 @@ function buildCodeInterpreterPreviewHtml() {
   const language = selectedInterpreterLanguage.value || "text";
   const code = selectedInterpreterCode.value || "";
   const escapedLanguage = escapeHtml(language);
-  const escapedCode = escapeHtml(code || (locale.value === "en"
-    ? "No code block has been selected yet."
-    : "아직 선택된 코드 블록이 없습니다."));
+  const escapedCode = escapeHtml(
+    code ||
+      (locale.value === "en"
+        ? "No code block has been selected yet."
+        : "아직 선택된 코드 블록이 없습니다.")
+  );
 
   if (locale.value === "en") {
     return `<article class="code-interpreter-sample">
@@ -306,7 +312,8 @@ function updateCodeInterpreterChatWidth() {
   const workspace = getChatWorkspaceElement();
   if (!workspace || typeof window === "undefined") return;
 
-  const composerWidth = composerSlotRef.value?.getBoundingClientRect?.().width || 0;
+  const composerWidth =
+    composerSlotRef.value?.getBoundingClientRect?.().width || 0;
   const workspaceWidth = workspace.clientWidth || 0;
   const horizontalPadding = 48;
   const fallbackWidth = Math.max(0, workspaceWidth - horizontalPadding);
@@ -317,7 +324,10 @@ function updateCodeInterpreterChatWidth() {
     Math.min(880, Math.max(420, baseWidth || 880))
   );
 
-  workspace.style.setProperty("--code-interpreter-chat-width", `${measuredWidth}px`);
+  workspace.style.setProperty(
+    "--code-interpreter-chat-width",
+    `${measuredWidth}px`
+  );
 }
 
 function scrollChatWorkspaceToStart() {
@@ -334,8 +344,8 @@ function updateDesktopRuntimeFlag() {
   const body = document.body;
   isDesktopRuntime.value = Boolean(
     body?.classList?.contains("desktop-mode") &&
-      !body?.classList?.contains("mobile-mode") &&
-      !body?.classList?.contains("actual-android-runtime")
+    !body?.classList?.contains("mobile-mode") &&
+    !body?.classList?.contains("actual-android-runtime")
   );
 }
 
@@ -371,7 +381,11 @@ function handleCodeInterpreterViewportChange() {
 }
 
 function observeCodeInterpreterRuntimeClasses() {
-  if (typeof document === "undefined" || typeof MutationObserver === "undefined") return;
+  if (
+    typeof document === "undefined" ||
+    typeof MutationObserver === "undefined"
+  )
+    return;
   codeInterpreterBodyClassObserver?.disconnect?.();
   codeInterpreterBodyClassObserver = new MutationObserver(() => {
     handleCodeInterpreterViewportChange();
@@ -433,7 +447,6 @@ function scheduleComposerHeightUpdate() {
     window.setTimeout(updateComposerHeight, delay)
   );
 }
-
 
 function handlePromptExpandedChange(expanded) {
   isPromptExpandedInChat.value = Boolean(expanded);
@@ -504,9 +517,18 @@ onMounted(async () => {
   observeCodeInterpreterRuntimeClasses();
   observeComposerHeight();
   if (typeof window !== "undefined") {
-    window.addEventListener("ds-code-interpreter-open", openCodeInterpreterPanel);
-    window.addEventListener("resize", handleCodeInterpreterViewportChange, {passive: true});
-    window.addEventListener("orientationchange", handleCodeInterpreterViewportChange, {passive: true});
+    window.addEventListener(
+      "ds-code-interpreter-open",
+      openCodeInterpreterPanel
+    );
+    window.addEventListener("resize", handleCodeInterpreterViewportChange, {
+      passive: true,
+    });
+    window.addEventListener(
+      "orientationchange",
+      handleCodeInterpreterViewportChange,
+      {passive: true}
+    );
   }
   syncCodeInterpreterPanelWithViewport();
 });
@@ -519,9 +541,15 @@ onBeforeUnmount(() => {
     document.body.classList.remove("code-interpreter-panel-open");
   }
   if (typeof window !== "undefined") {
-    window.removeEventListener("ds-code-interpreter-open", openCodeInterpreterPanel);
+    window.removeEventListener(
+      "ds-code-interpreter-open",
+      openCodeInterpreterPanel
+    );
     window.removeEventListener("resize", handleCodeInterpreterViewportChange);
-    window.removeEventListener("orientationchange", handleCodeInterpreterViewportChange);
+    window.removeEventListener(
+      "orientationchange",
+      handleCodeInterpreterViewportChange
+    );
   }
 });
 

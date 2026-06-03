@@ -8,17 +8,53 @@ import {
 } from "@/utils/overlayScrollbar";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 
+// 사용자가 맨 아래에 있다고 판단할 허용 오차(px)입니다.
+// scrollHeight - scrollTop - clientHeight 값이 48px 이하이면
+// "거의 맨 아래"로 보고 scroll-bottom 버튼 표시/자동 스크롤 여부 판단에 사용합니다.
 const BOTTOM_THRESHOLD = 48;
+
+// 실시간 답변 스트리밍 중 content 높이가 계속 변할 때
+// 하단 자동 스크롤을 안정적으로 유지하기 위한 재보정 타이밍(ms)입니다.
+// Markdown, code block, table wrapper 등으로 scrollHeight가 늦게 변할 수 있어
+// 여러 시점에 scrollToBottom을 재적용합니다.
+// history 대화방 최초 진입용이 아니라 streaming 중 자동 스크롤 보정용입니다.
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
+
+// history 대화방 진입 중 메시지 DOM/Assistant Markdown 렌더 완료 여부를
+// 주기적으로 확인하는 간격(ms)입니다.
+// pending assistant render, message DOM 개수, content ready 상태를 확인해서
+// 준비가 끝나면 Mermaid/OverlayScrollbar/최종 scroll 단계로 넘어갑니다.
 const HYDRATION_READY_CHECK_INTERVAL_MS = 120;
+
+// history 대화방 reveal 전에 최소로 기다릴 paint frame 수입니다.
+// DOM 생성, Mermaid 렌더, OverlayScrollbar update, scrollToBottom 이후
+// 브라우저 layout/paint가 안정될 시간을 주기 위한 값입니다.
 const HYDRATION_MIN_READY_PAINT_FRAMES = 2;
+
+// 대용량 history 대화방의 최대 hydration 대기 시간(ms)입니다.
+// 메시지/Markdown/Mermaid 렌더 이벤트가 누락되거나 특정 상태가 풀리지 않을 때
+// circle progress가 무한히 유지되는 것을 막기 위한 hard timeout입니다.
+// 정상 흐름에서는 이 시간까지 기다리지 않고 준비 완료 즉시 진행됩니다.
 const HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS = 12000;
+
+// 소형 history 대화방의 최대 hydration 대기 시간(ms)입니다.
+// 대화량이 적은 방에서 렌더 이벤트 누락 등으로 무한 로딩이 되는 것을 막기 위한
+// hard timeout입니다. 정상 흐름에서는 준비 완료 즉시 진행됩니다.
 const HYDRATION_SMALL_ROOM_HARD_TIMEOUT_MS = 4500;
+
+// resize, composer 높이 변경, PC/모바일 전환 등으로 스크롤 영역 재계산이 필요할 때
+// 과도한 반복 계산을 막기 위한 debounce 시간(ms)입니다.
+// 연속 resize 이벤트가 발생해도 120ms 단위로 묶어서
+// spacer, bottom state, OverlayScrollbar update를 재계산합니다.
 const RESIZE_RECALCULATE_DEBOUNCE_MS = 120;
+
+// 모바일, 특히 Android에서 키보드가 열린 상태로 질문을 전송한 뒤
+// visualViewport, 주소창, 키보드 애니메이션으로 인해 화면 높이가 늦게 안정되는 문제를
+// 보정하기 위한 scrollToBottom 재적용 타이밍(ms)입니다.
+// Android keyboard/viewport 특성 대응용이므로 history hydration timeout과는 별도입니다.
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
 ];
-
 
 function isAndroidHydrationRuntime() {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
@@ -216,7 +252,10 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function cleanupOverlayScrollbar() {
-    if (overlayScrollViewport && overlayScrollViewport !== overlayScrollSource) {
+    if (
+      overlayScrollViewport &&
+      overlayScrollViewport !== overlayScrollSource
+    ) {
       overlayScrollViewport.removeEventListener("scroll", handleScroll);
     }
     if (overlayScrollSource) destroyOverlayScrollbar(overlayScrollSource);
@@ -264,7 +303,9 @@ export function useMessageListScroll({props, emit}) {
       const userMessages = el.querySelectorAll(
         '[data-message-role="user"], article.message--user, .message--user'
       );
-      target = userMessages.length ? userMessages[userMessages.length - 1] : null;
+      target = userMessages.length
+        ? userMessages[userMessages.length - 1]
+        : null;
     }
 
     latestUserMessageCacheKey = cacheKey;
@@ -514,7 +555,8 @@ export function useMessageListScroll({props, emit}) {
     applyHydrationBottomScroll();
 
     const mermaidReady = await renderHydrationMermaidBeforeReveal(runId);
-    if (!mermaidReady || runId !== hydrationRunId || !props.initialHydrating) return;
+    if (!mermaidReady || runId !== hydrationRunId || !props.initialHydrating)
+      return;
 
     updateOverlayScrollbarFrame();
     applyHydrationBottomScroll();
@@ -563,9 +605,10 @@ export function useMessageListScroll({props, emit}) {
   function getHydrationHardTimeoutMs() {
     const messageCount = props.messages?.length || 0;
     const assistantCount = getAssistantMessageIds().length;
-    const base = messageCount >= 120
-      ? HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS
-      : HYDRATION_SMALL_ROOM_HARD_TIMEOUT_MS;
+    const base =
+      messageCount >= 120
+        ? HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS
+        : HYDRATION_SMALL_ROOM_HARD_TIMEOUT_MS;
 
     return Math.max(base, Math.min(16000, assistantCount * 24));
   }
@@ -573,7 +616,7 @@ export function useMessageListScroll({props, emit}) {
   function getHydrationDomMessageCount() {
     const root = scrollRef.value;
     if (!root?.isConnected) return 0;
-    return root.querySelectorAll('[data-message-role]').length;
+    return root.querySelectorAll("[data-message-role]").length;
   }
 
   function isHydrationDomReady() {
@@ -583,7 +626,9 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function isHydrationContentReady() {
-    return !pendingHydrationAssistantIds || pendingHydrationAssistantIds.size === 0;
+    return (
+      !pendingHydrationAssistantIds || pendingHydrationAssistantIds.size === 0
+    );
   }
 
   function scheduleHydrationReadyCheck(runId) {
@@ -724,7 +769,9 @@ export function useMessageListScroll({props, emit}) {
     if (pendingHydrationAssistantIds) {
       const id = String(messageId ?? "");
       const isLayoutReady =
-        !renderPart || renderPart === "content" || renderPart === "layout-ready";
+        !renderPart ||
+        renderPart === "content" ||
+        renderPart === "layout-ready";
       if (isLayoutReady) pendingHydrationAssistantIds.delete(id);
       if (!pendingHydrationAssistantIds.size) {
         const runId = hydrationRunId;
@@ -733,9 +780,10 @@ export function useMessageListScroll({props, emit}) {
       return;
     }
 
-    const shouldRecalculateSpacer = !(props.loading && !props.autoScrollOnAnswer);
+    const shouldRecalculateSpacer = !(
+      props.loading && !props.autoScrollOnAnswer
+    );
     scheduleRenderedFrameUpdate({spacer: shouldRecalculateSpacer});
-
 
     if (
       renderPart === "enhanced" &&

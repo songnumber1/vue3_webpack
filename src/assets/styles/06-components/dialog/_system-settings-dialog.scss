@@ -200,7 +200,10 @@ body.mobile-mode .chat-container-root--mode-main .mobile-topbar .round-icon,
 body.mobile-mode .chat-container-root--mode-chat .mobile-topbar .round-icon,
 body.mobile-mode .chat-container-root--mode-shared .mobile-topbar .round-icon,
 body.mobile-mode .chat-container-root--mode-studio .mobile-topbar .round-icon,
-body.mobile-mode .chat-container-root--mode-chat-search .mobile-topbar .round-icon {
+body.mobile-mode
+  .chat-container-root--mode-chat-search
+  .mobile-topbar
+  .round-icon {
   width: 34px;
   height: 34px;
 }

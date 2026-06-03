@@ -1,7 +1,6 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
-
 /* --- authority/_authority-picker-01.scss --- */
 /* Authority add popup: selectable grid with footer confirm/close, matching the selected-authority grid. */
 .studio-picker--authority {
@@ -27,13 +26,15 @@
   opacity: 0.48;
 }
 
-
 /* --- mobile/_authority-picker-02.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
   width: 100% !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid {
   flex: 0 0 auto;
   width: auto;
   margin: 14px 12px !important;
@@ -41,23 +42,32 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   -webkit-overflow-scrolling: touch;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row {
   grid-template-columns: 48px minmax(120px, 0.95fr) minmax(180px, 1.35fr) !important;
   min-width: 360px;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker__footer--authority {
   position: sticky;
   bottom: 0;
   padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
 }
 
-
 /* --- authority/_authority-picker-03.scss --- */
 /* Studio authority picker follow-up: searchable, paged grid with stable desktop/mobile typography. */
-.studio-icon--more { mask-image: url("../img/studio/more.svg"); -webkit-mask-image: url("../img/studio/more.svg"); }
-
+.studio-icon--more {
+  mask-image: url("../img/studio/more.svg");
+  -webkit-mask-image: url("../img/studio/more.svg");
+}
 
 /* --- create/_authority-picker-04.scss --- */
 .studio-create-panel__menu {
@@ -69,7 +79,6 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--autho
   width: 22px;
   height: 22px;
 }
-
 
 /* --- authority/_authority-picker-05.scss --- */
 .studio-picker--authority {
@@ -86,7 +95,6 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--autho
   padding: 16px;
 }
 
-
 /* --- mobile/_authority-picker-06.scss --- */
 .studio-authority-picker__search {
   position: relative;
@@ -95,7 +103,6 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--autho
   width: 100%;
   max-width: none;
 }
-
 
 /* --- authority/_authority-picker-07.scss --- */
 .studio-authority-picker__search input {
@@ -129,7 +136,6 @@ body.desktop-mode .studio-picker--authority .studio-picker__footer--authority {
   padding: 14px 16px !important;
 }
 
-
 /* --- mobile/_authority-picker-08.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
   height: 100% !important;
@@ -137,50 +143,81 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
   background: var(--studio-surface) !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-picker__head--authority {
   grid-template-columns: 40px minmax(0, 1fr) 40px !important;
   min-height: calc(56px + env(safe-area-inset-top, 0px)) !important;
   padding: env(safe-area-inset-top, 0px) 10px 0 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-picker__head--authority strong {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-picker__head--authority
+  strong {
   font-size: var(--text-size-title-sm, 16px) !important;
   font-weight: 900 !important;
   line-height: 1.3 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__body {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-authority-picker__body {
   padding: 12px 16px 0 !important;
   gap: 12px;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__search input {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-authority-picker__search
+  input {
   min-height: 44px;
   font-size: var(--text-size-body-sm, 14px);
   font-weight: 600;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__grid-shell {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-authority-picker__grid-shell {
   min-height: 0;
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid {
   width: 100%;
   min-width: 0;
   overflow: hidden;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row {
   grid-template-columns: 48px minmax(128px, 0.9fr) minmax(180px, 1.25fr) !important;
   min-width: 0 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div {
   min-height: 52px !important;
   padding: 10px 12px !important;
   font-size: var(--text-size-body-sm, 14px) !important;
@@ -189,15 +226,24 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   word-break: keep-all;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(3) {
   font-weight: 700;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-pagination {
   padding: 2px 0 12px !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker__footer--authority {
   position: sticky;
   bottom: 0;
   justify-content: flex-end;
@@ -207,13 +253,15 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--autho
   background: var(--studio-surface);
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker__footer--authority .studio-button {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker__footer--authority
+  .studio-button {
   min-width: 96px;
   min-height: 44px;
   font-size: var(--text-size-body-sm, 14px);
   font-weight: 800;
 }
-
 
 /* --- authority/_authority-picker-09.scss --- */
 /* Authority picker grid sizing fix: avoid mobile horizontal scroll and give desktop description enough room. */
@@ -226,7 +274,9 @@ body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
   min-height: 520px !important;
 }
 
-body.desktop-mode .studio-picker--authority .studio-authority-picker__grid-shell {
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker__grid-shell {
   min-height: 420px !important;
 }
 
@@ -236,99 +286,172 @@ body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
   min-width: 0 !important;
 }
 
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div,
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div {
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div,
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div {
   min-height: 52px !important;
   padding: 10px 14px !important;
 }
 
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:first-child,
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:first-child {
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:first-child,
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:first-child {
   justify-content: center !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2) {
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(2),
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(2) {
   justify-content: flex-start !important;
   white-space: nowrap !important;
 }
 
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(3),
+body.desktop-mode
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(3) {
   justify-content: flex-start !important;
   white-space: normal !important;
   word-break: keep-all !important;
   overflow-wrap: anywhere !important;
 }
 
-
 /* --- mobile/_authority-picker-10.scss --- */
-body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__body {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-authority-picker__body {
   padding: 12px 16px 0 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-authority-picker__grid-shell {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-authority-picker__grid-shell {
   width: 100% !important;
   min-width: 0 !important;
   overflow-x: hidden !important;
   overflow-y: hidden !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid {
   width: 100% !important;
   min-width: 0 !important;
   max-width: 100% !important;
   overflow-x: hidden !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row {
   grid-template-columns: 42px minmax(88px, 0.75fr) minmax(0, 1.25fr) !important;
   width: 100% !important;
   min-width: 0 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div {
   min-width: 0 !important;
   min-height: 52px !important;
   padding: 9px 10px !important;
   box-sizing: border-box !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:first-child,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:first-child {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:first-child,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:first-child {
   justify-content: center !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2) {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(2),
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(2) {
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(3),
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(3) {
   white-space: normal !important;
   word-break: keep-all !important;
   overflow-wrap: anywhere !important;
 }
 
-
 /* Authority picker mobile width final guard: keep the grid inside the viewport without horizontal scroll or right-edge clipping. */
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__body {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker__body {
   box-sizing: border-box !important;
   width: 100% !important;
   min-width: 0 !important;
   overflow-x: hidden !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker__grid-shell {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker__grid-shell {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -336,7 +459,10 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   overflow: hidden !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -345,8 +471,14 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   overflow: hidden !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row {
   box-sizing: border-box !important;
   width: 100% !important;
   max-width: 100% !important;
@@ -354,20 +486,43 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .st
   grid-template-columns: 42px minmax(78px, 0.68fr) minmax(0, 1.32fr) !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div,
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div {
   box-sizing: border-box !important;
   min-width: 0 !important;
   max-width: 100% !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(2),
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(2),
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__head > div:nth-child(3),
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-picker-grid__row > div:nth-child(3) {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(2),
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(2),
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__head
+  > div:nth-child(3),
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-picker-grid__row
+  > div:nth-child(3) {
   overflow: hidden !important;
 }
-
 
 /* --- pagination/_authority-picker-11.scss --- */
 /* A-stage hotfix: authority picker pagination belongs to the picker layout, not the share-tab shell.
@@ -415,8 +570,10 @@ body.desktop-mode .studio-picker--authority .studio-authority-pagination {
   padding: 12px 16px 16px !important;
 }
 
-
 /* --- mobile/_authority-picker-12.scss --- */
-body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority .studio-authority-pagination {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-picker--authority
+  .studio-authority-pagination {
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom, 0px)) !important;
 }

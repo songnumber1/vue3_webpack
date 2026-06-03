@@ -27,9 +27,11 @@ function resolveAssistantId(raw = {}, model = null) {
   return firstText(raw[C.ASSIST_ID], raw[C.ASSISTANT_ID], model?.assistId);
 }
 
-
 function resolveTitle(raw = {}, fallbackTitle = "새 대화") {
-  return firstText(raw[C.CHAT_TITLE], raw[C.CHAT_TITLE_LEGACY_TYPO], raw[C.TITLE]) || fallbackTitle;
+  return (
+    firstText(raw[C.CHAT_TITLE], raw[C.CHAT_TITLE_LEGACY_TYPO], raw[C.TITLE]) ||
+    fallbackTitle
+  );
 }
 
 /**
@@ -39,13 +41,16 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
   const modelId = resolveModelId(raw);
   const model = context.modelMap?.[modelId] || null;
   const assistantId = resolveAssistantId(raw, model);
-  const assistant = assistantId ? context.assistantMap?.[assistantId] || null : null;
+  const assistant = assistantId
+    ? context.assistantMap?.[assistantId] || null
+    : null;
   const title = resolveTitle(raw);
 
   return {
     id: firstText(raw[C.CHAT_ID], raw.id),
     title,
-    preview: title || firstText(raw[C.PREVIEW], raw[C.SNIPPET]) || "저장된 대화",
+    preview:
+      title || firstText(raw[C.PREVIEW], raw[C.SNIPPET]) || "저장된 대화",
     modelId,
     assistantId: assistantId || null,
     assistantType: assistant?.type || null,
@@ -68,8 +73,7 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
     .sort((a, b) => {
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
       return (
-        new Date(b.endedAt || 0).getTime() -
-        new Date(a.endedAt || 0).getTime()
+        new Date(b.endedAt || 0).getTime() - new Date(a.endedAt || 0).getTime()
       );
     });
 }
@@ -118,7 +122,9 @@ export function adaptChatSearchResponse(response, options = {}) {
 
   return {
     keyword: source?.[R.KEYWORD] || options.keyword || "",
-    suggestions: Array.isArray(source?.[R.SUGGESTIONS]) ? source[R.SUGGESTIONS] : [],
+    suggestions: Array.isArray(source?.[R.SUGGESTIONS])
+      ? source[R.SUGGESTIONS]
+      : [],
     list: adaptChatSearchList(listSource, options),
   };
 }
@@ -135,7 +141,12 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
   return {
     id: chatId,
     title,
-    preview: firstText(result.snippet, result.preview, result.title, result.chatTitle),
+    preview: firstText(
+      result.snippet,
+      result.preview,
+      result.title,
+      result.chatTitle
+    ),
     modelId: firstText(result.modelId, result.modeId),
     assistantId: firstText(result.assistId, result.assistantId),
     assistantType: result.assistantType || "",

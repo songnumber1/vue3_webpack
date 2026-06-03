@@ -13,13 +13,19 @@
       <div class="chat-search-panel">
         <header class="chat-search-page-head">
           <div class="chat-search-page-head__text">
-            <span>{{ t('chatSearch.eyebrow') }}</span>
-            <h1>{{ t('chatSearch.title') }}</h1>
+            <span>{{ t("chatSearch.eyebrow") }}</span>
+            <h1>{{ t("chatSearch.title") }}</h1>
           </div>
         </header>
 
-        <form class="chat-search-form" role="search" @submit.prevent="runSearch({resetPage: true})">
-          <label class="sr-only" for="chat-search-keyword">{{ t('chatSearch.inputLabel') }}</label>
+        <form
+          class="chat-search-form"
+          role="search"
+          @submit.prevent="runSearch({resetPage: true})"
+        >
+          <label class="sr-only" for="chat-search-keyword">{{
+            t("chatSearch.inputLabel")
+          }}</label>
           <input
             id="chat-search-keyword"
             v-model="keyword"
@@ -29,7 +35,10 @@
             @input="handleKeywordInput"
           />
           <button type="submit" :aria-label="t('chatSearch.searchAction')">
-            <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
+            <span
+              class="studio-icon studio-icon--search"
+              aria-hidden="true"
+            ></span>
           </button>
         </form>
 
@@ -42,21 +51,36 @@
           <div ref="listAreaRef" class="chat-search-list-area">
             <div v-if="loading" class="chat-search-state">
               <span class="chat-search-loading-dot" aria-hidden="true"></span>
-              <p>{{ t('chatSearch.loading') }}</p>
+              <p>{{ t("chatSearch.loading") }}</p>
             </div>
 
             <div v-else-if="!pagedResults.length" class="chat-search-empty">
-              <span class="studio-icon studio-icon--search" aria-hidden="true"></span>
-              <strong>{{ t('chatSearch.emptyTitle') }}</strong>
-              <p>{{ t('chatSearch.emptyDescription') }}</p>
+              <span
+                class="studio-icon studio-icon--search"
+                aria-hidden="true"
+              ></span>
+              <strong>{{ t("chatSearch.emptyTitle") }}</strong>
+              <p>{{ t("chatSearch.emptyDescription") }}</p>
             </div>
 
             <ul v-else class="chat-search-results">
-              <li v-for="result in pagedResults" :key="result.chatId || result.id">
-                <button type="button" class="chat-search-result" @click="openChat(result)">
+              <li
+                v-for="result in pagedResults"
+                :key="result.chatId || result.id"
+              >
+                <button
+                  type="button"
+                  class="chat-search-result"
+                  @click="openChat(result)"
+                >
                   <span class="chat-search-result__body">
-                    <span class="chat-search-result__title">{{ result.title || result.chatTitle }}</span>
-                    <span v-if="isSearchMode" class="chat-search-result__snippet">
+                    <span class="chat-search-result__title">{{
+                      result.title || result.chatTitle
+                    }}</span>
+                    <span
+                      v-if="isSearchMode"
+                      class="chat-search-result__snippet"
+                    >
                       {{ result.snippet || result.preview }}
                     </span>
                   </span>
@@ -68,9 +92,19 @@
             </ul>
           </div>
 
-          <nav class="chat-search-pagination" :aria-label="t('chatSearch.pagination')">
-            <button type="button" :disabled="currentPage <= 1" @click="goToPage(currentPage - 1)">
-              <span class="studio-icon studio-icon--page-prev" aria-hidden="true"></span>
+          <nav
+            class="chat-search-pagination"
+            :aria-label="t('chatSearch.pagination')"
+          >
+            <button
+              type="button"
+              :disabled="currentPage <= 1"
+              @click="goToPage(currentPage - 1)"
+            >
+              <span
+                class="studio-icon studio-icon--page-prev"
+                aria-hidden="true"
+              ></span>
             </button>
             <button
               v-for="page in visiblePages"
@@ -82,8 +116,15 @@
             >
               {{ page }}
             </button>
-            <button type="button" :disabled="currentPage >= totalPages" @click="goToPage(currentPage + 1)">
-              <span class="studio-icon studio-icon--page-next" aria-hidden="true"></span>
+            <button
+              type="button"
+              :disabled="currentPage >= totalPages"
+              @click="goToPage(currentPage + 1)"
+            >
+              <span
+                class="studio-icon studio-icon--page-next"
+                aria-hidden="true"
+              ></span>
             </button>
           </nav>
         </div>
@@ -137,18 +178,32 @@ const debounceTimer = ref(null);
 const listAreaRef = ref(null);
 
 const pageSize = computed(() => (isMobile.value ? 10 : 12));
-const totalPages = computed(() => Math.max(1, Math.ceil(allResults.value.length / pageSize.value)));
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(allResults.value.length / pageSize.value))
+);
 const isSearchMode = computed(() => Boolean(lastSearchedKeyword.value));
 const pagedResults = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   return allResults.value.slice(start, start + pageSize.value);
 });
-const visiblePages = computed(() => createVisiblePages(currentPage.value, totalPages.value));
-const listTitle = computed(() => (isSearchMode.value ? t("chatSearch.resultsTitle") : t("chatSearch.recentTitle")));
+const visiblePages = computed(() =>
+  createVisiblePages(currentPage.value, totalPages.value)
+);
+const listTitle = computed(() =>
+  isSearchMode.value
+    ? t("chatSearch.resultsTitle")
+    : t("chatSearch.recentTitle")
+);
 useOverlayScrollbar(
   listAreaRef,
   {overflow: {x: "hidden", y: "scroll"}},
-  {watchSource: () => [pagedResults.value.length, loading.value, currentPage.value]}
+  {
+    watchSource: () => [
+      pagedResults.value.length,
+      loading.value,
+      currentPage.value,
+    ],
+  }
 );
 
 const summaryText = computed(() => {

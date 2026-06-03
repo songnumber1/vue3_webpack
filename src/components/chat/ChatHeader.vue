@@ -70,7 +70,10 @@
       </button>
     </div>
 
-    <div v-else class="topbar-actions topbar-actions--desktop topbar-actions--desktop-chat"></div>
+    <div
+      v-else
+      class="topbar-actions topbar-actions--desktop topbar-actions--desktop-chat"
+    ></div>
   </header>
 </template>
 
@@ -168,5 +171,4 @@ const showDesktopConversationTitle = computed(
   overflow: visible !important;
   pointer-events: auto !important;
 }
-
 </style>

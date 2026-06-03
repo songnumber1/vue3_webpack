@@ -38,8 +38,12 @@ import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
 const {appInfo} = useAppContext();
 
 // 2. 실시간 런타임 상태 플래그 훅을 호출하여 플랫폼 세부 정보 및 모바일 레이아웃 채택 여부를 구조 분해 할당으로 가져옵니다.
-const {platformInfo, shouldUseMobileLayout, isCompactViewport, isMobileBrowser} =
-  useRuntimeModeFlags();
+const {
+  platformInfo,
+  shouldUseMobileLayout,
+  isCompactViewport,
+  isMobileBrowser,
+} = useRuntimeModeFlags();
 const viewportStore = useViewportStore();
 const responsiveLayoutStore = useResponsiveLayoutStore();
 
@@ -75,11 +79,11 @@ const isActualAndroidRuntime = computed(() => {
   const userAgent = String(info.userAgent || "");
   return Boolean(
     info.actualEnv === "android" ||
-      info.actualDevice === "android" ||
-      info.actualDevice === "android-webview" ||
-      info.actualBrowser === "android-webview" ||
-      info.isAndroidApp ||
-      /Android/i.test(userAgent)
+    info.actualDevice === "android" ||
+    info.actualDevice === "android-webview" ||
+    info.actualBrowser === "android-webview" ||
+    info.isAndroidApp ||
+    /Android/i.test(userAgent)
   );
 });
 

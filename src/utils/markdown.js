@@ -21,7 +21,6 @@ import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
 
-
 const COMMON_SAFE_ATTRIBUTES = [
   "ariaDescribedBy",
   "ariaHidden",
@@ -75,11 +74,7 @@ const MARKDOWN_SAFE_CLASS_TAGS = [
 const markdownSanitizeSchema = {
   ...defaultSchema,
   tagNames: Array.from(
-    new Set([
-      ...(defaultSchema.tagNames || []),
-      "figure",
-      "figcaption",
-    ])
+    new Set([...(defaultSchema.tagNames || []), "figure", "figcaption"])
   ),
   attributes: {
     ...(defaultSchema.attributes || {}),
@@ -485,7 +480,10 @@ function rehypeCodeBlockWrapper() {
                 tagName: "div",
                 properties: {className: ["md-code-actions"]},
                 children: [
-                  codeActionButton("interpreter", mdLabel("markdown.codeInterpreter")),
+                  codeActionButton(
+                    "interpreter",
+                    mdLabel("markdown.codeInterpreter")
+                  ),
                   codeActionButton("copy", mdLabel("markdown.copyCode")),
                 ],
               },

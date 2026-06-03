@@ -1,6 +1,10 @@
 <template>
-  <div class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2">
-    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
+  <div
+    class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+  >
+    <div
+      class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2"
+    >
       <PromptModelSelector
         ref="modelSelectorRef"
         :disabled="disabled"
@@ -57,9 +61,11 @@
             :key="tool.id"
             type="button"
             :class="{
-              'prompt-tool-menu-parent tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-control tw-px-2.5 tw-text-left': hasChildren(tool),
+              'prompt-tool-menu-parent tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-control tw-px-2.5 tw-text-left':
+                hasChildren(tool),
               active: activeToolGroupId === tool.id || tool.active,
-              'is-template-tool tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-controlSm tw-px-2.5 tw-text-left': Boolean(tool.promptTemplateKey),
+              'is-template-tool tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-controlSm tw-px-2.5 tw-text-left':
+                Boolean(tool.promptTemplateKey),
             }"
             :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
             :aria-expanded="
@@ -80,7 +86,9 @@
               aria-hidden="true"
               >{{ tool.icon }}</span
             >
-            <span class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left">
+            <span
+              class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left"
+            >
               <strong>{{ tool.label }}</strong>
             </span>
             <span

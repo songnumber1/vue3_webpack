@@ -95,66 +95,202 @@ body.mobile-mode .markdown-body pre {
  * 실제 Android 모바일 코드 블록은 현재 정상이라 actual-android-runtime은 건드리지 않고,
  * PC 데스크톱과 PC 모바일 사이즈의 md-code-card 내부 pre/code/hljs 색상만 고정한다.
  */
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card {
   background: var(--code-bg) !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .md-code-pre,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card pre.md-code-pre {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .md-code-pre,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  pre.md-code-pre {
   background: var(--code-bg) !important;
   color: var(--code-text) !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .md-code-pre code,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .md-code-pre code.hljs,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .md-code-pre .hljs {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .md-code-pre
+  code,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .md-code-pre
+  code.hljs,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .md-code-pre
+  .hljs {
   background: transparent !important;
   color: var(--code-text) !important;
   text-shadow: none !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-keyword,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-selector-tag,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-literal,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-section,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-link {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-keyword,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-selector-tag,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-literal,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-section,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-link {
   color: #ff7b72 !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-title,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-title.function_,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-function .hljs-title,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-params {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-title,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-title.function_,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-function
+  .hljs-title,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-params {
   color: #d2a8ff !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-string,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-attr,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-symbol,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-bullet,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-addition {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-string,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-attr,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-symbol,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-bullet,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-addition {
   color: #a5d6ff !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-number,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-variable,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-template-variable,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-type {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-number,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-variable,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-template-variable,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-type {
   color: #79c0ff !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-comment,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-quote,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-deletion {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-comment,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-quote,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-deletion {
   color: #8b949e !important;
 }
 
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-built_in,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-class .hljs-title,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-property,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-tag,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-name,
-body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-card .hljs-attribute {
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-built_in,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-class
+  .hljs-title,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-property,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-tag,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-name,
+body:not(.actual-android-runtime)
+  .message--assistant
+  .markdown-body
+  .md-code-card
+  .hljs-attribute {
   color: #ffa657 !important;
 }
 
@@ -163,7 +299,8 @@ body:not(.actual-android-runtime) .message--assistant .markdown-body .md-code-ca
   display: none;
 }
 
-body.desktop-mode:not(.mobile-mode):not(.actual-android-runtime) .md-code-action--interpreter {
+body.desktop-mode:not(.mobile-mode):not(.actual-android-runtime)
+  .md-code-action--interpreter {
   display: inline-flex;
   align-items: center;
   justify-content: center;

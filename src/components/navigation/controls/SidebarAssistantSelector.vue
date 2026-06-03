@@ -1,5 +1,8 @@
 <template>
-  <div ref="rootRef" class="assistant-selector tw-relative tw-min-w-0 tw-flex-1">
+  <div
+    ref="rootRef"
+    class="assistant-selector tw-relative tw-min-w-0 tw-flex-1"
+  >
     <button
       class="assistant-trigger tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-2 tw-rounded-control tw-border tw-border-app-sidebarBorder tw-bg-app-control tw-text-left tw-transition"
       type="button"
@@ -9,7 +12,10 @@
       <span>{{ currentAssistant.label }}</span>
       <ChevronDownIcon class="chevron chevron--selector" />
     </button>
-    <div v-if="open && !mobile" class="assistant-menu tw-absolute tw-z-popover tw-mt-2 tw-w-full tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu">
+    <div
+      v-if="open && !mobile"
+      class="assistant-menu tw-absolute tw-z-popover tw-mt-2 tw-w-full tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
+    >
       <button
         v-for="assistant in assistants"
         :key="assistant.id"
@@ -18,7 +24,9 @@
         type="button"
         @click="$emit('select', assistant.id)"
       >
-        <span class="assistant-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1">
+        <span
+          class="assistant-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1"
+        >
           <strong>{{ assistant.label }}</strong>
           <small>{{ assistant.description }}</small>
         </span>
@@ -75,9 +83,11 @@ const currentAssistant = computed(
 useOverlayScrollbar(
   menuRef,
   {overflow: {x: "hidden", y: "scroll"}},
-  {watchSource: () => [props.open, props.mobile, props.assistants.length], enabled: () => props.open && !props.mobile}
+  {
+    watchSource: () => [props.open, props.mobile, props.assistants.length],
+    enabled: () => props.open && !props.mobile,
+  }
 );
-
 
 defineExpose({rootRef});
 </script>

@@ -110,8 +110,8 @@ body.mobile-mode
   width: min(100%, 420px) !important;
   max-width: calc(100vw - 24px) !important;
   max-height: calc(
-    var(--app-height, 100dvh) - 24px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
+    var(--app-height, 100dvh) -
+      24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   ) !important;
   margin: auto !important;
   border-radius: var(--dialog-radius) !important;
@@ -122,12 +122,11 @@ body.mobile-mode
   .responsive-overlay.responsive-overlay--mobile-dialog
   .responsive-panel-body {
   max-height: calc(
-    var(--app-height, 100dvh) - 122px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
+    var(--app-height, 100dvh) -
+      122px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   ) !important;
   overflow-y: auto !important;
 }
-
 
 /* Step 3-3 stabilization: mobile fullscreen overlays must follow the
    runtime visual viewport variables, not static 100dvh. This keeps notice,
@@ -182,7 +181,6 @@ body.mobile-mode
   background: transparent;
 }
 
-
 /* Stage D-2 guard: keep ResponsiveOverlay modes stable after Tailwind shell migration.
    These rules intentionally use data-overlay-mode because the component already
    computes the final mode from breakpoint + mobileMode. They prevent the known
@@ -233,7 +231,8 @@ body.mobile-mode
   border-radius: 0 !important;
 }
 
-.responsive-overlay[data-overlay-mode="mobile-fullscreen"] .responsive-panel-body {
+.responsive-overlay[data-overlay-mode="mobile-fullscreen"]
+  .responsive-panel-body {
   min-height: 0 !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch;
@@ -249,7 +248,8 @@ body.mobile-mode
   min-height: 0 !important;
   display: grid !important;
   place-items: center !important;
-  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)) !important;
+  padding: max(12px, env(safe-area-inset-top)) 12px
+    max(12px, env(safe-area-inset-bottom)) !important;
   overflow-y: auto !important;
   overscroll-behavior: contain !important;
 }
@@ -257,7 +257,10 @@ body.mobile-mode
 .responsive-overlay[data-overlay-mode="mobile-dialog"] .responsive-panel {
   width: min(100%, 420px) !important;
   max-width: calc(100vw - 24px) !important;
-  max-height: calc(var(--app-height, 100dvh) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+  max-height: calc(
+    var(--app-height, 100dvh) -
+      24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  ) !important;
   margin: auto !important;
   border: 1px solid var(--dialog-panel-border) !important;
   border-radius: var(--dialog-radius) !important;

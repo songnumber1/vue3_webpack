@@ -348,7 +348,6 @@ export function usePromptComposer(props, emit) {
     applyPromptExpandedState(false);
   }
 
-
   // ── [생명주기 마운트] ────────────────────────────────────────────────────
   // 실제 DOM 트리가 기기 브라우저에 최종 활성화 안착한 시점에 최초 동기화 세팅을 구동합니다.
   // orientationchange 및 window.visualViewport 이벤트 추적은 usePromptMenu의 syncViewportMode 리스너에서 전담합니다.

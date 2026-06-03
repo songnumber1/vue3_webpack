@@ -1,5 +1,8 @@
 <template>
-  <section class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text" aria-label="Connector Store">
+  <section
+    class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text"
+    aria-label="Connector Store"
+  >
     <McpMainWorkspace
       :search-text="searchText"
       :active-tab="activeTab"
@@ -20,15 +23,33 @@
       @go-page="goPage"
     />
 
-    <div v-if="readyDialogOpen" class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal">
-      <article class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text" role="dialog" aria-modal="true" :aria-label="t('mcp.ready.title')">
+    <div
+      v-if="readyDialogOpen"
+      class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal"
+    >
+      <article
+        class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text"
+        role="dialog"
+        aria-modal="true"
+        :aria-label="t('mcp.ready.title')"
+      >
         <header class="studio-confirm-dialog__head">
           <strong>{{ t("mcp.ready.title") }}</strong>
-          <button type="button" :aria-label="t('common.close')" @click="readyDialogOpen = false">×</button>
+          <button
+            type="button"
+            :aria-label="t('common.close')"
+            @click="readyDialogOpen = false"
+          >
+            ×
+          </button>
         </header>
         <p>{{ t("mcp.ready.message") }}</p>
         <footer class="studio-confirm-dialog__footer">
-          <button class="studio-button studio-button--primary" type="button" @click="readyDialogOpen = false">
+          <button
+            class="studio-button studio-button--primary"
+            type="button"
+            @click="readyDialogOpen = false"
+          >
             {{ t("common.confirm") }}
           </button>
         </footer>
@@ -142,7 +163,9 @@ function createDefaultCategoryOptions() {
       value: "COMM",
       label: locale.value === "en" ? "Communication" : "커뮤니케이션",
       description:
-        locale.value === "en" ? "Communication connectors" : "커뮤니케이션 커넥터",
+        locale.value === "en"
+          ? "Communication connectors"
+          : "커뮤니케이션 커넥터",
     },
     {
       value: "DEV",
@@ -173,27 +196,212 @@ function createDefaultPromptExamples() {
         "Find linked documents",
         "Create action items",
       ]
-    : ["관련 메시지 검색", "최근 업데이트 요약", "연결 문서 찾기", "액션 아이템 생성"];
+    : [
+        "관련 메시지 검색",
+        "최근 업데이트 요약",
+        "연결 문서 찾기",
+        "액션 아이템 생성",
+      ];
 }
 
 function createDefaultMcps() {
   if (locale.value === "en") {
     return [
-      createMcp("mcp-mail", "M", "Mail Connector", "COMM", "Communication", "Mail", "Search and summarize work mail.", 18, 421, "Tester 1", true, true, "Mail, contacts", "My workspace"),
-      createMcp("mcp-calendar", "C", "Calendar Connector", "COMM", "Communication", "Calendar", "Find schedules and prepare meeting context.", 11, 308, "Tester 2", true, false, "Calendar", "Subscribed"),
-      createMcp("mcp-github", "G", "GitHub Connector", "DEV", "Development", "GitHub", "Search repositories, issues, and pull requests.", 25, 712, "Tester 3", false, false, "GitHub repositories", "Public"),
-      createMcp("mcp-docs", "D", "Document Connector", "DOC", "Documents", "File search", "Search and summarize internal documents.", 14, 266, "Tester 1", true, true, "Drive, file search", "My workspace"),
-      createMcp("mcp-deploy", "O", "Deployment Lookup Connector", "OPS", "Operations", "Deployment", "Look up deployment history and release notes.", 7, 154, "Tester 4", false, false, "Deployment logs", "Public"),
-      createMcp("mcp-jira", "J", "Jira Connector", "DEV", "Development", "Jira", "Search issues and sprint progress.", 16, 382, "Tester 2", true, false, "Jira projects", "Subscribed"),
+      createMcp(
+        "mcp-mail",
+        "M",
+        "Mail Connector",
+        "COMM",
+        "Communication",
+        "Mail",
+        "Search and summarize work mail.",
+        18,
+        421,
+        "Tester 1",
+        true,
+        true,
+        "Mail, contacts",
+        "My workspace"
+      ),
+      createMcp(
+        "mcp-calendar",
+        "C",
+        "Calendar Connector",
+        "COMM",
+        "Communication",
+        "Calendar",
+        "Find schedules and prepare meeting context.",
+        11,
+        308,
+        "Tester 2",
+        true,
+        false,
+        "Calendar",
+        "Subscribed"
+      ),
+      createMcp(
+        "mcp-github",
+        "G",
+        "GitHub Connector",
+        "DEV",
+        "Development",
+        "GitHub",
+        "Search repositories, issues, and pull requests.",
+        25,
+        712,
+        "Tester 3",
+        false,
+        false,
+        "GitHub repositories",
+        "Public"
+      ),
+      createMcp(
+        "mcp-docs",
+        "D",
+        "Document Connector",
+        "DOC",
+        "Documents",
+        "File search",
+        "Search and summarize internal documents.",
+        14,
+        266,
+        "Tester 1",
+        true,
+        true,
+        "Drive, file search",
+        "My workspace"
+      ),
+      createMcp(
+        "mcp-deploy",
+        "O",
+        "Deployment Lookup Connector",
+        "OPS",
+        "Operations",
+        "Deployment",
+        "Look up deployment history and release notes.",
+        7,
+        154,
+        "Tester 4",
+        false,
+        false,
+        "Deployment logs",
+        "Public"
+      ),
+      createMcp(
+        "mcp-jira",
+        "J",
+        "Jira Connector",
+        "DEV",
+        "Development",
+        "Jira",
+        "Search issues and sprint progress.",
+        16,
+        382,
+        "Tester 2",
+        true,
+        false,
+        "Jira projects",
+        "Subscribed"
+      ),
     ];
   }
   return [
-    createMcp("mcp-mail", "메", "메일 Connector", "COMM", "커뮤니케이션", "메일", "업무 메일을 검색하고 요약합니다.", 18, 421, "테스터1", true, true, "메일, 연락처", "내 워크스페이스"),
-    createMcp("mcp-calendar", "캘", "캘린더 Connector", "COMM", "커뮤니케이션", "캘린더", "일정과 회의 맥락을 확인합니다.", 11, 308, "테스터2", true, false, "캘린더", "구독 중"),
-    createMcp("mcp-github", "깃", "GitHub Connector", "DEV", "개발", "GitHub", "저장소, 이슈, PR을 검색합니다.", 25, 712, "테스터3", false, false, "GitHub 저장소", "전체 공개"),
-    createMcp("mcp-docs", "문", "문서 Connector", "DOC", "문서", "파일 검색", "사내 문서를 검색하고 요약합니다.", 14, 266, "테스터1", true, true, "Drive, 파일 검색", "내 워크스페이스"),
-    createMcp("mcp-deploy", "배", "배포 조회 Connector", "OPS", "운영", "배포 조회", "배포 이력과 릴리즈 노트를 조회합니다.", 7, 154, "테스터4", false, false, "배포 로그", "전체 공개"),
-    createMcp("mcp-jira", "지", "Jira Connector", "DEV", "개발", "Jira", "이슈와 스프린트 진행 상황을 검색합니다.", 16, 382, "테스터2", true, false, "Jira 프로젝트", "구독 중"),
+    createMcp(
+      "mcp-mail",
+      "메",
+      "메일 Connector",
+      "COMM",
+      "커뮤니케이션",
+      "메일",
+      "업무 메일을 검색하고 요약합니다.",
+      18,
+      421,
+      "테스터1",
+      true,
+      true,
+      "메일, 연락처",
+      "내 워크스페이스"
+    ),
+    createMcp(
+      "mcp-calendar",
+      "캘",
+      "캘린더 Connector",
+      "COMM",
+      "커뮤니케이션",
+      "캘린더",
+      "일정과 회의 맥락을 확인합니다.",
+      11,
+      308,
+      "테스터2",
+      true,
+      false,
+      "캘린더",
+      "구독 중"
+    ),
+    createMcp(
+      "mcp-github",
+      "깃",
+      "GitHub Connector",
+      "DEV",
+      "개발",
+      "GitHub",
+      "저장소, 이슈, PR을 검색합니다.",
+      25,
+      712,
+      "테스터3",
+      false,
+      false,
+      "GitHub 저장소",
+      "전체 공개"
+    ),
+    createMcp(
+      "mcp-docs",
+      "문",
+      "문서 Connector",
+      "DOC",
+      "문서",
+      "파일 검색",
+      "사내 문서를 검색하고 요약합니다.",
+      14,
+      266,
+      "테스터1",
+      true,
+      true,
+      "Drive, 파일 검색",
+      "내 워크스페이스"
+    ),
+    createMcp(
+      "mcp-deploy",
+      "배",
+      "배포 조회 Connector",
+      "OPS",
+      "운영",
+      "배포 조회",
+      "배포 이력과 릴리즈 노트를 조회합니다.",
+      7,
+      154,
+      "테스터4",
+      false,
+      false,
+      "배포 로그",
+      "전체 공개"
+    ),
+    createMcp(
+      "mcp-jira",
+      "지",
+      "Jira Connector",
+      "DEV",
+      "개발",
+      "Jira",
+      "이슈와 스프린트 진행 상황을 검색합니다.",
+      16,
+      382,
+      "테스터2",
+      true,
+      false,
+      "Jira 프로젝트",
+      "구독 중"
+    ),
   ];
 }
 

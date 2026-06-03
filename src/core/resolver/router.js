@@ -32,9 +32,13 @@ const PlaygroundPage = () => import("@/views/playground/PlaygroundPage.vue");
 const StudioPage = () =>
   import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
 const McpConnectorListPage = () =>
-  import(/* webpackChunkName: "connector-store" */ "@/views/mcp/McpConnectorListPage.vue");
+  import(
+    /* webpackChunkName: "connector-store" */ "@/views/mcp/McpConnectorListPage.vue"
+  );
 const ChatSearchPage = () =>
-  import(/* webpackChunkName: "chat-search" */ "@/views/search/ChatSearchPage.vue");
+  import(
+    /* webpackChunkName: "chat-search" */ "@/views/search/ChatSearchPage.vue"
+  );
 const NotFoundPage = () =>
   import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");

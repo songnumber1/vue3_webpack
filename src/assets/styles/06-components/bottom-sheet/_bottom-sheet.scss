@@ -15,15 +15,26 @@ body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row {
   align-items: center;
 }
 
-body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main {
+body.mobile-mode
+  .bottom-sheet-body
+  .bottom-sheet-option--row
+  > .bottom-sheet-option-main {
   width: auto !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
   text-align: left !important;
 }
 
-body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main strong,
-body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-option-main small {
+body.mobile-mode
+  .bottom-sheet-body
+  .bottom-sheet-option--row
+  > .bottom-sheet-option-main
+  strong,
+body.mobile-mode
+  .bottom-sheet-body
+  .bottom-sheet-option--row
+  > .bottom-sheet-option-main
+  small {
   width: 100% !important;
   text-align: left !important;
   white-space: normal;
@@ -32,7 +43,6 @@ body.mobile-mode .bottom-sheet-body .bottom-sheet-option--row > .bottom-sheet-op
 body.mobile-mode .bottom-sheet-body .bottom-sheet-option--choice {
   justify-content: flex-start;
 }
-
 
 /* Stage D-2 guard: preserve readable bottom-sheet option rows while Tailwind
    utilities are progressively added to individual sheets. This keeps checkbox,

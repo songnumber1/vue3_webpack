@@ -1,6 +1,10 @@
 <template>
-  <div class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2">
-    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
+  <div
+    class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+  >
+    <div
+      class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2"
+    >
       <div ref="modelRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
         <button
           class="prompt-model-trigger tw-inline-flex tw-min-w-0 tw-items-center tw-justify-center tw-gap-1.5 tw-rounded-control tw-border tw-border-solid tw-border-app-controlBorder"
@@ -50,7 +54,10 @@
         </button>
       </div>
 
-      <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0">
+      <div
+        ref="attachRoot"
+        class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0"
+      >
         <button
           class="prompt-icon-action attach-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-transition"
           :class="{'prompt-icon-action--active': attachMenuOpen}"

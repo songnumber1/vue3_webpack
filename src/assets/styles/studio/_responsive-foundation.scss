@@ -10,7 +10,9 @@ body.desktop-mode .studio-workspace__scroll {
   max-height: 100%;
 }
 
-body.desktop-mode .chat-container-root--mode-studio.chat-container-root--sidebar-collapsed .application-body {
+body.desktop-mode
+  .chat-container-root--mode-studio.chat-container-root--sidebar-collapsed
+  .application-body {
   grid-template-columns: 48px minmax(0, 1fr);
 }
 

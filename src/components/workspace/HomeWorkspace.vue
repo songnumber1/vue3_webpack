@@ -101,7 +101,9 @@ function handleSuggestionClick(item) {
   gap: 8px;
 }
 
-:global(body.mobile-mode) .mobile-main-fixed-prompt :deep(.prompt-left-actions) {
+:global(body.mobile-mode)
+  .mobile-main-fixed-prompt
+  :deep(.prompt-left-actions) {
   display: flex;
   flex: 0 1 auto;
   width: auto;

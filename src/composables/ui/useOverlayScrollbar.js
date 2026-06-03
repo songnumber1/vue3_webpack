@@ -26,11 +26,11 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     const userAgent = String(info.userAgent || "");
     return Boolean(
       info.actualEnv === "android" ||
-        info.actualDevice === "android" ||
-        info.actualDevice === "android-webview" ||
-        info.actualBrowser === "android-webview" ||
-        info.isAndroidApp ||
-        /Android/i.test(userAgent)
+      info.actualDevice === "android" ||
+      info.actualDevice === "android-webview" ||
+      info.actualBrowser === "android-webview" ||
+      info.isAndroidApp ||
+      /Android/i.test(userAgent)
     );
   }
 

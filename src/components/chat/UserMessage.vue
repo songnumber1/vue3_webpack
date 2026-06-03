@@ -1,7 +1,13 @@
 <template>
-  <article class="message message--user tw-flex tw-w-full tw-min-w-0 tw-justify-end">
-    <div class="bubble bubble--user tw-min-w-0 tw-rounded-messageUser tw-bg-app-messageUser tw-text-app-messageUserText">
-      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">You</div>
+  <article
+    class="message message--user tw-flex tw-w-full tw-min-w-0 tw-justify-end"
+  >
+    <div
+      class="bubble bubble--user tw-min-w-0 tw-rounded-messageUser tw-bg-app-messageUser tw-text-app-messageUserText"
+    >
+      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">
+        You
+      </div>
       <div
         v-if="hasAttachments"
         class="message-attachments message-attachments--user tw-flex tw-flex-wrap tw-gap-2"
@@ -27,7 +33,11 @@
             :href="file.url"
             :download="file.name"
           >
-            <span class="message-file-icon tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center" aria-hidden="true">📄</span>
+            <span
+              class="message-file-icon tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
+              aria-hidden="true"
+              >📄</span
+            >
             <span
               ><strong>{{ file.name }}</strong
               ><small>{{ formatFileSize(file.size) }}</small></span
@@ -35,7 +45,10 @@
           </a>
         </template>
       </div>
-      <div v-if="message.content" class="bubble-content bubble-content--plain tw-min-w-0 tw-whitespace-pre-wrap tw-break-words">
+      <div
+        v-if="message.content"
+        class="bubble-content bubble-content--plain tw-min-w-0 tw-whitespace-pre-wrap tw-break-words"
+      >
         {{ message.content }}
       </div>
       <MessageActions
@@ -96,4 +109,3 @@ function openImage(file) {
   );
 }
 </script>
-

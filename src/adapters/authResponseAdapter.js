@@ -41,7 +41,6 @@ const AUTH_USER_KEYS = [A.USER, "User", "userInfo", "UserInfo"];
 const AUTH_STATUS_KEYS = [R.STATUS, "Status", R.RESULT, "Result"];
 const AUTH_VALID_KEYS = [A.VALID, R.VALID, "Valid", "isValid", "IsValid"];
 
-
 /**
  * 소스 객체 내부에 찾고자 하는 다수의 후보 키(Keys) 배열 중 매칭되는 첫 번째 프로퍼티 값을 안전하게 추출합니다.
  * @param {Object} source - 검색 대상이 될 원본 데이터 객체
@@ -138,9 +137,7 @@ export function adaptAuthApiResponse(response = {}) {
  */
 export function normalizeAuthAccessInfo(accessInfo = {}) {
   // 1. 상태(status) 키 후보군을 조회하여 문자열 소문자 정형화를 적용합니다.
-  const status = normalizeStatus(
-    findObjectValue(accessInfo, AUTH_STATUS_KEYS)
-  );
+  const status = normalizeStatus(findObjectValue(accessInfo, AUTH_STATUS_KEYS));
 
   // 2. 토큰 유효 여부(valid) 관련 키 후보군을 안전하게 확보합니다.
   const valid = findObjectValue(accessInfo, AUTH_VALID_KEYS);

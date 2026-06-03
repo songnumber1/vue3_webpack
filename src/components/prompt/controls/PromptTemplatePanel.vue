@@ -14,15 +14,22 @@
         :key="group.id"
         class="prompt-template-group tw-inline-flex tw-min-w-max tw-flex-none tw-items-center tw-gap-[6px]"
       >
-        <strong class="prompt-template-group-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text">{{ group.label }}</strong>
-        <div class="prompt-template-chip-row tw-inline-flex tw-min-w-0 tw-items-center tw-gap-1">
+        <strong
+          class="prompt-template-group-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text"
+          >{{ group.label }}</strong
+        >
+        <div
+          class="prompt-template-chip-row tw-inline-flex tw-min-w-0 tw-items-center tw-gap-1"
+        >
           <button
             v-for="option in group.options"
             :key="option.tag"
             class="prompt-template-chip tw-inline-flex tw-min-h-[30px] tw-cursor-pointer tw-items-center tw-justify-center tw-gap-[6px] tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-px-[9px] tw-py-[5px] tw-font-app tw-text-fixed12 tw-font-extrabold tw-transition-colors tw-duration-fast"
-            :class="isOptionActive(group, option)
-              ? 'is-active tw-border-[color-mix(in_srgb,var(--accent)_54%,var(--control-border))] tw-bg-[color-mix(in_srgb,var(--accent)_9%,var(--surface))] tw-text-app-accent'
-              : 'tw-border-app-controlBorder tw-bg-app-surface tw-text-app-text hover:tw-bg-app-controlHover'"
+            :class="
+              isOptionActive(group, option)
+                ? 'is-active tw-border-[color-mix(in_srgb,var(--accent)_54%,var(--control-border))] tw-bg-[color-mix(in_srgb,var(--accent)_9%,var(--surface))] tw-text-app-accent'
+                : 'tw-border-app-controlBorder tw-bg-app-surface tw-text-app-text hover:tw-bg-app-controlHover'
+            "
             type="button"
             @click="$emit('select-option', group.id, option.tag)"
           >
@@ -41,7 +48,10 @@
         :key="group.id"
         class="prompt-template-mobile-group tw-inline-flex tw-min-w-0 tw-flex-none tw-items-center tw-gap-[5px]"
       >
-        <span class="prompt-template-mobile-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text">{{ group.label }}</span>
+        <span
+          class="prompt-template-mobile-title tw-whitespace-nowrap tw-text-sm tw-font-black tw-leading-[1.2] tw-text-app-text"
+          >{{ group.label }}</span
+        >
         <button
           class="prompt-template-mobile-chip tw-inline-flex tw-min-h-8 tw-flex-none tw-cursor-pointer tw-items-center tw-justify-center tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder tw-bg-app-surface tw-px-[10px] tw-py-[6px] tw-font-app tw-text-sm tw-font-extrabold tw-leading-[1.2] tw-text-app-text"
           type="button"

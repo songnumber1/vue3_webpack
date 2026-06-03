@@ -141,7 +141,10 @@ export function useChatHistoryActionDialog({
       try {
         await toggleHistoryBookmark(history);
       } catch (error) {
-        logWarn("[useChatHistoryActionDialog] toggleHistoryBookmark 오류:", error);
+        logWarn(
+          "[useChatHistoryActionDialog] toggleHistoryBookmark 오류:",
+          error
+        );
       }
       return; // 단발성 상태 스위칭이므로 핸들러 조기 종결
     }

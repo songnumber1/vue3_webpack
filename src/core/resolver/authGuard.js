@@ -15,7 +15,10 @@ import {
 } from "@/constants/auth";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
-import {resolveAuthAccessResult, unwrapAuthResponseBody} from "@/adapters/authResponseAdapter";
+import {
+  resolveAuthAccessResult,
+  unwrapAuthResponseBody,
+} from "@/adapters/authResponseAdapter";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {API_REQUEST_KEYS as Q} from "@/constants/api/apiRequestKeys";
 

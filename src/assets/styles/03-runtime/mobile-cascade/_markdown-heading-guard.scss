@@ -8,7 +8,10 @@
 body.mobile-mode .message--assistant .bubble-content,
 body.mobile-mode .bubble-content.markdown-body,
 body.mobile-mode .markdown-body {
-  font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15)) !important;
+  font-size: var(
+    --message-plain-mobile-font-size,
+    var(--font-size-fixed-15)
+  ) !important;
   line-height: 1.62 !important;
 }
 
@@ -28,4 +31,3 @@ body.mobile-mode .markdown-body h3 {
   font-size: var(--font-size-fixed-18) !important;
   line-height: 1.4 !important;
 }
-

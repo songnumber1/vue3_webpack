@@ -1,6 +1,13 @@
 <template>
-  <aside class="studio-preview tw-relative tw-min-h-0 tw-overflow-y-auto tw-border tw-border-solid tw-border-studio-border tw-rounded-studio tw-bg-studio-surface tw-p-4 tw-text-studio-text" :aria-label="t('studio.preview.label')">
-    <div class="studio-preview__label tw-absolute tw-left-4 tw-top-4 tw-shrink-0 tw-text-sm tw-font-extrabold tw-text-studio-muted">{{ t("studio.preview.label") }}</div>
+  <aside
+    class="studio-preview tw-relative tw-min-h-0 tw-overflow-y-auto tw-border tw-border-solid tw-border-studio-border tw-rounded-studio tw-bg-studio-surface tw-p-4 tw-text-studio-text"
+    :aria-label="t('studio.preview.label')"
+  >
+    <div
+      class="studio-preview__label tw-absolute tw-left-4 tw-top-4 tw-shrink-0 tw-text-sm tw-font-extrabold tw-text-studio-muted"
+    >
+      {{ t("studio.preview.label") }}
+    </div>
     <MainEmptyState
       preview
       class="studio-preview__main-empty tw-min-h-0"
@@ -54,7 +61,6 @@ const previewSuggestions = computed(() =>
 );
 </script>
 
-
 <style lang="scss">
 /*
  * Studio create preview-specific overrides.
@@ -62,37 +68,64 @@ const previewSuggestions = computed(() =>
  * MainEmptyState and the Studio preview do not share mutable visual rules.
  * Keep these selectors scoped to .studio-create-page .studio-preview only.
  */
-body.desktop-mode .studio-create-page .studio-preview .studio-preview__main-empty {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .studio-preview__main-empty {
   flex: 1 1 auto;
   min-height: 0;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview
+  .empty-center {
   gap: 14px;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-assistant-logo {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview
+  .empty-assistant-logo {
   width: 56px;
   height: 56px;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .empty-center h1 {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview
+  .empty-center
+  h1 {
   margin: 6px 0 0;
   font-size: 28px;
   line-height: 1.25;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-row--between {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview
+  .suggestion-row--between {
   margin-top: 8px;
 }
 
-body.desktop-mode .studio-create-page .studio-preview .main-empty-state--preview .suggestion-chip {
+body.desktop-mode
+  .studio-create-page
+  .studio-preview
+  .main-empty-state--preview
+  .suggestion-chip {
   pointer-events: none;
 }
 </style>

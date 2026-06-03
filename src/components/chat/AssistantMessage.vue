@@ -3,11 +3,22 @@
     class="message message--assistant tw-flex tw-w-full tw-min-w-0 tw-items-start tw-gap-3"
     :class="{'message--streaming': !isMessageComplete}"
   >
-    <div class="avatar tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-assistantAvatar tw-font-bold tw-text-app-assistantAvatarText">AI</div>
-    <div class="bubble bubble--assistant tw-min-w-0 tw-flex-1 tw-bg-app-bubbleAssistant">
-      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">Assistant</div>
+    <div
+      class="avatar tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-assistantAvatar tw-font-bold tw-text-app-assistantAvatarText"
+    >
+      AI
+    </div>
+    <div
+      class="bubble bubble--assistant tw-min-w-0 tw-flex-1 tw-bg-app-bubbleAssistant"
+    >
+      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">
+        Assistant
+      </div>
 
-      <section v-if="hasReasoning" class="reasoning-panel tw-rounded-control tw-border tw-border-app-reasoningBorder tw-bg-app-reasoning">
+      <section
+        v-if="hasReasoning"
+        class="reasoning-panel tw-rounded-control tw-border tw-border-app-reasoningBorder tw-bg-app-reasoning"
+      >
         <button
           type="button"
           class="reasoning-toggle tw-flex tw-w-full tw-items-center tw-gap-2 tw-text-left"
@@ -111,7 +122,6 @@ const reasoningTitle = computed(() =>
     ? t("chat.reasoning.thinking")
     : t("chat.reasoning.completed")
 );
-
 
 function hasMermaidContent(value = "") {
   return /```\s*mermaid|class=["'][^"']*\bmd-mermaid\b|data-mermaid-pending/i.test(
@@ -297,6 +307,4 @@ onBeforeUnmount(() => {
   html.value = "";
   reasoningHtml.value = "";
 });
-
 </script>
-

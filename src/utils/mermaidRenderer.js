@@ -202,7 +202,9 @@ function markMermaidCardState(target, state) {
 }
 
 function normalizeMermaidSource(value = "") {
-  return String(value || "").replace(/\r\n?/g, "\n").trim();
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .trim();
 }
 
 function getMermaidSource(target) {
@@ -310,7 +312,10 @@ async function renderMermaidTargetsWithRenderApi(mermaid, targets) {
       }
     } catch (error) {
       showMermaidSourceAsCode(target);
-      logWarn("Mermaid rendering failed. The source code block will remain visible.", error);
+      logWarn(
+        "Mermaid rendering failed. The source code block will remain visible.",
+        error
+      );
     }
   }
 }
@@ -382,7 +387,8 @@ async function renderMermaidTargets(root, options = {}) {
 
 function isRenderableRoot(root) {
   if (!root) return false;
-  if (typeof Node !== "undefined" && root.nodeType === Node.DOCUMENT_NODE) return true;
+  if (typeof Node !== "undefined" && root.nodeType === Node.DOCUMENT_NODE)
+    return true;
   return root.isConnected !== false;
 }
 

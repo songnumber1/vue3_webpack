@@ -906,5 +906,5 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-05T13:40:00Z",
     userId: "user-1234",
-  }
+  },
 ];

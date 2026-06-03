@@ -7,7 +7,8 @@ export const studioMessages = {
   ko: {
     studio: {
       title: "Assistant Studio",
-      heroDescription: "다양한 추가 지식과 기능을 활용한 맞춤형 Assistant를 탐색하고 직접 만들 수 있습니다.",
+      heroDescription:
+        "다양한 추가 지식과 기능을 활용한 맞춤형 Assistant를 탐색하고 직접 만들 수 있습니다.",
       searchLabel: "Assistant Studio 검색",
       searchPlaceholder: "Assistant 검색",
       searchAction: "검색",
@@ -90,7 +91,8 @@ export const studioMessages = {
       preview: {
         label: "미리보기",
         fallbackName: "Assistant 이름",
-        fallbackDescription: "설명을 입력하고 적용을 누르면 미리보기에 표시됩니다.",
+        fallbackDescription:
+          "설명을 입력하고 적용을 누르면 미리보기에 표시됩니다.",
         note: "미리보기는 실제 Assistant와 다를 수 있습니다.",
         composerPlaceholder: "메시지를 입력하세요",
       },
@@ -108,7 +110,8 @@ export const studioMessages = {
     },
     mcp: {
       title: "Connector Store",
-      heroDescription: "업무 시스템과 Assistant를 연결하는 MCP Connector를 탐색하고 구독할 수 있습니다.",
+      heroDescription:
+        "업무 시스템과 Assistant를 연결하는 MCP Connector를 탐색하고 구독할 수 있습니다.",
       searchLabel: "Connector Store 검색",
       searchPlaceholder: "Connector 검색",
       searchAction: "검색",
@@ -153,7 +156,8 @@ export const studioMessages = {
   en: {
     studio: {
       title: "Assistant Studio",
-      heroDescription: "Explore and create custom Assistants powered by additional knowledge and tools.",
+      heroDescription:
+        "Explore and create custom Assistants powered by additional knowledge and tools.",
       searchLabel: "Search Assistant Studio",
       searchPlaceholder: "Search Assistants",
       searchAction: "Search",
@@ -236,7 +240,8 @@ export const studioMessages = {
       preview: {
         label: "Preview",
         fallbackName: "Assistant name",
-        fallbackDescription: "Enter a description and click Apply to update the preview.",
+        fallbackDescription:
+          "Enter a description and click Apply to update the preview.",
         note: "The preview may differ from the actual Assistant.",
         composerPlaceholder: "Message Assistant",
       },
@@ -254,7 +259,8 @@ export const studioMessages = {
     },
     mcp: {
       title: "Connector Store",
-      heroDescription: "Explore and subscribe to MCP Connectors that connect Assistants with work systems.",
+      heroDescription:
+        "Explore and subscribe to MCP Connectors that connect Assistants with work systems.",
       searchLabel: "Search Connector Store",
       searchPlaceholder: "Search Connectors",
       searchAction: "Search",

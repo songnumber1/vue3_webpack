@@ -11,7 +11,10 @@
       :class="{selected: String(item.id) === String(selectedChatId)}"
     >
       <button
-        :class="[itemClass, 'sidebar-history-title-button tw-min-w-0 tw-flex-1 tw-rounded-control tw-text-left tw-transition']"
+        :class="[
+          itemClass,
+          'sidebar-history-title-button tw-min-w-0 tw-flex-1 tw-rounded-control tw-text-left tw-transition',
+        ]"
         type="button"
         :title="item.title"
         @click="$emit('select', item)"
@@ -19,7 +22,10 @@
         <span>{{ item.title }}</span>
       </button>
 
-      <div v-if="showActions" class="sidebar-history-actions tw-flex tw-shrink-0 tw-items-center tw-gap-1">
+      <div
+        v-if="showActions"
+        class="sidebar-history-actions tw-flex tw-shrink-0 tw-items-center tw-gap-1"
+      >
         <span
           v-if="item.isPinned"
           class="sidebar-history-pin tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm"
@@ -91,11 +97,11 @@ const isActualAndroidRuntime = computed(() => {
   const userAgent = String(info.userAgent || "");
   return Boolean(
     info.actualEnv === "android" ||
-      info.actualDevice === "android" ||
-      info.actualDevice === "android-webview" ||
-      info.actualBrowser === "android-webview" ||
-      info.isAndroidApp ||
-      /Android/i.test(userAgent)
+    info.actualDevice === "android" ||
+    info.actualDevice === "android-webview" ||
+    info.actualBrowser === "android-webview" ||
+    info.isAndroidApp ||
+    /Android/i.test(userAgent)
   );
 });
 
@@ -116,4 +122,3 @@ const scrollContainerAttrs = computed(() =>
     : {}
 );
 </script>
-

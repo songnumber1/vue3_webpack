@@ -28,7 +28,9 @@ function createChatTitle(input) {
 }
 
 function normalizeSearchText(value) {
-  return String(value || "").trim().toLowerCase();
+  return String(value || "")
+    .trim()
+    .toLowerCase();
 }
 
 function buildMessageSearchText(chatId) {
@@ -39,18 +41,23 @@ function buildMessageSearchText(chatId) {
 }
 
 function createSearchSnippet(text, keyword, fallback = "") {
-  const source = String(text || fallback || "").replace(/\s+/g, " ").trim();
+  const source = String(text || fallback || "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (!source) return "";
   const lower = source.toLowerCase();
   const index = keyword ? lower.indexOf(keyword) : -1;
-  if (index < 0) return source.length > 120 ? `${source.slice(0, 120)}...` : source;
+  if (index < 0)
+    return source.length > 120 ? `${source.slice(0, 120)}...` : source;
   const start = Math.max(0, index - 38);
   const end = Math.min(source.length, index + keyword.length + 72);
   return `${start > 0 ? "..." : ""}${source.slice(start, end)}${end < source.length ? "..." : ""}`;
 }
 
 function searchChatHistories(payload = {}) {
-  const keyword = normalizeSearchText(payload.keyword || payload.searchText || payload.query);
+  const keyword = normalizeSearchText(
+    payload.keyword || payload.searchText || payload.query
+  );
   const limit = Math.max(1, Number(payload.limit || 30));
   const source = historyStore.map((history) => {
     const chatId = String(history[CHAT_KEYS.ID] || "");
@@ -72,10 +79,15 @@ function searchChatHistories(payload = {}) {
       snippet: createSearchSnippet(item.messageText, keyword, item.title),
       preview: createSearchSnippet(item.messageText, keyword, item.title),
       chatEndDt: item.history[CHAT_KEYS.ENDED_AT] || "",
-      modelId: item.history[CHAT_KEYS.MODEL_ID] || item.history[CHAT_KEYS.LEGACY_MODEL_ID] || "",
+      modelId:
+        item.history[CHAT_KEYS.MODEL_ID] ||
+        item.history[CHAT_KEYS.LEGACY_MODEL_ID] ||
+        "",
       assistId: item.history.assistId || item.history.assistantId || "",
       bookmarkYN: item.history[CHAT_KEYS.BOOKMARK_YN],
-      matchCount: keyword ? Math.max(1, item.messageText.toLowerCase().split(keyword).length - 1) : 0,
+      matchCount: keyword
+        ? Math.max(1, item.messageText.toLowerCase().split(keyword).length - 1)
+        : 0,
     }));
 }
 
@@ -171,11 +183,14 @@ export const chatHistoryApiMock = {
     );
   },
   searchChats(payload = {}) {
-    return resolveMock({
-      keyword: payload.keyword || payload.searchText || payload.query || "",
-      suggestions: CHAT_SEARCH_SUGGESTIONS_RAW,
-      list: searchChatHistories(payload),
-    }, 180);
+    return resolveMock(
+      {
+        keyword: payload.keyword || payload.searchText || payload.query || "",
+        suggestions: CHAT_SEARCH_SUGGESTIONS_RAW,
+        list: searchChatHistories(payload),
+      },
+      180
+    );
   },
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);

@@ -7,7 +7,9 @@
       v-if="!sidebarCollapsed"
       class="sidebar-content sidebar-content--assistant tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-gap-3"
     >
-      <div class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2">
+      <div
+        class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2"
+      >
         <SidebarAssistantSelector
           ref="assistantSelectorRef"
           :assistants="assistants"
@@ -29,8 +31,14 @@
         </div>
       </div>
 
-      <nav class="quick-menu quick-menu--assistant tw-flex tw-flex-col tw-gap-1">
-        <button class="quick-item active tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition" type="button" @click="handleNewChat">
+      <nav
+        class="quick-menu quick-menu--assistant tw-flex tw-flex-col tw-gap-1"
+      >
+        <button
+          class="quick-item active tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
+          type="button"
+          @click="handleNewChat"
+        >
           <Icon name="pencil" />{{ t("chat.newChat") }}
         </button>
         <button
@@ -43,7 +51,11 @@
         </button>
       </nav>
 
-      <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
+      <div
+        class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection"
+      >
+        {{ t("chat.conversations") }}
+      </div>
       <SidebarHistoryList
         :histories="histories"
         :selected-chat-id="effectiveSelectedChatId"
@@ -75,11 +87,16 @@
   </transition>
 
   <transition name="drawer-slide">
-    <aside v-if="drawerOpen" class="mobile-drawer tw-fixed tw-inset-y-0 tw-left-0 tw-z-drawer tw-flex tw-h-full tw-w-mobileDrawer tw-flex-col tw-bg-app-sidebar">
+    <aside
+      v-if="drawerOpen"
+      class="mobile-drawer tw-fixed tw-inset-y-0 tw-left-0 tw-z-drawer tw-flex tw-h-full tw-w-mobileDrawer tw-flex-col tw-bg-app-sidebar"
+    >
       <div
         class="sidebar-content sidebar-content--mobile sidebar-content--assistant tw-flex tw-min-h-0 tw-flex-1 tw-flex-col tw-gap-3"
       >
-        <div class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2">
+        <div
+          class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2"
+        >
           <SidebarAssistantSelector
             :assistants="assistants"
             :selected-assistant-id="selectedAssistantId"
@@ -99,7 +116,9 @@
           </div>
         </div>
 
-        <nav class="quick-menu quick-menu--assistant quick-menu--mobile-search tw-flex tw-flex-col tw-gap-1">
+        <nav
+          class="quick-menu quick-menu--assistant quick-menu--mobile-search tw-flex tw-flex-col tw-gap-1"
+        >
           <button
             class="quick-item active tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
             type="button"
@@ -117,7 +136,11 @@
           </button>
         </nav>
 
-        <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
+        <div
+          class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection"
+        >
+          {{ t("chat.conversations") }}
+        </div>
         <SidebarHistoryList
           :histories="histories"
           :selected-chat-id="effectiveSelectedChatId"
@@ -144,7 +167,9 @@
       type="button"
       @click="selectAssistant(assistant.id)"
     >
-      <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1">
+      <span
+        class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1"
+      >
         <strong>{{ assistant.label }}</strong>
         <small>{{ assistant.description }}</small>
       </span>
@@ -197,7 +222,10 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
-import {CHAT_ACTIONS_KEY, createEmptyChatActions} from "@/composables/chat/chatActionContext";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 
@@ -212,7 +240,8 @@ const navigationStore = useNavigationStore();
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
-const {histories, pendingSelectedChatId, selectedChatId} = storeToRefs(chatStore);
+const {histories, pendingSelectedChatId, selectedChatId} =
+  storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} =
   storeToRefs(navigationStore);
 const assistantMenuOpen = ref(false);

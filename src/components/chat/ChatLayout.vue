@@ -9,7 +9,10 @@
   >
     <ApplicationHeader />
 
-    <div class="application-body tw-min-h-0 tw-min-w-0 tw-overflow-hidden tw-bg-app-chat" aria-label="Application body">
+    <div
+      class="application-body tw-min-h-0 tw-min-w-0 tw-overflow-hidden tw-bg-app-chat"
+      aria-label="Application body"
+    >
       <AppSidebar />
       <main class="chat-workspace tw-min-h-0 tw-min-w-0 tw-overflow-hidden">
         <slot />
@@ -42,4 +45,3 @@ defineProps({
   mode: {type: String, default: "main"},
 });
 </script>
-

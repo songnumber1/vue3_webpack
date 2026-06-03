@@ -3,7 +3,15 @@
     <transition name="sheet-fade">
       <div
         v-if="open"
-        :class="['bottom-sheet-backdrop', 'app-dialog-backdrop', 'tw-fixed', 'tw-inset-0', 'tw-z-bottomSheetBackdrop', 'tw-bg-app-drawerOverlay', overlayClass]"
+        :class="[
+          'bottom-sheet-backdrop',
+          'app-dialog-backdrop',
+          'tw-fixed',
+          'tw-inset-0',
+          'tw-z-bottomSheetBackdrop',
+          'tw-bg-app-drawerOverlay',
+          overlayClass,
+        ]"
         @click="emit('close')"
       ></div>
     </transition>
@@ -132,5 +140,4 @@ const {
   expand,
   collapse,
 } = useBottomSheetSizing(props, emit);
-
 </script>

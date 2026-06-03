@@ -17,10 +17,14 @@
       >
         <span class="studio-icon studio-icon--back" aria-hidden="true"></span>
       </button>
-      <strong class="studio-create-panel__title tw-min-w-0 tw-truncate tw-text-lg tw-font-black">{{
-        t("studio.createPage.title")
-      }}</strong>
-      <div v-if="!isMobile" class="studio-create-actions tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-flex-wrap">
+      <strong
+        class="studio-create-panel__title tw-min-w-0 tw-truncate tw-text-lg tw-font-black"
+        >{{ t("studio.createPage.title") }}</strong
+      >
+      <div
+        v-if="!isMobile"
+        class="studio-create-actions tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-flex-wrap"
+      >
         <button
           class="studio-button studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
           type="button"
@@ -111,7 +115,10 @@
           </button>
         </div>
 
-        <div ref="createContentRef" class="studio-create-content tw-min-h-0 tw-min-w-0 tw-flex-1 tw-overflow-y-auto">
+        <div
+          ref="createContentRef"
+          class="studio-create-content tw-min-h-0 tw-min-w-0 tw-flex-1 tw-overflow-y-auto"
+        >
           <StudioBasicInfoTab
             v-if="createTab === 'basic'"
             :draft="draft"
@@ -166,20 +173,45 @@
       @close="actionSheetOpen = false"
     >
       <div class="studio-create-action-sheet__list">
-        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="handleMobileApply">
-          <span class="studio-icon studio-icon--apply" aria-hidden="true"></span>
+        <button
+          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
+          type="button"
+          @click="handleMobileApply"
+        >
+          <span
+            class="studio-icon studio-icon--apply"
+            aria-hidden="true"
+          ></span>
           <strong>{{ t("studio.createPage.apply") }}</strong>
         </button>
-        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="actionSheetOpen = false">
+        <button
+          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
+          type="button"
+          @click="actionSheetOpen = false"
+        >
           <span class="studio-icon studio-icon--save" aria-hidden="true"></span>
           <strong>{{ t("studio.createPage.save") }}</strong>
         </button>
-        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="actionSheetOpen = false">
-          <span class="studio-icon studio-icon--register" aria-hidden="true"></span>
+        <button
+          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
+          type="button"
+          @click="actionSheetOpen = false"
+        >
+          <span
+            class="studio-icon studio-icon--register"
+            aria-hidden="true"
+          ></span>
           <strong>{{ t("studio.createPage.register") }}</strong>
         </button>
-        <button class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option" type="button" @click="handleMobileClose">
-          <span class="studio-icon studio-icon--close" aria-hidden="true"></span>
+        <button
+          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
+          type="button"
+          @click="handleMobileClose"
+        >
+          <span
+            class="studio-icon studio-icon--close"
+            aria-hidden="true"
+          ></span>
           <strong>{{ t("studio.createPage.close") }}</strong>
         </button>
       </div>
@@ -262,7 +294,11 @@ const createTabsClass = computed(() => [
   // utilities here so the before_front tab header remains visually identical.
   "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-bg-studio-surface",
 ]);
-const contentScrollbar = useOverlayScrollbar(createContentRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: isMobile});
+const contentScrollbar = useOverlayScrollbar(
+  createContentRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: isMobile}
+);
 
 let focusScrollTimer = 0;
 let repeatedFocusTimers = [];
@@ -303,7 +339,9 @@ function getVisibleViewportBounds(scroller) {
 }
 
 function isTextareaField(element) {
-  return Boolean(element instanceof HTMLElement && element.tagName === "TEXTAREA");
+  return Boolean(
+    element instanceof HTMLElement && element.tagName === "TEXTAREA"
+  );
 }
 
 function ensureFocusedEditorVisible(behavior = "smooth") {

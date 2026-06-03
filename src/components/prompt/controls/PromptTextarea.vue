@@ -118,4 +118,3 @@ function handleShiftEnter(event) {
 
 defineExpose({textareaRef});
 </script>
-

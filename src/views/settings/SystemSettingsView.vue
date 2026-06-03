@@ -131,7 +131,6 @@ const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
 const applying = ref(false);
 const settingsScrollRef = ref(null);
 
-
 const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
 
 const actualPlatformLabel = computed(() => {

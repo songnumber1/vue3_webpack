@@ -79,7 +79,6 @@ export const useChatStore = defineStore("chat", {
     },
   },
   actions: {
-
     /**
      * 메인 화면 새 대화 첫 질문으로 생성된 방 ID를 일회성 플래그로 기록합니다.
      * ChatContainer가 main -> chat 라우트 전환으로 재생성되어도 Pinia store에 남아 있어

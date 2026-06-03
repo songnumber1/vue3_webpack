@@ -174,27 +174,42 @@ const controllerProps = {
 };
 
 function syncAssistantSelectionWithRoute() {
-  const studioAssistant = assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
-  const connectorAssistant = assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
+  const studioAssistant =
+    assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
+  const connectorAssistant =
+    assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
   if (route.name === "studio") {
-    if (studioAssistant && assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID) {
+    if (
+      studioAssistant &&
+      assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
+    ) {
       assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
     }
     return;
   }
   if (route.name === "connector-store") {
-    if (connectorAssistant && assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID) {
+    if (
+      connectorAssistant &&
+      assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID
+    ) {
       assistantStore.selectAssistant(CONNECTOR_STORE_PORTAL_ID);
     }
     return;
   }
 
-  if ([ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(assistantStore.selectedAssistantId)) {
+  if (
+    [ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(
+      assistantStore.selectedAssistantId
+    )
+  ) {
     const fallbackAssistant = assistantStore.assistants.find(
-      (assistant) => ![ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(assistant.id)
-        && assistant.type !== "studio"
-        && assistant.type !== "mcp"
-        && !assistant.isStudio
+      (assistant) =>
+        ![ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(
+          assistant.id
+        ) &&
+        assistant.type !== "studio" &&
+        assistant.type !== "mcp" &&
+        !assistant.isStudio
     );
     if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);
   }
@@ -279,8 +294,6 @@ const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
-
-
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
@@ -289,7 +302,9 @@ function handleAssistantNewChat(assistantId) {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
     router
-      .push({name: assistantId === "connector-store" ? "connector-store" : "studio"})
+      .push({
+        name: assistantId === "connector-store" ? "connector-store" : "studio",
+      })
       .catch(() => {});
     return;
   }

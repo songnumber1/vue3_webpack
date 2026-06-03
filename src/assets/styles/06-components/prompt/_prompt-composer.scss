@@ -626,17 +626,29 @@ body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .empty-center {
   transform: none !important;
 }
 
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .empty-assistant-logo,
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .main-empty-state__logo,
+body.desktop-mode
+  .main-empty-state:has(.prompt-wrap--expanded)
+  .empty-assistant-logo,
+body.desktop-mode
+  .main-empty-state:has(.prompt-wrap--expanded)
+  .main-empty-state__logo,
 body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) h1,
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .main-empty-state__subtitle,
+body.desktop-mode
+  .main-empty-state:has(.prompt-wrap--expanded)
+  .main-empty-state__subtitle,
 body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .suggestion-row,
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .main-empty-state__suggestions {
+body.desktop-mode
+  .main-empty-state:has(.prompt-wrap--expanded)
+  .main-empty-state__suggestions {
   display: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt.prompt-wrap--expanded,
-body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prompt-wrap--expanded {
+body.desktop-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt.prompt-wrap--expanded,
+body.desktop-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt.prompt-wrap--expanded {
   position: static !important;
   inset: auto !important;
   display: flex !important;
@@ -651,7 +663,10 @@ body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt.prom
   box-shadow: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-main .prompt-wrap--expanded .prompt-box--expanded {
+body.desktop-mode
+  .chat-container-root--mode-main
+  .prompt-wrap--expanded
+  .prompt-box--expanded {
   width: 100% !important;
   max-width: var(--layout-prompt-width, 880px) !important;
   height: 100% !important;
@@ -661,21 +676,41 @@ body.desktop-mode .chat-container-root--mode-main .prompt-wrap--expanded .prompt
 /* Desktop chat/shared: do not let the expanded composer enlarge the page and
    create browser/workspace scroll. The composer occupies the message area with
    a small, stable header gap and shrinks as the browser height shrinks. */
-body.desktop-mode .chat-container-root--mode-chat .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded),
-body.desktop-mode .chat-container-root--mode-shared .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded),
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) {
   grid-template-rows: auto minmax(0, 1fr) !important;
   overflow: hidden !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) .message-list,
-body.desktop-mode .chat-container-root--mode-shared .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) .message-list,
-body.desktop-mode .chat-container-root--mode-chat .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) .typing-row,
-body.desktop-mode .chat-container-root--mode-shared .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) .typing-row {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .message-list,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .message-list,
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .typing-row,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .typing-row {
   display: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot:has(.prompt-wrap--expanded),
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot:has(.prompt-wrap--expanded) {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot:has(.prompt-wrap--expanded),
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot:has(.prompt-wrap--expanded) {
   grid-row: 2 !important;
   align-self: stretch !important;
   justify-self: center !important;
@@ -690,8 +725,14 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot:has(.pro
   overflow: hidden !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap--expanded,
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap--expanded {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-wrap--expanded,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-wrap--expanded {
   display: flex !important;
   flex: 1 1 auto !important;
   width: 100% !important;
@@ -704,8 +745,16 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-
   box-shadow: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap--expanded .prompt-box--expanded,
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap--expanded .prompt-box--expanded {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-wrap--expanded
+  .prompt-box--expanded,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-wrap--expanded
+  .prompt-box--expanded {
   width: 100% !important;
   max-width: var(--layout-prompt-width, 880px) !important;
   height: 100% !important;
@@ -772,4 +821,3 @@ body.actual-android-runtime .prompt-box--expanded > .prompt-textarea--expanded {
 body.prompt-input-expanded .scroll-bottom-button {
   display: none !important;
 }
-

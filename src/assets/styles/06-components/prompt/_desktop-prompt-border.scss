@@ -32,14 +32,38 @@ body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt,
   box-shadow: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
-body.desktop-mode .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini,
-body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
-body.desktop-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini,
-.app-container--web .chat-container-root--mode-main .desktop-center-prompt .prompt-box,
-.app-container--web .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini,
-.app-container--web .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
-.app-container--web .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box--gemini {
+body.desktop-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box,
+body.desktop-mode
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box--gemini,
+body.desktop-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box,
+body.desktop-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box--gemini,
+.app-container--web
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box,
+.app-container--web
+  .chat-container-root--mode-main
+  .desktop-center-prompt
+  .prompt-box--gemini,
+.app-container--web
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box,
+.app-container--web
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box--gemini {
   box-sizing: border-box;
   width: 100% !important;
   max-width: var(--layout-prompt-width, 820px) !important;
@@ -59,10 +83,22 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot,
   margin-block-end: var(--desktop-chat-composer-footer-gap, 12px) !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap,
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap,
-.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-wrap,
-.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-wrap {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-wrap,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-wrap,
+.app-container--web
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-wrap,
+.app-container--web
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-wrap {
   box-sizing: border-box;
   width: 100% !important;
   max-width: var(--layout-prompt-width, 820px) !important;
@@ -72,14 +108,38 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-
   box-shadow: none !important;
 }
 
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-box,
-body.desktop-mode .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-box,
-body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini,
-.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-box,
-.app-container--web .chat-container-root--mode-chat .chat-composer-slot .prompt-box--gemini,
-.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-box,
-.app-container--web .chat-container-root--mode-shared .chat-composer-slot .prompt-box--gemini {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-box,
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-box--gemini,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-box,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-box--gemini,
+.app-container--web
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-box,
+.app-container--web
+  .chat-container-root--mode-chat
+  .chat-composer-slot
+  .prompt-box--gemini,
+.app-container--web
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-box,
+.app-container--web
+  .chat-container-root--mode-shared
+  .chat-composer-slot
+  .prompt-box--gemini {
   box-sizing: border-box;
   width: 100% !important;
   max-width: var(--layout-prompt-width, 820px) !important;
@@ -93,14 +153,22 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot .prompt-
    Keep mobile untouched. The chat message lane and input lane share the same
    880px token so the conversation remains centered now, and can be split later
    when a right-side preview/code panel is introduced. */
-body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-chat .chat-workspace,
-body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-shared .chat-workspace {
+body.desktop-mode:not(.code-interpreter-panel-open)
+  .chat-container-root--mode-chat
+  .chat-workspace,
+body.desktop-mode:not(.code-interpreter-panel-open)
+  .chat-container-root--mode-shared
+  .chat-workspace {
   overflow-x: hidden !important;
   overflow-y: auto !important;
 }
 
-body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-chat .message-list,
-body.desktop-mode:not(.code-interpreter-panel-open) .chat-container-root--mode-shared .message-list {
+body.desktop-mode:not(.code-interpreter-panel-open)
+  .chat-container-root--mode-chat
+  .message-list,
+body.desktop-mode:not(.code-interpreter-panel-open)
+  .chat-container-root--mode-shared
+  .message-list {
   min-height: auto !important;
   height: auto !important;
   overflow: visible !important;
@@ -119,7 +187,9 @@ body.desktop-mode .chat-container-root--mode-shared .typing-row {
 }
 
 body.desktop-mode .chat-container-root--mode-chat .message:not(.message--user),
-body.desktop-mode .chat-container-root--mode-shared .message:not(.message--user) {
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .message:not(.message--user) {
   grid-template-columns: var(--layout-message-avatar-width, 38px) minmax(0, 1fr) !important;
 }
 
@@ -137,8 +207,14 @@ body.desktop-mode .chat-container-root--mode-shared .message--user .bubble {
 
 body.desktop-mode .chat-container-root--mode-chat .message--assistant .bubble,
 body.desktop-mode .chat-container-root--mode-shared .message--assistant .bubble,
-body.desktop-mode .chat-container-root--mode-chat .message:not(.message--user) .bubble,
-body.desktop-mode .chat-container-root--mode-shared .message:not(.message--user) .bubble {
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .message:not(.message--user)
+  .bubble,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .message:not(.message--user)
+  .bubble {
   width: 100% !important;
   max-width: 100% !important;
   justify-self: stretch !important;
@@ -152,4 +228,3 @@ body.desktop-mode .chat-container-root--mode-shared .chat-composer-slot {
   margin-left: auto !important;
   margin-right: auto !important;
 }
-

@@ -8,7 +8,8 @@
     min-height: 100%;
     height: 100% !important;
     padding-bottom: calc(
-      24px + var(--layout-mobile-drawer-footer-gap) + env(safe-area-inset-bottom)
+      24px + var(--layout-mobile-drawer-footer-gap) +
+        env(safe-area-inset-bottom)
     ) !important;
     box-sizing: border-box !important;
   }

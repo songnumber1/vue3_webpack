@@ -1,7 +1,6 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
-
 /* --- pagination/_overlay-pagination-fixes-01.scss --- */
 /* Final Studio / Connector Store layout fixes after mobile legacy patches.
    Pagination stays anchored; only card list and category strip scroll. */
@@ -50,7 +49,6 @@
   overscroll-behavior-x: contain;
   padding-bottom: 4px;
 }
-
 
 /* --- mobile/_overlay-pagination-fixes-02.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-workspace {
@@ -102,12 +100,19 @@ body.mobile-mode .chat-container-root--mode-studio .studio-pagination {
   padding: 14px 0 calc(18px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-
 /* --- pagination/_overlay-pagination-fixes-03.scss --- */
 /* Regression guard: Studio / Connector Store categories must wrap like chips, not become a horizontal scroller. */
-body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-category-chips,
-body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips,
-.app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips {
+body.desktop-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .chat-container-root--mode-studio
+  .studio-category-chips,
+body.desktop-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .studio-workspace
+  .studio-category-chips,
+.app-container:not(.app-container--native-scroll-runtime)
+  .studio-workspace
+  .studio-category-chips {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -119,9 +124,17 @@ body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .stu
   padding-bottom: 0;
 }
 
-body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-category-chips::-webkit-scrollbar,
-body.desktop-mode .app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips::-webkit-scrollbar,
-.app-container:not(.app-container--native-scroll-runtime) .studio-workspace .studio-category-chips::-webkit-scrollbar {
+body.desktop-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .chat-container-root--mode-studio
+  .studio-category-chips::-webkit-scrollbar,
+body.desktop-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .studio-workspace
+  .studio-category-chips::-webkit-scrollbar,
+.app-container:not(.app-container--native-scroll-runtime)
+  .studio-workspace
+  .studio-category-chips::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
@@ -158,11 +171,13 @@ body.desktop-mode .chat-container-root--mode-studio .studio-pagination {
   margin-top: 14px;
 }
 
-
 /* --- mobile/_overlay-pagination-fixes-04.scss --- */
 /* PC runtime must keep the Studio / MCP card list as the scroll viewport even when the browser is resized to mobile width. */
 .app-container--actual-pc-runtime .studio-workspace .studio-workspace__scroll,
-body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scroll {
+body.mobile-mode
+  .app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace__scroll {
   flex: 1 1 auto !important;
   height: 100% !important;
   min-height: 0 !important;
@@ -172,7 +187,10 @@ body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-st
 }
 
 .app-container--actual-pc-runtime .studio-workspace .studio-list-shell,
-body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell {
+body.mobile-mode
+  .app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-shell {
   flex: 1 1 0 !important;
   min-height: 0 !important;
   display: flex !important;
@@ -181,7 +199,10 @@ body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-st
 }
 
 .app-container--actual-pc-runtime .studio-workspace .studio-list-area,
-body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area {
+body.mobile-mode
+  .app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area {
   flex: 1 1 0 !important;
   min-height: 0 !important;
   display: block !important;
@@ -191,7 +212,10 @@ body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-st
 }
 
 .app-container--actual-pc-runtime .studio-workspace .studio-grid,
-body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-grid {
+body.mobile-mode
+  .app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-grid {
   height: auto !important;
   min-height: 0 !important;
   max-height: none !important;
@@ -199,13 +223,14 @@ body.mobile-mode .app-container--actual-pc-runtime .chat-container-root--mode-st
   align-content: start !important;
 }
 
-
 /* --- overlay/_overlay-pagination-fixes-05.scss --- */
 /* Studio/MCP list scroll hardening.
    PC runtime must keep the card list as the only scroll viewport even when the
    browser is resized into mobile layout. The selector is scoped to Studio/MCP
    list pages to avoid changing dialogs, create screens, or chat scroll areas. */
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace,
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace,
 body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace {
   height: 100% !important;
   min-height: 0 !important;
@@ -215,10 +240,13 @@ body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace {
   overflow: hidden !important;
 }
 
-
 /* --- pagination/_overlay-pagination-fixes-06.scss --- */
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scroll,
-body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scroll {
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace__scroll,
+body.actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace__scroll {
   flex: 1 1 0 !important;
   min-height: 0 !important;
   height: 100% !important;
@@ -229,7 +257,9 @@ body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace__scro
   box-sizing: border-box !important;
 }
 
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell,
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-shell,
 body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell {
   flex: 1 1 0 !important;
   min-height: 0 !important;
@@ -240,7 +270,9 @@ body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-shell {
   overflow: hidden !important;
 }
 
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area,
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area,
 body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area {
   position: relative !important;
   flex: 1 1 0 !important;
@@ -253,22 +285,38 @@ body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area {
   overscroll-behavior: contain;
 }
 
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlayscrollbars],
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlay-scrollbar-enhanced="true"],
-body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlayscrollbars],
-body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area[data-overlay-scrollbar-enhanced="true"] {
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlayscrollbars],
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlay-scrollbar-enhanced="true"],
+body.actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlayscrollbars],
+body.actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlay-scrollbar-enhanced="true"] {
   min-height: 0 !important;
   height: 100% !important;
   max-height: 100% !important;
 }
 
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-list-area [data-overlayscrollbars-viewport],
-body.actual-pc-runtime .chat-container-root--mode-studio .studio-list-area [data-overlayscrollbars-viewport] {
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area
+  [data-overlayscrollbars-viewport],
+body.actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area
+  [data-overlayscrollbars-viewport] {
   min-height: 0 !important;
   height: 100% !important;
 }
 
-.app-container--actual-pc-runtime .chat-container-root--mode-studio .studio-pagination,
+.app-container--actual-pc-runtime
+  .chat-container-root--mode-studio
+  .studio-pagination,
 body.actual-pc-runtime .chat-container-root--mode-studio .studio-pagination {
   flex: 0 0 auto !important;
 }

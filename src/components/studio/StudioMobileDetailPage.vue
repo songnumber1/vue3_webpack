@@ -3,7 +3,9 @@
     class="studio-mobile-page studio-mobile-page--detail tw-flex tw-min-h-0 tw-flex-col tw-bg-studio-bg tw-text-studio-text"
     :aria-label="t('studio.detail.title')"
   >
-    <header class="studio-mobile-page__head studio-mobile-page__head--notice tw-shrink-0 tw-items-center">
+    <header
+      class="studio-mobile-page__head studio-mobile-page__head--notice tw-shrink-0 tw-items-center"
+    >
       <button
         class="studio-mobile-page__back"
         type="button"
@@ -21,7 +23,10 @@
         :title="t('studio.detail.settings')"
         @click="actionSheetOpen = true"
       >
-        <span class="studio-icon studio-icon--settings" aria-hidden="true"></span>
+        <span
+          class="studio-icon studio-icon--settings"
+          aria-hidden="true"
+        ></span>
       </button>
       <button
         class="studio-mobile-page__close"
@@ -32,7 +37,10 @@
         ×
       </button>
     </header>
-    <div ref="contentRef" class="studio-mobile-page__content tw-min-h-0 tw-flex-1 tw-overflow-y-auto">
+    <div
+      ref="contentRef"
+      class="studio-mobile-page__content tw-min-h-0 tw-flex-1 tw-overflow-y-auto"
+    >
       <StudioInfoPanel :studio="studio" />
     </div>
 
@@ -52,7 +60,7 @@
           @click="selectAction('edit')"
         >
           <span aria-hidden="true">✎</span>
-          <strong>{{ t('studio.detail.edit') }}</strong>
+          <strong>{{ t("studio.detail.edit") }}</strong>
         </button>
         <button
           class="bottom-sheet-option bottom-sheet-option--row studio-detail-action-sheet__option studio-detail-action-sheet__option--danger"
@@ -60,7 +68,7 @@
           @click="selectAction('delete')"
         >
           <span aria-hidden="true">🗑</span>
-          <strong>{{ t('studio.detail.delete') }}</strong>
+          <strong>{{ t("studio.detail.delete") }}</strong>
         </button>
       </div>
     </BaseBottomSheet>

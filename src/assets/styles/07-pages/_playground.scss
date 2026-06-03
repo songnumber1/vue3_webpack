@@ -1,7 +1,6 @@
 /* Playground page styles consolidated from _playground-shell.scss and _playground.scss during Step 5. */
 @use "../00-abstracts/mixins" as *;
 
-
 .playground-page {
   min-height: var(--app-height, 100vh);
   width: 100%;
@@ -279,8 +278,8 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
   width: min(100%, 420px);
   max-width: calc(100vw - 32px);
   max-height: calc(
-    var(--app-height, 100vh) - 32px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
+    var(--app-height, 100vh) -
+      32px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   );
   border-radius: var(--dialog-radius);
   overflow: hidden;
@@ -306,8 +305,8 @@ body.mobile-mode .mobile-topbar .conversation-title-wrap strong {
 
 .responsive-overlay--mobile-dialog .responsive-panel-body {
   max-height: calc(
-    var(--app-height, 100vh) - 122px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
+    var(--app-height, 100vh) -
+      122px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   );
   overflow-y: auto;
 
@@ -840,9 +839,6 @@ body.mobile-mode
     transparent
   ) !important;
 }
-
-
-
 
 .mobile-settings-item-icon img {
   display: block;

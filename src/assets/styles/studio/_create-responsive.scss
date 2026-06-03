@@ -1,14 +1,28 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
-
 /* --- create/_create-responsive-01.scss --- */
 /* Studio create final responsive polish: PC preview suppression, mobile icon toolbar, keyboard-safe scrolling. */
-.studio-icon--back { mask-image: url("../img/studio/back.svg"); -webkit-mask-image: url("../img/studio/back.svg"); }
-.studio-icon--apply { mask-image: url("../img/studio/apply.svg"); -webkit-mask-image: url("../img/studio/apply.svg"); }
-.studio-icon--save { mask-image: url("../img/studio/save.svg"); -webkit-mask-image: url("../img/studio/save.svg"); }
-.studio-icon--register { mask-image: url("../img/studio/register.svg"); -webkit-mask-image: url("../img/studio/register.svg"); }
-.studio-icon--close { mask-image: url("../img/studio/close.svg"); -webkit-mask-image: url("../img/studio/close.svg"); }
+.studio-icon--back {
+  mask-image: url("../img/studio/back.svg");
+  -webkit-mask-image: url("../img/studio/back.svg");
+}
+.studio-icon--apply {
+  mask-image: url("../img/studio/apply.svg");
+  -webkit-mask-image: url("../img/studio/apply.svg");
+}
+.studio-icon--save {
+  mask-image: url("../img/studio/save.svg");
+  -webkit-mask-image: url("../img/studio/save.svg");
+}
+.studio-icon--register {
+  mask-image: url("../img/studio/register.svg");
+  -webkit-mask-image: url("../img/studio/register.svg");
+}
+.studio-icon--close {
+  mask-image: url("../img/studio/close.svg");
+  -webkit-mask-image: url("../img/studio/close.svg");
+}
 
 .studio-create-panel__title {
   min-width: 0;
@@ -28,9 +42,6 @@
   width: 16px;
   height: 16px;
 }
-
-
-
 
 .studio-feature-tab,
 .studio-share-tab {
@@ -64,14 +75,12 @@
   min-width: 0;
 }
 
-
 /* --- authority/_create-responsive-02.scss --- */
 .studio-authority-actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
 }
-
 
 /* --- create/_create-responsive-03.scss --- */
 .studio-multi-select__list {
@@ -102,13 +111,16 @@
   accent-color: var(--studio-primary);
 }
 
-
 body.desktop-mode .studio-create-page .studio-preview__card {
   min-height: 100%;
   padding: 48px 34px;
   justify-content: center;
   background:
-    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--studio-primary) 10%, transparent), transparent 38%),
+    radial-gradient(
+      circle at 50% 0%,
+      color-mix(in srgb, var(--studio-primary) 10%, transparent),
+      transparent 38%
+    ),
     var(--studio-surface);
 }
 
@@ -118,14 +130,12 @@ body.desktop-mode .studio-create-page .studio-preview__card h2 {
   line-height: 1.25;
 }
 
-
 /* --- mobile/_create-responsive-04.scss --- */
 body.desktop-mode .studio-create-page .studio-preview__card p {
   max-width: 420px;
   margin: 8px auto 22px;
   line-height: 1.55;
 }
-
 
 /* --- create/_create-responsive-05.scss --- */
 body.desktop-mode .studio-create-page .studio-prompt-grid--preview {
@@ -136,7 +146,6 @@ body.desktop-mode .studio-create-page .studio-prompt-grid--preview {
 body.desktop-mode .studio-create-page .studio-prompt-grid--preview:empty {
   display: none;
 }
-
 
 /* --- mobile/_create-responsive-06.scss --- */
 
@@ -159,7 +168,10 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-panel__back {
   font-size: 0;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-panel__back .studio-icon {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-panel__back
+  .studio-icon {
   width: 22px;
   height: 22px;
 }
@@ -181,7 +193,9 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-actions {
   flex-wrap: nowrap;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-action-button {
   width: 34px;
   height: 34px;
   min-width: 34px;
@@ -190,7 +204,10 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button 
   border-radius: 5px;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button > span:not(.studio-icon) {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-action-button
+  > span:not(.studio-icon) {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -202,15 +219,13 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button 
   border: 0;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-action-button .studio-icon {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-action-button
+  .studio-icon {
   width: 17px;
   height: 17px;
 }
-
-
-
-
-
 
 /* Step 5-7 hotfix: mobile Assistant create tabs/content scroll parity.
    Keep tab header as a tab strip with a single bottom border and make the
@@ -235,16 +250,26 @@ body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs {
   scrollbar-width: thin;
 }
 
-body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-create-tabs {
+body.mobile-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .chat-container-root--mode-studio
+  .studio-create-tabs {
   scrollbar-width: none;
 }
 
-body.mobile-mode .app-container:not(.app-container--native-scroll-runtime) .chat-container-root--mode-studio .studio-create-tabs::-webkit-scrollbar {
+body.mobile-mode
+  .app-container:not(.app-container--native-scroll-runtime)
+  .chat-container-root--mode-studio
+  .studio-create-tabs::-webkit-scrollbar {
   display: none;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-layout.os-host,
-body.mobile-mode .chat-container-root--mode-studio .studio-create-layout[data-overlayscrollbars-initialize] {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-layout.os-host,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-layout[data-overlayscrollbars-initialize] {
   overflow: hidden !important;
 }
 
@@ -269,7 +294,9 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset {
 body.mobile-mode .chat-container-root--mode-studio .studio-form-stack input,
 body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea,
 body.mobile-mode .chat-container-root--mode-studio .studio-select-like,
-body.mobile-mode .chat-container-root--mode-studio .studio-multi-select__trigger {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-multi-select__trigger {
   min-height: 44px;
   font-size: var(--text-size-body-sm, 14px);
   font-weight: 500;
@@ -320,30 +347,48 @@ body.mobile-mode .chat-container-root--mode-studio .studio-multi-select__list {
   flex: 1 1 auto;
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-panel__head {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-panel__head {
   min-height: 48px;
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-layout {
-  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px));
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-layout {
+  padding-bottom: calc(
+    28px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px)
+  );
 }
-
 
 /* Targeted fix: keep Studio create preview visible on desktop and make Android keyboard focus stable. */
 
-
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack label:focus-within,
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:focus-within {
-  scroll-margin-bottom: calc(160px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px));
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  label:focus-within,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  fieldset:focus-within {
+  scroll-margin-bottom: calc(
+    160px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px)
+  );
   scroll-margin-top: 72px;
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-layout {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-layout {
   max-height: calc(100dvh - 48px);
-  padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px));
+  padding-bottom: calc(
+    140px + env(safe-area-inset-bottom, 0px) + var(--keyboard-height, 0px)
+  );
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-tabs {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-tabs {
   position: relative;
   top: auto;
 }
@@ -353,28 +398,35 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
    shrinks --app-height with visualViewport, so adding --keyboard-height again here can
    double-count the keyboard height and push the focused input out of view. */
 body.mobile-mode .chat-container-root--mode-studio,
-body.mobile-mode .chat-container-root--mode-studio.chat-container-root--keyboard-open {
+body.mobile-mode
+  .chat-container-root--mode-studio.chat-container-root--keyboard-open {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   overflow: hidden !important;
 }
 
 body.mobile-mode .chat-container-root--mode-studio .chat-workspace,
-body.mobile-mode .chat-container-root--mode-studio.chat-container-root--keyboard-open .chat-workspace {
+body.mobile-mode
+  .chat-container-root--mode-studio.chat-container-root--keyboard-open
+  .chat-workspace {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   overflow: hidden !important;
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-page,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-page {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-page {
   height: var(--app-height, 100dvh) !important;
   max-height: var(--app-height, 100dvh) !important;
   overflow: hidden !important;
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-layout,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-layout {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-layout {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   height: auto !important;
@@ -386,25 +438,38 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
   touch-action: pan-y !important;
   padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
   scroll-padding-top: 72px !important;
-  scroll-padding-bottom: calc(128px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(
+    128px + env(safe-area-inset-bottom, 0px)
+  ) !important;
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-panel__head {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-panel__head {
   flex: 0 0 auto !important;
   min-height: 48px !important;
 }
 
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-tabs {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-tabs {
   position: static !important;
   top: auto !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack label:focus-within,
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:focus-within {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  label:focus-within,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  fieldset:focus-within {
   scroll-margin-top: 80px !important;
-  scroll-margin-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-margin-bottom: calc(
+    132px + env(safe-area-inset-bottom, 0px)
+  ) !important;
 }
-
 
 /* --- create/_create-responsive-07.scss --- */
 /* Studio targeted UI polish: keep existing layouts, only normalize create/detail controls. */
@@ -417,19 +482,19 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:f
   color: #fff !important;
 }
 
-
 .studio-select-native {
   appearance: auto;
   cursor: pointer;
 }
-
 
 /* --- mobile/_create-responsive-08.scss --- */
 
 /* Step 5-8 mobile scroll/focus hotfix: keep the create header and tab strip
    outside of the scrollable region. Only the active tab content scrolls. */
 body.mobile-mode .chat-container-root--mode-studio .studio-create-layout,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-layout {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-layout {
   display: block !important;
   overflow: hidden !important;
   padding: 12px !important;
@@ -437,7 +502,9 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-form,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-form {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-form {
   display: flex !important;
   flex-direction: column !important;
   height: 100% !important;
@@ -447,7 +514,9 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-tabs,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-tabs {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-tabs {
   position: relative !important;
   top: auto !important;
   z-index: 3;
@@ -457,7 +526,9 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-content,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-content {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-content {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
@@ -466,11 +537,17 @@ body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-s
   overscroll-behavior-y: contain !important;
   touch-action: pan-y !important;
   scroll-padding-top: 12px !important;
-  scroll-padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-padding-bottom: calc(
+    132px + env(safe-area-inset-bottom, 0px)
+  ) !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-create-content.os-host,
-body.mobile-mode .chat-container-root--mode-studio .studio-create-content[data-overlayscrollbars-initialize] {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-content.os-host,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-create-content[data-overlayscrollbars-initialize] {
   overflow: hidden !important;
 }
 
@@ -479,21 +556,36 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea {
   box-sizing: border-box !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack input:focus,
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea:focus,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  input:focus,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  textarea:focus,
 body.mobile-mode .chat-container-root--mode-studio .studio-select-like:focus,
-body.mobile-mode .chat-container-root--mode-studio .studio-multi-select__trigger:focus {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-multi-select__trigger:focus {
   outline: none !important;
   border-color: var(--studio-primary) !important;
   box-shadow: 0 0 0 1px var(--studio-primary) !important;
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack label:focus-within,
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack fieldset:focus-within {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  label:focus-within,
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  fieldset:focus-within {
   scroll-margin-top: 12px !important;
-  scroll-margin-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  scroll-margin-bottom: calc(
+    132px + env(safe-area-inset-bottom, 0px)
+  ) !important;
 }
-
 
 /* Studio create scroll/focus correction: keep both PC and mobile tab headers out of the scroll container.
    Only the active tab content scrolls; this also keeps Android textarea focus behavior consistent. */
@@ -501,7 +593,6 @@ body.desktop-mode .studio-create-page .studio-create-form {
   height: 100%;
   overflow: hidden !important;
 }
-
 
 /* --- create/_create-responsive-09.scss --- */
 body.desktop-mode .studio-create-page .studio-create-content {
@@ -511,10 +602,11 @@ body.desktop-mode .studio-create-page .studio-create-content {
   overflow-x: hidden !important;
 }
 
-
 /* --- mobile/_create-responsive-10.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-create-content,
-body.mobile-mode .chat-container-root--keyboard-open.chat-container-root--mode-studio .studio-create-content {
+body.mobile-mode
+  .chat-container-root--keyboard-open.chat-container-root--mode-studio
+  .studio-create-content {
   flex: 1 1 auto !important;
   min-height: 0 !important;
   overflow-y: auto !important;
@@ -542,7 +634,10 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea {
   transform: translateZ(0);
 }
 
-body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea:focus {
+body.mobile-mode
+  .chat-container-root--mode-studio
+  .studio-form-stack
+  textarea:focus {
   -webkit-appearance: none !important;
   appearance: none !important;
   outline: none !important;

@@ -1,5 +1,8 @@
 <template>
-  <section class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text" aria-label="Assistant Studio">
+  <section
+    class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text"
+    aria-label="Assistant Studio"
+  >
     <StudioCreateContainer
       v-if="createOpen"
       :create-tab="createTab"
@@ -617,7 +620,8 @@ async function loadMainInfo() {
       if (!categoryOptions.value.some((item) => item.value === draft.category))
         draft.category = categoryOptions.value[0]?.value || "";
     }
-    if (mainInfo.modelOptions.length) modelOptions.value = mainInfo.modelOptions;
+    if (mainInfo.modelOptions.length)
+      modelOptions.value = mainInfo.modelOptions;
     if (mainInfo.ragOptions.length) ragOptions.value = mainInfo.ragOptions;
     if (mainInfo.mcpOptions.length) mcpOptions.value = mainInfo.mcpOptions;
   } catch (error) {
@@ -711,8 +715,13 @@ function closeCreate() {
   editingStudioId.value = null;
 }
 function createDraftFromStudio(studio) {
-  const modelValue = modelOptions.value.find((model) => model.label === studio.model)?.value;
-  const prompts = Array.from({length: 8}, (_, index) => studio.prompts?.[index] || "");
+  const modelValue = modelOptions.value.find(
+    (model) => model.label === studio.model
+  )?.value;
+  const prompts = Array.from(
+    {length: 8},
+    (_, index) => studio.prompts?.[index] || ""
+  );
   return {
     image: "",
     category: studio.categoryCode || categoryOptions.value[0]?.value || "MKT",
@@ -721,11 +730,18 @@ function createDraftFromStudio(studio) {
     description: studio.description || "",
     prompts,
     models: modelValue ? [modelValue] : [],
-    rags: typeof studio.knowledge === "string" && studio.knowledge !== t("studio.defaults.noKnowledge")
-      ? studio.knowledge.split(",").map((item) => item.trim()).filter(Boolean)
-      : [],
+    rags:
+      typeof studio.knowledge === "string" &&
+      studio.knowledge !== t("studio.defaults.noKnowledge")
+        ? studio.knowledge
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+        : [],
     mcps: [],
-    scope: String(studio.scope || "").includes(t("studio.defaults.publicScope")) ? "public" : "private",
+    scope: String(studio.scope || "").includes(t("studio.defaults.publicScope"))
+      ? "public"
+      : "private",
   };
 }
 function deleteStudio(studio) {

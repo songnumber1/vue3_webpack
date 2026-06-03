@@ -3,7 +3,12 @@
  * @description Studio API 원본 응답 key 접근을 한 곳으로 모아 화면용 모델로 정규화합니다.
  */
 
-import {readBoolean, readNumber, readRaw, readString} from "@/adapters/adapterPrimitives";
+import {
+  readBoolean,
+  readNumber,
+  readRaw,
+  readString,
+} from "@/adapters/adapterPrimitives";
 import {STUDIO_API_KEYS as S} from "@/constants/api/studioApiKeys";
 import {unwrapApiBody} from "@/utils/apiResponseReader";
 
@@ -18,10 +23,12 @@ export function parseFirstStudioModelName(value) {
     const parsed = JSON.parse(value);
     if (Array.isArray(parsed)) return parsed[0] || "";
   } catch (error) {
-    return value
-      .replace(/\[|\]|"/g, "")
-      .split(",")[0]
-      ?.trim() || "";
+    return (
+      value
+        .replace(/\[|\]|"/g, "")
+        .split(",")[0]
+        ?.trim() || ""
+    );
   }
   return value;
 }
@@ -33,7 +40,11 @@ export function adaptStudioCategory(item = {}, options = {}) {
     value,
     label: readString(
       item,
-      [S.STUDIO_CATEGORY_NAME_KO, S.STUDIO_CATEGORY_NAME_EN, S.STUDIO_CATEGORY_CODE],
+      [
+        S.STUDIO_CATEGORY_NAME_KO,
+        S.STUDIO_CATEGORY_NAME_EN,
+        S.STUDIO_CATEGORY_CODE,
+      ],
       allLabel
     ),
     description: readString(
@@ -64,14 +75,30 @@ export function adaptStudioCategories(items = [], options = {}) {
 
 export function adaptStudioModelOption(item = {}) {
   return {
-    value: readString(item, [S.MODEL_ID, S.MODEL_ID_CAMEL, S.MODEL_NAME, S.MODEL_NAME_CAMEL]),
-    label: readString(item, [S.MODEL_NAME, S.MODEL_NAME_CAMEL, S.MODEL_ID, S.MODEL_ID_CAMEL]),
-    description: readString(item, [S.MODEL_DESC_KO, S.MODEL_DESC_EN, S.MODEL_DESC]),
+    value: readString(item, [
+      S.MODEL_ID,
+      S.MODEL_ID_CAMEL,
+      S.MODEL_NAME,
+      S.MODEL_NAME_CAMEL,
+    ]),
+    label: readString(item, [
+      S.MODEL_NAME,
+      S.MODEL_NAME_CAMEL,
+      S.MODEL_ID,
+      S.MODEL_ID_CAMEL,
+    ]),
+    description: readString(item, [
+      S.MODEL_DESC_KO,
+      S.MODEL_DESC_EN,
+      S.MODEL_DESC,
+    ]),
   };
 }
 
 export function adaptStudioModelOptions(items = []) {
-  return toArray(items).map(adaptStudioModelOption).filter((item) => item.value || item.label);
+  return toArray(items)
+    .map(adaptStudioModelOption)
+    .filter((item) => item.value || item.label);
 }
 
 export function adaptStudioSimpleOption(item = {}, keys = []) {
@@ -82,7 +109,14 @@ export function adaptStudioSimpleOption(item = {}, keys = []) {
 export function adaptStudioRagOptions(items = []) {
   return toArray(items)
     .map((item) =>
-      adaptStudioSimpleOption(item, [S.LABEL, S.NAME, S.ID, S.RAG_NAME, S.RAG_ID, S.RAG_DESC])
+      adaptStudioSimpleOption(item, [
+        S.LABEL,
+        S.NAME,
+        S.ID,
+        S.RAG_NAME,
+        S.RAG_ID,
+        S.RAG_DESC,
+      ])
     )
     .filter(Boolean);
 }
@@ -90,7 +124,14 @@ export function adaptStudioRagOptions(items = []) {
 export function adaptStudioMcpOptions(items = []) {
   return toArray(items)
     .map((item) =>
-      adaptStudioSimpleOption(item, [S.LABEL, S.NAME, S.ID, S.MCP_NAME, S.MCP_ID, S.MCP_DESC])
+      adaptStudioSimpleOption(item, [
+        S.LABEL,
+        S.NAME,
+        S.ID,
+        S.MCP_NAME,
+        S.MCP_ID,
+        S.MCP_DESC,
+      ])
     )
     .filter(Boolean);
 }
@@ -111,36 +152,81 @@ export function adaptStudioAuthorityItem(item = {}) {
 }
 
 export function adaptStudioAuthorityList(response = []) {
-  return toArray(unwrapApiBody(response, response)).map(adaptStudioAuthorityItem);
+  return toArray(unwrapApiBody(response, response)).map(
+    adaptStudioAuthorityItem
+  );
 }
 
 export function adaptStudioItem(item = {}, index = 0, options = {}) {
-  const name = readString(item, [S.STUDIO_NAME, S.CAMEL_STUDIO_NAME], `Studio ${index + 1}`);
-  const model = parseFirstStudioModelName(readRaw(item, [S.CONN_MODEL_NAME], "")) || options.defaultModel || "GPT-OSS";
+  const name = readString(
+    item,
+    [S.STUDIO_NAME, S.CAMEL_STUDIO_NAME],
+    `Studio ${index + 1}`
+  );
+  const model =
+    parseFirstStudioModelName(readRaw(item, [S.CONN_MODEL_NAME], "")) ||
+    options.defaultModel ||
+    "GPT-OSS";
   const isMine = readBoolean(item, [S.STUDIO_OWNER_YN, S.STUDIO_MEMBER_YN]);
-  const hasAuthScope = readBoolean(item, [S.AUTH_YN, S.STUDIO_PRIVATE_YN, S.PRIVATE_YN]);
+  const hasAuthScope = readBoolean(item, [
+    S.AUTH_YN,
+    S.STUDIO_PRIVATE_YN,
+    S.PRIVATE_YN,
+  ]);
 
   return {
-    id: readString(item, [S.STUDIO_ID_LEGACY_TYPO, S.STUDIO_ID, S.CAMEL_STUDIO_ID], `studio-${index}`),
+    id: readString(
+      item,
+      [S.STUDIO_ID_LEGACY_TYPO, S.STUDIO_ID, S.CAMEL_STUDIO_ID],
+      `studio-${index}`
+    ),
     initial: name.slice(0, 1).toUpperCase(),
     name,
-    categoryCode: readString(item, [S.STUDIO_CATEGORY_CODE, S.CAMEL_STUDIO_CATEGORY_CODE], options.defaultCategoryCode || "COMMON"),
+    categoryCode: readString(
+      item,
+      [S.STUDIO_CATEGORY_CODE, S.CAMEL_STUDIO_CATEGORY_CODE],
+      options.defaultCategoryCode || "COMMON"
+    ),
     category: readString(
       item,
-      [S.STUDIO_CATEGORY_NAME_KO, S.STUDIO_CATEGORY_NAME_EN, S.STUDIO_CATEGORY_CODE, S.CAMEL_STUDIO_CATEGORY_CODE],
+      [
+        S.STUDIO_CATEGORY_NAME_KO,
+        S.STUDIO_CATEGORY_NAME_EN,
+        S.STUDIO_CATEGORY_CODE,
+        S.CAMEL_STUDIO_CATEGORY_CODE,
+      ],
       options.defaultCategory || "Common"
     ),
     model,
-    description: readString(item, [S.STUDIO_DESC], options.defaultDescription || ""),
-    likes: readNumber(item, [S.STUDIO_LIKE_COUNT, S.CAMEL_STUDIO_LIKE_COUNT], 0),
+    description: readString(
+      item,
+      [S.STUDIO_DESC],
+      options.defaultDescription || ""
+    ),
+    likes: readNumber(
+      item,
+      [S.STUDIO_LIKE_COUNT, S.CAMEL_STUDIO_LIKE_COUNT],
+      0
+    ),
     views: readNumber(item, [S.STUDIO_WATCH_COUNT], 0),
-    owner: readString(item, [S.USER_NAME, S.USER_ID, S.REG_USER_ID], options.defaultUser || ""),
+    owner: readString(
+      item,
+      [S.USER_NAME, S.USER_ID, S.REG_USER_ID],
+      options.defaultUser || ""
+    ),
     isMine,
-    knowledge: readRaw(item, [S.STUDIO_AUTH_ARRAY], options.defaultKnowledge || ""),
+    knowledge: readRaw(
+      item,
+      [S.STUDIO_AUTH_ARRAY],
+      options.defaultKnowledge || ""
+    ),
     scope: hasAuthScope
       ? options.authScope || options.publicScope || ""
       : options.publicScope || "",
-    prompts: typeof options.createPromptExamples === "function" ? options.createPromptExamples() : [],
+    prompts:
+      typeof options.createPromptExamples === "function"
+        ? options.createPromptExamples()
+        : [],
     raw: item,
   };
 }

@@ -1,6 +1,9 @@
 <template>
   <div class="message-actions-wrap" :class="`message-actions-wrap--${role}`">
-    <div class="message-actions tw-flex tw-items-center tw-gap-1" :class="`message-actions--${role}`">
+    <div
+      class="message-actions tw-flex tw-items-center tw-gap-1"
+      :class="`message-actions--${role}`"
+    >
       <template v-if="role === 'assistant'">
         <button
           type="button"

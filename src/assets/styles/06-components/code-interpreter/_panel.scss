@@ -10,18 +10,31 @@
   --code-interpreter-panel-width: clamp(380px, 30vw, 520px);
   --code-interpreter-panel-min-width: 360px;
   --code-interpreter-chat-min-width: 420px;
-  --code-interpreter-chat-width: min(var(--layout-chat-lane-width, 880px), 100%);
+  --code-interpreter-chat-width: min(
+    var(--layout-chat-lane-width, 880px),
+    100%
+  );
   --code-interpreter-panel-gap: 24px;
   --code-interpreter-shell-padding-x: 24px;
   --code-interpreter-shell-padding-y: 18px;
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-workspace,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-workspace {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .chat-workspace,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .chat-workspace {
   display: grid !important;
   grid-template-columns:
-    minmax(var(--code-interpreter-chat-min-width), var(--code-interpreter-chat-width))
-    minmax(var(--code-interpreter-panel-min-width), var(--code-interpreter-panel-width));
+    minmax(
+      var(--code-interpreter-chat-min-width),
+      var(--code-interpreter-chat-width)
+    )
+    minmax(
+      var(--code-interpreter-panel-min-width),
+      var(--code-interpreter-panel-width)
+    );
   grid-template-rows: auto minmax(0, 1fr) auto;
   align-items: stretch;
   justify-content: safe center;
@@ -33,25 +46,35 @@ body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared 
   overflow-x: auto !important;
   overflow-y: hidden !important;
   overscroll-behavior-x: contain;
-  padding: 0 var(--code-interpreter-shell-padding-x) var(--code-interpreter-shell-padding-y);
+  padding: 0 var(--code-interpreter-shell-padding-x)
+    var(--code-interpreter-shell-padding-y);
   box-sizing: border-box;
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-workspace > .mobile-topbar,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-workspace > .mobile-topbar {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .chat-workspace
+  > .mobile-topbar,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .chat-workspace
+  > .mobile-topbar {
   grid-column: 1 / -1;
   grid-row: 1;
   min-width: calc(
-    var(--code-interpreter-chat-min-width) +
-      var(--code-interpreter-panel-gap) +
+    var(--code-interpreter-chat-min-width) + var(--code-interpreter-panel-gap) +
       var(--code-interpreter-panel-min-width)
   );
   margin-right: calc(-1 * var(--code-interpreter-shell-padding-x));
   margin-left: calc(-1 * var(--code-interpreter-shell-padding-x));
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .message-list,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .message-list {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .message-list,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .message-list {
   grid-column: 1;
   grid-row: 2;
   width: 100% !important;
@@ -68,18 +91,30 @@ body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared 
   padding-right: 0 !important;
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .message,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .message,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .typing-row,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .typing-row {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .message,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .message,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .typing-row,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .typing-row {
   width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
   max-width: min(var(--layout-chat-lane-width, 880px), 100%) !important;
   margin-left: auto !important;
   margin-right: auto !important;
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .chat-composer-slot,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .chat-composer-slot {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .chat-composer-slot,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .chat-composer-slot {
   grid-column: 1;
   grid-row: 3;
   justify-self: center !important;
@@ -90,8 +125,12 @@ body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared 
   margin-bottom: 0 !important;
 }
 
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-chat .scroll-bottom-button,
-body.desktop-mode.code-interpreter-panel-open .chat-container-root--mode-shared .scroll-bottom-button {
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-chat
+  .scroll-bottom-button,
+body.desktop-mode.code-interpreter-panel-open
+  .chat-container-root--mode-shared
+  .scroll-bottom-button {
   grid-column: 1;
   grid-row: 3;
   justify-self: center !important;
@@ -316,7 +355,9 @@ body.actual-android-runtime.code-interpreter-panel-open {
   white-space: pre;
   word-break: normal;
   overflow-wrap: normal;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    monospace;
   font-size: var(--font-size-fixed-13);
   line-height: 1.55;
 }

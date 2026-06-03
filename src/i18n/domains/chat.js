@@ -126,7 +126,8 @@ export const chatMessages = {
     chatSearch: {
       eyebrow: "대화 이력",
       title: "채팅 검색",
-      description: "이전 대화 제목과 메시지 내용을 빠르게 찾아 다시 열 수 있습니다.",
+      description:
+        "이전 대화 제목과 메시지 내용을 빠르게 찾아 다시 열 수 있습니다.",
       inputLabel: "검색어",
       placeholder: "대화에서 검색",
       searchAction: "검색",
@@ -271,7 +272,8 @@ export const chatMessages = {
     chatSearch: {
       eyebrow: "Conversation history",
       title: "Search chats",
-      description: "Find previous chat titles and message content, then reopen the conversation.",
+      description:
+        "Find previous chat titles and message content, then reopen the conversation.",
       inputLabel: "Search keyword",
       placeholder: "Search in chats",
       searchAction: "Search",

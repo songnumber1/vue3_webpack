@@ -6,8 +6,16 @@
     @close="$emit('cancel')"
   >
     <div class="chat-history-dialog tw-grid tw-gap-4">
-      <p v-if="message" class="chat-history-dialog__message tw-m-0 tw-text-sm tw-leading-relaxed tw-text-app-subtle">{{ message }}</p>
-      <label v-if="mode === 'rename'" class="chat-history-dialog__field tw-grid tw-gap-2">
+      <p
+        v-if="message"
+        class="chat-history-dialog__message tw-m-0 tw-text-sm tw-leading-relaxed tw-text-app-subtle"
+      >
+        {{ message }}
+      </p>
+      <label
+        v-if="mode === 'rename'"
+        class="chat-history-dialog__field tw-grid tw-gap-2"
+      >
         <span>{{ t("chat.historyDialog.titleField") }}</span>
         <input
           v-model="draftTitle"
@@ -25,7 +33,9 @@
           @keyup.enter="confirm"
         />
       </label>
-      <div class="chat-history-dialog__actions tw-flex tw-items-center tw-justify-end tw-gap-2">
+      <div
+        class="chat-history-dialog__actions tw-flex tw-items-center tw-justify-end tw-gap-2"
+      >
         <button
           class="playground-button playground-button--secondary"
           type="button"

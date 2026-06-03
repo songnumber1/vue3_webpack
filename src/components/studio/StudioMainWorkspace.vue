@@ -57,7 +57,10 @@
         :title="t('studio.detail.settings')"
         @click.stop="detailActionMenuOpen = !detailActionMenuOpen"
       >
-        <span class="studio-icon studio-icon--settings" aria-hidden="true"></span>
+        <span
+          class="studio-icon studio-icon--settings"
+          aria-hidden="true"
+        ></span>
       </button>
       <button
         class="studio-dialog__close tw-absolute tw-right-3 tw-top-3 tw-inline-flex tw-h-8 tw-w-8 tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-text-studio-text"
@@ -68,8 +71,14 @@
         ×
       </button>
       <StudioInfoPanel :studio="selectedStudio" />
-      <footer class="studio-dialog__footer tw-mx-[-24px] tw-mb-[-24px] tw-mt-5 tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-border-t tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-6 tw-py-3.5">
-        <button class="studio-button studio-button--primary" type="button" @click="closeDetailDialog">
+      <footer
+        class="studio-dialog__footer tw-mx-[-24px] tw-mb-[-24px] tw-mt-5 tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-border-t tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-6 tw-py-3.5"
+      >
+        <button
+          class="studio-button studio-button--primary"
+          type="button"
+          @click="closeDetailDialog"
+        >
           {{ t("common.close") }}
         </button>
       </footer>
@@ -84,28 +93,63 @@
       :style="detailActionMenuStyle"
     >
       <div class="studio-detail-context-menu" role="menu">
-        <button type="button" role="menuitem" @click="handleEditStudio(selectedStudio)">
+        <button
+          type="button"
+          role="menuitem"
+          @click="handleEditStudio(selectedStudio)"
+        >
           <span aria-hidden="true">✎</span>
-          <span>{{ t('studio.detail.edit') }}</span>
+          <span>{{ t("studio.detail.edit") }}</span>
         </button>
-        <button class="studio-detail-context-menu__danger" type="button" role="menuitem" @click="requestDeleteStudio(selectedStudio)">
+        <button
+          class="studio-detail-context-menu__danger"
+          type="button"
+          role="menuitem"
+          @click="requestDeleteStudio(selectedStudio)"
+        >
           <span aria-hidden="true">🗑</span>
-          <span>{{ t('studio.detail.delete') }}</span>
+          <span>{{ t("studio.detail.delete") }}</span>
         </button>
       </div>
     </div>
   </teleport>
 
-  <div v-if="deleteTarget" class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal">
-    <article class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text" role="dialog" aria-modal="true" :aria-label="t('studio.detail.deleteConfirmTitle')">
+  <div
+    v-if="deleteTarget"
+    class="studio-confirm-backdrop tw-fixed tw-inset-0 tw-z-modal"
+  >
+    <article
+      class="studio-confirm-dialog tw-bg-studio-surface tw-text-studio-text"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="t('studio.detail.deleteConfirmTitle')"
+    >
       <header class="studio-confirm-dialog__head">
-        <strong>{{ t('studio.detail.deleteConfirmTitle') }}</strong>
-        <button type="button" :aria-label="t('common.close')" @click="deleteTarget = null">×</button>
+        <strong>{{ t("studio.detail.deleteConfirmTitle") }}</strong>
+        <button
+          type="button"
+          :aria-label="t('common.close')"
+          @click="deleteTarget = null"
+        >
+          ×
+        </button>
       </header>
-      <p>{{ t('studio.detail.deleteConfirmMessage') }}</p>
+      <p>{{ t("studio.detail.deleteConfirmMessage") }}</p>
       <footer class="studio-confirm-dialog__footer">
-        <button class="studio-button" type="button" @click="deleteTarget = null">{{ t('common.close') }}</button>
-        <button class="studio-button studio-button--danger" type="button" @click="confirmDeleteStudio">{{ t('studio.detail.deleteConfirmAction') }}</button>
+        <button
+          class="studio-button"
+          type="button"
+          @click="deleteTarget = null"
+        >
+          {{ t("common.close") }}
+        </button>
+        <button
+          class="studio-button studio-button--danger"
+          type="button"
+          @click="confirmDeleteStudio"
+        >
+          {{ t("studio.detail.deleteConfirmAction") }}
+        </button>
       </footer>
     </article>
   </div>
@@ -120,7 +164,15 @@
 </template>
 
 <script setup>
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {useI18n} from "vue-i18n";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -176,24 +228,34 @@ const detailActionMenuOpen = ref(false);
 const detailSettingsButtonRef = ref(null);
 const detailActionMenuRef = ref(null);
 const deleteTarget = ref(null);
-useOverlayScrollbar(detailDialogRef, {overflow: {x: "hidden", y: "scroll"}}, {watchSource: () => [Boolean(selectedStudio.value)]});
-
-const {floatingStyles, update: updateDetailMenu, x, y} = useFloating(
-  detailSettingsButtonRef,
-  detailActionMenuRef,
-  {
-    placement: "bottom-end",
-    strategy: "fixed",
-    transform: false,
-    whileElementsMounted: autoUpdate,
-    middleware: [offset(8), flip({fallbackPlacements: ["bottom-start", "top-end"]}), shift({padding: 12})],
-  }
+useOverlayScrollbar(
+  detailDialogRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {watchSource: () => [Boolean(selectedStudio.value)]}
 );
+
+const {
+  floatingStyles,
+  update: updateDetailMenu,
+  x,
+  y,
+} = useFloating(detailSettingsButtonRef, detailActionMenuRef, {
+  placement: "bottom-end",
+  strategy: "fixed",
+  transform: false,
+  whileElementsMounted: autoUpdate,
+  middleware: [
+    offset(8),
+    flip({fallbackPlacements: ["bottom-start", "top-end"]}),
+    shift({padding: 12}),
+  ],
+});
 
 const detailActionMenuStyle = computed(() => ({
   ...floatingStyles.value,
   position: "fixed",
-  visibility: Number.isFinite(x.value) && Number.isFinite(y.value) ? "visible" : "hidden",
+  visibility:
+    Number.isFinite(x.value) && Number.isFinite(y.value) ? "visible" : "hidden",
 }));
 
 watch(isMobile, (mobile) => {

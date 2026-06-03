@@ -12,7 +12,10 @@ function isObject(value) {
 
 export function unwrapAxiosData(response, fallback = null) {
   if (response === undefined || response === null) return fallback;
-  if (isObject(response) && Object.prototype.hasOwnProperty.call(response, R.DATA)) {
+  if (
+    isObject(response) &&
+    Object.prototype.hasOwnProperty.call(response, R.DATA)
+  ) {
     return response[R.DATA];
   }
   return response;
@@ -62,7 +65,10 @@ export function readFirstDefined(source, keys = [], fallback = undefined) {
   if (!isObject(body) && !Array.isArray(body)) return fallback;
 
   for (const key of keys) {
-    if (Object.prototype.hasOwnProperty.call(body, key) && body[key] !== undefined) {
+    if (
+      Object.prototype.hasOwnProperty.call(body, key) &&
+      body[key] !== undefined
+    ) {
       return body[key];
     }
   }

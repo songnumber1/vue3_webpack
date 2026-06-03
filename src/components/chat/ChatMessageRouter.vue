@@ -55,4 +55,3 @@ const isErrorMessage = computed(
     (props.message?.status === "error" || props.message?.error === true)
 );
 </script>
-

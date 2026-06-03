@@ -1,18 +1,34 @@
 <template>
-  <div ref="menuRef" class="user-menu tw-relative tw-inline-flex tw-items-center" :class="{'user-menu--open': open}">
+  <div
+    ref="menuRef"
+    class="user-menu tw-relative tw-inline-flex tw-items-center"
+    :class="{'user-menu--open': open}"
+  >
     <button
       class="user-menu-trigger tw-inline-flex tw-h-10 tw-max-w-[220px] tw-items-center tw-gap-2 tw-rounded-full tw-border tw-border-app-controlBorder tw-bg-app-control tw-px-2.5 tw-text-app-text tw-shadow-control"
       type="button"
       :aria-label="t('common.user')"
       @click="toggleOpen"
     >
-      <span class="user-avatar user-avatar--header tw-inline-flex tw-h-7 tw-w-7 tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-primary tw-text-sm tw-font-extrabold tw-text-white">{{ userInitial }}</span>
-      <span class="user-menu-name tw-min-w-0 tw-max-w-[120px] tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-sm tw-font-bold">{{ displayName }}</span>
-      <ChevronDownIcon class="user-menu-chevron-icon tw-h-4 tw-w-4 tw-shrink-0 tw-text-app-subtle tw-transition-transform tw-duration-200" />
+      <span
+        class="user-avatar user-avatar--header tw-inline-flex tw-h-7 tw-w-7 tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-primary tw-text-sm tw-font-extrabold tw-text-white"
+        >{{ userInitial }}</span
+      >
+      <span
+        class="user-menu-name tw-min-w-0 tw-max-w-[120px] tw-overflow-hidden tw-text-ellipsis tw-whitespace-nowrap tw-text-sm tw-font-bold"
+        >{{ displayName }}</span
+      >
+      <ChevronDownIcon
+        class="user-menu-chevron-icon tw-h-4 tw-w-4 tw-shrink-0 tw-text-app-subtle tw-transition-transform tw-duration-200"
+      />
     </button>
 
     <transition name="menu-pop">
-      <section v-if="open" class="user-menu-panel tw-absolute tw-right-0 tw-top-[calc(100%+8px)] tw-z-popover tw-grid tw-min-w-[260px] tw-gap-1 tw-rounded-2xl tw-border tw-border-app-border tw-bg-app-surface tw-p-2 tw-text-app-text tw-shadow-menu" role="menu">
+      <section
+        v-if="open"
+        class="user-menu-panel tw-absolute tw-right-0 tw-top-[calc(100%+8px)] tw-z-popover tw-grid tw-min-w-[260px] tw-gap-1 tw-rounded-2xl tw-border tw-border-app-border tw-bg-app-surface tw-p-2 tw-text-app-text tw-shadow-menu"
+        role="menu"
+      >
         <button
           v-if="systemSettings.showNoticeMenu"
           class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
@@ -102,7 +118,10 @@
           </button>
 
           <transition name="menu-pop">
-            <div v-if="languageOpen" class="user-menu-language-options tw-mt-1 tw-grid tw-gap-1 tw-rounded-xl tw-bg-app-muted tw-p-1">
+            <div
+              v-if="languageOpen"
+              class="user-menu-language-options tw-mt-1 tw-grid tw-gap-1 tw-rounded-xl tw-bg-app-muted tw-p-1"
+            >
               <button
                 v-for="option in languageOptions"
                 :key="option.value"

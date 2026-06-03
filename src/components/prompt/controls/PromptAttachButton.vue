@@ -1,5 +1,8 @@
 <template>
-  <div ref="attachRoot" class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0">
+  <div
+    ref="attachRoot"
+    class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0"
+  >
     <button
       class="prompt-icon-action attach-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-control tw-border tw-border-app-controlBorder tw-bg-app-control tw-transition"
       :class="{'prompt-icon-action--active': attachMenuOpen}"

@@ -43,8 +43,8 @@
 .feedback-dialog {
   width: min(680px, calc(100vw - 32px)) !important;
   max-height: calc(
-    var(--app-height, 100dvh) - 24px - env(safe-area-inset-top) -
-      env(safe-area-inset-bottom)
+    var(--app-height, 100dvh) -
+      24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
   ) !important;
   margin: auto !important;
   border-radius: 5px !important;
@@ -58,8 +58,8 @@
 .feedback-dialog-body {
   @include mobile-mode {
     max-height: calc(
-      var(--app-height, 100dvh) - 180px - env(safe-area-inset-top) -
-        env(safe-area-inset-bottom)
+      var(--app-height, 100dvh) -
+        180px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
     );
     overflow-y: auto;
   }

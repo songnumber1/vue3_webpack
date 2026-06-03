@@ -27,7 +27,8 @@ const {t} = useI18n();
 const props = defineProps({studio: {type: Object, required: true}});
 
 const detailMeta = computed(
-  () => `${t("studio.likes")} ${props.studio.likes} · ${t("studio.questions")} ${props.studio.views} · ${props.studio.owner} · ${props.studio.model}`
+  () =>
+    `${t("studio.likes")} ${props.studio.likes} · ${t("studio.questions")} ${props.studio.views} · ${props.studio.owner} · ${props.studio.model}`
 );
 
 const detailLabels = computed(() => ({

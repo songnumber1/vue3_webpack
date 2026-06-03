@@ -81,8 +81,6 @@
   place-items: center;
 }
 
-
-
 @mixin desktop-mode {
   body.desktop-mode & {
     @content;
@@ -95,7 +93,10 @@
   }
 }
 
-@mixin viewport-height-lock($height: var(--layout-viewport-height, 100dvh), $important: false) {
+@mixin viewport-height-lock(
+  $height: var(--layout-viewport-height, 100dvh),
+  $important: false
+) {
   @if $important {
     height: $height !important;
     min-height: $height;
@@ -109,7 +110,10 @@
   }
 }
 
-@mixin viewport-height($height: var(--layout-viewport-height, 100dvh), $important: false) {
+@mixin viewport-height(
+  $height: var(--layout-viewport-height, 100dvh),
+  $important: false
+) {
   @if $important {
     height: $height !important;
     max-height: $height !important;
@@ -176,7 +180,10 @@
 
 @mixin safe-bottom-padding($fallback: var(--space-3, 12px), $important: false) {
   @if $important {
-    padding-bottom: max(#{$fallback}, env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: max(
+      #{$fallback},
+      env(safe-area-inset-bottom, 0px)
+    ) !important;
   } @else {
     padding-bottom: max(#{$fallback}, env(safe-area-inset-bottom, 0px));
   }
@@ -197,7 +204,6 @@
   place-items: center !important;
   overflow-y: auto !important;
 }
-
 
 @mixin keyboard-font-token-aliases {
   --keyboard-font-size-2xs: var(--font-size-2xs);

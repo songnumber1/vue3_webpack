@@ -1,10 +1,26 @@
 <template>
-  <article class="message message--assistant message--error tw-flex tw-w-full tw-min-w-0 tw-items-start tw-gap-3">
-    <div class="avatar tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-assistantAvatar tw-font-bold tw-text-app-assistantAvatarText">AI</div>
+  <article
+    class="message message--assistant message--error tw-flex tw-w-full tw-min-w-0 tw-items-start tw-gap-3"
+  >
+    <div
+      class="avatar tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full tw-bg-app-assistantAvatar tw-font-bold tw-text-app-assistantAvatarText"
+    >
+      AI
+    </div>
     <div class="bubble bubble--assistant bubble--error tw-min-w-0 tw-flex-1">
-      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">Assistant</div>
-      <section class="assistant-error-card tw-flex tw-items-start tw-gap-3 tw-rounded-control tw-border" role="alert">
-        <div class="assistant-error-icon tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full" aria-hidden="true">!</div>
+      <div class="bubble-meta tw-text-xs tw-font-semibold tw-text-app-subtle">
+        Assistant
+      </div>
+      <section
+        class="assistant-error-card tw-flex tw-items-start tw-gap-3 tw-rounded-control tw-border"
+        role="alert"
+      >
+        <div
+          class="assistant-error-icon tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-full"
+          aria-hidden="true"
+        >
+          !
+        </div>
         <div class="assistant-error-body tw-min-w-0 tw-flex-1">
           <strong>{{ errorTitle }}</strong>
           <p>{{ errorMessage }}</p>

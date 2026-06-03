@@ -6,7 +6,10 @@
 .mobile-drawer,
 .mobile-drawer .sidebar-content--mobile {
   @include mobile-mode {
-    @include viewport-height(var(--layout-viewport-height, var(--app-height, 100dvh)), true);
+    @include viewport-height(
+      var(--layout-viewport-height, var(--app-height, 100dvh)),
+      true
+    );
     overflow: hidden !important;
   }
 }

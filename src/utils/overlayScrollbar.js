@@ -27,7 +27,9 @@ function canUseDom() {
 
 function isActualAndroidRuntime() {
   if (!canUseDom()) return false;
-  return Boolean(window.AndroidBridge || /Android/i.test(navigator.userAgent || ""));
+  return Boolean(
+    window.AndroidBridge || /Android/i.test(navigator.userAgent || "")
+  );
 }
 
 function isUnsafeTarget(element) {

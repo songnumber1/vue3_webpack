@@ -12,12 +12,17 @@
       type="button"
       @click="$emit('select-model', model.id)"
     >
-      <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
+      <span
+        class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left"
+      >
         <strong>{{ model.label }}</strong>
         <small>{{ model.description }}</small>
       </span>
 
-      <CheckIcon v-if="model.id === modelValue" class="bottom-sheet-check tw-ml-auto tw-shrink-0" />
+      <CheckIcon
+        v-if="model.id === modelValue"
+        class="bottom-sheet-check tw-ml-auto tw-shrink-0"
+      />
     </button>
   </BaseBottomSheet>
 
@@ -52,7 +57,9 @@
           {{ tool.icon }}
         </span>
 
-        <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
+        <span
+          class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left"
+        >
           <strong>
             {{ tool.label }}
           </strong>

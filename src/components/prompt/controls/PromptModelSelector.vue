@@ -73,4 +73,3 @@ defineEmits(["open-model", "select-model"]);
 
 defineExpose({modelRoot});
 </script>
-

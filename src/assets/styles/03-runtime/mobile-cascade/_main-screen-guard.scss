@@ -28,12 +28,17 @@ body.mobile-mode .empty-stage--mobile-main {
   align-content: initial !important;
 }
 
-body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main .empty-center,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center,
 body.mobile-mode .empty-stage--mobile-main .empty-center {
   position: absolute !important;
   top: calc(var(--mobile-header-height, 56px) + 16px) !important;
   right: 0 !important;
-  bottom: calc(var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px)) !important;
+  bottom: calc(
+    var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px)
+  ) !important;
   left: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -53,7 +58,11 @@ body.mobile-mode .empty-stage--mobile-main .empty-center {
   touch-action: pan-y !important;
 }
 
-body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main .empty-center h1,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .empty-center
+  h1,
 body.mobile-mode .empty-stage--mobile-main .empty-center h1 {
   margin: 0 0 4px !important;
   font-size: var(--font-size-fixed-24) !important;
@@ -96,7 +105,9 @@ body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap {
   position: fixed !important;
   top: auto !important;
   right: 0 !important;
-  bottom: calc(var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(
+    var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
+  ) !important;
   left: 0 !important;
   z-index: var(--mobile-main-composer-z, var(--z-prompt-floating)) !important;
   box-sizing: border-box !important;
@@ -113,11 +124,13 @@ body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap {
   touch-action: manipulation !important;
 }
 
-body.mobile-mode .chat-container-root--mode-main .mobile-main-fixed-prompt .prompt-box,
+body.mobile-mode
+  .chat-container-root--mode-main
+  .mobile-main-fixed-prompt
+  .prompt-box,
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box--gemini {
   width: 100% !important;
   max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
   margin: 0 auto !important;
 }
-

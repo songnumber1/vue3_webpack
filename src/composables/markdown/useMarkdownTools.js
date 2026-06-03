@@ -84,7 +84,8 @@ function isDesktopCodeInterpreterRuntime() {
 }
 
 function dispatchCodeInterpreterOpen({code, language}) {
-  if (typeof window === "undefined" || !isDesktopCodeInterpreterRuntime()) return;
+  if (typeof window === "undefined" || !isDesktopCodeInterpreterRuntime())
+    return;
   window.dispatchEvent(
     new CustomEvent("ds-code-interpreter-open", {
       detail: {

@@ -6,7 +6,10 @@
       role="status"
       aria-live="polite"
     >
-      <span class="mobile-api-progress-spinner tw-inline-flex tw-h-11 tw-w-11 tw-animate-spin tw-rounded-full tw-border-4 tw-border-solid tw-border-slate-900/20 tw-border-t-app-primary" aria-hidden="true"></span>
+      <span
+        class="mobile-api-progress-spinner tw-inline-flex tw-h-11 tw-w-11 tw-animate-spin tw-rounded-full tw-border-4 tw-border-solid tw-border-slate-900/20 tw-border-t-app-primary"
+        aria-hidden="true"
+      ></span>
       <span class="sr-only">{{ t("overlayProgress.apiProcessing") }}</span>
     </div>
   </teleport>
@@ -38,6 +41,8 @@ const {isOverlayVisible} = storeToRefs(apiRequestStore);
 // 사용자가 시스템 설정에서 끄면 activeOverlayCount가 남아 있어도 화면에는
 // circle progress가 절대 렌더링되지 않습니다.
 const visible = computed(
-  () => Boolean(systemSettingsStore.showMobileApiProgress) && Boolean(isOverlayVisible.value)
+  () =>
+    Boolean(systemSettingsStore.showMobileApiProgress) &&
+    Boolean(isOverlayVisible.value)
 );
 </script>

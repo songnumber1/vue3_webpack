@@ -6,14 +6,21 @@
       'main-empty-state--preview': preview,
     }"
   >
-    <div class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[820px] tw-flex-col tw-items-center tw-gap-4 tw-text-center">
+    <div
+      class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[820px] tw-flex-col tw-items-center tw-gap-4 tw-text-center"
+    >
       <img
         class="empty-assistant-logo main-empty-state__logo tw-h-12 tw-w-12 tw-rounded-2xl tw-object-contain tw-shadow-control"
         :src="assistantIcon"
         :alt="assistantLabel"
       />
       <h1>{{ resolvedTitle }}</h1>
-      <p v-if="subtitle" class="main-empty-state__subtitle tw-mx-auto tw-max-w-[420px] tw-text-sm tw-leading-6 tw-text-app-subtle">{{ subtitle }}</p>
+      <p
+        v-if="subtitle"
+        class="main-empty-state__subtitle tw-mx-auto tw-max-w-[420px] tw-text-sm tw-leading-6 tw-text-app-subtle"
+      >
+        {{ subtitle }}
+      </p>
       <div
         v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
@@ -103,7 +110,6 @@ function handleSuggestionClick(item) {
 </script>
 
 <style scoped lang="scss">
-
 /*
  * Mobile main composer owns a separate dock outside .empty-center.
  * This prevents the prompt from staying in the desktop empty-state flow when
@@ -114,13 +120,17 @@ function handleSuggestionClick(item) {
 }
 
 .empty-stage--mobile-main .main-empty-state__center {
-  padding-bottom: calc(var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px));
+  padding-bottom: calc(
+    var(--mobile-main-composer-space, 174px) + var(--mobile-keyboard-inset, 0px)
+  );
 }
 
 .empty-stage--mobile-main .main-empty-state__composer-dock {
   position: fixed;
   right: 0;
-  bottom: calc(var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px));
+  bottom: calc(
+    var(--composer-keyboard-inset, 0px) + env(safe-area-inset-bottom, 0px)
+  );
   left: 0;
   z-index: var(--mobile-main-composer-z, var(--z-prompt-floating, 90));
   box-sizing: border-box;
@@ -136,8 +146,12 @@ function handleSuggestionClick(item) {
   pointer-events: auto;
 }
 
-.empty-stage--mobile-main .main-empty-state__composer-dock .mobile-main-fixed-prompt,
-.empty-stage--mobile-main .main-empty-state__composer-dock .desktop-center-prompt {
+.empty-stage--mobile-main
+  .main-empty-state__composer-dock
+  .mobile-main-fixed-prompt,
+.empty-stage--mobile-main
+  .main-empty-state__composer-dock
+  .desktop-center-prompt {
   position: static !important;
   inset: auto !important;
   box-sizing: border-box;

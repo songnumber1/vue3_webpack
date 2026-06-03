@@ -113,10 +113,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
 
     clearHistoryHydrationOverlayStopTimer();
-    historyHydrationOverlayStopTimerId = window.setTimeout(() => {
-      historyHydrationOverlayStopTimerId = 0;
-      window.requestAnimationFrame(stop);
-    }, Math.max(0, delay));
+    historyHydrationOverlayStopTimerId = window.setTimeout(
+      () => {
+        historyHydrationOverlayStopTimerId = 0;
+        window.requestAnimationFrame(stop);
+      },
+      Math.max(0, delay)
+    );
   }
 
   function beginHistoryHydration() {
@@ -165,10 +168,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       const now =
         typeof performance !== "undefined" ? performance.now() : Date.now();
       const elapsed = Math.max(0, now - historyHydrationOverlayStartedAt);
-      const remaining = Math.max(
-        0,
-        HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed
-      );
+      const remaining = Math.max(0, HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed);
 
       // MessageList가 history-hydrated를 emit한 뒤에도 Vue가 hidden 메시지 DOM을
       // 실제 화면에 reveal/paint하는 시간이 남아 있을 수 있습니다.
@@ -185,7 +185,9 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const isMainPage = computed(() => currentMode.value === "main"); // 대화 서랍이 비어있는 빈 홈 화면 여부
   const isChatPage = computed(() => currentMode.value === "chat"); // 실제 유저 본인의 프라이빗 대화방 여부
   const isSharedPage = computed(() => currentMode.value === "shared"); // URL 공유 링크를 통해 들어온 외부인 열람용 방 여부
-  const isConversationPage = computed(() => isChatPage.value || isSharedPage.value); // 실제 대화/공유 대화가 실재하는 뷰 포트 구조 판별
+  const isConversationPage = computed(
+    () => isChatPage.value || isSharedPage.value
+  ); // 실제 대화/공유 대화가 실재하는 뷰 포트 구조 판별
   const isReadOnly = computed(() => isSharedPage.value); // 공유 페이지인 경우 하단 인풋 창 타이핑 권한을 차단(박제)
 
   // 비즈니스 인프라 런타임 코어 스토어로부터 화면 구성에 필요한 상태 유닛 구조 분출
@@ -307,7 +309,9 @@ export function useChatDataController({props, ui, runtime, messages}) {
         beginHistoryHydration();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
-        const sharedMessages = await loadSharedConversation(activeHistoryId.value);
+        const sharedMessages = await loadSharedConversation(
+          activeHistoryId.value
+        );
         if (!isCurrentLoad()) return;
         messages.value = sharedMessages;
         await nextTick();
@@ -428,7 +432,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
     canWrite: () => !isReadOnly.value && !isActiveModelUnavailable.value, // 현재 전송 가능 상태 가드 밸리데이션 검증식
     isReadOnly,
     isActiveModelUnavailable,
-    markNewSubmitConversation: chatStore.markPendingNewSubmitChat.bind(chatStore),
+    markNewSubmitConversation:
+      chatStore.markPendingNewSubmitChat.bind(chatStore),
   });
 
   const isGenerating = computed(
