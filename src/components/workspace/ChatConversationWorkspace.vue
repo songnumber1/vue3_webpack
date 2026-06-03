@@ -8,6 +8,7 @@
   />
 
   <MessageList
+    v-show="!isPromptExpandedInChat"
     ref="listRef"
     :messages="messages"
     :loading="isGenerating"
@@ -18,7 +19,7 @@
     @regenerate="workspaceActions.regenerate($event)"
   />
   <button
-    v-if="showScrollBottom && !isInteractionBlocked"
+    v-if="showScrollBottom && !isInteractionBlocked && !isPromptExpandedInChat"
     class="scroll-bottom-button"
     type="button"
     :aria-label="t('chat.scrollBottom')"
@@ -32,7 +33,11 @@
       v-else-if="isActiveModelUnavailable"
       :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
     />
-    <PromptComposer v-else :class="{'mobile-chat-prompt': isMobile}" />
+    <PromptComposer
+      v-else
+      :class="{'mobile-chat-prompt': isMobile}"
+      @expanded-change="handlePromptExpandedChange"
+    />
   </div>
 
   <aside
@@ -101,6 +106,7 @@ const previewRef = ref(null);
 const previewHtml = ref("<p></p>");
 const isDesktopRuntime = ref(false);
 const codeInterpreterOpen = ref(false);
+const isPromptExpandedInChat = ref(false);
 const selectedInterpreterCode = ref("");
 const selectedInterpreterLanguage = ref("text");
 let composerResizeObserver = null;
@@ -411,6 +417,12 @@ function scheduleComposerHeightUpdate() {
   );
 }
 
+
+function handlePromptExpandedChange(expanded) {
+  isPromptExpandedInChat.value = Boolean(expanded);
+  scheduleComposerHeightUpdate();
+}
+
 function handleMessageContentRendered() {
   workspaceActions.handleMessageContentRendered();
   scheduleComposerHeightUpdate();
@@ -461,6 +473,7 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   cleanupComposerHeightObserver();
   cleanupCodeInterpreterRuntimeClasses();
+  isPromptExpandedInChat.value = false;
   if (typeof document !== "undefined") {
     document.body.classList.remove("code-interpreter-panel-open");
   }

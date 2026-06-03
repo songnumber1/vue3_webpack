@@ -171,7 +171,7 @@ const props = reactive({
   },
 });
 
-const emit = defineEmits(["blur"]);
+const emit = defineEmits(["blur", "expanded-change"]);
 
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
@@ -262,6 +262,7 @@ watch(
     if (typeof document !== "undefined") {
       document.body.classList.toggle("prompt-input-expanded", expanded);
     }
+    emit("expanded-change", expanded);
 
     await nextTick();
     workspaceActions.handlePromptResize();
@@ -273,6 +274,7 @@ onBeforeUnmount(() => {
   if (typeof document !== "undefined") {
     document.body.classList.remove("prompt-input-expanded");
   }
+  emit("expanded-change", false);
 });
 
 const resolvedToolbarComponent = computed(() =>
