@@ -16,6 +16,10 @@ const POST_REVEAL_SCROLL_DELAYS = [80, 180, 320];
 const ANDROID_POST_REVEAL_SCROLL_DELAYS = [80, 180, 320, 520];
 const HYDRATION_REVEAL_FALLBACK_MS = 180;
 const ANDROID_HYDRATION_REVEAL_FALLBACK_MS = 320;
+const HYDRATION_READY_CHECK_INTERVAL_MS = 120;
+const HYDRATION_MIN_READY_PAINT_FRAMES = 2;
+const HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS = 12000;
+const HYDRATION_SMALL_ROOM_HARD_TIMEOUT_MS = 4500;
 const RESIZE_RECALCULATE_DEBOUNCE_MS = 120;
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
@@ -115,6 +119,9 @@ export function useMessageListScroll({props, emit}) {
   let pendingAfterRenderOptions = null;
   let hydrationRunId = 0;
   let hydrationTimerId = 0;
+  let hydrationReadyCheckTimerId = 0;
+  let hydrationReadyStartedAt = 0;
+  let hydrationReadyPaintFrames = 0;
   let hydrationRafId = 0;
   let hydrationResizeObserver = null;
   let hydrationRevealTimerIds = [];
@@ -300,6 +307,12 @@ export function useMessageListScroll({props, emit}) {
       window.clearTimeout(hydrationTimerId);
       hydrationTimerId = 0;
     }
+    if (hydrationReadyCheckTimerId) {
+      window.clearTimeout(hydrationReadyCheckTimerId);
+      hydrationReadyCheckTimerId = 0;
+    }
+    hydrationReadyStartedAt = 0;
+    hydrationReadyPaintFrames = 0;
     if (hydrationRafId) {
       window.cancelAnimationFrame(hydrationRafId);
       hydrationRafId = 0;
@@ -546,6 +559,82 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
+  function getHydrationHardTimeoutMs() {
+    const messageCount = props.messages?.length || 0;
+    const assistantCount = getAssistantMessageIds().length;
+    const base = messageCount >= 120
+      ? HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS
+      : HYDRATION_SMALL_ROOM_HARD_TIMEOUT_MS;
+
+    return Math.max(base, Math.min(16000, assistantCount * 24));
+  }
+
+  function getHydrationDomMessageCount() {
+    const root = scrollRef.value;
+    if (!root?.isConnected) return 0;
+    return root.querySelectorAll('[data-message-role]').length;
+  }
+
+  function isHydrationDomReady() {
+    const expectedCount = props.messages?.length || 0;
+    if (!expectedCount) return true;
+    return getHydrationDomMessageCount() >= expectedCount;
+  }
+
+  function isHydrationContentReady() {
+    return !pendingHydrationAssistantIds || pendingHydrationAssistantIds.size === 0;
+  }
+
+  function scheduleHydrationReadyCheck(runId) {
+    if (hydrationTimerId) {
+      window.clearTimeout(hydrationTimerId);
+      hydrationTimerId = 0;
+    }
+    if (hydrationReadyCheckTimerId) {
+      window.clearTimeout(hydrationReadyCheckTimerId);
+      hydrationReadyCheckTimerId = 0;
+    }
+
+    if (!hydrationReadyStartedAt) {
+      hydrationReadyStartedAt = Date.now();
+      hydrationReadyPaintFrames = 0;
+    }
+
+    const check = () => {
+      if (runId !== hydrationRunId || !props.initialHydrating) return;
+
+      const elapsed = Date.now() - hydrationReadyStartedAt;
+      const hardTimeoutMs = getHydrationHardTimeoutMs();
+      const ready = isHydrationDomReady() && isHydrationContentReady();
+      const timedOut = elapsed >= hardTimeoutMs;
+
+      // Windows Chrome에서 500개 내외 대화방은 Markdown/Vue DOM 반영이 fallback 시간보다
+      // 늦는 경우가 있습니다. pending assistant가 남아 있으면 progress를 끄지 않고,
+      // DOM과 content가 준비된 뒤 최소 2 프레임을 더 기다려 hidden 해제/scroll 계산이
+      // 화면에 같이 반영되도록 합니다. 단, 비정상 렌더 이벤트 누락은 hard timeout으로
+      // 방어합니다.
+      if (ready || timedOut) {
+        window.requestAnimationFrame(() => {
+          if (runId !== hydrationRunId || !props.initialHydrating) return;
+          hydrationReadyPaintFrames += 1;
+          if (hydrationReadyPaintFrames < HYDRATION_MIN_READY_PAINT_FRAMES) {
+            scheduleHydrationReadyCheck(runId);
+            return;
+          }
+          completeInitialHydration(runId);
+        });
+        return;
+      }
+
+      hydrationReadyCheckTimerId = window.setTimeout(
+        () => scheduleHydrationReadyCheck(runId),
+        HYDRATION_READY_CHECK_INTERVAL_MS
+      );
+    };
+
+    check();
+  }
+
   function scheduleInitialHydrationFallback(runId) {
     if (hydrationTimerId) window.clearTimeout(hydrationTimerId);
     const pendingCount = pendingHydrationAssistantIds?.size || 0;
@@ -561,7 +650,7 @@ export function useMessageListScroll({props, emit}) {
 
     hydrationTimerId = window.setTimeout(() => {
       hydrationTimerId = 0;
-      completeInitialHydration(runId);
+      scheduleHydrationReadyCheck(runId);
     }, fallbackDelay);
   }
 
@@ -576,7 +665,7 @@ export function useMessageListScroll({props, emit}) {
 
     pendingHydrationAssistantIds = new Set(getAssistantMessageIds());
     if (!pendingHydrationAssistantIds.size) {
-      completeInitialHydration(runId);
+      scheduleHydrationReadyCheck(runId);
       return;
     }
 
@@ -635,7 +724,7 @@ export function useMessageListScroll({props, emit}) {
       if (isLayoutReady) pendingHydrationAssistantIds.delete(id);
       if (!pendingHydrationAssistantIds.size) {
         const runId = hydrationRunId;
-        completeInitialHydration(runId);
+        scheduleHydrationReadyCheck(runId);
       }
       return;
     }
