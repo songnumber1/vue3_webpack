@@ -1,13 +1,7 @@
+import {readFirstString} from "@/adapters/adapterPrimitives";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 import {API_RESPONSE_KEYS as R} from "@/constants/api/apiResponseKeys";
 import {unwrapApiBody} from "@/utils/apiResponseReader";
-
-function readFirstString(...values) {
-  const found = values.find(
-    (value) => typeof value === "string" && value !== ""
-  );
-  return found || "";
-}
 
 export function resolveGenerationRequestId(payload = {}) {
   return readFirstString(
@@ -23,17 +17,17 @@ export function resolveGenerationPromptText(payload = {}) {
 }
 
 export function resolveGenerationModelId(payload = {}) {
-  return readFirstString(payload?.[G.MODEL_ID], payload?.modeId);
+  return readFirstString(payload?.[G.MODEL_ID], payload?.[G.MODEL_ID_LEGACY]);
 }
 
 export function adaptGenerationResultContent(response) {
   const body = unwrapApiBody(response, response) || {};
   return readFirstString(
     body?.[G.CONTENT],
-    body?.answer,
+    body?.[G.ANSWER],
     body?.[R.DATA],
     response?.[G.CONTENT],
-    response?.answer,
+    response?.[G.ANSWER],
     response?.[R.DATA]
   );
 }

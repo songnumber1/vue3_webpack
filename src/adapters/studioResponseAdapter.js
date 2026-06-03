@@ -3,38 +3,12 @@
  * @description Studio API 원본 응답 key 접근을 한 곳으로 모아 화면용 모델로 정규화합니다.
  */
 
+import {readBoolean, readNumber, readRaw, readString} from "@/adapters/adapterPrimitives";
 import {STUDIO_API_KEYS as S} from "@/constants/api/studioApiKeys";
-import {readFirstDefined, unwrapApiBody} from "@/utils/apiResponseReader";
+import {unwrapApiBody} from "@/utils/apiResponseReader";
 
 function toArray(value) {
   return Array.isArray(value) ? value : [];
-}
-
-function readRaw(source, keys = [], fallback = undefined) {
-  return readFirstDefined(source, keys, fallback);
-}
-
-function readString(source, keys = [], fallback = "") {
-  const value = readRaw(source, keys, fallback);
-  if (value === undefined || value === null) return fallback;
-  return String(value);
-}
-
-function readNumber(source, keys = [], fallback = 0) {
-  const value = readRaw(source, keys, fallback);
-  const number = Number(value);
-  return Number.isFinite(number) ? number : fallback;
-}
-
-function readBoolean(source, keys = []) {
-  const value = readRaw(source, keys, false);
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value !== 0;
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    return ["true", "y", "yes", "1"].includes(normalized);
-  }
-  return Boolean(value);
 }
 
 export function parseFirstStudioModelName(value) {

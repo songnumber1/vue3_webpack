@@ -1,14 +1,8 @@
+import {readFirstString} from "@/adapters/adapterPrimitives";
 import {
   SSE_RESPONSE_KEYS as S,
   SSE_RESPONSE_TOKENS,
 } from "@/constants/api/sseResponseKeys";
-
-function readFirstString(...values) {
-  const found = values.find(
-    (value) => typeof value === "string" && value !== ""
-  );
-  return found || "";
-}
 
 export function createGenerationStreamError() {
   const error = new Error("generation stream returned Error");

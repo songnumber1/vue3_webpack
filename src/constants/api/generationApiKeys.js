@@ -1,6 +1,7 @@
 /**
  * @file constants/api/generationApiKeys.js
- * @description generation.do 요청/결과 및 생성 상태 API 원본 key 모음입니다.
+ * @description generation.do 요청 payload 및 일반 generation 결과 원본 key 모음입니다.
+ * SSE/OpenAI 호환 스트림 응답 전용 key는 sseResponseKeys.js에서 관리합니다.
  */
 
 export const GENERATION_API_KEYS = Object.freeze({
@@ -12,9 +13,11 @@ export const GENERATION_API_KEYS = Object.freeze({
   ASSIST_ID: "assistId",
   ASSISTANT_ID: "assistantId",
   MODEL_ID: "modelId",
+  MODEL_ID_LEGACY: "modeId",
   INPUT: "input",
   BODY: "body",
   CONTENT: "content",
+  ANSWER: "answer",
   IS_REASONING: "isReasoning",
   STUDIO: "studio",
   INTENTION: "intention",
@@ -29,18 +32,6 @@ export const GENERATION_API_KEYS = Object.freeze({
   STYLES: "styles",
   BYTE_SIZE: "byteSize",
   LAST_FEDERATION_INFO: "lastFederationInfo",
-  DELTA: "delta",
-  CHOICES: "choices",
-  FINISH_REASON: "finish_reason",
-  INDEX: "index",
-  LOGPROBS: "logprobs",
-  TOKEN_IDS: "token_ids",
-  CREATED: "created",
-  MODEL: "model",
-  OBJECT: "object",
-  SERVICE_TIER: "service_tier",
-  SYSTEM_FINGERPRINT: "system_fingerprint",
-  USAGE: "usage",
 });
 
 export default GENERATION_API_KEYS;
