@@ -64,13 +64,13 @@ export function revokeAttachmentUrl(attachment) {
   if (attachment?.url?.startsWith?.("blob:"))
     URL.revokeObjectURL(attachment.url);
 }
-export function imageAttachment(attachment, onReady) {
+export function imageAttachment(attachment, onHydrated) {
   const sourceFile = attachment?.file;
   if (!sourceFile || typeof FileReader === "undefined") return;
   const reader = new FileReader();
   reader.onload = () => {
     const dataUrl = typeof reader.result === "string" ? reader.result : "";
-    if (dataUrl) onReady?.(dataUrl);
+    if (dataUrl) onHydrated?.(dataUrl);
   };
   reader.onerror = () => {
     attachment.previewError = true;

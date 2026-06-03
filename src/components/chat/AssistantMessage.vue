@@ -227,7 +227,9 @@ async function renderReasoningContent() {
     }
 
     const {renderMarkdown} = await import("@/utils/markdown");
-    const rendered = await renderMarkdown(props.message.reasoningContent);
+    const rendered = await renderMarkdown(props.message.reasoningContent, {
+      renderMermaid: isMessageComplete.value,
+    });
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     destroyMarkdownScrollbars(reasoningRef.value);
     reasoningHtml.value = rendered;
@@ -242,7 +244,7 @@ async function renderReasoningContent() {
       source: props.message.reasoningContent,
       currentVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid: true,
+      renderMermaid: isMessageComplete.value && !props.deferMermaidEnhancement,
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
@@ -268,15 +270,14 @@ watch(
     await nextTick();
 
     const currentContentVersion = renderVersion;
-    // 초기 historyRender 완료 시점의 Mermaid 렌더링은 MessageList 단위에서 한 번만 수행합니다.
-    // 각 AssistantMessage가 동시에 Mermaid queue를 생성하면 큰 대화방 전환 후에도
-    // 이전 DOM root를 잡은 비동기 작업이 오래 남아 메모리 회수가 지연될 수 있습니다.
+    // history historyRender 중에는 MessageList가 v-for DOM 순서대로 Mermaid를 직렬 처리합니다.
+    // historyRender이 끝난 뒤에도 pending Mermaid가 남아 있는 예외 케이스는 여기서 한 번 더 안전하게 처리합니다.
     void enhanceRenderedMarkdown({
       root: contentRef.value,
       source: props.message.content,
       currentVersion: currentContentVersion,
       getVersion: () => renderVersion,
-      renderMermaid: false,
+      renderMermaid: isMessageComplete.value,
     });
 
     const currentReasoningVersion = reasoningRenderVersion;
@@ -285,7 +286,7 @@ watch(
       source: props.message.reasoningContent,
       currentVersion: currentReasoningVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid: false,
+      renderMermaid: isMessageComplete.value,
     });
   },
   {flush: "post"}

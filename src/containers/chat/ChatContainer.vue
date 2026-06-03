@@ -258,6 +258,7 @@ const {
   suggestions,
   isGenerating,
   isHistoryRendering,
+  historyMessagesLoaded,
   finishHistoryRender,
   autoScrollOnAnswer,
   closeImagePreview,
@@ -363,6 +364,7 @@ provide(
     showScrollBottom: showScrollBottom.value,
     autoScrollOnAnswer: autoScrollOnAnswer.value,
     isHistoryRendering: isHistoryRendering.value,
+    historyMessagesLoaded: historyMessagesLoaded.value,
   }))
 );
 
@@ -415,7 +417,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handlePromptResize: refreshPromptViewport,
   handleMessageContentRendered,
   scrollBottom: handleWorkspaceScrollBottom,
-  handleHistoryRenderReady: (options) => finishHistoryRender(options),
+  handleHistoryRendered: finishHistoryRender,
 });
 </script>
 

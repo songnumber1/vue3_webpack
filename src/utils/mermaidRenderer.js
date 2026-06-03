@@ -18,8 +18,8 @@ import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
  */
 
 let mermaidLoader = null;
-let mermaidRenderQueue = Promise.resolve();
 
+const MERMAID_LOAD_TIMEOUT_MS = 8000;
 const MERMAID_CDN =
   "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
 /**
@@ -123,24 +123,84 @@ function getMermaidConfig() {
  * mermaid CDN script를 한 번만 주입합니다.
  * 이미 script tag가 있으면 기존 load/error 이벤트를 재사용합니다.
  */
-function loadScript(src) {
+function loadScript(src, options = {}) {
   return new Promise((resolve, reject) => {
+    let settled = false;
+    let timerId = 0;
+    let rafId = 0;
+    let rafFrames = 0;
+    const useAnimationFrameTimeout = options.loadWaitMode === "animation-frame";
+    const maxRafFrames = Math.max(1, Number(options.loadMaxFrames) || 360);
+
+    const cleanup = (script, handleLoad, handleError) => {
+      script.removeEventListener("load", handleLoad);
+      script.removeEventListener("error", handleError);
+      if (timerId) {
+        window.clearTimeout(timerId);
+        timerId = 0;
+      }
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+    };
+
+    const settle = (script, handleLoad, handleError, callback) => {
+      if (settled) return;
+      settled = true;
+      cleanup(script, handleLoad, handleError);
+      callback();
+    };
+
+    const attachListeners = (script) => {
+      const handleLoad = () => settle(script, handleLoad, handleError, resolve);
+      const handleError = () =>
+        settle(script, handleLoad, handleError, () =>
+          reject(new Error(`Failed to load ${src}`))
+        );
+
+      script.addEventListener("load", handleLoad, {once: true});
+      script.addEventListener("error", handleError, {once: true});
+
+      if (useAnimationFrameTimeout) {
+        const tick = () => {
+          if (settled) return;
+          rafFrames += 1;
+          if (rafFrames >= maxRafFrames) {
+            settle(script, handleLoad, handleError, () =>
+              reject(new Error(`Timed out loading ${src}`))
+            );
+            return;
+          }
+          rafId = window.requestAnimationFrame(tick);
+        };
+        rafId = window.requestAnimationFrame(tick);
+        return;
+      }
+
+      timerId = window.setTimeout(
+        () =>
+          settle(script, handleLoad, handleError, () =>
+            reject(new Error(`Timed out loading ${src}`))
+          ),
+        MERMAID_LOAD_TIMEOUT_MS
+      );
+    };
+
     const existing = document.querySelector(`script[src="${src}"]`);
     if (existing) {
       if (window.mermaid) {
         resolve();
         return;
       }
-      existing.addEventListener("load", resolve, {once: true});
-      existing.addEventListener("error", reject, {once: true});
+      attachListeners(existing);
       return;
     }
 
     const script = document.createElement("script");
     script.src = src;
     script.async = true;
-    script.onload = resolve;
-    script.onerror = reject;
+    attachListeners(script);
     document.head.appendChild(script);
   });
 }
@@ -148,21 +208,40 @@ function loadScript(src) {
  * window.mermaid를 보장하고 현재 테마 설정으로 initialize합니다.
  * CDN 로딩 실패 시 raw mermaid code block을 그대로 유지하기 위해 null을 반환합니다.
  */
-async function ensureMermaid() {
+async function ensureMermaid(options = {}) {
   if (window.mermaid) {
     window.mermaid.initialize(getMermaidConfig());
 
     return window.mermaid;
   }
 
+  if (options.skipDynamicLoadWhenUnavailable) {
+    return null;
+  }
+
+  if (options.loadWaitMode === "animation-frame") {
+    const mermaid = await loadScript(MERMAID_CDN, options)
+      .then(() => window.mermaid)
+      .catch((error) => {
+        logWarn(
+          "Mermaid could not be loaded during history render. The source code block will remain visible.",
+          error
+        );
+        return null;
+      });
+    mermaid?.initialize?.(getMermaidConfig());
+    return mermaid;
+  }
+
   if (!mermaidLoader) {
-    mermaidLoader = loadScript(MERMAID_CDN)
+    mermaidLoader = loadScript(MERMAID_CDN, options)
       .then(() => window.mermaid)
       .catch((error) => {
         logWarn(
           "Mermaid could not be loaded. The source code block will remain visible.",
           error
         );
+        mermaidLoader = null;
 
         return null;
       });
@@ -366,11 +445,14 @@ async function renderMermaidTargets(root, options = {}) {
     }
   });
 
-  const mermaid = await ensureMermaid();
-  if (!mermaid?.render) return;
-
+  const mermaid = await ensureMermaid(options);
   const liveTargets = targets.filter((target) => target.isConnected);
   if (!liveTargets.length) return;
+
+  if (!mermaid?.render) {
+    liveTargets.forEach((target) => showMermaidSourceAsCode(target));
+    return;
+  }
 
   liveTargets.forEach((target) => {
     const source = getMermaidSource(target);
@@ -385,6 +467,16 @@ async function renderMermaidTargets(root, options = {}) {
   await renderMermaidTargetsWithRenderApi(mermaid, liveTargets);
 }
 
+export function fallbackPendingMermaidToCode(root) {
+  if (!root) return;
+
+  Array.from(
+    root.querySelectorAll?.('.md-mermaid[data-mermaid-pending="true"]') || []
+  )
+    .filter((target) => target.isConnected)
+    .forEach((target) => showMermaidSourceAsCode(target));
+}
+
 function isRenderableRoot(root) {
   if (!root) return false;
   if (typeof Node !== "undefined" && root.nodeType === Node.DOCUMENT_NODE)
@@ -395,13 +487,8 @@ function isRenderableRoot(root) {
 export function renderMermaidInElement(root, options = {}) {
   if (!isRenderableRoot(root)) return Promise.resolve();
 
-  const job = mermaidRenderQueue
-    .catch(() => {})
-    .then(() => {
-      if (!isRenderableRoot(root)) return undefined;
-      return renderMermaidTargets(root, options);
-    });
-
-  mermaidRenderQueue = job.catch(() => {});
-  return job;
+  // Mermaid는 전역 대기열을 두지 않습니다.
+  // v-for로 만들어진 현재 DOM root 안의 pending block만 DOM 순서대로 렌더링하고,
+  // 렌더링할 수 없으면 즉시 원본 코드 fallback으로 확정합니다.
+  return renderMermaidTargets(root, options);
 }

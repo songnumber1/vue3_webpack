@@ -3,12 +3,12 @@
     ref="scrollRef"
     class="message-list"
     :class="{
-      'message-list--initial-history-rendering': initialHistoryRendering,
+      'message-list--history-rendering': historyRendering,
       'message-list--manual-stream': loading && !autoScrollOnAnswer,
     }"
-    :inert="initialHistoryRendering ? '' : null"
+    :inert="historyRendering ? '' : null"
     aria-live="polite"
-    :aria-busy="initialHistoryRendering ? 'true' : 'false'"
+    :aria-busy="historyRendering ? 'true' : 'false'"
     @scroll.passive="handleScroll"
     @touchstart.passive="handleUserScrollIntent"
     @wheel.passive="handleUserScrollIntent"
@@ -21,7 +21,7 @@
       :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
-      :defer-mermaid-enhancement="initialHistoryRendering"
+      :defer-mermaid-enhancement="historyRendering"
       @rendered="handleMessageRendered(message.id, $event)"
       @regenerate="$emit('regenerate', $event)"
     />
@@ -46,12 +46,13 @@ const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
-  initialHistoryRendering: {type: Boolean, default: false},
+  historyRendering: {type: Boolean, default: false},
+  historyMessagesReady: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
   "content-rendered",
-  "history-render-ready",
+  "history-rendered",
   "regenerate",
 ]);
 
@@ -80,7 +81,6 @@ const {
   scrollToBottom,
   scrollToBottomAfterRender,
   scrollToLatestUserMessage,
-  finalizeHistoryRevealScroll,
   getIsAtBottom,
   getScrollElement,
 } = useMessageListScroll({props, emit});
@@ -89,7 +89,6 @@ defineExpose({
   scrollToBottom,
   scrollToBottomAfterRender,
   scrollToLatestUserMessage,
-  finalizeHistoryRevealScroll,
   isAtBottom: getIsAtBottom,
   getScrollElement,
 });
@@ -101,11 +100,15 @@ defineExpose({
   min-height: 0;
 }
 
-.message-list--initial-history-rendering {
+.message-list--history-rendering {
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;
   scroll-behavior: auto !important;
+  overflow: hidden !important;
+  overscroll-behavior: none !important;
+  scrollbar-width: none !important;
+  contain: paint;
 }
 
 .message-list--manual-stream {

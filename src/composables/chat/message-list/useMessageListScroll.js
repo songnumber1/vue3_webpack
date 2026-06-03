@@ -6,14 +6,18 @@ import {
   initOverlayScrollbar,
   updateOverlayScrollbar,
 } from "@/utils/overlayScrollbar";
-import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {
+  fallbackPendingMermaidToCode,
+  renderMermaidInElement,
+} from "@/utils/mermaidRenderer";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
-const HISTORY_RENDER_READY_CHECK_INTERVAL_MS = 120;
-const HISTORY_RENDER_MIN_READY_PAINT_FRAMES = 2;
-const HISTORY_RENDER_LARGE_ROOM_TIMEOUT_MS = 12000;
-const HISTORY_RENDER_SMALL_ROOM_TIMEOUT_MS = 4500;
+const HISTORY_RENDER_READY_STABLE_FRAMES = 3;
+const HISTORY_RENDER_DOM_READY_MAX_FRAMES = 360;
+const HISTORY_RENDER_ANDROID_DOM_READY_MAX_FRAMES = 720;
+const HISTORY_RENDER_LAYOUT_STABLE_FRAMES = 4;
+const HISTORY_RENDER_ANDROID_LAYOUT_STABLE_FRAMES = 6;
 const RESIZE_RECALCULATE_DEBOUNCE_MS = 120;
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
@@ -107,18 +111,11 @@ export function useMessageListScroll({props, emit}) {
   let overlayScrollViewport = null;
   let overlayScrollSource = null;
   let stableScrollTimerIds = [];
-  let afterRenderScrollTimerId = 0;
+  let afterRenderScrollRafId = 0;
   let pendingAfterRenderAssistantIds = null;
   let pendingAfterRenderOptions = null;
   let historyRenderRunId = 0;
-  let historyRenderTimerId = 0;
-  let historyRenderReadyCheckTimerId = 0;
-  let historyRenderReadyStartedAt = 0;
-  let historyRenderReadyPaintFrames = 0;
-  let historyRenderRafId = 0;
-  let historyRenderResizeObserver = null;
-  let pendingHistoryRenderAssistantIds = null;
-  let historyRenderCompletingRunId = 0;
+  let historyRenderCompleting = false;
   let resizeRecalculateTimerId = 0;
   let resizeRecalculateRafId = 0;
   let trackedRafIds = [];
@@ -308,51 +305,39 @@ export function useMessageListScroll({props, emit}) {
     clearTrackedAnimationFrames();
   }
 
-  function clearAfterRenderScrollTimer() {
-    if (!afterRenderScrollTimerId) return;
-    window.clearTimeout(afterRenderScrollTimerId);
-    afterRenderScrollTimerId = 0;
+  function clearAfterRenderScrollScheduler() {
+    if (!afterRenderScrollRafId || typeof window === "undefined") return;
+    window.cancelAnimationFrame(afterRenderScrollRafId);
+    afterRenderScrollRafId = 0;
   }
 
   function clearAfterRenderScrollState() {
-    clearAfterRenderScrollTimer();
+    clearAfterRenderScrollScheduler();
     pendingAfterRenderAssistantIds = null;
     pendingAfterRenderOptions = null;
   }
 
   function clearHistoryRenderState() {
     historyRenderRunId += 1;
-    if (historyRenderTimerId) {
-      window.clearTimeout(historyRenderTimerId);
-      historyRenderTimerId = 0;
-    }
-    if (historyRenderReadyCheckTimerId) {
-      window.clearTimeout(historyRenderReadyCheckTimerId);
-      historyRenderReadyCheckTimerId = 0;
-    }
-    historyRenderReadyStartedAt = 0;
-    historyRenderReadyPaintFrames = 0;
-    if (historyRenderRafId) {
-      window.cancelAnimationFrame(historyRenderRafId);
-      historyRenderRafId = 0;
-    }
     clearTrackedAnimationFrames();
-    historyRenderCompletingRunId = 0;
-    historyRenderResizeObserver?.disconnect();
-    historyRenderResizeObserver = null;
-    pendingHistoryRenderAssistantIds = null;
+    historyRenderCompleting = false;
+  }
+
+  function getHistoryRenderMessageKey(message, index) {
+    return String(message?.id ?? `${message?.role || "message"}-${index}`);
   }
 
   function getAssistantMessageIds() {
     return (props.messages || [])
-      .filter((message) => message?.role === "assistant")
-      .map((message, index) => String(message.id ?? `assistant-${index}`));
+      .map((message, index) => ({message, index}))
+      .filter(({message}) => message?.role === "assistant")
+      .map(({message, index}) => getHistoryRenderMessageKey(message, index));
   }
 
   function handleUserScrollIntent() {
     clearStableTimers();
     clearAfterRenderScrollState();
-    if (!props.initialHistoryRendering) {
+    if (!props.historyRendering) {
       clearHistoryRenderState();
     }
   }
@@ -375,8 +360,8 @@ export function useMessageListScroll({props, emit}) {
 
   function shouldAutoHistoryRenderBottomScroll() {
     // 대화방 이력 진입 시에는 답변 자동 스크롤 설정과 무관하게 항상 마지막 메시지로 이동합니다.
-    // autoScrollOnAnswer는 실시간 답변 추적 옵션이고, history historyRender의 시작 위치 정책과 분리되어야 합니다.
-    return props.initialHistoryRendering === true;
+    // autoScrollOnAnswer는 실시간 답변 추적 옵션이고, history render의 시작 위치 정책과 분리되어야 합니다.
+    return props.historyRendering === true;
   }
 
   function applyHistoryRenderBottomScroll() {
@@ -414,6 +399,8 @@ export function useMessageListScroll({props, emit}) {
 
   function scrollToLatestUserMessage(options = {}) {
     clearStableTimers();
+
+    if (props.historyRendering) return;
 
     const target = getLatestUserMessageElement();
     if (!target) return;
@@ -485,202 +472,302 @@ export function useMessageListScroll({props, emit}) {
     }
   }
 
-  async function renderHistoryRenderMermaidBeforeReveal(runId) {
-    await nextTick();
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-      return false;
+  function escapeMessageSelectorValue(value) {
+    const stringValue = String(value ?? "");
+    if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+      return CSS.escape(stringValue);
+    }
+    return stringValue.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  }
 
-    await waitAnimationFrames(1);
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-      return false;
-
+  function getHistoryRenderMessageElement(message, index) {
     const root = scrollRef.value;
-    if (!root) return true;
+    if (!root?.isConnected) return null;
 
-    try {
-      await renderMermaidInElement(root);
-    } catch {
-      // Mermaid 문법 오류나 렌더 실패가 있더라도 이력 대화방 historyRender은
-      // 코드블록 fallback 상태로 계속 완료되어야 합니다.
-    }
+    const key = getHistoryRenderMessageKey(message, index);
+    const escapedKey = escapeMessageSelectorValue(key);
+    const exactElement = root.querySelector(
+      `[data-message-id="${escapedKey}"]`
+    );
+    if (exactElement) return exactElement;
 
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-      return false;
-    updateOverlayScrollbarFrame();
-    emit("content-rendered");
-    return true;
+    // 데이터 속성 조회가 실패한 경우에만 v-for 순서와 role을 기준으로 폴백합니다.
+    const role = String(message?.role || "");
+    const roleElements = Array.from(
+      root.querySelectorAll(
+        `[data-message-role="${escapeMessageSelectorValue(role)}"]`
+      )
+    );
+    const roleIndex =
+      (props.messages || [])
+        .slice(0, index + 1)
+        .filter((item) => String(item?.role || "") === role).length - 1;
+    return roleElements[roleIndex] || null;
   }
 
-  async function runHistoryRenderRevealScrollSequence(runId) {
-    if (runId !== historyRenderRunId) return;
-
-    await nextTick();
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering) return;
-
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
-
-    const mermaidReady = await renderHistoryRenderMermaidBeforeReveal(runId);
-    if (
-      !mermaidReady ||
-      runId !== historyRenderRunId ||
-      !props.initialHistoryRendering
-    )
-      return;
-
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
-
-    await waitAnimationFrames(HISTORY_RENDER_MIN_READY_PAINT_FRAMES);
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering) return;
-
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
-    pendingHistoryRenderAssistantIds = null;
-    emit("history-render-ready");
+  function hasRenderedMarkdownElement(element, selector) {
+    const target = element?.querySelector?.(selector);
+    if (!target) return false;
+    return target.childNodes.length > 0 || target.textContent.trim().length > 0;
   }
 
-  function completeInitialHistoryRender(runId) {
-    if (runId !== historyRenderRunId) return;
-    if (historyRenderCompletingRunId === runId) return;
-    historyRenderCompletingRunId = runId;
-
-    if (historyRenderTimerId) {
-      window.clearTimeout(historyRenderTimerId);
-      historyRenderTimerId = 0;
-    }
-    if (historyRenderReadyCheckTimerId) {
-      window.clearTimeout(historyRenderReadyCheckTimerId);
-      historyRenderReadyCheckTimerId = 0;
-    }
-
-    scheduleTrackedAnimationFrame(() => {
-      if (runId !== historyRenderRunId) return;
-
-      if (!shouldAutoHistoryRenderBottomScroll()) {
-        pendingHistoryRenderAssistantIds = null;
-        emit("history-render-ready");
-        updateBottomState();
-        return;
-      }
-
-      runHistoryRenderRevealScrollSequence(runId).catch(() => {
-        if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-          return;
-        pendingHistoryRenderAssistantIds = null;
-        emit("history-render-ready");
-      });
-    });
-  }
-
-  function getHistoryRenderHardTimeoutMs() {
-    const messageCount = props.messages?.length || 0;
-    const assistantCount = getAssistantMessageIds().length;
-    const base =
-      messageCount >= 120
-        ? HISTORY_RENDER_LARGE_ROOM_TIMEOUT_MS
-        : HISTORY_RENDER_SMALL_ROOM_TIMEOUT_MS;
-
-    return Math.max(base, Math.min(16000, assistantCount * 24));
-  }
-
-  function getHistoryRenderDomMessageCount() {
-    const root = scrollRef.value;
-    if (!root?.isConnected) return 0;
-    return root.querySelectorAll("[data-message-role]").length;
-  }
-
-  function isHistoryRenderDomReady() {
-    const expectedCount = props.messages?.length || 0;
-    if (!expectedCount) return true;
-    return getHistoryRenderDomMessageCount() >= expectedCount;
-  }
-
-  function isHistoryRenderContentReady() {
-    return (
-      !pendingHistoryRenderAssistantIds ||
-      pendingHistoryRenderAssistantIds.size === 0
+  function isAssistantErrorMessage(message) {
+    return Boolean(
+      message?.role !== "user" &&
+      (message?.status === "error" || message?.error === true)
     );
   }
 
-  function scheduleHistoryRenderReadyCheck(runId) {
-    if (historyRenderTimerId) {
-      window.clearTimeout(historyRenderTimerId);
-      historyRenderTimerId = 0;
-    }
-    if (historyRenderReadyCheckTimerId) {
-      window.clearTimeout(historyRenderReadyCheckTimerId);
-      historyRenderReadyCheckTimerId = 0;
-    }
+  function isHistoryRenderContentReady() {
+    const list = props.messages || [];
+    for (let index = 0; index < list.length; index += 1) {
+      const message = list[index];
+      const element = getHistoryRenderMessageElement(message, index);
+      if (!element?.isConnected) return false;
 
-    if (!historyRenderReadyStartedAt) {
-      historyRenderReadyStartedAt = Date.now();
-      historyRenderReadyPaintFrames = 0;
-    }
-
-    const check = () => {
-      if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-        return;
-
-      const elapsed = Date.now() - historyRenderReadyStartedAt;
-      const hardTimeoutMs = getHistoryRenderHardTimeoutMs();
-      const ready = isHistoryRenderDomReady() && isHistoryRenderContentReady();
-      const timedOut = elapsed >= hardTimeoutMs;
-
-      // Windows Chrome에서 500개 내외 대화방은 Markdown/Vue DOM 반영이 fallback 시간보다
-      // 늦는 경우가 있습니다. pending assistant가 남아 있으면 progress를 끄지 않고,
-      // DOM과 content가 준비된 뒤 최소 2 프레임을 더 기다려 hidden 해제/scroll 계산이
-      // 화면에 같이 반영되도록 합니다. 단, 비정상 렌더 이벤트 누락은 hard timeout으로
-      // 방어합니다.
-      if (ready || timedOut) {
-        scheduleTrackedAnimationFrame(() => {
-          if (runId !== historyRenderRunId || !props.initialHistoryRendering)
-            return;
-          historyRenderReadyPaintFrames += 1;
-          if (
-            historyRenderReadyPaintFrames <
-            HISTORY_RENDER_MIN_READY_PAINT_FRAMES
-          ) {
-            scheduleHistoryRenderReadyCheck(runId);
-            return;
-          }
-          completeInitialHistoryRender(runId);
-        });
-        return;
+      if (message?.role !== "assistant" || isAssistantErrorMessage(message)) {
+        continue;
       }
 
-      historyRenderReadyCheckTimerId = window.setTimeout(
-        () => scheduleHistoryRenderReadyCheck(runId),
-        HISTORY_RENDER_READY_CHECK_INTERVAL_MS
-      );
-    };
+      if (message?.reasoningContent) {
+        if (
+          !hasRenderedMarkdownElement(
+            element,
+            ".reasoning-content.markdown-body"
+          )
+        ) {
+          return false;
+        }
+      }
 
-    check();
+      if (message?.content) {
+        if (
+          !hasRenderedMarkdownElement(element, ".bubble-content.markdown-body")
+        ) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
-  async function startInitialHistoryRender() {
-    if (!props.initialHistoryRendering || typeof window === "undefined") return;
+  function isHistoryRenderDomReady() {
+    const root = scrollRef.value;
+    if (!root?.isConnected) return false;
+
+    const list = props.messages || [];
+    if (!props.historyMessagesReady) return false;
+
+    for (let index = 0; index < list.length; index += 1) {
+      if (!getHistoryRenderMessageElement(list[index], index)?.isConnected) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  async function waitForHistoryRenderDomReady(runId) {
+    const maxFrames = isAndroidHistoryRenderRuntime()
+      ? HISTORY_RENDER_ANDROID_DOM_READY_MAX_FRAMES
+      : HISTORY_RENDER_DOM_READY_MAX_FRAMES;
+    let stableFrames = 0;
+
+    for (let frame = 0; frame < maxFrames; frame += 1) {
+      if (runId !== historyRenderRunId || !props.historyRendering) return false;
+
+      await nextTick();
+      updateOverlayScrollbarFrame();
+
+      const ready = isHistoryRenderDomReady() && isHistoryRenderContentReady();
+      if (ready) {
+        stableFrames += 1;
+        if (stableFrames >= HISTORY_RENDER_READY_STABLE_FRAMES) return true;
+      } else {
+        stableFrames = 0;
+      }
+
+      await waitAnimationFrames(1);
+    }
+
+    // 비정상 메시지/마크다운 이벤트 누락이 있어도 progress가 고착되지 않도록
+    // 현재 DOM 기준으로 가능한 후처리만 수행하고 finally에서 화면을 해제합니다.
+    return isHistoryRenderDomReady();
+  }
+
+  async function renderHistoryMessagesSequentially(runId) {
+    await nextTick();
+    if (runId !== historyRenderRunId || !props.historyRendering) return false;
+
+    await waitAnimationFrames(1);
+    if (runId !== historyRenderRunId || !props.historyRendering) return false;
+
+    const root = scrollRef.value;
+    if (!root?.isConnected) return true;
+
+    const messageEntries = (props.messages || []).map((message, index) => ({
+      message,
+      index,
+      element: getHistoryRenderMessageElement(message, index),
+    }));
+
+    for (const {message, element} of messageEntries) {
+      if (runId !== historyRenderRunId || !props.historyRendering) return false;
+      if (!element?.isConnected) continue;
+
+      // v-for로 만들어진 실제 메시지 DOM 순서대로 한 개씩 후처리합니다.
+      // 전역 queue/Set 누적 상태를 쓰지 않고, 현재 메시지에서 성공하면 SVG,
+      // 실패하면 해당 메시지만 원본 코드 fallback으로 확정합니다.
+      if (message?.role === "assistant") {
+        try {
+          await renderMermaidInElement(element, {
+            loadWaitMode: "animation-frame",
+            loadMaxFrames: isAndroidHistoryRenderRuntime()
+              ? HISTORY_RENDER_ANDROID_DOM_READY_MAX_FRAMES
+              : HISTORY_RENDER_DOM_READY_MAX_FRAMES,
+          });
+        } catch {
+          // Mermaid CDN/network/문법 오류가 발생해도 이력 대화방 historyRender은
+          // 해당 메시지를 코드 fallback으로 확정하고 다음 메시지로 진행합니다.
+        } finally {
+          fallbackPendingMermaidToCode(element);
+        }
+      }
+
+      updateOverlayScrollbarFrame();
+      await nextTick();
+      await waitAnimationFrames(1);
+    }
+
+    fallbackPendingMermaidToCode(root);
+    updateOverlayScrollbarFrame();
+    return true;
+  }
+
+  function getHistoryRenderLayoutMetrics() {
+    const el = getScrollElement();
+    const bottom = bottomRef.value;
+    if (!el) {
+      return "no-scroll-element";
+    }
+
+    const bottomRect = bottom?.getBoundingClientRect?.();
+    return [
+      Math.round(el.scrollHeight),
+      Math.round(el.clientHeight),
+      Math.round(el.scrollTop),
+      bottomRect ? Math.round(bottomRect.top) : "no-bottom",
+      bottomRect ? Math.round(bottomRect.height) : "no-bottom-height",
+    ].join(":");
+  }
+
+  function hasPendingHistoryRenderMermaid() {
+    const root = scrollRef.value;
+    if (!root?.isConnected) return false;
+    return Boolean(
+      root.querySelector('.md-mermaid[data-mermaid-pending="true"]')
+    );
+  }
+
+  async function waitForHistoryRenderLayoutStability(runId) {
+    const requiredStableFrames = isAndroidHistoryRenderRuntime()
+      ? HISTORY_RENDER_ANDROID_LAYOUT_STABLE_FRAMES
+      : HISTORY_RENDER_LAYOUT_STABLE_FRAMES;
+    let previousMetrics = "";
+    let stableFrames = 0;
+
+    while (runId === historyRenderRunId && props.historyRendering) {
+      await waitAnimationFrames(1);
+      if (runId !== historyRenderRunId || !props.historyRendering) return false;
+
+      updateOverlayScrollbarFrame();
+      applyHistoryRenderBottomScroll();
+      await nextTick();
+      if (runId !== historyRenderRunId || !props.historyRendering) return false;
+
+      const metrics = getHistoryRenderLayoutMetrics();
+      if (metrics === previousMetrics && !hasPendingHistoryRenderMermaid()) {
+        stableFrames += 1;
+      } else {
+        stableFrames = 0;
+        previousMetrics = metrics;
+      }
+
+      if (stableFrames >= requiredStableFrames) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  async function runHistoryRenderThenScrollSequence(runId) {
+    try {
+      if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      await nextTick();
+      if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      setupOverlayScrollbar();
+      updateOverlayScrollbarFrame();
+
+      await waitForHistoryRenderDomReady(runId);
+      if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      await renderHistoryMessagesSequentially(runId);
+      if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      recalculateFocusSpacerHeight();
+      updateOverlayScrollbarFrame();
+      applyHistoryRenderBottomScroll();
+
+      await waitForHistoryRenderLayoutStability(runId);
+      if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      updateOverlayScrollbarFrame();
+      applyHistoryRenderBottomScroll();
+      await nextTick();
+      await waitAnimationFrames(2);
+      applyHistoryRenderBottomScroll();
+      updateBottomState();
+    } finally {
+      historyRenderCompleting = false;
+      if (runId === historyRenderRunId && props.historyRendering) {
+        const root = scrollRef.value;
+        fallbackPendingMermaidToCode(root);
+        updateOverlayScrollbarFrame();
+        applyHistoryRenderBottomScroll();
+        emit("history-rendered");
+      }
+    }
+  }
+
+  async function startHistoryRoomRender() {
+    if (!props.historyRendering || !props.historyMessagesReady) return;
+    if (historyRenderCompleting) return;
 
     clearHistoryRenderState();
     const runId = historyRenderRunId;
-    await nextTick();
+    historyRenderCompleting = true;
 
-    if (runId !== historyRenderRunId || !props.initialHistoryRendering) return;
-
-    pendingHistoryRenderAssistantIds = new Set(getAssistantMessageIds());
-    if (!pendingHistoryRenderAssistantIds.size) {
-      scheduleHistoryRenderReadyCheck(runId);
-      return;
-    }
-
-    scheduleHistoryRenderReadyCheck(runId);
+    await runHistoryRenderThenScrollSequence(runId);
   }
 
   function scheduleAfterRenderScrollFallback() {
-    clearAfterRenderScrollTimer();
-    afterRenderScrollTimerId = window.setTimeout(() => {
+    clearAfterRenderScrollScheduler();
+    if (typeof window === "undefined") {
       applyBottomScrollAfterRender();
-    }, 1200);
+      return;
+    }
+
+    // 고정 시간 타이머 fallback 대신 렌더 이벤트가 누락된 예외 케이스만
+    // 다음 paint에서 한 번 보정합니다. history render 경로에서는 호출되지 않습니다.
+    afterRenderScrollRafId = window.requestAnimationFrame(() => {
+      afterRenderScrollRafId = 0;
+      if (pendingAfterRenderAssistantIds) {
+        applyBottomScrollAfterRender();
+      }
+    });
   }
 
   function scrollToBottomAfterRender(options = {}) {
@@ -700,32 +787,16 @@ export function useMessageListScroll({props, emit}) {
     scheduleAfterRenderScrollFallback();
   }
 
-  async function finalizeHistoryRevealScroll() {
-    // history-render-ready 이벤트 이후 부모가 input/composer를 다시 레이아웃에
-    // 참여시키더라도 MessageList는 isHistoryRenderRevealFinalizing으로 계속 hidden
-    // 상태를 유지합니다. Android Chrome/WebView는 composer 표시, VisualViewport,
-    // OverlayScrollbar viewport 반영이 서로 다른 frame에 안정될 수 있으므로
-    // 화면 reveal 전에 여러 frame 동안 최종 하단 위치를 동기화합니다.
-    // reveal 이후 delayed scroll correction은 다시 살리지 않습니다.
-    const framePasses = isAndroidHistoryRenderRuntime() ? 4 : 2;
-
-    await nextTick();
-
-    for (let index = 0; index < framePasses; index += 1) {
-      updateOverlayScrollbarFrame();
-      applyBottomScroll("auto");
-      await waitAnimationFrames(1);
-    }
-
-    updateOverlayScrollbarFrame();
-    applyBottomScroll("auto");
-    updateBottomState();
-  }
-
   function scrollToBottom(options = {}) {
     const force = options.force === true;
     const stable = options.stable === true;
     const behavior = options.behavior || "auto";
+
+    if (props.historyRendering) {
+      clearStableTimers();
+      applyHistoryRenderBottomScroll();
+      return;
+    }
 
     if (!force && !userIsAtBottom.value) return;
 
@@ -743,17 +814,11 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function handleMessageRendered(messageId, renderPart = "") {
-    if (pendingHistoryRenderAssistantIds) {
-      const id = String(messageId ?? "");
-      const isLayoutReady =
-        !renderPart ||
-        renderPart === "content" ||
-        renderPart === "layout-ready";
-      if (isLayoutReady) pendingHistoryRenderAssistantIds.delete(id);
-      if (!pendingHistoryRenderAssistantIds.size) {
-        const runId = historyRenderRunId;
-        scheduleHistoryRenderReadyCheck(runId);
-      }
+    if (props.historyRendering) {
+      // 채팅방 입장 중에는 메시지별 rendered 이벤트를 누적 상태로 관리하지 않습니다.
+      // API 완료 플래그가 켜진 뒤 startHistoryRoomRender()의 단일 try/finally 루프가
+      // 현재 v-for DOM 전체를 순차 처리합니다.
+      if (props.historyMessagesReady) startHistoryRoomRender();
       return;
     }
 
@@ -809,11 +874,24 @@ export function useMessageListScroll({props, emit}) {
       return;
     }
 
+    // 대화방 입장 history render 중에는 고정 시간 debounce를 사용하지 않습니다.
+    // 화면은 hidden 상태에서 렌더/mermaid/scroll 안정화 루프가 순차 진행하므로,
+    // resize observer가 끼어들어도 다음 paint에서 한 번만 보정합니다.
+    clearResizeRecalculateScheduler();
+    if (props.historyRendering) {
+      resizeRecalculateRafId = window.requestAnimationFrame(() => {
+        resizeRecalculateRafId = 0;
+        recalculateFocusSpacerHeight();
+        updateOverlayScrollbarFrame();
+        updateBottomState();
+      });
+      return;
+    }
+
     // 긴 대화방(250~1000개)에서 resize 이벤트가 연속 발생할 때마다
     // scrollHeight/getBoundingClientRect/querySelectorAll 계열 계산을 수행하면
     // 화면 전환 반응이 크게 느려집니다. 마지막 resize 프레임 근처에서 한 번만
     // composer spacer와 OverlayScrollbars를 갱신합니다.
-    clearResizeRecalculateScheduler();
     resizeRecalculateTimerId = window.setTimeout(() => {
       resizeRecalculateTimerId = 0;
       resizeRecalculateRafId = window.requestAnimationFrame(() => {
@@ -830,14 +908,17 @@ export function useMessageListScroll({props, emit}) {
       props.loading,
       props.autoScrollOnAnswer,
       props.messages.length,
-      props.initialHistoryRendering,
+      props.historyRendering,
+      props.historyMessagesReady,
     ],
-    ([loading, autoScrollOnAnswer, , initialHistoryRendering]) => {
+    ([loading, autoScrollOnAnswer, , historyRendering]) => {
       latestUserMessageCache = null;
       latestUserMessageCacheKey = "";
 
-      if (initialHistoryRendering) {
-        scheduleRenderedFrameUpdate({spacer: false});
+      if (historyRendering) {
+        // history render 중에는 content-rendered 이벤트/부모 타이머를 만들지 않고,
+        // MessageList 내부 직렬 루프에서 overlay/scroll 상태만 갱신합니다.
+        updateOverlayScrollbarFrame();
         return;
       }
 
@@ -854,11 +935,15 @@ export function useMessageListScroll({props, emit}) {
   );
 
   watch(
-    () => [props.initialHistoryRendering, props.messages.length],
+    () => [
+      props.historyRendering,
+      props.historyMessagesReady,
+      props.messages.length,
+    ],
     () => {
-      if (props.initialHistoryRendering) {
-        startInitialHistoryRender();
-      } else {
+      if (props.historyRendering && props.historyMessagesReady) {
+        startHistoryRoomRender();
+      } else if (!props.historyRendering) {
         clearHistoryRenderState();
       }
     },
@@ -869,7 +954,8 @@ export function useMessageListScroll({props, emit}) {
     if (typeof window === "undefined") return;
     setupOverlayScrollbar();
     recalculateFocusSpacerHeight();
-    if (props.initialHistoryRendering) startInitialHistoryRender();
+    if (props.historyRendering && props.historyMessagesReady)
+      startHistoryRoomRender();
     window.addEventListener("resize", scheduleResizeRecalculate, {
       passive: true,
     });
@@ -912,7 +998,6 @@ export function useMessageListScroll({props, emit}) {
     scrollToBottom,
     scrollToBottomAfterRender,
     scrollToLatestUserMessage,
-    finalizeHistoryRevealScroll,
     getIsAtBottom,
     getScrollElement,
   };

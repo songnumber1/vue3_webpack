@@ -9,7 +9,7 @@
 
 import {ref} from "vue";
 
-const LIST_READY_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520, 900];
+const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 /**
  * @typedef {object} ChatScrollControllerDependencies
@@ -37,9 +37,10 @@ export function useChatScrollController({
   let bottomStateTimer = 0;
   // 타임스탬프(ms)를 기록하여, 특정 밀리초 동안은 브라우저 리렌더링 버스트가 일어나더라도 무조건 스크롤을 바닥에 고정(Lock-in)하기 위한 만료 시점 타이머
   let forceBottomUntil = 0;
-  // 컴포넌트 마운트 레이턴시 및 마크다운 비동기 파싱 지연에 대응하기 위해 예약된 멀티 단계 타이머 핸들 수거 배열
+  // 컴포넌트 마운트 레이턴시 및 마크다운 비동기 파싱 지연에 대응하기 위해 예약된 타이머 핸들 수거 배열
   let latestUserScrollTimerIds = [];
-  let pendingBottomScrollTimerIds = [];
+  let pendingBottomScrollRafId = 0;
+  let pendingBottomScrollFrameCount = 0;
 
   /**
    * @description 외부 워크스페이스 컴포넌트 내부에서 노출(`defineExpose`)해 준 메시지 리스트 템플릿의 스크롤 조작 메서드 인터페이스 객체를 동적으로 탐색 수색하여 포인터를 탈취합니다.
@@ -78,43 +79,64 @@ export function useChatScrollController({
   }
 
   /**
-   * @description 비동기 렌더링 보정을 위해 스케줄러 큐에 예약 대기 중이던 좀비 타이머 핸들 채널들을 전부 파괴 수거하여 메모리 누수를 원천 봉쇄합니다.
+   * @description 비동기 렌더링 보정을 위해 스케줄러에 예약 대기 중이던 타이머 핸들을 전부 파괴 수거하여 메모리 누수를 원천 봉쇄합니다.
    */
   function clearLatestUserScrollTimers() {
     latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
     latestUserScrollTimerIds = [];
   }
 
-  function clearPendingBottomScrollTimers() {
-    pendingBottomScrollTimerIds.forEach((timerId) =>
-      window.clearTimeout(timerId)
-    );
-    pendingBottomScrollTimerIds = [];
+  function clearPendingBottomScrollScheduler() {
+    if (!pendingBottomScrollRafId || typeof window === "undefined") {
+      pendingBottomScrollRafId = 0;
+      pendingBottomScrollFrameCount = 0;
+      return;
+    }
+
+    window.cancelAnimationFrame(pendingBottomScrollRafId);
+    pendingBottomScrollRafId = 0;
+    pendingBottomScrollFrameCount = 0;
+  }
+
+  function applyBottomScrollWhenListReady(options = {}) {
+    const list = getMessageListRef();
+    if (!list?.scrollToBottom) return false;
+
+    if (options.afterRender && list.scrollToBottomAfterRender) {
+      list.scrollToBottomAfterRender({...options, force: true, stable: true});
+    } else {
+      list.scrollToBottom({...options, force: true, stable: true});
+    }
+
+    updateScrollBottomButton();
+    return true;
   }
 
   function scheduleBottomScrollWhenListReady(options = {}) {
-    clearPendingBottomScrollTimers();
+    clearPendingBottomScrollScheduler();
 
-    // 대화방 진입 시 메시지 렌더링이 단계적으로 완료될 때마다 반복적으로 스크롤을 이동하면
-    // 긴 대화방에서 사용자가 실제로 스크롤이 내려가는 과정을 보게 됩니다.
-    // 가장 마지막 렌더 안정화 시점 1회만 실행하여 즉시 최하단으로 고정합니다.
-    const delay = LIST_READY_SCROLL_DELAYS[LIST_READY_SCROLL_DELAYS.length - 1];
+    if (applyBottomScrollWhenListReady(options)) return;
+    if (typeof window === "undefined") return;
 
-    const timerId = window.setTimeout(() => {
-      const list = getMessageListRef();
-      if (!list?.scrollToBottom) return;
+    const check = () => {
+      pendingBottomScrollRafId = 0;
+      pendingBottomScrollFrameCount += 1;
 
-      if (options.afterRender && list.scrollToBottomAfterRender) {
-        list.scrollToBottomAfterRender({...options, force: true, stable: true});
-      } else {
-        list.scrollToBottom({...options, force: true, stable: true});
+      if (applyBottomScrollWhenListReady(options)) {
+        pendingBottomScrollFrameCount = 0;
+        return;
       }
 
-      updateScrollBottomButton();
-      clearPendingBottomScrollTimers();
-    }, delay);
+      if (pendingBottomScrollFrameCount >= LIST_READY_SCROLL_MAX_FRAMES) {
+        pendingBottomScrollFrameCount = 0;
+        updateScrollBottomButton();
+        return;
+      }
 
-    pendingBottomScrollTimerIds.push(timerId);
+      pendingBottomScrollRafId = window.requestAnimationFrame(check);
+    };
+
+    pendingBottomScrollRafId = window.requestAnimationFrame(check);
   }
 
   /**
@@ -138,7 +160,7 @@ export function useChatScrollController({
 
     const list = getMessageListRef();
     if (list?.scrollToBottom) {
-      clearPendingBottomScrollTimers();
+      clearPendingBottomScrollScheduler();
       if (options.afterRender && list.scrollToBottomAfterRender) {
         list.scrollToBottomAfterRender(options);
       } else {
@@ -158,7 +180,7 @@ export function useChatScrollController({
 
   /**
    * @description 사용자가 질문을 전송한 직후, 자신이 타이핑했던 '방금 그 마지막 질문 박스' 위치로 시선을 낚아채어 이동해주는 특수 앵커 스크롤 함수입니다.
-   * 이미지 로딩이나 마크다운 컴포넌트 비동기 마운트로 인해 화면 길이가 뒤늦게 늘어나는 웹 인터랙션 한계를 깨부수기 위해 5단계 점진적 백오프 배정 타이머(0ms~320ms) 큐를 연속 가동합니다.
+   * 이미지 로딩이나 마크다운 컴포넌트 비동기 마운트로 인해 화면 길이가 뒤늦게 늘어나는 웹 인터랙션 한계를 깨부수기 위해 5단계 점진적 백오프 타이머(0ms~320ms)를 제한적으로 가동합니다.
    * @param {object} [options={}] - 스크롤 커스텀 매개 옵션
    */
   async function scrollLatestUserMessage(options = {}) {
@@ -177,7 +199,7 @@ export function useChatScrollController({
       return true; // 정상 추적 완수 마킹 반환
     };
 
-    // 1회차 즉시 실행 시도: 만약 레이아웃 돔이 이미 완성되어 성공했다면 하위 백오프 타이머 큐를 굳이 가동하지 않고 조기 종결 탈출
+    // 1회차 즉시 실행 시도: 만약 레이아웃 돔이 이미 완성되어 성공했다면 하위 백오프 타이머를 굳이 가동하지 않고 조기 종결 탈출
     if (apply()) return;
 
     // 질문/재생성 직후 수동 앵커 이동은 "최초 1회" 정책이어야 합니다.
@@ -193,7 +215,7 @@ export function useChatScrollController({
     }
 
     // 대화방 이력 진입 또는 키보드 안정화처럼 명시적 안정 보정이 필요한 경우에만
-    // 짧은 백오프 큐를 사용합니다. 실시간 답변 수신 중에는 호출하지 않습니다.
+    // 짧은 백오프 보정을 사용합니다. 실시간 답변 수신 중에는 호출하지 않습니다.
     [0, 32, 80, 160, 320].forEach((delay) => {
       const timerId = window.setTimeout(apply, delay);
       latestUserScrollTimerIds.push(timerId); // 컴포넌트 언마운트 시 일괄 청소를 위해 버스 배열에 티켓 적재
@@ -230,12 +252,12 @@ export function useChatScrollController({
   }
 
   /**
-   * @description 컴포넌트가 파괴되거나 사용자가 방을 이탈하는 마지막 찰나에 가동 중이던 모든 백오프 타이머와 스케줄러 큐를 원천 폐쇄 수거하여 전역 자원 누수를 종결 차단합니다.
+   * @description 컴포넌트가 파괴되거나 사용자가 방을 이탈하는 마지막 찰나에 가동 중이던 모든 백오프 타이머와 스케줄러를 원천 폐쇄 수거하여 전역 자원 누수를 종결 차단합니다.
    */
   function cleanupScrollController() {
     window.clearTimeout(bottomStateTimer);
     clearLatestUserScrollTimers();
-    clearPendingBottomScrollTimers();
+    clearPendingBottomScrollScheduler();
   }
 
   // 최상위 ChatContainer 컨트롤러 및 우측 하단 플로팅 버튼 컴포넌트 단바인딩용 제어 인터페이스 레버 배출 반환

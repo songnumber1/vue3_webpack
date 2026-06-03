@@ -45,15 +45,15 @@ export function useChatDataController({props, ui, runtime, messages}) {
   // 비즈니스 인프라 마스터 데이터 부트스트랩 패치가 최종 완료되었는지를 나타내는 트리거 플래그입니다.
   const runtimeReady = ref(false);
   const isHistoryRendering = ref(false);
+  const historyMessagesLoaded = ref(false);
   const apiRequestStore = useApiRequestStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
   let historyRenderOverlayActive = false;
   let historyRenderOverlayStartedAt = 0;
-  let historyRenderOverlayStopTimerId = 0;
+  let historyRenderOverlayStopRafId = 0;
   let routeConversationLoadSeq = 0;
   let historyRenderFinishSeq = 0;
-  const HISTORY_RENDER_OVERLAY_MIN_MS = 160;
 
   function waitForNextPaint() {
     if (typeof window === "undefined") return Promise.resolve();
@@ -88,43 +88,19 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  function clearHistoryRenderOverlayStopTimer() {
-    if (!historyRenderOverlayStopTimerId || typeof window === "undefined") {
-      historyRenderOverlayStopTimerId = 0;
+  function clearHistoryRenderOverlayStopFrame() {
+    if (!historyRenderOverlayStopRafId || typeof window === "undefined") {
+      historyRenderOverlayStopRafId = 0;
       return;
     }
-    window.clearTimeout(historyRenderOverlayStopTimerId);
-    historyRenderOverlayStopTimerId = 0;
-  }
-
-  function stopHistoryRenderOverlayAfterPaint(delay = 0) {
-    if (!historyRenderOverlayActive) return;
-
-    const stop = () => {
-      if (!historyRenderOverlayActive) return;
-      apiRequestStore.stopOverlay();
-      historyRenderOverlayActive = false;
-      historyRenderOverlayStartedAt = 0;
-    };
-
-    if (typeof window === "undefined") {
-      stop();
-      return;
-    }
-
-    clearHistoryRenderOverlayStopTimer();
-    historyRenderOverlayStopTimerId = window.setTimeout(
-      () => {
-        historyRenderOverlayStopTimerId = 0;
-        window.requestAnimationFrame(stop);
-      },
-      Math.max(0, delay)
-    );
+    window.cancelAnimationFrame(historyRenderOverlayStopRafId);
+    historyRenderOverlayStopRafId = 0;
   }
 
   function beginHistoryRender() {
     historyRenderFinishSeq += 1;
-    clearHistoryRenderOverlayStopTimer();
+    clearHistoryRenderOverlayStopFrame();
+    historyMessagesLoaded.value = false;
     isHistoryRendering.value = true;
     if (
       systemSettingsStore.showMobileApiProgress &&
@@ -137,44 +113,41 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  function finishHistoryRender(options = {}) {
+  function finishHistoryRender() {
     const finishSeq = ++historyRenderFinishSeq;
-    const beforeReveal =
-      typeof options.beforeReveal === "function" ? options.beforeReveal : null;
 
     const revealAfterPaint = async () => {
-      await nextTick();
-      await waitForNextPaint();
+      try {
+        await nextTick();
+        await waitForNextPaint();
+        if (finishSeq !== historyRenderFinishSeq) return;
 
-      if (finishSeq !== historyRenderFinishSeq) return;
-      isHistoryRendering.value = false;
+        // MessageList가 hidden 상태에서 Markdown/Mermaid/하단 스크롤을 모두 끝낸 뒤에만
+        // composer를 다시 표시합니다. 이 시점부터 좋아요/재답변/입력창 높이가 실제 레이아웃에 반영됩니다.
+        isHistoryRendering.value = false;
 
-      // isHistoryRendering=false가 반영되면 input/composer가 다시 표시되면서
-      // message viewport 높이가 바뀔 수 있습니다. 다음 paint 전에 workspace가
-      // 최종 scrollToBottom을 수행할 수 있도록 callback을 먼저 실행합니다.
-      // 실패해도 progress가 무한 유지되지 않도록 finally 흐름은 계속 진행합니다.
-      if (beforeReveal) {
         await nextTick();
         if (finishSeq !== historyRenderFinishSeq) return;
-        try {
-          await beforeReveal();
-        } catch {
-          // reveal 직전 보정 실패 시에도 이력 대화방은 표시되어야 합니다.
+        await ui.scrollBottom?.({force: true, behavior: "auto"});
+
+        await waitForNextPaint();
+        if (finishSeq !== historyRenderFinishSeq) return;
+        await ui.scrollBottom?.({force: true, behavior: "auto"});
+
+        await waitForNextPaint();
+        if (finishSeq !== historyRenderFinishSeq) return;
+        await ui.scrollBottom?.({force: true, behavior: "auto"});
+      } finally {
+        if (finishSeq === historyRenderFinishSeq) {
+          historyMessagesLoaded.value = false;
+          clearHistoryRenderOverlayStopFrame();
+          if (historyRenderOverlayActive) {
+            apiRequestStore.stopOverlay();
+          }
+          historyRenderOverlayActive = false;
+          historyRenderOverlayStartedAt = 0;
         }
       }
-
-      if (!historyRenderOverlayActive) return;
-
-      const now =
-        typeof performance !== "undefined" ? performance.now() : Date.now();
-      const elapsed = Math.max(0, now - historyRenderOverlayStartedAt);
-      const remaining = Math.max(0, HISTORY_RENDER_OVERLAY_MIN_MS - elapsed);
-
-      // MessageList가 history-render-ready를 emit한 뒤에도 Vue가 hidden 메시지 DOM을
-      // 실제 화면에 reveal/paint하는 시간이 남아 있을 수 있습니다.
-      // initialHistoryRendering을 한 프레임 더 유지한 뒤 overlay를 닫아 progress가
-      // 페이지 준비 전 먼저 사라지는 현상을 방지합니다.
-      stopHistoryRenderOverlayAfterPaint(remaining);
     };
 
     void revealAfterPaint();
@@ -314,6 +287,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
         );
         if (!isCurrentLoad()) return;
         messages.value = sharedMessages;
+        historyMessagesLoaded.value = true;
         await nextTick();
         return;
       }
@@ -339,12 +313,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
       }
 
       // 새 대화 생성 직후 라우터가 chat 화면으로 이동하는 경우에는 기존 대화방 입장용
-      // historyRender overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
+      // history render overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
       // typing("...") 표시 로직이 즉시 append되므로 빈 방 복원 처리만 조용히 마칩니다.
       if (chatStore.consumePendingNewSubmitChat(history.id)) {
         finishHistoryRender();
         clearPendingSelectedIfMatched(history.id);
         messages.value = runtime.conversations.value?.[history.id] || [];
+        historyMessagesLoaded.value = true;
         await nextTick();
         return;
       }
@@ -358,6 +333,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       const loadedMessages = await ensureConversation(history.id);
       if (!isCurrentLoad()) return;
       messages.value = loadedMessages;
+      historyMessagesLoaded.value = true;
       clearPendingSelectedIfMatched(history.id);
       await nextTick();
       chatStore.pruneInactiveMessageCache(history.id);
@@ -489,7 +465,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
     onBeforeUnmount(() => {
       historyRenderFinishSeq += 1;
-      clearHistoryRenderOverlayStopTimer();
+      clearHistoryRenderOverlayStopFrame();
       if (historyRenderOverlayActive) {
         apiRequestStore.stopOverlay();
         historyRenderOverlayActive = false;
@@ -519,6 +495,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     suggestions,
     isGenerating,
     isHistoryRendering,
+    historyMessagesLoaded,
     finishHistoryRender,
     submit,
     regenerate,
