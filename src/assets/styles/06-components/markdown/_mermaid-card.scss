@@ -24,8 +24,11 @@
   color: var(--text);
 }
 .md-mermaid svg {
-  max-width: 100%;
+  display: block;
+  width: auto;
+  max-width: none;
   height: auto;
+  overflow: visible;
 }
 .md-mermaid[data-mermaid-error="true"] {
   white-space: pre-wrap;
@@ -276,4 +279,66 @@
 .md-mermaid-action-icon--code::before {
   content: "</>";
   font-size: var(--font-size-fixed-10);
+}
+
+/* Mermaid renders its own SVG/foreignObject tree.
+   Keep the SVG at Mermaid's intrinsic size and let the card body scroll horizontally.
+   Scaling the SVG to 100% can clip the right edge on PC and can amplify Android
+   font-metric differences inside nodes. */
+.md-mermaid svg[data-diagram-id],
+.md-mermaid svg[aria-roledescription],
+.md-mermaid svg {
+  display: block;
+  width: auto;
+  max-width: none !important;
+  height: auto;
+  overflow: visible !important;
+  font-family:
+    "Roboto", "Noto Sans KR", Inter, ui-sans-serif, system-ui, Arial, sans-serif !important;
+}
+
+.md-mermaid svg g,
+.md-mermaid svg foreignObject,
+.md-mermaid svg .label,
+.md-mermaid svg .nodeLabel,
+.md-mermaid svg .edgeLabel {
+  overflow: visible !important;
+}
+
+.md-mermaid svg text,
+.md-mermaid svg tspan,
+.md-mermaid svg .nodeLabel,
+.md-mermaid svg .edgeLabel,
+.md-mermaid svg .label,
+.md-mermaid svg .actor,
+.md-mermaid svg .messageText,
+.md-mermaid svg .labelText,
+.md-mermaid svg .loopText,
+.md-mermaid svg .noteText,
+.md-mermaid svg .signalText {
+  font-family:
+    "Roboto", "Noto Sans KR", Inter, ui-sans-serif, system-ui, Arial, sans-serif !important;
+  line-height: 1.32 !important;
+  overflow: visible !important;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.md-mermaid svg foreignObject > div,
+.md-mermaid svg .nodeLabel,
+.md-mermaid svg .edgeLabel,
+.md-mermaid svg .label {
+  box-sizing: border-box;
+  min-height: 1.32em;
+  line-height: 1.32 !important;
+  overflow: visible !important;
+}
+
+body.actual-android-runtime .md-mermaid {
+  padding: 16px 14px 20px;
+}
+
+body.actual-android-runtime .md-mermaid svg text,
+body.actual-android-runtime .md-mermaid svg tspan {
+  dominant-baseline: central;
 }

@@ -13,6 +13,27 @@ import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
 
 const DEFAULT_MERMAID_RENDER_RETRY_COUNT = 0;
 const DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP = 1;
+const MERMAID_FONT_STACK =
+  '"Roboto", "Noto Sans KR", Inter, ui-sans-serif, system-ui, Arial, sans-serif';
+
+function isAndroidMermaidRuntime() {
+  if (
+    typeof document !== "undefined" &&
+    document.body?.classList?.contains("actual-android-runtime")
+  ) {
+    return true;
+  }
+
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  return /Android/i.test(navigator.userAgent || "");
+}
+
+function getMermaidFontFamily() {
+  return MERMAID_FONT_STACK;
+}
 
 function waitAnimationFrames(frameCount = 1) {
   const count = Math.max(1, Number(frameCount) || 1);
@@ -101,7 +122,7 @@ function getMermaidConfig() {
           loopTextColor: "#f4f4f4",
           activationBkgColor: "#374151",
           activationBorderColor: "#d1d5db",
-          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: getMermaidFontFamily(),
         }
       : {
           background: "#ffffff",
@@ -139,8 +160,19 @@ function getMermaidConfig() {
           loopTextColor: "#202123",
           activationBkgColor: "#f3f4f6",
           activationBorderColor: "#374151",
-          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+          fontFamily: getMermaidFontFamily(),
         },
+    fontFamily: getMermaidFontFamily(),
+    flowchart: {
+      htmlLabels: true,
+      useMaxWidth: false,
+      padding: 18,
+    },
+    sequence: {
+      useMaxWidth: false,
+      diagramMarginY: 14,
+      boxTextMargin: 6,
+    },
   };
 }
 /**
@@ -251,6 +283,134 @@ async function isMermaidSourceRenderable(mermaid, source) {
   }
 }
 
+function parseSvgNumber(value) {
+  const match = String(value || "").match(/-?\d+(?:\.\d+)?/);
+  if (!match) return null;
+
+  const number = Number(match[0]);
+  return Number.isFinite(number) && number > 0 ? number : null;
+}
+
+function parseSvgViewBox(svg) {
+  const rawViewBox = svg?.getAttribute?.("viewBox");
+  if (!rawViewBox) return null;
+
+  const values = rawViewBox
+    .split(/[\s,]+/)
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value));
+
+  if (values.length !== 4 || values[2] <= 0 || values[3] <= 0) return null;
+
+  return {x: values[0], y: values[1], width: values[2], height: values[3]};
+}
+
+function applyStableMermaidSvgSize(svg, viewBox) {
+  if (!svg || !viewBox) return;
+
+  const width = Math.max(1, Math.ceil(viewBox.width));
+  const height = Math.max(1, Math.ceil(viewBox.height));
+
+  svg.setAttribute(
+    "viewBox",
+    `${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`
+  );
+  svg.setAttribute("width", String(width));
+  svg.setAttribute("height", String(height));
+  svg.style.width = `${width}px`;
+  svg.style.height = `${height}px`;
+  svg.style.maxWidth = "none";
+  svg.style.overflow = "visible";
+  svg.style.display = "block";
+  svg.style.fontFamily = MERMAID_FONT_STACK;
+  svg.setAttribute("preserveAspectRatio", "xMinYMin meet");
+}
+
+function normalizeMermaidSvgBounds(target) {
+  const svg = target?.querySelector?.("svg");
+  if (!svg) return;
+
+  svg.style.overflow = "visible";
+
+  const baseViewBox = parseSvgViewBox(svg);
+  const fallbackWidth = parseSvgNumber(
+    svg.getAttribute("width") || svg.style.width
+  );
+  const fallbackHeight = parseSvgNumber(
+    svg.getAttribute("height") || svg.style.height
+  );
+  let nextViewBox = baseViewBox || {
+    x: 0,
+    y: 0,
+    width: fallbackWidth || svg.clientWidth || 1,
+    height: fallbackHeight || svg.clientHeight || 1,
+  };
+
+  try {
+    if (typeof svg.getBBox === "function") {
+      const bbox = svg.getBBox();
+      if (bbox && bbox.width > 0 && bbox.height > 0) {
+        const padding = 8;
+        const minX = Math.min(nextViewBox.x, bbox.x) - padding;
+        const minY = Math.min(nextViewBox.y, bbox.y) - padding;
+        const maxX =
+          Math.max(nextViewBox.x + nextViewBox.width, bbox.x + bbox.width) +
+          padding;
+        const maxY =
+          Math.max(nextViewBox.y + nextViewBox.height, bbox.y + bbox.height) +
+          padding;
+        nextViewBox = {
+          x: Math.floor(minX),
+          y: Math.floor(minY),
+          width: Math.ceil(maxX - minX),
+          height: Math.ceil(maxY - minY),
+        };
+      }
+    }
+  } catch (error) {
+    // 일부 Android WebView에서는 최초 paint 전 getBBox가 실패할 수 있습니다.
+    // 이 경우 Mermaid가 제공한 viewBox/width/height를 그대로 사용합니다.
+  }
+
+  applyStableMermaidSvgSize(svg, nextViewBox);
+}
+
+function applyMermaidSvgTextGuards(target) {
+  if (!target?.isConnected) return;
+
+  const svg = target.querySelector("svg");
+  if (!svg) return;
+
+  target.setAttribute("data-mermaid-layout-normalized", "true");
+  target.toggleAttribute(
+    "data-mermaid-android-normalized",
+    isAndroidMermaidRuntime()
+  );
+
+  svg
+    .querySelectorAll(
+      "text, tspan, .nodeLabel, .edgeLabel, .label, .actor, .messageText"
+    )
+    .forEach((node) => {
+      node.style.fontFamily = MERMAID_FONT_STACK;
+      node.style.overflow = "visible";
+    });
+
+  svg.querySelectorAll("foreignObject").forEach((node) => {
+    node.style.overflow = "visible";
+  });
+
+  svg
+    .querySelectorAll("foreignObject div, .nodeLabel, .edgeLabel, .label")
+    .forEach((node) => {
+      node.style.fontFamily = MERMAID_FONT_STACK;
+      node.style.lineHeight = "1.32";
+      node.style.overflow = "visible";
+    });
+
+  normalizeMermaidSvgBounds(target);
+}
+
 async function renderMermaidTargetWithRenderApi(mermaid, target) {
   if (!mermaid?.render || !target?.isConnected) return false;
 
@@ -271,6 +431,7 @@ async function renderMermaidTargetWithRenderApi(mermaid, target) {
   }
 
   target.innerHTML = result?.svg || "";
+  applyMermaidSvgTextGuards(target);
   target.setAttribute("data-processed", "true");
   target.removeAttribute("data-mermaid-pending");
   target.removeAttribute("data-mermaid-error");
