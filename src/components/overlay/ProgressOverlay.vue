@@ -36,7 +36,7 @@ const apiRequestStore = useApiRequestStore();
 const systemSettingsStore = useSystemSettingsStore();
 const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
-// API 진행 표시 설정은 일반 HTTP/SSE 요청뿐 아니라 채팅방 이력 hydration처럼
+// API 진행 표시 설정은 일반 HTTP/SSE 요청뿐 아니라 채팅방 이력 historyRender처럼
 // 직접 startOverlay()로 보호하는 화면 전환 작업에도 동일하게 적용합니다.
 // 사용자가 시스템 설정에서 끄면 activeOverlayCount가 남아 있어도 화면에는
 // circle progress가 절대 렌더링되지 않습니다.

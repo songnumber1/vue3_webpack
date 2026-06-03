@@ -34,7 +34,7 @@ function readPreviewDataUrl(file) {
 }
 export function useImagePreview() {
   const previewImage = ref(null);
-  async function hydrateOpenPreviewFromFile(targetPreview) {
+  async function restoreOpenPreviewFromFile(targetPreview) {
     const dataUrl = await readPreviewDataUrl(targetPreview?.file);
     if (!dataUrl || previewImage.value?.id !== targetPreview.id) return;
     previewImage.value = {
@@ -61,7 +61,7 @@ export function useImagePreview() {
       error: !firstUrl && !detail.file,
     };
     if (detail.file && !detail.dataUrl)
-      hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
+      restoreOpenPreviewFromFile({...detail, id: previewImage.value.id});
   }
   function handlePreviewLoad() {
     if (!previewImage.value) return;

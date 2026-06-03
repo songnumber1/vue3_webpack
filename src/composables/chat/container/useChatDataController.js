@@ -44,16 +44,16 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   // 비즈니스 인프라 마스터 데이터 부트스트랩 패치가 최종 완료되었는지를 나타내는 트리거 플래그입니다.
   const runtimeReady = ref(false);
-  const isHistoryHydrating = ref(false);
+  const isHistoryRendering = ref(false);
   const apiRequestStore = useApiRequestStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
-  let historyHydrationOverlayActive = false;
-  let historyHydrationOverlayStartedAt = 0;
-  let historyHydrationOverlayStopTimerId = 0;
+  let historyRenderOverlayActive = false;
+  let historyRenderOverlayStartedAt = 0;
+  let historyRenderOverlayStopTimerId = 0;
   let routeConversationLoadSeq = 0;
-  let historyHydrationFinishSeq = 0;
-  const HISTORY_HYDRATION_OVERLAY_MIN_MS = 160;
+  let historyRenderFinishSeq = 0;
+  const HISTORY_RENDER_OVERLAY_MIN_MS = 160;
 
   function waitForNextPaint() {
     if (typeof window === "undefined") return Promise.resolve();
@@ -88,23 +88,23 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  function clearHistoryHydrationOverlayStopTimer() {
-    if (!historyHydrationOverlayStopTimerId || typeof window === "undefined") {
-      historyHydrationOverlayStopTimerId = 0;
+  function clearHistoryRenderOverlayStopTimer() {
+    if (!historyRenderOverlayStopTimerId || typeof window === "undefined") {
+      historyRenderOverlayStopTimerId = 0;
       return;
     }
-    window.clearTimeout(historyHydrationOverlayStopTimerId);
-    historyHydrationOverlayStopTimerId = 0;
+    window.clearTimeout(historyRenderOverlayStopTimerId);
+    historyRenderOverlayStopTimerId = 0;
   }
 
-  function stopHistoryHydrationOverlayAfterPaint(delay = 0) {
-    if (!historyHydrationOverlayActive) return;
+  function stopHistoryRenderOverlayAfterPaint(delay = 0) {
+    if (!historyRenderOverlayActive) return;
 
     const stop = () => {
-      if (!historyHydrationOverlayActive) return;
+      if (!historyRenderOverlayActive) return;
       apiRequestStore.stopOverlay();
-      historyHydrationOverlayActive = false;
-      historyHydrationOverlayStartedAt = 0;
+      historyRenderOverlayActive = false;
+      historyRenderOverlayStartedAt = 0;
     };
 
     if (typeof window === "undefined") {
@@ -112,33 +112,33 @@ export function useChatDataController({props, ui, runtime, messages}) {
       return;
     }
 
-    clearHistoryHydrationOverlayStopTimer();
-    historyHydrationOverlayStopTimerId = window.setTimeout(
+    clearHistoryRenderOverlayStopTimer();
+    historyRenderOverlayStopTimerId = window.setTimeout(
       () => {
-        historyHydrationOverlayStopTimerId = 0;
+        historyRenderOverlayStopTimerId = 0;
         window.requestAnimationFrame(stop);
       },
       Math.max(0, delay)
     );
   }
 
-  function beginHistoryHydration() {
-    historyHydrationFinishSeq += 1;
-    clearHistoryHydrationOverlayStopTimer();
-    isHistoryHydrating.value = true;
+  function beginHistoryRender() {
+    historyRenderFinishSeq += 1;
+    clearHistoryRenderOverlayStopTimer();
+    isHistoryRendering.value = true;
     if (
       systemSettingsStore.showMobileApiProgress &&
-      !historyHydrationOverlayActive
+      !historyRenderOverlayActive
     ) {
       apiRequestStore.startOverlay();
-      historyHydrationOverlayActive = true;
-      historyHydrationOverlayStartedAt =
+      historyRenderOverlayActive = true;
+      historyRenderOverlayStartedAt =
         typeof performance !== "undefined" ? performance.now() : Date.now();
     }
   }
 
-  function finishHistoryHydration(options = {}) {
-    const finishSeq = ++historyHydrationFinishSeq;
+  function finishHistoryRender(options = {}) {
+    const finishSeq = ++historyRenderFinishSeq;
     const beforeReveal =
       typeof options.beforeReveal === "function" ? options.beforeReveal : null;
 
@@ -146,16 +146,16 @@ export function useChatDataController({props, ui, runtime, messages}) {
       await nextTick();
       await waitForNextPaint();
 
-      if (finishSeq !== historyHydrationFinishSeq) return;
-      isHistoryHydrating.value = false;
+      if (finishSeq !== historyRenderFinishSeq) return;
+      isHistoryRendering.value = false;
 
-      // isHistoryHydrating=false가 반영되면 input/composer가 다시 표시되면서
+      // isHistoryRendering=false가 반영되면 input/composer가 다시 표시되면서
       // message viewport 높이가 바뀔 수 있습니다. 다음 paint 전에 workspace가
       // 최종 scrollToBottom을 수행할 수 있도록 callback을 먼저 실행합니다.
       // 실패해도 progress가 무한 유지되지 않도록 finally 흐름은 계속 진행합니다.
       if (beforeReveal) {
         await nextTick();
-        if (finishSeq !== historyHydrationFinishSeq) return;
+        if (finishSeq !== historyRenderFinishSeq) return;
         try {
           await beforeReveal();
         } catch {
@@ -163,18 +163,18 @@ export function useChatDataController({props, ui, runtime, messages}) {
         }
       }
 
-      if (!historyHydrationOverlayActive) return;
+      if (!historyRenderOverlayActive) return;
 
       const now =
         typeof performance !== "undefined" ? performance.now() : Date.now();
-      const elapsed = Math.max(0, now - historyHydrationOverlayStartedAt);
-      const remaining = Math.max(0, HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed);
+      const elapsed = Math.max(0, now - historyRenderOverlayStartedAt);
+      const remaining = Math.max(0, HISTORY_RENDER_OVERLAY_MIN_MS - elapsed);
 
-      // MessageList가 history-hydrated를 emit한 뒤에도 Vue가 hidden 메시지 DOM을
+      // MessageList가 history-render-ready를 emit한 뒤에도 Vue가 hidden 메시지 DOM을
       // 실제 화면에 reveal/paint하는 시간이 남아 있을 수 있습니다.
-      // initialHydrating을 한 프레임 더 유지한 뒤 overlay를 닫아 progress가
+      // initialHistoryRendering을 한 프레임 더 유지한 뒤 overlay를 닫아 progress가
       // 페이지 준비 전 먼저 사라지는 현상을 방지합니다.
-      stopHistoryHydrationOverlayAfterPaint(remaining);
+      stopHistoryRenderOverlayAfterPaint(remaining);
     };
 
     void revealAfterPaint();
@@ -296,7 +296,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
     // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
     if (isMainPage.value) {
-      finishHistoryHydration();
+      finishHistoryRender();
       messages.value = [];
       chatStore.pruneInactiveMessageCache(null);
       clearActiveSession();
@@ -306,7 +306,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     try {
       // 케이스 2: 공유 오픈방 열람 페이지인 경우 원격지의 전용 익명 오픈 조회 엔드포인트 파이프라인으로 우회 라우팅합니다.
       if (isSharedPage.value) {
-        beginHistoryHydration();
+        beginHistoryRender();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
         const sharedMessages = await loadSharedConversation(
@@ -320,11 +320,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
       // 케이스 3: 일반 채팅 모드인데 대상 방의 고유 ID가 식별되지 않는 예외 상황 처리
       if (!activeHistoryId.value) {
-        beginHistoryHydration();
+        beginHistoryRender();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
         clearActiveSession();
-        finishHistoryHydration();
+        finishHistoryRender();
         return;
       }
 
@@ -332,17 +332,17 @@ export function useChatDataController({props, ui, runtime, messages}) {
       const history = findHistory(activeHistoryId.value);
       if (!history) {
         clearPendingSelectedOnFailure(activeHistoryId.value);
-        finishHistoryHydration();
+        finishHistoryRender();
         // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
         await router.replace({name: "main"}).catch(() => {});
         return;
       }
 
       // 새 대화 생성 직후 라우터가 chat 화면으로 이동하는 경우에는 기존 대화방 입장용
-      // hydration overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
+      // historyRender overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
       // typing("...") 표시 로직이 즉시 append되므로 빈 방 복원 처리만 조용히 마칩니다.
       if (chatStore.consumePendingNewSubmitChat(history.id)) {
-        finishHistoryHydration();
+        finishHistoryRender();
         clearPendingSelectedIfMatched(history.id);
         messages.value = runtime.conversations.value?.[history.id] || [];
         await nextTick();
@@ -351,7 +351,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
       chatStore.setPendingSelectedChatId(history.id);
-      beginHistoryHydration();
+      beginHistoryRender();
       await flushConversationSwitchPaint();
       if (!isCurrentLoad()) return;
       chatStore.pruneInactiveMessageCache(history.id);
@@ -364,7 +364,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     } catch (error) {
       if (isCurrentLoad()) {
         clearPendingSelectedOnFailure(activeHistoryId.value);
-        finishHistoryHydration();
+        finishHistoryRender();
       }
       logWarn("[useChatDataController] loadRouteConversation 오류:", error);
     }
@@ -462,7 +462,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       },
       (nextMessages) => {
         if (!Array.isArray(nextMessages)) return;
-        if (isHistoryHydrating.value) return;
+        if (isHistoryRendering.value) return;
         if (messages.value === nextMessages) return; // 메모리 참조 포인터가 완벽하게 일치한다면 중복 할당 연산을 무시 차단합니다.
         messages.value = nextMessages;
       },
@@ -488,11 +488,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
     });
 
     onBeforeUnmount(() => {
-      historyHydrationFinishSeq += 1;
-      clearHistoryHydrationOverlayStopTimer();
-      if (historyHydrationOverlayActive) {
+      historyRenderFinishSeq += 1;
+      clearHistoryRenderOverlayStopTimer();
+      if (historyRenderOverlayActive) {
         apiRequestStore.stopOverlay();
-        historyHydrationOverlayActive = false;
+        historyRenderOverlayActive = false;
       }
     });
   }
@@ -518,8 +518,8 @@ export function useChatDataController({props, ui, runtime, messages}) {
     workspaceAssistantLabel,
     suggestions,
     isGenerating,
-    isHistoryHydrating,
-    finishHistoryHydration,
+    isHistoryRendering,
+    finishHistoryRender,
     submit,
     regenerate,
     bindDataEvents,

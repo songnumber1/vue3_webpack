@@ -13,9 +13,9 @@
     :messages="messages"
     :loading="isGenerating"
     :auto-scroll-on-answer="autoScrollOnAnswer"
-    :initial-hydrating="isMessageListHydrating"
+    :initial-history-rendering="isMessageListHistoryRendering"
     @content-rendered="handleMessageContentRendered"
-    @history-hydrated="handleHistoryHydrated"
+    @history-render-ready="handleHistoryRenderReady"
     @regenerate="workspaceActions.regenerate($event)"
   />
   <button
@@ -23,7 +23,7 @@
       showScrollBottom &&
       !isInteractionBlocked &&
       !isPromptExpandedInChat &&
-      !isMessageListHydrating
+      !isMessageListHistoryRendering
     "
     class="scroll-bottom-button"
     type="button"
@@ -33,14 +33,14 @@
     ↓
   </button>
   <div
-    v-show="!isHistoryHydrating"
+    v-show="!isHistoryRendering"
     ref="composerSlotRef"
     :class="{
-      'chat-composer-slot--history-finalizing': isHistoryRevealFinalizing,
+      'chat-composer-slot--history-finalizing': isHistoryRenderRevealFinalizing,
     }"
     class="chat-composer-slot"
     :aria-hidden="
-      isHistoryHydrating || isHistoryRevealFinalizing ? 'true' : null
+      isHistoryRendering || isHistoryRenderRevealFinalizing ? 'true' : null
     "
   >
     <ChatReadonlyInput v-if="readonly" />
@@ -123,7 +123,7 @@ const previewHtml = ref("<p></p>");
 const isDesktopRuntime = ref(false);
 const codeInterpreterOpen = ref(false);
 const isPromptExpandedInChat = ref(false);
-const isHistoryRevealFinalizing = ref(false);
+const isHistoryRenderRevealFinalizing = ref(false);
 const selectedInterpreterCode = ref("");
 const selectedInterpreterLanguage = ref("text");
 let composerResizeObserver = null;
@@ -164,11 +164,11 @@ const showScrollBottom = computed(() => workspaceState.value.showScrollBottom);
 const autoScrollOnAnswer = computed(
   () => workspaceState.value.autoScrollOnAnswer
 );
-const isHistoryHydrating = computed(
-  () => workspaceState.value.isHistoryHydrating
+const isHistoryRendering = computed(
+  () => workspaceState.value.isHistoryRendering
 );
-const isMessageListHydrating = computed(
-  () => isHistoryHydrating.value || isHistoryRevealFinalizing.value
+const isMessageListHistoryRendering = computed(
+  () => isHistoryRendering.value || isHistoryRenderRevealFinalizing.value
 );
 const canUseDesktopCodeInterpreter = computed(
   () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"
@@ -437,7 +437,7 @@ function scheduleComposerHeightUpdate() {
 
   // 긴 대화방에서 창 크기 변경 시 composer ResizeObserver와 watch가 동시에
   // 연쇄 실행되면 reflow가 누적됩니다. 마지막 프레임 근처에서만 높이를
-  // 갱신하고, streaming/hydration 상태 변화는 짧은 보정 타이머로 유지합니다.
+  // 갱신하고, streaming/historyRender 상태 변화는 짧은 보정 타이머로 유지합니다.
   clearComposerHeightSchedule();
   composerHeightRafId = window.requestAnimationFrame(() => {
     composerHeightRafId = 0;
@@ -466,13 +466,13 @@ function handleMessageContentRendered() {
   scheduleComposerHeightUpdate();
 }
 
-function handleHistoryHydrated() {
-  // Android Chrome/WebView에서는 isHistoryHydrating=false로 composer가 다시
+function handleHistoryRenderReady() {
+  // Android Chrome/WebView에서는 isHistoryRendering=false로 composer가 다시
   // 레이아웃에 참여한 직후 viewport 높이가 한 번 더 안정됩니다.
   // 그 사이 MessageList는 계속 hidden 상태로 유지하고, 최종 하단 스크롤이
   // 끝난 뒤에만 reveal하여 사용자가 중간 스크롤 이동을 보지 않게 합니다.
-  isHistoryRevealFinalizing.value = true;
-  workspaceActions.handleHistoryHydrated({
+  isHistoryRenderRevealFinalizing.value = true;
+  workspaceActions.handleHistoryRenderReady({
     beforeReveal: async () => {
       try {
         await nextTick();
@@ -480,7 +480,7 @@ function handleHistoryHydrated() {
         await listRef.value?.finalizeHistoryRevealScroll?.();
         scheduleComposerHeightUpdate();
       } finally {
-        isHistoryRevealFinalizing.value = false;
+        isHistoryRenderRevealFinalizing.value = false;
         await nextTick();
       }
     },
@@ -553,9 +553,9 @@ onBeforeUnmount(() => {
   }
 });
 
-watch(isHistoryHydrating, (loading) => {
+watch(isHistoryRendering, (loading) => {
   if (loading) {
-    isHistoryRevealFinalizing.value = false;
+    isHistoryRenderRevealFinalizing.value = false;
   }
 });
 
@@ -566,8 +566,8 @@ watch(
     showScrollBottom.value,
     isActiveModelUnavailable.value,
     isGenerating.value,
-    isHistoryHydrating.value,
-    isHistoryRevealFinalizing.value,
+    isHistoryRendering.value,
+    isHistoryRenderRevealFinalizing.value,
     messages.value.length,
     showCodeInterpreterPanel.value,
     isDesktopRuntime.value,

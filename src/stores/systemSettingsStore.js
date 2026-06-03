@@ -22,7 +22,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
   // 영구 불변 상수를 기반으로 개통 세팅된 하드웨어/UI 조율 프리셋 세션 상태 구조 명세
   state: () => ({
     settings: {...DEFAULT_SYSTEM_SETTINGS}, // 정규화 연산을 마친 최종 시스템 제어 파라미터 맵
-    hydrated: false, // 로컬 스토리지 캐시 등으로부터 데이터 하이드레이션 주입 매운 작업 완결 여부 플래그
+    ready: false, // 로컬 스토리지 캐시 등으로부터 데이터 하이드레이션 주입 매운 작업 완결 여부 플래그
   }),
   getters: {
     // 목업 API 인터페이스를 우회 바이패스하고 실제 원격 운영 서버 엔드포인트 게이트웨이로 물리 패킷을 쏠지 여부 판별식
@@ -89,7 +89,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
      */
     init() {
       this.settings = normalizeSystemSettings(this.settings); // 안전 보정 정규화
-      this.hydrated = true; // 사용 가동 완결 마킹 공표
+      this.ready = true; // 사용 가동 완결 마킹 공표
     },
     /**
      * @function applySettings
@@ -99,7 +99,7 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     applySettings(nextSettings) {
       const previous = {...this.settings}; // 이전 디버그 정보 대조용 얕은 카피 본 백업 복제
       this.settings = normalizeSystemSettings(nextSettings); // 정규화 규격 포맷 빌드 주입
-      this.hydrated = true;
+      this.ready = true;
 
       // 하드웨어 로깅 모듈을 가동하여 중단점 변경 히스토리를 물리 콘솔 로그 버스 파이프라인에 영구 기록 박제 처리합니다.
       logPlatformDebug("settings.apply", {

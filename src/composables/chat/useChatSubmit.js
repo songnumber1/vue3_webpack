@@ -74,7 +74,7 @@ async function ensureConversationForSubmit(options, normalized) {
     throw new Error("new.do response does not contain chatId.");
   }
 
-  // 새 대화는 기존 방 입장용 hydration overlay 대상이 아닙니다.
+  // 새 대화는 기존 방 입장용 historyRender overlay 대상이 아닙니다.
   // 라우트 이동보다 먼저 호출부에서 사용자 질문과 assistant typing("...") 메시지를
   // store에 append해야 메인 화면 첫 질문도 기존 채팅방 질문과 동일하게 보입니다.
   options.markNewSubmitConversation?.(targetHistoryId);

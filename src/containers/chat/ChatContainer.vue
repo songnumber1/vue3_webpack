@@ -257,8 +257,8 @@ const {
   workspaceAssistantLabel,
   suggestions,
   isGenerating,
-  isHistoryHydrating,
-  finishHistoryHydration,
+  isHistoryRendering,
+  finishHistoryRender,
   autoScrollOnAnswer,
   closeImagePreview,
   handlePreviewLoad,
@@ -362,7 +362,7 @@ provide(
     messages: messages.value,
     showScrollBottom: showScrollBottom.value,
     autoScrollOnAnswer: autoScrollOnAnswer.value,
-    isHistoryHydrating: isHistoryHydrating.value,
+    isHistoryRendering: isHistoryRendering.value,
   }))
 );
 
@@ -415,7 +415,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handlePromptResize: refreshPromptViewport,
   handleMessageContentRendered,
   scrollBottom: handleWorkspaceScrollBottom,
-  handleHistoryHydrated: (options) => finishHistoryHydration(options),
+  handleHistoryRenderReady: (options) => finishHistoryRender(options),
 });
 </script>
 

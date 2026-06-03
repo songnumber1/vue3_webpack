@@ -3,12 +3,12 @@
     ref="scrollRef"
     class="message-list"
     :class="{
-      'message-list--initial-hydrating': initialHydrating,
+      'message-list--initial-history-rendering': initialHistoryRendering,
       'message-list--manual-stream': loading && !autoScrollOnAnswer,
     }"
-    :inert="initialHydrating ? '' : null"
+    :inert="initialHistoryRendering ? '' : null"
     aria-live="polite"
-    :aria-busy="initialHydrating ? 'true' : 'false'"
+    :aria-busy="initialHistoryRendering ? 'true' : 'false'"
     @scroll.passive="handleScroll"
     @touchstart.passive="handleUserScrollIntent"
     @wheel.passive="handleUserScrollIntent"
@@ -21,7 +21,7 @@
       :show-regenerate="isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
-      :defer-mermaid-enhancement="initialHydrating"
+      :defer-mermaid-enhancement="initialHistoryRendering"
       @rendered="handleMessageRendered(message.id, $event)"
       @regenerate="$emit('regenerate', $event)"
     />
@@ -46,12 +46,12 @@ const props = defineProps({
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
-  initialHydrating: {type: Boolean, default: false},
+  initialHistoryRendering: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([
   "content-rendered",
-  "history-hydrated",
+  "history-render-ready",
   "regenerate",
 ]);
 
@@ -101,7 +101,7 @@ defineExpose({
   min-height: 0;
 }
 
-.message-list--initial-hydrating {
+.message-list--initial-history-rendering {
   visibility: hidden !important;
   opacity: 0 !important;
   pointer-events: none !important;

@@ -268,7 +268,7 @@ watch(
     await nextTick();
 
     const currentContentVersion = renderVersion;
-    // 초기 hydration 완료 시점의 Mermaid 렌더링은 MessageList 단위에서 한 번만 수행합니다.
+    // 초기 historyRender 완료 시점의 Mermaid 렌더링은 MessageList 단위에서 한 번만 수행합니다.
     // 각 AssistantMessage가 동시에 Mermaid queue를 생성하면 큰 대화방 전환 후에도
     // 이전 DOM root를 잡은 비동기 작업이 오래 남아 메모리 회수가 지연될 수 있습니다.
     void enhanceRenderedMarkdown({

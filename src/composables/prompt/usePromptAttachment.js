@@ -161,7 +161,7 @@ export function usePromptAttachment({
     // 반응형 배열의 불변성을 보존하며 신규 첨부 자원을 기존 배열 꼬리에 결합 주입합니다.
     attachments.value = [...attachments.value, ...mapped];
 
-    // 주입 완료된 파일 중 이미지 규격인 자원만 추려내어 화면 썸네일 노출용 Base64 DataURL을 동적 정밀 비동기 복원(Hydrate)합니다.
+    // 주입 완료된 파일 중 이미지 규격인 자원만 추려내어 화면 썸네일 노출용 Base64 DataURL을 동적 정밀 비동기 복원합니다.
     mapped
       .filter((file) => file.kind === "image")
       .forEach((attachment) => {
