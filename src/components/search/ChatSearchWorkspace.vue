@@ -107,6 +107,10 @@ import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {resolveChatApis} from "@/api/runtime/chatApis";
 import {chatHistoryApiMock} from "@/api/mock/chatHistoryApi.mock";
 import {
+  adaptChatSearchResponse,
+  createHistoryFromSearchResult,
+} from "@/adapters/chatResponseAdapter";
+import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
@@ -201,29 +205,10 @@ async function runSearch({resetPage = false} = {}) {
 }
 
 function normalizeSearchResponse(response) {
-  let source = response?.data || response?.result || response?.body || response;
-  if (source?.data || source?.result || source?.body) {
-    source = source.data || source.result || source.body;
-  }
-  if (Array.isArray(source)) return {list: normalizeResultList(source)};
-  return {
-    list: normalizeResultList(Array.isArray(source?.list) ? source.list : []),
-  };
-}
-
-function normalizeResultList(list) {
-  return list
-    .filter(Boolean)
-    .map((item) => ({
-      ...item,
-      chatId: item.chatId || item.id,
-      id: item.id || item.chatId,
-      title: item.title || item.chatTitle || t("chatSearch.untitled"),
-      chatTitle: item.chatTitle || item.title || t("chatSearch.untitled"),
-      snippet: item.snippet || item.preview || item.summary || "",
-      preview: item.preview || item.snippet || item.summary || "",
-      chatEndDt: item.chatEndDt || item.endedAt || item.updatedAt || "",
-    }));
+  return adaptChatSearchResponse(response, {
+    fallbackTitle: t("chatSearch.untitled"),
+    keyword: lastSearchedKeyword.value,
+  });
 }
 
 function goToPage(page) {
@@ -251,25 +236,12 @@ function openChat(result) {
 function ensureSearchResultHistory(result = {}, chatId = "") {
   if (!chatId || chatStore.getHistory(chatId)) return;
 
-  chatStore.addHistory({
-    id: chatId,
-    title: result.title || result.chatTitle || t("chatSearch.untitled"),
-    preview: result.snippet || result.preview || result.title || result.chatTitle || "",
-    modelId: result.modelId || result.modeId || "",
-    assistantId: result.assistId || result.assistantId || "",
-    assistantType: result.assistantType || "",
-    assistantLabel: result.assistantLabel || "",
-    modelLabel: result.modelLabel || "",
-    isPinned: Boolean(result.isPinned || result.bookmarkYN),
-    endedAt: result.chatEndDt || result.endedAt || result.updatedAt || new Date().toISOString(),
-    userId: result.userId || "",
-    raw: {
-      ...result,
-      chatId,
-      chatTitle: result.chatTitle || result.title || t("chatSearch.untitled"),
-      chatEndDt: result.chatEndDt || result.endedAt || result.updatedAt || "",
-    },
-  });
+  chatStore.addHistory(
+    createHistoryFromSearchResult(
+      {...result, chatId},
+      {fallbackTitle: t("chatSearch.untitled")}
+    )
+  );
 }
 
 function formatListDate(value) {

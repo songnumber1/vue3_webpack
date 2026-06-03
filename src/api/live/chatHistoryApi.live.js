@@ -10,6 +10,7 @@
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {API_KEYS} from "@/constants/apiConfig";
+import {unwrapApiBody} from "@/utils/apiResponseReader";
 
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
@@ -30,7 +31,7 @@ async function createChat(payload = {}) {
     payload,
     {apiKey: API_KEYS.CHAT_HISTORY_NEW}
   );
-  return response?.data?.data || response?.data || {};
+  return unwrapApiBody(response, {});
 }
 
 /**
