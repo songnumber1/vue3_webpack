@@ -52,6 +52,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
   let historyHydrationOverlayStartedAt = 0;
   let historyHydrationOverlayStopTimerId = 0;
   let routeConversationLoadSeq = 0;
+  let historyHydrationFinishSeq = 0;
   const HISTORY_HYDRATION_OVERLAY_MIN_MS = 160;
 
   function waitForNextPaint() {
@@ -119,6 +120,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
   }
 
   function beginHistoryHydration() {
+    historyHydrationFinishSeq += 1;
     clearHistoryHydrationOverlayStopTimer();
     isHistoryHydrating.value = true;
     if (
@@ -133,18 +135,33 @@ export function useChatDataController({props, ui, runtime, messages}) {
   }
 
   function finishHistoryHydration() {
-    isHistoryHydrating.value = false;
-    if (!historyHydrationOverlayActive) return;
+    const finishSeq = ++historyHydrationFinishSeq;
 
-    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
-    const elapsed = Math.max(0, now - historyHydrationOverlayStartedAt);
-    const remaining = Math.max(0, HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed);
+    const revealAfterPaint = async () => {
+      await nextTick();
+      await waitForNextPaint();
 
-    // MessageList가 history-hydrated를 emit하는 시점은 하단 스크롤 1차 고정이
-    // 완료된 직후입니다. 바로 카운터를 내리면 빠른 mock/cache 경로에서 스피너가
-    // 브라우저에 그려지기 전에 사라질 수 있으므로, 최소 표시 시간과 다음 paint를
-    // 보장한 뒤 overlay를 닫습니다.
-    stopHistoryHydrationOverlayAfterPaint(remaining);
+      if (finishSeq !== historyHydrationFinishSeq) return;
+      isHistoryHydrating.value = false;
+
+      if (!historyHydrationOverlayActive) return;
+
+      const now =
+        typeof performance !== "undefined" ? performance.now() : Date.now();
+      const elapsed = Math.max(0, now - historyHydrationOverlayStartedAt);
+      const remaining = Math.max(
+        0,
+        HISTORY_HYDRATION_OVERLAY_MIN_MS - elapsed
+      );
+
+      // MessageList가 history-hydrated를 emit한 뒤에도 Vue가 hidden 메시지 DOM을
+      // 실제 화면에 reveal/paint하는 시간이 남아 있을 수 있습니다.
+      // initialHydrating을 한 프레임 더 유지한 뒤 overlay를 닫아 progress가
+      // 페이지 준비 전 먼저 사라지는 현상을 방지합니다.
+      stopHistoryHydrationOverlayAfterPaint(remaining);
+    };
+
+    void revealAfterPaint();
   }
 
   // ── 📌 [1. 화면 라우팅 상태 분석 및 권한 가드 파트] ──────────────────
@@ -263,6 +280,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     if (isMainPage.value) {
       finishHistoryHydration();
       messages.value = [];
+      chatStore.pruneInactiveMessageCache(null);
       clearActiveSession();
       return;
     }
@@ -316,11 +334,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
       beginHistoryHydration();
       await flushConversationSwitchPaint();
       if (!isCurrentLoad()) return;
+      chatStore.pruneInactiveMessageCache(history.id);
       const loadedMessages = await ensureConversation(history.id);
       if (!isCurrentLoad()) return;
       messages.value = loadedMessages;
       clearPendingSelectedIfMatched(history.id);
       await nextTick();
+      chatStore.pruneInactiveMessageCache(history.id);
     } catch (error) {
       if (isCurrentLoad()) {
         clearPendingSelectedOnFailure(activeHistoryId.value);
@@ -447,6 +467,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     });
 
     onBeforeUnmount(() => {
+      historyHydrationFinishSeq += 1;
       clearHistoryHydrationOverlayStopTimer();
       if (historyHydrationOverlayActive) {
         apiRequestStore.stopOverlay();

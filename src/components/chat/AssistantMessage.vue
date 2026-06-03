@@ -61,10 +61,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {enhanceMarkdownScrollbars} from "@/utils/overlayScrollbar";
+import {
+  destroyMarkdownScrollbars,
+  enhanceMarkdownScrollbars,
+} from "@/utils/overlayScrollbar";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import {logWarn} from "@/utils/logger";
@@ -91,6 +94,7 @@ const {handleMarkdownClick: handleReasoningClick} =
   useMarkdownTools(reasoningRef);
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
+let componentAlive = true;
 
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
 const showMessageActions = computed(
@@ -134,14 +138,18 @@ async function enhanceRenderedMarkdown({
   renderMermaid = false,
 }) {
   try {
+    if (!componentAlive || !root?.isConnected) return;
     if (renderMermaid && hasMermaidContent(source)) {
       await renderMermaidInElement(root);
     }
+    if (!componentAlive || !root?.isConnected) return;
     if (currentVersion !== getVersion()) return;
     enhanceMarkdownScrollbars(root);
     emit("rendered", "enhanced");
   } catch (error) {
-    logWarn("[AssistantMessage] markdown enhancement failed:", error);
+    if (componentAlive) {
+      logWarn("[AssistantMessage] markdown enhancement failed:", error);
+    }
   }
 }
 
@@ -162,16 +170,17 @@ async function renderContent() {
   const currentVersion = ++renderVersion;
 
   try {
+    if (!componentAlive) return;
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = props.message.content
       ? await renderMarkdown(props.message.content, {
           renderMermaid: isMessageComplete.value,
         })
       : "";
-    if (currentVersion !== renderVersion) return;
+    if (!componentAlive || currentVersion !== renderVersion) return;
     html.value = rendered;
     await nextTick();
-    if (currentVersion !== renderVersion) return;
+    if (!componentAlive || currentVersion !== renderVersion) return;
 
     reservePendingMermaidHeight(contentRef.value);
     emit("rendered", "content");
@@ -184,7 +193,7 @@ async function renderContent() {
       renderMermaid: isMessageComplete.value && !props.deferMermaidEnhancement,
     });
   } catch (error) {
-    if (currentVersion !== renderVersion) return;
+    if (!componentAlive || currentVersion !== renderVersion) return;
     logWarn("[AssistantMessage] content render failed:", error);
     html.value = escapeHtml(props.message.content || "");
     emit("rendered", "content");
@@ -198,6 +207,7 @@ async function renderReasoningContent() {
   const currentVersion = ++reasoningRenderVersion;
 
   try {
+    if (!componentAlive) return;
     if (!props.message.reasoningContent) {
       reasoningHtml.value = "";
       emit("rendered", "reasoning");
@@ -206,10 +216,10 @@ async function renderReasoningContent() {
 
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = await renderMarkdown(props.message.reasoningContent);
-    if (currentVersion !== reasoningRenderVersion) return;
+    if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     reasoningHtml.value = rendered;
     await nextTick();
-    if (currentVersion !== reasoningRenderVersion) return;
+    if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
 
     reservePendingMermaidHeight(reasoningRef.value);
     emit("rendered", "reasoning");
@@ -222,7 +232,7 @@ async function renderReasoningContent() {
       renderMermaid: true,
     });
   } catch (error) {
-    if (currentVersion !== reasoningRenderVersion) return;
+    if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     logWarn("[AssistantMessage] reasoning render failed:", error);
     reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
     emit("rendered", "reasoning");
@@ -244,12 +254,15 @@ watch(
     await nextTick();
 
     const currentContentVersion = renderVersion;
+    // 초기 hydration 완료 시점의 Mermaid 렌더링은 MessageList 단위에서 한 번만 수행합니다.
+    // 각 AssistantMessage가 동시에 Mermaid queue를 생성하면 큰 대화방 전환 후에도
+    // 이전 DOM root를 잡은 비동기 작업이 오래 남아 메모리 회수가 지연될 수 있습니다.
     void enhanceRenderedMarkdown({
       root: contentRef.value,
       source: props.message.content,
       currentVersion: currentContentVersion,
       getVersion: () => renderVersion,
-      renderMermaid: true,
+      renderMermaid: false,
     });
 
     const currentReasoningVersion = reasoningRenderVersion;
@@ -258,7 +271,7 @@ watch(
       source: props.message.reasoningContent,
       currentVersion: currentReasoningVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid: true,
+      renderMermaid: false,
     });
   },
   {flush: "post"}
@@ -270,5 +283,16 @@ watch(
     renderReasoningContent();
   }
 );
+
+onBeforeUnmount(() => {
+  componentAlive = false;
+  renderVersion += 1;
+  reasoningRenderVersion += 1;
+  destroyMarkdownScrollbars(contentRef.value);
+  destroyMarkdownScrollbars(reasoningRef.value);
+  html.value = "";
+  reasoningHtml.value = "";
+});
+
 </script>
 

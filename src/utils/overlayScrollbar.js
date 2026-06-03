@@ -85,6 +85,15 @@ export function destroyOverlayScrollbar(element) {
   if (element?.dataset) delete element.dataset.overlayScrollbarEnhanced;
 }
 
+export function destroyMarkdownScrollbars(rootElement) {
+  if (!rootElement || !canUseDom()) return;
+  const targets = rootElement.matches?.(MARKDOWN_SCROLL_SELECTOR)
+    ? [rootElement]
+    : Array.from(rootElement.querySelectorAll(MARKDOWN_SCROLL_SELECTOR));
+
+  targets.forEach((target) => destroyOverlayScrollbar(target));
+}
+
 export function getOverlayScrollbarViewport(element) {
   const instance = element ? overlayInstances.get(element) : null;
   return instance?.elements?.().viewport || element || null;

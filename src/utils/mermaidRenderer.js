@@ -380,12 +380,21 @@ async function renderMermaidTargets(root, options = {}) {
   await renderMermaidTargetsWithRenderApi(mermaid, liveTargets);
 }
 
+function isRenderableRoot(root) {
+  if (!root) return false;
+  if (typeof Node !== "undefined" && root.nodeType === Node.DOCUMENT_NODE) return true;
+  return root.isConnected !== false;
+}
+
 export function renderMermaidInElement(root, options = {}) {
-  if (!root) return Promise.resolve();
+  if (!isRenderableRoot(root)) return Promise.resolve();
 
   const job = mermaidRenderQueue
     .catch(() => {})
-    .then(() => renderMermaidTargets(root, options));
+    .then(() => {
+      if (!isRenderableRoot(root)) return undefined;
+      return renderMermaidTargets(root, options);
+    });
 
   mermaidRenderQueue = job.catch(() => {});
   return job;
