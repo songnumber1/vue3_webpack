@@ -121,6 +121,10 @@ export function useChatNavigationActions({
 
     chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels(); // 대화 맥락이 바뀌므로 열려 있던 우측 정보 패널들 강제 셧다운
+    // 모바일/좁은 화면에서는 대용량 대화방 hydration overlay가 시작되기 전에
+    // 좌측 드로어와 접힌 최근 목록을 먼저 닫아 로딩 화면과 메뉴가 겹쳐 보이지 않게 합니다.
+    navigationStore.setDrawerOpen(false);
+    navigationStore.setCollapsedRecentOpen(false);
     await router.push({name: "chat", params: {id: historyId}}).catch(() => {});
     return true;
   }

@@ -19,7 +19,12 @@
     @regenerate="workspaceActions.regenerate($event)"
   />
   <button
-    v-if="showScrollBottom && !isInteractionBlocked && !isPromptExpandedInChat"
+    v-if="
+      showScrollBottom &&
+      !isInteractionBlocked &&
+      !isPromptExpandedInChat &&
+      !isHistoryHydrating
+    "
     class="scroll-bottom-button"
     type="button"
     :aria-label="t('chat.scrollBottom')"
@@ -27,7 +32,12 @@
   >
     ↓
   </button>
-  <div ref="composerSlotRef" class="chat-composer-slot">
+  <div
+    v-show="!isHistoryHydrating"
+    ref="composerSlotRef"
+    class="chat-composer-slot"
+    :aria-hidden="isHistoryHydrating ? 'true' : null"
+  >
     <ChatReadonlyInput v-if="readonly" />
     <ChatReadonlyInput
       v-else-if="isActiveModelUnavailable"
