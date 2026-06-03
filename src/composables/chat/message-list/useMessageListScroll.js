@@ -130,6 +130,7 @@ export function useMessageListScroll({props, emit}) {
   let resizeRecalculateTimerId = 0;
   let resizeRecalculateRafId = 0;
   let hydrationMermaidRafId = 0;
+  let trackedRafIds = [];
   let renderedFrameRafId = 0;
   let renderedFrameNeedsSpacer = false;
   let renderedFrameNeedsBottomState = false;
@@ -160,6 +161,29 @@ export function useMessageListScroll({props, emit}) {
   function updateOverlayScrollbarFrame() {
     if (!overlayScrollSource) return;
     updateOverlayScrollbar(overlayScrollSource);
+  }
+
+  function scheduleTrackedAnimationFrame(callback) {
+    if (typeof window === "undefined") {
+      callback?.();
+      return 0;
+    }
+
+    const rafId = window.requestAnimationFrame(() => {
+      trackedRafIds = trackedRafIds.filter((id) => id !== rafId);
+      callback?.();
+    });
+    trackedRafIds.push(rafId);
+    return rafId;
+  }
+
+  function clearTrackedAnimationFrames() {
+    if (typeof window === "undefined") {
+      trackedRafIds = [];
+      return;
+    }
+    trackedRafIds.forEach((rafId) => window.cancelAnimationFrame(rafId));
+    trackedRafIds = [];
   }
 
   function clearRenderedFrameScheduler() {
@@ -285,6 +309,7 @@ export function useMessageListScroll({props, emit}) {
   function clearStableTimers() {
     stableScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
     stableScrollTimerIds = [];
+    clearTrackedAnimationFrames();
   }
 
   function clearAfterRenderScrollTimer() {
@@ -317,6 +342,7 @@ export function useMessageListScroll({props, emit}) {
       window.cancelAnimationFrame(hydrationRafId);
       hydrationRafId = 0;
     }
+    clearTrackedAnimationFrames();
     // 주의: hydration 완료 직후 부모가 initialHydrating=false로 바꾸면
     // clearHydrationState()가 호출됩니다. 여기서 mermaid RAF까지 취소하면
     // 이력 메시지의 `.md-mermaid[data-mermaid-pending]` 후처리가 실행되지 않아
@@ -425,7 +451,7 @@ export function useMessageListScroll({props, emit}) {
       const delays = options.initialOnly ? [0, 32, 80] : [0, 32, 80, 160];
       delays.forEach((delay) => {
         const timerId = window.setTimeout(() => {
-          window.requestAnimationFrame(() => {
+          scheduleTrackedAnimationFrame(() => {
             applyLatestUserAnchor({...options, behavior: "auto"});
           });
         }, delay);
@@ -442,7 +468,7 @@ export function useMessageListScroll({props, emit}) {
 
     delays.forEach((delay) => {
       const timerId = window.setTimeout(() => {
-        window.requestAnimationFrame(() => {
+        scheduleTrackedAnimationFrame(() => {
           applyLatestUserAnchor({...options, behavior: "auto"});
         });
       }, delay);
@@ -454,8 +480,8 @@ export function useMessageListScroll({props, emit}) {
     const options = pendingAfterRenderOptions || {};
     clearAfterRenderScrollState();
 
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(() => {
+    scheduleTrackedAnimationFrame(() => {
+      scheduleTrackedAnimationFrame(() => {
         applyBottomScroll(options.behavior || "auto");
       });
     });
@@ -498,7 +524,7 @@ export function useMessageListScroll({props, emit}) {
 
     delays.forEach((delay) => {
       const timerId = window.setTimeout(() => {
-        window.requestAnimationFrame(() => {
+        scheduleTrackedAnimationFrame(() => {
           updateOverlayScrollbarFrame();
           applyBottomScroll("auto");
         });
@@ -520,7 +546,7 @@ export function useMessageListScroll({props, emit}) {
     delays.forEach((delay) => {
       const timerId = window.setTimeout(() => {
         if (runId !== hydrationRunId) return;
-        window.requestAnimationFrame(() => {
+        scheduleTrackedAnimationFrame(() => {
           if (runId !== hydrationRunId) return;
           applyHydrationBottomScroll();
           completedCount += 1;
@@ -544,7 +570,7 @@ export function useMessageListScroll({props, emit}) {
       hydrationTimerId = 0;
     }
 
-    window.requestAnimationFrame(() => {
+    scheduleTrackedAnimationFrame(() => {
       if (runId !== hydrationRunId) return;
 
       if (!shouldAutoHydrationBottomScroll()) {
@@ -614,7 +640,7 @@ export function useMessageListScroll({props, emit}) {
       // 화면에 같이 반영되도록 합니다. 단, 비정상 렌더 이벤트 누락은 hard timeout으로
       // 방어합니다.
       if (ready || timedOut) {
-        window.requestAnimationFrame(() => {
+        scheduleTrackedAnimationFrame(() => {
           if (runId !== hydrationRunId || !props.initialHydrating) return;
           hydrationReadyPaintFrames += 1;
           if (hydrationReadyPaintFrames < HYDRATION_MIN_READY_PAINT_FRAMES) {
@@ -733,7 +759,7 @@ export function useMessageListScroll({props, emit}) {
     scheduleRenderedFrameUpdate({spacer: shouldRecalculateSpacer});
 
     if (hydrationBottomCorrectionUntil && Date.now() <= hydrationBottomCorrectionUntil) {
-      window.requestAnimationFrame(() => {
+      scheduleTrackedAnimationFrame(() => {
         updateOverlayScrollbarFrame();
         applyBottomScroll("auto");
       });
@@ -745,7 +771,7 @@ export function useMessageListScroll({props, emit}) {
       props.autoScrollOnAnswer &&
       userIsAtBottom.value
     ) {
-      window.requestAnimationFrame(() => applyBottomScroll("auto"));
+      scheduleTrackedAnimationFrame(() => applyBottomScroll("auto"));
       return;
     }
 
@@ -868,6 +894,7 @@ export function useMessageListScroll({props, emit}) {
     clearHydrationState();
     clearHydrationMermaidScheduler();
     clearRenderedFrameScheduler();
+    clearTrackedAnimationFrames();
     clearResizeRecalculateScheduler();
     cleanupOverlayScrollbar();
     if (typeof window === "undefined") return;

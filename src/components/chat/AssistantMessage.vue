@@ -178,6 +178,7 @@ async function renderContent() {
         })
       : "";
     if (!componentAlive || currentVersion !== renderVersion) return;
+    destroyMarkdownScrollbars(contentRef.value);
     html.value = rendered;
     await nextTick();
     if (!componentAlive || currentVersion !== renderVersion) return;
@@ -195,6 +196,7 @@ async function renderContent() {
   } catch (error) {
     if (!componentAlive || currentVersion !== renderVersion) return;
     logWarn("[AssistantMessage] content render failed:", error);
+    destroyMarkdownScrollbars(contentRef.value);
     html.value = escapeHtml(props.message.content || "");
     emit("rendered", "content");
   }
@@ -217,6 +219,7 @@ async function renderReasoningContent() {
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = await renderMarkdown(props.message.reasoningContent);
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
+    destroyMarkdownScrollbars(reasoningRef.value);
     reasoningHtml.value = rendered;
     await nextTick();
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
@@ -234,6 +237,7 @@ async function renderReasoningContent() {
   } catch (error) {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     logWarn("[AssistantMessage] reasoning render failed:", error);
+    destroyMarkdownScrollbars(reasoningRef.value);
     reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
     emit("rendered", "reasoning");
   }

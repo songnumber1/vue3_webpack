@@ -13,6 +13,7 @@ import {
 
 export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   let instance = null;
+  let instanceElement = null;
   let resizeObserver = null;
   let removeWindowResizeListener = null;
   const enabled = config.enabled ?? true;
@@ -47,7 +48,11 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     await nextTick();
     const element = targetRef.value;
     if (!element) return;
+    if (instanceElement && instanceElement !== element) {
+      destroy();
+    }
     instance = initOverlayScrollbar(element, options);
+    instanceElement = instance ? element : null;
     if (instance && reserveScrollbarGap && element?.dataset) {
       element.dataset.overlayScrollbarGap = "true";
     }
@@ -73,11 +78,13 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     resizeObserver?.disconnect?.();
     resizeObserver = null;
     removeWindowResizeListener?.();
-    if (targetRef.value) {
-      if (targetRef.value.dataset) delete targetRef.value.dataset.overlayScrollbarGap;
-      destroyOverlayScrollbar(targetRef.value);
+    const element = instanceElement || targetRef.value;
+    if (element) {
+      if (element.dataset) delete element.dataset.overlayScrollbarGap;
+      destroyOverlayScrollbar(element);
     }
     instance = null;
+    instanceElement = null;
   }
 
   function bindWindowResizeUpdate() {
