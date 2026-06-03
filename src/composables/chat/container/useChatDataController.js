@@ -51,7 +51,41 @@ export function useChatDataController({props, ui, runtime, messages}) {
   let historyHydrationOverlayActive = false;
   let historyHydrationOverlayStartedAt = 0;
   let historyHydrationOverlayStopTimerId = 0;
+  let routeConversationLoadSeq = 0;
   const HISTORY_HYDRATION_OVERLAY_MIN_MS = 160;
+
+  function waitForNextPaint() {
+    if (typeof window === "undefined") return Promise.resolve();
+    return new Promise((resolve) => {
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(resolve);
+      });
+    });
+  }
+
+  async function flushConversationSwitchPaint({clearMessages = true} = {}) {
+    if (clearMessages) {
+      messages.value = [];
+    }
+
+    await nextTick();
+    await waitForNextPaint();
+  }
+
+  function clearPendingSelectedIfMatched(chatId) {
+    const pendingId = String(chatStore.pendingSelectedChatId || "");
+    const targetId = String(chatId || "");
+    if (!pendingId || pendingId === targetId) {
+      chatStore.clearPendingSelectedChatId();
+    }
+  }
+
+  function clearPendingSelectedOnFailure(chatId) {
+    const pendingId = String(chatStore.pendingSelectedChatId || "");
+    if (!pendingId || pendingId === String(chatId || "")) {
+      chatStore.clearPendingSelectedChatId();
+    }
+  }
 
   function clearHistoryHydrationOverlayStopTimer() {
     if (!historyHydrationOverlayStopTimerId || typeof window === "undefined") {
@@ -222,6 +256,9 @@ export function useChatDataController({props, ui, runtime, messages}) {
    * @description 주소창 라우트 정보가 변경되거나 방을 갈아탈 때, 해당 방의 과거 대화 이력을 로드하고 스크롤 포커싱을 선점 조율합니다.
    */
   async function loadRouteConversation() {
+    const loadSeq = ++routeConversationLoadSeq;
+    const isCurrentLoad = () => loadSeq === routeConversationLoadSeq;
+
     // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
     if (isMainPage.value) {
       finishHistoryHydration();
@@ -234,7 +271,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // 케이스 2: 공유 오픈방 열람 페이지인 경우 원격지의 전용 익명 오픈 조회 엔드포인트 파이프라인으로 우회 라우팅합니다.
       if (isSharedPage.value) {
         beginHistoryHydration();
-        messages.value = await loadSharedConversation(activeHistoryId.value);
+        await flushConversationSwitchPaint();
+        if (!isCurrentLoad()) return;
+        const sharedMessages = await loadSharedConversation(activeHistoryId.value);
+        if (!isCurrentLoad()) return;
+        messages.value = sharedMessages;
         await nextTick();
         return;
       }
@@ -242,9 +283,9 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // 케이스 3: 일반 채팅 모드인데 대상 방의 고유 ID가 식별되지 않는 예외 상황 처리
       if (!activeHistoryId.value) {
         beginHistoryHydration();
-        messages.value = [];
+        await flushConversationSwitchPaint();
+        if (!isCurrentLoad()) return;
         clearActiveSession();
-        await nextTick();
         finishHistoryHydration();
         return;
       }
@@ -252,6 +293,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // 케이스 4: 현재 메모리에 인덱싱된 대화 목록 서랍에서 타깃 방 객체를 검증 스캔합니다.
       const history = findHistory(activeHistoryId.value);
       if (!history) {
+        clearPendingSelectedOnFailure(activeHistoryId.value);
         finishHistoryHydration();
         // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
         await router.replace({name: "main"}).catch(() => {});
@@ -263,17 +305,27 @@ export function useChatDataController({props, ui, runtime, messages}) {
       // typing("...") 표시 로직이 즉시 append되므로 빈 방 복원 처리만 조용히 마칩니다.
       if (chatStore.consumePendingNewSubmitChat(history.id)) {
         finishHistoryHydration();
+        clearPendingSelectedIfMatched(history.id);
         messages.value = runtime.conversations.value?.[history.id] || [];
         await nextTick();
         return;
       }
 
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
+      chatStore.setPendingSelectedChatId(history.id);
       beginHistoryHydration();
-      messages.value = await ensureConversation(history.id);
+      await flushConversationSwitchPaint();
+      if (!isCurrentLoad()) return;
+      const loadedMessages = await ensureConversation(history.id);
+      if (!isCurrentLoad()) return;
+      messages.value = loadedMessages;
+      clearPendingSelectedIfMatched(history.id);
       await nextTick();
     } catch (error) {
-      finishHistoryHydration();
+      if (isCurrentLoad()) {
+        clearPendingSelectedOnFailure(activeHistoryId.value);
+        finishHistoryHydration();
+      }
       logWarn("[useChatDataController] loadRouteConversation 오류:", error);
     }
   }
@@ -369,6 +421,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       },
       (nextMessages) => {
         if (!Array.isArray(nextMessages)) return;
+        if (isHistoryHydrating.value) return;
         if (messages.value === nextMessages) return; // 메모리 참조 포인터가 완벽하게 일치한다면 중복 할당 연산을 무시 차단합니다.
         messages.value = nextMessages;
       },

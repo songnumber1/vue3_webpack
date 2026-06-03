@@ -46,7 +46,7 @@
       <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
       <SidebarHistoryList
         :histories="histories"
-        :selected-chat-id="selectedChatId"
+        :selected-chat-id="effectiveSelectedChatId"
         use-overlay-scrollbar
         @select="handleSelectHistory"
         @open-menu="openHistoryMenu"
@@ -57,7 +57,7 @@
       v-else
       :open="collapsedRecentOpen"
       :histories="histories"
-      :selected-chat-id="selectedChatId"
+      :selected-chat-id="effectiveSelectedChatId"
       @expand="navigationStore.setSidebarCollapsed(false)"
       @new-chat="handleNewChat"
       @set-recent-open="navigationStore.setCollapsedRecentOpen"
@@ -120,7 +120,7 @@
         <div class="section-label tw-px-2 tw-text-xs tw-font-semibold tw-text-app-sidebarSection">{{ t("chat.conversations") }}</div>
         <SidebarHistoryList
           :histories="histories"
-          :selected-chat-id="selectedChatId"
+          :selected-chat-id="effectiveSelectedChatId"
           use-overlay-scrollbar
           @select="handleSelectHistory"
           @open-menu="openHistoryMenu"
@@ -179,7 +179,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {inject, nextTick, ref, watch} from "vue";
+import {computed, inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
@@ -212,7 +212,7 @@ const navigationStore = useNavigationStore();
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
-const {histories, selectedChatId} = storeToRefs(chatStore);
+const {histories, pendingSelectedChatId, selectedChatId} = storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} =
   storeToRefs(navigationStore);
 const assistantMenuOpen = ref(false);
@@ -222,6 +222,9 @@ const historyMenuRef = ref(null);
 const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
 const historyMenuReferenceEl = ref(null);
+const effectiveSelectedChatId = computed(
+  () => pendingSelectedChatId.value || selectedChatId.value
+);
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
@@ -311,6 +314,7 @@ function selectHistoryMenuAction(action) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleSelectHistory(item) {
+  if (item?.id) chatStore.setPendingSelectedChatId(item.id);
   chatActions.selectHistory(item);
   navigationStore.setDrawerOpen(false);
 }
@@ -319,6 +323,7 @@ function handleSelectHistory(item) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleSelectHistoryCollapsed(item) {
+  if (item?.id) chatStore.setPendingSelectedChatId(item.id);
   chatActions.selectHistory(item);
   navigationStore.setCollapsedRecentOpen(false);
 }

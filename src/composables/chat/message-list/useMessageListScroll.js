@@ -123,6 +123,9 @@ export function useMessageListScroll({props, emit}) {
   let resizeRecalculateTimerId = 0;
   let resizeRecalculateRafId = 0;
   let hydrationMermaidRafId = 0;
+  let renderedFrameRafId = 0;
+  let renderedFrameNeedsSpacer = false;
+  let renderedFrameNeedsBottomState = false;
   let latestUserMessageCache = null;
   let latestUserMessageCacheKey = "";
 
@@ -150,6 +153,43 @@ export function useMessageListScroll({props, emit}) {
   function updateOverlayScrollbarFrame() {
     if (!overlayScrollSource) return;
     updateOverlayScrollbar(overlayScrollSource);
+  }
+
+  function clearRenderedFrameScheduler() {
+    if (!renderedFrameRafId || typeof window === "undefined") return;
+    window.cancelAnimationFrame(renderedFrameRafId);
+    renderedFrameRafId = 0;
+    renderedFrameNeedsSpacer = false;
+    renderedFrameNeedsBottomState = false;
+  }
+
+  function scheduleRenderedFrameUpdate(options = {}) {
+    emit("content-rendered");
+
+    const needsSpacer = options.spacer !== false;
+    renderedFrameNeedsSpacer = renderedFrameNeedsSpacer || needsSpacer;
+    renderedFrameNeedsBottomState =
+      renderedFrameNeedsBottomState || options.bottomState === true;
+
+    if (typeof window === "undefined") {
+      updateOverlayScrollbarFrame();
+      if (renderedFrameNeedsSpacer) recalculateFocusSpacerHeight();
+      if (renderedFrameNeedsBottomState) updateBottomState();
+      renderedFrameNeedsSpacer = false;
+      renderedFrameNeedsBottomState = false;
+      return;
+    }
+
+    if (renderedFrameRafId) return;
+
+    renderedFrameRafId = window.requestAnimationFrame(() => {
+      renderedFrameRafId = 0;
+      updateOverlayScrollbarFrame();
+      if (renderedFrameNeedsSpacer) recalculateFocusSpacerHeight();
+      if (renderedFrameNeedsBottomState) updateBottomState();
+      renderedFrameNeedsSpacer = false;
+      renderedFrameNeedsBottomState = false;
+    });
   }
 
   function cleanupOverlayScrollbar() {
@@ -587,20 +627,7 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-  async function handleMessageRendered(messageId, renderPart = "") {
-    emit("content-rendered");
-
-    await nextTick();
-    updateOverlayScrollbarFrame();
-
-    // 자동 스크롤 OFF + 답변 생성 중에는 질문 직후 계산한 하단 spacer를 유지합니다.
-    // chunk/render 이벤트마다 spacer를 다시 계산하면 답변 높이가 커지는 동안 spacer가 줄어들고,
-    // 브라우저 scroll anchoring과 맞물려 질문 위치가 위아래로 흔들릴 수 있습니다.
-    // loading 종료 watch에서 spacer는 0으로 정리됩니다.
-    if (!(props.loading && !props.autoScrollOnAnswer)) {
-      recalculateFocusSpacerHeight();
-    }
-
+  function handleMessageRendered(messageId, renderPart = "") {
     if (pendingHydrationAssistantIds) {
       const id = String(messageId ?? "");
       const isLayoutReady =
@@ -612,6 +639,9 @@ export function useMessageListScroll({props, emit}) {
       }
       return;
     }
+
+    const shouldRecalculateSpacer = !(props.loading && !props.autoScrollOnAnswer);
+    scheduleRenderedFrameUpdate({spacer: shouldRecalculateSpacer});
 
     if (hydrationBottomCorrectionUntil && Date.now() <= hydrationBottomCorrectionUntil) {
       window.requestAnimationFrame(() => {
@@ -685,10 +715,21 @@ export function useMessageListScroll({props, emit}) {
   }
 
   watch(
-    () => [props.loading, props.autoScrollOnAnswer, props.messages.length],
-    ([loading, autoScrollOnAnswer]) => {
+    () => [
+      props.loading,
+      props.autoScrollOnAnswer,
+      props.messages.length,
+      props.initialHydrating,
+    ],
+    ([loading, autoScrollOnAnswer, , initialHydrating]) => {
       latestUserMessageCache = null;
       latestUserMessageCacheKey = "";
+
+      if (initialHydrating) {
+        scheduleRenderedFrameUpdate({spacer: false});
+        return;
+      }
+
       updateOverlayScrollbarFrame();
 
       // 자동 스크롤 OFF로 답변을 생성하는 동안에는 질문 직후 scrollToLatestUserMessage()가
@@ -737,6 +778,7 @@ export function useMessageListScroll({props, emit}) {
     clearAfterRenderScrollState();
     clearHydrationState();
     clearHydrationMermaidScheduler();
+    clearRenderedFrameScheduler();
     clearResizeRecalculateScheduler();
     cleanupOverlayScrollbar();
     if (typeof window === "undefined") return;

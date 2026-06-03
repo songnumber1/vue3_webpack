@@ -45,6 +45,7 @@ export const useChatStore = defineStore("chat", {
   state: () => ({
     histories: [], // 좌측 히스토리 보드에 빌드 렌더링될 과거 대화방 마스터 리스트 배열
     selectedChatId: null, // 현재 화면 중앙 영역을 장악 중인 메인 룸 고유 Chat ID 식별자
+    pendingSelectedChatId: null, // 대화방 전환 클릭 직후 실제 session 세팅 전까지 좌측 메뉴 선택 색상을 먼저 반영하기 위한 임시 Chat ID
     activeSession: null, // 백엔드 세션 소켓 커넥션 정보 및 읽기 전용 가드 상태 믹스드 객체
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
     promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
@@ -128,6 +129,7 @@ export const useChatStore = defineStore("chat", {
     setActiveSession(session = null) {
       this.activeSession = session;
       this.selectedChatId = session?.chatId || null; // 활성 룸 포인터 인덱스 강제 변환 수립
+      this.clearPendingSelectedChatId(); // 실제 활성 방 포인터가 확정되었으므로 클릭 선반영 상태를 해제
       this.resetActivePromptToolSettings(); // 방이 체인지되었으므로 툴바 세팅 캐시 구조체도 타깃에 맞게 세로정렬 리셋 트리거
     },
     /**
@@ -136,8 +138,24 @@ export const useChatStore = defineStore("chat", {
     clearActiveSession() {
       this.activeSession = null;
       this.selectedChatId = null;
+      this.clearPendingSelectedChatId();
       this.resetActivePromptToolSettings();
     },
+
+    /**
+     * 대화방 클릭 직후 route/data hydration이 완료되기 전까지 좌측 메뉴 선택 색상만 먼저 반영합니다.
+     */
+    setPendingSelectedChatId(chatId) {
+      const id = String(chatId || "").trim();
+      this.pendingSelectedChatId = id || null;
+    },
+    /**
+     * 실제 selectedChatId가 확정되었거나 전환이 취소/실패된 경우 클릭 선반영 상태를 정리합니다.
+     */
+    clearPendingSelectedChatId() {
+      this.pendingSelectedChatId = null;
+    },
+
     /**
      * 특정 대화방 소유의 말풍선 메시지 리스트 데이터 타깃 풀을 업데이트 맵핑 주입합니다.
      */
