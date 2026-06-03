@@ -80,6 +80,7 @@ const {
   scrollToBottom,
   scrollToBottomAfterRender,
   scrollToLatestUserMessage,
+  finalizeHistoryRevealScroll,
   getIsAtBottom,
   getScrollElement,
 } = useMessageListScroll({props, emit});
@@ -88,6 +89,7 @@ defineExpose({
   scrollToBottom,
   scrollToBottomAfterRender,
   scrollToLatestUserMessage,
+  finalizeHistoryRevealScroll,
   isAtBottom: getIsAtBottom,
   getScrollElement,
 });

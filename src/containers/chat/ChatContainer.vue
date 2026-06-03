@@ -400,7 +400,7 @@ provide(WORKSPACE_ACTIONS_KEY, {
   handlePromptResize: refreshPromptViewport,
   handleMessageContentRendered,
   scrollBottom: handleWorkspaceScrollBottom,
-  handleHistoryHydrated: finishHistoryHydration,
+  handleHistoryHydrated: (options) => finishHistoryHydration(options),
 });
 </script>
 

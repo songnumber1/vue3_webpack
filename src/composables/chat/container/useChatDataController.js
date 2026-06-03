@@ -134,8 +134,10 @@ export function useChatDataController({props, ui, runtime, messages}) {
     }
   }
 
-  function finishHistoryHydration() {
+  function finishHistoryHydration(options = {}) {
     const finishSeq = ++historyHydrationFinishSeq;
+    const beforeReveal =
+      typeof options.beforeReveal === "function" ? options.beforeReveal : null;
 
     const revealAfterPaint = async () => {
       await nextTick();
@@ -143,6 +145,20 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
       if (finishSeq !== historyHydrationFinishSeq) return;
       isHistoryHydrating.value = false;
+
+      // isHistoryHydrating=false가 반영되면 input/composer가 다시 표시되면서
+      // message viewport 높이가 바뀔 수 있습니다. 다음 paint 전에 workspace가
+      // 최종 scrollToBottom을 수행할 수 있도록 callback을 먼저 실행합니다.
+      // 실패해도 progress가 무한 유지되지 않도록 finally 흐름은 계속 진행합니다.
+      if (beforeReveal) {
+        await nextTick();
+        if (finishSeq !== historyHydrationFinishSeq) return;
+        try {
+          await beforeReveal();
+        } catch {
+          // reveal 직전 보정 실패 시에도 이력 대화방은 표시되어야 합니다.
+        }
+      }
 
       if (!historyHydrationOverlayActive) return;
 

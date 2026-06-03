@@ -13,7 +13,7 @@
     :messages="messages"
     :loading="isGenerating"
     :auto-scroll-on-answer="autoScrollOnAnswer"
-    :initial-hydrating="isHistoryHydrating"
+    :initial-hydrating="isMessageListHydrating"
     @content-rendered="handleMessageContentRendered"
     @history-hydrated="handleHistoryHydrated"
     @regenerate="workspaceActions.regenerate($event)"
@@ -23,7 +23,7 @@
       showScrollBottom &&
       !isInteractionBlocked &&
       !isPromptExpandedInChat &&
-      !isHistoryHydrating
+      !isMessageListHydrating
     "
     class="scroll-bottom-button"
     type="button"
@@ -35,8 +35,9 @@
   <div
     v-show="!isHistoryHydrating"
     ref="composerSlotRef"
+    :class="{'chat-composer-slot--history-finalizing': isHistoryRevealFinalizing}"
     class="chat-composer-slot"
-    :aria-hidden="isHistoryHydrating ? 'true' : null"
+    :aria-hidden="isHistoryHydrating || isHistoryRevealFinalizing ? 'true' : null"
   >
     <ChatReadonlyInput v-if="readonly" />
     <ChatReadonlyInput
@@ -119,6 +120,7 @@ const previewHtml = ref("<p></p>");
 const isDesktopRuntime = ref(false);
 const codeInterpreterOpen = ref(false);
 const isPromptExpandedInChat = ref(false);
+const isHistoryRevealFinalizing = ref(false);
 const selectedInterpreterCode = ref("");
 const selectedInterpreterLanguage = ref("text");
 let composerResizeObserver = null;
@@ -161,6 +163,9 @@ const autoScrollOnAnswer = computed(
 );
 const isHistoryHydrating = computed(
   () => workspaceState.value.isHistoryHydrating
+);
+const isMessageListHydrating = computed(
+  () => isHistoryHydrating.value || isHistoryRevealFinalizing.value
 );
 const canUseDesktopCodeInterpreter = computed(
   () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"
@@ -449,8 +454,24 @@ function handleMessageContentRendered() {
 }
 
 function handleHistoryHydrated() {
-  workspaceActions.handleHistoryHydrated();
-  scheduleComposerHeightUpdate();
+  // Android Chrome/WebView에서는 isHistoryHydrating=false로 composer가 다시
+  // 레이아웃에 참여한 직후 viewport 높이가 한 번 더 안정됩니다.
+  // 그 사이 MessageList는 계속 hidden 상태로 유지하고, 최종 하단 스크롤이
+  // 끝난 뒤에만 reveal하여 사용자가 중간 스크롤 이동을 보지 않게 합니다.
+  isHistoryRevealFinalizing.value = true;
+  workspaceActions.handleHistoryHydrated({
+    beforeReveal: async () => {
+      try {
+        await nextTick();
+        updateComposerHeight();
+        await listRef.value?.finalizeHistoryRevealScroll?.();
+        scheduleComposerHeightUpdate();
+      } finally {
+        isHistoryRevealFinalizing.value = false;
+        await nextTick();
+      }
+    },
+  });
 }
 
 function observeComposerHeight() {
@@ -504,6 +525,12 @@ onBeforeUnmount(() => {
   }
 });
 
+watch(isHistoryHydrating, (loading) => {
+  if (loading) {
+    isHistoryRevealFinalizing.value = false;
+  }
+});
+
 watch(
   () => [
     readonly.value,
@@ -512,6 +539,7 @@ watch(
     isActiveModelUnavailable.value,
     isGenerating.value,
     isHistoryHydrating.value,
+    isHistoryRevealFinalizing.value,
     messages.value.length,
     showCodeInterpreterPanel.value,
     isDesktopRuntime.value,
@@ -602,5 +630,10 @@ defineExpose({
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.send-button),
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.voice-button) {
   flex: 0 0 auto;
+}
+
+.chat-composer-slot--history-finalizing {
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 </style>

@@ -10,12 +10,6 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 
 const BOTTOM_THRESHOLD = 48;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
-const HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 120];
-const ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS = [0, 32, 80, 160, 240];
-const POST_REVEAL_SCROLL_DELAYS = [80, 180, 320];
-const ANDROID_POST_REVEAL_SCROLL_DELAYS = [80, 180, 320, 520];
-const HYDRATION_REVEAL_FALLBACK_MS = 180;
-const ANDROID_HYDRATION_REVEAL_FALLBACK_MS = 320;
 const HYDRATION_READY_CHECK_INTERVAL_MS = 120;
 const HYDRATION_MIN_READY_PAINT_FRAMES = 2;
 const HYDRATION_LARGE_ROOM_HARD_TIMEOUT_MS = 12000;
@@ -124,12 +118,10 @@ export function useMessageListScroll({props, emit}) {
   let hydrationReadyPaintFrames = 0;
   let hydrationRafId = 0;
   let hydrationResizeObserver = null;
-  let hydrationRevealTimerIds = [];
-  let hydrationBottomCorrectionUntil = 0;
   let pendingHydrationAssistantIds = null;
+  let hydrationCompletingRunId = 0;
   let resizeRecalculateTimerId = 0;
   let resizeRecalculateRafId = 0;
-  let hydrationMermaidRafId = 0;
   let trackedRafIds = [];
   let renderedFrameRafId = 0;
   let renderedFrameNeedsSpacer = false;
@@ -326,8 +318,6 @@ export function useMessageListScroll({props, emit}) {
 
   function clearHydrationState() {
     hydrationRunId += 1;
-    hydrationRevealTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-    hydrationRevealTimerIds = [];
     if (hydrationTimerId) {
       window.clearTimeout(hydrationTimerId);
       hydrationTimerId = 0;
@@ -343,16 +333,10 @@ export function useMessageListScroll({props, emit}) {
       hydrationRafId = 0;
     }
     clearTrackedAnimationFrames();
-    // 주의: hydration 완료 직후 부모가 initialHydrating=false로 바꾸면
-    // clearHydrationState()가 호출됩니다. 여기서 mermaid RAF까지 취소하면
-    // 이력 메시지의 `.md-mermaid[data-mermaid-pending]` 후처리가 실행되지 않아
-    // 채팅방 입장 시 Mermaid가 원문 코드로 남는 회귀가 발생합니다.
-    // 방 전환/언마운트 시에도 예약 작업은 현재 scrollRef를 기준으로 pending 노드만
-    // 처리하므로 별도 취소하지 않고, 함수 내부의 root/null 체크에 맡깁니다.
+    hydrationCompletingRunId = 0;
     hydrationResizeObserver?.disconnect();
     hydrationResizeObserver = null;
     pendingHydrationAssistantIds = null;
-    hydrationBottomCorrectionUntil = 0;
   }
 
   function getAssistantMessageIds() {
@@ -364,7 +348,6 @@ export function useMessageListScroll({props, emit}) {
   function handleUserScrollIntent() {
     clearStableTimers();
     clearAfterRenderScrollState();
-    hydrationBottomCorrectionUntil = 0;
     if (!props.initialHydrating) {
       clearHydrationState();
     }
@@ -487,87 +470,76 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
-  function clearHydrationMermaidScheduler() {
-    if (!hydrationMermaidRafId || typeof window === "undefined") return;
-    window.cancelAnimationFrame(hydrationMermaidRafId);
-    hydrationMermaidRafId = 0;
+  function waitAnimationFrame() {
+    if (typeof window === "undefined") return Promise.resolve();
+    return new Promise((resolve) => window.requestAnimationFrame(resolve));
   }
 
-  function scheduleHydrationMermaidEnhancement() {
-    if (typeof window === "undefined") return;
-
-    clearHydrationMermaidScheduler();
-
-    hydrationMermaidRafId = window.requestAnimationFrame(() => {
-      hydrationMermaidRafId = 0;
-      const root = scrollRef.value;
-      if (!root) return;
-
-      renderMermaidInElement(root)
-        .then(() => {
-          updateOverlayScrollbarFrame();
-          if (hydrationBottomCorrectionUntil && Date.now() <= hydrationBottomCorrectionUntil) {
-            applyBottomScroll("auto");
-          }
-          emit("content-rendered");
-        })
-        .catch(() => {});
-    });
+  async function waitAnimationFrames(count = 1) {
+    for (let index = 0; index < count; index += 1) {
+      await waitAnimationFrame();
+    }
   }
 
-  function schedulePostRevealBottomCorrection() {
-    if (!shouldAutoHydrationBottomScroll()) return;
+  async function renderHydrationMermaidBeforeReveal(runId) {
+    await nextTick();
+    if (runId !== hydrationRunId || !props.initialHydrating) return false;
 
-    const delays = isAndroidHydrationRuntime()
-      ? ANDROID_POST_REVEAL_SCROLL_DELAYS
-      : POST_REVEAL_SCROLL_DELAYS;
+    await waitAnimationFrames(1);
+    if (runId !== hydrationRunId || !props.initialHydrating) return false;
 
-    delays.forEach((delay) => {
-      const timerId = window.setTimeout(() => {
-        scheduleTrackedAnimationFrame(() => {
-          updateOverlayScrollbarFrame();
-          applyBottomScroll("auto");
-        });
-      }, delay);
-      stableScrollTimerIds.push(timerId);
-    });
+    const root = scrollRef.value;
+    if (!root) return true;
+
+    try {
+      await renderMermaidInElement(root);
+    } catch {
+      // Mermaid 문법 오류나 렌더 실패가 있더라도 이력 대화방 hydration은
+      // 코드블록 fallback 상태로 계속 완료되어야 합니다.
+    }
+
+    if (runId !== hydrationRunId || !props.initialHydrating) return false;
+    updateOverlayScrollbarFrame();
+    emit("content-rendered");
+    return true;
   }
 
-  function runHydrationRevealScrollSequence(runId) {
-    hydrationBottomCorrectionUntil = Date.now() + (isAndroidHydrationRuntime() ? 2600 : 1800);
-    const delays = isAndroidHydrationRuntime()
-      ? ANDROID_HYDRATION_REVEAL_SCROLL_DELAYS
-      : HYDRATION_REVEAL_SCROLL_DELAYS;
-    let completedCount = 0;
+  async function runHydrationRevealScrollSequence(runId) {
+    if (runId !== hydrationRunId) return;
 
-    hydrationRevealTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-    hydrationRevealTimerIds = [];
+    await nextTick();
+    if (runId !== hydrationRunId || !props.initialHydrating) return;
 
-    delays.forEach((delay) => {
-      const timerId = window.setTimeout(() => {
-        if (runId !== hydrationRunId) return;
-        scheduleTrackedAnimationFrame(() => {
-          if (runId !== hydrationRunId) return;
-          applyHydrationBottomScroll();
-          completedCount += 1;
+    updateOverlayScrollbarFrame();
+    applyHydrationBottomScroll();
 
-          if (completedCount < delays.length) return;
-          hydrationRevealTimerIds = [];
-          pendingHydrationAssistantIds = null;
-          emit("history-hydrated");
-          schedulePostRevealBottomCorrection();
-          scheduleHydrationMermaidEnhancement();
-        });
-      }, delay);
-      hydrationRevealTimerIds.push(timerId);
-    });
+    const mermaidReady = await renderHydrationMermaidBeforeReveal(runId);
+    if (!mermaidReady || runId !== hydrationRunId || !props.initialHydrating) return;
+
+    updateOverlayScrollbarFrame();
+    applyHydrationBottomScroll();
+
+    await waitAnimationFrames(HYDRATION_MIN_READY_PAINT_FRAMES);
+    if (runId !== hydrationRunId || !props.initialHydrating) return;
+
+    updateOverlayScrollbarFrame();
+    applyHydrationBottomScroll();
+    pendingHydrationAssistantIds = null;
+    emit("history-hydrated");
   }
 
   function completeInitialHydration(runId) {
     if (runId !== hydrationRunId) return;
+    if (hydrationCompletingRunId === runId) return;
+    hydrationCompletingRunId = runId;
+
     if (hydrationTimerId) {
       window.clearTimeout(hydrationTimerId);
       hydrationTimerId = 0;
+    }
+    if (hydrationReadyCheckTimerId) {
+      window.clearTimeout(hydrationReadyCheckTimerId);
+      hydrationReadyCheckTimerId = 0;
     }
 
     scheduleTrackedAnimationFrame(() => {
@@ -580,8 +552,11 @@ export function useMessageListScroll({props, emit}) {
         return;
       }
 
-      applyHydrationBottomScroll();
-      runHydrationRevealScrollSequence(runId);
+      runHydrationRevealScrollSequence(runId).catch(() => {
+        if (runId !== hydrationRunId || !props.initialHydrating) return;
+        pendingHydrationAssistantIds = null;
+        emit("history-hydrated");
+      });
     });
   }
 
@@ -661,25 +636,6 @@ export function useMessageListScroll({props, emit}) {
     check();
   }
 
-  function scheduleInitialHydrationFallback(runId) {
-    if (hydrationTimerId) window.clearTimeout(hydrationTimerId);
-    const pendingCount = pendingHydrationAssistantIds?.size || 0;
-    const androidRuntime = isAndroidHydrationRuntime();
-    const baseDelay = androidRuntime
-      ? ANDROID_HYDRATION_REVEAL_FALLBACK_MS
-      : HYDRATION_REVEAL_FALLBACK_MS;
-    const adaptiveDelay = Math.min(
-      androidRuntime ? 2200 : 1600,
-      pendingCount * (androidRuntime ? 8 : 6)
-    );
-    const fallbackDelay = baseDelay + adaptiveDelay;
-
-    hydrationTimerId = window.setTimeout(() => {
-      hydrationTimerId = 0;
-      scheduleHydrationReadyCheck(runId);
-    }, fallbackDelay);
-  }
-
   async function startInitialHydration() {
     if (!props.initialHydrating || typeof window === "undefined") return;
 
@@ -695,7 +651,7 @@ export function useMessageListScroll({props, emit}) {
       return;
     }
 
-    scheduleInitialHydrationFallback(runId);
+    scheduleHydrationReadyCheck(runId);
   }
 
   function scheduleAfterRenderScrollFallback() {
@@ -720,6 +676,28 @@ export function useMessageListScroll({props, emit}) {
     }
 
     scheduleAfterRenderScrollFallback();
+  }
+
+  async function finalizeHistoryRevealScroll() {
+    // history-hydrated 이벤트 이후 부모가 input/composer를 다시 레이아웃에
+    // 참여시키더라도 MessageList는 isHistoryRevealFinalizing으로 계속 hidden
+    // 상태를 유지합니다. Android Chrome/WebView는 composer 표시, VisualViewport,
+    // OverlayScrollbar viewport 반영이 서로 다른 frame에 안정될 수 있으므로
+    // 화면 reveal 전에 여러 frame 동안 최종 하단 위치를 동기화합니다.
+    // reveal 이후 delayed scroll correction은 다시 살리지 않습니다.
+    const framePasses = isAndroidHydrationRuntime() ? 4 : 2;
+
+    await nextTick();
+
+    for (let index = 0; index < framePasses; index += 1) {
+      updateOverlayScrollbarFrame();
+      applyBottomScroll("auto");
+      await waitAnimationFrames(1);
+    }
+
+    updateOverlayScrollbarFrame();
+    applyBottomScroll("auto");
+    updateBottomState();
   }
 
   function scrollToBottom(options = {}) {
@@ -758,13 +736,6 @@ export function useMessageListScroll({props, emit}) {
     const shouldRecalculateSpacer = !(props.loading && !props.autoScrollOnAnswer);
     scheduleRenderedFrameUpdate({spacer: shouldRecalculateSpacer});
 
-    if (hydrationBottomCorrectionUntil && Date.now() <= hydrationBottomCorrectionUntil) {
-      scheduleTrackedAnimationFrame(() => {
-        updateOverlayScrollbarFrame();
-        applyBottomScroll("auto");
-      });
-      return;
-    }
 
     if (
       renderPart === "enhanced" &&
@@ -892,7 +863,6 @@ export function useMessageListScroll({props, emit}) {
     clearStableTimers();
     clearAfterRenderScrollState();
     clearHydrationState();
-    clearHydrationMermaidScheduler();
     clearRenderedFrameScheduler();
     clearTrackedAnimationFrames();
     clearResizeRecalculateScheduler();
@@ -917,6 +887,7 @@ export function useMessageListScroll({props, emit}) {
     scrollToBottom,
     scrollToBottomAfterRender,
     scrollToLatestUserMessage,
+    finalizeHistoryRevealScroll,
     getIsAtBottom,
     getScrollElement,
   };
