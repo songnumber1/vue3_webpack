@@ -77,10 +77,18 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isAndroidWebView = isAndroid && browserName === "android-webview";
   const isMobile = isAndroid;
   const isMobileBrowser = isMobile && !isNativeApp && browserName === "chrome";
+  const isActuallySamsungBrowser =
+    actualPlatform.browser === "samsung-browser" ||
+    /SamsungBrowser\//i.test(ua);
   const isSupportedRuntime =
-    forcedPlatform.isForced || isSupportedBrowserName(browserName);
+    !isActuallySamsungBrowser &&
+    (forcedPlatform.isForced || isSupportedBrowserName(browserName));
   const isUnsupportedBrowser = !isSupportedRuntime;
-  const unsupportedReason = isUnsupportedBrowser ? "unsupported-browser" : "";
+  const unsupportedReason = isActuallySamsungBrowser
+    ? "unsupported-samsung-browser"
+    : isUnsupportedBrowser
+      ? "unsupported-browser"
+      : "";
   const isAccess = !isUnsupportedBrowser;
   const viewportInfo = resolveViewportInfo(baseAppInfo);
   const isMic = isSupportedMobileMicBrowser({
@@ -149,6 +157,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     platformOverride,
     isChrome: browserName === "chrome",
     isSupportedRuntime,
+    isSamsungBrowser: isActuallySamsungBrowser,
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",
     appBuildVersion: baseAppInfo.appBuildVersion || "",

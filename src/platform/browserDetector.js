@@ -19,6 +19,10 @@ function isAndroidWebViewUserAgent(ua) {
   );
 }
 
+function isSamsungBrowserUserAgent(ua) {
+  return /SamsungBrowser\//i.test(ua);
+}
+
 function isChromeUserAgent(ua) {
   return /Chrome\//i.test(ua) || /Chromium\//i.test(ua);
 }
@@ -26,11 +30,15 @@ function isChromeUserAgent(ua) {
 export function getBrowserName(ua, hasBridge = false) {
   if (hasBridge) return "android-webview";
   if (isAndroidWebViewUserAgent(ua)) return "android-webview";
+  if (isSamsungBrowserUserAgent(ua)) return "samsung-browser";
   if (isChromeUserAgent(ua)) return "chrome";
   return "unsupported";
 }
 
 export function getBrowserVersion(ua, browserName) {
+  if (browserName === "samsung-browser") {
+    return parseVersion(ua, /SamsungBrowser\/([\d.]+)/i);
+  }
   if (browserName === "chrome") {
     return parseVersion(ua, /(?:Chrome|Chromium)\/([\d.]+)/i);
   }

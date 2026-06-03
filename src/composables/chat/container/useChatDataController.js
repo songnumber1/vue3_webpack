@@ -59,8 +59,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
   let historyRenderOverlayActive = false;
-  let historyRenderOverlayStartedAt = 0;
-  let historyRenderOverlayStopRafId = 0;
   let routeConversationLoadSeq = 0;
   let historyRenderFinishSeq = 0;
 
@@ -247,18 +245,8 @@ ${message?.reasoningContent || ""}`;
     }
   }
 
-  function clearHistoryRenderOverlayStopFrame() {
-    if (!historyRenderOverlayStopRafId || typeof window === "undefined") {
-      historyRenderOverlayStopRafId = 0;
-      return;
-    }
-    window.cancelAnimationFrame(historyRenderOverlayStopRafId);
-    historyRenderOverlayStopRafId = 0;
-  }
-
   function beginHistoryRender() {
     historyRenderFinishSeq += 1;
-    clearHistoryRenderOverlayStopFrame();
     historyMessagesLoaded.value = false;
     isHistoryRendering.value = true;
     if (
@@ -267,8 +255,6 @@ ${message?.reasoningContent || ""}`;
     ) {
       apiRequestStore.startOverlay();
       historyRenderOverlayActive = true;
-      historyRenderOverlayStartedAt =
-        typeof performance !== "undefined" ? performance.now() : Date.now();
     }
   }
 
@@ -299,12 +285,10 @@ ${message?.reasoningContent || ""}`;
       } finally {
         if (finishSeq === historyRenderFinishSeq) {
           historyMessagesLoaded.value = false;
-          clearHistoryRenderOverlayStopFrame();
           if (historyRenderOverlayActive) {
             apiRequestStore.stopOverlay();
           }
           historyRenderOverlayActive = false;
-          historyRenderOverlayStartedAt = 0;
         }
       }
     };
@@ -640,7 +624,6 @@ ${message?.reasoningContent || ""}`;
 
     onBeforeUnmount(() => {
       historyRenderFinishSeq += 1;
-      clearHistoryRenderOverlayStopFrame();
       if (historyRenderOverlayActive) {
         apiRequestStore.stopOverlay();
         historyRenderOverlayActive = false;
