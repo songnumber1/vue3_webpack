@@ -95,14 +95,32 @@ export function createActualPlatformInfo({
   };
 }
 
+function readBridgeMember(bridge, name) {
+  try {
+    const member = bridge?.[name];
+    return typeof member === "function" ? member.call(bridge) : member;
+  } catch (_error) {
+    return "";
+  }
+}
+
 export function getAppVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
-  return bridge?.appVersion || bridge?.version || "";
+  return (
+    readBridgeMember(bridge, "appVersion") ||
+    readBridgeMember(bridge, "version") ||
+    readBridgeMember(bridge, "getAppVersionName") ||
+    ""
+  );
 }
 
 export function getBridgeVersionFromBridge() {
   const bridge = typeof window === "undefined" ? null : window.AndroidBridge;
-  return bridge?.bridgeVersion || "";
+  return (
+    readBridgeMember(bridge, "bridgeVersion") ||
+    readBridgeMember(bridge, "getBridgeVersion") ||
+    ""
+  );
 }
 
 export function isSupportedMobileMicBrowser({
