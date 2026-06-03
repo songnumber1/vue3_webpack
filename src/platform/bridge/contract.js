@@ -10,36 +10,7 @@
 import {GetUserRequest, GetUserResponse} from "./schemas/getUser";
 import {LoginRequest, LoginResponse} from "./schemas/login";
 import {UploadFileRequest, UploadFileResponse} from "./schemas/uploadFile";
-import {
-  CancelRequestRequest,
-  CancelRequestResponse,
-  CheckNetworkResponse,
-  CloseAppResponse,
-  CopyClipboardRequest,
-  CopyClipboardResponse,
-  EmptyNativeRequest,
-  GetAppVersionResponse,
-  GetDeviceInfoResponse,
-  GetPushTokenResponse,
-  OpenExternalBrowserRequest,
-  OpenExternalBrowserResponse,
-  OpenFilePickerRequest,
-  OpenFilePickerResponse,
-  SetBackHandlerRequest,
-  SetBackHandlerResponse,
-  ShareRequest,
-  ShareResponse,
-  ShowToastRequest,
-  ShowToastResponse,
-  StorageGetRequest,
-  StorageGetResponse,
-  StorageSetRequest,
-  StorageSetResponse,
-  StorageRemoveRequest,
-  StorageRemoveResponse,
-  WriteLogRequest,
-  WriteLogResponse,
-} from "./schemas/native";
+import {JS_TO_ANDROID_API_REGISTRY} from "./bridgeApi.registry";
 import {
   NativeEventAckResponse,
   OnAppPauseRequest,
@@ -104,97 +75,12 @@ const jsToAndroid = (
   category: BRIDGE_CATEGORY.JS_TO_ANDROID,
   required,
 });
-export const JsToAndroidContract = {
-  OPEN_EXTERNAL_BROWSER: jsToAndroid(
-    OpenExternalBrowserRequest,
-    OpenExternalBrowserResponse,
-    "외부 링크를 Android Chrome 등 외부 브라우저로 엽니다."
-  ),
-  OPEN_FILE_PICKER: jsToAndroid(
-    OpenFilePickerRequest,
-    OpenFilePickerResponse,
-    "파일/카메라/갤러리 통합 선택기를 엽니다."
-  ),
-  GET_PUSH_TOKEN: jsToAndroid(
-    EmptyNativeRequest,
-    GetPushTokenResponse,
-    "FCM 푸시 토큰을 조회합니다."
-  ),
-  GET_APP_VERSION: jsToAndroid(
-    EmptyNativeRequest,
-    GetAppVersionResponse,
-    "앱/브릿지 버전을 조회합니다."
-  ),
-  COPY_CLIPBOARD: jsToAndroid(
-    CopyClipboardRequest,
-    CopyClipboardResponse,
-    "클립보드에 텍스트를 복사합니다."
-  ),
-  SHARE: jsToAndroid(
-    ShareRequest,
-    ShareResponse,
-    "Android 시스템 공유창을 실행합니다."
-  ),
-  CHECK_NETWORK: jsToAndroid(
-    EmptyNativeRequest,
-    CheckNetworkResponse,
-    "네트워크 상태를 조회합니다."
-  ),
-  GET_STORAGE: jsToAndroid(
-    StorageGetRequest,
-    StorageGetResponse,
-    "Android secure storage에서 값을 조회합니다.",
-    "recommended"
-  ),
-  SET_STORAGE: jsToAndroid(
-    StorageSetRequest,
-    StorageSetResponse,
-    "Android secure storage에 값을 저장합니다.",
-    "recommended"
-  ),
-  REMOVE_STORAGE: jsToAndroid(
-    StorageRemoveRequest,
-    StorageRemoveResponse,
-    "Android secure storage에서 값을 삭제합니다.",
-    "recommended"
-  ),
-  CANCEL_REQUEST: jsToAndroid(
-    CancelRequestRequest,
-    CancelRequestResponse,
-    "업로드/SSE 요청을 취소합니다.",
-    "recommended"
-  ),
-  SET_BACK_HANDLER: jsToAndroid(
-    SetBackHandlerRequest,
-    SetBackHandlerResponse,
-    "웹에서 Android 뒤로가기 제어 여부를 설정합니다.",
-    "recommended"
-  ),
-  SHOW_TOAST: jsToAndroid(
-    ShowToastRequest,
-    ShowToastResponse,
-    "네이티브 토스트를 표시합니다.",
-    "recommended"
-  ),
-  GET_DEVICE_INFO: jsToAndroid(
-    EmptyNativeRequest,
-    GetDeviceInfoResponse,
-    "OS/디바이스 상세 정보를 조회합니다.",
-    "optional"
-  ),
-  WRITE_LOG: jsToAndroid(
-    WriteLogRequest,
-    WriteLogResponse,
-    "네이티브 로그를 저장합니다.",
-    "optional"
-  ),
-  CLOSE_APP: jsToAndroid(
-    EmptyNativeRequest,
-    CloseAppResponse,
-    "Android 앱 종료를 요청합니다.",
-    "optional"
-  ),
-};
+export const JsToAndroidContract = Object.fromEntries(
+  Object.entries(JS_TO_ANDROID_API_REGISTRY).map(([type, api]) => [
+    type,
+    jsToAndroid(api.request, api.response, api.description, api.required),
+  ])
+);
 const androidToJs = (request, description, required = "required") => ({
   request,
   response: NativeEventAckResponse,

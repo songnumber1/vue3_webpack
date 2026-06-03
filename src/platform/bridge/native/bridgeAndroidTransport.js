@@ -7,24 +7,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-const ANDROID_METHOD_MAP = {
-  OPEN_EXTERNAL_BROWSER: "openExternalBrowser",
-  OPEN_FILE_PICKER: "openFilePicker",
-  GET_PUSH_TOKEN: "getPushToken",
-  GET_APP_VERSION: "getAppVersion",
-  COPY_CLIPBOARD: "copyClipboard",
-  SHARE: "share",
-  CHECK_NETWORK: "checkNetwork",
-  GET_STORAGE: "getStorage",
-  SET_STORAGE: "setStorage",
-  REMOVE_STORAGE: "removeStorage",
-  CANCEL_REQUEST: "cancelRequest",
-  SET_BACK_HANDLER: "setBackHandler",
-  SHOW_TOAST: "showToast",
-  GET_DEVICE_INFO: "getDeviceInfo",
-  WRITE_LOG: "writeLog",
-  CLOSE_APP: "closeApp",
-};
+import {JS_TO_ANDROID_API_REGISTRY} from "../bridgeApi.registry";
+
+const ANDROID_METHOD_MAP = Object.fromEntries(
+  Object.entries(JS_TO_ANDROID_API_REGISTRY)
+    .filter(([, api]) => Boolean(api.androidMethod))
+    .map(([type, api]) => [type, api.androidMethod])
+);
 
 export function getAndroidBridgeMethodName(type) {
   return ANDROID_METHOD_MAP[type];
