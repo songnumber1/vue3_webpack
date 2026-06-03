@@ -325,8 +325,8 @@ export function usePromptComposer(props, emit) {
     if (files && files.length) addFiles(files);
   }
 
-  function togglePromptExpanded() {
-    isPromptExpanded.value = !isPromptExpanded.value;
+  function applyPromptExpandedState(expanded) {
+    isPromptExpanded.value = Boolean(expanded);
     closeMenus();
 
     nextTick(() => {
@@ -337,6 +337,15 @@ export function usePromptComposer(props, emit) {
       }
       emit("height-change", getLastHeight());
     });
+  }
+
+  function togglePromptExpanded() {
+    applyPromptExpandedState(!isPromptExpanded.value);
+  }
+
+  function collapsePromptExpanded() {
+    if (!isPromptExpanded.value) return;
+    applyPromptExpandedState(false);
   }
 
 
@@ -404,6 +413,7 @@ export function usePromptComposer(props, emit) {
     isMobileSheet,
     isPromptExpanded,
     togglePromptExpanded,
+    collapsePromptExpanded,
     // submit 최종 전송 제어 파트
     canSubmit,
     actionDisabled,

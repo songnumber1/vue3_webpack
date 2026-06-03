@@ -35,6 +35,7 @@
     />
     <PromptComposer
       v-else
+      ref="promptComposerRef"
       :class="{'mobile-chat-prompt': isMobile}"
       @expanded-change="handlePromptExpandedChange"
     />
@@ -102,6 +103,7 @@ import {useChatStore} from "@/stores/chatStore";
 const {locale, t} = useI18n();
 const listRef = ref(null);
 const composerSlotRef = ref(null);
+const promptComposerRef = ref(null);
 const previewRef = ref(null);
 const previewHtml = ref("<p></p>");
 const isDesktopRuntime = ref(false);
@@ -423,6 +425,14 @@ function handlePromptExpandedChange(expanded) {
   scheduleComposerHeightUpdate();
 }
 
+function collapsePromptExpandedForChatSwitch() {
+  promptComposerRef.value?.collapsePromptExpanded?.();
+  if (isPromptExpandedInChat.value) {
+    isPromptExpandedInChat.value = false;
+  }
+  scheduleComposerHeightUpdate();
+}
+
 function handleMessageContentRendered() {
   workspaceActions.handleMessageContentRendered();
   scheduleComposerHeightUpdate();
@@ -539,6 +549,7 @@ watch(mode, () => {
 
 watch(activeChatId, () => {
   closeCodeInterpreterPanel();
+  collapsePromptExpandedForChatSwitch();
 });
 
 defineExpose({

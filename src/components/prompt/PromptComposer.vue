@@ -210,6 +210,7 @@ const {
   isMobileSheet,
   isPromptExpanded,
   togglePromptExpanded,
+  collapsePromptExpanded,
   isMicEnabled,
   isVoiceListening,
   hasVoiceStopped,
@@ -323,6 +324,7 @@ provide(
 
 defineExpose({
   setText,
+  collapsePromptExpanded,
 });
 </script>
 
