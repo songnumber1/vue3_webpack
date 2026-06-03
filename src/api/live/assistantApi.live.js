@@ -7,7 +7,8 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
+import {adaptGenericApiList} from "@/adapters/assistantResponseAdapter";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 /**
@@ -16,7 +17,7 @@ import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 async function getAssistants() {
   const response = await httpClient.get(API_ENDPOINTS.ASSISTANT_INFO);
 
-  return unwrapResponseData(response, []);
+  return adaptGenericApiList(response, []);
 }
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
@@ -24,7 +25,7 @@ async function getAssistants() {
 async function getStudios() {
   const response = await httpClient.get(API_ENDPOINTS.STUDIO_INFO);
 
-  return unwrapResponseData(response, []);
+  return adaptGenericApiList(response, []);
 }
 
 export const assistantApiLive = {getAssistants, getStudios};

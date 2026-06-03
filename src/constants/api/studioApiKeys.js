@@ -9,6 +9,9 @@ export const STUDIO_API_KEYS = Object.freeze({
   RAG_DATA_LIST: "ragDataList",
   MCP_PLUGIN_LIST: "mcpPluginList",
   ACCESS_INFO: "accessInfo",
+  ID: "id",
+  NAME: "name",
+  LABEL: "label",
 
   STUDIO_ID: "studio_id",
   STUDIO_ID_LEGACY_TYPO: "sutdio_id",

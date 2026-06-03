@@ -63,7 +63,13 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
 import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
+import {unwrapApiBody} from "@/utils/apiResponseReader";
+import {
+  adaptStudioAuthorityList,
+  adaptStudioList,
+  adaptStudioMainInfo,
+} from "@/adapters/studioResponseAdapter";
 
 const {t, locale} = useI18n();
 
@@ -598,48 +604,22 @@ async function loadStudioData() {
 async function loadMainInfo() {
   try {
     const response = await httpClient.get("/studio/search/main/info.do");
-    const data = unwrapResponseData(response, {});
-    if (Array.isArray(data.sysInfoList) && data.sysInfoList.length) {
-      studioCategoryOptions.value = data.sysInfoList
-        .filter((item) => item.studio_cat_use_yn !== false)
-        .map((item) => ({
-          value: item.studio_cat_code,
-          label:
-            item.studio_cat_name_ko ||
-            item.studio_cat_name_en ||
-            item.studio_cat_code,
-          description: item.studio_cat_desc_ko || item.studio_cat_desc_en || "",
-        }));
-      if (!studioCategoryOptions.value.some((item) => item.value === "ALL"))
-        studioCategoryOptions.value = [
-          {
-            value: "ALL",
-            label: t("studio.defaults.all"),
-            description: t("studio.defaults.allDescription"),
-          },
-          ...studioCategoryOptions.value,
-        ];
+    const data = unwrapApiBody(response, {});
+    const mainInfo = adaptStudioMainInfo(data, {
+      allLabel: t("studio.defaults.all"),
+      allDescription: t("studio.defaults.allDescription"),
+    });
+    if (mainInfo.categories.length) {
+      studioCategoryOptions.value = mainInfo.categories;
       categoryOptions.value = studioCategoryOptions.value.filter(
         (item) => item.value !== "ALL"
       );
       if (!categoryOptions.value.some((item) => item.value === draft.category))
         draft.category = categoryOptions.value[0]?.value || "";
     }
-    if (Array.isArray(data.studioModelList) && data.studioModelList.length) {
-      modelOptions.value = data.studioModelList.map((item) => ({
-        value: item.model_id || item.model_name,
-        label: item.model_name,
-        description: item.model_desc_ko || item.model_desc_en || "",
-      }));
-    }
-    if (Array.isArray(data.ragDataList))
-      ragOptions.value = data.ragDataList
-        .map((item) => item.label || item.name || item.id)
-        .filter(Boolean);
-    if (Array.isArray(data.mcpPluginList))
-      mcpOptions.value = data.mcpPluginList
-        .map((item) => item.label || item.name || item.id)
-        .filter(Boolean);
+    if (mainInfo.modelOptions.length) modelOptions.value = mainInfo.modelOptions;
+    if (mainInfo.ragOptions.length) ragOptions.value = mainInfo.ragOptions;
+    if (mainInfo.mcpOptions.length) mcpOptions.value = mainInfo.mcpOptions;
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
@@ -647,10 +627,8 @@ async function loadMainInfo() {
 async function loadAuthorityInfo() {
   try {
     const response = await httpClient.get("/studio/main/ssg/info");
-    const data = unwrapResponseData(response, []);
-    if (Array.isArray(data) && data.length) {
-      authorityOptions.value = data.map((item) => ({...item, checked: false}));
-    }
+    const data = adaptStudioAuthorityList(response);
+    if (data.length) authorityOptions.value = data;
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
@@ -660,54 +638,22 @@ async function loadStudioList() {
     const response = await httpClient.get("/studio/search/list.do", {
       params: {pageNo: 1, pagePerCnt: 20, categoryId: "", topCnt: 4},
     });
-    const data = unwrapResponseData(response, []);
-    if (Array.isArray(data) && data.length) {
-      studios.value = data.map(normalizeStudioItem);
+    const data = adaptStudioList(response, {
+      defaultCategory: t("studio.defaults.common"),
+      defaultDescription: t("studio.defaults.studioDescription"),
+      defaultUser: t("studio.defaults.user"),
+      defaultKnowledge: t("studio.defaults.noKnowledge"),
+      publicScope: t("studio.defaults.publicScope"),
+      authScope: t("studio.defaults.authScope"),
+      createPromptExamples: createDefaultPromptExamples,
+    });
+    if (data.length) {
+      studios.value = data;
       usesDefaultStudioData.value = false;
     }
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
-}
-function normalizeStudioItem(item, index) {
-  const model = parseFirstModelName(item.conn_model_name) || "GPT-OSS";
-  const name = item.studio_name || `Studio ${index + 1}`;
-  return {
-    id: item.sutdio_id || item.studio_id || `studio-${index}`,
-    initial: name.slice(0, 1).toUpperCase(),
-    name,
-    categoryCode: item.studio_cat_code || "COMMON",
-    category:
-      item.studio_cat_name_ko ||
-      item.studio_cat_name_en ||
-      item.studio_cat_code ||
-      t("studio.defaults.common"),
-    model,
-    description: item.studio_desc || t("studio.defaults.studioDescription"),
-    likes: Number(item.studio_like_cnt || 0),
-    views: Number(item.studio_watch_cnt || 0),
-    owner: item.user_name || item.user_id || t("studio.defaults.user"),
-    isMine: Boolean(item.reg_yn || item.studio_member_yn),
-    knowledge: item.assist_ssg_auth_arr || t("studio.defaults.noKnowledge"),
-    scope: item.assist_ssg_auth_yn
-      ? t("studio.defaults.authScope")
-      : t("studio.defaults.publicScope"),
-    prompts: createDefaultPromptExamples(),
-  };
-}
-function parseFirstModelName(value) {
-  if (Array.isArray(value)) return value[0];
-  if (typeof value !== "string") return "";
-  try {
-    const parsed = JSON.parse(value);
-    if (Array.isArray(parsed)) return parsed[0];
-  } catch (error) {
-    return value
-      .replace(/\[|\]|"/g, "")
-      .split(",")[0]
-      ?.trim();
-  }
-  return value;
 }
 function runSearch() {
   submittedSearchText.value = searchText.value;

@@ -7,7 +7,8 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
+import {adaptGenericApiBody} from "@/adapters/assistantResponseAdapter";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 
 export async function getAccessInfo(payload = {}) {
@@ -16,7 +17,7 @@ export async function getAccessInfo(payload = {}) {
     payload
   );
 
-  return unwrapResponseData(response, {});
+  return adaptGenericApiBody(response, {});
 }
 
 export const accessApiLive = {getAccessInfo};

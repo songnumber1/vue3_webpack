@@ -7,7 +7,8 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
+import {adaptGenericApiBody} from "@/adapters/assistantResponseAdapter";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 
 /**
@@ -18,7 +19,7 @@ async function getExamplePrompts(params = {}) {
     params,
   });
 
-  return unwrapResponseData(response, {list: []});
+  return adaptGenericApiBody(response, {list: []});
 }
 
 export const examplePromptApiLive = {getExamplePrompts};

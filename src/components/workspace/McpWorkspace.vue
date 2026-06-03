@@ -41,7 +41,9 @@
 import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import McpMainWorkspace from "@/components/mcp/McpMainWorkspace.vue";
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
+import {unwrapApiBody} from "@/utils/apiResponseReader";
+import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
 
 const {t, locale} = useI18n();
 
@@ -238,25 +240,13 @@ async function loadMcpData() {
 async function loadMainInfo() {
   try {
     const response = await httpClient.get("/mcp/search/main/info.do");
-    const data = unwrapResponseData(response, {});
-    if (Array.isArray(data.sysInfoList) && data.sysInfoList.length) {
-      mcpCategoryOptions.value = data.sysInfoList
-        .filter((item) => item.mcp_cat_use_yn !== false)
-        .map((item) => ({
-          value: item.mcp_cat_code,
-          label: item.mcp_cat_name_ko || item.mcp_cat_name_en || item.mcp_cat_code,
-          description: item.mcp_cat_desc_ko || item.mcp_cat_desc_en || "",
-        }));
-      if (!mcpCategoryOptions.value.some((item) => item.value === "ALL")) {
-        mcpCategoryOptions.value = [
-          {
-            value: "ALL",
-            label: t("mcp.defaults.all"),
-            description: t("mcp.defaults.allDescription"),
-          },
-          ...mcpCategoryOptions.value,
-        ];
-      }
+    const data = unwrapApiBody(response, {});
+    const mainInfo = adaptMcpMainInfo(data, {
+      allLabel: t("mcp.defaults.all"),
+      allDescription: t("mcp.defaults.allDescription"),
+    });
+    if (mainInfo.categories.length) {
+      mcpCategoryOptions.value = mainInfo.categories;
     }
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
@@ -268,42 +258,22 @@ async function loadMcpList() {
     const response = await httpClient.get("/mcp/search/list.do", {
       params: {pageNo: 1, pagePerCnt: 20, categoryId: "", topCnt: 4},
     });
-    const data = unwrapResponseData(response, []);
-    if (Array.isArray(data) && data.length) {
-      mcps.value = data.map(normalizeMcpItem);
+    const data = adaptMcpList(response, {
+      defaultCategory: t("mcp.defaults.common"),
+      defaultConnector: t("mcp.defaults.connector"),
+      defaultDescription: t("mcp.defaults.description"),
+      defaultUser: t("mcp.defaults.user"),
+      defaultCapability: t("mcp.defaults.capability"),
+      publicScope: t("mcp.defaults.publicScope"),
+      createPromptExamples: createDefaultPromptExamples,
+    });
+    if (data.length) {
+      mcps.value = data;
       usesDefaultMcpData.value = false;
     }
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
   }
-}
-
-function normalizeMcpItem(item, index) {
-  const name = item.mcp_name || item.connector_name || `MCP ${index + 1}`;
-  const isCreated = Boolean(item.reg_yn || item.created_yn);
-  const isSubscribed = Boolean(item.subscribe_yn || item.subscribed_yn);
-  return {
-    id: item.mcp_id || item.connector_id || `mcp-${index}`,
-    initial: name.slice(0, 1).toUpperCase(),
-    name,
-    categoryCode: item.mcp_cat_code || "COMM",
-    category:
-      item.mcp_cat_name_ko ||
-      item.mcp_cat_name_en ||
-      item.mcp_cat_code ||
-      t("mcp.defaults.common"),
-    model: item.connector_type || item.mcp_type || t("mcp.defaults.connector"),
-    description: item.mcp_desc || item.connector_desc || t("mcp.defaults.description"),
-    likes: Number(item.mcp_like_cnt || 0),
-    views: Number(item.mcp_subscribe_cnt || item.mcp_watch_cnt || 0),
-    owner: item.user_name || item.user_id || t("mcp.defaults.user"),
-    isMine: isCreated || isSubscribed,
-    isCreated,
-    isSubscribed,
-    knowledge: item.mcp_capability || item.mcp_auth_arr || t("mcp.defaults.capability"),
-    scope: item.mcp_scope || t("mcp.defaults.publicScope"),
-    prompts: createDefaultPromptExamples(),
-  };
 }
 
 function runSearch() {

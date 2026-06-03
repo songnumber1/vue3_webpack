@@ -30,6 +30,7 @@ export const MCP_API_KEYS = Object.freeze({
   MCP_SCOPE: "mcp_scope",
   CREATED_YN: "created_yn",
   SUBSCRIBE_YN: "subscribe_yn",
+  SUBSCRIBED_YN: "subscribed_yn",
   REG_YN: "reg_yn",
   USER_ID: "user_id",
   USER_NAME: "user_name",
