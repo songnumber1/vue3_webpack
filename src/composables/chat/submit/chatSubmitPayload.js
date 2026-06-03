@@ -1,5 +1,6 @@
 import {useChatStore} from "@/stores/chatStore";
 import {createId} from "@/utils/id";
+import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 
 export function normalizePromptPayload(payload) {
   if (typeof payload === "string") {
@@ -17,8 +18,8 @@ function createRequestPayload(base = {}) {
   const msgId = createId("message");
   const respMsgId = createId("message");
   return {
-    msgId,
-    respMsgId,
+    [G.MESSAGE_ID]: msgId,
+    [G.RESPONSE_MESSAGE_ID]: respMsgId,
     ...base,
   };
 }
@@ -64,21 +65,21 @@ export function createGenerationPayload(options, normalized, chatId) {
     : [];
 
   return createRequestPayload({
-    chatId: resolvedChatId,
-    assistId: options.selectedAssistantId?.value || "",
-    modelId: options.selectedModel?.value || "",
-    studio: false,
-    intention: "직접입력",
-    rag: knowledgeSearch.length > 0,
-    ragCot: false,
-    imgS3Path: null,
-    sourceType: "internal",
-    arrayOptions: knowledgeSearch,
-    messageFileHist: null,
-    styles: resolveStyleOptions(settings),
-    body: normalized.text,
-    byteSize: 10000,
-    lastFederationInfo: null,
-    uiStateInfoWrapper: null,
+    [G.CHAT_ID]: resolvedChatId,
+    [G.ASSIST_ID]: options.selectedAssistantId?.value || "",
+    [G.MODEL_ID]: options.selectedModel?.value || "",
+    [G.STUDIO]: false,
+    [G.INTENTION]: "직접입력",
+    [G.RAG]: knowledgeSearch.length > 0,
+    [G.RAG_COT]: false,
+    [G.IMAGE_S3_PATH_LEGACY]: null,
+    [G.SOURCE_TYPE]: "internal",
+    [G.ARRAY_OPTIONS]: knowledgeSearch,
+    [G.MESSAGE_FILE_HISTORY]: null,
+    [G.STYLES]: resolveStyleOptions(settings),
+    [G.BODY]: normalized.text,
+    [G.BYTE_SIZE]: 10000,
+    [G.LAST_FEDERATION_INFO]: null,
+    [G.UI_STATE_INFO_WRAPPER]: null,
   });
 }

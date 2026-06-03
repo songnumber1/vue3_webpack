@@ -2,6 +2,7 @@ import {applyGenerationStreamData} from "@/api/sse/common/generationStreamParser
 import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
+import {resolveGenerationRequestId} from "@/adapters/generationResponseAdapter";
 import {
   resolveGenerationUrl,
   resolveSseAuthOptions,
@@ -42,8 +43,7 @@ export async function runSseGenerationStream({
       ]),
   });
 
-  const requestId =
-    payload?.requestId || payload?.request_id || payload?.msgId || "";
+  const requestId = resolveGenerationRequestId(payload);
 
   const closeSource = () => {
     if (!source) return;

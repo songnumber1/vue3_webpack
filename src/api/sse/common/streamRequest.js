@@ -14,6 +14,7 @@ import {getAccessToken} from "@/auth/tokenStore";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 import {createId} from "@/utils/id";
+import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 
 export async function resolveSseAuthOptions() {
   const policy = resolveAuthPolicy();
@@ -56,7 +57,7 @@ function resolveGenerationResultUrl(requestId) {
     : DEFAULT_API_BASE_PATH;
 
   const query = encodeURIComponent(requestId || "");
-  return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION_RESULT}?requestId=${query}`;
+  return `${base.replace(/\/$/, "")}${API_ENDPOINTS.GENERATION_RESULT}?${G.REQUEST_ID}=${query}`;
 }
 
 export async function fetchGenerationResult(requestId) {

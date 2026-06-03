@@ -4,11 +4,12 @@ import {fetchGenerationResult} from "@/api/sse/common/streamRequest";
 import {logWarn} from "@/utils/logger";
 import {createGenerationPayload} from "./chatSubmitPayload";
 import {commitFirstAnswerChunk} from "./streamingMessageCommitter";
+import {adaptGenerationResultContent} from "@/adapters/generationResponseAdapter";
 
 async function resolveGenerationResultContent(requestId) {
   try {
     const result = await fetchGenerationResult(requestId);
-    return result?.content || result?.answer || result?.data || "";
+    return adaptGenerationResultContent(result);
   } catch (error) {
     logWarn("[useChatSubmit] generation result sync failed:", error);
     return "";

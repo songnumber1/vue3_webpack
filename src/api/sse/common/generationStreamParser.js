@@ -1,95 +1,10 @@
-const SSE_DONE_TOKEN = "[DONE]";
-
-function createGenerationStreamError() {
-  const error = new Error("generation stream returned Error");
-  error.name = "GenerationStreamError";
-  return error;
-}
-
-function readFirstString(...values) {
-  const found = values.find(
-    (value) => typeof value === "string" && value !== ""
-  );
-  return found || "";
-}
-
-function normalizeCompanyDelta(parsed) {
-  const delta = parsed?.choices?.[0]?.delta;
-  if (!delta) return null;
-
-  const content = readFirstString(delta.content);
-
-  // 회사 실시간 generation.do는 reasoning_content(snake_case)를 사용합니다.
-  // 일부 테스트/레거시 응답이 reasoningContent(camelCase)를 보낼 수 있어
-  // 수신부에서는 함께 흡수하되, 우선순위는 회사 규격인 reasoning_content입니다.
-  const reason = readFirstString(
-    delta.reasoning_content,
-    delta.reasoningContent,
-    delta.reasoning
-  );
-
-  return {
-    done: false,
-    type: reason ? "reason" : "answer",
-    content,
-    reason,
-  };
-}
-
-function normalizeLegacyPayload(parsed) {
-  const reason = readFirstString(
-    parsed?.reasoning_content,
-    parsed?.reasoningContent,
-    parsed?.reasonContent,
-    parsed?.reasoning,
-    parsed?.reason
-  );
-  const type = String(parsed?.type || (reason ? "reason" : "answer"));
-
-  return {
-    done: false,
-    type,
-    content: String(parsed?.data ?? parsed?.content ?? ""),
-    reason,
-  };
-}
-
-function splitNestedSseData(raw) {
-  const text = String(raw || "");
-  const trimmed = text.trim();
-
-  if (!trimmed.startsWith("data:")) {
-    return [text];
-  }
-
-  return trimmed
-    .split(/(?=data:\s*)/g)
-    .map((frame) => frame.replace(/^data:\s*/, "").trim())
-    .filter(Boolean);
-}
+import {
+  parseSseGenerationPayload,
+  splitNestedSseData,
+} from "@/adapters/sseResponseAdapter";
 
 function parseGenerationStreamData(raw) {
-  const normalizedRaw = String(raw || "").trim();
-
-  if (normalizedRaw === SSE_DONE_TOKEN) return {done: true};
-  if (normalizedRaw === "Error") throw createGenerationStreamError();
-
-  try {
-    const parsed = JSON.parse(normalizedRaw);
-
-    if (parsed === "Error") throw createGenerationStreamError();
-
-    return normalizeCompanyDelta(parsed) || normalizeLegacyPayload(parsed);
-  } catch (error) {
-    if (error?.name === "GenerationStreamError") throw error;
-
-    return {
-      done: false,
-      type: "answer",
-      content: String(raw || ""),
-      reason: "",
-    };
-  }
+  return parseSseGenerationPayload(raw);
 }
 
 function applyParsedGenerationData({data, accumulated, reasonAccumulated}) {
