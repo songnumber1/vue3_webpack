@@ -15,8 +15,9 @@ import {
 } from "@/constants/auth";
 import {useAuthStore} from "@/stores/authStore";
 import {logInfo} from "@/utils/logger";
-import {resolveAuthAccessResult} from "@/adapters/authResponseAdapter";
+import {resolveAuthAccessResult, unwrapAuthResponseBody} from "@/adapters/authResponseAdapter";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
+import {API_REQUEST_KEYS as Q} from "@/constants/api/apiRequestKeys";
 
 /**
  * 라우터 진입 타깃 목적지(to) 정보를 바탕으로 백엔드 보안 엔진에 전달할 파라미터 페이로드를 생성합니다.
@@ -28,12 +29,12 @@ import {resolveAuthPolicy} from "@/auth/authPolicy";
  */
 function createAccessPayload(to) {
   return {
-    language: "ko", // 기본 요청 국가/언어 코드 고정
-    entryType: to?.name === "chat" ? "chat" : "main", // 진입한 페이지 성격 분기
-    shareId: to?.params?.shareId || null, // 공유 페이지 진입 시 고유 공유 식별자
-    chatId: to?.params?.id || null, // 일반 대화방 진입 시 고유 대화 히스토리 식별자
-    msgId: null, // 특정 메시지 하이라이트 진입용 파라미터 (기본값 null)
-    studioId: to?.query?.studioId || null, // 쿼리 스트링으로 넘어온 특화 스튜디오 룸 ID
+    [Q.LANGUAGE]: "ko", // 기본 요청 국가/언어 코드 고정
+    [Q.ENTRY_TYPE]: to?.name === "chat" ? "chat" : "main", // 진입한 페이지 성격 분기
+    [Q.SHARE_ID]: to?.params?.shareId || null, // 공유 페이지 진입 시 고유 공유 식별자
+    [Q.CHAT_ID]: to?.params?.id || null, // 일반 대화방 진입 시 고유 대화 히스토리 식별자
+    [Q.MESSAGE_ID]: null, // 특정 메시지 하이라이트 진입용 파라미터 (기본값 null)
+    [Q.STUDIO_ID]: to?.query?.studioId || null, // 쿼리 스트링으로 넘어온 특화 스튜디오 룸 ID
   };
 }
 
@@ -76,7 +77,7 @@ async function requestAccessInfo(authAxios, payload) {
     payload
   );
 
-  return response?.data || {};
+  return unwrapAuthResponseBody(response, {});
 }
 
 /**

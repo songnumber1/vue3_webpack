@@ -7,6 +7,8 @@ import {
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {getRefreshToken, setTokens, clearTokens} from "@/auth/tokenStore";
 import {AUTH_HEADER_NAMES, AUTH_MODES} from "@/auth/authConstants";
+import {AUTH_API_KEYS as A} from "@/constants/api/authApiKeys";
+import {adaptAuthTokens} from "@/adapters/authResponseAdapter";
 import {useAuthStore} from "@/stores/authStore";
 
 let refreshPromise = null;
@@ -39,7 +41,7 @@ export async function refreshAccessTokenOnce() {
     const client = createRefreshClient();
     const response = await client.post(
       policy.refreshUrl,
-      {refreshToken},
+      {[A.REFRESH_TOKEN]: refreshToken},
       {
         headers: {
           [AUTH_HEADER_NAMES.CLIENT_PLATFORM]: policy.platform,
@@ -47,10 +49,10 @@ export async function refreshAccessTokenOnce() {
         },
       }
     );
-    const data = response?.data || {};
-    const accessToken = data.accessToken || data.access_token;
-    const nextRefreshToken =
-      data.refreshToken || data.refresh_token || refreshToken;
+    const {accessToken, refreshToken: nextRefreshToken} = adaptAuthTokens(
+      response,
+      refreshToken
+    );
     if (!accessToken) throw new Error("Refresh response has no access token.");
     setTokens({accessToken, refreshToken: nextRefreshToken});
     return accessToken;

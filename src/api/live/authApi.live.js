@@ -7,17 +7,18 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
+import {httpClient} from "@/api/clients/httpClient";
 import {API_KEYS} from "@/constants/apiConfig";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {setTokens, clearTokens} from "@/auth/tokenStore";
+import {adaptAuthApiResponse, adaptAuthTokens} from "@/adapters/authResponseAdapter";
 
 export const authApiLive = {
   async checkLogin() {
     const response = await httpClient.get(resolveAuthPolicy().loginUrl, {
       apiKey: API_KEYS.LOGIN,
     });
-    return unwrapResponseData(response, {});
+    return adaptAuthApiResponse(response);
   },
 
   async tempLogin(payload = {}) {
@@ -28,11 +29,9 @@ export const authApiLive = {
         apiKey: API_KEYS.LOGIN,
       }
     );
-    const data = unwrapResponseData(response, {});
-    setTokens({
-      accessToken: data.accessToken || data.access_token,
-      refreshToken: data.refreshToken || data.refresh_token,
-    });
+    const data = adaptAuthApiResponse(response);
+    const tokens = adaptAuthTokens(data);
+    setTokens(tokens);
     return data;
   },
 
@@ -45,7 +44,7 @@ export const authApiLive = {
           apiKey: API_KEYS.LOGIN,
         }
       );
-      return unwrapResponseData(response, {});
+      return adaptAuthApiResponse(response);
     } finally {
       clearTokens();
     }

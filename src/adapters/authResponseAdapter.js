@@ -8,6 +8,9 @@
  */
 
 import {AUTH_FAILURE_REASONS} from "@/constants/auth";
+import {AUTH_API_KEYS as A} from "@/constants/api/authApiKeys";
+import {API_RESPONSE_KEYS as R} from "@/constants/api/apiResponseKeys";
+import {unwrapApiBody} from "@/utils/apiResponseReader";
 import {toBoolean} from "@/utils/booleanUtils";
 
 /** 로그인 재요청 판별을 위한 문자열 상태 집합 (Set) */
@@ -26,6 +29,18 @@ const USER_AGREEMENT_STATUSES = new Set([
   "user_agree",
   "user-agree",
 ]);
+
+const ACCESS_TOKEN_KEYS = [A.ACCESS_TOKEN, A.ACCESS_TOKEN_SNAKE];
+const REFRESH_TOKEN_KEYS = [A.REFRESH_TOKEN, A.REFRESH_TOKEN_SNAKE];
+
+const AUTH_SUCCESS_KEYS = [A.SUCCESS, R.SUCCESS, R.OK];
+const AUTH_CODE_KEYS = [A.CODE, R.CODE];
+const AUTH_MESSAGE_KEYS = [A.MESSAGE, R.MESSAGE, R.ERROR_MESSAGE];
+const AUTH_PATH_KEYS = [A.PATH, R.PATH];
+const AUTH_USER_KEYS = [A.USER, "User", "userInfo", "UserInfo"];
+const AUTH_STATUS_KEYS = [R.STATUS, "Status", R.RESULT, "Result"];
+const AUTH_VALID_KEYS = [A.VALID, R.VALID, "Valid", "isValid", "IsValid"];
+
 
 /**
  * 소스 객체 내부에 찾고자 하는 다수의 후보 키(Keys) 배열 중 매칭되는 첫 번째 프로퍼티 값을 안전하게 추출합니다.
@@ -62,6 +77,57 @@ function normalizeStatus(value) {
     .toLowerCase();
 }
 
+function readAuthValue(source, keys, fallback = undefined) {
+  const body = unwrapApiBody(source, source);
+  const value = findObjectValue(body, keys);
+  return value === undefined ? fallback : value;
+}
+
+function normalizeOptionalBoolean(value) {
+  return value === undefined ? undefined : toBoolean(value);
+}
+
+export function unwrapAuthResponseBody(response, fallback = {}) {
+  return unwrapApiBody(response, fallback) || fallback;
+}
+
+export function adaptAuthTokens(source = {}, fallbackRefreshToken = "") {
+  const body = unwrapAuthResponseBody(source, {});
+  const accessToken = readAuthValue(body, ACCESS_TOKEN_KEYS, "") || "";
+  const refreshToken =
+    readAuthValue(body, REFRESH_TOKEN_KEYS, "") || fallbackRefreshToken || "";
+
+  return {
+    accessToken,
+    refreshToken,
+    raw: body,
+  };
+}
+
+export function adaptAuthApiResponse(response = {}) {
+  const body = unwrapAuthResponseBody(response, {});
+
+  return {
+    ...body,
+    success: normalizeOptionalBoolean(
+      readAuthValue(body, AUTH_SUCCESS_KEYS, undefined)
+    ),
+    code: readAuthValue(body, AUTH_CODE_KEYS, undefined),
+    message: readAuthValue(body, AUTH_MESSAGE_KEYS, ""),
+    path: readAuthValue(body, AUTH_PATH_KEYS, ""),
+    authenticated: normalizeOptionalBoolean(
+      readAuthValue(body, [A.AUTHENTICATED], undefined)
+    ),
+    authMode: readAuthValue(body, [A.AUTH_MODE], ""),
+    user: readAuthValue(body, AUTH_USER_KEYS, null),
+    accessToken: readAuthValue(body, ACCESS_TOKEN_KEYS, "") || "",
+    refreshToken: readAuthValue(body, REFRESH_TOKEN_KEYS, "") || "",
+    expiresIn: readAuthValue(body, [A.EXPIRES_IN], undefined),
+    tokenType: readAuthValue(body, [A.TOKEN_TYPE], ""),
+    raw: body,
+  };
+}
+
 /**
  * 전달받은 비정형화된 인증 접근 정보 객체를 분석하여 일관된 스펙의 논리 플래그 플랫 객체로 변환합니다.
  * @param {Object} [accessInfo={}] - 서버 혹은 외부 API로부터 주입받은 원본 접근 정보 객체
@@ -73,24 +139,14 @@ function normalizeStatus(value) {
 export function normalizeAuthAccessInfo(accessInfo = {}) {
   // 1. 상태(status) 키 후보군을 조회하여 문자열 소문자 정형화를 적용합니다.
   const status = normalizeStatus(
-    findObjectValue(accessInfo, ["status", "Status", "result", "Result"])
+    findObjectValue(accessInfo, AUTH_STATUS_KEYS)
   );
 
   // 2. 토큰 유효 여부(valid) 관련 키 후보군을 안전하게 확보합니다.
-  const valid = findObjectValue(accessInfo, [
-    "valid",
-    "Valid",
-    "isValid",
-    "IsValid",
-  ]);
+  const valid = findObjectValue(accessInfo, AUTH_VALID_KEYS);
 
   // 3. 내부 유저 세부 정보 객체(user) 관련 키 후보군을 확보합니다.
-  const user = findObjectValue(accessInfo, [
-    "user",
-    "User",
-    "userInfo",
-    "UserInfo",
-  ]);
+  const user = findObjectValue(accessInfo, AUTH_USER_KEYS);
 
   // 4. [로그인 요구 여부 종합 판단] 토큰이 유효하지 않거나(valid === false), 상태 세트 목록에 걸리거나, 로그인 요구 플래그 문자열이 참이거나, 유저 정보 자체가 없으면 로그인이 필요한 상태로 단언합니다.
   const loginRequired =
