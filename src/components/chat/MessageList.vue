@@ -49,6 +49,7 @@ const props = defineProps({
   historyRendering: {type: Boolean, default: false},
   historyMessagesReady: {type: Boolean, default: false},
   hasPreviousHistoryMessages: {type: Boolean, default: false},
+  historyLazyTopThreshold: {type: Number, default: 96},
 });
 
 const emit = defineEmits([

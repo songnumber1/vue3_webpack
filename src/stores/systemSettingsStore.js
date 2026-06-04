@@ -68,6 +68,8 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showMobileApiProgress: (state) => state.settings.showMobileApiProgress,
     // AI의 답변 토큰이 실시간 분출 타이핑 출력될 때 메인 대화 스크롤바 영역을 화면 하단 꼬리로 완전 자동 연속 동적 추적 다운시킬지 판별식
     autoScrollOnAnswer: (state) => state.settings.autoScrollOnAnswer,
+    historyLazyChunkSize: (state) => state.settings.historyLazyChunkSize,
+    historyLazyTopThreshold: (state) => state.settings.historyLazyTopThreshold,
     // 임직원이 AI 질문 답변 연산 대기 도중 스마트폰 홈 버튼을 누르거나 타 전하 앱 통화 모션 등으로
     // 브라우저가 백그라운드로 소외 이탈(무효 유휴 세션 진입)했을 때 진행 중인 무거운 거대 AI 통신 토큰 세션을 리소스 절약을 위해 즉각 강제 폭파 낙태 취소(Abort)시킬지 여부
     abortChatOnMobileBackground: (state) =>

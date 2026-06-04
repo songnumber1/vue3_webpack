@@ -15,6 +15,12 @@ export const DEFAULT_MOBILE_BREAKPOINT_PX =
 export const MIN_MOBILE_BREAKPOINT_PX = 400;
 export const MAX_MOBILE_BREAKPOINT_PX = 9999;
 
+// 대용량 이력 대화방 lazy 렌더링 설정 허용 범위
+export const MIN_HISTORY_LAZY_CHUNK_SIZE = 20;
+export const MAX_HISTORY_LAZY_CHUNK_SIZE = 500;
+export const MIN_HISTORY_LAZY_TOP_THRESHOLD = 16;
+export const MAX_HISTORY_LAZY_TOP_THRESHOLD = 400;
+
 // 하위 호환성을 위해 기존 export 명칭은 유지하되, 더 이상 플랫폼 오버라이드 여부로 강제 적용하지 않습니다.
 export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = MAX_MOBILE_BREAKPOINT_PX;
 
@@ -149,6 +155,8 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showLogoutButton: "showLogoutButton", // 인증 세션 로그아웃 버튼 노출 여부
   showMobileApiProgress: "showMobileApiProgress", // API 호출 및 채팅방 이력 로딩/렌더링 진행 표시 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
+  historyLazyChunkSize: "historyLazyChunkSize", // 이력 대화방 최초/추가 lazy 렌더링 메시지 묶음 개수
+  historyLazyTopThreshold: "historyLazyTopThreshold", // 이력 대화방 상단 추가 로드 트리거 scrollTop 기준(px)
   abortChatOnMobileBackground: "abortChatOnMobileBackground", // 모바일 환경에서 사용자가 홈 화면으로 빠져나가 백그라운드로 전환될 때 통신 파괴 여부
   webAuthMode: "webAuthMode", // 웹/PC 환경 기본 인증 방식(session/jwt)
   mobileAuthMode: "mobileAuthMode", // 모바일 브라우저/WebView 환경 기본 인증 방식(session/jwt)
@@ -248,6 +256,14 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   [SYSTEM_SETTING_KEYS.autoScrollOnAnswer]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_AUTO_SCROLL_ON_ANSWER,
     false
+  ),
+  [SYSTEM_SETTING_KEYS.historyLazyChunkSize]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_HISTORY_LAZY_CHUNK_SIZE,
+    100
+  ),
+  [SYSTEM_SETTING_KEYS.historyLazyTopThreshold]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_HISTORY_LAZY_TOP_THRESHOLD,
+    96
   ),
   [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_ABORT_CHAT_ON_MOBILE_BACKGROUND,
@@ -394,6 +410,29 @@ export function normalizeSystemSettings(value = {}) {
       const numeric = Number(source[key]);
       next[key] = Number.isFinite(numeric)
         ? Math.min(Math.max(Math.round(numeric), 320), 960)
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+
+
+    if (key === SYSTEM_SETTING_KEYS.historyLazyChunkSize) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(
+            Math.max(Math.round(numeric), MIN_HISTORY_LAZY_CHUNK_SIZE),
+            MAX_HISTORY_LAZY_CHUNK_SIZE
+          )
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+
+    if (key === SYSTEM_SETTING_KEYS.historyLazyTopThreshold) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(
+            Math.max(Math.round(numeric), MIN_HISTORY_LAZY_TOP_THRESHOLD),
+            MAX_HISTORY_LAZY_TOP_THRESHOLD
+          )
         : DEFAULT_SYSTEM_SETTINGS[key];
       return;
     }

@@ -12,7 +12,7 @@ import {
 } from "@/utils/mermaidRenderer";
 
 const BOTTOM_THRESHOLD = 48;
-const HISTORY_LAZY_TOP_THRESHOLD = 96;
+const DEFAULT_HISTORY_LAZY_TOP_THRESHOLD = 96;
 const STABLE_SCROLL_DELAYS = [0, 32, 80, 160, 320, 520];
 const HISTORY_RENDER_READY_STABLE_FRAMES = 3;
 const HISTORY_RENDER_DOM_READY_MAX_FRAMES = 360;
@@ -335,7 +335,11 @@ export function useMessageListScroll({props, emit}) {
       return;
 
     const el = getScrollElement();
-    if (!el || el.scrollTop > HISTORY_LAZY_TOP_THRESHOLD) return;
+    const threshold = Number(props.historyLazyTopThreshold);
+    const topThreshold = Number.isFinite(threshold) && threshold >= 0
+      ? threshold
+      : DEFAULT_HISTORY_LAZY_TOP_THRESHOLD;
+    if (!el || el.scrollTop > topThreshold) return;
 
     previousHistoryLoadInProgress = true;
     const previousScrollHeight = el.scrollHeight;

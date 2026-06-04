@@ -127,6 +127,16 @@ export const settingsMessages = {
           label: "자동 스크롤",
           description: "답변 시 스크롤 자동 이동 여부입니다.",
         },
+        historyLazyChunkSize: {
+          label: "이력 메시지 로드 개수",
+          description:
+            "대용량 대화방 입장 및 상단 갱신 시 한 번에 렌더링할 메시지 개수입니다.",
+        },
+        historyLazyTopThreshold: {
+          label: "이력 상단 로드 기준",
+          description:
+            "스크롤이 상단 몇 px 이내로 접근하면 이전 메시지를 추가 로드할지 결정합니다.",
+        },
         abortChatOnMobileBackground: {
           label: "백그라운드 모드 시 채팅 종료",
           description:
@@ -414,6 +424,16 @@ export const settingsMessages = {
           label: "Auto scroll",
           description:
             "Automatically scroll to the bottom while answers arrive.",
+        },
+        historyLazyChunkSize: {
+          label: "History message load count",
+          description:
+            "Number of messages rendered at once when entering or prepending a large history chat.",
+        },
+        historyLazyTopThreshold: {
+          label: "History top load threshold",
+          description:
+            "ScrollTop threshold in px that triggers loading previous history messages near the top.",
         },
         abortChatOnMobileBackground: {
           label: "End chat on mobile background",

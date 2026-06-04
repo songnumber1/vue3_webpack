@@ -62,6 +62,7 @@ export function createEmptyWorkspaceState() {
     isHistoryRendering: false,
     historyMessagesLoaded: false,
     hasPreviousHistoryMessages: false,
+    historyLazyTopThreshold: 96,
   };
 }
 

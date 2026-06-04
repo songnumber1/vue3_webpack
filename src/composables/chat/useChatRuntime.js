@@ -166,6 +166,14 @@ export function useChatRuntime() {
     }
   }
 
+  function shouldPreserveSidebarAssistantOnHistoryOpen() {
+    if (typeof document === "undefined") return false;
+    const classList = document.body?.classList;
+    return (
+      classList?.contains("desktop-mode") && !classList?.contains("mobile-mode")
+    );
+  }
+
   /**
    * [액션 8] 유저가 사이드바나 헤더에서 대화 대상을 다른 AI 어시스턴트 페르소나 객체로 스위칭 전환 선택했을 때의 메인 헨들러입니다.
    * @param {string} id - 변경 타깃이 되는 어시스턴트 ID
@@ -220,7 +228,9 @@ export function useChatRuntime() {
       : assistantStore.assistantMap[session.assistantId] || fallbackAssistant;
 
     if (displayAssistant?.id) {
-      assistantStore.selectAssistant(displayAssistant.id); // 글로벌 인프라 포커스 강제 스위칭
+      if (!shouldPreserveSidebarAssistantOnHistoryOpen()) {
+        assistantStore.selectAssistant(displayAssistant.id); // 모바일에서는 기존처럼 현재 방의 어시스턴트로 동기화
+      }
       session.displayAssistantId = displayAssistant.id; // 화면 보정 표기용 닉네임 ID 매핑 임베딩
       session.displayAssistantLabel = displayAssistant.label;
     }

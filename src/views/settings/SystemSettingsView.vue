@@ -113,7 +113,11 @@ import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   KEYBOARD_MODE_OPTIONS,
+  MAX_HISTORY_LAZY_CHUNK_SIZE,
+  MAX_HISTORY_LAZY_TOP_THRESHOLD,
   MAX_MOBILE_BREAKPOINT_PX,
+  MIN_HISTORY_LAZY_CHUNK_SIZE,
+  MIN_HISTORY_LAZY_TOP_THRESHOLD,
   MIN_MOBILE_BREAKPOINT_PX,
   PLATFORM_OVERRIDE_OPTIONS,
   AUTH_MODE_OPTIONS,
@@ -243,7 +247,21 @@ const groups = computed(() => [
   {
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
-    items: [settingItem("autoScrollOnAnswer")],
+    items: [
+      settingItem("autoScrollOnAnswer"),
+      settingItem("historyLazyChunkSize", {
+        type: "number",
+        min: MIN_HISTORY_LAZY_CHUNK_SIZE,
+        max: MAX_HISTORY_LAZY_CHUNK_SIZE,
+        step: 1,
+      }),
+      settingItem("historyLazyTopThreshold", {
+        type: "number",
+        min: MIN_HISTORY_LAZY_TOP_THRESHOLD,
+        max: MAX_HISTORY_LAZY_TOP_THRESHOLD,
+        step: 1,
+      }),
+    ],
   },
   {
     kicker: "ACTION",

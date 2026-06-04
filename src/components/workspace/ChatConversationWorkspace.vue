@@ -16,6 +16,7 @@
     :history-rendering="isHistoryRendering"
     :history-messages-ready="historyMessagesLoaded"
     :has-previous-history-messages="hasPreviousHistoryMessages"
+    :history-lazy-top-threshold="historyLazyTopThreshold"
     @content-rendered="handleMessageContentRendered"
     @history-rendered="handleHistoryRendered"
     @load-previous-history="handleLoadPreviousHistory"
@@ -169,6 +170,9 @@ const historyMessagesLoaded = computed(
 );
 const hasPreviousHistoryMessages = computed(
   () => workspaceState.value.hasPreviousHistoryMessages
+);
+const historyLazyTopThreshold = computed(
+  () => workspaceState.value.historyLazyTopThreshold || 96
 );
 const canUseDesktopCodeInterpreter = computed(
   () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"

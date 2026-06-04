@@ -260,6 +260,7 @@ const {
   isHistoryRendering,
   historyMessagesLoaded,
   hasPreviousHistoryMessages,
+  historyLazyTopThreshold,
   loadPreviousHistoryMessages,
   finishHistoryRender,
   autoScrollOnAnswer,
@@ -368,6 +369,7 @@ provide(
     isHistoryRendering: isHistoryRendering.value,
     historyMessagesLoaded: historyMessagesLoaded.value,
     hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
+    historyLazyTopThreshold: historyLazyTopThreshold.value,
   }))
 );
 

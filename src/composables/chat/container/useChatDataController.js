@@ -49,7 +49,14 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const runtimeReady = ref(false);
   const isHistoryRendering = ref(false);
   const historyMessagesLoaded = ref(false);
-  const HISTORY_LAZY_CHUNK_SIZE = 100;
+  const DEFAULT_HISTORY_LAZY_CHUNK_SIZE = 100;
+
+  function getHistoryLazyChunkSize() {
+    const value = Number(systemSettingsStore.historyLazyChunkSize);
+    return Number.isFinite(value) && value > 0
+      ? Math.max(1, Math.round(value))
+      : DEFAULT_HISTORY_LAZY_CHUNK_SIZE;
+  }
   const fullHistoryMessages = ref([]);
   const historyVisibleStartIndex = ref(0);
   const hasPreviousHistoryMessages = computed(
@@ -87,7 +94,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   function getInitialLazyHistorySlice(sourceMessages = []) {
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    const start = Math.max(list.length - HISTORY_LAZY_CHUNK_SIZE, 0);
+    const start = Math.max(list.length - getHistoryLazyChunkSize(), 0);
     return {start, visibleMessages: list.slice(start)};
   }
 
@@ -108,7 +115,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
     const currentVisibleCount = Math.max(
       messages.value.length,
-      Math.min(HISTORY_LAZY_CHUNK_SIZE, list.length)
+      Math.min(getHistoryLazyChunkSize(), list.length)
     );
     const isShowingLatest =
       historyVisibleStartIndex.value + messages.value.length >=
@@ -117,7 +124,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     fullHistoryMessages.value = list;
 
     if (isShowingLatest) {
-      const count = Math.max(currentVisibleCount, HISTORY_LAZY_CHUNK_SIZE);
+      const count = Math.max(currentVisibleCount, getHistoryLazyChunkSize());
       historyVisibleStartIndex.value = Math.max(list.length - count, 0);
     } else {
       historyVisibleStartIndex.value = Math.min(
@@ -152,7 +159,7 @@ ${message?.reasoningContent || ""}`;
     if (historyVisibleStartIndex.value <= 0) return false;
 
     const previousStart = historyVisibleStartIndex.value;
-    const nextStart = Math.max(previousStart - HISTORY_LAZY_CHUNK_SIZE, 0);
+    const nextStart = Math.max(previousStart - getHistoryLazyChunkSize(), 0);
     if (nextStart === previousStart) return false;
 
     historyVisibleStartIndex.value = nextStart;
@@ -209,7 +216,7 @@ ${message?.reasoningContent || ""}`;
       : [];
 
     const visibleCount = Math.max(
-      HISTORY_LAZY_CHUNK_SIZE,
+      getHistoryLazyChunkSize(),
       Math.min(
         fullHistoryMessages.value.length,
         (messages.value?.length || 0) + 2
@@ -655,6 +662,7 @@ ${message?.reasoningContent || ""}`;
     isHistoryRendering,
     historyMessagesLoaded,
     hasPreviousHistoryMessages,
+    historyLazyTopThreshold: computed(() => systemSettingsStore.historyLazyTopThreshold),
     loadPreviousHistoryMessages,
     finishHistoryRender,
     submit,
