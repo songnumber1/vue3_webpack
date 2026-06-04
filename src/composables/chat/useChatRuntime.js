@@ -173,10 +173,15 @@ export function useChatRuntime() {
    */
   async function selectAssistant(id, {forNewChat = false} = {}) {
     if (!forNewChat && chatStore.isModelLocked) return; // 이미 기존 방 락 조건에 걸려있다면 어시스턴트 무단 강제 변조를 거부합니다.
+    if (!assistantStore.assistantMap[id]) return; // 존재하지 않는 어시스턴트 ID는 선택/프롬프트 로딩 모두 차단합니다.
     try {
+      // PC 메인 화면에서 Assistant 변경 시 추천 프롬프트가 빈 배열로 먼저 렌더링되면
+      // 예시 영역과 입력창 폭이 순간적으로 흔들립니다.
+      // 새 Assistant의 예시 프롬프트를 먼저 캐시에 준비한 뒤 선택값을 교체해
+      // 기존 예시 → 신규 예시가 한 번에 바뀌도록 합니다.
+      await preloadExamplePrompts(id);
       assistantStore.selectAssistant(id); // 선택 모델 상태값 업데이트
       if (forNewChat) chatStore.clearActiveSession(); // 완전히 새로운 룸 생성 전제 하라면 기존 방 바인딩 데이터 클리어 제거
-      await preloadExamplePrompts(id); // 변경된 페르소나의 추천 프롬프트 데이터 긴급 패치 예비 기동
     } catch (error) {
       logWarn("[useChatRuntime] selectAssistant 오류:", error);
     }
