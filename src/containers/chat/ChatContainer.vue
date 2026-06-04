@@ -261,6 +261,7 @@ const {
   historyMessagesLoaded,
   hasPreviousHistoryMessages,
   historyLazyTopThreshold,
+  historyLazyChunkSize,
   loadPreviousHistoryMessages,
   finishHistoryRender,
   autoScrollOnAnswer,
@@ -370,6 +371,7 @@ provide(
     historyMessagesLoaded: historyMessagesLoaded.value,
     hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
     historyLazyTopThreshold: historyLazyTopThreshold.value,
+    historyLazyChunkSize: historyLazyChunkSize.value,
   }))
 );
 

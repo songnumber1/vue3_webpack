@@ -663,6 +663,7 @@ ${message?.reasoningContent || ""}`;
     historyMessagesLoaded,
     hasPreviousHistoryMessages,
     historyLazyTopThreshold: computed(() => systemSettingsStore.historyLazyTopThreshold),
+    historyLazyChunkSize: computed(() => getHistoryLazyChunkSize()),
     loadPreviousHistoryMessages,
     finishHistoryRender,
     submit,

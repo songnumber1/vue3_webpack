@@ -10,6 +10,8 @@ import {
   fallbackPendingMermaidToCode,
   renderMermaidInElement,
 } from "@/utils/mermaidRenderer";
+import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 
 const BOTTOM_THRESHOLD = 48;
 const DEFAULT_HISTORY_LAZY_TOP_THRESHOLD = 96;
@@ -26,6 +28,9 @@ const RESIZE_RECALCULATE_DEBOUNCE_MS = 120;
 const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
   0, 80, 160, 320, 600, 900, 1300, 1800, 2300,
 ];
+// Android Chrome/WebView native scrolling keeps momentum after a fast fling.
+// Auto prepend during native scrolling is unstable, so Android uses a manual
+// "load previous history" button. PC keeps the existing automatic threshold path.
 
 function isAndroidHistoryRenderRuntime() {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
@@ -40,6 +45,42 @@ function isAndroidHistoryRenderRuntime() {
     bodyClassList?.contains("android-webview") ||
     bodyClassList?.contains("android-chrome")
   );
+}
+
+function isForcedAndroidPlatformOverride() {
+  const override = getRuntimeSystemSettings().platformOverride;
+  return (
+    override === PLATFORM_OVERRIDE_MODES.androidChrome ||
+    override === PLATFORM_OVERRIDE_MODES.androidWebView
+  );
+}
+
+function isCompactHistoryViewport() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return false;
+  }
+
+  if (document.body?.classList?.contains("mobile-mode")) return true;
+
+  const settings = getRuntimeSystemSettings();
+  const breakpoint = Number(settings.mobileBreakpoint);
+  const limit = Number.isFinite(breakpoint) && breakpoint > 0 ? breakpoint : 768;
+  const width = Math.min(
+    window.visualViewport?.width || Number.POSITIVE_INFINITY,
+    window.innerWidth || Number.POSITIVE_INFINITY,
+    document.documentElement?.clientWidth || Number.POSITIVE_INFINITY
+  );
+
+  return Number.isFinite(width) && width > 0 && width <= limit;
+}
+
+function shouldUseManualHistoryLoadMode() {
+  if (isAndroidHistoryRenderRuntime()) return true;
+
+  // PC 브라우저에서 Android 플랫폼을 강제 설정한 경우에는 실제 Android 런타임이 아니므로
+  // 데스크톱 폭에서는 PC 자동 lazy load를 유지합니다. 단, 모바일 사이즈로 줄여
+  // Android 모바일 UX를 검증할 때는 명시적 버튼 방식을 사용합니다.
+  return isForcedAndroidPlatformOverride() && isCompactHistoryViewport();
 }
 
 function canElementScroll(element) {
@@ -128,7 +169,24 @@ export function useMessageListScroll({props, emit}) {
   let renderedFrameNeedsBottomState = false;
   let latestUserMessageCache = null;
   let latestUserMessageCacheKey = "";
-  let previousHistoryLoadInProgress = false;
+  const previousHistoryLoadInProgress = ref(false);
+  const androidManualHistoryLoadMode = ref(false);
+  let historyLazyScrollRestoreUntil = 0;
+  let manualHistoryAnchorLockCleanup = null;
+  let manualHistoryAnchorLockToken = 0;
+
+  function isHistoryLazyScrollRestoreSuppressed() {
+    return (
+      historyLazyScrollRestoreUntil > 0 &&
+      typeof Date !== "undefined" &&
+      Date.now() < historyLazyScrollRestoreUntil
+    );
+  }
+
+  function suppressHistoryLazyScrollRestore(duration = 260) {
+    if (typeof Date === "undefined") return;
+    historyLazyScrollRestoreUntil = Date.now() + duration;
+  }
 
   function getScrollElement() {
     return overlayScrollViewport || scrollRef.value;
@@ -300,9 +358,259 @@ export function useMessageListScroll({props, emit}) {
     userIsAtBottom.value = isNearBottom();
   }
 
+  function refreshManualHistoryLoadMode() {
+    androidManualHistoryLoadMode.value = shouldUseManualHistoryLoadMode();
+  }
+
   function handleScroll() {
     updateBottomState();
+
+    // Android Chrome/WebView는 빠른 native fling 중 DOM prepend가 발생하면
+    // 브라우저 관성 스크롤과 수동 scrollTop 보정이 충돌할 수 있습니다.
+    // 실제 Android 런타임에서는 자동 상단 lazy load를 사용하지 않고,
+    // 메시지 목록 최상단의 명시적 버튼으로만 이전 대화를 불러옵니다.
+    refreshManualHistoryLoadMode();
+    if (androidManualHistoryLoadMode.value) {
+      return;
+    }
+
+    if (isHistoryLazyScrollRestoreSuppressed()) return;
     void requestPreviousHistoryMessagesIfNeeded();
+  }
+
+
+  function findMessageElementById(container, messageId) {
+    if (!container || !messageId) return null;
+
+    const targetId = String(messageId);
+    const nodes = container.querySelectorAll?.("[data-message-id]") || [];
+    for (const node of nodes) {
+      if (node?.getAttribute?.("data-message-id") === targetId) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  function getElementOffsetTopWithinScroll(element, container) {
+    if (!element || !container) return 0;
+
+    let top = 0;
+    let current = element;
+    while (current && current !== container) {
+      top += Number(current.offsetTop || 0);
+      current = current.offsetParent;
+    }
+
+    if (current === container) return top;
+
+    const containerRect = container.getBoundingClientRect?.();
+    const elementRect = element.getBoundingClientRect?.();
+    if (!containerRect || !elementRect) return 0;
+    return container.scrollTop + elementRect.top - containerRect.top;
+  }
+
+  function getHistoryLazyViewportAnchor(el) {
+    if (!el?.querySelectorAll || !el.getBoundingClientRect) return null;
+
+    const containerRect = el.getBoundingClientRect();
+    const anchorTopLimit = containerRect.top + 12;
+    const anchorBottomLimit = containerRect.bottom - 12;
+    const candidates = Array.from(el.querySelectorAll("[data-message-id]"));
+
+    let fallback = null;
+    for (const node of candidates) {
+      if (!node?.getBoundingClientRect) continue;
+      const rect = node.getBoundingClientRect();
+      if (rect.bottom <= anchorTopLimit || rect.top >= anchorBottomLimit) {
+        continue;
+      }
+
+      const id = node.getAttribute("data-message-id");
+      if (!id) continue;
+
+      const snapshot = {
+        id,
+        scrollTop: el.scrollTop,
+        offsetTop: getElementOffsetTopWithinScroll(node, el),
+        viewportTop: rect.top - containerRect.top,
+      };
+
+      // 화면 맨 위에 반쯤 걸친 요소보다 화면 안쪽에 안정적으로 보이는 요소를 우선합니다.
+      if (rect.top >= anchorTopLimit) {
+        return snapshot;
+      }
+      if (!fallback) fallback = snapshot;
+    }
+
+    return fallback;
+  }
+
+  function restoreHistoryLazyViewportAnchor(el, anchor) {
+    if (!el || !anchor?.id) return false;
+
+    const target = findMessageElementById(el, anchor.id);
+    if (!target) return false;
+
+    const currentOffsetTop = getElementOffsetTopWithinScroll(target, el);
+    const delta = currentOffsetTop - Number(anchor.offsetTop || 0);
+    const maxScrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
+    const nextScrollTop = Math.min(
+      maxScrollTop,
+      Math.max(0, Number(anchor.scrollTop || 0) + delta)
+    );
+
+    if (Math.abs(el.scrollTop - nextScrollTop) >= 1) {
+      suppressHistoryLazyScrollRestore();
+      el.scrollTop = nextScrollTop;
+    }
+    return true;
+  }
+
+  function restoreHistoryLazyViewportAnchorByViewport(el, anchor) {
+    if (!el || !anchor?.id || !el.getBoundingClientRect) return false;
+
+    const target = findMessageElementById(el, anchor.id);
+    if (!target?.getBoundingClientRect) return false;
+
+    const containerRect = el.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    const currentViewportTop = targetRect.top - containerRect.top;
+    const expectedViewportTop = Number.isFinite(anchor.viewportTop)
+      ? Number(anchor.viewportTop)
+      : 0;
+    const delta = currentViewportTop - expectedViewportTop;
+
+    if (Math.abs(delta) < 0.5) return true;
+
+    const maxScrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
+    const nextScrollTop = Math.min(
+      maxScrollTop,
+      Math.max(0, el.scrollTop + delta)
+    );
+
+    if (Math.abs(el.scrollTop - nextScrollTop) >= 0.5) {
+      suppressHistoryLazyScrollRestore();
+      el.scrollTop = nextScrollTop;
+    }
+    return true;
+  }
+
+  function cancelManualHistoryAnchorLock() {
+    manualHistoryAnchorLockToken += 1;
+    if (typeof manualHistoryAnchorLockCleanup === "function") {
+      manualHistoryAnchorLockCleanup();
+    }
+    manualHistoryAnchorLockCleanup = null;
+  }
+
+  function collectElementsBeforeAnchor(el, anchorId) {
+    if (!el?.querySelectorAll || !anchorId) return [];
+
+    const nodes = Array.from(el.querySelectorAll("[data-message-id]"));
+    const result = [];
+    for (const node of nodes) {
+      const id = node?.getAttribute?.("data-message-id");
+      if (id === anchorId) break;
+      if (node?.nodeType === 1) result.push(node);
+    }
+    return result;
+  }
+
+  function startManualHistoryAnchorLock(el, anchor, duration = 2200) {
+    if (!el || !anchor?.id || typeof window === "undefined") return false;
+
+    cancelManualHistoryAnchorLock();
+    const token = manualHistoryAnchorLockToken;
+    let target = findMessageElementById(el, anchor.id);
+    if (!target) return false;
+
+    let finished = false;
+    let rafId = 0;
+    const timerIds = [];
+    let resizeObserver = null;
+    let mutationObserver = null;
+    let observedNodes = [];
+
+    el.classList?.add?.("message-list--history-prepend-locking");
+
+    const cleanup = () => {
+      if (finished) return;
+      finished = true;
+      if (rafId) window.cancelAnimationFrame(rafId);
+      timerIds.forEach((timerId) => window.clearTimeout(timerId));
+      resizeObserver?.disconnect?.();
+      mutationObserver?.disconnect?.();
+      observedNodes = [];
+      el.classList?.remove?.("message-list--history-prepend-locking");
+      if (manualHistoryAnchorLockCleanup === cleanup) {
+        manualHistoryAnchorLockCleanup = null;
+      }
+    };
+
+    const scheduleAdjust = () => {
+      if (finished || rafId || token !== manualHistoryAnchorLockToken) return;
+      rafId = window.requestAnimationFrame(adjust);
+    };
+
+    const observePrependNodes = () => {
+      if (typeof ResizeObserver === "undefined") return;
+      target = findMessageElementById(el, anchor.id);
+      if (!target) return;
+
+      const nextNodes = collectElementsBeforeAnchor(el, anchor.id);
+      if (
+        nextNodes.length === observedNodes.length &&
+        nextNodes.every((node, index) => node === observedNodes[index])
+      ) {
+        return;
+      }
+
+      observedNodes = nextNodes;
+      resizeObserver?.disconnect?.();
+      resizeObserver = new ResizeObserver(scheduleAdjust);
+      observedNodes.forEach((node) => resizeObserver.observe(node));
+      resizeObserver.observe(target);
+    };
+
+    function adjust() {
+      rafId = 0;
+      if (finished || token !== manualHistoryAnchorLockToken) {
+        cleanup();
+        return;
+      }
+      target = findMessageElementById(el, anchor.id);
+      if (!target) {
+        cleanup();
+        return;
+      }
+      restoreHistoryLazyViewportAnchorByViewport(el, anchor);
+      observePrependNodes();
+      updateOverlayScrollbarFrame();
+      updateBottomState();
+    }
+
+    manualHistoryAnchorLockCleanup = cleanup;
+    observePrependNodes();
+
+    if (typeof MutationObserver !== "undefined") {
+      mutationObserver = new MutationObserver(scheduleAdjust);
+      mutationObserver.observe(el, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    scheduleAdjust();
+    [0, 16, 32, 64, 96, 160, 240, 360, 520, 760, 1040, 1400, 1800, 2200].forEach(
+      (delay) => {
+        timerIds.push(window.setTimeout(scheduleAdjust, delay));
+      }
+    );
+
+    timerIds.push(window.setTimeout(cleanup, duration));
+    return true;
   }
 
   function clearStableTimers() {
@@ -329,36 +637,84 @@ export function useMessageListScroll({props, emit}) {
     historyRenderCompleting = false;
   }
 
-  async function requestPreviousHistoryMessagesIfNeeded() {
-    if (props.historyRendering || props.loading) return;
-    if (!props.hasPreviousHistoryMessages || previousHistoryLoadInProgress)
-      return;
+  async function requestPreviousHistoryMessagesIfNeeded(options = {}) {
+    if (props.historyRendering || props.loading) return false;
+    if (!props.hasPreviousHistoryMessages || previousHistoryLoadInProgress.value) {
+      return false;
+    }
 
     const el = getScrollElement();
     const threshold = Number(props.historyLazyTopThreshold);
     const topThreshold = Number.isFinite(threshold) && threshold >= 0
       ? threshold
       : DEFAULT_HISTORY_LAZY_TOP_THRESHOLD;
-    if (!el || el.scrollTop > topThreshold) return;
+    if (!el || (!options.force && el.scrollTop > topThreshold)) return false;
 
-    previousHistoryLoadInProgress = true;
+    previousHistoryLoadInProgress.value = true;
     const previousScrollHeight = el.scrollHeight;
     const previousScrollTop = el.scrollTop;
+    const anchor = getHistoryLazyViewportAnchor(el);
+    const useManualViewportLock = options.manual === true;
 
     try {
+      suppressHistoryLazyScrollRestore(useManualViewportLock ? 900 : 420);
       emit("load-previous-history");
       await nextTick();
-      updateOverlayScrollbarFrame();
-      await waitAnimationFrames(1);
+
+      if (useManualViewportLock) {
+        const restoredByViewport = restoreHistoryLazyViewportAnchorByViewport(
+          el,
+          anchor
+        );
+        if (!restoredByViewport) {
+          const heightDelta = Math.max(0, el.scrollHeight - previousScrollHeight);
+          suppressHistoryLazyScrollRestore();
+          el.scrollTop = Math.max(0, previousScrollTop + heightDelta);
+        }
+        startManualHistoryAnchorLock(el, anchor);
+        updateOverlayScrollbarFrame();
+        updateBottomState();
+        return true;
+      }
+
+      await waitAnimationFrames(2);
       updateOverlayScrollbarFrame();
 
       const nextScrollHeight = el.scrollHeight;
       const heightDelta = Math.max(0, nextScrollHeight - previousScrollHeight);
-      el.scrollTop = Math.max(0, previousScrollTop + heightDelta);
+      if (heightDelta <= 0) {
+        updateBottomState();
+        return true;
+      }
+
+      const restoredByAnchor = restoreHistoryLazyViewportAnchor(el, anchor);
+      if (!restoredByAnchor) {
+        suppressHistoryLazyScrollRestore();
+        el.scrollTop = Math.max(0, previousScrollTop + heightDelta);
+      }
+
+      updateOverlayScrollbarFrame();
       updateBottomState();
+      return true;
     } finally {
-      previousHistoryLoadInProgress = false;
+      previousHistoryLoadInProgress.value = false;
     }
+  }
+
+  function blurHistoryLoadMoreTrigger(event) {
+    const target = event?.currentTarget || event?.target || null;
+    if (typeof target?.blur === "function") {
+      target.blur();
+    }
+    const active = typeof document !== "undefined" ? document.activeElement : null;
+    if (active && active !== document.body && typeof active.blur === "function") {
+      active.blur();
+    }
+  }
+
+  function handleManualPreviousHistoryLoad(event) {
+    blurHistoryLoadMoreTrigger(event);
+    return requestPreviousHistoryMessagesIfNeeded({force: true, manual: true});
   }
 
   function getHistoryRenderMessageKey(message, index) {
@@ -373,6 +729,7 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function handleUserScrollIntent() {
+    cancelManualHistoryAnchorLock();
     clearStableTimers();
     clearAfterRenderScrollState();
     if (!props.historyRendering) {
@@ -1025,6 +1382,7 @@ export function useMessageListScroll({props, emit}) {
     if (props.historyRendering) {
       resizeRecalculateRafId = window.requestAnimationFrame(() => {
         resizeRecalculateRafId = 0;
+        refreshManualHistoryLoadMode();
         recalculateFocusSpacerHeight();
         updateOverlayScrollbarFrame();
         updateBottomState();
@@ -1040,6 +1398,7 @@ export function useMessageListScroll({props, emit}) {
       resizeRecalculateTimerId = 0;
       resizeRecalculateRafId = window.requestAnimationFrame(() => {
         resizeRecalculateRafId = 0;
+        refreshManualHistoryLoadMode();
         recalculateFocusSpacerHeight();
         updateOverlayScrollbarFrame();
         updateBottomState();
@@ -1096,6 +1455,7 @@ export function useMessageListScroll({props, emit}) {
 
   onMounted(() => {
     if (typeof window === "undefined") return;
+    refreshManualHistoryLoadMode();
     setupOverlayScrollbar();
     recalculateFocusSpacerHeight();
     if (props.historyRendering && props.historyMessagesReady)
@@ -1121,6 +1481,7 @@ export function useMessageListScroll({props, emit}) {
     clearRenderedFrameScheduler();
     clearTrackedAnimationFrames();
     clearResizeRecalculateScheduler();
+    cancelManualHistoryAnchorLock();
     cleanupOverlayScrollbar();
     if (typeof window === "undefined") return;
     window.removeEventListener("resize", scheduleResizeRecalculate);
@@ -1136,8 +1497,11 @@ export function useMessageListScroll({props, emit}) {
     scrollRef,
     bottomRef,
     streamFocusSpacerHeight,
+    androidManualHistoryLoadMode,
+    previousHistoryLoadInProgress,
     handleScroll,
     handleUserScrollIntent,
+    handleManualPreviousHistoryLoad,
     handleMessageRendered,
     scrollToBottom,
     scrollToBottomAfterRender,

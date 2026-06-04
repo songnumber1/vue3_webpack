@@ -14,6 +14,20 @@
     @wheel.passive="handleUserScrollIntent"
     @pointerdown.passive="handleUserScrollIntent"
   >
+    <div
+      v-if="showAndroidHistoryLoadMore"
+      class="history-load-more-row"
+    >
+      <button
+        class="history-load-more-button"
+        type="button"
+        :disabled="previousHistoryLoadInProgress"
+        @click="handleManualPreviousHistoryLoad($event)"
+      >
+        <span v-if="previousHistoryLoadInProgress">이전 대화 불러오는 중...</span>
+        <span v-else>이전 대화 {{ historyLazyChunkSize }}개 더 보기</span>
+      </button>
+    </div>
     <ChatMessageRouter
       v-for="message in messages"
       :key="message.id"
@@ -39,6 +53,7 @@
 </template>
 
 <script setup>
+import {computed} from "vue";
 import ChatMessageRouter from "./ChatMessageRouter.vue";
 import {useMessageListScroll} from "@/composables/chat/message-list/useMessageListScroll";
 
@@ -50,6 +65,7 @@ const props = defineProps({
   historyMessagesReady: {type: Boolean, default: false},
   hasPreviousHistoryMessages: {type: Boolean, default: false},
   historyLazyTopThreshold: {type: Number, default: 96},
+  historyLazyChunkSize: {type: Number, default: 100},
 });
 
 const emit = defineEmits([
@@ -78,8 +94,11 @@ const {
   scrollRef,
   bottomRef,
   streamFocusSpacerHeight,
+  androidManualHistoryLoadMode,
+  previousHistoryLoadInProgress,
   handleScroll,
   handleUserScrollIntent,
+  handleManualPreviousHistoryLoad,
   handleMessageRendered,
   scrollToBottom,
   scrollToBottomAfterRender,
@@ -87,6 +106,14 @@ const {
   getIsAtBottom,
   getScrollElement,
 } = useMessageListScroll({props, emit});
+
+const showAndroidHistoryLoadMore = computed(
+  () =>
+    androidManualHistoryLoadMode.value &&
+    props.hasPreviousHistoryMessages &&
+    !props.historyRendering &&
+    !props.loading
+);
 
 defineExpose({
   scrollToBottom,
@@ -101,6 +128,53 @@ defineExpose({
 .message-list {
   min-width: 0;
   min-height: 0;
+  overflow-anchor: none;
+}
+
+.message-list--history-prepend-locking {
+  overflow-anchor: none !important;
+  scroll-behavior: auto !important;
+}
+
+.history-load-more-row {
+  display: flex;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 16px 16px;
+}
+
+.history-load-more-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  max-width: min(100%, 320px);
+  padding: 0 16px;
+  border: 1px solid var(--app-control-border, var(--border-color, #d9d9d9));
+  border-radius: 999px;
+  background: var(--app-control, var(--bg-elevated, #fff));
+  color: var(--app-text, var(--text-color, #111827));
+  box-shadow: var(--shadow-control, 0 4px 14px rgba(15, 23, 42, 0.08));
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    transform 0.16s ease;
+  touch-action: manipulation;
+}
+
+.history-load-more-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.history-load-more-button:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 .message-list--history-rendering {
@@ -115,6 +189,16 @@ defineExpose({
   scroll-behavior: auto !important;
   overscroll-behavior: none !important;
   scrollbar-width: none !important;
+  overflow-anchor: none;
+}
+
+:global(body.android-webview) .message-list,
+:global(body.android-chrome) .message-list {
+  /*
+   * Lazy prepend 위치는 useMessageListScroll의 DOM anchor 보정으로만 처리합니다.
+   * Android 브라우저 scroll anchoring과 수동 scrollTop 보정이 동시에 동작하면
+   * lazy load 직후 viewport가 중간 위치로 튈 수 있습니다.
+   */
   overflow-anchor: none;
 }
 

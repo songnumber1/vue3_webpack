@@ -133,9 +133,9 @@ export const settingsMessages = {
             "대용량 대화방 입장 및 상단 갱신 시 한 번에 렌더링할 메시지 개수입니다.",
         },
         historyLazyTopThreshold: {
-          label: "이력 상단 로드 기준",
+          label: "이력 상단 로드 기준(PC 전용)",
           description:
-            "스크롤이 상단 몇 px 이내로 접근하면 이전 메시지를 추가 로드할지 결정합니다.",
+            "PC에서 스크롤이 상단 몇 px 이내로 접근하면 이전 메시지를 자동 추가 로드할지 결정합니다. Android 버튼 방식에는 적용되지 않습니다.",
         },
         abortChatOnMobileBackground: {
           label: "백그라운드 모드 시 채팅 종료",
@@ -431,9 +431,9 @@ export const settingsMessages = {
             "Number of messages rendered at once when entering or prepending a large history chat.",
         },
         historyLazyTopThreshold: {
-          label: "History top load threshold",
+          label: "History top load threshold (PC only)",
           description:
-            "ScrollTop threshold in px that triggers loading previous history messages near the top.",
+            "ScrollTop threshold in px that triggers automatic previous-history loading on PC. This does not apply to the Android button-based mode.",
         },
         abortChatOnMobileBackground: {
           label: "End chat on mobile background",
