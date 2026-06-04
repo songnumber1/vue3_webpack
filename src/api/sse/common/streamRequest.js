@@ -79,6 +79,11 @@ export async function fetchGenerationResult(requestId) {
     buildOptions(authOptions.headers)
   );
 
+  if (response.status === 403) {
+    resetAuthStateSafely();
+    return null;
+  }
+
   if (response.status === 401 && authOptions.policy.isJwt) {
     try {
       const accessToken = await refreshAccessTokenOnce();
@@ -89,12 +94,15 @@ export async function fetchGenerationResult(requestId) {
           Authorization: `Bearer ${accessToken}`,
         })
       );
-      if (response.status === 401) {
+      if (response.status === 401 || response.status === 403) {
         resetAuthStateSafely();
       }
     } catch (_error) {
       return null;
     }
+  } else if (response.status === 401) {
+    resetAuthStateSafely();
+    return null;
   }
 
   if (!response.ok) return null;

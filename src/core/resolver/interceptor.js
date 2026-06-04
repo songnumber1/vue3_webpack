@@ -11,6 +11,7 @@ import {isNativeApp} from "@/core/config";
 import {
   applyAuthRequestConfig,
   handleAuthResponseError,
+  isAuthExpiredStatus,
   shouldTryRefresh,
 } from "@/auth/httpAuthInterceptor";
 
@@ -50,7 +51,7 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
 }
 
 /**
- * @description 전역 HTTP 응답에 대한 가로채기(Interceptor)를 수행하여 401(미인증), 500대(서버 에러) 상태 코드를 일괄 모니터링하고 UI 경고창을 연동합니다.
+ * @description 전역 HTTP 응답에 대한 가로채기(Interceptor)를 수행하여 401/403(인증 만료), 500대(서버 에러) 상태 코드를 일괄 모니터링하고 UI 경고창을 연동합니다.
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
  * @param {object} errorUI - 전역 알림(Toast/Modal) 레이어를 트리거할 UI 가드 인스턴스 기구 컨텍스트
  * @returns {void}
@@ -61,8 +62,8 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
 function notifyHttpError(error, errorUI) {
   const status = error?.response?.status; // 인입된 HTTP Status Code 스캔
 
-  // 인증 토큰 만료 혹은 비인가 접근 제한 사태 발생 시 (Unauthorized)
-  if (status === 401) {
+  // 인증 토큰/세션 만료 혹은 비인가 접근 제한 사태 발생 시
+  if (isAuthExpiredStatus(status)) {
     errorUI?.notify?.("인증 정보가 만료되었습니다.");
   }
 

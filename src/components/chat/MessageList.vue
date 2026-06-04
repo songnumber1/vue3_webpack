@@ -100,17 +100,6 @@ defineExpose({
 .message-list {
   min-width: 0;
   min-height: 0;
-  /*
-   * Mermaid가 많은 대화방의 history hydration 중 내부 scrollHeight가 커져도
-   * message-list가 부모 채팅 영역 밖으로 body/document 높이를 밀지 않도록
-   * 자체 스크롤 컨테이너 경계를 명확히 고정합니다.
-   * display/visibility/contain:paint는 Android 최초 Mermaid 계산에 영향을 줄 수 있어
-   * 건드리지 않고 높이 전파 방어만 수행합니다.
-   */
-  height: 100%;
-  max-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
 }
 
 .message-list--history-rendering {

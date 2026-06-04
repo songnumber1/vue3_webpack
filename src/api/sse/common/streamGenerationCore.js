@@ -10,11 +10,15 @@ import {
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 
-function isUnauthorizedStreamError(error) {
+function getUnauthorizedStreamStatus(error) {
   const status = Number(
     error?.status || error?.responseCode || error?.code || 0
   );
-  return status === 401;
+  return status === 401 || status === 403 ? status : 0;
+}
+
+function isUnauthorizedStreamError(error) {
+  return Boolean(getUnauthorizedStreamStatus(error));
 }
 
 export async function runSseGenerationStream({
@@ -152,11 +156,13 @@ export async function runSseGenerationStream({
     try {
       await executeStream(authOptions);
     } catch (error) {
-      if (
-        authOptions.policy.isJwt &&
-        isUnauthorizedStreamError(error) &&
-        !controller?.signal?.aborted
-      ) {
+      const unauthorizedStatus = getUnauthorizedStreamStatus(error);
+      if (unauthorizedStatus && !controller?.signal?.aborted) {
+        if (!authOptions.policy.isJwt || unauthorizedStatus === 403) {
+          resetAuthStateSafely();
+          throw error;
+        }
+
         const accessToken = await refreshAccessTokenOnce();
         authOptions = {
           ...authOptions,

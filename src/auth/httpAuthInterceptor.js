@@ -25,9 +25,23 @@ export function applyAuthRequestConfig(config = {}) {
   return config;
 }
 
+export function isAuthExpiredStatus(status) {
+  return status === 401 || status === 403;
+}
+
+function shouldResetAuthForError(error) {
+  const status = error?.response?.status;
+  const config = error?.config || {};
+  if (!isAuthExpiredStatus(status)) return false;
+  if (isAuthPublicUrl(config.url)) return false;
+  return true;
+}
+
 export function shouldTryRefresh(error) {
   const status = error?.response?.status;
   const config = error?.config || {};
+  // JWT refresh는 access token 만료를 의미하는 401에서만 수행합니다.
+  // 백엔드 세션 인터셉터가 내려주는 403은 refresh 재시도 없이 인증 상태를 정리합니다.
   if (status !== 401) return false;
   if (config.__authRetry) return false;
   if (config.signal?.aborted) return false;
@@ -56,11 +70,16 @@ export function resetAuthStateSafely() {
 }
 
 function isUnauthorized(error) {
-  return error?.response?.status === 401;
+  return isAuthExpiredStatus(error?.response?.status);
 }
 
 export async function handleAuthResponseError(error, client) {
-  if (!shouldTryRefresh(error)) return Promise.reject(error);
+  if (!shouldTryRefresh(error)) {
+    if (shouldResetAuthForError(error)) {
+      resetAuthStateSafely();
+    }
+    return Promise.reject(error);
+  }
 
   let accessToken;
   try {

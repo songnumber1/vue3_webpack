@@ -50,7 +50,6 @@ export const useChatStore = defineStore("chat", {
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
     promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
     pendingNewSubmitChatIds: {}, // 메인 새 대화 submit 직후 라우트 전환 시 기존 대화방 historyRender overlay/scroll을 건너뛰기 위한 일회성 플래그 맵
-    historyNavigationLoading: false, // 좌측 히스토리 클릭 직후 라우터/데이터 로딩 파이프라인이 시작되기 전까지 전역 progress를 즉시 표시하기 위한 UI 전용 플래그
   }),
   getters: {
     /**
@@ -154,22 +153,6 @@ export const useChatStore = defineStore("chat", {
      */
     clearPendingSelectedChatId() {
       this.pendingSelectedChatId = null;
-    },
-
-    /**
-     * 좌측 히스토리 메뉴 클릭 순간부터 route watcher와 history render overlay가 실제로
-     * 동작하기 전까지의 짧은 공백을 메우는 progress 표시 전용 플래그를 켭니다.
-     * API overlay 카운터와 분리해 start/stop 중첩 카운트 꼬임을 만들지 않습니다.
-     */
-    startHistoryNavigationLoading() {
-      this.historyNavigationLoading = true;
-    },
-    /**
-     * history render 완료, route 실패, 컴포넌트 해제 등 모든 종료 지점에서 호출해
-     * 클릭 선반영 progress가 화면에 남지 않도록 정리합니다.
-     */
-    stopHistoryNavigationLoading() {
-      this.historyNavigationLoading = false;
     },
 
     /**

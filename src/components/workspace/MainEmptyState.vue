@@ -4,7 +4,6 @@
     :class="{
       'empty-stage--mobile-main': isMobile,
       'main-empty-state--preview': preview,
-      'main-empty-state--reserve-suggestions': shouldReserveSuggestionSpace,
     }"
   >
     <div
@@ -23,12 +22,8 @@
         {{ subtitle }}
       </p>
       <div
-        v-if="normalizedSuggestions.length || shouldReserveSuggestionSpace"
+        v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
-        :class="{
-          'main-empty-state__suggestions--empty': !normalizedSuggestions.length,
-        }"
-        :aria-hidden="!normalizedSuggestions.length ? 'true' : undefined"
       >
         <button
           v-for="item in normalizedSuggestions"
@@ -79,15 +74,11 @@ const props = defineProps({
   title: {type: String, default: ""},
   subtitle: {type: String, default: ""},
   suggestions: {type: Array, default: () => []},
-  reserveSuggestionSpace: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(["suggestion-click"]);
 
 const resolvedTitle = computed(() => props.title || t("chat.startQuestion"));
-const shouldReserveSuggestionSpace = computed(
-  () => !props.preview && !props.isMobile && props.reserveSuggestionSpace
-);
 const normalizedSuggestions = computed(() =>
   (props.suggestions || [])
     .filter(Boolean)
@@ -119,50 +110,6 @@ function handleSuggestionClick(item) {
 </script>
 
 <style scoped lang="scss">
-/*
- * PC main layout guard:
- * - 추천 예시가 0개이거나 assistant 변경 중 일시적으로 비어도 composer 폭이 줄지 않게 고정합니다.
- * - mobile은 기존 dock/fixed 정책을 그대로 사용해야 하므로 empty-stage--mobile-main에는 적용하지 않습니다.
- */
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  .main-empty-state__center {
-  box-sizing: border-box;
-  width: min(var(--layout-prompt-width, 820px), calc(100% - 40px));
-  max-width: var(--layout-prompt-width, 820px);
-}
-
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  :deep(.desktop-center-prompt.prompt-wrap) {
-  flex: 0 0 auto;
-  align-self: stretch;
-  box-sizing: border-box;
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
-  min-width: 0;
-  margin-right: auto !important;
-  margin-left: auto !important;
-}
-
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  :deep(.desktop-center-prompt .prompt-box),
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  :deep(.desktop-center-prompt .prompt-box--gemini) {
-  box-sizing: border-box;
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
-}
-
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  .main-empty-state__suggestions {
-  min-height: 40px;
-}
-
-.main-empty-state:not(.empty-stage--mobile-main):not(.main-empty-state--preview)
-  .main-empty-state__suggestions--empty {
-  visibility: hidden;
-  pointer-events: none;
-}
-
 /*
  * Mobile main composer owns a separate dock outside .empty-center.
  * This prevents the prompt from staying in the desktop empty-state flow when

@@ -259,7 +259,6 @@ ${message?.reasoningContent || ""}`;
   }
 
   function finishHistoryRender() {
-    chatStore.stopHistoryNavigationLoading();
     const finishSeq = ++historyRenderFinishSeq;
 
     const revealAfterPaint = async () => {
@@ -625,7 +624,6 @@ ${message?.reasoningContent || ""}`;
 
     onBeforeUnmount(() => {
       historyRenderFinishSeq += 1;
-      chatStore.stopHistoryNavigationLoading();
       if (historyRenderOverlayActive) {
         apiRequestStore.stopOverlay();
         historyRenderOverlayActive = false;

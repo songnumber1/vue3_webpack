@@ -13,7 +13,6 @@
     :assistant-icon="mainAssistantIcon"
     :assistant-label="assistantLabel"
     :suggestions="suggestions"
-    :reserve-suggestion-space="!isMobile"
     @suggestion-click="handleSuggestionClick"
   >
     <template #composer>

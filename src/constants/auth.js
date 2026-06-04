@@ -49,11 +49,11 @@ export const AUTH_FAILURE_REASONS = Object.freeze({
 
 /**
  * @constant {boolean} ENABLE_AUTH_GUARD_CACHE
- * @description 매 라우팅 페이지 전환 시마다 발생하는 인증 검증 부하를 줄이기 위해 로컬 인메모리 영역에 권한 체크 스냅샷 결과를 캐싱하여 우회 통과시킬지 여부 플래그 (기본값: false)
+ * @description 매 라우팅 페이지 전환 시마다 발생하는 인증 검증 부하를 줄이기 위해 로컬 인메모리 영역에 권한 체크 스냅샷 결과를 캐싱하여 우회 통과시킬지 여부 플래그 (기본값: true)
  */
 export const ENABLE_AUTH_GUARD_CACHE = readBooleanEnv(
   process.env.VUE_APP_ENABLE_AUTH_GUARD_CACHE,
-  false
+  true
 );
 
 /**
