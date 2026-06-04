@@ -29,20 +29,26 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
+import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const {t} = useI18n();
 const apiRequestStore = useApiRequestStore();
+const chatStore = useChatStore();
 const systemSettingsStore = useSystemSettingsStore();
 const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
 // API 진행 표시 설정은 일반 HTTP/SSE 요청뿐 아니라 채팅방 이력 historyRender처럼
 // 직접 startOverlay()로 보호하는 화면 전환 작업에도 동일하게 적용합니다.
-// 사용자가 시스템 설정에서 끄면 activeOverlayCount가 남아 있어도 화면에는
+// 좌측 히스토리 클릭 직후에는 route watcher가 실행되기 전 짧은 공백이 생길 수 있어
+// chatStore.historyNavigationLoading을 OR 조건으로 함께 봅니다. 이 값은 overlay count와
+// 분리되어 있어 HTTP/SSE progress 카운터 정합성을 깨뜨리지 않습니다.
+// 사용자가 시스템 설정에서 끄면 activeOverlayCount 또는 historyNavigationLoading이 남아 있어도
 // circle progress가 절대 렌더링되지 않습니다.
 const visible = computed(
   () =>
     Boolean(systemSettingsStore.showMobileApiProgress) &&
-    Boolean(isOverlayVisible.value)
+    (Boolean(isOverlayVisible.value) ||
+      Boolean(chatStore.historyNavigationLoading))
 );
 </script>

@@ -119,13 +119,40 @@ export function useChatNavigationActions({
     const historyId = String(item?.id || "").trim();
     if (!historyId) return false;
 
-    chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels(); // 대화 맥락이 바뀌므로 열려 있던 우측 정보 패널들 강제 셧다운
     // 모바일/좁은 화면에서는 대용량 대화방 historyRender overlay가 시작되기 전에
     // 좌측 드로어와 접힌 최근 목록을 먼저 닫아 로딩 화면과 메뉴가 겹쳐 보이지 않게 합니다.
     navigationStore.setDrawerOpen(false);
     navigationStore.setCollapsedRecentOpen(false);
-    await router.push({name: "chat", params: {id: historyId}}).catch(() => {});
+
+    const currentId = String(chatStore.selectedChatId || "").trim();
+    const pendingId = String(chatStore.pendingSelectedChatId || "").trim();
+    if (historyId === currentId && !pendingId) {
+      chatStore.stopHistoryNavigationLoading();
+      return true;
+    }
+
+    chatStore.setPendingSelectedChatId(historyId);
+    // 기존 apiRequestStore.startOverlay()를 직접 호출하면 beginHistoryRender()의
+    // overlay count와 중첩되어 progress가 남을 수 있습니다. 별도 UI flag로
+    // 클릭 즉시 표시만 보장하고, 실제 historyRender 종료 지점에서 정리합니다.
+    chatStore.startHistoryNavigationLoading();
+
+    try {
+      const navigationFailure = await router.push({
+        name: "chat",
+        params: {id: historyId},
+      });
+      if (navigationFailure) {
+        // 라우터가 이동을 취소/중복 처리하면 route watcher가 실행되지 않을 수 있습니다.
+        chatStore.stopHistoryNavigationLoading();
+      }
+    } catch (error) {
+      void error;
+      // 예외성 네비게이션 실패로 loadRouteConversation이 이어지지 않는 경우
+      // 클릭 선반영 progress가 고착되지 않도록 즉시 회수합니다.
+      chatStore.stopHistoryNavigationLoading();
+    }
     return true;
   }
 
