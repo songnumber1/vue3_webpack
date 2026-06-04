@@ -33,6 +33,15 @@ body.mobile-mode .message--user .bubble {
   margin-left: auto;
 }
 
+body.mobile-mode .message--assistant .bubble {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 12px 16px;
+  max-width: 100%;
+  margin-right: 0;
+}
+
 body.mobile-mode .bubble-content {
   font-size: var(--font-size-fixed-17);
   line-height: 1.66;
