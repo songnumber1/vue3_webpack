@@ -14,7 +14,8 @@
     var(--layout-chat-lane-width, 880px),
     100%
   );
-  --code-interpreter-panel-gap: 24px;
+  --code-interpreter-panel-gap: 32px;
+  --code-interpreter-header-panel-gap: 16px;
   --code-interpreter-shell-padding-x: 24px;
   --code-interpreter-shell-padding-y: 18px;
 }
@@ -27,17 +28,14 @@ body.desktop-mode.code-interpreter-panel-open
   .chat-workspace {
   display: grid !important;
   grid-template-columns:
-    minmax(
-      var(--code-interpreter-chat-min-width),
-      var(--code-interpreter-chat-width)
-    )
+    minmax(var(--code-interpreter-chat-min-width), 1fr)
     minmax(
       var(--code-interpreter-panel-min-width),
       var(--code-interpreter-panel-width)
     );
   grid-template-rows: auto minmax(0, 1fr) auto;
   align-items: stretch;
-  justify-content: safe center;
+  justify-content: stretch;
   column-gap: var(--code-interpreter-panel-gap);
   row-gap: 0;
   width: 100%;
@@ -61,10 +59,10 @@ body.desktop-mode.code-interpreter-panel-open
   > .mobile-topbar {
   grid-column: 1 / -1;
   grid-row: 1;
-  min-width: calc(
-    var(--code-interpreter-chat-min-width) + var(--code-interpreter-panel-gap) +
-      var(--code-interpreter-panel-min-width)
-  );
+  justify-self: stretch;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
   margin-right: calc(-1 * var(--code-interpreter-shell-padding-x));
   margin-left: calc(-1 * var(--code-interpreter-shell-padding-x));
 }
@@ -153,7 +151,8 @@ body.desktop-mode.code-interpreter-panel-open .code-interpreter-preview-panel {
   min-width: 0;
   max-width: none;
   min-height: 0;
-  height: 100%;
+  height: calc(100% - var(--code-interpreter-header-panel-gap));
+  margin-top: var(--code-interpreter-header-panel-gap);
   z-index: var(--z-content-raised);
 }
 
