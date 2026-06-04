@@ -27,10 +27,15 @@ function isChromeUserAgent(ua) {
   return /Chrome\//i.test(ua) || /Chromium\//i.test(ua);
 }
 
+function isFirefoxUserAgent(ua) {
+  return /Firefox\//i.test(ua);
+}
+
 export function getBrowserName(ua, hasBridge = false) {
   if (hasBridge) return "android-webview";
   if (isAndroidWebViewUserAgent(ua)) return "android-webview";
   if (isSamsungBrowserUserAgent(ua)) return "samsung-browser";
+  if (isFirefoxUserAgent(ua)) return "firefox";
   if (isChromeUserAgent(ua)) return "chrome";
   return "unsupported";
 }
@@ -41,6 +46,9 @@ export function getBrowserVersion(ua, browserName) {
   }
   if (browserName === "chrome") {
     return parseVersion(ua, /(?:Chrome|Chromium)\/([\d.]+)/i);
+  }
+  if (browserName === "firefox") {
+    return parseVersion(ua, /Firefox\/([\d.]+)/i);
   }
   if (browserName === "android-webview") {
     return (
@@ -65,8 +73,20 @@ export function resolveBasePlatform(value, ua, navPlatform) {
     : detectEnv(ua, navPlatform);
 }
 
-export function isSupportedBrowserName(browserName) {
-  return browserName === "chrome" || browserName === "android-webview";
+function isDesktopEnv(env) {
+  return (
+    env === PLATFORM.WINDOWS || env === PLATFORM.MAC || env === PLATFORM.LINUX
+  );
+}
+
+export function isSupportedBrowserName(browserName, {env} = {}) {
+  if (browserName === "chrome" || browserName === "android-webview") {
+    return true;
+  }
+
+  // Firefox는 PC 웹에서만 지원합니다. Android Firefox는 기존 모바일 지원 범위
+  // Android Chrome/WebView 밖이므로 계속 비지원 처리합니다.
+  return browserName === "firefox" && isDesktopEnv(env);
 }
 
 export function detectDevice({env, browserName}) {
@@ -76,12 +96,10 @@ export function detectDevice({env, browserName}) {
       ? browserName
       : "unsupported-browser";
   }
-  if (
-    env === PLATFORM.WINDOWS ||
-    env === PLATFORM.MAC ||
-    env === PLATFORM.LINUX
-  ) {
-    return browserName === "chrome" ? "chrome" : "unsupported-browser";
+  if (isDesktopEnv(env)) {
+    return browserName === "chrome" || browserName === "firefox"
+      ? browserName
+      : "unsupported-browser";
   }
   return "unsupported-browser";
 }

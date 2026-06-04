@@ -82,7 +82,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     /SamsungBrowser\//i.test(ua);
   const isSupportedRuntime =
     !isActuallySamsungBrowser &&
-    (forcedPlatform.isForced || isSupportedBrowserName(browserName));
+    (forcedPlatform.isForced || isSupportedBrowserName(browserName, {env}));
   const isUnsupportedBrowser = !isSupportedRuntime;
   const unsupportedReason = isActuallySamsungBrowser
     ? "unsupported-samsung-browser"
@@ -156,6 +156,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isPlatformForced: forcedPlatform.isForced,
     platformOverride,
     isChrome: browserName === "chrome",
+    isFirefox: browserName === "firefox",
     isSupportedRuntime,
     isSamsungBrowser: isActuallySamsungBrowser,
     isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
