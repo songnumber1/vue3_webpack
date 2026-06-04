@@ -14,6 +14,7 @@
     </button>
     <div
       v-if="open && !mobile"
+      ref="menuRef"
       class="assistant-menu tw-absolute tw-z-popover tw-mt-2 tw-w-full tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
     >
       <button

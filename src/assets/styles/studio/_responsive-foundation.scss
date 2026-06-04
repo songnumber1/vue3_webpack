@@ -120,8 +120,14 @@ body.mobile-mode .mcp-created-filter {
    the Connector category chip row without changing mobile/tablet runtime styles. */
 body.desktop-mode .chat-container-root--mode-studio .mcp-created-filter,
 body.desktop-mode .studio-workspace .mcp-created-filter {
+  display: inline-flex;
+  width: fit-content;
+  max-width: calc(100% - 24px);
   min-height: 32px;
   box-sizing: border-box;
+  align-self: flex-start;
+  justify-content: flex-start;
   margin: -4px 0 12px;
   padding: 0 13px;
+  white-space: nowrap;
 }

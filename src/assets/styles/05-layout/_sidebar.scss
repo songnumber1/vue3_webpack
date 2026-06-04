@@ -27,6 +27,9 @@ body.desktop-mode .desktop-sidebar .assistant-menu {
   width: calc(100% - 8px);
   min-width: 0;
   max-width: 232px;
+  max-height: min(320px, calc(100vh - 112px));
+  overflow-x: hidden;
+  overflow-y: auto;
   transform: translateX(-50%);
 }
 
