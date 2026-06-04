@@ -131,18 +131,22 @@
       ></span>
     </button>
 
-    <label
+    <div
       v-if="activeTab === 'mine'"
-      class="mcp-created-filter tw-inline-flex tw-shrink-0 tw-cursor-pointer tw-select-none tw-items-center tw-gap-2 tw-self-start tw-rounded-[8px] tw-border tw-border-solid tw-border-studio-border tw-bg-studio-panel tw-px-3 tw-py-[9px] tw-text-[14px] tw-font-semibold tw-leading-[1.35] tw-text-studio-text"
+      class="mcp-created-filter-row tw-mx-auto tw-mb-3 tw-mt-[-4px] tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-justify-start"
     >
-      <input
-        :checked="createdOnly"
-        class="tw-m-0 tw-h-4 tw-w-4 tw-shrink-0 tw-accent-studio-primary"
-        type="checkbox"
-        @change="$emit('update-created-only', $event.target.checked)"
-      />
-      <span>{{ t("mcp.createdOnly") }}</span>
-    </label>
+      <label
+        class="mcp-created-filter tw-inline-flex tw-shrink-0 tw-cursor-pointer tw-select-none tw-items-center tw-gap-2 tw-self-start tw-rounded-[8px] tw-border tw-border-solid tw-border-studio-border tw-bg-studio-panel tw-px-3 tw-py-[9px] tw-text-[14px] tw-font-semibold tw-leading-[1.35] tw-text-studio-text"
+      >
+        <input
+          :checked="createdOnly"
+          class="tw-m-0 tw-h-4 tw-w-4 tw-shrink-0 tw-accent-studio-primary"
+          type="checkbox"
+          @change="$emit('update-created-only', $event.target.checked)"
+        />
+        <span>{{ t("mcp.createdOnly") }}</span>
+      </label>
+    </div>
 
     <div
       class="studio-list-shell tw-mx-auto tw-flex tw-min-h-0 tw-w-full tw-max-w-studio tw-flex-1 tw-flex-col tw-overflow-hidden"

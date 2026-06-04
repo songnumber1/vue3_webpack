@@ -131,3 +131,12 @@ body.desktop-mode .studio-workspace .mcp-created-filter {
   padding: 0 13px;
   white-space: nowrap;
 }
+
+/* PC only: align the My MCP created filter to the same left edge as the MCP card grid
+   without changing or widening the card grid itself. The row uses the same
+   tw-max-w-studio utility as .studio-list-shell, so only the old filter margin
+   is reset here. */
+body.desktop-mode .chat-container-root--mode-studio .mcp-created-filter-row .mcp-created-filter,
+body.desktop-mode .studio-workspace .mcp-created-filter-row .mcp-created-filter {
+  margin: 0;
+}
