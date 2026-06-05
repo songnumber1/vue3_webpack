@@ -72,8 +72,8 @@ export async function bootstrap() {
   // 12. 라우팅 전환 시 인증 인스턴스(`authAxios`)를 검증하여 페이지 접근 권한을 판단하는 클라이언트 라우터 설정을 로드합니다.
   const router = resolveRouter(appInfo, {authAxios});
 
-  // 13. 데스크톱, 모바일 뷰포트 상태에 따라 전체적인 뼈대가 될 메인 글로벌 레이아웃 컴포넌트(Layout)를 가동합니다.
-  const Layout = resolveLayout(appInfo);
+  // 13. 현재 앱의 단일 글로벌 레이아웃 컴포넌트(Layout)를 가동합니다.
+  const Layout = resolveLayout();
 
   // 14. Vue.js 프레임워크의 루트 인스턴스(App.vue)를 인스턴스화합니다.
   const app = createApp(App);

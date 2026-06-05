@@ -168,10 +168,17 @@ export const useChatStore = defineStore("chat", {
      * 긴 대화방을 여러 번 전환하면 이전 방의 message 배열이 캐시에 계속 남아
      * DOM은 제거되어도 JS heap이 회수되지 않습니다. 현재 열 방만 보존하고
      * 비활성 메시지 배열은 명시적으로 제거해 대용량 방 반복 진입 시 메모리 누적을 방지합니다.
+     *
+     * 입력창 툴바 설정도 대화방 ID별 map 구조라서 동일한 시점에 비활성 방의 설정을 함께 정리합니다.
+     * 단, 아직 chatId가 없는 새 대화 화면에서 사용하는 draft 설정 슬롯은 항상 보존합니다.
      */
     pruneInactiveMessageCache(keepChatId) {
       const keepId = String(keepChatId || "");
+      const shouldKeepChatScopedCache = (chatId) =>
+        String(chatId) === keepId ||
+        String(chatId) === DRAFT_PROMPT_TOOL_SETTINGS_KEY;
       const nextMessageMap = {};
+      const nextPromptToolSettingsMap = {};
 
       Object.entries(this.messageMap || {}).forEach(([chatId, list]) => {
         if (String(chatId) === keepId) {
@@ -179,7 +186,17 @@ export const useChatStore = defineStore("chat", {
         }
       });
 
+      Object.entries(this.promptToolSettingsMap || {}).forEach(
+        ([chatId, settings]) => {
+          if (shouldKeepChatScopedCache(chatId)) {
+            nextPromptToolSettingsMap[chatId] =
+              clonePromptToolSettings(settings);
+          }
+        }
+      );
+
       this.messageMap = nextMessageMap;
+      this.promptToolSettingsMap = nextPromptToolSettingsMap;
     },
     /**
      * 새로운 대화 이력이 생성되었거나 변경 사항이 발생했을 때 리스트 최선두에 아이템을 새치기 배치하고 구방을 뒤로 밀어 정렬합니다.

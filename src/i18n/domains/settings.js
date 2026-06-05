@@ -10,6 +10,10 @@
 export const settingsMessages = {
   ko: {
     systemSettings: {
+      eyebrow: "시스템",
+      title: "앱 동작 설정",
+      description:
+        "화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.",
       close: "닫기",
       apply: "적용",
       authModeChangeLogoutConfirm:
@@ -299,6 +303,10 @@ export const settingsMessages = {
     legal: {
       updatedAt: "시행일: 2026.05.18",
       privacy: {
+        eyebrow: "Privacy",
+        title: "개인정보처리방침",
+        description:
+          "DS Assistant는 서비스 제공에 필요한 최소한의 개인정보를 안전하게 처리합니다.",
         sections: [
           {
             title: "1. 수집하는 개인정보",

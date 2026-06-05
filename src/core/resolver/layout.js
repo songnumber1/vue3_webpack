@@ -9,6 +9,10 @@
 
 import AppContainer from "@/containers/AppContainer.vue";
 
+/**
+ * 현재 앱은 플랫폼별 레이아웃을 분기하지 않고 단일 AppContainer를 사용합니다.
+ * appInfo는 호출부에서 resolver별 일관성을 위해 전달되지만, 이 resolver에서는 사용하지 않습니다.
+ */
 export function resolveLayout() {
   return AppContainer;
 }

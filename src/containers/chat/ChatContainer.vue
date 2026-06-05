@@ -160,9 +160,20 @@ const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
 const CONNECTOR_STORE_PORTAL_ID = "connector-store";
+const PORTAL_ASSISTANT_IDS = [
+  ASSISTANT_STUDIO_PORTAL_ID,
+  CONNECTOR_STORE_PORTAL_ID,
+];
+const CONNECTOR_STORE_ROUTE_NAME = "connector-store";
+const STUDIO_ROUTE_NAMES = ["studio", CONNECTOR_STORE_ROUTE_NAME];
+
+function isPortalAssistantId(assistantId) {
+  return PORTAL_ASSISTANT_IDS.includes(assistantId);
+}
+
 const routeMode = computed(() => {
   if (route.name === "shared") return "shared";
-  if (["studio", "connector-store"].includes(route.name)) return "studio";
+  if (STUDIO_ROUTE_NAMES.includes(route.name)) return "studio";
   if (route.name === "chat-search") return "chat-search";
   if (route.name === "chat" || route.name === "chat-entry") return "chat";
   return "main";
@@ -187,7 +198,7 @@ function syncAssistantSelectionWithRoute() {
     }
     return;
   }
-  if (route.name === "connector-store") {
+  if (route.name === CONNECTOR_STORE_ROUTE_NAME) {
     if (
       connectorAssistant &&
       assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID
@@ -198,15 +209,11 @@ function syncAssistantSelectionWithRoute() {
   }
 
   if (
-    [ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(
-      assistantStore.selectedAssistantId
-    )
+    isPortalAssistantId(assistantStore.selectedAssistantId)
   ) {
     const fallbackAssistant = assistantStore.assistants.find(
       (assistant) =>
-        ![ASSISTANT_STUDIO_PORTAL_ID, CONNECTOR_STORE_PORTAL_ID].includes(
-          assistant.id
-        ) &&
+        !isPortalAssistantId(assistant.id) &&
         assistant.type !== "studio" &&
         assistant.type !== "mcp" &&
         !assistant.isStudio
@@ -309,12 +316,15 @@ const showVirtualKeyboardDebugButton = computed(
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleAssistantNewChat(assistantId) {
-  if (assistantId === "assistant-studio" || assistantId === "connector-store") {
+  if (isPortalAssistantId(assistantId)) {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
     router
       .push({
-        name: assistantId === "connector-store" ? "connector-store" : "studio",
+        name:
+          assistantId === CONNECTOR_STORE_PORTAL_ID
+            ? CONNECTOR_STORE_ROUTE_NAME
+            : "studio",
       })
       .catch(() => {});
     return;
