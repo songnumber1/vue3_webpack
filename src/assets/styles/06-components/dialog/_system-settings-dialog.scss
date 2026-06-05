@@ -24,6 +24,58 @@
   background: color-mix(in srgb, var(--surface) 92%, var(--accent) 8%);
 }
 
+
+.system-settings-tabs-row {
+  margin-top: 14px;
+  border-bottom: 1px solid var(--control-border);
+}
+
+.system-settings-tabs {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.system-settings-tab {
+  position: relative;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 5px 5px 0 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  padding: 11px 14px;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease;
+}
+
+.system-settings-tab:hover,
+.system-settings-tab:focus-visible {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  color: var(--text);
+  outline: none;
+}
+
+.system-settings-tab.is-active {
+  color: var(--accent);
+}
+
+.system-settings-tab.is-active::after {
+  content: "";
+  position: absolute;
+  right: 10px;
+  bottom: -1px;
+  left: 10px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
 .system-settings-eyebrow,
 .system-settings-group header span {
   margin: 0 0 6px;
@@ -126,6 +178,27 @@
 
 .system-settings-switch input:checked + span::after {
   transform: translateX(18px);
+}
+
+.system-settings-row.is-disabled {
+  opacity: 0.58;
+}
+
+.system-settings-row.is-disabled .system-settings-copy small {
+  color: color-mix(in srgb, var(--muted) 78%, transparent);
+}
+
+.system-settings-row.is-disabled input,
+.system-settings-row.is-disabled select {
+  cursor: not-allowed;
+}
+
+.system-settings-switch input:disabled {
+  cursor: not-allowed;
+}
+
+.system-settings-switch input:disabled + span {
+  background: color-mix(in srgb, var(--control-border) 72%, transparent);
 }
 
 .system-settings-number {

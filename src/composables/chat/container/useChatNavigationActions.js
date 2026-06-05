@@ -14,6 +14,8 @@ import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -141,9 +143,16 @@ export function useChatNavigationActions({
       await nextTick(); // Vue DOM 트리 상에 다크/라이트 CSS 클래스명이 전격 주입 정착되는 프레임 대기
 
       // [중요 인프라 가드]: 테마 백그라운드가 바뀌면 흰색/검은색 선이 가려지므로 돔 요소를 수색하여 인라인 SVG 머메이드 다이어그램 코드를 강제 강도 압착 재생성
-      await renderMermaidInElement(document.querySelector(".message-list"), {
-        force: true,
-      });
+      if (
+        isMermaidRenderingEnabledForPlatform(
+          getRuntimeSystemSettings(),
+          Boolean(isMobile?.value)
+        )
+      ) {
+        await renderMermaidInElement(document.querySelector(".message-list"), {
+          force: true,
+        });
+      }
 
       // 차트 재생성으로 인해 채팅창 총 길이가 변동될 수 있으므로 스테이블 모드로 하단 최적화 스크롤 복구 안착
       scrollBottom({stable: true});

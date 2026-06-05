@@ -12,6 +12,7 @@ import {
 } from "@/utils/mermaidRenderer";
 import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {createMessageScrollTargetController} from "./useMessageScrollTarget";
 
 const BOTTOM_THRESHOLD = 48;
@@ -32,6 +33,11 @@ const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
 // Android Chrome/WebView native scrolling keeps momentum after a fast fling.
 // Auto prepend during native scrolling is unstable, so Android uses a manual
 // "load previous history" button. PC keeps the existing automatic threshold path.
+
+
+function isMermaidRenderingEnabled() {
+  return isMermaidRenderingEnabledForPlatform(getRuntimeSystemSettings());
+}
 
 function isAndroidHistoryRenderRuntime() {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
@@ -949,6 +955,7 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function getExpectedHistoryRenderMermaidCount() {
+    if (!isMermaidRenderingEnabled()) return 0;
     return (props.messages || []).reduce((count, message) => {
       if (
         !message ||
@@ -1062,6 +1069,7 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function getPendingHistoryRenderMermaidTargets(root = scrollRef.value) {
+    if (!isMermaidRenderingEnabled()) return [];
     if (!root?.isConnected) return [];
     return Array.from(
       root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
@@ -1121,6 +1129,13 @@ export function useMessageListScroll({props, emit}) {
 
     const root = scrollRef.value;
     if (!root?.isConnected) return true;
+
+    if (!isMermaidRenderingEnabled()) {
+      fallbackPendingMermaidToCode(root);
+      updateOverlayScrollbarFrame();
+      applyHistoryRenderBottomScroll();
+      return true;
+    }
 
     const targets = getPendingHistoryRenderMermaidTargets(root);
     if (!targets.length) {

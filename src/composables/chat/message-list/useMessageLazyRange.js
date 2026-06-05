@@ -3,11 +3,18 @@
  * @description PC/모바일별 이력 메시지 lazy 렌더링 개수와 visible range 계산을 담당합니다.
  */
 
+import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+
 const DEFAULT_PC_INITIAL_COUNT = 100;
 const DEFAULT_PC_APPEND_COUNT = 50;
 const DEFAULT_PC_TOP_THRESHOLD_PX = 300;
 const DEFAULT_MOBILE_INITIAL_COUNT = 50;
 const DEFAULT_MOBILE_APPEND_COUNT = 25;
+
+export const MESSAGE_LAZY_DEVICE_MODES = Object.freeze({
+  pc: "pc",
+  mobile: "mobile",
+});
 
 function normalizePositiveInteger(value, fallback) {
   const numeric = Number(value);
@@ -23,9 +30,29 @@ function normalizeNonNegativeInteger(value, fallback) {
     : fallback;
 }
 
+export function isForcedMobilePlatformOverride(platformOverride) {
+  return (
+    platformOverride === PLATFORM_OVERRIDE_MODES.androidChrome ||
+    platformOverride === PLATFORM_OVERRIDE_MODES.androidWebView
+  );
+}
+
+export function resolveMessageLazyDeviceMode(settings = {}, isMobile = false) {
+  if (isForcedMobilePlatformOverride(settings.platformOverride)) {
+    return MESSAGE_LAZY_DEVICE_MODES.mobile;
+  }
+
+  return isMobile
+    ? MESSAGE_LAZY_DEVICE_MODES.mobile
+    : MESSAGE_LAZY_DEVICE_MODES.pc;
+}
+
 export function resolveMessageLazySettings(settings = {}, isMobile = false) {
-  if (isMobile) {
+  const deviceMode = resolveMessageLazyDeviceMode(settings, isMobile);
+
+  if (deviceMode === MESSAGE_LAZY_DEVICE_MODES.mobile) {
     return {
+      deviceMode,
       initialCount: normalizePositiveInteger(
         settings.mobileHistoryLazyInitialCount,
         DEFAULT_MOBILE_INITIAL_COUNT
@@ -39,6 +66,7 @@ export function resolveMessageLazySettings(settings = {}, isMobile = false) {
   }
 
   return {
+    deviceMode,
     initialCount: normalizePositiveInteger(
       settings.pcHistoryLazyInitialCount ?? settings.historyLazyChunkSize,
       DEFAULT_PC_INITIAL_COUNT

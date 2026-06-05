@@ -1,70 +1,45 @@
 <template>
   <form class="system-settings-view" @submit.prevent="apply">
     <div ref="settingsScrollRef" class="system-settings-scroll">
-      <section class="system-settings-hero">
-        <p class="system-settings-eyebrow">{{ t("systemSettings.eyebrow") }}</p>
-        <h3>{{ t("systemSettings.title") }}</h3>
-        <p>{{ t("systemSettings.description") }}</p>
-      </section>
 
-      <section
-        v-for="group in groups"
-        :key="group.title"
-        class="system-settings-group"
-      >
+      <div class="system-settings-tabs-row">
+        <div class="studio-tabs system-settings-tabs" role="tablist" :aria-label="t('systemSettings.tabsLabel')">
+          <button v-for="tab in settingTabs" :key="tab.key" class="studio-tab system-settings-tab" type="button"
+            role="tab" :aria-selected="activeSettingTab === tab.key"
+            :class="{ 'is-active': activeSettingTab === tab.key }" @click="activeSettingTab = tab.key">
+            {{ tab.label }}
+          </button>
+        </div>
+      </div>
+
+      <section v-for="group in activeGroups" :key="group.title" class="system-settings-group">
         <header>
           <span>{{ group.kicker }}</span>
           <h4>{{ group.title }}</h4>
         </header>
 
-        <label
-          v-for="item in group.items"
-          :key="item.key"
-          class="system-settings-row"
-          :for="`system-setting-${item.key}`"
-        >
+        <label v-for="item in group.items" :key="item.key" class="system-settings-row"
+          :class="{ 'is-disabled': item.disabled }" :for="`system-setting-${item.key}`"
+          :aria-disabled="item.disabled ? 'true' : undefined">
           <span class="system-settings-copy">
             <strong>{{ item.label }}</strong>
             <small>{{ item.description }}</small>
           </span>
 
-          <input
-            v-if="item.type === 'number'"
-            :id="`system-setting-${item.key}`"
-            v-model.number="draft[item.key]"
-            class="system-settings-number"
-            type="number"
-            :min="item.min || 0"
-            :max="item.max || 9999"
-            :step="item.step || 1"
-          />
-          <input
-            v-else-if="item.type === 'text'"
-            :id="`system-setting-${item.key}`"
-            v-model="draft[item.key]"
-            class="system-settings-text"
-            type="text"
-          />
-          <select
-            v-else-if="item.type === 'select'"
-            :id="`system-setting-${item.key}`"
-            v-model="draft[item.key]"
-            class="system-settings-select"
-          >
-            <option
-              v-for="option in item.options"
-              :key="option.value"
-              :value="option.value"
-            >
+          <input v-if="item.type === 'number'" :id="`system-setting-${item.key}`" v-model.number="draft[item.key]"
+            class="system-settings-number" type="number" :min="item.min || 0" :max="item.max || 9999"
+            :step="item.step || 1" :disabled="item.disabled" />
+          <input v-else-if="item.type === 'text'" :id="`system-setting-${item.key}`" v-model="draft[item.key]"
+            class="system-settings-text" type="text" :disabled="item.disabled" />
+          <select v-else-if="item.type === 'select'" :id="`system-setting-${item.key}`" v-model="draft[item.key]"
+            class="system-settings-select" :disabled="item.disabled">
+            <option v-for="option in item.options" :key="option.value" :value="option.value">
               {{ option.label }}
             </option>
           </select>
           <span v-else class="system-settings-switch">
-            <input
-              :id="`system-setting-${item.key}`"
-              v-model="draft[item.key]"
-              type="checkbox"
-            />
+            <input :id="`system-setting-${item.key}`" v-model="draft[item.key]" type="checkbox"
+              :disabled="item.disabled" />
             <span aria-hidden="true"></span>
           </span>
         </label>
@@ -72,17 +47,10 @@
     </div>
 
     <footer class="system-settings-footer">
-      <button
-        class="playground-button playground-button--secondary"
-        type="button"
-        @click="$emit('close')"
-      >
+      <button class="playground-button playground-button--secondary" type="button" @click="$emit('close')">
         {{ t("systemSettings.close") }}
       </button>
-      <button
-        class="playground-button playground-button--primary system-settings-apply-button"
-        type="submit"
-      >
+      <button class="playground-button playground-button--primary system-settings-apply-button" type="submit">
         {{ t("systemSettings.apply") }}
       </button>
     </footer>
@@ -99,30 +67,26 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, reactive, ref, watch} from "vue";
-import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import {useI18n} from "vue-i18n";
-import {useRouter} from "vue-router";
-import {storeToRefs} from "pinia";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {usePlatformStore} from "@/stores/platformStore";
-import {useAuthStore} from "@/stores/authStore";
-import {authApiLive} from "@/api/live/authApi.live";
-import {logWarn} from "@/utils/logger";
-import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
+import { computed, reactive, ref, watch } from "vue";
+import { useOverlayScrollbar } from "@/composables/ui/useOverlayScrollbar";
+import { useI18n } from "vue-i18n";
+import { useRouter } from "vue-router";
+import { storeToRefs } from "pinia";
+import { useSystemSettingsStore } from "@/stores/systemSettingsStore";
+import { usePlatformStore } from "@/stores/platformStore";
+import { useAuthStore } from "@/stores/authStore";
+import { authApiLive } from "@/api/live/authApi.live";
+import { logWarn } from "@/utils/logger";
+import { syncViewportSettings } from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_SYSTEM_SETTINGS,
   KEYBOARD_MODE_OPTIONS,
-  MAX_HISTORY_LAZY_CHUNK_SIZE,
-  MAX_HISTORY_LAZY_TOP_THRESHOLD,
   MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT,
   MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
   MAX_PC_HISTORY_LAZY_APPEND_COUNT,
   MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
   MAX_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
   MAX_MOBILE_BREAKPOINT_PX,
-  MIN_HISTORY_LAZY_CHUNK_SIZE,
-  MIN_HISTORY_LAZY_TOP_THRESHOLD,
   MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT,
   MIN_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
   MIN_PC_HISTORY_LAZY_APPEND_COUNT,
@@ -134,16 +98,17 @@ import {
 } from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
-const {t} = useI18n();
+const { t } = useI18n();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
 const authStore = useAuthStore();
-const {settings} = storeToRefs(systemSettingsStore);
+const { settings } = storeToRefs(systemSettingsStore);
 
-const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
+const draft = reactive({ ...DEFAULT_SYSTEM_SETTINGS });
 const applying = ref(false);
 const settingsScrollRef = ref(null);
+const activeSettingTab = ref("common");
 
 const settingText = (key, field) => t(`systemSettings.items.${key}.${field}`);
 
@@ -171,9 +136,9 @@ function settingItem(key, extra = {}) {
   };
 }
 
-useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}});
+useOverlayScrollbar(settingsScrollRef, { overflow: { x: "hidden", y: "scroll" } });
 
-const groups = computed(() => [
+const commonGroups = computed(() => [
   {
     kicker: t("common.api"),
     title: t("systemSettings.groups.api"),
@@ -195,21 +160,81 @@ const groups = computed(() => [
     items: [
       settingItem("webAuthMode", {
         type: "select",
-        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
+        options: AUTH_MODE_OPTIONS.map((value) => ({ value, label: value })),
       }),
       settingItem("mobileAuthMode", {
         type: "select",
-        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
+        options: AUTH_MODE_OPTIONS.map((value) => ({ value, label: value })),
       }),
-      settingItem("webLoginUrl", {type: "text"}),
-      settingItem("mobileLoginUrl", {type: "text"}),
-      settingItem("tempLoginUrl", {type: "text"}),
-      settingItem("accessInfoUrl", {type: "text"}),
-      settingItem("logoutUrl", {type: "text"}),
-      settingItem("jwtRefreshUrl", {type: "text"}),
+      settingItem("webLoginUrl", { type: "text" }),
+      settingItem("mobileLoginUrl", { type: "text" }),
+      settingItem("tempLoginUrl", { type: "text" }),
+      settingItem("accessInfoUrl", { type: "text" }),
+      settingItem("logoutUrl", { type: "text" }),
+      settingItem("jwtRefreshUrl", { type: "text" }),
       settingItem("jwtWithCredentials"),
     ],
   },
+  {
+    kicker: "CHAT",
+    title: t("systemSettings.groups.chat"),
+    items: [settingItem("autoScrollOnAnswer")],
+  },
+  {
+    kicker: "ACTION",
+    title: t("systemSettings.groups.action"),
+    items: [
+      settingItem("showGuideButton"),
+      settingItem("showThemeButton"),
+      settingItem("showSwaggerButton"),
+    ],
+  },
+  {
+    kicker: "MENU",
+    title: t("systemSettings.groups.menu"),
+    items: [
+      settingItem("showNoticeMenu"),
+      settingItem("showPrivacyMenu"),
+      settingItem("showTermsMenu"),
+      settingItem("showPersonalizationMenu"),
+      settingItem("showPlaygroundMenu"),
+      settingItem("showLogoutButton"),
+    ],
+  },
+]);
+
+const pcGroups = computed(() => [
+  {
+    kicker: "PC",
+    title: t("systemSettings.groups.chat"),
+    items: [
+      settingItem("pcEnableMermaidRendering"),
+      settingItem("pcShowMermaidHeader", {
+        disabled: !draft.pcEnableMermaidRendering,
+      }),
+      settingItem("pcHistoryLazyInitialCount", {
+        type: "number",
+        min: MIN_PC_HISTORY_LAZY_INITIAL_COUNT,
+        max: MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
+        step: 1,
+      }),
+      settingItem("pcHistoryLazyAppendCount", {
+        type: "number",
+        min: MIN_PC_HISTORY_LAZY_APPEND_COUNT,
+        max: MAX_PC_HISTORY_LAZY_APPEND_COUNT,
+        step: 1,
+      }),
+      settingItem("pcHistoryLazyTopThresholdPx", {
+        type: "number",
+        min: MIN_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
+        max: MAX_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
+        step: 1,
+      }),
+    ],
+  },
+]);
+
+const mobileGroups = computed(() => [
   {
     kicker: "MOBILE",
     title: t("systemSettings.groups.mobile"),
@@ -258,24 +283,9 @@ const groups = computed(() => [
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
     items: [
-      settingItem("autoScrollOnAnswer"),
-      settingItem("pcHistoryLazyInitialCount", {
-        type: "number",
-        min: MIN_PC_HISTORY_LAZY_INITIAL_COUNT,
-        max: MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
-        step: 1,
-      }),
-      settingItem("pcHistoryLazyAppendCount", {
-        type: "number",
-        min: MIN_PC_HISTORY_LAZY_APPEND_COUNT,
-        max: MAX_PC_HISTORY_LAZY_APPEND_COUNT,
-        step: 1,
-      }),
-      settingItem("pcHistoryLazyTopThresholdPx", {
-        type: "number",
-        min: MIN_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
-        max: MAX_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
-        step: 1,
+      settingItem("mobileEnableMermaidRendering"),
+      settingItem("mobileShowMermaidHeader", {
+        disabled: !draft.mobileEnableMermaidRendering,
       }),
       settingItem("mobileHistoryLazyInitialCount", {
         type: "number",
@@ -291,28 +301,19 @@ const groups = computed(() => [
       }),
     ],
   },
-  {
-    kicker: "ACTION",
-    title: t("systemSettings.groups.action"),
-    items: [
-      settingItem("showGuideButton"),
-      settingItem("showThemeButton"),
-      settingItem("showSwaggerButton"),
-    ],
-  },
-  {
-    kicker: "MENU",
-    title: t("systemSettings.groups.menu"),
-    items: [
-      settingItem("showNoticeMenu"),
-      settingItem("showPrivacyMenu"),
-      settingItem("showTermsMenu"),
-      settingItem("showPersonalizationMenu"),
-      settingItem("showPlaygroundMenu"),
-      settingItem("showLogoutButton"),
-    ],
-  },
 ]);
+
+const settingTabs = computed(() => [
+  { key: "common", label: t("systemSettings.tabs.common") },
+  { key: "pc", label: t("systemSettings.tabs.pc") },
+  { key: "mobile", label: t("systemSettings.tabs.mobile") },
+]);
+
+const activeGroups = computed(() => {
+  if (activeSettingTab.value === "pc") return pcGroups.value;
+  if (activeSettingTab.value === "mobile") return mobileGroups.value;
+  return commonGroups.value;
+});
 
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
@@ -384,13 +385,13 @@ async function apply() {
 
     if (authModeChanged) {
       await router
-        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
-        .catch(() => {});
+        .replace({ name: "login-required", query: { reason: "LOGIN_REQUIRED" } })
+        .catch(() => { });
     }
   } finally {
     applying.value = false;
   }
 }
 
-watch(settings, syncDraft, {immediate: true, deep: true});
+watch(settings, syncDraft, { immediate: true, deep: true });
 </script>

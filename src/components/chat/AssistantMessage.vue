@@ -75,6 +75,7 @@
  */
 
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
+import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {
@@ -83,6 +84,9 @@ import {
 } from "@/utils/overlayScrollbar";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
 import MessageActions from "./MessageActions.vue";
 
@@ -95,6 +99,9 @@ const props = defineProps({
   deferMermaidEnhancement: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
+const systemSettingsStore = useSystemSettingsStore();
+const {settings} = storeToRefs(systemSettingsStore);
+const responsiveContext = useResponsiveContext();
 const emit = defineEmits(["rendered", "regenerate"]);
 const {isInteractionBlocked} = useInteractionGuard();
 const html = ref("");
@@ -119,6 +126,19 @@ const showMessageActions = computed(
 );
 const isMessageComplete = computed(
   () => !props.message.status || props.message.status === "complete"
+);
+
+const resolvedMermaidSettings = computed(() =>
+  resolveMermaidPlatformSettings(
+    settings.value,
+    Boolean(responsiveContext.value?.isMobile)
+  )
+);
+const showMermaidHeader = computed(
+  () => resolvedMermaidSettings.value.showMermaidHeader
+);
+const enableMermaidRendering = computed(
+  () => resolvedMermaidSettings.value.enableMermaidRendering
 );
 
 const reasoningTitle = computed(() =>
@@ -153,7 +173,11 @@ async function enhanceRenderedMarkdown({
 }) {
   try {
     if (!componentAlive || !root?.isConnected) return;
-    if (renderMermaid && hasMermaidContent(source)) {
+    if (
+      enableMermaidRendering.value &&
+      renderMermaid &&
+      hasMermaidContent(source)
+    ) {
       await renderMermaidInElement(root);
     }
     if (!componentAlive || !root?.isConnected) return;
@@ -189,7 +213,8 @@ async function renderContent() {
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = props.message.content
       ? await renderMarkdown(props.message.content, {
-          renderMermaid: isMessageComplete.value,
+          renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
+          showMermaidHeader: showMermaidHeader.value,
         })
       : "";
     if (!componentAlive || currentVersion !== renderVersion) return;
@@ -201,7 +226,9 @@ async function renderContent() {
     await nextTick();
     if (!componentAlive || currentVersion !== renderVersion) return;
 
-    reservePendingMermaidHeight(contentRef.value);
+    if (enableMermaidRendering.value) {
+      reservePendingMermaidHeight(contentRef.value);
+    }
     emit("rendered", "content");
 
     void enhanceRenderedMarkdown({
@@ -209,7 +236,10 @@ async function renderContent() {
       source: props.message.content,
       currentVersion,
       getVersion: () => renderVersion,
-      renderMermaid: isMessageComplete.value && !props.deferMermaidEnhancement,
+      renderMermaid:
+        isMessageComplete.value &&
+        enableMermaidRendering.value &&
+        !props.deferMermaidEnhancement,
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== renderVersion) return;
@@ -241,7 +271,8 @@ async function renderReasoningContent() {
 
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = await renderMarkdown(props.message.reasoningContent, {
-      renderMermaid: isMessageComplete.value,
+      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
+      showMermaidHeader: showMermaidHeader.value,
     });
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     destroyMarkdownScrollbars(reasoningRef.value);
@@ -252,7 +283,9 @@ async function renderReasoningContent() {
     await nextTick();
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
 
-    reservePendingMermaidHeight(reasoningRef.value);
+    if (enableMermaidRendering.value) {
+      reservePendingMermaidHeight(reasoningRef.value);
+    }
     emit("rendered", "reasoning");
 
     void enhanceRenderedMarkdown({
@@ -260,7 +293,10 @@ async function renderReasoningContent() {
       source: props.message.reasoningContent,
       currentVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid: isMessageComplete.value && !props.deferMermaidEnhancement,
+      renderMermaid:
+        isMessageComplete.value &&
+        enableMermaidRendering.value &&
+        !props.deferMermaidEnhancement,
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
@@ -274,12 +310,25 @@ async function renderReasoningContent() {
   }
 }
 
-watch(() => [props.message.content, props.message.status], renderContent, {
-  immediate: true,
-});
-watch(() => props.message.reasoningContent, renderReasoningContent, {
-  immediate: true,
-});
+watch(
+  () => [
+    props.message.content,
+    props.message.status,
+    showMermaidHeader.value,
+    enableMermaidRendering.value,
+  ],
+  renderContent,
+  {immediate: true}
+);
+watch(
+  () => [
+    props.message.reasoningContent,
+    showMermaidHeader.value,
+    enableMermaidRendering.value,
+  ],
+  renderReasoningContent,
+  {immediate: true}
+);
 watch(
   () => props.deferMermaidEnhancement,
   async (deferMermaidEnhancement, previousDeferMermaidEnhancement) => {
@@ -296,7 +345,7 @@ watch(
       source: props.message.content,
       currentVersion: currentContentVersion,
       getVersion: () => renderVersion,
-      renderMermaid: isMessageComplete.value,
+      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
     });
 
     const currentReasoningVersion = reasoningRenderVersion;
@@ -305,7 +354,7 @@ watch(
       source: props.message.reasoningContent,
       currentVersion: currentReasoningVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid: isMessageComplete.value,
+      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
     });
   },
   {flush: "post"}

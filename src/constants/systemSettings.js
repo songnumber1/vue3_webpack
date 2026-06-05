@@ -165,6 +165,12 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showLogoutButton: "showLogoutButton", // 인증 세션 로그아웃 버튼 노출 여부
   showMobileApiProgress: "showMobileApiProgress", // API 호출 및 채팅방 이력 로딩/렌더링 진행 표시 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
+  showMermaidHeader: "showMermaidHeader", // Mermaid 헤더 표시 여부(하위 호환)
+  enableMermaidRendering: "enableMermaidRendering", // Mermaid 렌더링 사용 여부(하위 호환)
+  pcShowMermaidHeader: "pcShowMermaidHeader", // PC Mermaid 다이어그램 카드 상단 헤더 및 액션 버튼 노출 여부
+  pcEnableMermaidRendering: "pcEnableMermaidRendering", // PC Mermaid 코드 블록을 SVG 다이어그램으로 렌더링할지 여부
+  mobileShowMermaidHeader: "mobileShowMermaidHeader", // 모바일 Mermaid 다이어그램 카드 상단 헤더 및 액션 버튼 노출 여부
+  mobileEnableMermaidRendering: "mobileEnableMermaidRendering", // 모바일 Mermaid 코드 블록을 SVG 다이어그램으로 렌더링할지 여부
   historyLazyChunkSize: "historyLazyChunkSize", // 이력 대화방 최초/추가 lazy 렌더링 메시지 묶음 개수(하위 호환)
   historyLazyTopThreshold: "historyLazyTopThreshold", // 이력 대화방 상단 추가 로드 트리거 scrollTop 기준(px, 하위 호환)
   pcHistoryLazyInitialCount: "pcHistoryLazyInitialCount", // PC 이력 대화방 최초 lazy 렌더링 메시지 개수
@@ -272,6 +278,30 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
     process.env.VUE_APP_SYSTEM_AUTO_SCROLL_ON_ANSWER,
     false
   ),
+  [SYSTEM_SETTING_KEYS.showMermaidHeader]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.enableMermaidRendering]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_ENABLE_MERMAID_RENDERING,
+    true
+  ),
+  [SYSTEM_SETTING_KEYS.pcShowMermaidHeader]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_PC_SHOW_MERMAID_HEADER,
+    readBooleanEnv(process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER, true)
+  ),
+  [SYSTEM_SETTING_KEYS.pcEnableMermaidRendering]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_PC_ENABLE_MERMAID_RENDERING,
+    readBooleanEnv(process.env.VUE_APP_SYSTEM_ENABLE_MERMAID_RENDERING, true)
+  ),
+  [SYSTEM_SETTING_KEYS.mobileShowMermaidHeader]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_SHOW_MERMAID_HEADER,
+    readBooleanEnv(process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER, true)
+  ),
+  [SYSTEM_SETTING_KEYS.mobileEnableMermaidRendering]: readBooleanEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_ENABLE_MERMAID_RENDERING,
+    readBooleanEnv(process.env.VUE_APP_SYSTEM_ENABLE_MERMAID_RENDERING, true)
+  ),
   [SYSTEM_SETTING_KEYS.historyLazyChunkSize]: readNumberEnv(
     process.env.VUE_APP_SYSTEM_HISTORY_LAZY_CHUNK_SIZE,
     100
@@ -370,6 +400,29 @@ function normalizeKeyboardMode(value) {
 export function normalizeSystemSettings(value = {}) {
   const rawSource = value && typeof value === "object" ? value : {}; // 데이터 유효 타입 세이프 검증
   const source = {...rawSource};
+
+  // 기존 공통 Mermaid 설정을 가진 로컬 캐시/임시 설정은 PC·모바일 분리 설정으로 안전하게 승격합니다.
+  if (SYSTEM_SETTING_KEYS.showMermaidHeader in source) {
+    const legacyShowMermaidHeader = source[SYSTEM_SETTING_KEYS.showMermaidHeader];
+    if (!(SYSTEM_SETTING_KEYS.pcShowMermaidHeader in source)) {
+      source[SYSTEM_SETTING_KEYS.pcShowMermaidHeader] = legacyShowMermaidHeader;
+    }
+    if (!(SYSTEM_SETTING_KEYS.mobileShowMermaidHeader in source)) {
+      source[SYSTEM_SETTING_KEYS.mobileShowMermaidHeader] = legacyShowMermaidHeader;
+    }
+  }
+  if (SYSTEM_SETTING_KEYS.enableMermaidRendering in source) {
+    const legacyEnableMermaidRendering =
+      source[SYSTEM_SETTING_KEYS.enableMermaidRendering];
+    if (!(SYSTEM_SETTING_KEYS.pcEnableMermaidRendering in source)) {
+      source[SYSTEM_SETTING_KEYS.pcEnableMermaidRendering] =
+        legacyEnableMermaidRendering;
+    }
+    if (!(SYSTEM_SETTING_KEYS.mobileEnableMermaidRendering in source)) {
+      source[SYSTEM_SETTING_KEYS.mobileEnableMermaidRendering] =
+        legacyEnableMermaidRendering;
+    }
+  }
 
   // 기존 단일 lazy 설정을 가진 로컬 캐시/임시 설정은 PC·모바일 분리 설정으로 안전하게 승격합니다.
   if (SYSTEM_SETTING_KEYS.historyLazyChunkSize in source) {
@@ -540,7 +593,8 @@ export function normalizeSystemSettings(value = {}) {
     }
 
     // 세부 정규화 7구역: 수치형을 제외한 나머지 범용 온오프 플래그 옵션들은 불리언 데이터 타입(Boolean)으로 강제 변환 규격화 마감
-    next[key] = Boolean(source[key]);
+    // localStorage/API에서 "false", "0", "off" 같은 문자열이 들어와도 true로 오인하지 않도록 환경 변수 파서와 같은 규칙을 사용합니다.
+    next[key] = readBooleanEnv(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
   });
 
   // 반응형 전환 기준 너비는 플랫폼 오버라이드(auto/android...) 상태와 무관하게 사용자가 입력한 값을 유지합니다.

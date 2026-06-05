@@ -24,6 +24,7 @@ import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 import {resolveMessageRenderPolicy} from "@/composables/chat/message-list/useMessageRenderPolicy";
+import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {
   resolveInitialMessageLazyRange,
   resolveMessageLazySettings,
@@ -180,7 +181,15 @@ export function useChatDataController({props, ui, runtime, messages}) {
     return true;
   }
 
+  function isMermaidRenderingEnabled() {
+    return isMermaidRenderingEnabledForPlatform(
+      systemSettingsStore.settings,
+      Boolean(ui.isMobile?.value)
+    );
+  }
+
   function hasMermaidInHistoryMessages(sourceMessages = []) {
+    if (!isMermaidRenderingEnabled()) return false;
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
     return list.some((message) => {
       const content = `${message?.content || ""}
@@ -529,9 +538,9 @@ ${message?.reasoningContent || ""}`;
       // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
       chatStore.setPendingSelectedChatId(history.id);
       beginHistoryRender();
-      const mermaidWarmupPromise = warmupMermaidForHistoryRender().catch(
-        () => null
-      );
+      const mermaidWarmupPromise = isMermaidRenderingEnabled()
+        ? warmupMermaidForHistoryRender().catch(() => null)
+        : Promise.resolve(null);
       await flushConversationSwitchPaint();
       if (!isCurrentLoad()) return;
       chatStore.pruneInactiveMessageCache(history.id);
@@ -566,10 +575,13 @@ ${message?.reasoningContent || ""}`;
         ui.markForceBottom(1000); // 연산 및 컴포넌트 확장 팽창 시간을 고려하여 1000ms 동안 하단 스크롤 잠금 유지
       }
 
-      // 마크다운 컨테이너 내부의 텍스트 코드를 실제 시각적 플로우차트 그래픽 SVG 구조체로 드로잉 치환 렌더링합니다.
-      await renderMermaidInElement(document.querySelector(".message-list"), {
-        force: true,
-      });
+      // 마크다운 컨테이너 내부의 Mermaid 코드 블록을 실제 SVG 다이어그램으로 치환합니다.
+      // 시스템에서 Mermaid 렌더링을 끈 경우 일반 코드 블록 fallback을 유지하고 후처리를 생략합니다.
+      if (isMermaidRenderingEnabled()) {
+        await renderMermaidInElement(document.querySelector(".message-list"), {
+          force: true,
+        });
+      }
 
       // 자동 스크롤 ON은 기존처럼 하단을 추적합니다.
       // OFF 상태에서는 질문 직후 1회만 사용자 질문으로 이동하고, 스트림/마크다운/머메이드

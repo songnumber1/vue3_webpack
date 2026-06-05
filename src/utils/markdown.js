@@ -370,13 +370,13 @@ function rehypeTableWrapper() {
 /**
  * ```mermaid 코드 블록을 mermaid 렌더 대상 카드로 변환합니다.
  *
- * streaming 중에는 renderMermaid=false processor를 사용해 이 변환을 건너뛰고,
- * 답변 완료 후 renderMermaidInElement가 data-mermaid-pending 노드를 실제 SVG로 렌더합니다.
+ * renderMermaid=false일 때는 이 변환을 건너뛰고 mermaid 코드를 일반 코드 블록으로 유지합니다.
+ * renderMermaid=true이면 답변 완료 후 renderMermaidInElement가 data-mermaid-pending 노드를 실제 SVG로 렌더합니다.
  */
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
-function rehypeMermaidBlock() {
+function rehypeMermaidBlock({showMermaidHeader = true} = {}) {
   return (tree) => {
     visit(tree, "element", (node, index, parent) => {
       if (!parent || typeof index !== "number") return;
@@ -394,29 +394,33 @@ function rehypeMermaidBlock() {
         tagName: "div",
         properties: {className: ["md-mermaid-card"]},
         children: [
-          {
-            type: "element",
-            tagName: "div",
-            properties: {className: ["md-mermaid-toolbar"]},
-            children: [
-              {
-                type: "element",
-                tagName: "strong",
-                properties: {className: ["md-mermaid-title"]},
-                children: [{type: "text", value: "Mermaid"}],
-              },
-              {
-                type: "element",
-                tagName: "div",
-                properties: {className: ["md-mermaid-actions"]},
-                children: [
-                  mermaidActionButton("copy", mdLabel("markdown.copyMermaid")),
-                  mermaidActionButton("svg", "SVG 저장"),
-                  mermaidActionButton("code", "코드 내보내기"),
-                ],
-              },
-            ],
-          },
+          ...(showMermaidHeader
+            ? [
+                {
+                  type: "element",
+                  tagName: "div",
+                  properties: {className: ["md-mermaid-toolbar"]},
+                  children: [
+                    {
+                      type: "element",
+                      tagName: "strong",
+                      properties: {className: ["md-mermaid-title"]},
+                      children: [{type: "text", value: "Mermaid"}],
+                    },
+                    {
+                      type: "element",
+                      tagName: "div",
+                      properties: {className: ["md-mermaid-actions"]},
+                      children: [
+                        mermaidActionButton("copy", mdLabel("markdown.copyMermaid")),
+                        mermaidActionButton("svg", "SVG 저장"),
+                        mermaidActionButton("code", "코드 내보내기"),
+                      ],
+                    },
+                  ],
+                },
+              ]
+            : []),
           {
             type: "element",
             tagName: "div",
@@ -506,13 +510,13 @@ function rehypeCodeBlockWrapper() {
 /**
  * Markdown processor를 생성합니다.
  *
- * renderMermaid=false는 SSE streaming 중에 사용됩니다. 스트리밍 중 mermaid를 매 chunk마다
- * 렌더하면 비용이 크고 문법이 미완성일 수 있으므로, 완료 후 한 번만 렌더링합니다.
+ * renderMermaid=false는 SSE streaming 중이거나 시스템 설정에서 Mermaid 렌더링을 끈 경우 사용됩니다.
+ * Mermaid 변환을 생략하면 mermaid 코드 블록은 일반 코드 카드로 표시됩니다.
  */
 /**
  * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
-function createProcessor({renderMermaid = true} = {}) {
+function createProcessor({renderMermaid = true, showMermaidHeader = true} = {}) {
   const nextProcessor = unified()
     .use(remarkParse)
     .use(remarkGfm, {singleTilde: false})
@@ -525,7 +529,7 @@ function createProcessor({renderMermaid = true} = {}) {
     .use(rehypeTableWrapper);
 
   if (renderMermaid) {
-    nextProcessor.use(rehypeMermaidBlock);
+    nextProcessor.use(rehypeMermaidBlock, {showMermaidHeader});
   }
 
   nextProcessor.use(rehypeCodeBlockWrapper);
@@ -538,19 +542,30 @@ function createProcessor({renderMermaid = true} = {}) {
     .use(rehypeStringify);
 }
 
-const defaultProcessor = createProcessor({renderMermaid: true});
-const streamingProcessor = createProcessor({renderMermaid: false});
+const defaultProcessor = createProcessor({
+  renderMermaid: true,
+  showMermaidHeader: true,
+});
+const noMermaidHeaderProcessor = createProcessor({
+  renderMermaid: true,
+  showMermaidHeader: false,
+});
+const noMermaidProcessor = createProcessor({renderMermaid: false});
 
 /**
  * assistant/user message content를 HTML 문자열로 변환합니다.
  *
  * @param {string} text markdown 원문
- * @param {{renderMermaid?: boolean}} options renderMermaid=false면 mermaid 변환을 생략합니다.
+ * @param {{renderMermaid?: boolean, showMermaidHeader?: boolean}} options renderMermaid=false면 mermaid 변환을 생략하고, showMermaidHeader=false면 Mermaid 카드 헤더만 숨깁니다.
  * @returns {Promise<string>} v-html에 전달할 HTML 문자열
  */
 export async function renderMarkdown(text, options = {}) {
   const processor =
-    options.renderMermaid === false ? streamingProcessor : defaultProcessor;
+    options.renderMermaid === false
+      ? noMermaidProcessor
+      : options.showMermaidHeader === false
+        ? noMermaidHeaderProcessor
+        : defaultProcessor;
   const file = await processor.process(String(text ?? ""));
   const html = String(file).trim();
 

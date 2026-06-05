@@ -10,14 +10,16 @@
 export const settingsMessages = {
   ko: {
     systemSettings: {
-      eyebrow: "시스템",
-      title: "앱 동작 설정",
-      description:
-        "화면 노출, API 사용 여부, 모바일 기준값을 한 곳에서 조정합니다. 적용을 누르면 즉시 저장되고 다음 화면 동작부터 반영됩니다.",
       close: "닫기",
       apply: "적용",
       authModeChangeLogoutConfirm:
         "인증 방식이 변경되어 현재 로그인 상태가 초기화됩니다. 적용 후 다시 로그인이 필요합니다. 계속하시겠습니까?",
+      tabsLabel: "시스템 설정 분류",
+      tabs: {
+        common: "공통",
+        pc: "PC",
+        mobile: "모바일",
+      },
       groups: {
         api: "API",
         auth: "인증",
@@ -126,6 +128,36 @@ export const settingsMessages = {
         autoScrollOnAnswer: {
           label: "자동 스크롤",
           description: "답변 시 스크롤 자동 이동 여부입니다.",
+        },
+        showMermaidHeader: {
+          label: "Mermaid 헤더 표시",
+          description:
+            "Mermaid 다이어그램 상단의 제목과 복사/SVG/코드 버튼 표시 여부입니다.",
+        },
+        enableMermaidRendering: {
+          label: "Mermaid 렌더링 사용",
+          description:
+            "Mermaid 코드 블록을 SVG 다이어그램으로 렌더링합니다. 끄면 일반 코드 블록으로 표시합니다.",
+        },
+        pcShowMermaidHeader: {
+          label: "PC Mermaid 헤더 표시",
+          description:
+            "PC에서 Mermaid 다이어그램 상단의 제목과 복사/SVG/코드 버튼 표시 여부입니다.",
+        },
+        pcEnableMermaidRendering: {
+          label: "PC Mermaid 렌더링 사용",
+          description:
+            "PC에서 Mermaid 코드 블록을 SVG 다이어그램으로 렌더링합니다. 끄면 일반 코드 블록으로 표시합니다.",
+        },
+        mobileShowMermaidHeader: {
+          label: "모바일 Mermaid 헤더 표시",
+          description:
+            "모바일에서 Mermaid 다이어그램 상단의 제목과 복사/SVG/코드 버튼 표시 여부입니다.",
+        },
+        mobileEnableMermaidRendering: {
+          label: "모바일 Mermaid 렌더링 사용",
+          description:
+            "모바일에서 Mermaid 코드 블록을 SVG 다이어그램으로 렌더링합니다. 끄면 일반 코드 블록으로 표시합니다.",
         },
         historyLazyChunkSize: {
           label: "이력 메시지 로드 개수",
@@ -333,14 +365,16 @@ export const settingsMessages = {
   },
   en: {
     systemSettings: {
-      eyebrow: "System",
-      title: "App behavior settings",
-      description:
-        "Manage visible screens, API usage, and mobile thresholds in one place. Changes are saved when you apply them and affect the next screen behavior immediately.",
       close: "Close",
       apply: "Apply",
       authModeChangeLogoutConfirm:
         "The authentication mode has changed, so your current login state will be cleared. You will need to sign in again after applying. Continue?",
+      tabsLabel: "System settings categories",
+      tabs: {
+        common: "Common",
+        pc: "PC",
+        mobile: "Mobile",
+      },
       groups: {
         api: "API",
         auth: "Authentication",
@@ -449,6 +483,36 @@ export const settingsMessages = {
           label: "Auto scroll",
           description:
             "Automatically scroll to the bottom while answers arrive.",
+        },
+        showMermaidHeader: {
+          label: "Show Mermaid header",
+          description:
+            "Controls the title and copy/SVG/code buttons above Mermaid diagrams.",
+        },
+        enableMermaidRendering: {
+          label: "Enable Mermaid rendering",
+          description:
+            "Render Mermaid code blocks as SVG diagrams. When disabled, they are shown as normal code blocks.",
+        },
+        pcShowMermaidHeader: {
+          label: "Show PC Mermaid header",
+          description:
+            "Controls the title and copy/SVG/code buttons above Mermaid diagrams on PC.",
+        },
+        pcEnableMermaidRendering: {
+          label: "Enable PC Mermaid rendering",
+          description:
+            "Render Mermaid code blocks as SVG diagrams on PC. When disabled, they are shown as normal code blocks.",
+        },
+        mobileShowMermaidHeader: {
+          label: "Show mobile Mermaid header",
+          description:
+            "Controls the title and copy/SVG/code buttons above Mermaid diagrams on mobile.",
+        },
+        mobileEnableMermaidRendering: {
+          label: "Enable mobile Mermaid rendering",
+          description:
+            "Render Mermaid code blocks as SVG diagrams on mobile. When disabled, they are shown as normal code blocks.",
         },
         historyLazyChunkSize: {
           label: "History message load count",
