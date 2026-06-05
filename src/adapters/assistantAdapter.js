@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {ASSISTANT_KEYS} from "@/constants/apiKeys";
+import {ASSISTANT_API_KEYS as ASSISTANT_KEYS} from "@/constants/api/assistantApiKeys";
 import {ASSISTANT_TYPES} from "@/constants/domain";
 import {toBoolean} from "@/utils/booleanUtils";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";

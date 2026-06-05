@@ -145,6 +145,7 @@ import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
+import {useRouteMode} from "@/composables/route/useRouteMode";
 
 /**
  * [ChatContainer 연결 구조]
@@ -165,19 +166,12 @@ const PORTAL_ASSISTANT_IDS = [
   CONNECTOR_STORE_PORTAL_ID,
 ];
 const CONNECTOR_STORE_ROUTE_NAME = "connector-store";
-const STUDIO_ROUTE_NAMES = ["studio", CONNECTOR_STORE_ROUTE_NAME];
 
 function isPortalAssistantId(assistantId) {
   return PORTAL_ASSISTANT_IDS.includes(assistantId);
 }
 
-const routeMode = computed(() => {
-  if (route.name === "shared") return "shared";
-  if (STUDIO_ROUTE_NAMES.includes(route.name)) return "studio";
-  if (route.name === "chat-search") return "chat-search";
-  if (route.name === "chat" || route.name === "chat-entry") return "chat";
-  return "main";
-});
+const routeMode = useRouteMode(route);
 const controllerProps = {
   get mode() {
     return routeMode.value;

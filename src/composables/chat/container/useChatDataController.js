@@ -8,7 +8,6 @@
  */
 
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
@@ -19,7 +18,6 @@ import {
 } from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -596,11 +594,8 @@ ${message?.reasoningContent || ""}`;
   }
 
   // ── [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
-  const chatStreamStore = useChatStreamStore();
-  const {isStreaming} = storeToRefs(chatStreamStore);
-
   const {
-    isGenerating: isSubmitGenerating,
+    isGenerating,
     submit,
     regenerate,
   } = useChatSubmit({
@@ -632,10 +627,6 @@ ${message?.reasoningContent || ""}`;
     markNewSubmitConversation:
       chatStore.markPendingNewSubmitChat.bind(chatStore),
   });
-
-  const isGenerating = computed(
-    () => isSubmitGenerating.value || isStreaming.value
-  );
 
   // ── 👀 [6. 반응형 런타임 데이터 이벤트 왓처 버스 맵핑] ──────────────────
   /**

@@ -17,6 +17,12 @@ export const useChatStreamStore = defineStore("chatStream", {
   // 스트리밍 플래그 상태 정의
   state: () => ({
     isStreaming: false, // 현재 AI 모델 인프라가 대화 패킷을 타이핑 중인지 판별 플래그
+    /**
+     * 새 채팅 생성 직후 프론트 내부에서 수행하는 /chat/:id 라우팅만
+     * 스트리밍 중 1회 통과시키기 위한 임시 허용권입니다.
+     * 사용자 클릭 이동, 다른 대화방 이동, Studio/MCP 이동 허용 용도가 아닙니다.
+     */
+    allowedNavigation: null,
   }),
   actions: {
     /**
@@ -30,6 +36,49 @@ export const useChatStreamStore = defineStore("chatStream", {
      */
     finish() {
       this.isStreaming = false; // 잠금 전면 해제 릴리즈
+      this.clearAllowedNavigation();
+    },
+    /**
+     * 새 채팅 생성 직후 /chat/:id로 이동하는 내부 라우팅만 1회 허용합니다.
+     * 이 허용권은 router.push({name: "chat", params: {id}}) 직전에만 설정되며,
+     * 사용자 클릭/다른 라우트 이동은 기존처럼 스트리밍 가드가 차단합니다.
+     * @param {object} route - 허용할 라우트 대상
+     */
+    allowNavigationTo(route = {}) {
+      this.allowedNavigation = {
+        name: route.name || null,
+        params: {...(route.params || {})},
+      };
+    },
+    /**
+     * 전역 라우터 가드에서 스트리밍 중 허용된 내부 라우팅인지 확인하고,
+     * 일치하면 허용권을 즉시 소모합니다. 한 번 소모된 허용권은 재사용되지 않습니다.
+     * @param {object} to - Vue Router의 목적지 라우트
+     * @returns {boolean} 허용 여부
+     */
+    consumeAllowedNavigation(to = {}) {
+      const allowed = this.allowedNavigation;
+      if (!allowed) return false;
+
+      const isSameName =
+        !allowed.name || String(to.name) === String(allowed.name);
+      const isSameParams = Object.entries(allowed.params || {}).every(
+        ([key, value]) =>
+          String(to.params?.[key] || "") === String(value || "")
+      );
+
+      if (isSameName && isSameParams) {
+        this.clearAllowedNavigation();
+        return true;
+      }
+
+      return false;
+    },
+    /**
+     * 내부 라우팅 허용권을 명시적으로 폐기합니다.
+     */
+    clearAllowedNavigation() {
+      this.allowedNavigation = null;
     },
   },
 });

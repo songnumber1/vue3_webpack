@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {CHAT_KEYS} from "@/constants/apiKeys";
+import {CHAT_API_KEYS as C} from "@/constants/api/chatApiKeys";
 import {CHAT_HISTORY_LIST_RAW} from "@/api/mock/data/chatHistoryList.raw";
 import {CHAT_MESSAGES_RAW} from "@/api/mock/data/chatMessages.raw";
 import {CHAT_SEARCH_SUGGESTIONS_RAW} from "@/api/mock/data/chatSearchSuggestions.raw";
@@ -74,8 +74,8 @@ function searchChatHistories(payload = {}) {
   );
   const limit = Math.max(1, Number(payload.limit || 30));
   const source = historyStore.map((history) => {
-    const chatId = String(history[CHAT_KEYS.ID] || "");
-    const title = String(history[CHAT_KEYS.TITLE] || "");
+    const chatId = String(history[C.CHAT_ID] || "");
+    const title = String(history[C.CHAT_TITLE] || "");
     const messageText = buildMessageSearchText(chatId);
     const combined = `${title} ${messageText}`.toLowerCase();
     const matched = !keyword || combined.includes(keyword);
@@ -95,14 +95,14 @@ function searchChatHistories(payload = {}) {
       preview: createSearchSnippet(item.messageText, keyword, item.title),
       messageId: item.targetMessage?.id || "",
       role: item.targetMessage?.role || "",
-      chatEndDt: item.history[CHAT_KEYS.ENDED_AT] || "",
-      sharedId: item.history[CHAT_KEYS.SHARED_ID] || null,
+      chatEndDt: item.history[C.CHAT_END_DT] || "",
+      sharedId: item.history[C.SHARED_ID] || null,
       modelId:
-        item.history[CHAT_KEYS.MODEL_ID] ||
-        item.history[CHAT_KEYS.LEGACY_MODEL_ID] ||
+        item.history[C.MODEL_ID] ||
+        item.history[C.MODEL_ID_LEGACY] ||
         "",
       assistId: item.history.assistId || item.history.assistantId || "",
-      bookmarkYN: item.history[CHAT_KEYS.BOOKMARK_YN],
+      bookmarkYN: item.history[C.BOOKMARK_YN],
       matchCount: keyword
         ? Math.max(1, item.messageText.toLowerCase().split(keyword).length - 1)
         : 0,
@@ -165,7 +165,7 @@ function attachMockReasoning(messages = [], chatId = "") {
  */
 function findHistory(chatId) {
   return historyStore.find(
-    (item) => String(item[CHAT_KEYS.ID]) === String(chatId)
+    (item) => String(item[C.CHAT_ID]) === String(chatId)
   );
 }
 
@@ -214,20 +214,20 @@ export const chatHistoryApiMock = {
   updateBookmark({chatId, bookmarkYN} = {}) {
     const target = findHistory(chatId);
     if (target) {
-      target[CHAT_KEYS.BOOKMARK_YN] = Boolean(bookmarkYN);
-      target[CHAT_KEYS.ENDED_AT] =
-        target[CHAT_KEYS.ENDED_AT] || new Date().toISOString();
+      target[C.BOOKMARK_YN] = Boolean(bookmarkYN);
+      target[C.CHAT_END_DT] =
+        target[C.CHAT_END_DT] || new Date().toISOString();
     }
     return resolveMock({success: true}, 140);
   },
   renameChat({chatId, chatTitle} = {}) {
     const target = findHistory(chatId);
-    if (target && chatTitle) target[CHAT_KEYS.TITLE] = chatTitle;
+    if (target && chatTitle) target[C.CHAT_TITLE] = chatTitle;
     return resolveMock({success: true}, 140);
   },
   deleteChat({chatId} = {}) {
     const index = historyStore.findIndex(
-      (item) => String(item[CHAT_KEYS.ID]) === String(chatId)
+      (item) => String(item[C.CHAT_ID]) === String(chatId)
     );
     if (index >= 0) historyStore.splice(index, 1);
     return resolveMock({success: true}, 140);

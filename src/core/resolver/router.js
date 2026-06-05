@@ -308,8 +308,14 @@ function registerRouteGuard(router, appInfo, context = {}) {
     // 1. 라우트가 전환될 때마다 디바이스 스냅샷 실시간 동기화 리프레시
     platformStore.refresh(appInfo);
 
-    // [중요 비즈니스 방어 가드] AI 답변 스트리밍 응답이 가동 중일 때, 강제 페이지 이동 시 소켓 유실 및 자원 파손을 유발하므로 네비게이션 행위 자체를 원천 무효화(false) 처리합니다.
-    if (chatStreamStore.isStreaming) {
+    // [중요 비즈니스 방어 가드]
+    // AI 답변 스트리밍 중 사용자 이동은 소켓 유실 및 자원 파손을 유발할 수 있어 차단합니다.
+    // 단, 새 채팅 생성 직후 프론트가 내부적으로 수행하는 /chat/:id 1회 이동은
+    // chatStreamStore.consumeAllowedNavigation(to)로만 통과시킵니다.
+    if (
+      chatStreamStore.isStreaming &&
+      !chatStreamStore.consumeAllowedNavigation(to)
+    ) {
       return false;
     }
 

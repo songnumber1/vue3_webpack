@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {MODEL_KEYS} from "@/constants/apiKeys";
+import {MODEL_API_KEYS as MODEL_KEYS} from "@/constants/api/modelApiKeys";
 import {toBoolean} from "@/utils/booleanUtils";
 
 /**

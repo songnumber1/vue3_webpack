@@ -1,55 +1,37 @@
 /**
  * @file constants/apiKeys.js
- * @description 여러 계층에서 공유하는 상수 모음입니다. UI/런타임/이미지/설정 값의 단일 출처 역할을 합니다.
+ * @description legacy API key import 호환 레이어입니다.
  *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * 신규 코드는 src/constants/api/*ApiKeys.js를 직접 사용하세요.
+ * 이 파일은 기존 import가 남아 있는 외부/레거시 코드의 런타임 호환만 보장합니다.
  */
 
-export const ASSISTANT_KEYS = Object.freeze({
-  ID: "assistId",
-  NAME: "assistName",
-  ORDER: "assistOrder",
-  STUDIO_YN: "studioYN",
-  RAG_YN: "ragYN",
-  AUTH_YN: "authYN",
-  DELETE_YN: "delYN",
-  PRIVATE_YN: "privateYN",
-  FIX_YN: "fixYN",
-  IMAGE_48_SRC: "Image48Src",
-  IMAGE_20_SRC: "image20Src",
-  IMAGE_16_SRC: "image16Src",
-});
+import {ASSISTANT_API_KEYS} from "@/constants/api/assistantApiKeys";
+import {MODEL_API_KEYS} from "@/constants/api/modelApiKeys";
+import {CHAT_API_KEYS} from "@/constants/api/chatApiKeys";
+import {MESSAGE_API_KEYS} from "@/constants/api/messageApiKeys";
 
-export const MODEL_KEYS = Object.freeze({
-  ID: "modelId",
-  NAME: "modelName",
-  TYPE: "ModelType",
-  ASSISTANT_ID: "assistId",
-  ORDER: "modelOrder",
-  AUTH_YN: "authYN",
-  DELETE_YN: "delYN",
-});
+export const ASSISTANT_KEYS = ASSISTANT_API_KEYS;
+export const MODEL_KEYS = MODEL_API_KEYS;
 
 export const CHAT_KEYS = Object.freeze({
-  ID: "chatId",
-  TITLE: "chatTitle",
-  MODEL_ID: "modelId",
-  LEGACY_MODEL_ID: "modeId",
-  BOOKMARK_YN: "bookmarkYN",
-  ENDED_AT: "chatEndDt",
-  USER_ID: "userId",
-  SHARED_ID: "sharedId",
+  ID: CHAT_API_KEYS.CHAT_ID,
+  TITLE: CHAT_API_KEYS.CHAT_TITLE,
+  MODEL_ID: CHAT_API_KEYS.MODEL_ID,
+  LEGACY_MODEL_ID: CHAT_API_KEYS.MODEL_ID_LEGACY,
+  BOOKMARK_YN: CHAT_API_KEYS.BOOKMARK_YN,
+  ENDED_AT: CHAT_API_KEYS.CHAT_END_DT,
+  USER_ID: CHAT_API_KEYS.USER_ID,
+  SHARED_ID: CHAT_API_KEYS.SHARED_ID,
 });
 
 export const MESSAGE_KEYS = Object.freeze({
-  ID: "id",
-  ROLE: "role",
-  CONTENT: "content",
-  SENT_AT: "sendTime",
-  REFERENCES: "references",
-  LEGACY_REFERENCES: "refreences",
-  REASONING_CONTENT: "reasoningContent",
-  REASONING_STATUS: "reasoningStatus",
+  ID: MESSAGE_API_KEYS.ID,
+  ROLE: MESSAGE_API_KEYS.ROLE,
+  CONTENT: MESSAGE_API_KEYS.CONTENT,
+  SENT_AT: MESSAGE_API_KEYS.SENT_AT,
+  REFERENCES: MESSAGE_API_KEYS.REFERENCES,
+  LEGACY_REFERENCES: MESSAGE_API_KEYS.REFERENCES_LEGACY_TYPO,
+  REASONING_CONTENT: MESSAGE_API_KEYS.REASONING_CONTENT,
+  REASONING_STATUS: MESSAGE_API_KEYS.REASONING_STATUS,
 });

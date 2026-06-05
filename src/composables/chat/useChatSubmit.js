@@ -1,4 +1,4 @@
-import {nextTick, ref} from "vue";
+import {computed, nextTick} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -16,7 +16,7 @@ import {
   scrollAfterUserSubmit,
 } from "./submit/chatSubmitScroll";
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
-// runAssistantStream 내부에서 streamGeneration을 호출하여 isGenerating 가드와 스트리밍 흐름을 유지합니다.
+// chatStreamStore.isStreaming을 생성 중 상태의 단일 기준으로 사용합니다.
 
 function normalizeChatId(chatId) {
   return String(chatId || "").trim();
@@ -118,8 +118,8 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
 }
 
 export function useChatSubmit(options) {
-  const isGenerating = ref(false);
   const chatStreamStore = useChatStreamStore();
+  const isGenerating = computed(() => chatStreamStore.isStreaming);
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
 
@@ -128,12 +128,12 @@ export function useChatSubmit(options) {
     if (
       !canWrite(options) ||
       (!normalized.text && normalized.attachments.length === 0) ||
-      isGenerating.value
+      chatStreamStore.isStreaming
     ) {
       return;
     }
 
-    isGenerating.value = true;
+    chatStreamStore.start();
 
     const initialHistoryId = normalizeChatId(options.route.params.id);
     const isNewConversationSubmit = shouldCreateConversation(
@@ -171,16 +171,19 @@ export function useChatSubmit(options) {
       committer.commit();
 
       if (isNewConversationSubmit) {
-        await options.router
-          .push({name: "chat", params: {id: targetHistoryId}})
-          .catch(() => {});
+        const nextRoute = {name: "chat", params: {id: targetHistoryId}};
+        // chatStreamStore.isStreaming 상태에서 새 채팅방으로 입장해야 하므로,
+        // 새 대화 생성 직후 내부 /chat/:id 라우팅만 1회 허용합니다.
+        // 사용자가 클릭한 다른 대화방/Studio/MCP 이동은 router guard에서 계속 차단됩니다.
+        chatStreamStore.allowNavigationTo(nextRoute);
+        await options.router.push(nextRoute).catch(() => {
+          chatStreamStore.clearAllowedNavigation();
+        });
       }
 
       await nextTick();
       options.syncHistories?.();
       await scrollAfterUserSubmit(options, normalized);
-
-      chatStreamStore.start();
 
       await runAssistantStream({
         options,
@@ -198,13 +201,12 @@ export function useChatSubmit(options) {
         apiRequestStore.resumeOverlay();
         overlaySuppressed = false;
       }
-      isGenerating.value = false;
       chatStreamStore.finish();
     }
   }
 
   async function regenerateResponse(message = {}) {
-    if (!canWrite(options) || isGenerating.value) return;
+    if (!canWrite(options) || chatStreamStore.isStreaming) return;
 
     const targetHistoryId = normalizeChatId(options.route.params.id);
     if (!targetHistoryId) return;
@@ -243,7 +245,6 @@ export function useChatSubmit(options) {
     // 자동 스크롤 OFF 재생성에서는 질문 박스를 화면 상단에 배치하기 위한
     // 하단 spacer 계산이 필요합니다. 이 계산은 MessageList의 loading=true 조건에서만
     // 동작하므로 commit/scroll 전에 생성 상태를 먼저 열어 둡니다.
-    isGenerating.value = true;
     chatStreamStore.start();
 
     committer.commit();
@@ -273,7 +274,6 @@ export function useChatSubmit(options) {
         logPrefix: "[useChatSubmit] 재생성",
       });
     } finally {
-      isGenerating.value = false;
       chatStreamStore.finish();
     }
   }
