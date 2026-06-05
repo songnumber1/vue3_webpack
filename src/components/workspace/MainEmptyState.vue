@@ -5,6 +5,7 @@
       'empty-stage--mobile-main': isMobile,
       'main-empty-state--preview': preview,
     }"
+    style="display: flex"
   >
     <div
       class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[820px] tw-flex-col tw-items-center tw-gap-4 tw-text-center"

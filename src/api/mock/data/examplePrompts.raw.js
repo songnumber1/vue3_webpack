@@ -168,26 +168,7 @@ export const EXAMPLE_PROMPTS_RAW = {
     ],
   },
   "studio-marketing": {
-    list: [
-      prompt(
-        "studio-marketing",
-        1,
-        "신규 기능 출시 안내 문구를 작성해줘",
-        "Write a launch announcement"
-      ),
-      prompt(
-        "studio-marketing",
-        2,
-        "앱 리뷰 답변 톤을 다듬어줘",
-        "Improve app review reply tone"
-      ),
-      prompt(
-        "studio-marketing",
-        3,
-        "이벤트 배너 문구 10개를 만들어줘",
-        "Create 10 event banner copies"
-      ),
-    ],
+    list: [],
   },
   "studio-ops": {
     list: [
