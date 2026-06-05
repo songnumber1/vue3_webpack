@@ -7,9 +7,15 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-// 일반적인 모바일 터치 디바이스 판정 기준 가로폭 해상도 (768px)
+// PC에서도 모바일 화면을 검증할 수 있도록 시스템 기본 반응형 전환 기준은 1400px로 둡니다.
+const RAW_DEFAULT_MOBILE_BREAKPOINT_PX = Number(
+  process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT
+);
 export const DEFAULT_MOBILE_BREAKPOINT_PX =
-  process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT;
+  Number.isFinite(RAW_DEFAULT_MOBILE_BREAKPOINT_PX) &&
+  RAW_DEFAULT_MOBILE_BREAKPOINT_PX > 0
+    ? RAW_DEFAULT_MOBILE_BREAKPOINT_PX
+    : 1400;
 
 // 사용자가 설정할 수 있는 모바일 전환 기준 너비의 최소/최대 허용 범위
 export const MIN_MOBILE_BREAKPOINT_PX = 400;
@@ -31,8 +37,8 @@ export const MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT = 300;
 export const MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT = 10;
 export const MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT = 200;
 
-// 하위 호환성을 위해 기존 export 명칭은 유지하되, 더 이상 플랫폼 오버라이드 여부로 강제 적용하지 않습니다.
-export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = MAX_MOBILE_BREAKPOINT_PX;
+// PC 브라우저에서 Android 강제 플랫폼을 선택하면 모바일 레이아웃을 즉시 확인할 수 있도록 사용하는 전환 기준입니다.
+export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 8888;
 
 /**
  * 모바일 가상 키보드가 전격 팝업될 때 화면 뷰포트를 어떤 레이아웃 공식으로 반응형 밀어내기 처리할지 규정하는 불변 모드 상수입니다.
@@ -392,6 +398,22 @@ function normalizeKeyboardMode(value) {
     : DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.keyboardMode];
 }
 
+function normalizeMobileBreakpoint(value) {
+  if (value === undefined || value === null || value === "") {
+    return DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.mobileBreakpoint];
+  }
+
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric <= 0) {
+    return DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.mobileBreakpoint];
+  }
+
+  return Math.min(
+    Math.max(Math.round(numeric), MIN_MOBILE_BREAKPOINT_PX),
+    MAX_MOBILE_BREAKPOINT_PX
+  );
+}
+
 /**
  * @description 로컬 스토리지의 위변조된 데이터나 백엔드에서 내려온 불안정한 타입의 설정 객체를 인입받아, 비즈니스 한계 영역 규격에 맞춰 안전 범위(Min/Max Clamp)로 치환 정규화해주는 무결성 방어 마스터 함수입니다.
  * @param {object} [value={}] 외부 서버 또는 저장소로부터 추출된 미검증 가변 시스템 설정 로우 객체
@@ -455,13 +477,7 @@ export function normalizeSystemSettings(value = {}) {
 
     // 세부 정규화 1구역: 모바일 해상도 트리거 포인트 정밀 클램프 연산
     if (key === SYSTEM_SETTING_KEYS.mobileBreakpoint) {
-      const numeric = Number(source[key]);
-      next[key] = Number.isFinite(numeric)
-        ? Math.min(
-            Math.max(Math.round(numeric), MIN_MOBILE_BREAKPOINT_PX),
-            MAX_MOBILE_BREAKPOINT_PX
-          ) // 해상도가 비정상적으로 깨지는 현상을 막기 위해 최소 400px에서 최대 9999px로 범위 강제 잠금(Clamp)
-        : DEFAULT_SYSTEM_SETTINGS[key];
+      next[key] = normalizeMobileBreakpoint(source[key]);
       return;
     }
 

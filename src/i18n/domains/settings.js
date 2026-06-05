@@ -21,6 +21,7 @@ export const settingsMessages = {
         mobile: "모바일",
       },
       groups: {
+        platformResponsive: "플랫폼 / 반응형",
         api: "API",
         auth: "인증",
         mobile: "모바일",
@@ -78,13 +79,14 @@ export const settingsMessages = {
         },
         mobileBreakpoint: {
           label: "반응형 전환 기준",
-          description: "모바일 모드로 전환할 기준 너비(px)입니다.",
+          description:
+            "브라우저 너비가 이 값 이하이면 모바일 화면으로 전환됩니다. 플랫폼 강제 설정을 Auto로 변경하면 시스템 기본값으로, Auto가 아닌 강제 플랫폼을 선택하면 8888px로 자동 설정됩니다. 입력 범위: 400~9999px.",
         },
         platformOverride: {
           label: "플랫폼 강제 설정",
           labelWithActual: "플랫폼 강제 설정 (진짜 플랫폼: {actual})",
           description:
-            "웹 브라우저에서도 선택한 모바일 플랫폼 분기 로직을 적용합니다.",
+            "웹 브라우저에서도 선택한 플랫폼 분기 로직을 적용합니다. Auto는 시스템 기본 반응형 기준을 사용하고, 강제 플랫폼은 반응형 전환 기준을 8888px로 자동 설정합니다.",
         },
         keyboardMode: {
           label: "키보드 모드",
@@ -297,10 +299,6 @@ export const settingsMessages = {
     legal: {
       updatedAt: "시행일: 2026.05.18",
       privacy: {
-        eyebrow: "Privacy",
-        title: "개인정보처리방침",
-        description:
-          "DS Assistant는 서비스 제공에 필요한 최소한의 개인정보를 안전하게 처리합니다.",
         sections: [
           {
             title: "1. 수집하는 개인정보",
@@ -365,6 +363,10 @@ export const settingsMessages = {
   },
   en: {
     systemSettings: {
+      eyebrow: "System",
+      title: "App behavior settings",
+      description:
+        "Manage visible screens, API usage, and mobile thresholds in one place. Changes are saved when you apply them and affect the next screen behavior immediately.",
       close: "Close",
       apply: "Apply",
       authModeChangeLogoutConfirm:
@@ -376,6 +378,7 @@ export const settingsMessages = {
         mobile: "Mobile",
       },
       groups: {
+        platformResponsive: "Platform / responsive",
         api: "API",
         auth: "Authentication",
         mobile: "Mobile",
@@ -431,13 +434,14 @@ export const settingsMessages = {
         },
         mobileBreakpoint: {
           label: "Mobile breakpoint",
-          description: "Viewport width in px used to switch to mobile mode.",
+          description:
+            "Switches to mobile layout when the browser width is at or below this value. Auto uses the system default breakpoint, while a forced platform automatically sets this value to 8888px. Allowed range: 400–9999px.",
         },
         platformOverride: {
           label: "Force platform",
           labelWithActual: "Force platform (Actual: {actual})",
           description:
-            "Apply the selected mobile platform branch logic even in a web browser.",
+            "Apply the selected platform branch logic even in a web browser. Auto uses the system default breakpoint, while a forced platform automatically sets the breakpoint to 8888px.",
         },
         keyboardMode: {
           label: "Keyboard mode",

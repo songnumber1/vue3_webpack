@@ -79,7 +79,9 @@ import { authApiLive } from "@/api/live/authApi.live";
 import { logWarn } from "@/utils/logger";
 import { syncViewportSettings } from "@/utils/applyViewportBreakpoint";
 import {
+  DEFAULT_MOBILE_BREAKPOINT_PX,
   DEFAULT_SYSTEM_SETTINGS,
+  FORCED_MOBILE_PLATFORM_BREAKPOINT_PX,
   KEYBOARD_MODE_OPTIONS,
   MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT,
   MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
@@ -94,6 +96,7 @@ import {
   MIN_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
   MIN_MOBILE_BREAKPOINT_PX,
   PLATFORM_OVERRIDE_OPTIONS,
+  PLATFORM_OVERRIDE_MODES,
   AUTH_MODE_OPTIONS,
 } from "@/constants/systemSettings";
 
@@ -140,11 +143,9 @@ useOverlayScrollbar(settingsScrollRef, { overflow: { x: "hidden", y: "scroll" } 
 
 const commonGroups = computed(() => [
   {
-    kicker: t("common.api"),
-    title: t("systemSettings.groups.api"),
+    kicker: "PLATFORM",
+    title: t("systemSettings.groups.platformResponsive"),
     items: [
-      settingItem("useRealApi"),
-      settingItem("showMobileApiProgress"),
       settingItem("platformOverride", {
         type: "select",
         label: t("systemSettings.items.platformOverride.labelWithActual", {
@@ -152,7 +153,18 @@ const commonGroups = computed(() => [
         }),
         options: PLATFORM_OVERRIDE_OPTIONS,
       }),
+      settingItem("mobileBreakpoint", {
+        type: "number",
+        min: MIN_MOBILE_BREAKPOINT_PX,
+        max: MAX_MOBILE_BREAKPOINT_PX,
+        step: 1,
+      }),
     ],
+  },
+  {
+    kicker: t("common.api"),
+    title: t("systemSettings.groups.api"),
+    items: [settingItem("useRealApi"), settingItem("showMobileApiProgress")],
   },
   {
     kicker: "AUTH",
@@ -239,12 +251,6 @@ const mobileGroups = computed(() => [
     kicker: "MOBILE",
     title: t("systemSettings.groups.mobile"),
     items: [
-      settingItem("mobileBreakpoint", {
-        type: "number",
-        min: MIN_MOBILE_BREAKPOINT_PX,
-        max: MAX_MOBILE_BREAKPOINT_PX,
-        step: 1,
-      }),
       settingItem("keyboardMode", {
         type: "select",
         options: KEYBOARD_MODE_OPTIONS,
@@ -336,6 +342,17 @@ function hasAuthModeChanged() {
 /**
  * 브라우저 기본 confirm을 사용해 기존 디자인/CSS를 건드리지 않고 로그아웃 안내만 제공합니다.
  */
+
+function isAutoPlatformOverride(value) {
+  return value === PLATFORM_OVERRIDE_MODES.auto;
+}
+
+function resolveBreakpointForPlatformOverride(value) {
+  return isAutoPlatformOverride(value)
+    ? DEFAULT_MOBILE_BREAKPOINT_PX
+    : FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
+}
+
 function confirmAuthModeLogout() {
   if (typeof window === "undefined" || typeof window.confirm !== "function") {
     return true;
@@ -394,4 +411,15 @@ async function apply() {
 }
 
 watch(settings, syncDraft, { immediate: true, deep: true });
+
+watch(
+  () => draft.platformOverride,
+  (nextPlatformOverride, previousPlatformOverride) => {
+    if (nextPlatformOverride === previousPlatformOverride) return;
+    draft.mobileBreakpoint = resolveBreakpointForPlatformOverride(
+      nextPlatformOverride
+    );
+  }
+);
+
 </script>

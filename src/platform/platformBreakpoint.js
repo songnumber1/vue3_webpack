@@ -5,8 +5,12 @@ import {
 } from "@/constants/systemSettings";
 
 export function resolveCompactBreakpoint(value) {
+  if (value === undefined || value === null || value === "") {
+    return DEFAULT_MOBILE_BREAKPOINT_PX;
+  }
+
   const numeric = Number(value);
-  return Number.isFinite(numeric)
+  return Number.isFinite(numeric) && numeric > 0
     ? Math.min(
         Math.max(Math.round(numeric), MIN_MOBILE_BREAKPOINT_PX),
         MAX_MOBILE_BREAKPOINT_PX
