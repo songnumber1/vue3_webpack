@@ -262,6 +262,12 @@ const {
   hasPreviousHistoryMessages,
   historyLazyTopThreshold,
   historyLazyChunkSize,
+  messageRenderPolicy,
+  pcHistoryLazyInitialCount,
+  pcHistoryLazyAppendCount,
+  pcHistoryLazyTopThresholdPx,
+  mobileHistoryLazyInitialCount,
+  mobileHistoryLazyAppendCount,
   loadPreviousHistoryMessages,
   finishHistoryRender,
   autoScrollOnAnswer,
@@ -372,6 +378,12 @@ provide(
     hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
     historyLazyTopThreshold: historyLazyTopThreshold.value,
     historyLazyChunkSize: historyLazyChunkSize.value,
+    messageRenderPolicy: messageRenderPolicy.value,
+    pcHistoryLazyInitialCount: pcHistoryLazyInitialCount.value,
+    pcHistoryLazyAppendCount: pcHistoryLazyAppendCount.value,
+    pcHistoryLazyTopThresholdPx: pcHistoryLazyTopThresholdPx.value,
+    mobileHistoryLazyInitialCount: mobileHistoryLazyInitialCount.value,
+    mobileHistoryLazyAppendCount: mobileHistoryLazyAppendCount.value,
   }))
 );
 

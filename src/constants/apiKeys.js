@@ -40,6 +40,7 @@ export const CHAT_KEYS = Object.freeze({
   BOOKMARK_YN: "bookmarkYN",
   ENDED_AT: "chatEndDt",
   USER_ID: "userId",
+  SHARED_ID: "sharedId",
 });
 
 export const MESSAGE_KEYS = Object.freeze({

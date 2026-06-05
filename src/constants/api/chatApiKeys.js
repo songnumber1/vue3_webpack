@@ -21,6 +21,7 @@ export const CHAT_API_KEYS = Object.freeze({
   SNIPPET: "snippet",
   PREVIEW: "preview",
   MATCH_COUNT: "matchCount",
+  SHARED_ID: "sharedId",
   HISTORY: "history",
   MESSAGES: "messages",
   PROMPTS: "prompts",

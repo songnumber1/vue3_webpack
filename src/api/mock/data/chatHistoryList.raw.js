@@ -8,22 +8,24 @@ import {PERFORMANCE_CHAT_HISTORY_RAW} from "@/api/mock/data/performanceChatHisto
 export const CHAT_HISTORY_LIST_RAW = [
   ...PERFORMANCE_CHAT_HISTORY_RAW,
   {
-    chatTitle: "공동상속주택 1가구 2주택 양도세",
+    chatTitle: "공유 - 공동상속주택 1가구 2주택 양도세",
     chatId: "chat-search-sample-001",
     modeId: "model-ds-fast",
     bookmarkYN: false,
     dayGroup: 0,
     chatEndDt: "2026-05-29T10:07:00Z",
     userId: "user-1234",
+    sharedId: "3d4d79d5-3a5e-4551-9285-889a9f4bf1c4",
   },
   {
-    chatTitle: "Sass와 CSS의 차이점과 장점",
+    chatTitle: "공유 - Sass와 CSS의 차이점과 장점",
     chatId: "chat-search-sample-002",
     modeId: "model-ds-rag",
     bookmarkYN: false,
     dayGroup: 0,
     chatEndDt: "2026-05-29T11:14:00Z",
     userId: "user-1234",
+    sharedId: "ae2d62dd-2453-4f35-8f52-3ca4ea99e3b5",
   },
   {
     chatTitle: "JavaScript 코드 JSDoc 및 주석 추가",
@@ -33,6 +35,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-29T12:21:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "개인 PC IP 노출 보안 위험",
@@ -42,6 +45,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-29T13:28:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "오류 응답 화면 확인",
@@ -51,6 +55,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-28T14:35:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Markdown 렌더링 종합 테스트",
@@ -60,6 +65,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-28T15:42:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "삭제된 모델 채팅방 확인",
@@ -69,6 +75,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-28T16:49:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Container Business Adapter Mock API 구조 설계",
@@ -78,6 +85,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-28T17:56:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Vue 모바일 WebView Bottom Sheet overflow 문제 분석",
@@ -87,6 +95,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-27T18:03:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Spring Boot CLOSE_WAIT 대응 코드 흐름 정리",
@@ -96,6 +105,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-05-27T19:10:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "API key constant와 adapter 분리 전략",
@@ -105,6 +115,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-27T20:17:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "공지사항 문구 다듬기 및 사용자 안내 톤 정리",
@@ -114,6 +125,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-27T21:24:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "데이터 테이블 CSV 다운로드와 복사 UX 점검",
@@ -123,6 +135,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-26T22:31:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "마케팅 스튜디오 출시 안내 문구 생성",
@@ -132,6 +145,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-26T23:38:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "채팅 검색 Gemini 스타일 레이아웃 개선",
@@ -141,6 +155,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-26T00:45:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Assistant Studio 공유 범위 UI 정리",
@@ -150,6 +165,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-26T01:52:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Connector Store MCP 카드 상세 팝업 설계",
@@ -159,6 +175,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-25T02:59:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Vue Router 채팅 검색 화면 추가",
@@ -168,6 +185,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-25T03:06:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Spring Boot Mock Controller Service 구조",
@@ -177,6 +195,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-25T04:13:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "React Native 위치 권한 체크 플로우",
@@ -186,6 +205,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 1,
     chatEndDt: "2026-05-25T05:20:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Android WebView safe area 키보드 대응",
@@ -195,6 +215,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-24T06:27:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "SSE 스트리밍 응답 렌더링 분석",
@@ -204,6 +225,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-24T07:34:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Mermaid SVG 내보내기 버튼 조건 처리",
@@ -213,6 +235,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-24T08:41:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "KaTeX rehype sanitize markdown pipeline",
@@ -222,6 +245,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-24T09:48:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "PostgreSQL VACUUM 및 커넥션 풀 튜닝",
@@ -231,6 +255,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-23T10:55:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Undertow 버퍼 설정과 JVM G1GC 점검",
@@ -240,6 +265,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-23T11:02:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "WebClient timeout onErrorResume doFinally",
@@ -249,6 +275,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-23T12:09:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Redis 위치 캐시 WebSocket 구독 설계",
@@ -258,6 +285,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-23T13:16:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "OAuth users oauth_accounts JPA CRUD",
@@ -267,6 +295,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-22T14:23:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "MySQL 테이블 설계와 인덱스 전략",
@@ -276,6 +305,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 2,
     chatEndDt: "2026-05-22T15:30:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Wireshark TCP Window Full 재현 실험",
@@ -285,6 +315,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-22T16:37:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Linux 커널 네트워크 버퍼 튜닝",
@@ -294,6 +325,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-22T17:44:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Vue 3 Option API Mermaid 자동 렌더링",
@@ -303,6 +335,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-21T18:51:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "PlantUML 오프라인 렌더링 구조",
@@ -312,6 +345,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-21T19:58:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Chart.js destroy 재생성 오류 해결",
@@ -321,6 +355,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-21T20:05:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "AG Grid Community 기능 Vue 구현",
@@ -330,6 +365,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-21T21:12:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "json editor context menu import export UX",
@@ -339,6 +375,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-20T22:19:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Family Link 유사 위치 공유 앱 설계",
@@ -348,6 +385,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-20T23:26:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Foreground Service 위치 전송 안정화",
@@ -357,6 +395,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-20T00:33:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "iOS Location 저전력 모드 체크",
@@ -366,6 +405,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 3,
     chatEndDt: "2026-05-20T01:40:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Spring Security 세션 기반 AD 로그인",
@@ -375,6 +415,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-19T02:47:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "CORS CSRF XSS 보안 예제 정리",
@@ -384,6 +425,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-19T03:54:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "iframe 임베드 보안 필터 구성",
@@ -393,6 +435,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-19T04:01:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "프론트엔드 인증 가드 환경변수 정리",
@@ -402,6 +445,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-19T05:08:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Swagger UI Android Bridge 연동 검토",
@@ -411,6 +455,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-18T06:15:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "zod to openapi 버전 충돌 해결",
@@ -420,6 +465,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-18T07:22:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Node 16 Vue CLI 빌드 최적화",
@@ -429,6 +475,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-18T08:29:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "mkcert HTTPS 개발 서버 설정",
@@ -438,6 +485,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-18T09:36:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "모바일 Bottom Sheet drag snap 개선",
@@ -447,6 +495,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-17T10:43:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "BaseBottomSheet 헤더 타이포그래피 통일",
@@ -456,6 +505,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 4,
     chatEndDt: "2026-05-17T11:50:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "StudioMultiSelect 외부 클릭 닫기",
@@ -465,6 +515,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-17T12:57:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "공개 대상 추가 그리드 검색 페이징",
@@ -474,6 +525,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-17T13:04:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "공유 권한 목록 체크박스 정렬 보정",
@@ -483,6 +535,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-16T14:11:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Assistant 만들기 미리보기 공통 컴포넌트",
@@ -492,6 +545,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-16T15:18:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "MainEmptyState 재사용 구조 리팩토링",
@@ -501,6 +555,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-16T16:25:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Studio SCSS partial 분리 전략",
@@ -510,6 +565,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-16T17:32:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "MCP 상세 보기 공통 ResourceDetailContent",
@@ -519,6 +575,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-15T18:39:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "ResourceCard 공통 카드 컴포넌트 설계",
@@ -528,6 +585,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-15T19:46:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "채팅 자동 스크롤 설정 메뉴 추가",
@@ -537,6 +595,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-15T20:53:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "답변 중 전송 버튼 progress 표시",
@@ -546,6 +605,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 5,
     chatEndDt: "2026-05-15T21:00:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "모바일 가상 키보드 adjustResize 검증",
@@ -555,6 +615,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-14T22:07:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "VisualViewport safe-area env 적용",
@@ -564,6 +625,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-14T23:14:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Samsung Browser Firefox Android 대응",
@@ -573,6 +635,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-14T00:21:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "iOS Safari 미지원 범위 정리",
@@ -582,6 +645,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-14T01:28:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "다크 테마 Mermaid 글자 색상 보정",
@@ -591,6 +655,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-13T02:35:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "클립보드 복사 toast i18n 처리",
@@ -600,6 +665,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-13T03:42:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "PC header 사용자명 색상 문제 수정",
@@ -609,6 +675,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-13T04:49:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "팝업 footer 버튼 일관성 보정",
@@ -618,6 +685,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-13T05:56:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "좌측 메뉴 Assistant 이미지 크기 통일",
@@ -627,6 +695,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-12T06:03:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "대화방 제목 변경 팝업 키보드 대응",
@@ -636,6 +705,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 6,
     chatEndDt: "2026-05-12T07:10:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "피드백 보내기 팝업 위치 보정",
@@ -645,6 +715,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-12T08:17:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "검색 결과 리스트 날짜 표시 규칙",
@@ -654,6 +725,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-12T09:24:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Gemini 최근 대화 목록 UX 참고",
@@ -663,6 +735,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-11T10:31:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "채팅 검색 페이징 하단 고정",
@@ -672,6 +745,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-11T11:38:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "검색어 debounce API fallback 처리",
@@ -681,6 +755,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-11T12:45:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Mock API 응답 구조 normalize",
@@ -690,6 +765,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-11T13:52:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "백엔드 HashMap 응답 adapter 설계",
@@ -699,6 +775,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-10T14:59:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Session 종료 후 채팅 가능 문제 분석",
@@ -708,6 +785,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-10T15:06:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "브라우저 종료 sendBeacon 처리",
@@ -717,6 +795,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-10T16:13:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "SSE 중단 abort controller 정리",
@@ -726,6 +805,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 7,
     chatEndDt: "2026-05-10T17:20:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "외부 API presigned URL 업로드 구조",
@@ -735,6 +815,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-09T18:27:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "파일 업로드 rx_queued_bytes 증가 원인",
@@ -744,6 +825,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-09T19:34:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "HttpClient 재사용 풀 관리 전략",
@@ -753,6 +835,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-09T20:41:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "ConnectionProvider dispose 방지 전략",
@@ -762,6 +845,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-09T21:48:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "Flux merge pingFlux generationFlux 구조",
@@ -771,6 +855,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-08T22:55:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "JPA 저장 위치 doFinally 이동 검토",
@@ -780,6 +865,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-08T23:02:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "StringBuilder Queue 메모리 사용 개선",
@@ -789,6 +875,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-08T00:09:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "DB connection pool timeout 설정",
@@ -798,6 +885,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-08T01:16:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "운영 개발 서버 JVM 차이 정리",
@@ -807,6 +895,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-07T02:23:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "16코어 32GB 서버 튜닝 체크리스트",
@@ -816,6 +905,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 8,
     chatEndDt: "2026-05-07T03:30:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "4코어 8GB 개발 서버 설정 구분",
@@ -825,6 +915,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-07T04:37:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "대기업급 디자인 시스템 점수화",
@@ -834,6 +925,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-07T05:44:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "SCSS important 사용 기준 평가",
@@ -843,6 +935,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-06T06:51:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "CSS specificity 충돌 제거 계획",
@@ -852,6 +945,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-06T07:58:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "z-index 토큰 적용 가능한 범위",
@@ -861,6 +955,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-06T08:05:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "PromptToolbarDesktop 컴포넌트 분리",
@@ -870,6 +965,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-06T09:12:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "useChatContainerController 책임 분리",
@@ -879,6 +975,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-05T10:19:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "i18n 도메인 분리 전략",
@@ -888,6 +985,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-05T11:26:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "반응형 전환 기준 값 검증",
@@ -897,6 +995,7 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-05T12:33:00Z",
     userId: "user-1234",
+    sharedId: null,
   },
   {
     chatTitle: "모바일 웹앱 배포 체크리스트",
@@ -906,5 +1005,17 @@ export const CHAT_HISTORY_LIST_RAW = [
     dayGroup: 9,
     chatEndDt: "2026-05-05T13:40:00Z",
     userId: "user-1234",
+    sharedId: null,
+  },
+  {
+    chatTitle: "오류 응답 박스 테스트",
+    chatId: "chat-error-response",
+    modeId: "model-ds-fast",
+    modelId: "model-ds-fast",
+    bookmarkYN: false,
+    dayGroup: 9,
+    chatEndDt: "2026-05-05T14:47:00Z",
+    userId: "user-1234",
+    sharedId: null,
   },
 ];

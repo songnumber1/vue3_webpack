@@ -1,4 +1,5 @@
 import {applyGenerationStreamData} from "@/api/sse/common/generationStreamParser";
+import {createGenerationStreamError} from "@/adapters/sseResponseAdapter";
 import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
@@ -9,6 +10,58 @@ import {
 } from "@/api/sse/common/streamRequest";
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
+
+
+function readEventErrorMessage(event) {
+  const rawData = event?.data;
+  if (typeof rawData === "string" && rawData.trim()) {
+    try {
+      const parsed = JSON.parse(rawData);
+      return (
+        parsed?.error?.message ||
+        parsed?.errorMessage ||
+        parsed?.message ||
+        rawData
+      );
+    } catch (_error) {
+      return rawData;
+    }
+  }
+
+  return event?.message || "generation stream failed";
+}
+
+function readEventErrorCode(event) {
+  const rawData = event?.data;
+  if (typeof rawData === "string" && rawData.trim()) {
+    try {
+      const parsed = JSON.parse(rawData);
+      return parsed?.error?.code || parsed?.errorCode || parsed?.code;
+    } catch (_error) {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
+function createSseEventError(event) {
+  const status = event?.status || event?.responseCode;
+  return createGenerationStreamError({
+    message: readEventErrorMessage(event),
+    code: readEventErrorCode(event) || "SSE_EVENT_ERROR",
+    status,
+  });
+}
+
+function createGenerationDoneMissingError() {
+  const error = createGenerationStreamError({
+    message: "generation stream closed before DONE",
+    code: "SSE_DONE_MISSING",
+  });
+  error.doneMissing = true;
+  return error;
+}
 
 function getUnauthorizedStreamStatus(error) {
   const status = Number(
@@ -119,12 +172,7 @@ export async function runSseGenerationStream({
       });
 
       source.addEventListener("error", (event) => {
-        const error = new Error(
-          event?.message || event?.data || "generation stream failed"
-        );
-        const status = event?.status || event?.responseCode;
-        if (status) error.status = status;
-        finishReject(error);
+        finishReject(createSseEventError(event));
       });
 
       source.addEventListener("abort", () => {
@@ -142,7 +190,7 @@ export async function runSseGenerationStream({
           !completed &&
           !controller?.signal?.aborted
         ) {
-          finishResolve();
+          finishReject(createGenerationDoneMissingError());
         }
       });
 

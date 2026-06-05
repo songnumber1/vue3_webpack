@@ -6,6 +6,31 @@ import {createGenerationPayload} from "./chatSubmitPayload";
 import {commitFirstAnswerChunk} from "./streamingMessageCommitter";
 import {adaptGenerationResultContent} from "@/adapters/generationResponseAdapter";
 
+
+function resolveStreamErrorTitle(error) {
+  if (error?.doneMissing) return "답변 생성이 완료되지 않았습니다";
+  return "답변 생성 실패";
+}
+
+function resolveStreamErrorMessage({error, fallbackMessage}) {
+  const message = String(error?.message || "").trim();
+  if (error?.doneMissing) {
+    return "서버 응답이 완료 신호 없이 종료되었습니다. 잠시 후 다시 시도해 주세요.";
+  }
+
+  if (error?.streamError && message) return message;
+  if (message && !/generation stream failed|generation stream returned error/i.test(message)) {
+    return message;
+  }
+
+  return fallbackMessage || "응답 생성 중 오류가 발생했습니다.";
+}
+
+function resolveStreamErrorCode(error) {
+  if (error?.doneMissing) return "SSE_DONE_MISSING";
+  return error?.streamErrorCode || "SSE_STREAM_ERROR";
+}
+
 async function resolveGenerationResultContent(requestId) {
   try {
     const result = await fetchGenerationResult(requestId);
@@ -62,23 +87,41 @@ export async function runAssistantStream({
     const syncedContent = await resolveGenerationResultContent(
       error.generationRequestId
     );
+
+    if (!isAbort && !syncedContent) {
+      commit({
+        status: "error",
+        error: true,
+        errorTitle: resolveStreamErrorTitle(error),
+        errorMessage: resolveStreamErrorMessage({
+          error,
+          fallbackMessage: errorFallbackMessage,
+        }),
+        errorCode: resolveStreamErrorCode(error),
+        isReasoning:
+          getAssistantMessage().isReasoning || Boolean(error.reasonAccumulated),
+        reasoningContent:
+          error.reasonAccumulated ||
+          getAssistantMessage().reasoningContent ||
+          "",
+        reasoningStatus: "completed",
+        content: "",
+      });
+      return;
+    }
+
     const fallbackContent =
       syncedContent ||
       error.accumulated ||
       getAssistantMessage().content ||
       (isAbort ? abortFallbackMessage : errorFallbackMessage);
 
-    const shouldShowErrorArea = !isAbort && !syncedContent;
-
     commit({
-      status: shouldShowErrorArea
-        ? "error"
-        : fallbackContent
-          ? "complete"
-          : "error",
-      error: shouldShowErrorArea,
-      errorTitle: shouldShowErrorArea ? "답변 생성 실패" : "",
-      errorMessage: shouldShowErrorArea ? fallbackContent : "",
+      status: fallbackContent ? "complete" : "error",
+      error: false,
+      errorTitle: "",
+      errorMessage: "",
+      errorCode: "",
       isReasoning:
         getAssistantMessage().isReasoning || Boolean(error.reasonAccumulated),
       reasoningContent:

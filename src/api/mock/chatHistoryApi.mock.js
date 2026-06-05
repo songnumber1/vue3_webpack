@@ -40,6 +40,20 @@ function buildMessageSearchText(chatId) {
     .join(" ");
 }
 
+function findSearchTargetMessage(chatId, keyword = "") {
+  const messages = messageStore[chatId] || [];
+  const normalizedKeyword = normalizeSearchText(keyword);
+
+  if (!normalizedKeyword) return null;
+
+  return (
+    messages.find((message) => {
+      const content = String(message?.content || message?.answer || "").toLowerCase();
+      return content.includes(normalizedKeyword);
+    }) || null
+  );
+}
+
 function createSearchSnippet(text, keyword, fallback = "") {
   const source = String(text || fallback || "")
     .replace(/\s+/g, " ")
@@ -65,7 +79,8 @@ function searchChatHistories(payload = {}) {
     const messageText = buildMessageSearchText(chatId);
     const combined = `${title} ${messageText}`.toLowerCase();
     const matched = !keyword || combined.includes(keyword);
-    return {history, chatId, title, messageText, matched};
+    const targetMessage = matched ? findSearchTargetMessage(chatId, keyword) : null;
+    return {history, chatId, title, messageText, matched, targetMessage};
   });
 
   return source
@@ -78,7 +93,10 @@ function searchChatHistories(payload = {}) {
       title: item.title,
       snippet: createSearchSnippet(item.messageText, keyword, item.title),
       preview: createSearchSnippet(item.messageText, keyword, item.title),
+      messageId: item.targetMessage?.id || "",
+      role: item.targetMessage?.role || "",
       chatEndDt: item.history[CHAT_KEYS.ENDED_AT] || "",
+      sharedId: item.history[CHAT_KEYS.SHARED_ID] || null,
       modelId:
         item.history[CHAT_KEYS.MODEL_ID] ||
         item.history[CHAT_KEYS.LEGACY_MODEL_ID] ||
@@ -171,6 +189,7 @@ export const chatHistoryApiMock = {
       dayGroup: 0,
       chatEndDt: new Date().toISOString(),
       userId: "user-1234",
+      sharedId: null,
     };
     historyStore.unshift(history);
     messageStore[chatId] = [];

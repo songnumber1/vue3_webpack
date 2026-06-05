@@ -63,8 +63,14 @@ const props = defineProps({
   historyRendering: {type: Boolean, default: false},
   historyMessagesReady: {type: Boolean, default: false},
   hasPreviousHistoryMessages: {type: Boolean, default: false},
-  historyLazyTopThreshold: {type: Number, default: 96},
-  historyLazyChunkSize: {type: Number, default: 100},
+  historyLazyTopThreshold: {type: Number, default: 300},
+  historyLazyChunkSize: {type: Number, default: 50},
+  messageRenderPolicy: {type: Object, default: null},
+  pcHistoryLazyInitialCount: {type: Number, default: 100},
+  pcHistoryLazyAppendCount: {type: Number, default: 50},
+  pcHistoryLazyTopThresholdPx: {type: Number, default: 300},
+  mobileHistoryLazyInitialCount: {type: Number, default: 50},
+  mobileHistoryLazyAppendCount: {type: Number, default: 25},
 });
 
 const emit = defineEmits([
@@ -101,6 +107,7 @@ const {
   handleMessageRendered,
   scrollToBottom,
   scrollToBottomAfterRender,
+  scrollToInitialTarget,
   scrollToLatestUserMessage,
   getIsAtBottom,
   getScrollElement,
@@ -117,6 +124,7 @@ const showAndroidHistoryLoadMore = computed(
 defineExpose({
   scrollToBottom,
   scrollToBottomAfterRender,
+  scrollToInitialTarget,
   scrollToLatestUserMessage,
   isAtBottom: getIsAtBottom,
   getScrollElement,

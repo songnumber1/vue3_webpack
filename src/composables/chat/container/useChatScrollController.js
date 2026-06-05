@@ -183,6 +183,23 @@ export function useChatScrollController({
    * 이미지 로딩이나 마크다운 컴포넌트 비동기 마운트로 인해 화면 길이가 뒤늦게 늘어나는 웹 인터랙션 한계를 깨부수기 위해 5단계 점진적 백오프 타이머(0ms~320ms)를 제한적으로 가동합니다.
    * @param {object} [options={}] - 스크롤 커스텀 매개 옵션
    */
+  async function scrollInitialTarget(scrollTarget = {}, options = {}) {
+    const list = getMessageListRef();
+    if (list?.scrollToInitialTarget) {
+      list.scrollToInitialTarget(scrollTarget, {behavior: "auto", ...options});
+      updateScrollBottomButton();
+      return true;
+    }
+
+    if (scrollTarget?.type === "bottom") {
+      await scrollBottom({force: true, behavior: "auto", ...options});
+      return true;
+    }
+
+    updateScrollBottomButton();
+    return false;
+  }
+
   async function scrollLatestUserMessage(options = {}) {
     clearLatestUserScrollTimers(); // 기존에 잔존하던 이전 회차 백오프 타이머 예약 대기열 일괄 폭파 청소
 
@@ -266,6 +283,7 @@ export function useChatScrollController({
     markForceBottom,
     clearForceBottom,
     scrollBottom,
+    scrollInitialTarget,
     scrollLatestUserMessage,
     scheduleBottomStateCheck,
     handleMessageContentRendered,

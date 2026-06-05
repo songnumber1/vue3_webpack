@@ -20,6 +20,16 @@ export const MIN_HISTORY_LAZY_CHUNK_SIZE = 20;
 export const MAX_HISTORY_LAZY_CHUNK_SIZE = 500;
 export const MIN_HISTORY_LAZY_TOP_THRESHOLD = 16;
 export const MAX_HISTORY_LAZY_TOP_THRESHOLD = 400;
+export const MIN_PC_HISTORY_LAZY_INITIAL_COUNT = 20;
+export const MAX_PC_HISTORY_LAZY_INITIAL_COUNT = 500;
+export const MIN_PC_HISTORY_LAZY_APPEND_COUNT = 20;
+export const MAX_PC_HISTORY_LAZY_APPEND_COUNT = 500;
+export const MIN_PC_HISTORY_LAZY_TOP_THRESHOLD_PX = 16;
+export const MAX_PC_HISTORY_LAZY_TOP_THRESHOLD_PX = 400;
+export const MIN_MOBILE_HISTORY_LAZY_INITIAL_COUNT = 20;
+export const MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT = 300;
+export const MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT = 10;
+export const MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT = 200;
 
 // 하위 호환성을 위해 기존 export 명칭은 유지하되, 더 이상 플랫폼 오버라이드 여부로 강제 적용하지 않습니다.
 export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = MAX_MOBILE_BREAKPOINT_PX;
@@ -155,8 +165,13 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showLogoutButton: "showLogoutButton", // 인증 세션 로그아웃 버튼 노출 여부
   showMobileApiProgress: "showMobileApiProgress", // API 호출 및 채팅방 이력 로딩/렌더링 진행 표시 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
-  historyLazyChunkSize: "historyLazyChunkSize", // 이력 대화방 최초/추가 lazy 렌더링 메시지 묶음 개수
-  historyLazyTopThreshold: "historyLazyTopThreshold", // 이력 대화방 상단 추가 로드 트리거 scrollTop 기준(px)
+  historyLazyChunkSize: "historyLazyChunkSize", // 이력 대화방 최초/추가 lazy 렌더링 메시지 묶음 개수(하위 호환)
+  historyLazyTopThreshold: "historyLazyTopThreshold", // 이력 대화방 상단 추가 로드 트리거 scrollTop 기준(px, 하위 호환)
+  pcHistoryLazyInitialCount: "pcHistoryLazyInitialCount", // PC 이력 대화방 최초 lazy 렌더링 메시지 개수
+  pcHistoryLazyAppendCount: "pcHistoryLazyAppendCount", // PC 이력 대화방 상단 추가 lazy 렌더링 메시지 개수
+  pcHistoryLazyTopThresholdPx: "pcHistoryLazyTopThresholdPx", // PC 이력 대화방 상단 추가 로드 트리거 scrollTop 기준(px)
+  mobileHistoryLazyInitialCount: "mobileHistoryLazyInitialCount", // 모바일 이력 대화방 최초 lazy 렌더링 메시지 개수
+  mobileHistoryLazyAppendCount: "mobileHistoryLazyAppendCount", // 모바일 이력 대화방 수동 추가 lazy 렌더링 메시지 개수
   abortChatOnMobileBackground: "abortChatOnMobileBackground", // 모바일 환경에서 사용자가 홈 화면으로 빠져나가 백그라운드로 전환될 때 통신 파괴 여부
   webAuthMode: "webAuthMode", // 웹/PC 환경 기본 인증 방식(session/jwt)
   mobileAuthMode: "mobileAuthMode", // 모바일 브라우저/WebView 환경 기본 인증 방식(session/jwt)
@@ -265,6 +280,26 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
     process.env.VUE_APP_SYSTEM_HISTORY_LAZY_TOP_THRESHOLD,
     96
   ),
+  [SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_PC_HISTORY_LAZY_INITIAL_COUNT,
+    100
+  ),
+  [SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_PC_HISTORY_LAZY_APPEND_COUNT,
+    50
+  ),
+  [SYSTEM_SETTING_KEYS.pcHistoryLazyTopThresholdPx]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_PC_HISTORY_LAZY_TOP_THRESHOLD_PX,
+    300
+  ),
+  [SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
+    50
+  ),
+  [SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount]: readNumberEnv(
+    process.env.VUE_APP_SYSTEM_MOBILE_HISTORY_LAZY_APPEND_COUNT,
+    25
+  ),
   [SYSTEM_SETTING_KEYS.abortChatOnMobileBackground]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_ABORT_CHAT_ON_MOBILE_BACKGROUND,
     true
@@ -333,7 +368,33 @@ function normalizeKeyboardMode(value) {
  * @returns {object} 자바스크립트 논리 파괴 및 폭포수 렌더링 에러를 예방할 수 있게 보정 완성된 완전무결 설정 팩
  */
 export function normalizeSystemSettings(value = {}) {
-  const source = value && typeof value === "object" ? value : {}; // 데이터 유효 타입 세이프 검증
+  const rawSource = value && typeof value === "object" ? value : {}; // 데이터 유효 타입 세이프 검증
+  const source = {...rawSource};
+
+  // 기존 단일 lazy 설정을 가진 로컬 캐시/임시 설정은 PC·모바일 분리 설정으로 안전하게 승격합니다.
+  if (SYSTEM_SETTING_KEYS.historyLazyChunkSize in source) {
+    const legacyChunkSize = source[SYSTEM_SETTING_KEYS.historyLazyChunkSize];
+    if (!(SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount in source)) {
+      source[SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount] = legacyChunkSize;
+    }
+    if (!(SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount in source)) {
+      source[SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount] = legacyChunkSize;
+    }
+    if (!(SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount in source)) {
+      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount] = legacyChunkSize;
+    }
+    if (!(SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount in source)) {
+      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount] = legacyChunkSize;
+    }
+  }
+  if (
+    SYSTEM_SETTING_KEYS.historyLazyTopThreshold in source &&
+    !(SYSTEM_SETTING_KEYS.pcHistoryLazyTopThresholdPx in source)
+  ) {
+    source[SYSTEM_SETTING_KEYS.pcHistoryLazyTopThresholdPx] =
+      source[SYSTEM_SETTING_KEYS.historyLazyTopThreshold];
+  }
+
   const next = {...DEFAULT_SYSTEM_SETTINGS}; // 원본 보존 및 가변 조작을 위한 베이스 디폴트 프로토타입 디프 카피 스냅샷 생성
 
   Object.keys(DEFAULT_SYSTEM_SETTINGS).forEach((key) => {
@@ -431,6 +492,48 @@ export function normalizeSystemSettings(value = {}) {
         ? Math.min(
             Math.max(Math.round(numeric), MIN_HISTORY_LAZY_TOP_THRESHOLD),
             MAX_HISTORY_LAZY_TOP_THRESHOLD
+          )
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+
+    if (
+      key === SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount ||
+      key === SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount ||
+      key === SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount ||
+      key === SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount
+    ) {
+      const numeric = Number(source[key]);
+      const range = {
+        [SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount]: [
+          MIN_PC_HISTORY_LAZY_INITIAL_COUNT,
+          MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
+        ],
+        [SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount]: [
+          MIN_PC_HISTORY_LAZY_APPEND_COUNT,
+          MAX_PC_HISTORY_LAZY_APPEND_COUNT,
+        ],
+        [SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount]: [
+          MIN_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
+          MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
+        ],
+        [SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount]: [
+          MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT,
+          MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT,
+        ],
+      }[key];
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(Math.max(Math.round(numeric), range[0]), range[1])
+        : DEFAULT_SYSTEM_SETTINGS[key];
+      return;
+    }
+
+    if (key === SYSTEM_SETTING_KEYS.pcHistoryLazyTopThresholdPx) {
+      const numeric = Number(source[key]);
+      next[key] = Number.isFinite(numeric)
+        ? Math.min(
+            Math.max(Math.round(numeric), MIN_PC_HISTORY_LAZY_TOP_THRESHOLD_PX),
+            MAX_PC_HISTORY_LAZY_TOP_THRESHOLD_PX
           )
         : DEFAULT_SYSTEM_SETTINGS[key];
       return;

@@ -137,6 +137,31 @@ export const settingsMessages = {
           description:
             "PC에서 스크롤이 상단 몇 px 이내로 접근하면 이전 메시지를 자동 추가 로드할지 결정합니다. Android 버튼 방식에는 적용되지 않습니다.",
         },
+        pcHistoryLazyInitialCount: {
+          label: "PC 초기 렌더 개수",
+          description:
+            "PC 일반 대화방에 처음 입장할 때 하단 기준으로 먼저 렌더링할 메시지 개수입니다.",
+        },
+        pcHistoryLazyAppendCount: {
+          label: "PC 추가 렌더 개수",
+          description:
+            "PC 일반 대화방에서 상단으로 이동했을 때 추가로 렌더링할 이전 메시지 개수입니다.",
+        },
+        pcHistoryLazyTopThresholdPx: {
+          label: "PC 상단 로드 감지 거리(px)",
+          description:
+            "PC에서 스크롤이 상단 몇 px 이내로 접근하면 이전 메시지를 자동 추가 로드할지 결정합니다.",
+        },
+        mobileHistoryLazyInitialCount: {
+          label: "모바일 초기 렌더 개수",
+          description:
+            "모바일 대화방에 처음 입장할 때 하단 기준으로 먼저 렌더링할 메시지 개수입니다.",
+        },
+        mobileHistoryLazyAppendCount: {
+          label: "모바일 추가 렌더 개수",
+          description:
+            "모바일에서 이전 대화 더 보기 버튼을 눌렀을 때 추가로 렌더링할 메시지 개수입니다.",
+        },
         abortChatOnMobileBackground: {
           label: "백그라운드 모드 시 채팅 종료",
           description:
@@ -434,6 +459,31 @@ export const settingsMessages = {
           label: "History top load threshold (PC only)",
           description:
             "ScrollTop threshold in px that triggers automatic previous-history loading on PC. This does not apply to the Android button-based mode.",
+        },
+        pcHistoryLazyInitialCount: {
+          label: "PC initial render count",
+          description:
+            "Number of latest messages rendered first when entering a normal PC chat room.",
+        },
+        pcHistoryLazyAppendCount: {
+          label: "PC append render count",
+          description:
+            "Number of previous messages appended when scrolling near the top in a normal PC chat room.",
+        },
+        pcHistoryLazyTopThresholdPx: {
+          label: "PC top load trigger distance (px)",
+          description:
+            "ScrollTop distance in px that triggers automatic previous-message rendering on PC.",
+        },
+        mobileHistoryLazyInitialCount: {
+          label: "Mobile initial render count",
+          description:
+            "Number of latest messages rendered first when entering a mobile chat room.",
+        },
+        mobileHistoryLazyAppendCount: {
+          label: "Mobile append render count",
+          description:
+            "Number of previous messages appended when tapping the mobile load-previous button.",
         },
         abortChatOnMobileBackground: {
           label: "End chat on mobile background",

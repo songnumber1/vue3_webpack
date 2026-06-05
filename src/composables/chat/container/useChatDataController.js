@@ -23,6 +23,12 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
+import {resolveMessageRenderPolicy} from "@/composables/chat/message-list/useMessageRenderPolicy";
+import {
+  resolveInitialMessageLazyRange,
+  resolveMessageLazySettings,
+  resolvePreviousMessageLazyStart,
+} from "@/composables/chat/message-list/useMessageLazyRange";
 
 /**
  * [Route/Data controller]
@@ -49,22 +55,43 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const runtimeReady = ref(false);
   const isHistoryRendering = ref(false);
   const historyMessagesLoaded = ref(false);
-  const DEFAULT_HISTORY_LAZY_CHUNK_SIZE = 100;
 
-  function getHistoryLazyChunkSize() {
-    const value = Number(systemSettingsStore.historyLazyChunkSize);
-    return Number.isFinite(value) && value > 0
-      ? Math.max(1, Math.round(value))
-      : DEFAULT_HISTORY_LAZY_CHUNK_SIZE;
+  function getMessageLazySettings() {
+    return resolveMessageLazySettings(
+      systemSettingsStore.settings,
+      Boolean(ui.isMobile?.value)
+    );
+  }
+
+  function getHistoryLazyInitialCount() {
+    return getMessageLazySettings().initialCount;
+  }
+
+  function getHistoryLazyAppendCount() {
+    return getMessageLazySettings().appendCount;
+  }
+
+  function getHistoryLazyTopThresholdPx() {
+    return getMessageLazySettings().topThresholdPx;
   }
   const fullHistoryMessages = ref([]);
   const historyVisibleStartIndex = ref(0);
   const hasPreviousHistoryMessages = computed(
-    () => isChatPage.value && historyVisibleStartIndex.value > 0
+    () =>
+      isChatPage.value &&
+      messageRenderPolicy.value.useLazyLoading !== false &&
+      historyVisibleStartIndex.value > 0
   );
   const apiRequestStore = useApiRequestStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
+  const messageRenderPolicy = computed(() =>
+    resolveMessageRenderPolicy({
+      isMobile: Boolean(ui.isMobile?.value),
+      selectedChat: activeHistory.value,
+      searchTargetMessageId: route.query?.messageId,
+    })
+  );
   let historyRenderOverlayActive = false;
   let routeConversationLoadSeq = 0;
   let historyRenderFinishSeq = 0;
@@ -94,8 +121,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   function getInitialLazyHistorySlice(sourceMessages = []) {
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    const start = Math.max(list.length - getHistoryLazyChunkSize(), 0);
-    return {start, visibleMessages: list.slice(start)};
+    return resolveInitialMessageLazyRange({
+      messages: list,
+      initialCount: getHistoryLazyInitialCount(),
+      useLazyLoading: messageRenderPolicy.value.useLazyLoading !== false,
+    });
   }
 
   function setHistoryMessagesForInitialRender(sourceMessages = []) {
@@ -108,6 +138,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    if (messageRenderPolicy.value.useLazyLoading === false) {
+      fullHistoryMessages.value = list;
+      historyVisibleStartIndex.value = 0;
+      messages.value = list;
+      return true;
+    }
+
     if (!isChatPage.value || !fullHistoryMessages.value.length) {
       fullHistoryMessages.value = list;
       return false;
@@ -115,7 +152,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
     const currentVisibleCount = Math.max(
       messages.value.length,
-      Math.min(getHistoryLazyChunkSize(), list.length)
+      Math.min(getHistoryLazyInitialCount(), list.length)
     );
     const isShowingLatest =
       historyVisibleStartIndex.value + messages.value.length >=
@@ -124,7 +161,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     fullHistoryMessages.value = list;
 
     if (isShowingLatest) {
-      const count = Math.max(currentVisibleCount, getHistoryLazyChunkSize());
+      const count = Math.max(currentVisibleCount, getHistoryLazyInitialCount());
       historyVisibleStartIndex.value = Math.max(list.length - count, 0);
     } else {
       historyVisibleStartIndex.value = Math.min(
@@ -154,12 +191,16 @@ ${message?.reasoningContent || ""}`;
 
   function loadPreviousHistoryMessages() {
     if (!isChatPage.value) return false;
+    if (messageRenderPolicy.value.useLazyLoading === false) return false;
     const list = fullHistoryMessages.value;
     if (!Array.isArray(list) || !list.length) return false;
     if (historyVisibleStartIndex.value <= 0) return false;
 
     const previousStart = historyVisibleStartIndex.value;
-    const nextStart = Math.max(previousStart - getHistoryLazyChunkSize(), 0);
+    const nextStart = resolvePreviousMessageLazyStart({
+      currentStart: previousStart,
+      appendCount: getHistoryLazyAppendCount(),
+    });
     if (nextStart === previousStart) return false;
 
     historyVisibleStartIndex.value = nextStart;
@@ -169,6 +210,7 @@ ${message?.reasoningContent || ""}`;
 
   function isLazyHistoryActiveForChat(chatId) {
     return (
+      messageRenderPolicy.value.useLazyLoading !== false &&
       isChatPage.value &&
       String(activeHistoryId.value || "") === String(chatId || "") &&
       Array.isArray(fullHistoryMessages.value) &&
@@ -216,7 +258,7 @@ ${message?.reasoningContent || ""}`;
       : [];
 
     const visibleCount = Math.max(
-      getHistoryLazyChunkSize(),
+      getHistoryLazyInitialCount(),
       Math.min(
         fullHistoryMessages.value.length,
         (messages.value?.length || 0) + 2
@@ -280,15 +322,21 @@ ${message?.reasoningContent || ""}`;
 
         await nextTick();
         if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollBottom?.({force: true, behavior: "auto"});
+        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
+          behavior: "auto",
+        });
 
         await waitForNextPaint();
         if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollBottom?.({force: true, behavior: "auto"});
+        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
+          behavior: "auto",
+        });
 
         await waitForNextPaint();
         if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollBottom?.({force: true, behavior: "auto"});
+        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
+          behavior: "auto",
+        });
       } finally {
         if (finishSeq === historyRenderFinishSeq) {
           historyMessagesLoaded.value = false;
@@ -585,7 +633,12 @@ ${message?.reasoningContent || ""}`;
   function bindDataEvents() {
     // 왓처 A: 사용자가 URL 주소를 바꾸거나 뒤로가기/앞으로가기 및 메인 전환 모션을 취할 시 감지하여 세션 복원 함수를 호출합니다.
     watch(
-      () => [route.params.id, route.params.shareId, currentMode.value],
+      () => [
+        route.params.id,
+        route.params.shareId,
+        route.query?.messageId,
+        currentMode.value,
+      ],
       () => {
         if (runtimeReady.value) loadRouteConversation();
       }
@@ -662,10 +715,24 @@ ${message?.reasoningContent || ""}`;
     isHistoryRendering,
     historyMessagesLoaded,
     hasPreviousHistoryMessages,
-    historyLazyTopThreshold: computed(
-      () => systemSettingsStore.historyLazyTopThreshold
+    messageRenderPolicy,
+    historyLazyTopThreshold: computed(() => getHistoryLazyTopThresholdPx()),
+    historyLazyChunkSize: computed(() => getHistoryLazyAppendCount()),
+    pcHistoryLazyInitialCount: computed(
+      () => systemSettingsStore.pcHistoryLazyInitialCount
     ),
-    historyLazyChunkSize: computed(() => getHistoryLazyChunkSize()),
+    pcHistoryLazyAppendCount: computed(
+      () => systemSettingsStore.pcHistoryLazyAppendCount
+    ),
+    pcHistoryLazyTopThresholdPx: computed(
+      () => systemSettingsStore.pcHistoryLazyTopThresholdPx
+    ),
+    mobileHistoryLazyInitialCount: computed(
+      () => systemSettingsStore.mobileHistoryLazyInitialCount
+    ),
+    mobileHistoryLazyAppendCount: computed(
+      () => systemSettingsStore.mobileHistoryLazyAppendCount
+    ),
     loadPreviousHistoryMessages,
     finishHistoryRender,
     submit,

@@ -285,7 +285,10 @@ function openChat(result) {
   if (!chatId) return;
 
   ensureSearchResultHistory(result, chatId);
-  router.push({name: "chat", params: {id: chatId}}).catch(() => {});
+
+  const messageId = String(result?.messageId || result?.targetMessageId || "").trim();
+  const query = isSearchMode.value && messageId ? {messageId} : undefined;
+  router.push({name: "chat", params: {id: chatId}, query: query || {}}).catch(() => {});
 }
 
 function ensureSearchResultHistory(result = {}, chatId = "") {

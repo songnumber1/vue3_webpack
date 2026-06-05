@@ -24,6 +24,9 @@
         <div class="assistant-error-body tw-min-w-0 tw-flex-1">
           <strong>{{ errorTitle }}</strong>
           <p>{{ errorMessage }}</p>
+          <small v-if="errorCode" class="assistant-error-code">
+            오류 코드: {{ errorCode }}
+          </small>
         </div>
       </section>
     </div>
@@ -45,9 +48,9 @@ const errorTitle = computed(
 const errorMessage = computed(
   () =>
     props.message.errorMessage ||
-    props.message.content ||
     "답변을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
 );
+const errorCode = computed(() => props.message.errorCode || "");
 
 onMounted(() => emit("rendered", "error"));
 </script>
@@ -100,5 +103,13 @@ onMounted(() => emit("rendered", "error"));
   font-size: var(--font-size-sm);
   line-height: 1.55;
   white-space: pre-wrap;
+}
+
+.assistant-error-code {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
 }
 </style>

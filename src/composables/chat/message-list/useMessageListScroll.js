@@ -12,6 +12,7 @@ import {
 } from "@/utils/mermaidRenderer";
 import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {createMessageScrollTargetController} from "./useMessageScrollTarget";
 
 const BOTTOM_THRESHOLD = 48;
 const DEFAULT_HISTORY_LAZY_TOP_THRESHOLD = 96;
@@ -358,6 +359,13 @@ export function useMessageListScroll({props, emit}) {
   function updateBottomState() {
     userIsAtBottom.value = isNearBottom();
   }
+
+  const messageScrollTarget = createMessageScrollTargetController({
+    getScrollElement,
+    getScrollRoot: () => scrollRef.value,
+    getBottomElement: () => bottomRef.value,
+    updateBottomState,
+  });
 
   function refreshManualHistoryLoadMode() {
     androidManualHistoryLoadMode.value = shouldUseManualHistoryLoadMode();
@@ -750,19 +758,9 @@ export function useMessageListScroll({props, emit}) {
   }
 
   function applyBottomScroll(behavior = "auto") {
-    const el = getScrollElement();
-    if (!el) return;
-
-    if (bottomRef.value?.scrollIntoView) {
-      bottomRef.value.scrollIntoView({
-        block: "end",
-        inline: "nearest",
-        behavior,
-      });
+    if (messageScrollTarget.scrollToBottom({behavior})) {
+      userIsAtBottom.value = true;
     }
-
-    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
-    userIsAtBottom.value = true;
   }
 
   function shouldAutoHistoryRenderBottomScroll() {
@@ -771,17 +769,26 @@ export function useMessageListScroll({props, emit}) {
     return props.historyRendering === true;
   }
 
-  function applyHistoryRenderBottomScroll() {
+  function applyHistoryRenderInitialScrollTarget() {
     if (!shouldAutoHistoryRenderBottomScroll()) return;
 
-    const el = getScrollElement();
-    if (!el) return;
+    const target = props.messageRenderPolicy?.scrollTarget || {type: "bottom"};
+    const applied = messageScrollTarget.applyScrollTarget(target, {
+      behavior: "auto",
+      block: "center",
+    });
 
-    // 채팅방 입장 중에는 bottomRef.scrollIntoView()를 사용하지 않습니다.
-    // Android Chrome/WebView에서 scrollIntoView가 외부 page scroll까지 건드리면
-    // hidden 상태에서도 화면이 내려가는 움직임이 보일 수 있으므로, 내부 scrollTop만 확정합니다.
-    el.scrollTop = Math.max(0, el.scrollHeight - el.clientHeight);
-    userIsAtBottom.value = true;
+    if (target?.type === "bottom") {
+      userIsAtBottom.value = true;
+    } else {
+      updateBottomState();
+    }
+
+    return applied;
+  }
+
+  function applyHistoryRenderBottomScroll() {
+    return applyHistoryRenderInitialScrollTarget();
   }
 
   function applyElementScroll(target, options = {}) {
@@ -1326,6 +1333,15 @@ export function useMessageListScroll({props, emit}) {
     });
   }
 
+  function scrollToInitialTarget(scrollTarget = {}, options = {}) {
+    clearStableTimers();
+    return messageScrollTarget.applyScrollTarget(scrollTarget || {type: "bottom"}, {
+      behavior: "auto",
+      block: "center",
+      ...options,
+    });
+  }
+
   function handleMessageRendered(messageId, renderPart = "") {
     if (props.historyRendering) {
       // 채팅방 입장 중에는 메시지별 rendered 이벤트를 누적 상태로 관리하지 않습니다.
@@ -1517,6 +1533,7 @@ export function useMessageListScroll({props, emit}) {
     handleMessageRendered,
     scrollToBottom,
     scrollToBottomAfterRender,
+    scrollToInitialTarget,
     scrollToLatestUserMessage,
     getIsAtBottom,
     getScrollElement,

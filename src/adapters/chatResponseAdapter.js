@@ -59,6 +59,7 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
     isPinned: toBoolean(raw[C.BOOKMARK_YN]),
     endedAt: raw[C.CHAT_END_DT] || "",
     userId: raw[C.USER_ID] || "",
+    sharedId: firstDefined(raw[C.SHARED_ID], raw.sharedId),
     raw,
   };
 }
@@ -103,6 +104,9 @@ export function adaptChatSearchItem(raw = {}, options = {}) {
     assistantId: firstText(raw[C.ASSISTANT_ID], raw[C.ASSIST_ID]),
     bookmarkYN: firstDefined(raw[C.BOOKMARK_YN], raw.isPinned),
     matchCount: Number(raw[C.MATCH_COUNT] || 0),
+    messageId: firstText(raw.messageId, raw.message_id, raw.targetMessageId),
+    role: firstText(raw.role, raw.messageRole, raw.targetRole),
+    sharedId: firstDefined(raw[C.SHARED_ID], raw.sharedId),
   };
 }
 
@@ -155,11 +159,27 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
     isPinned: Boolean(result.isPinned || result.bookmarkYN),
     endedAt: endedAt || new Date().toISOString(),
     userId: result.userId || "",
+    sharedId: firstDefined(result.sharedId, result.raw?.sharedId),
+    searchTargetMessageId: firstText(
+      result.messageId,
+      result.message_id,
+      result.targetMessageId,
+      result.raw?.messageId
+    ),
+    searchTargetRole: firstText(result.role, result.messageRole, result.raw?.role),
     raw: {
       ...result,
       chatId,
       chatTitle: firstText(result.chatTitle, result.title) || fallbackTitle,
       chatEndDt: endedAt,
+      sharedId: firstDefined(result.sharedId, result.raw?.sharedId),
+      messageId: firstText(
+        result.messageId,
+        result.message_id,
+        result.targetMessageId,
+        result.raw?.messageId
+      ),
+      role: firstText(result.role, result.messageRole, result.raw?.role),
     },
   };
 }

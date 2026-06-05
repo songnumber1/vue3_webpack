@@ -18,6 +18,12 @@
     :has-previous-history-messages="hasPreviousHistoryMessages"
     :history-lazy-top-threshold="historyLazyTopThreshold"
     :history-lazy-chunk-size="historyLazyChunkSize"
+    :message-render-policy="messageRenderPolicy"
+    :pc-history-lazy-initial-count="pcHistoryLazyInitialCount"
+    :pc-history-lazy-append-count="pcHistoryLazyAppendCount"
+    :pc-history-lazy-top-threshold-px="pcHistoryLazyTopThresholdPx"
+    :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
+    :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     @content-rendered="handleMessageContentRendered"
     @history-rendered="handleHistoryRendered"
     @load-previous-history="handleLoadPreviousHistory"
@@ -176,10 +182,28 @@ const hasPreviousHistoryMessages = computed(
   () => workspaceState.value.hasPreviousHistoryMessages
 );
 const historyLazyTopThreshold = computed(
-  () => workspaceState.value.historyLazyTopThreshold || 96
+  () => workspaceState.value.historyLazyTopThreshold || 300
 );
 const historyLazyChunkSize = computed(
-  () => workspaceState.value.historyLazyChunkSize || 100
+  () => workspaceState.value.historyLazyChunkSize || 50
+);
+const messageRenderPolicy = computed(
+  () => workspaceState.value.messageRenderPolicy || null
+);
+const pcHistoryLazyInitialCount = computed(
+  () => workspaceState.value.pcHistoryLazyInitialCount || 100
+);
+const pcHistoryLazyAppendCount = computed(
+  () => workspaceState.value.pcHistoryLazyAppendCount || 50
+);
+const pcHistoryLazyTopThresholdPx = computed(
+  () => workspaceState.value.pcHistoryLazyTopThresholdPx || 300
+);
+const mobileHistoryLazyInitialCount = computed(
+  () => workspaceState.value.mobileHistoryLazyInitialCount || 50
+);
+const mobileHistoryLazyAppendCount = computed(
+  () => workspaceState.value.mobileHistoryLazyAppendCount || 25
 );
 const canUseDesktopCodeInterpreter = computed(
   () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"

@@ -63,6 +63,7 @@ export function adaptMessageItem(raw = {}) {
       raw.error_message,
       raw[R.ERROR_MESSAGE]
     ),
+    errorCode: firstText(raw.errorCode, raw.error_code, raw.code),
     reasoningContent,
     reasoningStatus:
       raw[M.REASONING_STATUS] || (reasoningContent ? "completed" : ""),
