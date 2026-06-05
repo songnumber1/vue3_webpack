@@ -1,0 +1,49 @@
+/*
+ * Android keyboard layout helper classes.
+ *
+ * These helpers are opt-in only. Existing main/chat composer,
+ * StudioCreatePage and BottomSheet behavior should remain owned by their
+ * current implementations unless a screen explicitly adopts the helper.
+ *
+ * Usage guide:
+ * - .mobile-keyboard-dock marks a keyboard-aware dock and owns the shared
+ *   bottom custom property.
+ * - .mobile-keyboard-dock--fixed applies that bottom value to fixed docks.
+ *   Do not add it to relative wrappers such as the chat composer slot.
+ * - .mobile-keyboard-scroll-page / .mobile-keyboard-form reserve scroll space
+ *   for long form screens that also use useKeyboardFocusGuard.
+ * - .mobile-keyboard-overlay-form is for non-BottomSheet overlay forms.
+ */
+
+body.mobile-mode .mobile-keyboard-dock {
+  --mobile-keyboard-dock-bottom: calc(
+    var(--composer-keyboard-inset, var(--keyboard-height, 0px)) +
+      env(safe-area-inset-bottom, 0px)
+  );
+}
+
+body.mobile-mode .mobile-keyboard-dock--fixed {
+  bottom: var(--mobile-keyboard-dock-bottom);
+}
+
+body.mobile-mode .mobile-keyboard-scroll-page,
+body.mobile-mode .mobile-keyboard-form {
+  scroll-padding-bottom: calc(
+    var(--keyboard-height, 0px) + env(safe-area-inset-bottom, 0px) + 24px
+  );
+}
+
+body.mobile-mode
+  .chat-container-root--keyboard-open
+  .mobile-keyboard-scroll-page {
+  padding-bottom: calc(
+    var(--keyboard-height, 0px) + env(safe-area-inset-bottom, 0px) + 24px
+  );
+}
+
+body.mobile-mode .mobile-keyboard-overlay-form {
+  max-height: var(--layout-viewport-height, 100dvh);
+  scroll-padding-bottom: calc(
+    var(--keyboard-height, 0px) + env(safe-area-inset-bottom, 0px) + 24px
+  );
+}

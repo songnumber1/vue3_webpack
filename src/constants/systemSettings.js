@@ -414,7 +414,6 @@ export function normalizeSystemSettings(value = {}) {
       return;
     }
 
-
     if (key === SYSTEM_SETTING_KEYS.historyLazyChunkSize) {
       const numeric = Number(source[key]);
       next[key] = Number.isFinite(numeric)

@@ -223,10 +223,11 @@
 import StudioBasicInfoTab from "@/components/studio/StudioBasicInfoTab.vue";
 import StudioFeatureTab from "@/components/studio/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
-import {computed, nextTick, onBeforeUnmount, onMounted, ref} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useKeyboardFocusGuard} from "@/composables/viewport/useKeyboardFocusGuard";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 
@@ -253,7 +254,6 @@ const createPageRef = ref(null);
 const createFormRef = ref(null);
 const createLayoutRef = ref(null);
 const createContentRef = ref(null);
-const focusedEditor = ref(null);
 const actionSheetOpen = ref(false);
 
 const createPageClass = computed(() => [
@@ -300,153 +300,18 @@ const contentScrollbar = useOverlayScrollbar(
   {watchSource: isMobile}
 );
 
-let focusScrollTimer = 0;
-let repeatedFocusTimers = [];
-
-function isEditableField(element) {
-  return Boolean(
-    element instanceof HTMLElement &&
-    ["INPUT", "TEXTAREA", "SELECT"].includes(element.tagName)
-  );
-}
-
-function clearFocusScrollTimers() {
-  window.clearTimeout(focusScrollTimer);
-  focusScrollTimer = 0;
-  repeatedFocusTimers.forEach((timer) => window.clearTimeout(timer));
-  repeatedFocusTimers = [];
-}
-
-function getVisibleViewportBounds(scroller) {
-  const visualViewport = window.visualViewport;
-  const scrollerRect = scroller.getBoundingClientRect();
-  const viewportTop = Math.max(
-    scrollerRect.top,
-    Math.round(visualViewport?.offsetTop || 0)
-  );
-  const viewportBottom = Math.min(
-    scrollerRect.bottom,
-    Math.round(
-      (visualViewport?.offsetTop || 0) +
-        (visualViewport?.height || window.innerHeight || scrollerRect.bottom)
-    )
-  );
-
-  return {
-    top: viewportTop + 14,
-    bottom: viewportBottom - 24,
-  };
-}
-
-function isTextareaField(element) {
-  return Boolean(
-    element instanceof HTMLElement && element.tagName === "TEXTAREA"
-  );
-}
-
-function ensureFocusedEditorVisible(behavior = "smooth") {
-  if (!isMobile.value) {
-    return;
-  }
-  const target = focusedEditor.value;
-  const scroller = contentScrollbar.getViewport();
-  if (!target || !scroller) {
-    return;
-  }
-  const field = target.closest?.("label, fieldset") || target;
-  if (!(field instanceof HTMLElement)) {
-    return;
-  }
-
-  const bounds = getVisibleViewportBounds(scroller);
-  const fieldRect = field.getBoundingClientRect();
-  const fieldHeight = Math.max(fieldRect.height, 44);
-  const visibleHeight = Math.max(bounds.bottom - bounds.top, 120);
-  const targetTop =
-    bounds.top + Math.max(12, (visibleHeight - fieldHeight) * 0.42);
-
-  let delta = 0;
-  if (fieldRect.bottom > bounds.bottom) {
-    delta = fieldRect.bottom - bounds.bottom;
-  }
-  if (fieldRect.top < bounds.top) {
-    delta = fieldRect.top - bounds.top;
-  }
-
-  if (Math.abs(delta) < 4 && fieldRect.top > targetTop + 24) {
-    delta = fieldRect.top - targetTop;
-  }
-
-  if (Math.abs(delta) > 3) {
-    scroller.scrollBy({top: delta, left: 0, behavior});
-  }
-}
-
-function scheduleFocusedEditorVisible() {
-  clearFocusScrollTimers();
-  const delays = [80, 180, 340, 560];
-  repeatedFocusTimers = delays.map((delay, index) =>
-    window.setTimeout(() => {
-      ensureFocusedEditorVisible(index === 0 ? "auto" : "smooth");
-    }, delay)
-  );
-}
-
-function handleCreateFocusIn(event) {
-  const target = event.target;
-  if (!isMobile.value || !isEditableField(target)) {
-    return;
-  }
-
-  // Android Chrome/WebView has a native textarea keyboard scroll behavior.
-  // Running our repeated VisualViewport scroll correction on top of that can
-  // repaint the textarea border/height incorrectly, especially on the first
-  // Instruction focus. Inputs/selects still use the custom correction.
-  if (isTextareaField(target)) {
-    focusedEditor.value = null;
-    clearFocusScrollTimers();
-    return;
-  }
-
-  focusedEditor.value = target;
-  nextTick(scheduleFocusedEditorVisible);
-}
-
-function handleCreateFocusOut(event) {
-  const target = event.target;
-  if (target === focusedEditor.value) {
-    focusedEditor.value = null;
-    clearFocusScrollTimers();
-  }
-}
-
-onMounted(() => {
-  window.visualViewport?.addEventListener(
-    "resize",
-    scheduleFocusedEditorVisible,
-    {
-      passive: true,
-    }
-  );
-  window.visualViewport?.addEventListener(
-    "scroll",
-    scheduleFocusedEditorVisible,
-    {
-      passive: true,
-    }
-  );
-});
-
-onBeforeUnmount(() => {
-  clearFocusScrollTimers();
-  window.visualViewport?.removeEventListener(
-    "resize",
-    scheduleFocusedEditorVisible
-  );
-  window.visualViewport?.removeEventListener(
-    "scroll",
-    scheduleFocusedEditorVisible
-  );
+const {
+  handleKeyboardFocusIn: handleCreateFocusIn,
+  handleKeyboardFocusOut: handleCreateFocusOut,
+} = useKeyboardFocusGuard({
+  enabled: isMobile,
+  scrollContainer: () => contentScrollbar.getViewport(),
+  ignoreInput: true,
+  ignoreTextarea: true,
+  fieldSelector: "label, fieldset",
+  delays: [80, 180, 340, 560],
+  edgePaddingTop: 14,
+  edgePaddingBottom: 24,
 });
 
 const emit = defineEmits([

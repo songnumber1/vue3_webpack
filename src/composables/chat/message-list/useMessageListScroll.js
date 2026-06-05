@@ -64,7 +64,8 @@ function isCompactHistoryViewport() {
 
   const settings = getRuntimeSystemSettings();
   const breakpoint = Number(settings.mobileBreakpoint);
-  const limit = Number.isFinite(breakpoint) && breakpoint > 0 ? breakpoint : 768;
+  const limit =
+    Number.isFinite(breakpoint) && breakpoint > 0 ? breakpoint : 768;
   const width = Math.min(
     window.visualViewport?.width || Number.POSITIVE_INFINITY,
     window.innerWidth || Number.POSITIVE_INFINITY,
@@ -378,7 +379,6 @@ export function useMessageListScroll({props, emit}) {
     void requestPreviousHistoryMessagesIfNeeded();
   }
 
-
   function findMessageElementById(container, messageId) {
     if (!container || !messageId) return null;
 
@@ -603,11 +603,11 @@ export function useMessageListScroll({props, emit}) {
     }
 
     scheduleAdjust();
-    [0, 16, 32, 64, 96, 160, 240, 360, 520, 760, 1040, 1400, 1800, 2200].forEach(
-      (delay) => {
-        timerIds.push(window.setTimeout(scheduleAdjust, delay));
-      }
-    );
+    [
+      0, 16, 32, 64, 96, 160, 240, 360, 520, 760, 1040, 1400, 1800, 2200,
+    ].forEach((delay) => {
+      timerIds.push(window.setTimeout(scheduleAdjust, delay));
+    });
 
     timerIds.push(window.setTimeout(cleanup, duration));
     return true;
@@ -639,15 +639,19 @@ export function useMessageListScroll({props, emit}) {
 
   async function requestPreviousHistoryMessagesIfNeeded(options = {}) {
     if (props.historyRendering || props.loading) return false;
-    if (!props.hasPreviousHistoryMessages || previousHistoryLoadInProgress.value) {
+    if (
+      !props.hasPreviousHistoryMessages ||
+      previousHistoryLoadInProgress.value
+    ) {
       return false;
     }
 
     const el = getScrollElement();
     const threshold = Number(props.historyLazyTopThreshold);
-    const topThreshold = Number.isFinite(threshold) && threshold >= 0
-      ? threshold
-      : DEFAULT_HISTORY_LAZY_TOP_THRESHOLD;
+    const topThreshold =
+      Number.isFinite(threshold) && threshold >= 0
+        ? threshold
+        : DEFAULT_HISTORY_LAZY_TOP_THRESHOLD;
     if (!el || (!options.force && el.scrollTop > topThreshold)) return false;
 
     previousHistoryLoadInProgress.value = true;
@@ -667,7 +671,10 @@ export function useMessageListScroll({props, emit}) {
           anchor
         );
         if (!restoredByViewport) {
-          const heightDelta = Math.max(0, el.scrollHeight - previousScrollHeight);
+          const heightDelta = Math.max(
+            0,
+            el.scrollHeight - previousScrollHeight
+          );
           suppressHistoryLazyScrollRestore();
           el.scrollTop = Math.max(0, previousScrollTop + heightDelta);
         }
@@ -706,8 +713,13 @@ export function useMessageListScroll({props, emit}) {
     if (typeof target?.blur === "function") {
       target.blur();
     }
-    const active = typeof document !== "undefined" ? document.activeElement : null;
-    if (active && active !== document.body && typeof active.blur === "function") {
+    const active =
+      typeof document !== "undefined" ? document.activeElement : null;
+    if (
+      active &&
+      active !== document.body &&
+      typeof active.blur === "function"
+    ) {
       active.blur();
     }
   }

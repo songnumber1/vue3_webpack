@@ -662,7 +662,9 @@ ${message?.reasoningContent || ""}`;
     isHistoryRendering,
     historyMessagesLoaded,
     hasPreviousHistoryMessages,
-    historyLazyTopThreshold: computed(() => systemSettingsStore.historyLazyTopThreshold),
+    historyLazyTopThreshold: computed(
+      () => systemSettingsStore.historyLazyTopThreshold
+    ),
     historyLazyChunkSize: computed(() => getHistoryLazyChunkSize()),
     loadPreviousHistoryMessages,
     finishHistoryRender,

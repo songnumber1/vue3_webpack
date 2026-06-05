@@ -14,17 +14,16 @@
     @wheel.passive="handleUserScrollIntent"
     @pointerdown.passive="handleUserScrollIntent"
   >
-    <div
-      v-if="showAndroidHistoryLoadMore"
-      class="history-load-more-row"
-    >
+    <div v-if="showAndroidHistoryLoadMore" class="history-load-more-row">
       <button
         class="history-load-more-button"
         type="button"
         :disabled="previousHistoryLoadInProgress"
         @click="handleManualPreviousHistoryLoad($event)"
       >
-        <span v-if="previousHistoryLoadInProgress">이전 대화 불러오는 중...</span>
+        <span v-if="previousHistoryLoadInProgress"
+          >이전 대화 불러오는 중...</span
+        >
         <span v-else>이전 대화 {{ historyLazyChunkSize }}개 더 보기</span>
       </button>
     </div>

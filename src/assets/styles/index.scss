@@ -29,6 +29,7 @@
 @use "./03-runtime/mobile-mode" as *;
 @use "./03-runtime/safe-area" as *;
 @use "./03-runtime/viewport-keyboard" as *;
+@use "./03-runtime/keyboard-layout-helpers" as *;
 @use "./03-runtime/scroll-lock" as *;
 @use "./03-runtime/bottom-sheet-runtime" as *;
 @use "./04-platform/android-chrome-webview" as *;

@@ -51,7 +51,10 @@
     <PromptComposer
       v-else
       ref="promptComposerRef"
-      :class="{'mobile-chat-prompt': isMobile}"
+      :class="{
+        'mobile-chat-prompt': isMobile,
+        'mobile-keyboard-dock': isMobile,
+      }"
       @expanded-change="handlePromptExpandedChange"
     />
   </div>
