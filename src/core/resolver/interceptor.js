@@ -12,7 +12,6 @@ import {
   applyAuthRequestConfig,
   handleAuthResponseError,
   isAuthExpiredStatus,
-  shouldTryRefresh,
 } from "@/auth/httpAuthInterceptor";
 
 /**
@@ -80,19 +79,14 @@ function applyResponseInterceptor(instance, errorUI) {
 
     // 케이스 B: 백엔드 API 레이어에서 에러 예외 핸들링 판정이 반환되어 400~500대 코드가 인입된 경우
     async (error) => {
-      // JWT 모드에서는 access token 만료 시 refresh 후 원 요청을 1회 재시도합니다.
-      // refresh 대상 401은 재시도 결과가 최종 실패로 확정된 뒤에만 알림을 표시해 중복/오탐 알림을 방지합니다.
-      if (shouldTryRefresh(error)) {
-        try {
-          return await handleAuthResponseError(error, instance);
-        } catch (finalError) {
-          notifyHttpError(finalError, errorUI);
-          return Promise.reject(finalError);
-        }
+      // 인증 방식별 만료 처리(JWT refresh/retry, Session reset)는 auth strategy에 위임합니다.
+      // JWT refresh 대상 401은 재시도 결과가 최종 실패로 확정된 뒤에만 알림을 표시해 중복/오탐 알림을 방지합니다.
+      try {
+        return await handleAuthResponseError(error, instance);
+      } catch (finalError) {
+        notifyHttpError(finalError, errorUI);
+        return Promise.reject(finalError);
       }
-
-      notifyHttpError(error, errorUI);
-      return Promise.reject(error);
     }
   );
 }
