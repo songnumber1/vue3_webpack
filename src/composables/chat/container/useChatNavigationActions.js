@@ -321,6 +321,11 @@ export function useChatNavigationActions({
     } catch (error) {
       logWarn("[useChatNavigationActions] logout 오류:", error); // 서버 다운 등으로 실패하더라도 프론트엔드 탈거는 계속 마감 진행
     } finally {
+      // 대화방 선택 이후 URL 숨김 모드에서 로그아웃하면 active room/pending lock이
+      // 로그인 후 메인 복귀를 다시 막을 수 있으므로 인증 폐기와 함께 정리합니다.
+      chatStore.setHistoryNavigationLocked(false);
+      chatStore.clearActiveSession();
+      chatStreamStore.finish();
       useAuthStore().resetAuth(); // 2. 피나(Pinia) 토큰, 유저 프로필 메모리 정보 전격 소멸
       navigationStore.setDrawerOpen(false); // 3. 잔존해 있던 네비게이션 가시 오버레이 파괴 해제
 
