@@ -11,6 +11,9 @@ import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {useChatDataController} from "@/composables/chat/container/useChatDataController";
+import {useChatStore} from "@/stores/chatStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {resolveActiveChatId} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {useChatUIController} from "@/composables/chat/container/useChatUIController";
 
 /**
@@ -37,6 +40,8 @@ export function useChatContainerController(props) {
 
   // 2. 글로벌 채팅 엔진의 상태 및 다국어 인스턴스에 접근하기 위해 공통 런타임 객체를 로드합니다.
   const runtime = useChatRuntime();
+  const chatStore = useChatStore();
+  const systemSettingsStore = useSystemSettingsStore();
 
   // 3. 화면에 실시간으로 표시될 반응형 대화 메시지 목록 배열 데이터를 생성합니다.
   const messages = ref([]);
@@ -66,10 +71,20 @@ export function useChatContainerController(props) {
    * @type {import("vue").ComputedRef<string|null>}
    */
   const activeHistoryId = computed(() => {
-    // 현재 진행형 대화방 모드라면 URL 파라미터 경로의 :id 값을 반환합니다.
-    if (pageState.isChatPage.value) return route.params.id;
-    // 단순 공유 페이지 뷰어 모드라면 URL 파라미터 경로의 :shareId 값을 반환합니다.
-    if (pageState.isSharedPage.value) return route.params.shareId;
+    // 현재 진행형 대화방 모드라면 URL 정책에 따라 route.params.id 또는 Pinia activeRoomId를 반환합니다.
+    if (pageState.isChatPage.value) {
+      return resolveActiveChatId({
+        route,
+        chatStore,
+        settings: systemSettingsStore.settings,
+      });
+    }
+    // 공유 페이지 뷰어 모드라면 /shared/:id 진입 후 Pinia activeRoomId를 우선 사용합니다.
+    if (pageState.isSharedPage.value) {
+      return chatStore.activeRoomType === "shared"
+        ? String(chatStore.activeRoomId || "").trim()
+        : String(route.params?.id || route.params?.shareId || "").trim();
+    }
     // 어떤 조건도 맞지 않는 메인 홈이라면 활성화된 이력 ID가 없으므로 null을 반환합니다.
     return null;
   });

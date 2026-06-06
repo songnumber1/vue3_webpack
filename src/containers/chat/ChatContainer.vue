@@ -399,7 +399,7 @@ provide(
     showHelp: false,
     selectedModel: selectedModel.value,
     models: models.value,
-    disabled: false,
+    disabled: isReadOnly.value,
     generating: isGenerating.value,
     modelReadonly: isModelLocked.value,
     placeholder: "",
@@ -429,10 +429,13 @@ provide(CHAT_ACTIONS_KEY, {
 
 provide(WORKSPACE_ACTIONS_KEY, {
   submit: (payload) => {
-    if (isGenerating.value) return;
+    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value) return;
     submit(payload);
   },
-  regenerate,
+  regenerate: (message) => {
+    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value) return;
+    regenerate(message);
+  },
   updateSelectedModel: (val) => {
     selectedModel.value = val;
   },

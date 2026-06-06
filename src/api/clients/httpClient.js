@@ -16,7 +16,8 @@ import {
 import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
+import {usePlatformStore} from "@/stores/platformStore";
+import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
 import {
   applyAuthRequestConfig,
   handleAuthResponseError,
@@ -38,18 +39,19 @@ function resolveBaseURL() {
 }
 
 /**
- * @description 특정 API 키에 선언된 개별 정책(Policy)과 시스템 설정 스토어의 스냅샷을 대조하여, 네트워크 통신 도중 모바일 화면에 프로그레스 오버레이 로딩 바를 노출해야 하는지 여부를 판별합니다.
+ * @description 특정 API 키에 선언된 개별 정책(Policy)과 시스템 설정/플랫폼 스토어를 대조하여, 네트워크 통신 도중 ProgressBar를 표시할지 판별합니다.
  * @param {object} policy - `resolveApiPolicy` 파이프라인에서 추출된 해당 API의 정책 규격 객체
- * @returns {boolean} 모바일 인라인 로딩 오버레이 가동 여부 플래그
+ * @returns {boolean} 전역 ProgressBar 가동 여부 플래그
  */
-function shouldShowMobileOverlay(policy) {
+function shouldShowOverlay(policy) {
   try {
+    if (!policy.overlay) return false;
     const systemSettingsStore = useSystemSettingsStore();
-    // 3대 충족 조건: 정책상 오버레이가 허용됨 AND 시스템 설정의 모바일 프로그레스 활성화 상태가 참임 AND 현재 가시 너비가 모바일 중단점 범위 내에 속함
-    return Boolean(
-      policy.overlay &&
-      systemSettingsStore.showMobileApiProgress &&
-      isMobileLikeViewport(systemSettingsStore.mobileBreakpoint)
+    const platformStore = usePlatformStore();
+
+    return isProgressAllowedForCurrentPlatform(
+      systemSettingsStore.settings,
+      platformStore.info
     );
   } catch (_error) {
     // Pinia 스토어 활성화 전 시점 등 초기 부트스트랩 에러 발생 시 예외 크래시 방지를 위해 false 가드 처리
@@ -95,7 +97,7 @@ export function createHttpClient() {
     // 요청 고유 식별자(Request Key) 난수 조합 생성: 동시 다발적 중복 요청 트래킹 및 특정 요청 타깃 중도 abort 저격을 위함
     const requestKey = createId();
     const controller = createAbortController(apiPolicy, config);
-    const overlay = shouldShowMobileOverlay(apiPolicy);
+    const overlay = shouldShowOverlay(apiPolicy);
 
     // 런타임 유연 대응을 위한 베이스 주소 최신화 및 인터셉터 통과 증적 메타 필드 은닉 주입
     config.baseURL = resolveBaseURL();

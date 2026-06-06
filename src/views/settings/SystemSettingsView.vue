@@ -98,6 +98,7 @@ import {
   PLATFORM_OVERRIDE_OPTIONS,
   PLATFORM_OVERRIDE_MODES,
   AUTH_MODE_OPTIONS,
+  CONVERSATION_URL_MODE_OPTIONS,
 } from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
@@ -164,7 +165,11 @@ const commonGroups = computed(() => [
   {
     kicker: t("common.api"),
     title: t("systemSettings.groups.api"),
-    items: [settingItem("useRealApi"), settingItem("showMobileApiProgress")],
+    items: [
+      settingItem("useRealApi"),
+      settingItem("showPcProgress"),
+      settingItem("showMobileProgress"),
+    ],
   },
   {
     kicker: "AUTH",
@@ -190,7 +195,13 @@ const commonGroups = computed(() => [
   {
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
-    items: [settingItem("autoScrollOnAnswer")],
+    items: [
+      settingItem("autoScrollOnAnswer"),
+      settingItem("conversationUrlMode", {
+        type: "select",
+        options: CONVERSATION_URL_MODE_OPTIONS,
+      }),
+    ],
   },
   {
     kicker: "ACTION",
@@ -339,6 +350,14 @@ function hasAuthModeChanged() {
   );
 }
 
+function hasConversationUrlModeChanged() {
+  return draft.conversationUrlMode !== settings.value.conversationUrlMode;
+}
+
+function hasLogoutRequiredSettingChanged() {
+  return hasAuthModeChanged() || hasConversationUrlModeChanged();
+}
+
 /**
  * 브라우저 기본 confirm을 사용해 기존 디자인/CSS를 건드리지 않고 로그아웃 안내만 제공합니다.
  */
@@ -353,23 +372,23 @@ function resolveBreakpointForPlatformOverride(value) {
     : FORCED_MOBILE_PLATFORM_BREAKPOINT_PX;
 }
 
-function confirmAuthModeLogout() {
+function confirmLogoutRequiredSettingChange() {
   if (typeof window === "undefined" || typeof window.confirm !== "function") {
     return true;
   }
 
-  return window.confirm(t("systemSettings.authModeChangeLogoutConfirm"));
+  return window.confirm(t("systemSettings.logoutRequiredSettingChangeConfirm"));
 }
 
 /**
  * 인증 모드 전환 시 기존 인증 컨텍스트를 정리합니다.
  * 서버 로그아웃이 실패해도 클라이언트 인증 상태는 반드시 초기화합니다.
  */
-async function forceLogoutForAuthModeChange() {
+async function forceLogoutForPolicyChange() {
   try {
     await authApiLive.logout();
   } catch (error) {
-    logWarn("[SystemSettingsView] auth mode change logout 오류:", error);
+    logWarn("[SystemSettingsView] policy setting change logout 오류:", error);
   } finally {
     authStore.resetAuth();
   }
@@ -381,17 +400,20 @@ async function forceLogoutForAuthModeChange() {
 async function apply() {
   if (applying.value) return;
 
-  const authModeChanged = hasAuthModeChanged();
+  const logoutRequiredSettingChanged = hasLogoutRequiredSettingChanged();
 
-  if (authModeChanged && !confirmAuthModeLogout()) {
+  if (
+    logoutRequiredSettingChanged &&
+    !confirmLogoutRequiredSettingChange()
+  ) {
     return;
   }
 
   applying.value = true;
 
   try {
-    if (authModeChanged) {
-      await forceLogoutForAuthModeChange();
+    if (logoutRequiredSettingChanged) {
+      await forceLogoutForPolicyChange();
     }
 
     systemSettingsStore.applySettings(draft);
@@ -400,7 +422,7 @@ async function apply() {
     emit("applied");
     emit("close");
 
-    if (authModeChanged) {
+    if (logoutRequiredSettingChanged) {
       await router
         .replace({ name: "login-required", query: { reason: "LOGIN_REQUIRED" } })
         .catch(() => { });

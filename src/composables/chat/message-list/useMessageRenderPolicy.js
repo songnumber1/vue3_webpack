@@ -9,8 +9,14 @@ export const MESSAGE_SCROLL_TARGET_TYPES = Object.freeze({
   message: "message",
 });
 
+function hasSharedId(chat) {
+  return String(chat?.sharedId || "").trim().length > 0;
+}
+
 export function isSharedChat(chat) {
-  return Boolean(chat?.sharedId);
+  // 사용자가 제목에 "공유 -"를 직접 입력할 수 있으므로, 제목/문구가 아니라
+  // 백엔드가 내려준 sharedId 존재 여부만 공유방 렌더 정책 기준으로 사용합니다.
+  return hasSharedId(chat);
 }
 
 function normalizeMessageId(value) {

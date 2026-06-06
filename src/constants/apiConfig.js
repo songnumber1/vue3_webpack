@@ -17,6 +17,7 @@ export const API_KEYS = Object.freeze({
   GENERATION: "GENERATION", // LLM 문장 실시간 생성/스트리밍 전용 비동기 API 라우트 포인터
   CHAT_HISTORY_NEW: "CHAT_HISTORY_NEW", // 신규 대화방 생성(new.do) 전용 비동기 API 라우트 포인터
   CHAT_HISTORY_SYNC: "CHAT_HISTORY_SYNC", // 사이드바 대화 이력 백그라운드 동기화 전용 비동기 API 라우트 포인터
+  SHARED_INFO: "SHARED_INFO", // 공유 URL 검증 및 조회 전용 API 라우트 포인터
   LOGIN: "LOGIN", // 사용자 로그인 및 세션 인증 전용 비동기 API 라우트 포인터
 });
 
@@ -52,7 +53,13 @@ export const API_CONFIG = Object.freeze({
     abort: true,
   }),
 
-  // 케이스 D: 로그인 및 본인 인증(LOGIN) API 정책
+  // 케이스 D: 공유 URL 검증(SHARED_INFO) API 정책
+  [API_KEYS.SHARED_INFO]: Object.freeze({
+    overlay: true,
+    abort: true,
+  }),
+
+  // 케이스 E: 로그인 및 본인 인증(LOGIN) API 정책
   [API_KEYS.LOGIN]: Object.freeze({
     overlay: true, // 로그인 처리 도중 사용자의 화면 이탈이나 중복 진입을 원천 차단하기 위해 전체 화면 로딩 오버레이 가동
     abort: false, // 로그인 응답 패킷의 경우 인앱 상태 전역 포맷(Reset) 로직과 얽혀 있으므로 중간 가로채기 취소(Abort)를 엄격히 불허 금지

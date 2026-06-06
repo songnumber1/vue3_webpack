@@ -27,6 +27,11 @@ function createChatTitle(input) {
   return value.length > 20 ? value.slice(0, 20) : value;
 }
 
+function normalizeSharedIdValue(value) {
+  const id = String(value || "").trim();
+  return id || null;
+}
+
 function normalizeSearchText(value) {
   return String(value || "")
     .trim()
@@ -96,7 +101,7 @@ function searchChatHistories(payload = {}) {
       messageId: item.targetMessage?.id || "",
       role: item.targetMessage?.role || "",
       chatEndDt: item.history[C.CHAT_END_DT] || "",
-      sharedId: item.history[C.SHARED_ID] || null,
+      sharedId: normalizeSharedIdValue(item.history[C.SHARED_ID] || item.history.sharedId),
       modelId:
         item.history[C.MODEL_ID] ||
         item.history[C.MODEL_ID_LEGACY] ||
@@ -169,6 +174,40 @@ function findHistory(chatId) {
   );
 }
 
+function findHistoryBySharedId(shareId) {
+  const id = String(shareId || "").trim();
+  if (!id) return null;
+  return historyStore.find(
+    (item) => String(item[C.SHARED_ID] || item.sharedId || "") === id
+  );
+}
+
+function buildSharedConversationResponse(shareId) {
+  const normalizedShareId = String(shareId || "").trim();
+  const history = findHistoryBySharedId(normalizedShareId);
+
+  if (!history) {
+    return {
+      success: false,
+      exists: false,
+      code: "SHARED_NOT_FOUND",
+      message: "공유 대화방을 찾을 수 없습니다.",
+      shareId: normalizedShareId,
+      messages: [],
+    };
+  }
+
+  const chatId = String(history[C.CHAT_ID] || history.chatId || "");
+  return {
+    success: true,
+    exists: true,
+    shareId: normalizedShareId,
+    chatId,
+    title: history[C.CHAT_TITLE] || history.chatTitle || "",
+    messages: attachMockReasoning(messageStore[chatId] || [], chatId),
+  };
+}
+
 export const chatHistoryApiMock = {
   getChatHistoryList() {
     return resolveMock(historyStore, 210);
@@ -200,6 +239,9 @@ export const chatHistoryApiMock = {
       attachMockReasoning(messageStore[chatId] || [], chatId),
       180
     );
+  },
+  getSharedConversation({shareId} = {}) {
+    return resolveMock(buildSharedConversationResponse(shareId), 180);
   },
   searchChats(payload = {}) {
     return resolveMock(

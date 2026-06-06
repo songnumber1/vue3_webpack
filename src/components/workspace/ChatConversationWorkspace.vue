@@ -24,10 +24,11 @@
     :pc-history-lazy-top-threshold-px="pcHistoryLazyTopThresholdPx"
     :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
+    :readonly="readonly"
     @content-rendered="handleMessageContentRendered"
     @history-rendered="handleHistoryRendered"
     @load-previous-history="handleLoadPreviousHistory"
-    @regenerate="workspaceActions.regenerate($event)"
+    @regenerate="handleRegenerate"
   />
   <button
     v-if="
@@ -486,6 +487,11 @@ function scheduleComposerHeightUpdate() {
   composerHeightTimerIds = [80, 160].map((delay) =>
     window.setTimeout(updateComposerHeight, delay)
   );
+}
+
+function handleRegenerate(message) {
+  if (readonly.value || isGenerating.value) return;
+  workspaceActions.regenerate(message);
 }
 
 function handlePromptExpandedChange(expanded) {

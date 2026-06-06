@@ -141,6 +141,8 @@
 import {computed, inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
@@ -159,6 +161,7 @@ import {
 const {t, locale} = useI18n();
 const router = useRouter();
 const chatStore = useChatStore();
+const systemSettingsStore = useSystemSettingsStore();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 const injectedWorkspaceState = inject(
@@ -288,7 +291,19 @@ function openChat(result) {
 
   const messageId = String(result?.messageId || result?.targetMessageId || "").trim();
   const query = isSearchMode.value && messageId ? {messageId} : undefined;
-  router.push({name: "chat", params: {id: chatId}, query: query || {}}).catch(() => {});
+  navigateToConversation({
+    router,
+    chatStore,
+    settings: systemSettingsStore.settings,
+    chatId,
+  })
+    .then(() => {
+      if (query && Object.keys(query).length) {
+        return router.replace({query}).catch(() => {});
+      }
+      return undefined;
+    })
+    .catch(() => {});
 }
 
 function ensureSearchResultHistory(result = {}, chatId = "") {

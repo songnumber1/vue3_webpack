@@ -14,6 +14,9 @@ import {isAndroidApp} from "@/core/config";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -39,8 +42,6 @@ const ChatSearchPage = () =>
   import(
     /* webpackChunkName: "chat-search" */ "@/views/search/ChatSearchPage.vue"
   );
-const NotFoundPage = () =>
-  import(/* webpackChunkName: "not-found" */ "@/views/NotFoundPage.vue");
 const LoginRequiredPage = () => import("@/views/LoginRequiredPage.vue");
 const AndroidUpdate = () => import("@/views/android/AndroidUpdate.vue");
 const TermsPage = () =>
@@ -111,11 +112,17 @@ const baseRoutes = [
         meta: {title: "Guide"},
       },
       {
-        path: "shared/:shareId",
+        path: "shared",
         name: "shared",
         component: SharedPage,
+        meta: {title: "Shared Chat", skipAuthCheck: true},
+      },
+      {
+        path: "shared/:id",
+        name: "shared-entry",
+        component: SharedPage,
         props: true,
-        meta: {title: "Shared Chat"},
+        meta: {title: "Shared Chat", skipAuthCheck: true},
       },
       {
         path: "playground",
@@ -181,13 +188,12 @@ const androidRoutes = [
 
 /**
  * @type {import('vue-router').RouteRecordRaw}
- * @description 잘못된 경로 진입 시 매칭될 와일드카드폴백 (404 Not Found) 라우트 설정입니다.
+ * @description 정의되지 않은 경로는 404 화면 대신 메인 화면으로 되돌립니다.
+ * NotFoundPage.vue 파일은 향후 404 정책 복원 가능성을 위해 보류하지만, 현재 라우터에서는 사용하지 않습니다.
  */
-const notFoundRoute = {
+const fallbackRoute = {
   path: "/:pathMatch(.*)*",
-  name: "not-found",
-  component: NotFoundPage,
-  meta: {title: "Not Found", skipAuthCheck: true, skipVersionCheck: true},
+  redirect: {name: "main"},
 };
 
 /**
@@ -257,6 +263,40 @@ function debugRouteGuard(...args) {
 }
 
 /**
+ * 대화방 이력 로딩/렌더링 중에는 ProgressBar 표시 여부와 무관하게
+ * 사용자 라우팅을 전역 차단합니다. 다만 현재 선택한 대화방으로 들어가는
+ * 내부 전환과 /shared/:id 검증 성공 후 /shared로 숨기는 내부 replace는 허용합니다.
+ */
+function isAllowedHistoryLockNavigation({to, from, chatStore, settings}) {
+  const pendingHistoryId = String(chatStore.pendingSelectedChatId || "").trim();
+
+  if (pendingHistoryId) {
+    const isPendingVisibleChatRoute =
+      to.name === "chat" && String(to.params?.id || "") === pendingHistoryId;
+    const isPendingHiddenChatRoute =
+      to.name === "chat-entry" && isHiddenConversationUrlMode(settings);
+
+    return isPendingVisibleChatRoute || isPendingHiddenChatRoute;
+  }
+
+  if (to.fullPath && from?.fullPath && to.fullPath === from.fullPath) {
+    return true;
+  }
+
+  // /shared/:id에서 공유 검증 성공 후 주소의 id를 숨기기 위해 수행하는
+  // 내부 /shared replace는 로딩 중에도 허용해야 공유방 진입이 막히지 않습니다.
+  if (
+    from?.name === "shared-entry" &&
+    to.name === "shared" &&
+    chatStore.isActiveSharedRoom
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * @description 부모 라우트가 가진 `requireAuth` 필드를 하위 중첩된 모든 자식 라우트 노드들로 재귀 상속 가공합니다.
  * @param {Array<import('vue-router').RouteRecordRaw>} routes - 정규화 가공을 진행할 대상 라우트 목록 배열
  * @param {boolean} [inheritedRequireAuth=false] - 부모 트리 계층으로부터 전파 상속된 인증 조건 플래그
@@ -301,22 +341,61 @@ function registerRouteGuard(router, appInfo, context = {}) {
   const {authAxios} = context;
 
   // 전역 직전 가드(beforeEach) 파이프라인 개통 수립
-  router.beforeEach(async (to) => {
+  router.beforeEach(async (to, from) => {
     const platformStore = usePlatformStore();
     const chatStreamStore = useChatStreamStore();
+    const chatStore = useChatStore();
+    const systemSettingsStore = useSystemSettingsStore();
 
     // 1. 라우트가 전환될 때마다 디바이스 스냅샷 실시간 동기화 리프레시
     platformStore.refresh(appInfo);
 
+
     // [중요 비즈니스 방어 가드]
     // AI 답변 스트리밍 중 사용자 이동은 소켓 유실 및 자원 파손을 유발할 수 있어 차단합니다.
-    // 단, 새 채팅 생성 직후 프론트가 내부적으로 수행하는 /chat/:id 1회 이동은
+    // 단, 새 채팅 생성 직후 프론트가 내부적으로 수행하는 URL 정책에 따른 내부 채팅 라우트 1회 이동은
     // chatStreamStore.consumeAllowedNavigation(to)로만 통과시킵니다.
     if (
       chatStreamStore.isStreaming &&
       !chatStreamStore.consumeAllowedNavigation(to)
     ) {
       return false;
+    }
+
+
+    // 대용량 대화방 이력 로딩/렌더링 중에는 ProgressBar 표시 여부와 무관하게
+    // 답변 생성 중과 동일하게 사용자 네비게이션을 전역 차단합니다.
+    // pendingSelectedChatId가 이미 정리된 뒤 finishHistoryRender 전까지의 구간도
+    // historyNavigationLocked로 차단해야 데이터 출력 완료 전 route 이동을 막을 수 있습니다.
+    if (
+      chatStore.isNavigationLocked &&
+      !isAllowedHistoryLockNavigation({
+        to,
+        from,
+        chatStore,
+        settings: systemSettingsStore.settings,
+      })
+    ) {
+      return false;
+    }
+
+    // URL 노출 모드에서는 /chat 단독 접근이 특정 대화방을 의미하지 않습니다.
+    // 빈 대화방 화면이 표시되지 않도록 메인으로 돌립니다.
+    if (
+      !isHiddenConversationUrlMode(systemSettingsStore.settings) &&
+      to.name === "chat-entry"
+    ) {
+      return {name: "main", replace: true};
+    }
+
+    // URL 숨김 모드에서는 /chat/:id 직접 접근을 대화방 복원으로 취급하지 않고
+    // 메인으로 돌려 URL 복사 공유 오해를 방지합니다. 스트리밍 중 사용자 이동은
+    // 위의 스트리밍 가드가 먼저 차단하므로 기존 생성 보호 정책을 약화시키지 않습니다.
+    if (
+      isHiddenConversationUrlMode(systemSettingsStore.settings) &&
+      to.name === "chat"
+    ) {
+      return {name: "main", replace: true};
     }
 
     // 2. 인증 타겟 스크리닝 연산
@@ -381,7 +460,7 @@ export function resolveRouter(appInfo, context = {}) {
     ...legalRoutes,
     ...authRoutes,
     ...(isAndroidApp(appInfo) ? androidRoutes : []), // 안드로이드 환경이 확인될 경우에만 원본 라우트 풀에 업데이트 전용 노드 가치 결합
-    notFoundRoute,
+    fallbackRoute,
   ]);
 
   // 히스토리 모드 가동 및 빌드 완료 라우트 구조체를 주입하여 인스턴스 1차 생성

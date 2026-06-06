@@ -21,6 +21,17 @@ const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
   promptTemplateOptions: {}, // 템플릿 내부에 동적 조립 변수로 인입될 라디오/체크 옵션 적치 버퍼 맵
 });
 
+// URL 노출/숨김 정책과 공유방 조회 모드를 모두 같은 채팅 화면에서 다룰 수 있도록
+// 현재 화면에 표시할 방의 출처를 단일 activeRoom 상태로 관리합니다.
+export const ACTIVE_ROOM_TYPES = Object.freeze({
+  chat: "chat",
+  shared: "shared",
+});
+
+function normalizeActiveRoomType(type) {
+  return Object.values(ACTIVE_ROOM_TYPES).includes(type) ? type : null;
+}
+
 /**
  * 객체 참조 복사로 인한 버그를 완벽히 격리 방어하기 위해 도구 세팅 구조체를
  * 딥 카피 수준으로 완벽하게 분리 복제 빌드해 주는 순수 헬퍼 가공식입니다.
@@ -45,7 +56,10 @@ export const useChatStore = defineStore("chat", {
   state: () => ({
     histories: [], // 좌측 히스토리 보드에 빌드 렌더링될 과거 대화방 마스터 리스트 배열
     selectedChatId: null, // 현재 화면 중앙 영역을 장악 중인 메인 룸 고유 Chat ID 식별자
+    activeRoomId: null, // URL 숨김/공유 조회 정책에서 현재 화면에 표시할 방 ID
+    activeRoomType: null, // activeRoomId의 출처 타입(chat/shared)
     pendingSelectedChatId: null, // 대화방 전환 클릭 직후 실제 session 세팅 전까지 좌측 메뉴 선택 색상을 먼저 반영하기 위한 임시 Chat ID
+    historyNavigationLocked: false, // ProgressBar 표시 여부와 무관하게 대화방 이력 로딩/렌더 완료 전까지 전역 네비게이션을 차단합니다.
     activeSession: null, // 백엔드 세션 소켓 커넥션 정보 및 읽기 전용 가드 상태 믹스드 객체
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
     promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
@@ -64,6 +78,16 @@ export const useChatStore = defineStore("chat", {
      */
     activeMessages: (state) =>
       state.selectedChatId ? state.messageMap[state.selectedChatId] || [] : [],
+    /**
+     * URL 숨김 정책 또는 공유방 조회 정책에서 현재 화면에 표시 중인 방이 공유 링크 기반인지 판별합니다.
+     */
+    isActiveSharedRoom: (state) =>
+      state.activeRoomType === ACTIVE_ROOM_TYPES.shared,
+    /**
+     * 답변 생성 외에도 대화방 입장/이력 렌더링 중에는 좌측 메뉴와 주요 액션을 잠급니다.
+     */
+    isNavigationLocked: (state) =>
+      Boolean(state.pendingSelectedChatId) || Boolean(state.historyNavigationLocked),
     /**
      * 특정 챗방이 히스토리 박제 형태 또는 이미 완료 처리되어 AI 모델 사양을 유저가 도중에 함부로 가로채 교체할 수 없도록 강제 락을 걸었는지 확인하는 판별식입니다.
      */
@@ -121,6 +145,27 @@ export const useChatStore = defineStore("chat", {
       );
     },
     /**
+     * URL 표시/숨김 정책에 관계없이 현재 채팅 화면에 표시할 방을 단일 activeRoom 상태로 기록합니다.
+     * 기존 selectedChatId는 현행 /chat/:id 기반 로직 호환을 위해 유지하고, 후속 단계에서 점진 전환합니다.
+     */
+    setActiveRoom(roomId, roomType = ACTIVE_ROOM_TYPES.chat) {
+      const id = String(roomId || "").trim();
+      const type = normalizeActiveRoomType(roomType);
+      this.activeRoomId = id || null;
+      this.activeRoomType = id && type ? type : null;
+    },
+    setActiveChatRoom(chatId) {
+      this.setActiveRoom(chatId, ACTIVE_ROOM_TYPES.chat);
+    },
+    setActiveSharedRoom(shareId) {
+      this.setActiveRoom(shareId, ACTIVE_ROOM_TYPES.shared);
+    },
+    clearActiveRoom() {
+      this.activeRoomId = null;
+      this.activeRoomType = null;
+    },
+
+    /**
      * @function setActiveSession
      * @description 유저가 대화방을 체인지하거나 새로운 방에 인입했을 때 글로벌 세션 상태와 포인터 ID를 리타겟팅 스위칭합니다.
      * @param {object|null} session - 새로 개통 전개된 챗방 세션 디테일 오브젝트
@@ -128,6 +173,11 @@ export const useChatStore = defineStore("chat", {
     setActiveSession(session = null) {
       this.activeSession = session;
       this.selectedChatId = session?.chatId || null; // 활성 룸 포인터 인덱스 강제 변환 수립
+      if (this.selectedChatId) {
+        this.setActiveChatRoom(this.selectedChatId);
+      } else if (this.activeRoomType !== ACTIVE_ROOM_TYPES.shared) {
+        this.clearActiveRoom();
+      }
       this.clearPendingSelectedChatId(); // 실제 활성 방 포인터가 확정되었으므로 클릭 선반영 상태를 해제
       this.resetActivePromptToolSettings(); // 방이 체인지되었으므로 툴바 세팅 캐시 구조체도 타깃에 맞게 세로정렬 리셋 트리거
     },
@@ -137,6 +187,7 @@ export const useChatStore = defineStore("chat", {
     clearActiveSession() {
       this.activeSession = null;
       this.selectedChatId = null;
+      this.clearActiveRoom();
       this.clearPendingSelectedChatId();
       this.resetActivePromptToolSettings();
     },
@@ -153,6 +204,12 @@ export const useChatStore = defineStore("chat", {
      */
     clearPendingSelectedChatId() {
       this.pendingSelectedChatId = null;
+    },
+    /**
+     * ProgressBar가 꺼져 있어도 대화방 이력 로딩/렌더링 중에는 사용자 이동을 차단합니다.
+     */
+    setHistoryNavigationLocked(locked = false) {
+      this.historyNavigationLocked = Boolean(locked);
     },
 
     /**

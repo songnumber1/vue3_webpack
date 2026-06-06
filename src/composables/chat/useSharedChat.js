@@ -1,28 +1,80 @@
 /**
  * @file composables/chat/useSharedChat.js
- * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 공유 URL 진입 검증과 공유 대화방 조회를 담당합니다.
  */
 
-import {createId} from "@/utils/id";
+import {resolveChatApis} from "@/api/runtime/chatApis";
 
-export async function loadSharedConversation(shareId) {
+function resolveSharedExists(response = {}, messages = []) {
+  if (response.exists === false || response.success === false) return false;
+  if (response.exists === true || response.success === true) return true;
+
+  // 백엔드 응답이 비어 있거나 exists/success 플래그가 누락된 경우에는
+  // 공유 URL을 성공으로 추정하지 않습니다. 없는 공유 URL이 빈 객체로
+  // 내려와도 반드시 알림 후 메인으로 이동해야 하기 때문입니다.
+  return messages.length > 0;
+}
+
+function normalizeSharedResponse(response = {}, shareId = "") {
+  const messages = Array.isArray(response.messages) ? response.messages : [];
+  const normalizedShareId = String(response.shareId || shareId || "").trim();
+  const exists = resolveSharedExists(response, messages);
+
+  return {
+    ...response,
+    exists,
+    success: exists,
+    shareId: normalizedShareId,
+    chatId: response.chatId || response.id || "",
+    title: response.title || response.chatTitle || "",
+    code: response.code || (exists ? "" : "SHARED_NOT_FOUND"),
+    message: response.message || "",
+    messages,
+  };
+}
+
+function createSharedUnavailableResponse(shareId) {
   const normalizedShareId = String(shareId || "").trim();
 
-  return [
+  return normalizeSharedResponse(
     {
-      id: createId("message"),
-      role: "user",
-      content: `공유 URL로 전달된 대화입니다.\n\nshareId: ${normalizedShareId || "unknown"}`,
+      success: false,
+      exists: false,
+      shareId: normalizedShareId,
+      code: "SHARED_API_UNAVAILABLE",
+      message: "공유 대화방을 확인할 수 없습니다.",
+      messages: [],
     },
-    {
-      id: createId("message"),
-      role: "assistant",
-      content:
-        "이 화면은 공유 받은 대화 전용 읽기 모드입니다. 기존 채팅 화면과 동일한 메시지 레이아웃을 사용하지만 하단 입력 영역은 전송 가능한 입력창이 아니라 안내 영역으로 표시됩니다.",
-    },
-  ];
+    normalizedShareId
+  );
+}
+
+export async function getSharedConversation(shareId) {
+  const normalizedShareId = String(shareId || "").trim();
+  const {chatHistoryApi} = resolveChatApis();
+
+  if (typeof chatHistoryApi?.getSharedConversation === "function") {
+    return normalizeSharedResponse(
+      await chatHistoryApi.getSharedConversation({shareId: normalizedShareId}),
+      normalizedShareId
+    );
+  }
+
+  // 공유 URL은 존재하지 않거나 검증 API가 준비되지 않은 경우에도 성공으로
+  // 추정하지 않습니다. API 계약이 깨졌을 때도 반드시 알림 후 메인으로
+  // 이동해야 하므로 fail-closed 응답으로 정규화합니다.
+  return createSharedUnavailableResponse(normalizedShareId);
+}
+
+export async function loadSharedConversation(shareId) {
+  const result = await getSharedConversation(shareId);
+  if (!result.exists) {
+    const error = new Error(
+      result.message || "공유 대화방을 찾을 수 없습니다."
+    );
+    error.code = result.code || "SHARED_NOT_FOUND";
+    error.sharedResult = result;
+    throw error;
+  }
+  return result.messages;
 }

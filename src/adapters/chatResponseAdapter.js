@@ -19,6 +19,11 @@ function firstDefined(...values) {
   return values.find((value) => value !== undefined && value !== null);
 }
 
+function optionalText(...values) {
+  const value = firstText(...values);
+  return value || null;
+}
+
 function resolveModelId(raw = {}) {
   return firstText(raw[C.MODEL_ID], raw[C.MODEL_ID_LEGACY]);
 }
@@ -59,7 +64,7 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
     isPinned: toBoolean(raw[C.BOOKMARK_YN]),
     endedAt: raw[C.CHAT_END_DT] || "",
     userId: raw[C.USER_ID] || "",
-    sharedId: firstDefined(raw[C.SHARED_ID], raw.sharedId),
+    sharedId: optionalText(raw[C.SHARED_ID], raw.sharedId),
     raw,
   };
 }
@@ -106,7 +111,7 @@ export function adaptChatSearchItem(raw = {}, options = {}) {
     matchCount: Number(raw[C.MATCH_COUNT] || 0),
     messageId: firstText(raw.messageId, raw.message_id, raw.targetMessageId),
     role: firstText(raw.role, raw.messageRole, raw.targetRole),
-    sharedId: firstDefined(raw[C.SHARED_ID], raw.sharedId),
+    sharedId: optionalText(raw[C.SHARED_ID], raw.sharedId),
   };
 }
 
@@ -159,7 +164,7 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
     isPinned: Boolean(result.isPinned || result.bookmarkYN),
     endedAt: endedAt || new Date().toISOString(),
     userId: result.userId || "",
-    sharedId: firstDefined(result.sharedId, result.raw?.sharedId),
+    sharedId: optionalText(result.sharedId, result.raw?.sharedId),
     searchTargetMessageId: firstText(
       result.messageId,
       result.message_id,
@@ -172,7 +177,7 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
       chatId,
       chatTitle: firstText(result.chatTitle, result.title) || fallbackTitle,
       chatEndDt: endedAt,
-      sharedId: firstDefined(result.sharedId, result.raw?.sharedId),
+      sharedId: optionalText(result.sharedId, result.raw?.sharedId),
       messageId: firstText(
         result.messageId,
         result.message_id,

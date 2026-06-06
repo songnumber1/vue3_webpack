@@ -220,6 +220,7 @@ import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFoote
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {
@@ -236,6 +237,7 @@ const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
+const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
@@ -254,6 +256,9 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
+const isSidebarNavigationLocked = computed(
+  () => chatStreamStore.isStreaming || chatStore.isNavigationLocked
+);
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
@@ -265,6 +270,7 @@ function syncViewportMode() {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openAssistantSelector() {
+  if (isSidebarNavigationLocked.value) return;
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
@@ -273,6 +279,7 @@ function openAssistantSelector() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectAssistant(id) {
+  if (isSidebarNavigationLocked.value) return;
   const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
   const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
 
@@ -298,12 +305,14 @@ function selectAssistant(id) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 function handleNewChat() {
+  if (isSidebarNavigationLocked.value) return;
   chatActions.newChat();
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
 }
 
 function handleChatSearch() {
+  if (isSidebarNavigationLocked.value) return;
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
   router.push({name: "chat-search"}).catch(() => {});
@@ -313,6 +322,7 @@ function handleChatSearch() {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openHistoryMenu(payload = {}) {
+  if (isSidebarNavigationLocked.value) return;
   const {item, event} = payload;
   syncViewportMode();
   historyMenuTarget.value = item || null;
@@ -333,6 +343,7 @@ function closeHistoryMenu() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectHistoryMenuAction(action) {
+  if (isSidebarNavigationLocked.value) return;
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
   if (!history || !action) return;
@@ -343,6 +354,7 @@ function selectHistoryMenuAction(action) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistory(item) {
+  if (isSidebarNavigationLocked.value) return;
   const moved = await chatActions.selectHistory(item);
   if (moved === false) return;
   navigationStore.setDrawerOpen(false);
@@ -352,6 +364,7 @@ async function handleSelectHistory(item) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistoryCollapsed(item) {
+  if (isSidebarNavigationLocked.value) return;
   const moved = await chatActions.selectHistory(item);
   if (moved === false) return;
   navigationStore.setCollapsedRecentOpen(false);

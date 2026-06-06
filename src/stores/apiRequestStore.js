@@ -29,8 +29,18 @@ export const useApiRequestStore = defineStore("apiRequest", {
     /**
      * 무거운 동기식 필수 자원 다운로드 트랜잭션이 개시될 때 로딩 화면 레이어 차단 누적 카운트를 1단 단위 스택 증가 점등 시킵니다.
      */
-    startOverlay() {
+    startProgress() {
       this.activeOverlayCount += 1;
+    },
+    stopProgress() {
+      this.activeOverlayCount = Math.max(this.activeOverlayCount - 1, 0);
+    },
+    clearProgress() {
+      this.activeOverlayCount = 0;
+      this.overlaySuppressCount = 0;
+    },
+    startOverlay() {
+      this.startProgress();
     },
     /**
      * 새 대화 submit처럼 사용자 질문/typing 표시가 즉시 노출되어야 하는 구간에서
@@ -51,7 +61,7 @@ export const useApiRequestStore = defineStore("apiRequest", {
      * 특정 트랜잭션 요청이 무사 완료 완결 혹은 타임아웃 종료되었을 때 차단 카운트를 차감 소등 유도하며 음수 언더플로우를 방어 가드합니다.
      */
     stopOverlay() {
-      this.activeOverlayCount = Math.max(this.activeOverlayCount - 1, 0); // 최소 0 하한선 사양 가드 유지 보장
+      this.stopProgress(); // 최소 0 하한선 사양 가드 유지 보장
     },
     /**
      * @function registerController

@@ -34,7 +34,7 @@ function createAccessPayload(to) {
   return {
     [Q.LANGUAGE]: "ko", // 기본 요청 국가/언어 코드 고정
     [Q.ENTRY_TYPE]: to?.name === "chat" ? "chat" : "main", // 진입한 페이지 성격 분기
-    [Q.SHARE_ID]: to?.params?.shareId || null, // 공유 페이지 진입 시 고유 공유 식별자
+    [Q.SHARE_ID]: to?.params?.shareId || to?.params?.id || null, // 공유 페이지 진입 시 고유 공유 식별자
     [Q.CHAT_ID]: to?.params?.id || null, // 일반 대화방 진입 시 고유 대화 히스토리 식별자
     [Q.MESSAGE_ID]: null, // 특정 메시지 하이라이트 진입용 파라미터 (기본값 null)
     [Q.STUDIO_ID]: to?.query?.studioId || null, // 쿼리 스트링으로 넘어온 특화 스튜디오 룸 ID

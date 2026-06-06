@@ -2,6 +2,7 @@ import {computed, nextTick} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -16,6 +17,11 @@ import {
   scrollAfterUserSubmit,
 } from "./submit/chatSubmitScroll";
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
+import {
+  applyHiddenConversationActiveRoom,
+  createConversationRoute,
+  resolveActiveChatId,
+} from "@/composables/chat/navigation/conversationUrlPolicy";
 // chatStreamStore.isStreaming을 생성 중 상태의 단일 기준으로 사용합니다.
 
 function normalizeChatId(chatId) {
@@ -53,15 +59,21 @@ async function createConversationForSubmit(options, normalized) {
 }
 
 function shouldCreateConversation(options, targetHistoryId) {
-  return (
-    options.route.name === "main" ||
-    options.route.name === "chat-entry" ||
-    !targetHistoryId
-  );
+  // URL 숨김 모드에서는 기존 대화방도 /chat(chat-entry) 라우트를 사용합니다.
+  // 따라서 라우트 이름만으로 새 대화 여부를 판단하면 기존 대화방 추가 질문이
+  // new.do로 잘못 분기될 수 있습니다. visible/hidden 정책을 모두 반영한
+  // active chat id가 있으면 항상 기존 대화방으로 처리합니다.
+  if (targetHistoryId) return false;
+
+  return options.route.name === "main" || options.route.name === "chat-entry";
 }
 
-async function ensureConversationForSubmit(options, normalized) {
-  let targetHistoryId = normalizeChatId(options.route.params.id);
+async function ensureConversationForSubmit(
+  options,
+  normalized,
+  currentHistoryId
+) {
+  let targetHistoryId = normalizeChatId(currentHistoryId);
 
   if (!shouldCreateConversation(options, targetHistoryId)) {
     return targetHistoryId;
@@ -122,10 +134,12 @@ export function useChatSubmit(options) {
   const isGenerating = computed(() => chatStreamStore.isStreaming);
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
+  const systemSettingsStore = useSystemSettingsStore();
 
   async function submitPrompt(payload) {
     const normalized = normalizePromptPayload(payload);
     if (
+      chatStore.isActiveSharedRoom ||
       !canWrite(options) ||
       (!normalized.text && normalized.attachments.length === 0) ||
       chatStreamStore.isStreaming
@@ -135,7 +149,13 @@ export function useChatSubmit(options) {
 
     chatStreamStore.start();
 
-    const initialHistoryId = normalizeChatId(options.route.params.id);
+    const initialHistoryId = normalizeChatId(
+      resolveActiveChatId({
+        route: options.route,
+        chatStore,
+        settings: systemSettingsStore.settings,
+      })
+    );
     const isNewConversationSubmit = shouldCreateConversation(
       options,
       initialHistoryId
@@ -150,7 +170,8 @@ export function useChatSubmit(options) {
     try {
       const targetHistoryId = await ensureConversationForSubmit(
         options,
-        normalized
+        normalized,
+        initialHistoryId
       );
 
       if (isNewConversationSubmit) {
@@ -171,13 +192,21 @@ export function useChatSubmit(options) {
       committer.commit();
 
       if (isNewConversationSubmit) {
-        const nextRoute = {name: "chat", params: {id: targetHistoryId}};
+        const nextRoute = createConversationRoute({
+          chatId: targetHistoryId,
+          settings: systemSettingsStore.settings,
+        });
         // chatStreamStore.isStreaming 상태에서 새 채팅방으로 입장해야 하므로,
-        // 새 대화 생성 직후 내부 /chat/:id 라우팅만 1회 허용합니다.
+        // URL 정책에 따라 내부 /chat/:id 또는 /chat 라우팅만 1회 허용합니다.
         // 사용자가 클릭한 다른 대화방/Studio/MCP 이동은 router guard에서 계속 차단됩니다.
         chatStreamStore.allowNavigationTo(nextRoute);
         await options.router.push(nextRoute).catch(() => {
           chatStreamStore.clearAllowedNavigation();
+        });
+        applyHiddenConversationActiveRoom({
+          chatId: targetHistoryId,
+          chatStore,
+          settings: systemSettingsStore.settings,
         });
       }
 
@@ -206,9 +235,21 @@ export function useChatSubmit(options) {
   }
 
   async function regenerateResponse(message = {}) {
-    if (!canWrite(options) || chatStreamStore.isStreaming) return;
+    if (
+      chatStore.isActiveSharedRoom ||
+      !canWrite(options) ||
+      chatStreamStore.isStreaming
+    ) {
+      return;
+    }
 
-    const targetHistoryId = normalizeChatId(options.route.params.id);
+    const targetHistoryId = normalizeChatId(
+      resolveActiveChatId({
+        route: options.route,
+        chatStore,
+        settings: systemSettingsStore.settings,
+      })
+    );
     if (!targetHistoryId) return;
 
     const currentMessages = Array.isArray(options.messages.value)

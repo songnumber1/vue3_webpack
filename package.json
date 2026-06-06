@@ -29,7 +29,8 @@
     "madge:all": "madge --image madge-graph.png src && madge --image madge-chat.svg src/components/chat && madge --image madge-stores.svg src/stores && madge --image madge-composables.svg src/composables && madge --image madge-overlay.svg src/components/overlay && madge --image madge-platform.svg src/platform && madge --circular src && madge --orphans src",
     "depcruise:all": "depcruise src --no-config --include-only \"^src\" --output-type html > dependency-report.html && depcruise src --no-config --output-type err && depcruise src/composables --no-config --output-type html > depcruise-composables-report.html && depcruise src/stores --no-config --output-type html > depcruise-stores-report.html && depcruise src/components/chat --no-config --output-type html > depcruise-chat-report.html && depcruise src --no-config --output-type json > depcruise-report.json",
     "analyze:all": "npm run madge:all && npm run depcruise:all",
-    "test:regression": "node tests/run-all.cjs"
+    "test:regression": "node tests/run-all.cjs",
+    "test:url-policy": "node tests/url-policy-static.cjs"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^7.3.4",

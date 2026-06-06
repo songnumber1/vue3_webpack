@@ -7,7 +7,8 @@ import {
 import {API_KEYS, resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {isMobileLikeViewport} from "@/platform/viewport/viewportMode";
+import {usePlatformStore} from "@/stores/platformStore";
+import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {getAccessToken} from "@/auth/tokenStore";
@@ -112,19 +113,20 @@ export async function fetchGenerationResult(requestId) {
 
 function shouldUseOverlay(policy) {
   const settings = useSystemSettingsStore();
-
-  const mobileLikeViewport = isMobileLikeViewport(settings.mobileBreakpoint);
+  const platformStore = usePlatformStore();
 
   const result = Boolean(
-    policy.overlay && settings.showMobileApiProgress && mobileLikeViewport
+    policy.overlay &&
+      isProgressAllowedForCurrentPlatform(settings.settings, platformStore.info)
   );
 
   logPlatformDebug("sse.overlay", {
     result,
     policyOverlay: Boolean(policy.overlay),
-    showMobileApiProgress: Boolean(settings.showMobileApiProgress),
-    mobileBreakpoint: settings.mobileBreakpoint,
-    mobileLikeViewport,
+    showPcProgress: Boolean(settings.showPcProgress),
+    showMobileProgress: Boolean(settings.showMobileProgress),
+    platformOverride: settings.platformOverride,
+    progressPlatform: platformStore.info?.isMobile ? "mobile" : "pc",
   });
 
   return result;

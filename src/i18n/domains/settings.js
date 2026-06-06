@@ -18,6 +18,8 @@ export const settingsMessages = {
       apply: "적용",
       authModeChangeLogoutConfirm:
         "인증 방식이 변경되어 현재 로그인 상태가 초기화됩니다. 적용 후 다시 로그인이 필요합니다. 계속하시겠습니까?",
+      logoutRequiredSettingChangeConfirm:
+        "대화방 URL 표시 방식 또는 인증 방식이 변경되어 현재 로그인 상태가 초기화됩니다. 적용 후 다시 로그인이 필요합니다. 계속하시겠습니까?",
       tabsLabel: "시스템 설정 분류",
       tabs: {
         common: "공통",
@@ -116,10 +118,15 @@ export const settingsMessages = {
           label: "마이크 사용",
           description: "프롬프트 입력 영역의 음성 버튼 노출 여부입니다.",
         },
-        showMobileApiProgress: {
-          label: "API 진행 표시",
+        showPcProgress: {
+          label: "PC ProgressBar",
           description:
-            "API 호출 및 채팅방 로딩/렌더링 중 전체 화면 진행 표시를 사용합니다.",
+            "PC 플랫폼에서 코드가 요청한 전체 화면 ProgressBar 표시를 허용합니다. 화면 너비가 아니라 실제/강제 플랫폼 기준으로 판단합니다.",
+        },
+        showMobileProgress: {
+          label: "모바일 ProgressBar",
+          description:
+            "모바일 플랫폼에서 코드가 요청한 전체 화면 ProgressBar 표시를 허용합니다. 강제 플랫폼 설정이 Android이면 PC에서도 이 설정을 따릅니다.",
         },
         bottomSheetMinHeight: {
           label: "최소 높이",
@@ -134,6 +141,11 @@ export const settingsMessages = {
         autoScrollOnAnswer: {
           label: "자동 스크롤",
           description: "답변 시 스크롤 자동 이동 여부입니다.",
+        },
+        conversationUrlMode: {
+          label: "대화방 URL 표시 방식",
+          description:
+            "일반 대화방 주소에 chatId를 표시할지, /chat 주소로 숨길지 선택합니다. 숨김 모드는 새로고침 시 채팅 메인으로 이동합니다.",
         },
         showMermaidHeader: {
           label: "Mermaid 헤더 표시",
@@ -379,6 +391,8 @@ export const settingsMessages = {
       apply: "Apply",
       authModeChangeLogoutConfirm:
         "The authentication mode has changed, so your current login state will be cleared. You will need to sign in again after applying. Continue?",
+      logoutRequiredSettingChangeConfirm:
+        "The conversation URL mode or authentication mode has changed, so your current login state will be cleared. You will need to sign in again after applying. Continue?",
       tabsLabel: "System settings categories",
       tabs: {
         common: "Common",
@@ -476,10 +490,15 @@ export const settingsMessages = {
           description:
             "Controls whether the voice button is shown in the prompt input.",
         },
-        showMobileApiProgress: {
-          label: "API progress indicator",
+        showPcProgress: {
+          label: "PC ProgressBar",
           description:
-            "Show full-screen progress during API calls and chat history loading/rendering.",
+            "Allow full-screen ProgressBar display on PC platforms when code explicitly requests progress. This uses actual/forced platform, not viewport width.",
+        },
+        showMobileProgress: {
+          label: "Mobile ProgressBar",
+          description:
+            "Allow full-screen ProgressBar display on mobile platforms when code explicitly requests progress. Forced Android platform uses this setting even on PC.",
         },
         bottomSheetMinHeight: {
           label: "Minimum height",
@@ -495,6 +514,11 @@ export const settingsMessages = {
           label: "Auto scroll",
           description:
             "Automatically scroll to the bottom while answers arrive.",
+        },
+        conversationUrlMode: {
+          label: "Conversation URL mode",
+          description:
+            "Choose whether normal chat URLs expose the chatId or stay on /chat. Hidden mode returns to the chat main screen after refresh.",
         },
         showMermaidHeader: {
           label: "Show Mermaid header",

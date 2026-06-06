@@ -64,10 +64,13 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showPlaygroundMenu: (state) => state.settings.showPlaygroundMenu,
     // 세션 종료 로그아웃 단추 UI 기식화 플래그
     showLogoutButton: (state) => state.settings.showLogoutButton,
-    // API 호출과 채팅방 이력 로딩/렌더링 중 전역 진행 표시를 노출할지 여부
-    showMobileApiProgress: (state) => state.settings.showMobileApiProgress,
+    // PC 플랫폼에서 전역 ProgressBar 표시를 허용할지 여부
+    showPcProgress: (state) => state.settings.showPcProgress,
+    // 모바일 플랫폼에서 전역 ProgressBar 표시를 허용할지 여부
+    showMobileProgress: (state) => state.settings.showMobileProgress,
     // AI의 답변 토큰이 실시간 분출 타이핑 출력될 때 메인 대화 스크롤바 영역을 화면 하단 꼬리로 완전 자동 연속 동적 추적 다운시킬지 판별식
     autoScrollOnAnswer: (state) => state.settings.autoScrollOnAnswer,
+    conversationUrlMode: (state) => state.settings.conversationUrlMode,
     showMermaidHeader: (state) => state.settings.showMermaidHeader,
     enableMermaidRendering: (state) => state.settings.enableMermaidRendering,
     pcShowMermaidHeader: (state) => state.settings.pcShowMermaidHeader,

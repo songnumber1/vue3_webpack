@@ -31,7 +31,7 @@
       v-for="message in messages"
       :key="message.id"
       :message="message"
-      :show-regenerate="isLastAssistantMessage(message)"
+      :show-regenerate="!readonly && isLastAssistantMessage(message)"
       :message-dom-id="String(message.id || '')"
       :message-dom-role="message.role"
       :defer-mermaid-enhancement="historyRendering"
@@ -71,6 +71,7 @@ const props = defineProps({
   pcHistoryLazyTopThresholdPx: {type: Number, default: 300},
   mobileHistoryLazyInitialCount: {type: Number, default: 50},
   mobileHistoryLazyAppendCount: {type: Number, default: 25},
+  readonly: {type: Boolean, default: false},
 });
 
 const emit = defineEmits([

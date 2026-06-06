@@ -11,7 +11,7 @@ import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
-import {loadSharedConversation} from "@/composables/chat/useSharedChat";
+import {getSharedConversation} from "@/composables/chat/useSharedChat";
 import {
   renderMermaidInElement,
   warmupMermaidForHistoryRender,
@@ -19,9 +19,18 @@ import {
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
+import {usePlatformStore} from "@/stores/platformStore";
+import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveMessageRenderPolicy} from "@/composables/chat/message-list/useMessageRenderPolicy";
+import {
+  isSharedChat,
+  resolveMessageRenderPolicy,
+} from "@/composables/chat/message-list/useMessageRenderPolicy";
+import {
+  isHiddenConversationUrlMode,
+  resolveActiveChatId,
+} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {
   resolveInitialMessageLazyRange,
@@ -82,6 +91,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       historyVisibleStartIndex.value > 0
   );
   const apiRequestStore = useApiRequestStore();
+  const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
   const messageRenderPolicy = computed(() =>
@@ -305,8 +315,12 @@ ${message?.reasoningContent || ""}`;
     historyRenderFinishSeq += 1;
     historyMessagesLoaded.value = false;
     isHistoryRendering.value = true;
+    chatStore.setHistoryNavigationLocked(true);
     if (
-      systemSettingsStore.showMobileApiProgress &&
+      isProgressAllowedForCurrentPlatform(
+        systemSettingsStore.settings,
+        platformStore.info
+      ) &&
       !historyRenderOverlayActive
     ) {
       apiRequestStore.startOverlay();
@@ -326,6 +340,7 @@ ${message?.reasoningContent || ""}`;
         // MessageList가 hidden 상태에서 Markdown/Mermaid/하단 스크롤을 모두 끝낸 뒤에만
         // composer를 다시 표시합니다. 이 시점부터 좋아요/재답변/입력창 높이가 실제 레이아웃에 반영됩니다.
         isHistoryRendering.value = false;
+        chatStore.setHistoryNavigationLocked(false);
 
         await nextTick();
         if (finishSeq !== historyRenderFinishSeq) return;
@@ -366,7 +381,12 @@ ${message?.reasoningContent || ""}`;
   const isConversationPage = computed(
     () => isChatPage.value || isSharedPage.value
   ); // 실제 대화/공유 대화가 실재하는 뷰 포트 구조 판별
-  const isReadOnly = computed(() => isSharedPage.value); // 공유 페이지인 경우 하단 인풋 창 타이핑 권한을 차단(박제)
+  const isReadOnly = computed(
+    () =>
+      isSharedPage.value ||
+      chatStore.isActiveSharedRoom ||
+      isSharedChat(activeHistory.value)
+  ); // 공유 URL 또는 sharedId가 있는 대화방은 제목 문구와 무관하게 조회 전용으로 박제합니다.
 
   // 비즈니스 인프라 런타임 코어 스토어로부터 화면 구성에 필요한 상태 유닛 구조 분출
   const {
@@ -391,8 +411,18 @@ ${message?.reasoningContent || ""}`;
 
   // 현재 활성화된 라우터 세션의 고유 식별자 키(대화방 ID 또는 공유 ID)를 파싱 추출합니다.
   const activeHistoryId = computed(() => {
-    if (isChatPage.value) return route.params.id;
-    if (isSharedPage.value) return route.params.shareId;
+    if (isChatPage.value) {
+      return resolveActiveChatId({
+        route,
+        chatStore,
+        settings: systemSettingsStore.settings,
+      });
+    }
+    if (isSharedPage.value) {
+      return chatStore.activeRoomType === "shared"
+        ? String(chatStore.activeRoomId || "").trim()
+        : String(route.params?.id || route.params?.shareId || "").trim();
+    }
     return null;
   });
 
@@ -463,6 +493,24 @@ ${message?.reasoningContent || ""}`;
       .filter((item) => item.text && item.prompt); // 비정상 공백 질문은 필터링 제거합니다.
   });
 
+  function getSharedEntryId() {
+    if (route.name !== "shared-entry") return "";
+    return String(route.params?.id || route.params?.shareId || "").trim();
+  }
+
+  async function redirectSharedNotFound(result = {}) {
+    const message =
+      result?.message || t("chat.sharedNotFoundMessage");
+    if (typeof window !== "undefined" && typeof window.alert === "function") {
+      window.alert(message);
+    }
+    chatStore.clearActiveRoom();
+    clearLazyHistoryMessages();
+    messages.value = [];
+    finishHistoryRender();
+    await router.replace({name: "main"}).catch(() => {});
+  }
+
   // ── 🚀 [3. 라우팅 전환에 따른 메시지 세션 복원 동기화 엔지니어링] ──────────────────
   /**
    * @function loadRouteConversation
@@ -474,6 +522,7 @@ ${message?.reasoningContent || ""}`;
 
     // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
     if (isMainPage.value) {
+      chatStore.setHistoryNavigationLocked(false);
       finishHistoryRender();
       clearLazyHistoryMessages();
       messages.value = [];
@@ -483,30 +532,83 @@ ${message?.reasoningContent || ""}`;
     }
 
     try {
-      // 케이스 2: 공유 오픈방 열람 페이지인 경우 원격지의 전용 익명 오픈 조회 엔드포인트 파이프라인으로 우회 라우팅합니다.
+      // 케이스 2: 공유 오픈방 열람 페이지인 경우 공유 URL 검증 후 읽기 전용 대화로 로드합니다.
       if (isSharedPage.value) {
         beginHistoryRender();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
-        const sharedMessages = await loadSharedConversation(
-          activeHistoryId.value
-        );
+
+        const sharedEntryId = getSharedEntryId();
+        if (sharedEntryId) {
+          const result = await getSharedConversation(sharedEntryId);
+          if (!isCurrentLoad()) return;
+          if (!result.exists) {
+            await redirectSharedNotFound(result);
+            return;
+          }
+          chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
+          await router.replace({name: "shared"}).catch(() => {});
+          // /shared/:id -> /shared replace 직후 route watcher가 새 loadRouteConversation을
+          // 시작할 수 있습니다. 이 경우 현재 load는 stale 상태가 되므로 메시지를
+          // 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
+          if (!isCurrentLoad()) return;
+          setHistoryMessagesForInitialRender(result.messages);
+          historyMessagesLoaded.value = true;
+          await nextTick();
+          finishHistoryRender();
+          return;
+        }
+
+        if (!activeHistoryId.value) {
+          clearLazyHistoryMessages();
+          messages.value = [];
+          finishHistoryRender();
+          await router.replace({name: "main"}).catch(() => {});
+          return;
+        }
+
+        const result = await getSharedConversation(activeHistoryId.value);
         if (!isCurrentLoad()) return;
-        clearLazyHistoryMessages();
-        messages.value = sharedMessages;
+        if (!result.exists) {
+          await redirectSharedNotFound(result);
+          return;
+        }
+
+        setHistoryMessagesForInitialRender(result.messages);
         historyMessagesLoaded.value = true;
         await nextTick();
+        finishHistoryRender();
         return;
       }
 
       // 케이스 3: 일반 채팅 모드인데 대상 방의 고유 ID가 식별되지 않는 예외 상황 처리
       if (!activeHistoryId.value) {
+        const hasPendingHiddenNavigation =
+          isHiddenConversationUrlMode(systemSettingsStore.settings) &&
+          Boolean(chatStore.pendingSelectedChatId);
+
         beginHistoryRender();
         await flushConversationSwitchPaint();
         if (!isCurrentLoad()) return;
         clearLazyHistoryMessages();
-        clearActiveSession();
+        messages.value = [];
+
+        // URL 숨김 모드에서 좌측 대화방 클릭 직후에는 /chat 라우트가 먼저 감지되고
+        // activeRoomId가 뒤이어 세팅될 수 있습니다. 이 pending 상태에서 clearActiveSession을
+        // 호출하면 pendingSelectedChatId까지 지워져 첫 대화방 진입이 메인 redirect로 바뀌므로
+        // 복원 가능한 방이 없는 진짜 /chat 새로고침/직접 접근일 때만 세션을 정리합니다.
+        if (!hasPendingHiddenNavigation) {
+          clearActiveSession();
+        }
         finishHistoryRender();
+
+        // URL 노출 모드에서는 /chat 단독 접근이 특정 대화방을 의미하지 않습니다.
+        // URL 숨김 모드에서도 activeRoomId가 없는 /chat 새로고침/직접 접근은
+        // 복원 가능한 대화방이 없으므로 메인으로 되돌립니다. 단, 좌측 대화방 클릭 직후
+        // activeRoomId가 곧 세팅될 pending 상태는 첫 진입 로드를 막지 않기 위해 대기합니다.
+        if (!hasPendingHiddenNavigation) {
+          await router.replace({name: "main"}).catch(() => {});
+        }
         return;
       }
 
@@ -554,6 +656,12 @@ ${message?.reasoningContent || ""}`;
       chatStore.pruneInactiveMessageCache(history.id);
     } catch (error) {
       if (isCurrentLoad()) {
+        if (isSharedPage.value) {
+          await redirectSharedNotFound({
+            message: error?.message || t("chat.sharedNotFoundMessage"),
+          });
+          return;
+        }
         clearPendingSelectedOnFailure(activeHistoryId.value);
         finishHistoryRender();
       }
@@ -621,7 +729,11 @@ ${message?.reasoningContent || ""}`;
     autoScrollOnAnswer: ui.autoScrollOnAnswer,
     syncHistories: () => syncHistoriesInBackground({notifyOnError: true}), // 전송 성공 직후 사이드바 히스토리 타이틀 스냅샷 백그라운드 동기화
     renderAfterStream,
-    canWrite: () => !isReadOnly.value && !isActiveModelUnavailable.value, // 현재 전송 가능 상태 가드 밸리데이션 검증식
+    canWrite: () =>
+      !isReadOnly.value &&
+      !isHistoryRendering.value &&
+      !chatStore.isNavigationLocked &&
+      !isActiveModelUnavailable.value, // 현재 전송 가능 상태 가드 밸리데이션 검증식
     isReadOnly,
     isActiveModelUnavailable,
     markNewSubmitConversation:
@@ -639,6 +751,9 @@ ${message?.reasoningContent || ""}`;
       () => [
         route.params.id,
         route.params.shareId,
+        chatStore.activeRoomId,
+        chatStore.activeRoomType,
+        systemSettingsStore.settings.conversationUrlMode,
         route.query?.messageId,
         currentMode.value,
       ],
@@ -687,6 +802,7 @@ ${message?.reasoningContent || ""}`;
 
     onBeforeUnmount(() => {
       historyRenderFinishSeq += 1;
+      chatStore.setHistoryNavigationLocked(false);
       if (historyRenderOverlayActive) {
         apiRequestStore.stopOverlay();
         historyRenderOverlayActive = false;
