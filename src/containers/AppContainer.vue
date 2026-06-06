@@ -24,6 +24,7 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
+import {isActualAndroidRuntime as resolveActualAndroidRuntime} from "@/platform/runtime/runtimeDetector";
 
 /**
  * @component AppContainer
@@ -74,18 +75,9 @@ const deviceName = computed(() => platformInfo.value.device || "unknown");
  */
 const isMobileContainer = computed(() => shouldUseMobileLayout.value);
 
-const isActualAndroidRuntime = computed(() => {
-  const info = platformInfo.value || {};
-  const userAgent = String(info.userAgent || "");
-  return Boolean(
-    info.actualEnv === "android" ||
-    info.actualDevice === "android" ||
-    info.actualDevice === "android-webview" ||
-    info.actualBrowser === "android-webview" ||
-    info.isAndroidApp ||
-    /Android/i.test(userAgent)
-  );
-});
+const isActualAndroidRuntime = computed(() =>
+  resolveActualAndroidRuntime(platformInfo.value || {})
+);
 
 /**
  * 상기 계산된 개별 플랫폼 속성값들을 조합하여 템플릿의 컨테이너 Div에 실시간 매핑할 CSS 클래스 객체를 빌드합니다.

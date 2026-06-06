@@ -146,6 +146,7 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * [ChatContainer 연결 구조]
@@ -165,7 +166,7 @@ const PORTAL_ASSISTANT_IDS = [
   ASSISTANT_STUDIO_PORTAL_ID,
   CONNECTOR_STORE_PORTAL_ID,
 ];
-const CONNECTOR_STORE_ROUTE_NAME = "connector-store";
+const CONNECTOR_STORE_ROUTE_NAME = ROUTE_NAMES.CONNECTOR_STORE;
 
 function isPortalAssistantId(assistantId) {
   return PORTAL_ASSISTANT_IDS.includes(assistantId);
@@ -183,7 +184,7 @@ function syncAssistantSelectionWithRoute() {
     assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
   const connectorAssistant =
     assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
-  if (route.name === "studio") {
+  if (route.name === ROUTE_NAMES.STUDIO) {
     if (
       studioAssistant &&
       assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
@@ -313,17 +314,16 @@ function handleAssistantNewChat(assistantId) {
   if (isPortalAssistantId(assistantId)) {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
-    router
+    return router
       .push({
         name:
           assistantId === CONNECTOR_STORE_PORTAL_ID
             ? CONNECTOR_STORE_ROUTE_NAME
-            : "studio",
+            : ROUTE_NAMES.STUDIO,
       })
       .catch(() => {});
-    return;
   }
-  startNewChat({assistantId});
+  return startNewChat({assistantId});
 }
 
 /**

@@ -79,6 +79,7 @@ import { useChatStore } from "@/stores/chatStore";
 import { useChatStreamStore } from "@/stores/chatStreamStore";
 import { authApiLive } from "@/api/live/authApi.live";
 import { logWarn } from "@/utils/logger";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 import { syncViewportSettings } from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_MOBILE_BREAKPOINT_PX,
@@ -435,7 +436,10 @@ async function apply() {
 
     if (logoutRequiredSettingChanged) {
       await router
-        .replace({ name: "login-required", query: { reason: "LOGIN_REQUIRED" } })
+        .replace({
+          name: ROUTE_NAMES.LOGIN_REQUIRED,
+          query: {reason: "LOGIN_REQUIRED"},
+        })
         .catch(() => { });
     }
   } finally {

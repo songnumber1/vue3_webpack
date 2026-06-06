@@ -4,6 +4,7 @@
  */
 import {nextTick, onBeforeUnmount, onMounted, watch} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
+import {isActualAndroidRuntime} from "@/platform/runtime/runtimeDetector";
 import {
   destroyOverlayScrollbar,
   getOverlayScrollbarViewport,
@@ -21,21 +22,8 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   const reserveScrollbarGap = config.reserveScrollbarGap ?? true;
   const platformStore = usePlatformStore();
 
-  function isActualAndroidRuntime() {
-    const info = platformStore.info || {};
-    const userAgent = String(info.userAgent || "");
-    return Boolean(
-      info.actualEnv === "android" ||
-      info.actualDevice === "android" ||
-      info.actualDevice === "android-webview" ||
-      info.actualBrowser === "android-webview" ||
-      info.isAndroidApp ||
-      /Android/i.test(userAgent)
-    );
-  }
-
   function isNativeScrollPlatform() {
-    return disableOnMobile && isActualAndroidRuntime();
+    return disableOnMobile && isActualAndroidRuntime(platformStore.info || {});
   }
 
   function resolveEnabled() {

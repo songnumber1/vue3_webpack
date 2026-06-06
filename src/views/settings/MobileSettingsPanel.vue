@@ -130,6 +130,7 @@
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 import {setAppLocale} from "@/i18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
@@ -252,7 +253,11 @@ function selectMenuItem(key) {
   if (key === "terms" || key === "playground") {
     closePanel();
     router
-      .push(key === "terms" ? {name: "terms"} : {name: "playground"})
+      .push(
+        key === "terms"
+          ? {name: ROUTE_NAMES.TERMS}
+          : {name: ROUTE_NAMES.PLAYGROUND}
+      )
       .catch(() => {});
     return;
   }

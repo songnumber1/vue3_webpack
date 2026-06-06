@@ -43,7 +43,7 @@
         </button>
         <button
           class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
-          :class="{active: route.name === 'chat-search'}"
+          :class="{active: route.name === ROUTE_NAMES.CHAT_SEARCH}"
           type="button"
           @click="handleChatSearch"
         >
@@ -128,7 +128,7 @@
           </button>
           <button
             class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
-            :class="{active: route.name === 'chat-search'}"
+            :class="{active: route.name === ROUTE_NAMES.CHAT_SEARCH}"
             type="button"
             @click="handleChatSearch"
           >
@@ -227,6 +227,7 @@ import {
   CHAT_ACTIONS_KEY,
   createEmptyChatActions,
 } from "@/composables/chat/chatActionContext";
+import {ROUTE_NAMES, STUDIO_ROUTE_NAMES} from "@/constants/routeNames";
 
 const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 
@@ -256,10 +257,10 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
-const isSidebarNavigationLocked = computed(
+const shouldBlockHistoryRoomOpen = computed(
   () => chatStreamStore.isStreaming || chatStore.isNavigationLocked
 );
-const isStreamingNavigationLocked = computed(() => chatStreamStore.isStreaming);
+const shouldBlockMainNavigation = computed(() => chatStreamStore.isStreaming);
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
@@ -271,7 +272,7 @@ function syncViewportMode() {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openAssistantSelector() {
-  if (isStreamingNavigationLocked.value) return;
+  if (shouldBlockMainNavigation.value) return;
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
@@ -280,7 +281,7 @@ function openAssistantSelector() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function selectAssistant(id) {
-  if (isStreamingNavigationLocked.value) return;
+  if (shouldBlockMainNavigation.value) return;
   const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
   const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
 
@@ -288,17 +289,20 @@ async function selectAssistant(id) {
     assistantStore.selectAssistant(id);
     assistantMenuOpen.value = false;
     navigationStore.setDrawerOpen(false);
-    router
-      .push({name: isConnectorPortal ? "connector-store" : "studio"})
+    return router
+      .push({
+        name: isConnectorPortal
+          ? ROUTE_NAMES.CONNECTOR_STORE
+          : ROUTE_NAMES.STUDIO,
+      })
       .catch(() => {});
-    return;
   }
 
   await chatActions.selectAssistant(id);
   assistantMenuOpen.value = false;
 
-  if (["studio", "connector-store"].includes(route.name)) {
-    router.push({name: "main"}).catch(() => {});
+  if (STUDIO_ROUTE_NAMES.includes(route.name)) {
+    await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
   }
 }
 
@@ -306,24 +310,24 @@ async function selectAssistant(id) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleNewChat() {
-  if (isStreamingNavigationLocked.value) return;
+  if (shouldBlockMainNavigation.value) return;
   await chatActions.newChat();
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
 }
 
 function handleChatSearch() {
-  if (isSidebarNavigationLocked.value) return;
+  if (shouldBlockHistoryRoomOpen.value) return;
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
-  router.push({name: "chat-search"}).catch(() => {});
+  router.push({name: ROUTE_NAMES.CHAT_SEARCH}).catch(() => {});
 }
 
 /**
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openHistoryMenu(payload = {}) {
-  if (isSidebarNavigationLocked.value) return;
+  if (shouldBlockHistoryRoomOpen.value) return;
   const {item, event} = payload;
   syncViewportMode();
   historyMenuTarget.value = item || null;
@@ -344,7 +348,7 @@ function closeHistoryMenu() {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectHistoryMenuAction(action) {
-  if (isSidebarNavigationLocked.value) return;
+  if (shouldBlockHistoryRoomOpen.value) return;
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
   if (!history || !action) return;
@@ -355,7 +359,7 @@ function selectHistoryMenuAction(action) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistory(item) {
-  if (isSidebarNavigationLocked.value) return;
+  if (shouldBlockHistoryRoomOpen.value) return;
   const moved = await chatActions.selectHistory(item);
   if (moved === false) return;
   navigationStore.setDrawerOpen(false);
@@ -365,7 +369,7 @@ async function handleSelectHistory(item) {
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistoryCollapsed(item) {
-  if (isSidebarNavigationLocked.value) return;
+  if (shouldBlockHistoryRoomOpen.value) return;
   const moved = await chatActions.selectHistory(item);
   if (moved === false) return;
   navigationStore.setCollapsedRecentOpen(false);
