@@ -313,7 +313,7 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   ),
   [SYSTEM_SETTING_KEYS.conversationUrlMode]: readStringEnv(
     process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE,
-    CONVERSATION_URL_MODES.visible
+    CONVERSATION_URL_MODES.hidden
   ),
   [SYSTEM_SETTING_KEYS.showMermaidHeader]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER,
