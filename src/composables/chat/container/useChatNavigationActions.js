@@ -8,6 +8,7 @@
  */
 
 import {nextTick} from "vue";
+import {isNavigationFailure} from "vue-router";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {authApiLive} from "@/api/live/authApi.live";
@@ -15,6 +16,7 @@ import {useAuthStore} from "@/stores/authStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
@@ -84,16 +86,58 @@ export function useChatNavigationActions({
   }
 
   /**
+   * @description 새 대화/Assistant 선택은 기존 대화방 이력 렌더링 상태에서 빠져나가는
+   * 명시적 초기화 액션이므로 history navigation lock을 먼저 해제합니다.
+   * 스트리밍 중 이동 차단 정책은 그대로 유지합니다.
+   */
+  function releaseChatNavigationStateForMain() {
+    chatStore.clearPendingSelectedChatId();
+    chatStore.setHistoryNavigationLocked(false);
+    chatStreamStore.clearAllowedNavigation();
+  }
+
+  function isMainRouteActive() {
+    const current = router.currentRoute?.value || {};
+    return current.name === ROUTE_NAMES.MAIN && current.path === "/";
+  }
+
+  async function moveToMainRoute() {
+    releaseChatNavigationStateForMain();
+
+    const firstResult = await router.replace({name: ROUTE_NAMES.MAIN});
+
+    if (isMainRouteActive()) return;
+
+    if (isNavigationFailure(firstResult)) {
+      releaseChatNavigationStateForMain();
+    }
+
+    const secondResult = await router.replace("/");
+    if (isMainRouteActive()) return;
+
+    if (isNavigationFailure(secondResult)) {
+      releaseChatNavigationStateForMain();
+      await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
+    }
+  }
+
+  /**
    * @description [내부 공통 로직] 대화 타임라인을 파괴 비우고 메모리 누수를 막기 위해 파일 리소스를 취소 처리한 뒤 초기 메인 대시보드로 라우팅 이탈합니다.
    * @param {object} [options={}] - 신규 대화 초기화 커스텀 옵션 패킷
    * @param {string|null} [options.assistantId=null] - 새로운 채팅방 개통과 동시에 특정 어시스턴트를 자동 낙점 선택하고자 할 때 주입하는 ID 포인터
    */
   async function resetChatState({assistantId = null} = {}) {
-    if (isNavigationLocked()) return; // 스트리밍 락 발동 시 명령 전격 거부
+    if (chatStreamStore.isStreaming) return; // 답변 스트리밍 중 이동 차단 정책은 유지
+
+    releaseChatNavigationStateForMain();
 
     // 메모리 누수 방지 가드: 대화방을 완전히 나가거나 초기화하므로 가비지 컬렉터 유도를 위해 첨부파일 인메모리 임시 URL 전원 소멸 폐기
     revokeMessageAttachments(messages.value);
     messages.value = []; // 대화창 배열 원자적 증발
+
+    // URL 숨김/노출 모드 모두에서 새 대화 진입 전 활성 방 포인터와
+    // 대화방 전용 Pinia 상태를 먼저 초기화해야 /chat 상태가 남지 않습니다.
+    clearActiveSession();
 
     if (assistantId) {
       try {
@@ -103,15 +147,18 @@ export function useChatNavigationActions({
         logWarn("[useChatNavigationActions] selectAssistant 오류:", error);
       }
       assistantSheetOpen.value = false; // 연동 바텀시트 가인드 폐쇄
-    } else {
-      clearActiveSession(); // 일반 새 대화 개통 시 활성 채팅방 세션 포인터를 깔끔하게 증발 소멸
     }
 
     navigationStore.closeTransientPanels(); // 화면에 열려 있던 임시 우측 사이드 패널 등 일괄 수거 클로즈
+    navigationStore.setDrawerOpen(false); // PC/모바일 모두 좌측 드로어 잔상 없이 메인 화면으로 복귀
+    navigationStore.setCollapsedRecentOpen(false);
     clearForceBottom(); // 하단 스크롤 강제 락 전격 오프
 
-    // 메인 홈 화면 주소로 안전하게 인앱 주 주소 전환 집행 (중복 라우팅 에러 전파 방어)
-    await router.push({name: "main"}).catch(() => {});
+    // Vue Router 4는 guard 취소를 reject하지 않고 navigation failure로 resolve할 수 있습니다.
+    // 결과를 확인하며 메인 라우트가 실제로 확정될 때까지 최소 재시도합니다.
+    await moveToMainRoute().catch((error) => {
+      logWarn("[useChatNavigationActions] main route 이동 오류:", error);
+    });
   }
 
   // 외부 노출 인터페이스 명칭을 도메인에 직관적인 'startNewChat' 별칭 명세로 동기 미러 바인딩 처리
