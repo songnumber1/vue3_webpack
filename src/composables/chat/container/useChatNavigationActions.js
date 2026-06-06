@@ -173,6 +173,32 @@ export function useChatNavigationActions({
     const historyId = String(item?.id || "").trim();
     if (!historyId) return false;
 
+    const currentRoute = router.currentRoute?.value || {};
+    const currentRouteChatId =
+      currentRoute.name === ROUTE_NAMES.CHAT_DETAIL
+        ? String(currentRoute.params?.id || "").trim()
+        : "";
+    const currentActiveChatId =
+      chatStore.activeRoomType === "chat"
+        ? String(chatStore.activeRoomId || "").trim()
+        : "";
+    const currentSelectedChatId = String(chatStore.selectedChatId || "").trim();
+    const isSameChatRoom =
+      historyId === currentActiveChatId ||
+      historyId === currentSelectedChatId ||
+      historyId === currentRouteChatId;
+
+    // 이미 열린 동일 채팅방을 다시 클릭한 경우에는 라우터 이동과 hydration을 재시작하지 않습니다.
+    // 동일 URL 이동은 route watcher를 다시 발생시키지 않으므로 pending lock만 남을 수 있습니다.
+    if (isSameChatRoom) {
+      chatStore.clearPendingSelectedChatId();
+      chatStore.setHistoryNavigationLocked(false);
+      navigationStore.closeTransientPanels();
+      navigationStore.setDrawerOpen(false);
+      navigationStore.setCollapsedRecentOpen(false);
+      return true;
+    }
+
     chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels(); // 대화 맥락이 바뀌므로 열려 있던 우측 정보 패널들 강제 셧다운
     // 모바일/좁은 화면에서는 대용량 대화방 historyRender overlay가 시작되기 전에
