@@ -75,6 +75,8 @@ import { storeToRefs } from "pinia";
 import { useSystemSettingsStore } from "@/stores/systemSettingsStore";
 import { usePlatformStore } from "@/stores/platformStore";
 import { useAuthStore } from "@/stores/authStore";
+import { useChatStore } from "@/stores/chatStore";
+import { useChatStreamStore } from "@/stores/chatStreamStore";
 import { authApiLive } from "@/api/live/authApi.live";
 import { logWarn } from "@/utils/logger";
 import { syncViewportSettings } from "@/utils/applyViewportBreakpoint";
@@ -390,6 +392,15 @@ async function forceLogoutForPolicyChange() {
   } catch (error) {
     logWarn("[SystemSettingsView] policy setting change logout 오류:", error);
   } finally {
+    const chatStore = useChatStore();
+    const chatStreamStore = useChatStreamStore();
+
+    // 인증/URL 정책 변경은 현재 대화 컨텍스트를 폐기하는 전역 정책 변경입니다.
+    // 대화방 렌더링 락이나 스트리밍 허용권이 남아 있으면 login-required 이동이
+    // 차단될 수 있으므로 로그아웃 처리 전에 채팅 이동 잠금을 명시적으로 정리합니다.
+    chatStore.setHistoryNavigationLocked(false);
+    chatStore.clearActiveSession();
+    chatStreamStore.finish();
     authStore.resetAuth();
   }
 }

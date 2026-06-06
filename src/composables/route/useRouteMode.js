@@ -1,4 +1,5 @@
 import {computed} from "vue";
+import {ROUTE_NAMES, CHAT_ROUTE_NAMES, STUDIO_ROUTE_NAMES} from "@/constants/routeNames";
 
 const ROUTE_MODES = Object.freeze({
   MAIN: "main",
@@ -8,13 +9,11 @@ const ROUTE_MODES = Object.freeze({
   CHAT_SEARCH: "chat-search",
 });
 
-const STUDIO_ROUTE_NAMES = Object.freeze(["studio", "connector-store"]);
-const CHAT_ROUTE_NAMES = Object.freeze(["chat", "chat-entry"]);
 
 export function resolveRouteMode(routeName) {
-  if (routeName === "shared" || routeName === "shared-entry") return ROUTE_MODES.SHARED;
+  if (routeName === ROUTE_NAMES.SHARED || routeName === ROUTE_NAMES.SHARED_ENTRY) return ROUTE_MODES.SHARED;
   if (STUDIO_ROUTE_NAMES.includes(routeName)) return ROUTE_MODES.STUDIO;
-  if (routeName === "chat-search") return ROUTE_MODES.CHAT_SEARCH;
+  if (routeName === ROUTE_NAMES.CHAT_SEARCH) return ROUTE_MODES.CHAT_SEARCH;
   if (CHAT_ROUTE_NAMES.includes(routeName)) return ROUTE_MODES.CHAT;
   return ROUTE_MODES.MAIN;
 }

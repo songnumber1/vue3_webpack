@@ -191,7 +191,7 @@ function buildSharedConversationResponse(shareId) {
       success: false,
       exists: false,
       code: "SHARED_NOT_FOUND",
-      message: "공유 대화방을 찾을 수 없습니다.",
+      message: "공유방을 찾을 수 없습니다.",
       shareId: normalizedShareId,
       messages: [],
     };

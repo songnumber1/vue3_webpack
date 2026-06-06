@@ -4,9 +4,10 @@
  */
 
 import {CONVERSATION_URL_MODES} from "@/constants/systemSettings";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
-export const CHAT_ENTRY_ROUTE_NAME = "chat-entry";
-export const CHAT_DETAIL_ROUTE_NAME = "chat";
+export const CHAT_ENTRY_ROUTE_NAME = ROUTE_NAMES.CHAT_ENTRY;
+export const CHAT_DETAIL_ROUTE_NAME = ROUTE_NAMES.CHAT_DETAIL;
 export const ACTIVE_ROOM_TYPE_CHAT = "chat";
 
 export function isHiddenConversationUrlMode(settings = {}) {

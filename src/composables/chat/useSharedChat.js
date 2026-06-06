@@ -42,7 +42,7 @@ function createSharedUnavailableResponse(shareId) {
       exists: false,
       shareId: normalizedShareId,
       code: "SHARED_API_UNAVAILABLE",
-      message: "공유 대화방을 확인할 수 없습니다.",
+      message: "공유방을 찾을 수 없습니다.",
       messages: [],
     },
     normalizedShareId
@@ -70,7 +70,7 @@ export async function loadSharedConversation(shareId) {
   const result = await getSharedConversation(shareId);
   if (!result.exists) {
     const error = new Error(
-      result.message || "공유 대화방을 찾을 수 없습니다."
+      result.message || "공유방을 찾을 수 없습니다."
     );
     error.code = result.code || "SHARED_NOT_FOUND";
     error.sharedResult = result;

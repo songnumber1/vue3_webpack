@@ -162,7 +162,8 @@ export const CONVERSATION_URL_MODE_OPTIONS = Object.freeze([
   {
     value: CONVERSATION_URL_MODES.hidden,
     label: "URL에서 숨김",
-    description: "대화방 주소를 /chat으로 유지하고 chatId는 내부 상태로 관리합니다.",
+    description:
+      "대화방 주소를 /chat으로 유지하고 chatId는 내부 상태로 관리합니다.",
   },
 ]);
 
@@ -461,12 +462,14 @@ export function normalizeSystemSettings(value = {}) {
 
   // 기존 공통 Mermaid 설정을 가진 로컬 캐시/임시 설정은 PC·모바일 분리 설정으로 안전하게 승격합니다.
   if (SYSTEM_SETTING_KEYS.showMermaidHeader in source) {
-    const legacyShowMermaidHeader = source[SYSTEM_SETTING_KEYS.showMermaidHeader];
+    const legacyShowMermaidHeader =
+      source[SYSTEM_SETTING_KEYS.showMermaidHeader];
     if (!(SYSTEM_SETTING_KEYS.pcShowMermaidHeader in source)) {
       source[SYSTEM_SETTING_KEYS.pcShowMermaidHeader] = legacyShowMermaidHeader;
     }
     if (!(SYSTEM_SETTING_KEYS.mobileShowMermaidHeader in source)) {
-      source[SYSTEM_SETTING_KEYS.mobileShowMermaidHeader] = legacyShowMermaidHeader;
+      source[SYSTEM_SETTING_KEYS.mobileShowMermaidHeader] =
+        legacyShowMermaidHeader;
     }
   }
   if (SYSTEM_SETTING_KEYS.enableMermaidRendering in source) {
@@ -492,10 +495,12 @@ export function normalizeSystemSettings(value = {}) {
       source[SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount] = legacyChunkSize;
     }
     if (!(SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount in source)) {
-      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount] = legacyChunkSize;
+      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount] =
+        legacyChunkSize;
     }
     if (!(SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount in source)) {
-      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount] = legacyChunkSize;
+      source[SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount] =
+        legacyChunkSize;
     }
   }
   if (
