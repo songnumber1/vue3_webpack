@@ -19,6 +19,7 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -84,13 +85,37 @@ export function useChatNavigationActions({
     return chatStreamStore.isStreaming || chatStore.isNavigationLocked;
   }
 
+  function clearConversationNavigationState() {
+    chatStore.clearPendingSelectedChatId();
+    chatStore.setHistoryNavigationLocked(false);
+    clearActiveSession();
+  }
+
+  async function navigateToMainAfterReset() {
+    chatStore.clearPendingSelectedChatId();
+    chatStore.setHistoryNavigationLocked(false);
+
+    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+    await nextTick();
+
+    if (router.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
+      chatStore.clearPendingSelectedChatId();
+      chatStore.setHistoryNavigationLocked(false);
+      await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
+    }
+  }
+
   /**
    * @description [내부 공통 로직] 대화 타임라인을 파괴 비우고 메모리 누수를 막기 위해 파일 리소스를 취소 처리한 뒤 초기 메인 대시보드로 라우팅 이탈합니다.
    * @param {object} [options={}] - 신규 대화 초기화 커스텀 옵션 패킷
    * @param {string|null} [options.assistantId=null] - 새로운 채팅방 개통과 동시에 특정 어시스턴트를 자동 낙점 선택하고자 할 때 주입하는 ID 포인터
    */
   async function resetChatState({assistantId = null} = {}) {
-    if (isNavigationLocked()) return; // 스트리밍 락 발동 시 명령 전격 거부
+    if (chatStreamStore.isStreaming) return; // 답변 스트리밍 중에는 새 대화/Assistant 전환을 차단합니다.
+
+    // 기존 대화방 렌더 lock이 남아 있어도 새 대화/Assistant 전환은 현재 방을 벗어나는 취소성 액션입니다.
+    // activeRoom까지 먼저 정리해야 hidden/visible 모드 모두에서 첫 클릭이 /chat 엔트리에 머물지 않습니다.
+    clearConversationNavigationState();
 
     // 메모리 누수 방지 가드: 대화방을 완전히 나가거나 초기화하므로 가비지 컬렉터 유도를 위해 첨부파일 인메모리 임시 URL 전원 소멸 폐기
     revokeMessageAttachments(messages.value);
@@ -104,15 +129,15 @@ export function useChatNavigationActions({
         logWarn("[useChatNavigationActions] selectAssistant 오류:", error);
       }
       assistantSheetOpen.value = false; // 연동 바텀시트 가인드 폐쇄
-    } else {
-      clearActiveSession(); // 일반 새 대화 개통 시 활성 채팅방 세션 포인터를 깔끔하게 증발 소멸
     }
 
     navigationStore.closeTransientPanels(); // 화면에 열려 있던 임시 우측 사이드 패널 등 일괄 수거 클로즈
+    navigationStore.setDrawerOpen(false);
+    navigationStore.setCollapsedRecentOpen(false);
     clearForceBottom(); // 하단 스크롤 강제 락 전격 오프
 
-    // 메인 홈 화면 주소로 안전하게 인앱 주 주소 전환 집행 (중복 라우팅 에러 전파 방어)
-    await router.push({name: "main"}).catch(() => {});
+    // 새대화/Assistant 선택은 브라우저 history에 /chat 중간 상태를 남기지 않도록 replace 우선으로 메인 보정합니다.
+    await navigateToMainAfterReset();
   }
 
   // 외부 노출 인터페이스 명칭을 도메인에 직관적인 'startNewChat' 별칭 명세로 동기 미러 바인딩 처리

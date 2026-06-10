@@ -1,6 +1,6 @@
 <template>
   <ChatLayout
-    v-if="runtimeReady"
+    v-if="shellReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
   >
@@ -124,6 +124,7 @@ import {computed, provide, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
+import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {
   CHAT_ACTIONS_KEY,
   CHAT_WORKSPACE_STATE_KEY,
@@ -156,6 +157,7 @@ import {useRouteMode} from "@/composables/route/useRouteMode";
 
 const route = useRoute();
 const router = useRouter();
+const appRuntimeStore = useAppRuntimeStore();
 const systemSettingsStore = useSystemSettingsStore();
 const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
@@ -300,6 +302,10 @@ const {
   handleSystemSettingsApplied,
 } = useChatContainerController(controllerProps);
 
+const shellReady = computed(
+  () => runtimeReady.value || appRuntimeStore.initialized
+);
+
 const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
@@ -307,7 +313,7 @@ const showVirtualKeyboardDebugButton = computed(
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function handleAssistantNewChat(assistantId) {
+async function handleAssistantNewChat(assistantId) {
   if (isPortalAssistantId(assistantId)) {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
@@ -321,7 +327,7 @@ function handleAssistantNewChat(assistantId) {
       .catch(() => {});
     return;
   }
-  startNewChat({assistantId});
+  await startNewChat({assistantId});
 }
 
 /**

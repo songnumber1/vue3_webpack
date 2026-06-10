@@ -278,8 +278,8 @@ function openAssistantSelector() {
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
-function selectAssistant(id) {
-  if (isSidebarNavigationLocked.value) return;
+async function selectAssistant(id) {
+  if (chatStreamStore.isStreaming) return;
   const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
   const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
 
@@ -293,7 +293,7 @@ function selectAssistant(id) {
     return;
   }
 
-  chatActions.selectAssistant(id);
+  await chatActions.selectAssistant(id);
   assistantMenuOpen.value = false;
 
   if (["studio", "connector-store"].includes(route.name)) {
@@ -304,9 +304,9 @@ function selectAssistant(id) {
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function handleNewChat() {
-  if (isSidebarNavigationLocked.value) return;
-  chatActions.newChat();
+async function handleNewChat() {
+  if (chatStreamStore.isStreaming) return;
+  await chatActions.newChat();
   navigationStore.setDrawerOpen(false);
   navigationStore.setCollapsedRecentOpen(false);
 }
