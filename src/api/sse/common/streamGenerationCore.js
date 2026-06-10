@@ -11,7 +11,6 @@ import {
 import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 
-
 function readEventErrorMessage(event) {
   const rawData = event?.data;
   if (typeof rawData === "string" && rawData.trim()) {

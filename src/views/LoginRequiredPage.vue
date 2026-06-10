@@ -53,15 +53,12 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
-import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
 const authStore = useAuthStore();
-const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
 
 const loading = ref(false);
 const checking = ref(false);
@@ -84,12 +81,8 @@ const redirectPath = computed(() => {
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function moveAfterAuthenticated() {
-  // 로그인 화면 진입 전 대화방 이력 로딩 lock이 남아 있으면
-  // 인증 성공 후 메인/리다이렉트 라우팅이 전역 guard에서 다시 취소될 수 있습니다.
-  // 인증 상태는 tempLogin/checkLogin 결과를 유지해야 하므로 resetAuth()는 호출하지 않습니다.
-  chatStore.clearPendingSelectedChatId();
-  chatStore.setHistoryNavigationLocked(false);
-  chatStreamStore.finish();
+  resetAppBootstrapState();
+  authStore.resetAuth();
   await router.replace(redirectPath.value || "/");
 }
 

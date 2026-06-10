@@ -21,6 +21,7 @@ import {
 } from "@/adapters/authResponseAdapter";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {API_REQUEST_KEYS as Q} from "@/constants/api/apiRequestKeys";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 
 /**
  * 라우터 진입 타깃 목적지(to) 정보를 바탕으로 백엔드 보안 엔진에 전달할 파라미터 페이로드를 생성합니다.
@@ -97,6 +98,13 @@ function normalizeAccessResult(accessInfo = {}) {
 }
 
 /**
+ * 인증 실패가 확정되면 이전 사용자 기준 앱 bootstrap 상태를 폐기합니다.
+ */
+function resetAppBootstrapAfterAuthFailure() {
+  resetAppBootstrapState();
+}
+
+/**
  * [외부 노출 메인 함수] 목적지 경로로의 전환이 안전한지 검증하고 인증 상태에 따라 전역 스토어를 갱신합니다.
  * @param {Object} context - 라우터 가드 실행 콘텍스트
  * @param {Object} context.to - 이동하고자 하는 목적지 라우트 객체
@@ -141,6 +149,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
       authStore.setAuthenticatedAccessInfo(result.accessInfo);
     } else {
       // 실패했다면 실질적인 제한 사유(만료, 권한부족, 약관동의 누락 등) 코드를 스토어에 세팅합니다.
+      resetAppBootstrapAfterAuthFailure();
       authStore.setAuthFailure(result.reason, result.accessInfo);
     }
 
@@ -151,6 +160,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     // 네트워크 오류 중 HTTP status 코드가 401(Unauthorized)이거나 403(Forbidden)인 경우, 로그인이 만료된 것으로 단언합니다.
     const status = error?.response?.status;
     if (status === 401 || status === 403) {
+      resetAppBootstrapAfterAuthFailure();
       authStore.setAuthFailure(AUTH_FAILURE_REASONS.LOGIN_REQUIRED);
 
       return {
@@ -161,6 +171,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
     }
 
     // 그 외 통신 단절, 500 내부 서버 에러 등은 시스템 자체의 하드 오류로 판단하여 처리합니다.
+    resetAppBootstrapAfterAuthFailure();
     authStore.setAuthError(error);
 
     return {

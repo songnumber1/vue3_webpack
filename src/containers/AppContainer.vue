@@ -18,13 +18,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, provide, watchEffect} from "vue";
+import {computed, onMounted, provide, watchEffect} from "vue";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
+import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
-import {isActualAndroidRuntime as resolveActualAndroidRuntime} from "@/platform/runtime/runtimeDetector";
 
 /**
  * @component AppContainer
@@ -47,6 +47,11 @@ const {
 } = useRuntimeModeFlags();
 const viewportStore = useViewportStore();
 const responsiveLayoutStore = useResponsiveLayoutStore();
+const appBootstrap = useAppBootstrap();
+
+onMounted(() => {
+  appBootstrap.initialize().catch(() => {});
+});
 
 /**
  * 현재 애플리케이션이 구동 중인 실행 환경 명칭(env)을 우선 채택하고, 없을 경우 기기 플랫폼 명칭을 폴백으로 지정하는 반응형 변수입니다.
@@ -75,9 +80,18 @@ const deviceName = computed(() => platformInfo.value.device || "unknown");
  */
 const isMobileContainer = computed(() => shouldUseMobileLayout.value);
 
-const isActualAndroidRuntime = computed(() =>
-  resolveActualAndroidRuntime(platformInfo.value || {})
-);
+const isActualAndroidRuntime = computed(() => {
+  const info = platformInfo.value || {};
+  const userAgent = String(info.userAgent || "");
+  return Boolean(
+    info.actualEnv === "android" ||
+    info.actualDevice === "android" ||
+    info.actualDevice === "android-webview" ||
+    info.actualBrowser === "android-webview" ||
+    info.isAndroidApp ||
+    /Android/i.test(userAgent)
+  );
+});
 
 /**
  * 상기 계산된 개별 플랫폼 속성값들을 조합하여 템플릿의 컨테이너 Div에 실시간 매핑할 CSS 클래스 객체를 빌드합니다.

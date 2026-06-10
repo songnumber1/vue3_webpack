@@ -1,45 +1,91 @@
 <template>
   <form class="system-settings-view" @submit.prevent="apply">
     <div ref="settingsScrollRef" class="system-settings-scroll">
-
       <div class="system-settings-tabs-row">
-        <div class="studio-tabs system-settings-tabs" role="tablist" :aria-label="t('systemSettings.tabsLabel')">
-          <button v-for="tab in settingTabs" :key="tab.key" class="studio-tab system-settings-tab" type="button"
-            role="tab" :aria-selected="activeSettingTab === tab.key"
-            :class="{ 'is-active': activeSettingTab === tab.key }" @click="activeSettingTab = tab.key">
+        <div
+          class="studio-tabs system-settings-tabs"
+          role="tablist"
+          :aria-label="t('systemSettings.tabsLabel')"
+        >
+          <button
+            v-for="tab in settingTabs"
+            :key="tab.key"
+            class="studio-tab system-settings-tab"
+            type="button"
+            role="tab"
+            :aria-selected="activeSettingTab === tab.key"
+            :class="{'is-active': activeSettingTab === tab.key}"
+            @click="activeSettingTab = tab.key"
+          >
             {{ tab.label }}
           </button>
         </div>
       </div>
 
-      <section v-for="group in activeGroups" :key="group.title" class="system-settings-group">
+      <section
+        v-for="group in activeGroups"
+        :key="group.title"
+        class="system-settings-group"
+      >
         <header>
           <span>{{ group.kicker }}</span>
           <h4>{{ group.title }}</h4>
         </header>
 
-        <label v-for="item in group.items" :key="item.key" class="system-settings-row"
-          :class="{ 'is-disabled': item.disabled }" :for="`system-setting-${item.key}`"
-          :aria-disabled="item.disabled ? 'true' : undefined">
+        <label
+          v-for="item in group.items"
+          :key="item.key"
+          class="system-settings-row"
+          :class="{'is-disabled': item.disabled}"
+          :for="`system-setting-${item.key}`"
+          :aria-disabled="item.disabled ? 'true' : undefined"
+        >
           <span class="system-settings-copy">
             <strong>{{ item.label }}</strong>
             <small>{{ item.description }}</small>
           </span>
 
-          <input v-if="item.type === 'number'" :id="`system-setting-${item.key}`" v-model.number="draft[item.key]"
-            class="system-settings-number" type="number" :min="item.min || 0" :max="item.max || 9999"
-            :step="item.step || 1" :disabled="item.disabled" />
-          <input v-else-if="item.type === 'text'" :id="`system-setting-${item.key}`" v-model="draft[item.key]"
-            class="system-settings-text" type="text" :disabled="item.disabled" />
-          <select v-else-if="item.type === 'select'" :id="`system-setting-${item.key}`" v-model="draft[item.key]"
-            class="system-settings-select" :disabled="item.disabled">
-            <option v-for="option in item.options" :key="option.value" :value="option.value">
+          <input
+            v-if="item.type === 'number'"
+            :id="`system-setting-${item.key}`"
+            v-model.number="draft[item.key]"
+            class="system-settings-number"
+            type="number"
+            :min="item.min || 0"
+            :max="item.max || 9999"
+            :step="item.step || 1"
+            :disabled="item.disabled"
+          />
+          <input
+            v-else-if="item.type === 'text'"
+            :id="`system-setting-${item.key}`"
+            v-model="draft[item.key]"
+            class="system-settings-text"
+            type="text"
+            :disabled="item.disabled"
+          />
+          <select
+            v-else-if="item.type === 'select'"
+            :id="`system-setting-${item.key}`"
+            v-model="draft[item.key]"
+            class="system-settings-select"
+            :disabled="item.disabled"
+          >
+            <option
+              v-for="option in item.options"
+              :key="option.value"
+              :value="option.value"
+            >
               {{ option.label }}
             </option>
           </select>
           <span v-else class="system-settings-switch">
-            <input :id="`system-setting-${item.key}`" v-model="draft[item.key]" type="checkbox"
-              :disabled="item.disabled" />
+            <input
+              :id="`system-setting-${item.key}`"
+              v-model="draft[item.key]"
+              type="checkbox"
+              :disabled="item.disabled"
+            />
             <span aria-hidden="true"></span>
           </span>
         </label>
@@ -47,10 +93,17 @@
     </div>
 
     <footer class="system-settings-footer">
-      <button class="playground-button playground-button--secondary" type="button" @click="$emit('close')">
+      <button
+        class="playground-button playground-button--secondary"
+        type="button"
+        @click="$emit('close')"
+      >
         {{ t("systemSettings.close") }}
       </button>
-      <button class="playground-button playground-button--primary system-settings-apply-button" type="submit">
+      <button
+        class="playground-button playground-button--primary system-settings-apply-button"
+        type="submit"
+      >
         {{ t("systemSettings.apply") }}
       </button>
     </footer>
@@ -67,20 +120,20 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import { computed, reactive, ref, watch } from "vue";
-import { useOverlayScrollbar } from "@/composables/ui/useOverlayScrollbar";
-import { useI18n } from "vue-i18n";
-import { useRouter } from "vue-router";
-import { storeToRefs } from "pinia";
-import { useSystemSettingsStore } from "@/stores/systemSettingsStore";
-import { usePlatformStore } from "@/stores/platformStore";
-import { useAuthStore } from "@/stores/authStore";
-import { useChatStore } from "@/stores/chatStore";
-import { useChatStreamStore } from "@/stores/chatStreamStore";
-import { authApiLive } from "@/api/live/authApi.live";
-import { logWarn } from "@/utils/logger";
-import {ROUTE_NAMES} from "@/constants/routeNames";
-import { syncViewportSettings } from "@/utils/applyViewportBreakpoint";
+import {computed, reactive, ref, watch} from "vue";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useI18n} from "vue-i18n";
+import {useRouter} from "vue-router";
+import {storeToRefs} from "pinia";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {usePlatformStore} from "@/stores/platformStore";
+import {useAuthStore} from "@/stores/authStore";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {useChatStore} from "@/stores/chatStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {authApiLive} from "@/api/live/authApi.live";
+import {logWarn} from "@/utils/logger";
+import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_MOBILE_BREAKPOINT_PX,
   DEFAULT_SYSTEM_SETTINGS,
@@ -105,14 +158,14 @@ import {
 } from "@/constants/systemSettings";
 
 const emit = defineEmits(["close", "applied"]);
-const { t } = useI18n();
+const {t} = useI18n();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
 const authStore = useAuthStore();
-const { settings } = storeToRefs(systemSettingsStore);
+const {settings} = storeToRefs(systemSettingsStore);
 
-const draft = reactive({ ...DEFAULT_SYSTEM_SETTINGS });
+const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
 const applying = ref(false);
 const settingsScrollRef = ref(null);
 const activeSettingTab = ref("common");
@@ -143,7 +196,7 @@ function settingItem(key, extra = {}) {
   };
 }
 
-useOverlayScrollbar(settingsScrollRef, { overflow: { x: "hidden", y: "scroll" } });
+useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}});
 
 const commonGroups = computed(() => [
   {
@@ -180,18 +233,18 @@ const commonGroups = computed(() => [
     items: [
       settingItem("webAuthMode", {
         type: "select",
-        options: AUTH_MODE_OPTIONS.map((value) => ({ value, label: value })),
+        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
       }),
       settingItem("mobileAuthMode", {
         type: "select",
-        options: AUTH_MODE_OPTIONS.map((value) => ({ value, label: value })),
+        options: AUTH_MODE_OPTIONS.map((value) => ({value, label: value})),
       }),
-      settingItem("webLoginUrl", { type: "text" }),
-      settingItem("mobileLoginUrl", { type: "text" }),
-      settingItem("tempLoginUrl", { type: "text" }),
-      settingItem("accessInfoUrl", { type: "text" }),
-      settingItem("logoutUrl", { type: "text" }),
-      settingItem("jwtRefreshUrl", { type: "text" }),
+      settingItem("webLoginUrl", {type: "text"}),
+      settingItem("mobileLoginUrl", {type: "text"}),
+      settingItem("tempLoginUrl", {type: "text"}),
+      settingItem("accessInfoUrl", {type: "text"}),
+      settingItem("logoutUrl", {type: "text"}),
+      settingItem("jwtRefreshUrl", {type: "text"}),
       settingItem("jwtWithCredentials"),
     ],
   },
@@ -324,9 +377,9 @@ const mobileGroups = computed(() => [
 ]);
 
 const settingTabs = computed(() => [
-  { key: "common", label: t("systemSettings.tabs.common") },
-  { key: "pc", label: t("systemSettings.tabs.pc") },
-  { key: "mobile", label: t("systemSettings.tabs.mobile") },
+  {key: "common", label: t("systemSettings.tabs.common")},
+  {key: "pc", label: t("systemSettings.tabs.pc")},
+  {key: "mobile", label: t("systemSettings.tabs.mobile")},
 ]);
 
 const activeGroups = computed(() => {
@@ -402,6 +455,7 @@ async function forceLogoutForPolicyChange() {
     chatStore.setHistoryNavigationLocked(false);
     chatStore.clearActiveSession();
     chatStreamStore.finish();
+    resetAppBootstrapState();
     authStore.resetAuth();
   }
 }
@@ -414,10 +468,7 @@ async function apply() {
 
   const logoutRequiredSettingChanged = hasLogoutRequiredSettingChanged();
 
-  if (
-    logoutRequiredSettingChanged &&
-    !confirmLogoutRequiredSettingChange()
-  ) {
+  if (logoutRequiredSettingChanged && !confirmLogoutRequiredSettingChange()) {
     return;
   }
 
@@ -436,27 +487,22 @@ async function apply() {
 
     if (logoutRequiredSettingChanged) {
       await router
-        .replace({
-          name: ROUTE_NAMES.LOGIN_REQUIRED,
-          query: {reason: "LOGIN_REQUIRED"},
-        })
-        .catch(() => { });
+        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .catch(() => {});
     }
   } finally {
     applying.value = false;
   }
 }
 
-watch(settings, syncDraft, { immediate: true, deep: true });
+watch(settings, syncDraft, {immediate: true, deep: true});
 
 watch(
   () => draft.platformOverride,
   (nextPlatformOverride, previousPlatformOverride) => {
     if (nextPlatformOverride === previousPlatformOverride) return;
-    draft.mobileBreakpoint = resolveBreakpointForPlatformOverride(
-      nextPlatformOverride
-    );
+    draft.mobileBreakpoint =
+      resolveBreakpointForPlatformOverride(nextPlatformOverride);
   }
 );
-
 </script>

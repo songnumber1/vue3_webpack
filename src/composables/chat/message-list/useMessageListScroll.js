@@ -34,7 +34,6 @@ const KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS = [
 // Auto prepend during native scrolling is unstable, so Android uses a manual
 // "load previous history" button. PC keeps the existing automatic threshold path.
 
-
 function isMermaidRenderingEnabled() {
   return isMermaidRenderingEnabledForPlatform(getRuntimeSystemSettings());
 }
@@ -1350,11 +1349,14 @@ export function useMessageListScroll({props, emit}) {
 
   function scrollToInitialTarget(scrollTarget = {}, options = {}) {
     clearStableTimers();
-    return messageScrollTarget.applyScrollTarget(scrollTarget || {type: "bottom"}, {
-      behavior: "auto",
-      block: "center",
-      ...options,
-    });
+    return messageScrollTarget.applyScrollTarget(
+      scrollTarget || {type: "bottom"},
+      {
+        behavior: "auto",
+        block: "center",
+        ...options,
+      }
+    );
   }
 
   function handleMessageRendered(messageId, renderPart = "") {

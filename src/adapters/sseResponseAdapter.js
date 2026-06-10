@@ -8,7 +8,8 @@ function readErrorMessage(errorValue) {
   if (!errorValue) return "";
   if (typeof errorValue === "string") return errorValue;
   if (typeof errorValue?.message === "string") return errorValue.message;
-  if (typeof errorValue?.errorMessage === "string") return errorValue.errorMessage;
+  if (typeof errorValue?.errorMessage === "string")
+    return errorValue.errorMessage;
   if (typeof errorValue?.detail === "string") return errorValue.detail;
   return "";
 }

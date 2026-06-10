@@ -87,7 +87,8 @@ export const useChatStore = defineStore("chat", {
      * 답변 생성 외에도 대화방 입장/이력 렌더링 중에는 좌측 메뉴와 주요 액션을 잠급니다.
      */
     isNavigationLocked: (state) =>
-      Boolean(state.pendingSelectedChatId) || Boolean(state.historyNavigationLocked),
+      Boolean(state.pendingSelectedChatId) ||
+      Boolean(state.historyNavigationLocked),
     /**
      * 특정 챗방이 히스토리 박제 형태 또는 이미 완료 처리되어 AI 모델 사양을 유저가 도중에 함부로 가로채 교체할 수 없도록 강제 락을 걸었는지 확인하는 판별식입니다.
      */

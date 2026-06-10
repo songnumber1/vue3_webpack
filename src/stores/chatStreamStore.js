@@ -63,8 +63,7 @@ export const useChatStreamStore = defineStore("chatStream", {
       const isSameName =
         !allowed.name || String(to.name) === String(allowed.name);
       const isSameParams = Object.entries(allowed.params || {}).every(
-        ([key, value]) =>
-          String(to.params?.[key] || "") === String(value || "")
+        ([key, value]) => String(to.params?.[key] || "") === String(value || "")
       );
 
       if (isSameName && isSameParams) {

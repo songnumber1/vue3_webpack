@@ -289,12 +289,10 @@ function openChat(result) {
 
   ensureSearchResultHistory(result, chatId);
 
-  const messageId = String(result?.messageId || result?.targetMessageId || "").trim();
+  const messageId = String(
+    result?.messageId || result?.targetMessageId || ""
+  ).trim();
   const query = isSearchMode.value && messageId ? {messageId} : undefined;
-
-  // URL 숨김 모드는 /chat 하나를 여러 대화방이 공유하므로,
-  // 라우터 guard가 /chat 진입을 허용할 수 있도록 선택한 방을 먼저 pending으로 표시합니다.
-  chatStore.setPendingSelectedChatId(chatId);
   navigateToConversation({
     router,
     chatStore,
@@ -307,10 +305,7 @@ function openChat(result) {
       }
       return undefined;
     })
-    .catch(() => {
-      chatStore.clearPendingSelectedChatId();
-      chatStore.setHistoryNavigationLocked(false);
-    });
+    .catch(() => {});
 }
 
 function ensureSearchResultHistory(result = {}, chatId = "") {

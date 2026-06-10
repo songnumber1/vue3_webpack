@@ -1,8 +1,10 @@
 import {clearTokens} from "@/auth/tokenStore";
 import {useAuthStore} from "@/stores/authStore";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 
 export function resetAuthStateSafely() {
   clearTokens();
+  resetAppBootstrapState();
   try {
     useAuthStore().resetAuth();
   } catch (_storeError) {

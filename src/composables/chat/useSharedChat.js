@@ -69,9 +69,7 @@ export async function getSharedConversation(shareId) {
 export async function loadSharedConversation(shareId) {
   const result = await getSharedConversation(shareId);
   if (!result.exists) {
-    const error = new Error(
-      result.message || "공유방을 찾을 수 없습니다."
-    );
+    const error = new Error(result.message || "공유방을 찾을 수 없습니다.");
     error.code = result.code || "SHARED_NOT_FOUND";
     error.sharedResult = result;
     throw error;

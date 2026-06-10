@@ -1,5 +1,5 @@
 /**
- * @file composables/app/chatRuntimeBootstrap.js
+ * @file composables/app/appRuntimeBootstrap.js
  * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
  *
  * 프리징 코드 주석 기준:
@@ -10,7 +10,7 @@
 import {resolveChatApis} from "@/api/runtime/chatApis";
 import {adaptAssistantList} from "@/adapters/assistantAdapter";
 import {adaptModelList, filterAvailableModels} from "@/adapters/modelAdapter";
-import {adaptChatHistoryList, adaptMessageList} from "@/adapters/chatAdapter";
+import {adaptChatHistoryList} from "@/adapters/chatAdapter";
 import {
   adaptExamplePromptList,
   adaptPromptTemplateList,
@@ -156,7 +156,7 @@ function pickInitialModel(
 }
 
 /**
- * @function bootstrapChatRuntime
+ * @function bootstrapAppRuntime
  * @description 서비스 인입 시점에 유저 세션 인증, 일반/스튜디오 어시스턴트, 가용 LLM 모델 딕셔너리,
  * 과거 대화 서랍 목록, 마스터 프롬프트 템플릿까지 서비스 가동에 필요한 모든 공용 자원을 단 한 번의 메가 트랜잭션으로
  * 병렬 풀링 연산하여 마운트 세팅하는 코어 인프라 초기화 함수입니다.
@@ -164,7 +164,7 @@ function pickInitialModel(
  * @param {Object} options.accessInfoOverride - 기 확보된 유저 세션 정보가 있을 시 중복 통신 차단용으로 주입하는 패스용 세션 객체
  * @returns {Promise<Object>} 프론트엔드 Pinia 글로벌 인메모리 스토어 진입용 규격 마스터 컨텍스트 데이터 통틀음 팩
  */
-export async function bootstrapChatRuntime(options = {}) {
+export async function bootstrapAppRuntime(options = {}) {
   const {accessInfoOverride = null} = options;
   // 1. 현재 런타임 플랫폼 규격에 매핑된 하위 엔드포인트 API 모듈 단락들을 전격 빌드 로드합니다.
   const {
@@ -292,68 +292,6 @@ export async function bootstrapChatRuntime(options = {}) {
     initialAssistantId: initialAssistant?.id || "",
     initialModelId: initialModel?.id || "",
   };
-}
-
-/**
- * [원격 API 브릿지 - C] 신규 대화방 세션을 원격 저장소 서버에 수립 및 개통 신청합니다.
- */
-export async function createChatHistory(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  return chatHistoryApi.createChat(payload);
-}
-
-/**
- * [원격 API 브릿지 - R] 유저의 과거 전체 대화방 서랍 목록 리스트 데이터를 수집한 뒤 정형화 정렬 가공하여 반환합니다.
- */
-export async function loadChatHistoryList(context = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  const rawHistories = await chatHistoryApi.getChatHistoryList();
-  return adaptChatHistoryList(rawHistories, context);
-}
-
-/**
- * [원격 API 브릿지 - U] 특정 대화 기록의 상단 즐겨찾기 북마크 고정 고리 상태 여부를 동적 업데이트 처리합니다.
- */
-export async function updateChatBookmark(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  return chatHistoryApi.updateBookmark(payload);
-}
-
-/**
- * [원격 API 브릿지 - U] 사용자가 덮어씌운 텍스트를 기점으로 대화방 타이틀 명칭을 원격 수정 갱신합니다.
- */
-export async function renameChatHistory(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  return chatHistoryApi.renameChat(payload);
-}
-
-/**
- * [원격 API 브릿지 - D] 불필요해진 특정 대화방 레코드 아키텍처 리소스를 서버 데이터베이스에서 영구 소멸 소거합니다.
- */
-export async function deleteChatHistory(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  return chatHistoryApi.deleteChat(payload);
-}
-
-/**
- * [원격 API 브릿지 - R 세부 대화 정보] 특정 방 내부로 입장했을 때 과거에 유저와 AI가 주고받았던 시간순 대화 말풍선 히스토리 리스트를 완벽하게 정형화 추출합니다.
- */
-export async function loadChatMessageRouters(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);
-  return adaptMessageList(rawMessages);
-}
-
-/**
- * [원격 API 브릿지 - 서브 추천 컴포넌트] 특정 어시스턴트방 하단에 배치할 단발성 추천 예시 힌트 질문 칩 배열 데이터 목록을 패치합니다.
- */
-export async function loadExamplePrompts({assistantId, studioYN = false} = {}) {
-  const {examplePromptApi} = resolveChatApis();
-  const response = await examplePromptApi.getExamplePrompts({
-    assistId: assistantId,
-    studioYN,
-  });
-  return adaptExamplePromptList(response);
 }
 
 /**

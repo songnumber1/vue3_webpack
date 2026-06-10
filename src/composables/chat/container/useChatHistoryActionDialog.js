@@ -10,7 +10,6 @@
 import {computed, ref} from "vue";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * @typedef {object} ChatHistoryActionDialogDependencies
@@ -112,7 +111,7 @@ export function useChatHistoryActionDialog({
         // 잔존 화면이 굳어 유령 데이터를 보지 않도록 메모리 타임라인 메시지 풀을 증발 비우고 전역 메인 루트 화면으로 강제 이탈 페이지 전환 처리 감행
         if (String(activeHistoryId.value) === String(target.id)) {
           messages.value = [];
-          await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {}); // 라우팅 중복 에러 전파 방어 가드 체결
+          await router.replace({name: "main"}).catch(() => {}); // 라우팅 중복 에러 전파 방어 가드 체결
         }
       }
     } catch (error) {

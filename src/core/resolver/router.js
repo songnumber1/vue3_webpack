@@ -268,7 +268,10 @@ function guardConversationUrlMode({to, chatStore, chatStreamStore, settings}) {
   if (
     hiddenMode &&
     to.name === ROUTE_NAMES.CHAT_ENTRY &&
-    !(chatStore.activeRoomType === "chat" && String(chatStore.activeRoomId || "").trim()) &&
+    !(
+      chatStore.activeRoomType === "chat" &&
+      String(chatStore.activeRoomId || "").trim()
+    ) &&
     !String(chatStore.pendingSelectedChatId || "").trim() &&
     !chatStreamStore.isStreaming
   ) {

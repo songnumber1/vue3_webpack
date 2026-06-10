@@ -83,7 +83,8 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     historyLazyTopThreshold: (state) => state.settings.historyLazyTopThreshold,
     pcHistoryLazyInitialCount: (state) =>
       state.settings.pcHistoryLazyInitialCount,
-    pcHistoryLazyAppendCount: (state) => state.settings.pcHistoryLazyAppendCount,
+    pcHistoryLazyAppendCount: (state) =>
+      state.settings.pcHistoryLazyAppendCount,
     pcHistoryLazyTopThresholdPx: (state) =>
       state.settings.pcHistoryLazyTopThresholdPx,
     mobileHistoryLazyInitialCount: (state) =>

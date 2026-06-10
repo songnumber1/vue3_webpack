@@ -42,5 +42,13 @@ export const useAppRuntimeStore = defineStore("appRuntime", {
       this.loading = false; // 로딩 강제 종료
       this.error = error; // 에러 객체 적치
     },
+    /**
+     * 인증 세션 변경 또는 강제 로그아웃 시 앱 부트스트랩 상태를 초기화합니다.
+     */
+    resetRuntime() {
+      this.initialized = false;
+      this.loading = false;
+      this.error = null;
+    },
   },
 });

@@ -10,6 +10,7 @@ import {AUTH_HEADER_NAMES, AUTH_MODES} from "@/auth/authConstants";
 import {AUTH_API_KEYS as A} from "@/constants/api/authApiKeys";
 import {adaptAuthTokens} from "@/adapters/authResponseAdapter";
 import {useAuthStore} from "@/stores/authStore";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 
 let refreshPromise = null;
 
@@ -62,6 +63,7 @@ export async function refreshAccessTokenOnce() {
     return await refreshPromise;
   } catch (error) {
     clearTokens();
+    resetAppBootstrapState();
     try {
       useAuthStore().resetAuth();
     } catch (_storeError) {

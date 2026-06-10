@@ -53,7 +53,9 @@ function findSearchTargetMessage(chatId, keyword = "") {
 
   return (
     messages.find((message) => {
-      const content = String(message?.content || message?.answer || "").toLowerCase();
+      const content = String(
+        message?.content || message?.answer || ""
+      ).toLowerCase();
       return content.includes(normalizedKeyword);
     }) || null
   );
@@ -84,7 +86,9 @@ function searchChatHistories(payload = {}) {
     const messageText = buildMessageSearchText(chatId);
     const combined = `${title} ${messageText}`.toLowerCase();
     const matched = !keyword || combined.includes(keyword);
-    const targetMessage = matched ? findSearchTargetMessage(chatId, keyword) : null;
+    const targetMessage = matched
+      ? findSearchTargetMessage(chatId, keyword)
+      : null;
     return {history, chatId, title, messageText, matched, targetMessage};
   });
 
@@ -101,11 +105,11 @@ function searchChatHistories(payload = {}) {
       messageId: item.targetMessage?.id || "",
       role: item.targetMessage?.role || "",
       chatEndDt: item.history[C.CHAT_END_DT] || "",
-      sharedId: normalizeSharedIdValue(item.history[C.SHARED_ID] || item.history.sharedId),
+      sharedId: normalizeSharedIdValue(
+        item.history[C.SHARED_ID] || item.history.sharedId
+      ),
       modelId:
-        item.history[C.MODEL_ID] ||
-        item.history[C.MODEL_ID_LEGACY] ||
-        "",
+        item.history[C.MODEL_ID] || item.history[C.MODEL_ID_LEGACY] || "",
       assistId: item.history.assistId || item.history.assistantId || "",
       bookmarkYN: item.history[C.BOOKMARK_YN],
       matchCount: keyword
@@ -257,8 +261,7 @@ export const chatHistoryApiMock = {
     const target = findHistory(chatId);
     if (target) {
       target[C.BOOKMARK_YN] = Boolean(bookmarkYN);
-      target[C.CHAT_END_DT] =
-        target[C.CHAT_END_DT] || new Date().toISOString();
+      target[C.CHAT_END_DT] = target[C.CHAT_END_DT] || new Date().toISOString();
     }
     return resolveMock({success: true}, 140);
   },

@@ -57,7 +57,9 @@ export function resolveMermaidSettingDeviceMode(
   }
 
   const shouldUseMobile =
-    typeof isMobile === "boolean" ? isMobile : isBrowserMobileViewport(settings);
+    typeof isMobile === "boolean"
+      ? isMobile
+      : isBrowserMobileViewport(settings);
 
   return shouldUseMobile
     ? MERMAID_SETTING_DEVICE_MODES.mobile
@@ -83,7 +85,10 @@ export function resolveMermaidPlatformSettings(settings = {}, isMobile) {
 
   return {
     deviceMode,
-    showMermaidHeader: readMermaidBooleanSetting(settings.pcShowMermaidHeader, true),
+    showMermaidHeader: readMermaidBooleanSetting(
+      settings.pcShowMermaidHeader,
+      true
+    ),
     enableMermaidRendering: readMermaidBooleanSetting(
       settings.pcEnableMermaidRendering,
       true

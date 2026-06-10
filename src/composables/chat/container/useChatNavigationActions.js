@@ -12,14 +12,13 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
+import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
-import {ACTIVE_ROOM_TYPES} from "@/stores/chatStore";
-import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -86,38 +85,12 @@ export function useChatNavigationActions({
   }
 
   /**
-   * @description 새대화/Assistant 선택처럼 메인 화면으로 빠져나가는 동작은 이력 hydration lock이 아니라 스트리밍 중일 때만 차단합니다.
-   * @returns {boolean} 메인 이동성 액션 차단 여부
-   */
-  function isMainNavigationLocked() {
-    return chatStreamStore.isStreaming;
-  }
-
-  /**
-   * @description 새대화/Assistant 선택은 현재 대화방을 빠져나가는 액션이므로,
-   * history hydration lock이 남아 있어도 main 라우터 이동이 막히지 않도록 먼저 해제한 뒤 이동합니다.
-   * @returns {Promise<void>} 메인 라우터 이동 완료 Promise
-   */
-  async function navigateToMainAfterReset() {
-    chatStore.clearPendingSelectedChatId();
-    chatStore.setHistoryNavigationLocked(false);
-
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-
-    if (router.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
-      chatStore.clearPendingSelectedChatId();
-      chatStore.setHistoryNavigationLocked(false);
-      await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    }
-  }
-
-  /**
    * @description [내부 공통 로직] 대화 타임라인을 파괴 비우고 메모리 누수를 막기 위해 파일 리소스를 취소 처리한 뒤 초기 메인 대시보드로 라우팅 이탈합니다.
    * @param {object} [options={}] - 신규 대화 초기화 커스텀 옵션 패킷
    * @param {string|null} [options.assistantId=null] - 새로운 채팅방 개통과 동시에 특정 어시스턴트를 자동 낙점 선택하고자 할 때 주입하는 ID 포인터
    */
   async function resetChatState({assistantId = null} = {}) {
-    if (isMainNavigationLocked()) return; // 스트리밍 락 발동 시 명령 전격 거부
+    if (isNavigationLocked()) return; // 스트리밍 락 발동 시 명령 전격 거부
 
     // 메모리 누수 방지 가드: 대화방을 완전히 나가거나 초기화하므로 가비지 컬렉터 유도를 위해 첨부파일 인메모리 임시 URL 전원 소멸 폐기
     revokeMessageAttachments(messages.value);
@@ -138,8 +111,8 @@ export function useChatNavigationActions({
     navigationStore.closeTransientPanels(); // 화면에 열려 있던 임시 우측 사이드 패널 등 일괄 수거 클로즈
     clearForceBottom(); // 하단 스크롤 강제 락 전격 오프
 
-    // 새대화는 현재 방을 떠나는 동작이므로 history lock을 먼저 풀고 메인 주소를 확정합니다.
-    await navigateToMainAfterReset();
+    // 메인 홈 화면 주소로 안전하게 인앱 주 주소 전환 집행 (중복 라우팅 에러 전파 방어)
+    await router.push({name: "main"}).catch(() => {});
   }
 
   // 외부 노출 인터페이스 명칭을 도메인에 직관적인 'startNewChat' 별칭 명세로 동기 미러 바인딩 처리
@@ -153,29 +126,6 @@ export function useChatNavigationActions({
     if (isNavigationLocked()) return false;
     const historyId = String(item?.id || "").trim();
     if (!historyId) return false;
-
-    const currentActiveRoomId = String(chatStore.activeRoomId || "").trim();
-    const currentSelectedChatId = String(chatStore.selectedChatId || "").trim();
-    const currentRouteChatId = String(
-      router.currentRoute?.value?.name === ROUTE_NAMES.CHAT_DETAIL
-        ? router.currentRoute.value.params?.id || ""
-        : ""
-    ).trim();
-    const currentChatId =
-      chatStore.activeRoomType === ACTIVE_ROOM_TYPES.chat
-        ? currentActiveRoomId || currentSelectedChatId || currentRouteChatId
-        : currentSelectedChatId || currentRouteChatId;
-
-    // 이미 열려 있는 같은 채팅방을 다시 선택한 경우에는 route/watch가 재실행되지 않으므로
-    // pending lock을 만들지 않고 열린 메뉴만 닫아 no-op 처리합니다.
-    if (currentChatId && currentChatId === historyId) {
-      chatStore.clearPendingSelectedChatId();
-      chatStore.setHistoryNavigationLocked(false);
-      navigationStore.closeTransientPanels();
-      navigationStore.setDrawerOpen(false);
-      navigationStore.setCollapsedRecentOpen(false);
-      return true;
-    }
 
     chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels(); // 대화 맥락이 바뀌므로 열려 있던 우측 정보 패널들 강제 셧다운
@@ -226,14 +176,14 @@ export function useChatNavigationActions({
   // 시스템 API 개발서 전용 주소창 다이렉트 점프
   function openSwagger() {
     if (isNavigationLocked()) return;
-    router.push({name: ROUTE_NAMES.SWAGGER}).catch(() => {});
+    router.push("/swagger").catch(() => {});
   }
 
   // 프롬프트 및 API 테스트 전용 실험실(Playground) 화면 이동 (이동 시 사이드 드로어는 눈을 가리기 위해 닫기 처리)
   function openPlayground() {
     if (isNavigationLocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.PLAYGROUND}).catch(() => {});
+    router.push({name: "playground"}).catch(() => {});
   }
 
   // 모바일 환경에서 가상 키보드 튐이나 인풋 포커스 록을 깨부수고 부드럽게 좌측 사이드 메뉴 드로어를 슬라이딩 노출합니다.
@@ -267,7 +217,7 @@ export function useChatNavigationActions({
   function openGuide() {
     if (isNavigationLocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.GUIDE}).catch(() => {});
+    router.push({name: "guide"}).catch(() => {});
   }
 
   // 시스템 전체 공지사항 모달 가시 노출 활성화
@@ -288,7 +238,7 @@ export function useChatNavigationActions({
   function openTerms() {
     if (isNavigationLocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
+    router.push({name: "terms"}).catch(() => {});
   }
 
   // 시스템 커스텀 마이페이지 개인화 모달 팝업 개통
@@ -321,27 +271,20 @@ export function useChatNavigationActions({
     } catch (error) {
       logWarn("[useChatNavigationActions] logout 오류:", error); // 서버 다운 등으로 실패하더라도 프론트엔드 탈거는 계속 마감 진행
     } finally {
-      // 대화방 선택 이후 URL 숨김 모드에서 로그아웃하면 active room/pending lock이
-      // 로그인 후 메인 복귀를 다시 막을 수 있으므로 인증 폐기와 함께 정리합니다.
-      chatStore.setHistoryNavigationLocked(false);
-      chatStore.clearActiveSession();
-      chatStreamStore.finish();
+      resetAppBootstrapState();
       useAuthStore().resetAuth(); // 2. 피나(Pinia) 토큰, 유저 프로필 메모리 정보 전격 소멸
       navigationStore.setDrawerOpen(false); // 3. 잔존해 있던 네비게이션 가시 오버레이 파괴 해제
 
       // 4. 인증 상실 전용 가이드 뷰페이지로 리플레이스 강제 릴리즈 (뒤로가기 방어 처리 및 다국어 리즌 코드 쿼리 수치화 결합)
       await router
-        .replace({
-          name: ROUTE_NAMES.LOGIN_REQUIRED,
-          query: {reason: "LOGIN_REQUIRED"},
-        })
+        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
         .catch(() => {});
     }
   }
 
   // 상단 탑 헤더 영역의 모델명 버튼 명세 등을 클릭했을 때 하향식 어시스턴트 목록 변경 팝업 시트를 개통 조율
   function openAssistantFromHeader() {
-    if (isMainNavigationLocked()) return;
+    if (isNavigationLocked()) return;
     assistantSheetOpen.value = true;
   }
 

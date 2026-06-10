@@ -4,9 +4,27 @@
  * mobile decisions aligned with the global viewport/body mobile mode used by SCSS.
  */
 import {computed} from "vue";
-import {shouldUseMobilePlatformLayout} from "@/platform/runtime/runtimeDetector";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useViewportStore} from "@/stores/viewportStore";
+
+function shouldUseMobilePlatformLayout(platformInfo = {}) {
+  if (platformInfo.isPlatformForced) {
+    return Boolean(
+      platformInfo.isAndroidApp ||
+      platformInfo.isNativeApp ||
+      platformInfo.isNativeRuntime ||
+      (platformInfo.actualEnv === "android" &&
+        platformInfo.actualRuntime !== "native")
+    );
+  }
+
+  return Boolean(
+    platformInfo.isMobileBrowser ||
+    platformInfo.isAndroidApp ||
+    platformInfo.isNativeApp ||
+    platformInfo.isNativeRuntime
+  );
+}
 
 function hasMobileBodyClass() {
   if (typeof document === "undefined") return false;

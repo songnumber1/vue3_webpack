@@ -37,7 +37,6 @@ import {
   resolveMessageLazySettings,
   resolvePreviousMessageLazyStart,
 } from "@/composables/chat/message-list/useMessageLazyRange";
-import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * [Route/Data controller]
@@ -523,7 +522,7 @@ ${message?.reasoningContent || ""}`;
     // main 이동이 router guard의 historyNavigationLocked에 막힐 수 있습니다.
     // 실패 경로에서는 즉시 렌더 상태와 lock을 정리한 뒤 메인으로 이동합니다.
     finishHistoryRenderImmediately();
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+    await router.replace({name: "main"}).catch(() => {});
   }
 
   // ── 🚀 [3. 라우팅 전환에 따른 메시지 세션 복원 동기화 엔지니어링] ──────────────────
@@ -563,7 +562,7 @@ ${message?.reasoningContent || ""}`;
           }
           chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
           if (isHiddenConversationUrlMode(systemSettingsStore.settings)) {
-            await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
+            await router.replace({name: "shared"}).catch(() => {});
             // URL 숨김 모드에서는 /shared/:id -> /shared replace 직후 route watcher가
             // 새 loadRouteConversation을 시작할 수 있습니다. 이 경우 현재 load는 stale
             // 상태가 되므로 메시지를 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
@@ -580,7 +579,7 @@ ${message?.reasoningContent || ""}`;
           clearLazyHistoryMessages();
           messages.value = [];
           finishHistoryRender();
-          await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+          await router.replace({name: "main"}).catch(() => {});
           return;
         }
 
@@ -624,7 +623,7 @@ ${message?.reasoningContent || ""}`;
         // 복원 가능한 대화방이 없으므로 메인으로 되돌립니다. 단, 좌측 대화방 클릭 직후
         // activeRoomId가 곧 세팅될 pending 상태는 첫 진입 로드를 막지 않기 위해 대기합니다.
         if (!hasPendingHiddenNavigation) {
-          await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+          await router.replace({name: "main"}).catch(() => {});
         }
         return;
       }
@@ -635,7 +634,7 @@ ${message?.reasoningContent || ""}`;
         clearPendingSelectedOnFailure(activeHistoryId.value);
         finishHistoryRender();
         // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
-        await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+        await router.replace({name: "main"}).catch(() => {});
         return;
       }
 
@@ -719,11 +718,7 @@ ${message?.reasoningContent || ""}`;
   }
 
   // ── [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
-  const {
-    isGenerating,
-    submit,
-    regenerate,
-  } = useChatSubmit({
+  const {isGenerating, submit, regenerate} = useChatSubmit({
     router,
     route,
     histories,

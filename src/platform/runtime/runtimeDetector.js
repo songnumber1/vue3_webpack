@@ -64,52 +64,6 @@ export function isAndroidWebViewUserAgent() {
   );
 }
 
-
-/**
- * 플랫폼 스토어의 실제 런타임 스냅샷을 기준으로 Android 계열 실행 환경인지 확인합니다.
- * 기존 AppContainer/useOverlayScrollbar/SidebarHistoryList에 흩어진 조건식을 그대로 공통화한 함수입니다.
- * @param {object} [info={}] platformStore.info 또는 useRuntimeModeFlags().platformInfo 값
- * @returns {boolean} 실제 Android Chrome/WebView/App 런타임이면 true
- */
-export function isActualAndroidRuntime(info = {}) {
-  const userAgent = String(info.userAgent || "");
-
-  return Boolean(
-    info.actualEnv === "android" ||
-      info.actualDevice === "android" ||
-      info.actualDevice === "android-webview" ||
-      info.actualBrowser === "android-webview" ||
-      info.isAndroidApp ||
-      /Android/i.test(userAgent)
-  );
-}
-
-
-/**
- * 플랫폼 스냅샷을 기준으로 모바일 전용 레이아웃을 사용해야 하는지 확인합니다.
- * 기존 useChatMobileState/useResolvedMobileMode에 중복되어 있던 조건식을 그대로 공통화한 함수입니다.
- * @param {object} [platformInfo={}] platformStore.info 또는 useRuntimeModeFlags().platformInfo 값
- * @returns {boolean} 모바일 플랫폼 레이아웃 대상이면 true
- */
-export function shouldUseMobilePlatformLayout(platformInfo = {}) {
-  if (platformInfo.isPlatformForced) {
-    return Boolean(
-      platformInfo.isAndroidApp ||
-        platformInfo.isNativeApp ||
-        platformInfo.isNativeRuntime ||
-        (platformInfo.actualEnv === "android" &&
-          platformInfo.actualRuntime !== "native")
-    );
-  }
-
-  return Boolean(
-    platformInfo.isMobileBrowser ||
-      platformInfo.isAndroidApp ||
-      platformInfo.isNativeApp ||
-      platformInfo.isNativeRuntime
-  );
-}
-
 /**
  * 현재 애플리케이션이 실행되고 있는 스트림 런타임 환경 유형(Runtime Type)을 최종 판별합니다.
  * * * **반환 런타임 유형 종류 목록:**

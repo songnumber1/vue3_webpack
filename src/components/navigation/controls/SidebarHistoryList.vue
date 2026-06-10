@@ -61,7 +61,6 @@
 
 import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
-import {isActualAndroidRuntime as resolveActualAndroidRuntime} from "@/platform/runtime/runtimeDetector";
 import {OverlayScrollbarsComponent} from "overlayscrollbars-vue";
 import "overlayscrollbars/overlayscrollbars.css";
 import {useI18n} from "vue-i18n";
@@ -93,9 +92,18 @@ const overlayScrollbarOptions = {
   },
 };
 
-const isActualAndroidRuntime = computed(() =>
-  resolveActualAndroidRuntime(platformStore.info || {})
-);
+const isActualAndroidRuntime = computed(() => {
+  const info = platformStore.info || {};
+  const userAgent = String(info.userAgent || "");
+  return Boolean(
+    info.actualEnv === "android" ||
+    info.actualDevice === "android" ||
+    info.actualDevice === "android-webview" ||
+    info.actualBrowser === "android-webview" ||
+    info.isAndroidApp ||
+    /Android/i.test(userAgent)
+  );
+});
 
 const shouldUseOverlayScrollbar = computed(
   () => props.useOverlayScrollbar && !isActualAndroidRuntime.value

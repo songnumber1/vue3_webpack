@@ -3,7 +3,7 @@ import {
   loadChatHistoryList,
   renameChatHistory,
   updateChatBookmark,
-} from "@/composables/app/chatRuntimeBootstrap";
+} from "@/composables/chat/runtime/chatRuntimeApi";
 import {logWarn} from "@/utils/logger";
 import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
 

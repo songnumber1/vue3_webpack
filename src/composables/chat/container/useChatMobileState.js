@@ -1,5 +1,28 @@
 import {computed} from "vue";
-import {shouldUseMobilePlatformLayout} from "@/platform/runtime/runtimeDetector";
+
+/**
+ * @description 시스템 플랫폼 메타 데이터 패킷을 해독하여 현재 에이전트가 모바일 전용 웹 브라우저 커널 환경이거나, 또는 안드로이드 네이티브 앱/웹뷰 내부 환경에서 동작 중인지 여부를 논리값(Boolean)으로 판별합니다.
+ * @param {object} [platformInfo={}] - 시스템 플랫폼 저장소(Platform Store)에서 제공하는 환경 분석 스냅샷 객체
+ * @returns {boolean} 모바일 플랫폼 레이아웃 강제 활성화 대상 여부
+ */
+function shouldUseMobilePlatformLayout(platformInfo = {}) {
+  if (platformInfo.isPlatformForced) {
+    return Boolean(
+      platformInfo.isAndroidApp ||
+      platformInfo.isNativeApp ||
+      platformInfo.isNativeRuntime ||
+      (platformInfo.actualEnv === "android" &&
+        platformInfo.actualRuntime !== "native")
+    );
+  }
+
+  return Boolean(
+    platformInfo.isMobileBrowser ||
+    platformInfo.isAndroidApp ||
+    platformInfo.isNativeApp ||
+    platformInfo.isNativeRuntime
+  );
+}
 
 /**
  * @description 뷰포트의 물리적인 미디어 쿼리 크기(Compact 여부)와 디바이스 본연의 런타임 하드웨어 특성을 수학적 합집합 조건으로 교차 검증하여, UI 전반의 렌더링 분기 기준점이 되는 통합 `isMobile` 상태 레버를 추출 및 관리하는 훅입니다.

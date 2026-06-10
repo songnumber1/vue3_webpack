@@ -146,7 +146,6 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
-import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * [ChatContainer 연결 구조]
@@ -166,7 +165,7 @@ const PORTAL_ASSISTANT_IDS = [
   ASSISTANT_STUDIO_PORTAL_ID,
   CONNECTOR_STORE_PORTAL_ID,
 ];
-const CONNECTOR_STORE_ROUTE_NAME = ROUTE_NAMES.CONNECTOR_STORE;
+const CONNECTOR_STORE_ROUTE_NAME = "connector-store";
 
 function isPortalAssistantId(assistantId) {
   return PORTAL_ASSISTANT_IDS.includes(assistantId);
@@ -184,7 +183,7 @@ function syncAssistantSelectionWithRoute() {
     assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
   const connectorAssistant =
     assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
-  if (route.name === ROUTE_NAMES.STUDIO) {
+  if (route.name === "studio") {
     if (
       studioAssistant &&
       assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
@@ -203,9 +202,7 @@ function syncAssistantSelectionWithRoute() {
     return;
   }
 
-  if (
-    isPortalAssistantId(assistantStore.selectedAssistantId)
-  ) {
+  if (isPortalAssistantId(assistantStore.selectedAssistantId)) {
     const fallbackAssistant = assistantStore.assistants.find(
       (assistant) =>
         !isPortalAssistantId(assistant.id) &&
@@ -314,16 +311,17 @@ function handleAssistantNewChat(assistantId) {
   if (isPortalAssistantId(assistantId)) {
     assistantStore.selectAssistant(assistantId);
     assistantSheetOpen.value = false;
-    return router
+    router
       .push({
         name:
           assistantId === CONNECTOR_STORE_PORTAL_ID
             ? CONNECTOR_STORE_ROUTE_NAME
-            : ROUTE_NAMES.STUDIO,
+            : "studio",
       })
       .catch(() => {});
+    return;
   }
-  return startNewChat({assistantId});
+  startNewChat({assistantId});
 }
 
 /**
@@ -429,11 +427,13 @@ provide(CHAT_ACTIONS_KEY, {
 
 provide(WORKSPACE_ACTIONS_KEY, {
   submit: (payload) => {
-    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value) return;
+    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value)
+      return;
     submit(payload);
   },
   regenerate: (message) => {
-    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value) return;
+    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value)
+      return;
     regenerate(message);
   },
   updateSelectedModel: (val) => {

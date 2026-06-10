@@ -412,7 +412,10 @@ function rehypeMermaidBlock({showMermaidHeader = true} = {}) {
                       tagName: "div",
                       properties: {className: ["md-mermaid-actions"]},
                       children: [
-                        mermaidActionButton("copy", mdLabel("markdown.copyMermaid")),
+                        mermaidActionButton(
+                          "copy",
+                          mdLabel("markdown.copyMermaid")
+                        ),
                         mermaidActionButton("svg", "SVG 저장"),
                         mermaidActionButton("code", "코드 내보내기"),
                       ],
@@ -516,7 +519,10 @@ function rehypeCodeBlockWrapper() {
 /**
  * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
-function createProcessor({renderMermaid = true, showMermaidHeader = true} = {}) {
+function createProcessor({
+  renderMermaid = true,
+  showMermaidHeader = true,
+} = {}) {
   const nextProcessor = unified()
     .use(remarkParse)
     .use(remarkGfm, {singleTilde: false})

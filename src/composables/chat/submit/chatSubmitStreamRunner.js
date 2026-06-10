@@ -6,7 +6,6 @@ import {createGenerationPayload} from "./chatSubmitPayload";
 import {commitFirstAnswerChunk} from "./streamingMessageCommitter";
 import {adaptGenerationResultContent} from "@/adapters/generationResponseAdapter";
 
-
 function resolveStreamErrorTitle(error) {
   if (error?.doneMissing) return "답변 생성이 완료되지 않았습니다";
   return "답변 생성 실패";
@@ -19,7 +18,10 @@ function resolveStreamErrorMessage({error, fallbackMessage}) {
   }
 
   if (error?.streamError && message) return message;
-  if (message && !/generation stream failed|generation stream returned error/i.test(message)) {
+  if (
+    message &&
+    !/generation stream failed|generation stream returned error/i.test(message)
+  ) {
     return message;
   }
 

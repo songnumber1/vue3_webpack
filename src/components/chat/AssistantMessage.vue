@@ -213,7 +213,8 @@ async function renderContent() {
     const {renderMarkdown} = await import("@/utils/markdown");
     const rendered = props.message.content
       ? await renderMarkdown(props.message.content, {
-          renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
+          renderMermaid:
+            isMessageComplete.value && enableMermaidRendering.value,
           showMermaidHeader: showMermaidHeader.value,
         })
       : "";

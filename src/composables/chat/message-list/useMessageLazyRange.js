@@ -97,7 +97,10 @@ export function resolveInitialMessageLazyRange({
     };
   }
 
-  const count = normalizePositiveInteger(initialCount, DEFAULT_PC_INITIAL_COUNT);
+  const count = normalizePositiveInteger(
+    initialCount,
+    DEFAULT_PC_INITIAL_COUNT
+  );
   const start = Math.max(list.length - count, 0);
   return {
     start,

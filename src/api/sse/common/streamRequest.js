@@ -117,7 +117,7 @@ function shouldUseOverlay(policy) {
 
   const result = Boolean(
     policy.overlay &&
-      isProgressAllowedForCurrentPlatform(settings.settings, platformStore.info)
+    isProgressAllowedForCurrentPlatform(settings.settings, platformStore.info)
   );
 
   logPlatformDebug("sse.overlay", {

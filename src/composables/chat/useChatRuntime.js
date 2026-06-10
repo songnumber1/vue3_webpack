@@ -12,14 +12,12 @@ import {storeToRefs} from "pinia";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {
-  bootstrapChatRuntime,
   createChatHistory,
   loadChatMessageRouters,
   loadExamplePrompts,
-} from "@/composables/app/chatRuntimeBootstrap";
-import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
+} from "@/composables/chat/runtime/chatRuntimeApi";
+import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
 import {adaptChatHistory} from "@/adapters/chatAdapter";
 import {
@@ -41,14 +39,13 @@ import {createChatHistoryRuntime} from "@/composables/chat/runtime/useChatHistor
 /**
  * 애플리케이션의 핵심 대화 파이프라인 가동, 무중단 히스토리 동기화 및 렌더링 세션 활성화를 주도하는 전역 런타임 컴포저블입니다.
  * @returns {Object} 채팅 레이아웃 및 네비게이션 서브 시스템에서 참조할 상태 세트 및 액션 핸들러 인터페이스
- * @see {@link bootstrapChatRuntime} 최초 시스템 구동 시 유저 권한 및 대화 목록을 한 번에 가져오는 결합 부트스트랩 API
+ * @see {@link useAppBootstrap} 최초 시스템 구동 시 유저 권한 및 대화 목록을 한 번에 가져오는 앱 부트스트랩 API
  * @see {@link useChatStore} 개별 메시지 맵 및 활성 세션을 영구 보존하는 Pinia 대화 코어 스토어
  * @see {@link useAssistantStore} 서비스 가능한 인프라 AI 모델 및 페르소나 어시스턴트 전용 매스터 스토어
  */
 export function useChatRuntime() {
   // 시스템 인프라 전역 상태 스토어 군집 통합 풀링
-  const appRuntimeStore = useAppRuntimeStore();
-  const authStore = useAuthStore();
+  const appBootstrap = useAppBootstrap();
   const assistantStore = useAssistantStore();
   const chatStore = useChatStore();
 
@@ -119,33 +116,9 @@ export function useChatRuntime() {
    * [액션 1] 서비스 메인 인입 시점에 유저의 최신 권한 세션 및 대화방 이력을 동시 확보하여 애플리케이션의 시동을 거는 부트스트랩 핵심 초기화 함수입니다.
    */
   async function initialize() {
-    // 중복 기동 방지 혹은 이미 비동기 로딩 파이프라인이 돌고 있는 상태라면 인터셉트하여 탈출합니다.
-    if (appRuntimeStore.initialized || appRuntimeStore.loading) return;
-
-    appRuntimeStore.startLoading(); // 전역 스플래시 인디케이터 기동
-    try {
-      // 1. 초기 연동 대형 번들 API 데이터 셋을 단 한 번의 비동기 호출로 수집합니다.
-      const data = await bootstrapChatRuntime({
-        accessInfoOverride: authStore.accessInfo || null,
-      });
-
-      // 2. 수집된 최신 유저 세션 인증 상태를 판별하여 글로벌 보안 스토어에 보존합니다.
-      if (data.accessInfo?.user) {
-        authStore.setAuthenticatedAccessInfo(data.accessInfo);
-      } else {
-        authStore.setAccessInfo(data.accessInfo);
-      }
-
-      // 3. 어시스턴트 목록, 마스터 모델 딕셔너리 정보 등을 인메모리 스토어에 마운트 동기화합니다.
-      assistantStore.setBootstrapData(data);
-      // 4. 사이드바에 노출할 유저의 최신 대화 목록 리스트를 세팅합니다.
-      chatStore.setHistories(data.chatHistories);
-
-      appRuntimeStore.finishLoading(); // 전역 스플래시 종료 처리 및 앱 활성화 완료 통보
-    } catch (error) {
-      appRuntimeStore.fail(error); // 인프라 다운 예외 처리 화면 스위칭 트리거
-      throw error;
-    }
+    // AppContainer에서 시작한 앱 공통 bootstrap을 보장합니다.
+    // 동일 singleton promise를 재사용하므로 ChatContainer와 중복 호출되어도 API bundle은 한 번만 실행됩니다.
+    await appBootstrap.ensureInitialized();
   }
 
   /**

@@ -171,7 +171,11 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
       result.targetMessageId,
       result.raw?.messageId
     ),
-    searchTargetRole: firstText(result.role, result.messageRole, result.raw?.role),
+    searchTargetRole: firstText(
+      result.role,
+      result.messageRole,
+      result.raw?.role
+    ),
     raw: {
       ...result,
       chatId,

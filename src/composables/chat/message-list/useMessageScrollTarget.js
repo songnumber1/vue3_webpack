@@ -7,9 +7,15 @@ import {MESSAGE_SCROLL_TARGET_TYPES} from "./useMessageRenderPolicy";
 
 function getSafeScrollTop(container, top) {
   if (!container) return 0;
-  const maxScrollTop = Math.max(0, container.scrollHeight - container.clientHeight);
+  const maxScrollTop = Math.max(
+    0,
+    container.scrollHeight - container.clientHeight
+  );
   const numeric = Number(top);
-  return Math.min(maxScrollTop, Math.max(0, Number.isFinite(numeric) ? numeric : 0));
+  return Math.min(
+    maxScrollTop,
+    Math.max(0, Number.isFinite(numeric) ? numeric : 0)
+  );
 }
 
 function getElementOffsetTopWithinScroll(element, container) {
@@ -90,7 +96,10 @@ export function createMessageScrollTargetController({
     return true;
   }
 
-  function scrollToMessage(messageId, {behavior = "auto", block = "center"} = {}) {
+  function scrollToMessage(
+    messageId,
+    {behavior = "auto", block = "center"} = {}
+  ) {
     const el = getScrollElement?.();
     if (!el) return false;
 
