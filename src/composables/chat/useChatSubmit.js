@@ -1,30 +1,23 @@
 import {computed, nextTick} from "vue";
-
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
-import {ROUTE_NAMES} from "@/constants/routeNames";
-
 import {canWrite, isSelectedModelReasoning} from "./submit/chatSubmitGuards";
 import {normalizePromptPayload} from "./submit/chatSubmitPayload";
-
 import {
   createAssistantMessageCommitter,
   createAssistantStreamingPatch,
 } from "./submit/streamingMessageCommitter";
-
 import {
   createStreamScrollScheduler,
   scrollAfterUserSubmit,
 } from "./submit/chatSubmitScroll";
-
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
-
+import {ROUTE_NAMES} from "@/constants/routeNames";
 import {
   applyHiddenConversationActiveRoom,
   createConversationRoute,

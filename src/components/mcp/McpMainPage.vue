@@ -97,7 +97,7 @@
     </div>
 
     <div
-      v-if="activeTab === 'all'"
+      v-if="activeTab === 'all' && !isMobile"
       class="studio-category-chips tw-mx-auto tw-mb-3 tw-mt-[-4px] tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-visible"
       :aria-label="t('mcp.categoryLabel')"
     >
@@ -118,7 +118,7 @@
     </div>
 
     <button
-      v-if="activeTab === 'all'"
+      v-if="activeTab === 'all' && isMobile"
       class="studio-mobile-category-select tw-shrink-0 tw-items-center tw-justify-between"
       type="button"
       :aria-label="t('mcp.categorySelect')"
@@ -254,12 +254,15 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
 const listAreaRef = ref(null);
+const responsiveContext = useResponsiveContext();
+const isMobile = computed(() => Boolean(responsiveContext.value?.isMobile));
 
 const props = defineProps({
   searchText: {type: String, default: ""},
