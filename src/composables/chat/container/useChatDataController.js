@@ -353,7 +353,7 @@ ${message?.reasoningContent || ""}`;
     canWrite: () =>
       !isReadOnly.value &&
       !isHistoryRendering.value &&
-      !chatStore.isNavigationLocked &&
+      !navigationLock.isChatHistoryLocked.value &&
       !isActiveModelUnavailable.value, // 현재 전송 가능 상태 가드 밸리데이션 검증식
     isReadOnly,
     isActiveModelUnavailable,

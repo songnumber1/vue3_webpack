@@ -14,6 +14,10 @@ import {shouldUseServerApi} from "@/constants/apiMode";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {ROUTE_COMPONENTS} from "@/core/resolver/routeComponents";
 import {logInfo} from "@/utils/logger";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 
 const baseRoutes = [
   {
@@ -243,8 +247,16 @@ function guardStreamingNavigation(to, chatStreamStore) {
   return chatStreamStore.consumeAllowedNavigation(to) ? true : false;
 }
 
-function guardHistoryNavigation({to, from, chatStore, settings}) {
-  if (!chatStore.isNavigationLocked) return true;
+function guardHistoryNavigation({
+  to,
+  from,
+  chatStore,
+  settings,
+  navigationLockStore,
+}) {
+  if (!navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)) {
+    return true;
+  }
   return isAllowedHistoryLockNavigation({to, from, chatStore, settings})
     ? true
     : false;
@@ -332,6 +344,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
     const chatStreamStore = useChatStreamStore();
     const chatStore = useChatStore();
     const systemSettingsStore = useSystemSettingsStore();
+    const navigationLockStore = useNavigationLockStore();
 
     platformStore.refresh(appInfo);
 
@@ -345,6 +358,7 @@ function registerRouteGuard(router, appInfo, context = {}) {
         from,
         chatStore,
         settings: systemSettingsStore.settings,
+        navigationLockStore,
       }),
       guardSharedRoute(to, chatStore),
       guardConversationUrlMode({

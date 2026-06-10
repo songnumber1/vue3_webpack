@@ -148,7 +148,7 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
 import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
-import {APP_SHELL_ACTIONS_KEY} from "@/composables/app/appShellActionContext";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * [ChatContainer 연결 구조]
@@ -169,7 +169,6 @@ const PORTAL_ASSISTANT_IDS = [
   ASSISTANT_STUDIO_PORTAL_ID,
   CONNECTOR_STORE_PORTAL_ID,
 ];
-const CONNECTOR_STORE_ROUTE_NAME = "connector-store";
 
 function isPortalAssistantId(assistantId) {
   return PORTAL_ASSISTANT_IDS.includes(assistantId);
@@ -187,7 +186,7 @@ function syncAssistantSelectionWithRoute() {
     assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
   const connectorAssistant =
     assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
-  if (route.name === "studio") {
+  if (route.name === ROUTE_NAMES.STUDIO) {
     if (
       studioAssistant &&
       assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
@@ -196,7 +195,7 @@ function syncAssistantSelectionWithRoute() {
     }
     return;
   }
-  if (route.name === CONNECTOR_STORE_ROUTE_NAME) {
+  if (route.name === ROUTE_NAMES.CONNECTOR_STORE) {
     if (
       connectorAssistant &&
       assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID
@@ -278,24 +277,9 @@ const {
   handlePreviewLoad,
   handlePreviewError,
   startNewChat,
-  openHistory,
   handleHistoryMenuAction,
   closeHistoryDialog,
   confirmHistoryDialog,
-  openMobileDrawer,
-  toggleTheme,
-  openSwagger,
-  openPlayground,
-  openSettings,
-  openGuide,
-  openNotice,
-  openPrivacy,
-  openTerms,
-  openPersonalization,
-  openSystem,
-  openLanguage,
-  openAssistantFromHeader,
-  logout,
   submit,
   regenerate,
   refreshPromptViewport,
@@ -331,8 +315,8 @@ async function handleAssistantNewChat(assistantId) {
       .push({
         name:
           assistantId === CONNECTOR_STORE_PORTAL_ID
-            ? CONNECTOR_STORE_ROUTE_NAME
-            : "studio",
+            ? ROUTE_NAMES.CONNECTOR_STORE
+            : ROUTE_NAMES.STUDIO,
       })
       .catch(() => {});
     return;
@@ -354,6 +338,10 @@ function handleWorkspaceScrollBottom() {
 function setWorkspaceRef(el) {
   workspaceRef.value = el;
 }
+
+provide(CHAT_ACTIONS_KEY, {
+  historyMenuAction: handleHistoryMenuAction,
+});
 
 provide(
   CHAT_WORKSPACE_STATE_KEY,
@@ -400,30 +388,6 @@ provide(
     placeholder: "",
   }))
 );
-
-provide(APP_SHELL_ACTIONS_KEY, {
-  toggleTheme,
-  openSwagger,
-  openSettings,
-  openGuide,
-  openNotice,
-  openPrivacy,
-  openTerms,
-  openPersonalization,
-  openSystem,
-  openLanguage,
-  openPlayground,
-  logout,
-});
-
-provide(CHAT_ACTIONS_KEY, {
-  openDrawer: openMobileDrawer,
-  openAssistant: openAssistantFromHeader,
-  newChat: startNewChat,
-  selectHistory: openHistory,
-  historyMenuAction: handleHistoryMenuAction,
-  selectAssistant: handleAssistantNewChat,
-});
 
 provide(WORKSPACE_ACTIONS_KEY, {
   submit: (payload) => {

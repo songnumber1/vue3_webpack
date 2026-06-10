@@ -4,7 +4,6 @@
  */
 
 import {computed} from "vue";
-import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
@@ -13,16 +12,12 @@ function toValue(source) {
 }
 
 export function useChatPageLock(options = {}) {
-  const chatStore = useChatStore();
   const chatStreamStore = useChatStreamStore();
   const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
     useNavigationLock();
 
   const isHistoryBusy = computed(
-    () =>
-      isChatHistoryLocked.value ||
-      chatStore.historyNavigationLocked ||
-      toValue(options.isHistoryRendering)
+    () => isChatHistoryLocked.value || toValue(options.isHistoryRendering)
   );
 
   const isConversationActionBlocked = computed(

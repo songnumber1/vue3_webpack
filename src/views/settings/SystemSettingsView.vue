@@ -133,6 +133,7 @@ import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {authApiLive} from "@/api/live/authApi.live";
 import {logWarn} from "@/utils/logger";
+import {useNavigationLockStore} from "@/stores/navigationLockStore";
 import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_MOBILE_BREAKPOINT_PX,
@@ -156,6 +157,7 @@ import {
   AUTH_MODE_OPTIONS,
   CONVERSATION_URL_MODE_OPTIONS,
 } from "@/constants/systemSettings";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 const emit = defineEmits(["close", "applied"]);
 const {t} = useI18n();
@@ -163,6 +165,7 @@ const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
 const authStore = useAuthStore();
+const navigationLockStore = useNavigationLockStore();
 const {settings} = storeToRefs(systemSettingsStore);
 
 const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
@@ -452,7 +455,7 @@ async function forceLogoutForPolicyChange() {
     // 인증/URL 정책 변경은 현재 대화 컨텍스트를 폐기하는 전역 정책 변경입니다.
     // 대화방 렌더링 락이나 스트리밍 허용권이 남아 있으면 login-required 이동이
     // 차단될 수 있으므로 로그아웃 처리 전에 채팅 이동 잠금을 명시적으로 정리합니다.
-    chatStore.setHistoryNavigationLocked(false);
+    navigationLockStore.releaseAll();
     chatStore.clearActiveSession();
     chatStreamStore.finish();
     resetAppBootstrapState();
@@ -487,7 +490,10 @@ async function apply() {
 
     if (logoutRequiredSettingChanged) {
       await router
-        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .replace({
+          name: ROUTE_NAMES.LOGIN_REQUIRED,
+          query: {reason: "LOGIN_REQUIRED"},
+        })
         .catch(() => {});
     }
   } finally {

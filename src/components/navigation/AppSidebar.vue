@@ -43,7 +43,7 @@
         </button>
         <button
           class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
-          :class="{active: route.name === 'chat-search'}"
+          :class="{active: route.name === ROUTE_NAMES.CHAT_SEARCH}"
           type="button"
           @click="handleChatSearch"
         >
@@ -128,7 +128,7 @@
           </button>
           <button
             class="quick-item tw-flex tw-w-full tw-items-center tw-gap-2 tw-rounded-control tw-text-left tw-transition"
-            :class="{active: route.name === 'chat-search'}"
+            :class="{active: route.name === ROUTE_NAMES.CHAT_SEARCH}"
             type="button"
             @click="handleChatSearch"
           >
@@ -224,6 +224,7 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useChatSidebarLock} from "@/composables/chat/sidebar/useChatSidebarLock";
 import {useChatSidebarActions} from "@/composables/chat/sidebar/useChatSidebarActions";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 const router = useRouter();
 const route = useRoute();
 const {t} = useI18n();

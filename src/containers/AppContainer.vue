@@ -24,10 +24,15 @@ import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {useAuthStore} from "@/stores/authStore";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
+import {useAppShellActions} from "@/composables/app/useAppShellActions";
+import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {APP_SHELL_ACTIONS_KEY} from "@/composables/app/appShellActionContext";
 
 /**
  * @component AppContainer
@@ -39,7 +44,7 @@ import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
  */
 
 // 1. 전역 애플리케이션 콘텍스트로부터 초기화 단계에 설정된 고유 앱 정보(`appInfo`)를 비동기 추출합니다.
-const {appInfo} = useAppContext();
+const {appInfo, theme} = useAppContext();
 
 // 2. 실시간 런타임 상태 플래그 훅을 호출하여 플랫폼 세부 정보 및 모바일 레이아웃 채택 여부를 구조 분해 할당으로 가져옵니다.
 const {
@@ -53,7 +58,8 @@ const responsiveLayoutStore = useResponsiveLayoutStore();
 const appBootstrap = useAppBootstrap();
 const authStore = useAuthStore();
 const route = useRoute();
-
+const router = useRouter();
+const navigationStore = useNavigationStore();
 function shouldBootstrapAppForRoute(targetRoute) {
   if (!targetRoute) return false;
   if (targetRoute.meta?.skipAuthCheck) return false;
@@ -110,6 +116,24 @@ const deviceName = computed(() => platformInfo.value.device || "unknown");
  * @see {@link useRuntimeModeFlags.shouldUseMobileLayout} 모바일 레이아웃 판단 소스 플래그
  */
 const isMobileContainer = computed(() => shouldUseMobileLayout.value);
+
+const {themeName} = useAppShellThemeState(theme?.current);
+const appShellOverlays = useAppShellOverlays();
+const appShellActions = useAppShellActions({
+  router,
+  theme,
+  themeName,
+  isMobile: isMobileContainer,
+  navigationStore,
+  noticeOpen: appShellOverlays.noticeOpen,
+  privacyOpen: appShellOverlays.privacyOpen,
+  personalizationOpen: appShellOverlays.personalizationOpen,
+  systemOpen: appShellOverlays.systemOpen,
+  languageSheetOpen: appShellOverlays.languageSheetOpen,
+  mobileSettingsOpen: appShellOverlays.mobileSettingsOpen,
+});
+
+provide(APP_SHELL_ACTIONS_KEY, appShellActions);
 
 const isActualAndroidRuntime = computed(() => {
   const info = platformInfo.value || {};

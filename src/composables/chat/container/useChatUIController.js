@@ -25,8 +25,10 @@ import {useChatMobileState} from "@/composables/chat/container/useChatMobileStat
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
 import {useChatPromptActions} from "@/composables/chat/container/useChatPromptActions";
 import {useChatScrollController} from "@/composables/chat/container/useChatScrollController";
-import {useAppShellActions} from "@/composables/app/useAppShellActions";
 import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
+import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
+import {registerActiveConversationCleanup} from "@/composables/chat/conversation/useActiveConversationCleanup";
 
 /**
  * @function useChatUIController
@@ -59,10 +61,10 @@ export function useChatUIController({
   // ── [1. 돔 레퍼런스 및 모달/시트 개폐 플래그 셋] ──────────────────
   const {scrollToBottom} = useAutoScroll({value: null});
   const workspaceRef = ref(null); // 스크롤 연산 타깃이 될 메인 워크스페이스 컨테이너 DOM 가리킴 고리
-  const themeName = ref(theme.current); // 현재 브라우저에 마운트된 UI 테마 식별 명칭
+  const {themeName} = useAppShellThemeState(theme.current); // 현재 브라우저에 마운트된 UI 테마 식별 명칭
 
   // 각종 바텀시트 및 오버레이 설정 레이어 모달들의 마운트 플래그 세트
-  const assistantSheetOpen = ref(false); // 모바일 전용 AI 어시스턴트 변경 시트
+  const {assistantSheetOpen} = useChatAssistantSheetState(); // 모바일 전용 AI 어시스턴트 변경 시트
   const {
     noticeOpen,
     privacyOpen,
@@ -182,21 +184,6 @@ export function useChatUIController({
     scrollBottom,
   });
 
-  const appShellActions = useAppShellActions({
-    router,
-    theme,
-    themeName,
-    isMobile,
-    navigationStore,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    scrollBottom,
-  });
-
   // ── [9. 반응형 시스템 세팅 변동 동기화 왓처 마운트] ──────────────────
   // 관리자 도구 혹은 유저 설정에서 모바일 판단 중단점(px) 사양을 실시간 커스텀 변경할 시 즉각 시스템 뷰포트를 리프레시합니다.
   watch(
@@ -232,12 +219,22 @@ export function useChatUIController({
     scrollBottom({stable: true});
   }
 
+  function cleanupConversationForNavigation() {
+    runtime.revokeMessageAttachments(messages.value);
+    messages.value = [];
+  }
+
+  const unregisterActiveConversationCleanup = registerActiveConversationCleanup(
+    cleanupConversationForNavigation
+  );
+
   /**
    * @function cleanupUiController
    * @description [메모리 누수 차단 가드] 컴포넌트가 파괴되거나 사용자가 해당 채팅 뷰 포트 공간을 완전히 떠날 때
    * 스크롤 타이머 해제 및 브라우저 인메모리에 잔존하는 Blob 파일 객체(이미지 미리보기, 업로드 첨부 자원 등)의 주소(URL)를 영구 소멸 해제합니다.
    */
   function cleanupUiController() {
+    unregisterActiveConversationCleanup();
     cleanupScrollController();
     runtime.revokeMessageAttachments(messages.value);
   }
@@ -286,6 +283,5 @@ export function useChatUIController({
     handleMobileSettingsDesktopOpen,
     cleanupUiController,
     ...navigationActions, // 네비게이션 액션 분출 팩 전개 주입
-    ...appShellActions, // 앱 shell action은 기존 navigation action을 점진적으로 대체합니다.
   };
 }

@@ -4,12 +4,10 @@
  */
 
 import {computed} from "vue";
-import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
 export function useAppShellLock() {
-  const chatStore = useChatStore();
   const chatStreamStore = useChatStreamStore();
   const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
     useNavigationLock();
@@ -19,8 +17,7 @@ export function useAppShellLock() {
       isGlobalLocked.value ||
       isStreamingLocked.value ||
       isChatHistoryLocked.value ||
-      chatStreamStore.isStreaming ||
-      chatStore.isNavigationLocked
+      chatStreamStore.isStreaming
   );
 
   const isAppNavigationBlocked = computed(

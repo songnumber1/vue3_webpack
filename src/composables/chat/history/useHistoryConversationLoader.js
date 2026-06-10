@@ -6,6 +6,7 @@
 import {nextTick} from "vue";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
 import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useHistoryConversationLoader({
   router,
@@ -30,7 +31,6 @@ export function useHistoryConversationLoader({
   const {ensureConversation, clearActiveSession} = runtime;
 
   function resetMainRouteConversation() {
-    chatStore.setHistoryNavigationLocked(false);
     finishHistoryRender();
     clearLazyHistoryMessages();
     messages.value = [];
@@ -63,7 +63,7 @@ export function useHistoryConversationLoader({
     // 복원 가능한 대화방이 없으므로 메인으로 되돌립니다. 단, 좌측 대화방 클릭 직후
     // activeRoomId가 곧 세팅될 pending 상태는 첫 진입 로드를 막지 않기 위해 대기합니다.
     if (!hasPendingHiddenNavigation) {
-      await router.replace({name: "main"}).catch(() => {});
+      await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
     }
   }
 
@@ -71,7 +71,7 @@ export function useHistoryConversationLoader({
     clearPendingSelectedOnFailure(activeHistoryId.value);
     finishHistoryRender();
     // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
-    await router.replace({name: "main"}).catch(() => {});
+    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
   }
 
   async function applyPendingNewSubmitHistory(history) {

@@ -149,6 +149,7 @@ import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
 import languageIcon from "@/assets/img/settings/language.svg";
 import playgroundIcon from "@/assets/img/settings/playground.svg";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -252,7 +253,11 @@ function selectMenuItem(key) {
   if (key === "terms" || key === "playground") {
     closePanel();
     router
-      .push(key === "terms" ? {name: "terms"} : {name: "playground"})
+      .push(
+        key === "terms"
+          ? {name: ROUTE_NAMES.TERMS}
+          : {name: ROUTE_NAMES.PLAYGROUND}
+      )
       .catch(() => {});
     return;
   }

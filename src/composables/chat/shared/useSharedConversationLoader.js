@@ -6,6 +6,7 @@
 import {nextTick} from "vue";
 import {getSharedConversation} from "@/composables/chat/useSharedChat";
 import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useSharedConversationLoader({
   t,
@@ -33,10 +34,10 @@ export function useSharedConversationLoader({
     messages.value = [];
     // 공유 URL 검증 실패는 더 이상 렌더 완료 대기/스크롤 보정이 필요하지 않습니다.
     // finishHistoryRender()는 nextTick/paint 이후에 lock을 해제하므로, alert 확인 직후
-    // main 이동이 router guard의 historyNavigationLocked에 막힐 수 있습니다.
+    // main 이동이 router guard의 chat-history lock에 막힐 수 있습니다.
     // 실패 경로에서는 즉시 렌더 상태와 lock을 정리한 뒤 메인으로 이동합니다.
     finishHistoryRenderImmediately();
-    await router.replace({name: "main"}).catch(() => {});
+    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
   }
 
   async function loadSharedRouteConversation({isCurrentLoad}) {
@@ -54,7 +55,7 @@ export function useSharedConversationLoader({
       }
       chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
       if (isHiddenConversationUrlMode(systemSettingsStore.settings)) {
-        await router.replace({name: "shared"}).catch(() => {});
+        await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
         // URL 숨김 모드에서는 /shared/:id -> /shared replace 직후 route watcher가
         // 새 loadRouteConversation을 시작할 수 있습니다. 이 경우 현재 load는 stale
         // 상태가 되므로 메시지를 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
@@ -71,7 +72,7 @@ export function useSharedConversationLoader({
       clearLazyHistoryMessages();
       messages.value = [];
       finishHistoryRender();
-      await router.replace({name: "main"}).catch(() => {});
+      await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
       return;
     }
 

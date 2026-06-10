@@ -75,7 +75,8 @@ export function useChatNavigationActions({
   const chatStreamStore = useChatStreamStore();
   const chatStore = useChatStore();
   const systemSettingsStore = useSystemSettingsStore();
-  const {NAVIGATION_LOCK_SCOPES, releaseLock} = useNavigationLock();
+  const {NAVIGATION_LOCK_SCOPES, isChatHistoryLocked, releaseLock} =
+    useNavigationLock();
 
   /**
    * @description 답변 스트리밍 또는 대화방 이력 렌더링 중에는 좌측 메뉴/헤더 이동을 차단합니다.
@@ -83,20 +84,18 @@ export function useChatNavigationActions({
    * 대용량 대화방 메시지가 실제 화면에 출력될 때까지 답변 생성 중과 동일하게 메뉴 이동을 막습니다.
    * @returns {boolean} 네비게이션 액션 차단 여부
    */
-  function isNavigationLocked() {
-    return chatStreamStore.isStreaming || chatStore.isNavigationLocked;
+  function isChatNavigationBlocked() {
+    return chatStreamStore.isStreaming || isChatHistoryLocked.value;
   }
 
   function clearConversationNavigationState() {
     chatStore.clearPendingSelectedChatId();
-    chatStore.setHistoryNavigationLocked(false);
     releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
     clearActiveSession();
   }
 
   async function navigateToMainAfterReset() {
     chatStore.clearPendingSelectedChatId();
-    chatStore.setHistoryNavigationLocked(false);
     releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
 
     await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
@@ -104,7 +103,6 @@ export function useChatNavigationActions({
 
     if (router.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
       chatStore.clearPendingSelectedChatId();
-      chatStore.setHistoryNavigationLocked(false);
       releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
       await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
     }
@@ -153,7 +151,7 @@ export function useChatNavigationActions({
    * @param {object} item - 라우팅 타깃이 된 특정 대화방 히스토리 로우 오브젝트
    */
   async function openHistory(item) {
-    if (isNavigationLocked()) return false;
+    if (isChatNavigationBlocked()) return false;
     const historyId = String(item?.id || "").trim();
     if (!historyId) return false;
 
@@ -177,7 +175,7 @@ export function useChatNavigationActions({
    * @description 라이트 모드 <-> 다크 모드 스타일 레이어를 반전 토글하고, 이에 대응하여 메시지 리스트에 내장된 Mermaid.js 기반 순서도/다이어그램 그래프의 색상 스키마를 강제 리렌더링 보정합니다.
    */
   async function toggleTheme() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     try {
       theme.toggle(); // 글로벌 하드웨어 테마 쿠키/로컬스토리지 스위칭 연동
       themeName.value = theme.current; // 현재 모드 런타임 캐싱 업데이트
@@ -205,20 +203,20 @@ export function useChatNavigationActions({
 
   // 시스템 API 개발서 전용 주소창 다이렉트 점프
   function openSwagger() {
-    if (isNavigationLocked()) return;
-    router.push("/swagger").catch(() => {});
+    if (isChatNavigationBlocked()) return;
+    router.push({name: ROUTE_NAMES.SWAGGER}).catch(() => {});
   }
 
   // 프롬프트 및 API 테스트 전용 실험실(Playground) 화면 이동 (이동 시 사이드 드로어는 눈을 가리기 위해 닫기 처리)
   function openPlayground() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "playground"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.PLAYGROUND}).catch(() => {});
   }
 
   // 모바일 환경에서 가상 키보드 튐이나 인풋 포커스 록을 깨부수고 부드럽게 좌측 사이드 메뉴 드로어를 슬라이딩 노출합니다.
   function openMobileDrawer() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
 
     // 모바일 포커싱 디포커스 처리: 인풋 폼에 포커스가 잡힌 상태에서 드로어가 열리면 UI 레이아웃이 찢어지므로 네이티브 활성 노드 엘리먼트를 강제 블러 처리 탈거
     const activeElement =
@@ -234,7 +232,7 @@ export function useChatNavigationActions({
 
   // 해상도 조건에 의거하여 반응형으로 디바이스 맞춤형 환경설정 모달 또는 전용 페이지 창을 점등 제어합니다.
   function openSettings() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     if (isMobile.value) {
       navigationStore.setDrawerOpen(false); // 모바일은 드로어를 등 뒤로 끄고 전체화면 세팅 팝업 로드
       mobileSettingsOpen.value = true;
@@ -245,49 +243,49 @@ export function useChatNavigationActions({
 
   // 이용 가이드라인 가이드북 라우팅 화면 점프
   function openGuide() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "guide"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.GUIDE}).catch(() => {});
   }
 
   // 시스템 전체 공지사항 모달 가시 노출 활성화
   function openNotice() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
     noticeOpen.value = true;
   }
 
   // 서비스 개인정보 처리방침 규약 모달 가시 노출 활성화
   function openPrivacy() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
     privacyOpen.value = true;
   }
 
   // 서비스 공식 이용약관 서면 페이지 라우팅 이동
   function openTerms() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "terms"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
   }
 
   // 시스템 커스텀 마이페이지 개인화 모달 팝업 개통
   function openPersonalization() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
     personalizationOpen.value = true;
   }
 
   // 인프라 운영 모니터링 및 코어 시스템 정보 가이드 모달 개통
   function openSystem() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     navigationStore.setDrawerOpen(false);
     systemOpen.value = true;
   }
 
   // 다국어 글로벌 번역 체인지 전용 바텀시트 활성화
   function openLanguage() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     languageSheetOpen.value = true;
   }
 
@@ -295,7 +293,7 @@ export function useChatNavigationActions({
    * @description 백엔드 라이브 인증 세션 서버에 로그아웃 HTTP 요청을 무효화 집행하고, 통신 성공 여부와 상관없이 클라이언트 전역 인증 토큰/프로필 컨텍스트 스토어를 영구 리셋 포맷한 뒤 로그인 필수 화면으로 추방 라우트 전환합니다.
    */
   async function logout() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     try {
       await authApiLive.logout(); // 1. 인증 가동 서버의 쿠키 및 단방향 세션 블록 날리기 요청
     } catch (error) {
@@ -307,14 +305,17 @@ export function useChatNavigationActions({
 
       // 4. 인증 상실 전용 가이드 뷰페이지로 리플레이스 강제 릴리즈 (뒤로가기 방어 처리 및 다국어 리즌 코드 쿼리 수치화 결합)
       await router
-        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .replace({
+          name: ROUTE_NAMES.LOGIN_REQUIRED,
+          query: {reason: "LOGIN_REQUIRED"},
+        })
         .catch(() => {});
     }
   }
 
   // 상단 탑 헤더 영역의 모델명 버튼 명세 등을 클릭했을 때 하향식 어시스턴트 목록 변경 팝업 시트를 개통 조율
   function openAssistantFromHeader() {
-    if (isNavigationLocked()) return;
+    if (isChatNavigationBlocked()) return;
     assistantSheetOpen.value = true;
   }
 

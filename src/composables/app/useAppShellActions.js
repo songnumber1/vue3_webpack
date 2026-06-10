@@ -12,6 +12,7 @@ import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {useAppShellLock} from "@/composables/app/useAppShellLock";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useAppShellActions({
   router,
@@ -57,19 +58,19 @@ export function useAppShellActions({
 
   function openSwagger() {
     if (isBlocked()) return;
-    router.push("/swagger").catch(() => {});
+    router.push({name: ROUTE_NAMES.SWAGGER}).catch(() => {});
   }
 
   function openPlayground() {
     if (isBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "playground"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.PLAYGROUND}).catch(() => {});
   }
 
   function openGuide() {
     if (isBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "guide"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.GUIDE}).catch(() => {});
   }
 
   function openNotice() {
@@ -87,7 +88,7 @@ export function useAppShellActions({
   function openTerms() {
     if (isBlocked()) return;
     navigationStore.setDrawerOpen(false);
-    router.push({name: "terms"}).catch(() => {});
+    router.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
   }
 
   function openPersonalization() {
@@ -128,7 +129,10 @@ export function useAppShellActions({
       useAuthStore().resetAuth();
       navigationStore.setDrawerOpen(false);
       await router
-        .replace({name: "login-required", query: {reason: "LOGIN_REQUIRED"}})
+        .replace({
+          name: ROUTE_NAMES.LOGIN_REQUIRED,
+          query: {reason: "LOGIN_REQUIRED"},
+        })
         .catch(() => {});
     }
   }

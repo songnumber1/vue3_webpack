@@ -59,7 +59,6 @@ export const useChatStore = defineStore("chat", {
     activeRoomId: null, // URL 숨김/공유 조회 정책에서 현재 화면에 표시할 방 ID
     activeRoomType: null, // activeRoomId의 출처 타입(chat/shared)
     pendingSelectedChatId: null, // 대화방 전환 클릭 직후 실제 session 세팅 전까지 좌측 메뉴 선택 색상을 먼저 반영하기 위한 임시 Chat ID
-    historyNavigationLocked: false, // ProgressBar 표시 여부와 무관하게 대화방 이력 로딩/렌더 완료 전까지 전역 네비게이션을 차단합니다.
     activeSession: null, // 백엔드 세션 소켓 커넥션 정보 및 읽기 전용 가드 상태 믹스드 객체
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
     promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
@@ -83,12 +82,6 @@ export const useChatStore = defineStore("chat", {
      */
     isActiveSharedRoom: (state) =>
       state.activeRoomType === ACTIVE_ROOM_TYPES.shared,
-    /**
-     * 답변 생성 외에도 대화방 입장/이력 렌더링 중에는 좌측 메뉴와 주요 액션을 잠급니다.
-     */
-    isNavigationLocked: (state) =>
-      Boolean(state.pendingSelectedChatId) ||
-      Boolean(state.historyNavigationLocked),
     /**
      * 특정 챗방이 히스토리 박제 형태 또는 이미 완료 처리되어 AI 모델 사양을 유저가 도중에 함부로 가로채 교체할 수 없도록 강제 락을 걸었는지 확인하는 판별식입니다.
      */
@@ -206,13 +199,6 @@ export const useChatStore = defineStore("chat", {
     clearPendingSelectedChatId() {
       this.pendingSelectedChatId = null;
     },
-    /**
-     * ProgressBar가 꺼져 있어도 대화방 이력 로딩/렌더링 중에는 사용자 이동을 차단합니다.
-     */
-    setHistoryNavigationLocked(locked = false) {
-      this.historyNavigationLocked = Boolean(locked);
-    },
-
     /**
      * 특정 대화방 소유의 말풍선 메시지 리스트 데이터 타깃 풀을 업데이트 맵핑 주입합니다.
      */

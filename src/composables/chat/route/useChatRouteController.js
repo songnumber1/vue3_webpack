@@ -5,6 +5,7 @@
 
 import {computed} from "vue";
 import {resolveActiveChatId} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
  * main/chat/shared route 상태와 현재 active id를 계산합니다.
@@ -43,7 +44,7 @@ export function useChatRouteController({
   });
 
   function getSharedEntryId() {
-    if (route.name !== "shared-entry") return "";
+    if (route.name !== ROUTE_NAMES.SHARED_ENTRY) return "";
     return String(route.params?.id || route.params?.shareId || "").trim();
   }
 

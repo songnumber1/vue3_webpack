@@ -4,12 +4,10 @@
  */
 
 import {computed} from "vue";
-import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
 export function useMainPageLock() {
-  const chatStore = useChatStore();
   const chatStreamStore = useChatStreamStore();
   const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
     useNavigationLock();
@@ -19,8 +17,7 @@ export function useMainPageLock() {
       isGlobalLocked.value ||
       isStreamingLocked.value ||
       chatStreamStore.isStreaming ||
-      isChatHistoryLocked.value ||
-      chatStore.historyNavigationLocked
+      isChatHistoryLocked.value
   );
 
   const isPromptSubmitBlocked = computed(() => isMainPageActionBlocked.value);

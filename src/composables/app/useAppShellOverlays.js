@@ -5,14 +5,14 @@
 
 import {ref} from "vue";
 
-export function useAppShellOverlays() {
-  const noticeOpen = ref(false);
-  const privacyOpen = ref(false);
-  const personalizationOpen = ref(false);
-  const systemOpen = ref(false);
-  const languageSheetOpen = ref(false);
-  const mobileSettingsOpen = ref(false);
+const noticeOpen = ref(false);
+const privacyOpen = ref(false);
+const personalizationOpen = ref(false);
+const systemOpen = ref(false);
+const languageSheetOpen = ref(false);
+const mobileSettingsOpen = ref(false);
 
+export function useAppShellOverlays() {
   function closeNotice() {
     noticeOpen.value = false;
   }

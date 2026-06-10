@@ -84,7 +84,6 @@ export function useConversationRenderLifecycle({
     historyRenderFinishSeq += 1;
     historyMessagesLoaded.value = false;
     isHistoryRendering.value = true;
-    chatStore.setHistoryNavigationLocked(true);
     navigationLock.acquireLockIfFree(
       navigationLock.NAVIGATION_LOCK_SCOPES.chatHistory,
       {
@@ -111,7 +110,6 @@ export function useConversationRenderLifecycle({
     historyRenderFinishSeq += 1;
     historyMessagesLoaded.value = false;
     isHistoryRendering.value = false;
-    chatStore.setHistoryNavigationLocked(false);
     releaseCurrentChatHistoryLock();
     if (historyRenderOverlayActive) {
       apiRequestStore.stopOverlay();
@@ -129,7 +127,6 @@ export function useConversationRenderLifecycle({
         if (finishSeq !== historyRenderFinishSeq) return;
 
         isHistoryRendering.value = false;
-        chatStore.setHistoryNavigationLocked(false);
         releaseCurrentChatHistoryLock();
 
         await nextTick();
@@ -192,7 +189,6 @@ export function useConversationRenderLifecycle({
 
   function cleanupHistoryRender() {
     invalidateHistoryRender();
-    chatStore.setHistoryNavigationLocked(false);
     forceReleaseChatHistoryLock();
     if (historyRenderOverlayActive) {
       apiRequestStore.stopOverlay();
