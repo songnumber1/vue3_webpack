@@ -62,11 +62,20 @@
 import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import McpMainWorkspace from "@/components/mcp/McpMainWorkspace.vue";
-import {httpClient} from "@/api/clients/httpClient";
-import {unwrapApiBody} from "@/utils/apiResponseReader";
-import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
+import {useMcpWorkspaceData} from "@/composables/mcp/useMcpWorkspaceData";
 
 const {t, locale} = useI18n();
+const mcpData = useMcpWorkspaceData({
+  allLabel: t("mcp.defaults.all"),
+  allDescription: t("mcp.defaults.allDescription"),
+  defaultCategory: t("mcp.defaults.common"),
+  defaultConnector: t("mcp.defaults.connector"),
+  defaultDescription: t("mcp.defaults.description"),
+  defaultUser: t("mcp.defaults.user"),
+  defaultCapability: t("mcp.defaults.capability"),
+  publicScope: t("mcp.defaults.publicScope"),
+  createPromptExamples: createDefaultPromptExamples,
+});
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -447,40 +456,29 @@ async function loadMcpData() {
 
 async function loadMainInfo() {
   try {
-    const response = await httpClient.get("/mcp/search/main/info.do");
-    const data = unwrapApiBody(response, {});
-    const mainInfo = adaptMcpMainInfo(data, {
-      allLabel: t("mcp.defaults.all"),
-      allDescription: t("mcp.defaults.allDescription"),
-    });
+    const mainInfo = await mcpData.fetchMainInfo();
     if (mainInfo.categories.length) {
       mcpCategoryOptions.value = mainInfo.categories;
     }
   } catch (error) {
-    // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
+    // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
   }
 }
 
 async function loadMcpList() {
   try {
-    const response = await httpClient.get("/mcp/search/list.do", {
-      params: {pageNo: 1, pagePerCnt: 20, categoryId: "", topCnt: 4},
-    });
-    const data = adaptMcpList(response, {
-      defaultCategory: t("mcp.defaults.common"),
-      defaultConnector: t("mcp.defaults.connector"),
-      defaultDescription: t("mcp.defaults.description"),
-      defaultUser: t("mcp.defaults.user"),
-      defaultCapability: t("mcp.defaults.capability"),
-      publicScope: t("mcp.defaults.publicScope"),
-      createPromptExamples: createDefaultPromptExamples,
+    const data = await mcpData.fetchMcpList({
+      pageNo: 1,
+      pagePerCnt: 20,
+      categoryId: "",
+      topCnt: 4,
     });
     if (data.length) {
       mcps.value = data;
       usesDefaultMcpData.value = false;
     }
   } catch (error) {
-    // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
+    // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
   }
 }
 

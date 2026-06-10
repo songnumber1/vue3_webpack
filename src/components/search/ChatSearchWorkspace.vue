@@ -147,18 +147,18 @@ import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import {resolveChatApis} from "@/api/runtime/chatApis";
-import {chatHistoryApiMock} from "@/api/mock/chatHistoryApi.mock";
-import {
-  adaptChatSearchResponse,
-  createHistoryFromSearchResult,
-} from "@/adapters/chatResponseAdapter";
+import {useChatSearch} from "@/composables/search/useChatSearch";
+import {createHistoryFromSearchResult} from "@/adapters/chatResponseAdapter";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
 
 const {t, locale} = useI18n();
+const chatSearch = useChatSearch({
+  fallbackTitle: t("chatSearch.untitled"),
+  limit: 200,
+});
 const router = useRouter();
 const chatStore = useChatStore();
 const systemSettingsStore = useSystemSettingsStore();
@@ -245,28 +245,12 @@ async function runSearch({resetPage = false} = {}) {
   if (resetPage) currentPage.value = 1;
   loading.value = true;
   try {
-    const {chatHistoryApi} = resolveChatApis();
-    const response = await chatHistoryApi.searchChats({
-      keyword: nextKeyword,
-      searchText: nextKeyword,
-      query: nextKeyword,
-      limit: 200,
-    });
-    allResults.value = normalizeSearchResponse(response).list;
+    allResults.value = (await chatSearch.search(nextKeyword)).list;
   } catch (_error) {
-    allResults.value = normalizeSearchResponse(
-      await chatHistoryApiMock.searchChats({keyword: nextKeyword, limit: 200})
-    ).list;
+    allResults.value = [];
   } finally {
     loading.value = false;
   }
-}
-
-function normalizeSearchResponse(response) {
-  return adaptChatSearchResponse(response, {
-    fallbackTitle: t("chatSearch.untitled"),
-    keyword: lastSearchedKeyword.value,
-  });
 }
 
 function goToPage(page) {

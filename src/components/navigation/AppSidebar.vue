@@ -204,7 +204,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject, nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
@@ -220,24 +220,15 @@ import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFoote
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
-import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
-
-const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
-
+import {useChatSidebarLock} from "@/composables/chat/sidebar/useChatSidebarLock";
+import {useChatSidebarActions} from "@/composables/chat/sidebar/useChatSidebarActions";
 const router = useRouter();
 const route = useRoute();
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
@@ -256,9 +247,14 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
-const isSidebarNavigationLocked = computed(
-  () => chatStreamStore.isStreaming || chatStore.isNavigationLocked
-);
+const sidebarLock = useChatSidebarLock();
+const {
+  isAssistantSelectBlocked,
+  isChatSearchBlocked,
+  isHistoryMenuBlocked,
+  isHistorySelectBlocked,
+  isNewChatBlocked,
+} = sidebarLock;
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
@@ -270,61 +266,36 @@ function syncViewportMode() {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openAssistantSelector() {
-  if (isSidebarNavigationLocked.value) return;
-  syncViewportMode();
-  assistantMenuOpen.value = !assistantMenuOpen.value;
+  sidebarActions.openAssistantSelector();
 }
 
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function selectAssistant(id) {
-  if (chatStreamStore.isStreaming) return;
-  const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
-  const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
-
-  if (isStudioPortal || isConnectorPortal) {
-    assistantStore.selectAssistant(id);
-    assistantMenuOpen.value = false;
-    navigationStore.setDrawerOpen(false);
-    router
-      .push({name: isConnectorPortal ? "connector-store" : "studio"})
-      .catch(() => {});
-    return;
-  }
-
-  await chatActions.selectAssistant(id);
-  assistantMenuOpen.value = false;
-
-  if (["studio", "connector-store"].includes(route.name)) {
-    router.push({name: "main"}).catch(() => {});
-  }
+  await sidebarActions.selectAssistant(id);
 }
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleNewChat() {
-  if (chatStreamStore.isStreaming) return;
-  await chatActions.newChat();
-  navigationStore.setDrawerOpen(false);
-  navigationStore.setCollapsedRecentOpen(false);
+  if (isNewChatBlocked.value) return;
+  await sidebarActions.newChat();
 }
 
 function handleChatSearch() {
-  if (isSidebarNavigationLocked.value) return;
-  navigationStore.setDrawerOpen(false);
-  navigationStore.setCollapsedRecentOpen(false);
-  router.push({name: "chat-search"}).catch(() => {});
+  if (isChatSearchBlocked.value) return;
+  sidebarActions.openChatSearch();
 }
 
 /**
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openHistoryMenu(payload = {}) {
-  if (isSidebarNavigationLocked.value) return;
+  if (isHistoryMenuBlocked.value) return;
+  if (sidebarActions.openHistoryMenu(payload) === false) return;
   const {item, event} = payload;
-  syncViewportMode();
   historyMenuTarget.value = item || null;
   historyMenuReferenceEl.value = event?.currentTarget || null;
   historyMenuOpen.value = true;
@@ -339,35 +310,42 @@ function closeHistoryMenu() {
   historyMenuReferenceEl.value = null;
 }
 
+const sidebarActions = useChatSidebarActions({
+  router,
+  route,
+  lock: sidebarLock,
+  assistantMenuOpen,
+  syncViewportMode,
+  closeHistoryMenu,
+});
+
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function selectHistoryMenuAction(action) {
-  if (isSidebarNavigationLocked.value) return;
+  if (isHistoryMenuBlocked.value) return;
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
-  if (!history || !action) return;
-  chatActions.historyMenuAction({action, history});
+  sidebarActions.historyMenuAction({action, history});
 }
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistory(item) {
-  if (isSidebarNavigationLocked.value) return;
-  const moved = await chatActions.selectHistory(item);
-  if (moved === false) return;
-  navigationStore.setDrawerOpen(false);
+  if (isHistorySelectBlocked.value) return;
+  await sidebarActions.selectHistory(item);
 }
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
 async function handleSelectHistoryCollapsed(item) {
-  if (isSidebarNavigationLocked.value) return;
-  const moved = await chatActions.selectHistory(item);
-  if (moved === false) return;
-  navigationStore.setCollapsedRecentOpen(false);
+  if (isHistorySelectBlocked.value) return;
+  await sidebarActions.selectHistory(item, {
+    source: "collapsed-sidebar",
+    closeCollapsedRecent: true,
+  });
 }
 
 useOutsideClick(

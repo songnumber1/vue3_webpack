@@ -66,15 +66,20 @@ import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
 import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
-import {httpClient} from "@/api/clients/httpClient";
-import {unwrapApiBody} from "@/utils/apiResponseReader";
-import {
-  adaptStudioAuthorityList,
-  adaptStudioList,
-  adaptStudioMainInfo,
-} from "@/adapters/studioResponseAdapter";
+import {useStudioWorkspaceData} from "@/composables/studio/useStudioWorkspaceData";
 
 const {t, locale} = useI18n();
+const studioData = useStudioWorkspaceData({
+  allLabel: t("studio.defaults.all"),
+  allDescription: t("studio.defaults.allDescription"),
+  defaultCategory: t("studio.defaults.common"),
+  defaultDescription: t("studio.defaults.studioDescription"),
+  defaultUser: t("studio.defaults.user"),
+  defaultKnowledge: t("studio.defaults.noKnowledge"),
+  publicScope: t("studio.defaults.publicScope"),
+  authScope: t("studio.defaults.authScope"),
+  createPromptExamples: createDefaultPromptExamples,
+});
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -606,12 +611,7 @@ async function loadStudioData() {
 }
 async function loadMainInfo() {
   try {
-    const response = await httpClient.get("/studio/search/main/info.do");
-    const data = unwrapApiBody(response, {});
-    const mainInfo = adaptStudioMainInfo(data, {
-      allLabel: t("studio.defaults.all"),
-      allDescription: t("studio.defaults.allDescription"),
-    });
+    const mainInfo = await studioData.fetchMainInfo();
     if (mainInfo.categories.length) {
       studioCategoryOptions.value = mainInfo.categories;
       categoryOptions.value = studioCategoryOptions.value.filter(
@@ -625,38 +625,31 @@ async function loadMainInfo() {
     if (mainInfo.ragOptions.length) ragOptions.value = mainInfo.ragOptions;
     if (mainInfo.mcpOptions.length) mcpOptions.value = mainInfo.mcpOptions;
   } catch (error) {
-    // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
+    // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
   }
 }
 async function loadAuthorityInfo() {
   try {
-    const response = await httpClient.get("/studio/main/ssg/info");
-    const data = adaptStudioAuthorityList(response);
+    const data = await studioData.fetchAuthorityInfo();
     if (data.length) authorityOptions.value = data;
   } catch (error) {
-    // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
+    // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
   }
 }
 async function loadStudioList() {
   try {
-    const response = await httpClient.get("/studio/search/list.do", {
-      params: {pageNo: 1, pagePerCnt: 20, categoryId: "", topCnt: 4},
-    });
-    const data = adaptStudioList(response, {
-      defaultCategory: t("studio.defaults.common"),
-      defaultDescription: t("studio.defaults.studioDescription"),
-      defaultUser: t("studio.defaults.user"),
-      defaultKnowledge: t("studio.defaults.noKnowledge"),
-      publicScope: t("studio.defaults.publicScope"),
-      authScope: t("studio.defaults.authScope"),
-      createPromptExamples: createDefaultPromptExamples,
+    const data = await studioData.fetchStudioList({
+      pageNo: 1,
+      pagePerCnt: 20,
+      categoryId: "",
+      topCnt: 4,
     });
     if (data.length) {
       studios.value = data;
       usesDefaultStudioData.value = false;
     }
   } catch (error) {
-    // 백엔드 미연결 개발 환경에서는 기본 mock 데이터를 유지합니다.
+    // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
   }
 }
 function runSearch() {

@@ -147,6 +147,8 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
+import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
+import {APP_SHELL_ACTIONS_KEY} from "@/composables/app/appShellActionContext";
 
 /**
  * [ChatContainer 연결 구조]
@@ -300,6 +302,7 @@ const {
   handleMessageContentRendered,
   scrollBottom,
   handleSystemSettingsApplied,
+  handleMobileSettingsDesktopOpen,
 } = useChatContainerController(controllerProps);
 
 const shellReady = computed(
@@ -309,6 +312,13 @@ const shellReady = computed(
 const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
+
+const chatPageLock = useChatPageLock({
+  readonly: isReadOnly,
+  isGenerating,
+  isHistoryRendering,
+  isActiveModelUnavailable,
+});
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
@@ -343,25 +353,6 @@ function handleWorkspaceScrollBottom() {
 
 function setWorkspaceRef(el) {
   workspaceRef.value = el;
-}
-
-function handleMobileSettingsDesktopOpen(target) {
-  mobileSettingsOpen.value = false;
-  if (target === "notice") {
-    noticeOpen.value = true;
-    return;
-  }
-  if (target === "privacy") {
-    privacyOpen.value = true;
-    return;
-  }
-  if (target === "personalization") {
-    personalizationOpen.value = true;
-    return;
-  }
-  if (target === "system") {
-    systemOpen.value = true;
-  }
 }
 
 provide(
@@ -410,12 +401,10 @@ provide(
   }))
 );
 
-provide(CHAT_ACTIONS_KEY, {
-  openDrawer: openMobileDrawer,
+provide(APP_SHELL_ACTIONS_KEY, {
   toggleTheme,
   openSwagger,
   openSettings,
-  openAssistant: openAssistantFromHeader,
   openGuide,
   openNotice,
   openPrivacy,
@@ -425,6 +414,11 @@ provide(CHAT_ACTIONS_KEY, {
   openLanguage,
   openPlayground,
   logout,
+});
+
+provide(CHAT_ACTIONS_KEY, {
+  openDrawer: openMobileDrawer,
+  openAssistant: openAssistantFromHeader,
   newChat: startNewChat,
   selectHistory: openHistory,
   historyMenuAction: handleHistoryMenuAction,
@@ -433,13 +427,11 @@ provide(CHAT_ACTIONS_KEY, {
 
 provide(WORKSPACE_ACTIONS_KEY, {
   submit: (payload) => {
-    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value)
-      return;
+    if (chatPageLock.isSubmitBlocked.value) return;
     submit(payload);
   },
   regenerate: (message) => {
-    if (isReadOnly.value || isGenerating.value || isHistoryRendering.value)
-      return;
+    if (chatPageLock.isRegenerateBlocked.value) return;
     regenerate(message);
   },
   updateSelectedModel: (val) => {

@@ -7,36 +7,28 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
-import {getSharedConversation} from "@/composables/chat/useSharedChat";
-import {
-  renderMermaidInElement,
-  warmupMermaidForHistoryRender,
-} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {usePlatformStore} from "@/stores/platformStore";
-import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 import {
   isSharedChat,
   resolveMessageRenderPolicy,
 } from "@/composables/chat/message-list/useMessageRenderPolicy";
-import {
-  isHiddenConversationUrlMode,
-  resolveActiveChatId,
-} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
-import {
-  resolveInitialMessageLazyRange,
-  resolveMessageLazySettings,
-  resolvePreviousMessageLazyStart,
-} from "@/composables/chat/message-list/useMessageLazyRange";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {useChatRouteController} from "@/composables/chat/route/useChatRouteController";
+import {useChatRouteLoader} from "@/composables/chat/route/useChatRouteLoader";
+import {useHistoryConversationLoader} from "@/composables/chat/history/useHistoryConversationLoader";
+import {useSharedConversationLoader} from "@/composables/chat/shared/useSharedConversationLoader";
+import {useConversationLazyHistory} from "@/composables/chat/conversation/useConversationLazyHistory";
+import {useConversationRenderLifecycle} from "@/composables/chat/conversation/useConversationRenderLifecycle";
 
 /**
  * [Route/Data controller]
@@ -61,39 +53,12 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   // 비즈니스 인프라 마스터 데이터 부트스트랩 패치가 최종 완료되었는지를 나타내는 트리거 플래그입니다.
   const runtimeReady = ref(false);
-  const isHistoryRendering = ref(false);
-  const historyMessagesLoaded = ref(false);
 
-  function getMessageLazySettings() {
-    return resolveMessageLazySettings(
-      systemSettingsStore.settings,
-      Boolean(ui.isMobile?.value)
-    );
-  }
-
-  function getHistoryLazyInitialCount() {
-    return getMessageLazySettings().initialCount;
-  }
-
-  function getHistoryLazyAppendCount() {
-    return getMessageLazySettings().appendCount;
-  }
-
-  function getHistoryLazyTopThresholdPx() {
-    return getMessageLazySettings().topThresholdPx;
-  }
-  const fullHistoryMessages = ref([]);
-  const historyVisibleStartIndex = ref(0);
-  const hasPreviousHistoryMessages = computed(
-    () =>
-      isChatPage.value &&
-      messageRenderPolicy.value.useLazyLoading !== false &&
-      historyVisibleStartIndex.value > 0
-  );
   const apiRequestStore = useApiRequestStore();
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
+  const navigationLock = useNavigationLock();
   const messageRenderPolicy = computed(() =>
     resolveMessageRenderPolicy({
       isMobile: Boolean(ui.isMobile?.value),
@@ -101,297 +66,23 @@ export function useChatDataController({props, ui, runtime, messages}) {
       searchTargetMessageId: route.query?.messageId,
     })
   );
-  let historyRenderOverlayActive = false;
-  let routeConversationLoadSeq = 0;
-  let historyRenderFinishSeq = 0;
-
-  function waitForNextPaint() {
-    if (typeof window === "undefined") return Promise.resolve();
-    return new Promise((resolve) => {
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(resolve);
-      });
-    });
-  }
-
-  async function flushConversationSwitchPaint({clearMessages = true} = {}) {
-    if (clearMessages) {
-      messages.value = [];
-    }
-
-    await nextTick();
-    await waitForNextPaint();
-  }
-
-  function clearLazyHistoryMessages() {
-    fullHistoryMessages.value = [];
-    historyVisibleStartIndex.value = 0;
-  }
-
-  function getInitialLazyHistorySlice(sourceMessages = []) {
-    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    return resolveInitialMessageLazyRange({
-      messages: list,
-      initialCount: getHistoryLazyInitialCount(),
-      useLazyLoading: messageRenderPolicy.value.useLazyLoading !== false,
-    });
-  }
-
-  function setHistoryMessagesForInitialRender(sourceMessages = []) {
-    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    fullHistoryMessages.value = list;
-    const {start, visibleMessages} = getInitialLazyHistorySlice(list);
-    historyVisibleStartIndex.value = start;
-    messages.value = visibleMessages;
-  }
-
-  function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
-    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    if (messageRenderPolicy.value.useLazyLoading === false) {
-      fullHistoryMessages.value = list;
-      historyVisibleStartIndex.value = 0;
-      messages.value = list;
-      return true;
-    }
-
-    if (!isChatPage.value || !fullHistoryMessages.value.length) {
-      fullHistoryMessages.value = list;
-      return false;
-    }
-
-    const currentVisibleCount = Math.max(
-      messages.value.length,
-      Math.min(getHistoryLazyInitialCount(), list.length)
-    );
-    const isShowingLatest =
-      historyVisibleStartIndex.value + messages.value.length >=
-      fullHistoryMessages.value.length;
-
-    fullHistoryMessages.value = list;
-
-    if (isShowingLatest) {
-      const count = Math.max(currentVisibleCount, getHistoryLazyInitialCount());
-      historyVisibleStartIndex.value = Math.max(list.length - count, 0);
-    } else {
-      historyVisibleStartIndex.value = Math.min(
-        historyVisibleStartIndex.value,
-        Math.max(list.length - 1, 0)
-      );
-    }
-
-    const end = isShowingLatest
-      ? list.length
-      : Math.min(
-          historyVisibleStartIndex.value + currentVisibleCount,
-          list.length
-        );
-    messages.value = list.slice(historyVisibleStartIndex.value, end);
-    return true;
-  }
-
-  function isMermaidRenderingEnabled() {
-    return isMermaidRenderingEnabledForPlatform(
-      systemSettingsStore.settings,
-      Boolean(ui.isMobile?.value)
-    );
-  }
-
-  function hasMermaidInHistoryMessages(sourceMessages = []) {
-    if (!isMermaidRenderingEnabled()) return false;
-    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    return list.some((message) => {
-      const content = `${message?.content || ""}
-${message?.reasoningContent || ""}`;
-      return /```\s*mermaid/i.test(content);
-    });
-  }
-
-  function loadPreviousHistoryMessages() {
-    if (!isChatPage.value) return false;
-    if (messageRenderPolicy.value.useLazyLoading === false) return false;
-    const list = fullHistoryMessages.value;
-    if (!Array.isArray(list) || !list.length) return false;
-    if (historyVisibleStartIndex.value <= 0) return false;
-
-    const previousStart = historyVisibleStartIndex.value;
-    const nextStart = resolvePreviousMessageLazyStart({
-      currentStart: previousStart,
-      appendCount: getHistoryLazyAppendCount(),
-    });
-    if (nextStart === previousStart) return false;
-
-    historyVisibleStartIndex.value = nextStart;
-    messages.value = list.slice(nextStart);
-    return true;
-  }
-
-  function isLazyHistoryActiveForChat(chatId) {
-    return (
-      messageRenderPolicy.value.useLazyLoading !== false &&
-      isChatPage.value &&
-      String(activeHistoryId.value || "") === String(chatId || "") &&
-      Array.isArray(fullHistoryMessages.value) &&
-      fullHistoryMessages.value.length > 0
-    );
-  }
-
-  function mergeVisibleMessagesIntoFullHistory(nextVisibleMessages = []) {
-    const existing = Array.isArray(fullHistoryMessages.value)
-      ? fullHistoryMessages.value
-      : [];
-    const start = Math.max(0, historyVisibleStartIndex.value);
-    const visible = Array.isArray(nextVisibleMessages)
-      ? nextVisibleMessages
-      : [];
-
-    const merged = [...existing.slice(0, start), ...visible];
-    fullHistoryMessages.value = merged;
-    messages.value = visible;
-    return merged;
-  }
-
-  function setConversationPreservingLazyHistory(chatId, nextMessages) {
-    if (isLazyHistoryActiveForChat(chatId)) {
-      const merged = mergeVisibleMessagesIntoFullHistory(nextMessages);
-      setMessages(chatId, merged);
-      return;
-    }
-
-    setMessages(chatId, nextMessages);
-  }
-
-  function appendUserAndAssistantMessagesPreservingLazyHistory(
-    chatId,
-    normalized
-  ) {
-    const result = appendUserAndAssistantMessages(chatId, normalized);
-
-    if (!isLazyHistoryActiveForChat(chatId)) {
-      return result;
-    }
-
-    fullHistoryMessages.value = Array.isArray(result.messages)
-      ? result.messages
-      : [];
-
-    const visibleCount = Math.max(
-      getHistoryLazyInitialCount(),
-      Math.min(
-        fullHistoryMessages.value.length,
-        (messages.value?.length || 0) + 2
-      )
-    );
-    historyVisibleStartIndex.value = Math.max(
-      fullHistoryMessages.value.length - visibleCount,
-      0
-    );
-    const visibleMessages = fullHistoryMessages.value.slice(
-      historyVisibleStartIndex.value
-    );
-    messages.value = visibleMessages;
-
-    return {
-      messages: visibleMessages,
-      assistantMessage: result.assistantMessage,
-    };
-  }
-
-  function clearPendingSelectedIfMatched(chatId) {
-    const pendingId = String(chatStore.pendingSelectedChatId || "");
-    const targetId = String(chatId || "");
-    if (!pendingId || pendingId === targetId) {
-      chatStore.clearPendingSelectedChatId();
-    }
-  }
-
-  function clearPendingSelectedOnFailure(chatId) {
-    const pendingId = String(chatStore.pendingSelectedChatId || "");
-    if (!pendingId || pendingId === String(chatId || "")) {
-      chatStore.clearPendingSelectedChatId();
-    }
-  }
-
-  function beginHistoryRender() {
-    historyRenderFinishSeq += 1;
-    historyMessagesLoaded.value = false;
-    isHistoryRendering.value = true;
-    chatStore.setHistoryNavigationLocked(true);
-    if (
-      isProgressAllowedForCurrentPlatform(
-        systemSettingsStore.settings,
-        platformStore.info
-      ) &&
-      !historyRenderOverlayActive
-    ) {
-      apiRequestStore.startOverlay();
-      historyRenderOverlayActive = true;
-    }
-  }
-
-  function finishHistoryRenderImmediately() {
-    historyRenderFinishSeq += 1;
-    historyMessagesLoaded.value = false;
-    isHistoryRendering.value = false;
-    chatStore.setHistoryNavigationLocked(false);
-    if (historyRenderOverlayActive) {
-      apiRequestStore.stopOverlay();
-    }
-    historyRenderOverlayActive = false;
-  }
-
-  function finishHistoryRender() {
-    const finishSeq = ++historyRenderFinishSeq;
-
-    const revealAfterPaint = async () => {
-      try {
-        await nextTick();
-        await waitForNextPaint();
-        if (finishSeq !== historyRenderFinishSeq) return;
-
-        // MessageList가 hidden 상태에서 Markdown/Mermaid/하단 스크롤을 모두 끝낸 뒤에만
-        // composer를 다시 표시합니다. 이 시점부터 좋아요/재답변/입력창 높이가 실제 레이아웃에 반영됩니다.
-        isHistoryRendering.value = false;
-        chatStore.setHistoryNavigationLocked(false);
-
-        await nextTick();
-        if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
-          behavior: "auto",
-        });
-
-        await waitForNextPaint();
-        if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
-          behavior: "auto",
-        });
-
-        await waitForNextPaint();
-        if (finishSeq !== historyRenderFinishSeq) return;
-        await ui.scrollInitialTarget?.(messageRenderPolicy.value.scrollTarget, {
-          behavior: "auto",
-        });
-      } finally {
-        if (finishSeq === historyRenderFinishSeq) {
-          historyMessagesLoaded.value = false;
-          if (historyRenderOverlayActive) {
-            apiRequestStore.stopOverlay();
-          }
-          historyRenderOverlayActive = false;
-        }
-      }
-    };
-
-    void revealAfterPaint();
-  }
 
   // ── 📌 [1. 화면 라우팅 상태 분석 및 권한 가드 파트] ──────────────────
-  const currentMode = computed(() => props.mode);
-  const isMainPage = computed(() => currentMode.value === "main"); // 대화 서랍이 비어있는 빈 홈 화면 여부
-  const isChatPage = computed(() => currentMode.value === "chat"); // 실제 유저 본인의 프라이빗 대화방 여부
-  const isSharedPage = computed(() => currentMode.value === "shared"); // URL 공유 링크를 통해 들어온 외부인 열람용 방 여부
-  const isConversationPage = computed(
-    () => isChatPage.value || isSharedPage.value
-  ); // 실제 대화/공유 대화가 실재하는 뷰 포트 구조 판별
+  const {
+    currentMode,
+    isMainPage,
+    isChatPage,
+    isSharedPage,
+    isConversationPage,
+    activeHistoryId,
+    getSharedEntryId,
+  } = useChatRouteController({
+    props,
+    route,
+    chatStore,
+    systemSettingsStore,
+  });
+
   const isReadOnly = computed(
     () =>
       isSharedPage.value ||
@@ -420,23 +111,6 @@ ${message?.reasoningContent || ""}`;
     syncHistoriesInBackground,
   } = runtime;
 
-  // 현재 활성화된 라우터 세션의 고유 식별자 키(대화방 ID 또는 공유 ID)를 파싱 추출합니다.
-  const activeHistoryId = computed(() => {
-    if (isChatPage.value) {
-      return resolveActiveChatId({
-        route,
-        chatStore,
-        settings: systemSettingsStore.settings,
-      });
-    }
-    if (isSharedPage.value) {
-      return chatStore.activeRoomType === "shared"
-        ? String(chatStore.activeRoomId || "").trim()
-        : String(route.params?.id || route.params?.shareId || "").trim();
-    }
-    return null;
-  });
-
   /**
    * 전역 히스토리 서랍 데이터 내부에서 특정 ID를 가진 채팅방 레코드를 검색합니다.
    */
@@ -449,6 +123,96 @@ ${message?.reasoningContent || ""}`;
   }
 
   const activeHistory = computed(() => findHistory(activeHistoryId.value));
+
+  /**
+   * 대화방 이동 클릭 직후 표시용 pending id는 실제 history load 성공/실패 시점에만 정리합니다.
+   * pendingSelectedChatId는 lock이 아니라 좌측 메뉴 선택 색상 선반영용 상태입니다.
+   */
+  function clearPendingSelectedIfMatched(chatId) {
+    const pendingId = String(chatStore.pendingSelectedChatId || "").trim();
+    const targetId = String(chatId || "").trim();
+    if (!pendingId || pendingId === targetId) {
+      chatStore.clearPendingSelectedChatId();
+    }
+  }
+
+  function clearPendingSelectedOnFailure(chatId) {
+    const pendingId = String(chatStore.pendingSelectedChatId || "").trim();
+    const targetId = String(chatId || "").trim();
+    if (!pendingId || pendingId === targetId) {
+      chatStore.clearPendingSelectedChatId();
+    }
+  }
+
+  function isMermaidRenderingEnabled() {
+    return isMermaidRenderingEnabledForPlatform(
+      systemSettingsStore.settings,
+      Boolean(ui.isMobile?.value)
+    );
+  }
+
+  function hasMermaidInHistoryMessages(sourceMessages = []) {
+    if (!isMermaidRenderingEnabled()) return false;
+    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
+    return list.some((message) => {
+      const content = `${message?.content || ""}
+${message?.reasoningContent || ""}`;
+      return /```\s*mermaid/i.test(content);
+    });
+  }
+
+  const renderLifecycle = useConversationRenderLifecycle({
+    ui,
+    chatStore,
+    apiRequestStore,
+    systemSettingsStore,
+    platformStore,
+    activeHistoryId,
+    isMermaidRenderingEnabled,
+    messageRenderPolicy,
+    navigationLock,
+  });
+
+  const {
+    isHistoryRendering,
+    historyMessagesLoaded,
+    beginHistoryRender,
+    finishHistoryRender,
+    finishHistoryRenderImmediately,
+    renderAfterStream,
+    cleanupHistoryRender,
+  } = renderLifecycle;
+
+  async function flushConversationSwitchPaint(options = {}) {
+    return renderLifecycle.flushConversationSwitchPaint({
+      messages,
+      ...options,
+    });
+  }
+
+  const lazyHistory = useConversationLazyHistory({
+    messages,
+    isChatPage,
+    activeHistoryId,
+    messageRenderPolicy,
+    systemSettingsStore,
+    isMobile: ui.isMobile,
+    setMessages,
+    appendUserAndAssistantMessages,
+  });
+
+  const {
+    hasPreviousHistoryMessages,
+    getHistoryLazyInitialCount,
+    getHistoryLazyAppendCount,
+    getHistoryLazyTopThresholdPx,
+    clearLazyHistoryMessages,
+    setHistoryMessagesForInitialRender,
+    syncVisibleHistoryMessagesFromFull,
+    loadPreviousHistoryMessages,
+    setConversationPreservingLazyHistory,
+    appendUserAndAssistantMessagesPreservingLazyHistory,
+  } = lazyHistory;
 
   // 현재 진입한 대화방 상단 헤더 영역에 바인딩할 타이틀 텍스트를 산출합니다.
   const activeConversationTitle = computed(() => {
@@ -504,174 +268,51 @@ ${message?.reasoningContent || ""}`;
       .filter((item) => item.text && item.prompt); // 비정상 공백 질문은 필터링 제거합니다.
   });
 
-  function getSharedEntryId() {
-    if (route.name !== "shared-entry") return "";
-    return String(route.params?.id || route.params?.shareId || "").trim();
-  }
+  const {loadSharedRouteConversation, redirectSharedNotFound} =
+    useSharedConversationLoader({
+      t,
+      router,
+      chatStore,
+      systemSettingsStore,
+      messages,
+      activeHistoryId,
+      getSharedEntryId,
+      beginHistoryRender,
+      finishHistoryRender,
+      finishHistoryRenderImmediately,
+      flushConversationSwitchPaint,
+      clearLazyHistoryMessages,
+      setHistoryMessagesForInitialRender,
+      historyMessagesLoaded,
+    });
 
-  async function redirectSharedNotFound() {
-    const message = t("chat.sharedNotFoundMessage");
-    if (typeof window !== "undefined" && typeof window.alert === "function") {
-      window.alert(message);
-    }
-    chatStore.clearActiveRoom();
-    clearLazyHistoryMessages();
-    messages.value = [];
-    // 공유 URL 검증 실패는 더 이상 렌더 완료 대기/스크롤 보정이 필요하지 않습니다.
-    // finishHistoryRender()는 nextTick/paint 이후에 lock을 해제하므로, alert 확인 직후
-    // main 이동이 router guard의 historyNavigationLocked에 막힐 수 있습니다.
-    // 실패 경로에서는 즉시 렌더 상태와 lock을 정리한 뒤 메인으로 이동합니다.
-    finishHistoryRenderImmediately();
-    await router.replace({name: "main"}).catch(() => {});
-  }
+  const {loadHistoryRouteConversation} = useHistoryConversationLoader({
+    router,
+    runtime,
+    systemSettingsStore,
+    chatStore,
+    messages,
+    isMainPage,
+    activeHistoryId,
+    findHistory,
+    beginHistoryRender,
+    finishHistoryRender,
+    flushConversationSwitchPaint,
+    clearLazyHistoryMessages,
+    setHistoryMessagesForInitialRender,
+    historyMessagesLoaded,
+    clearPendingSelectedIfMatched,
+    clearPendingSelectedOnFailure,
+    isMermaidRenderingEnabled,
+    hasMermaidInHistoryMessages,
+  });
 
-  // ── 🚀 [3. 라우팅 전환에 따른 메시지 세션 복원 동기화 엔지니어링] ──────────────────
-  /**
-   * @function loadRouteConversation
-   * @description 주소창 라우트 정보가 변경되거나 방을 갈아탈 때, 해당 방의 과거 대화 이력을 로드하고 스크롤 포커싱을 선점 조율합니다.
-   */
-  async function loadRouteConversation() {
-    const loadSeq = ++routeConversationLoadSeq;
-    const isCurrentLoad = () => loadSeq === routeConversationLoadSeq;
-
-    // 케이스 1: 홈 메인 로드인 경우 화면 말풍선을 비우고 액티브 대화방 메모리 컨텍스트를 소거합니다.
-    if (isMainPage.value) {
-      chatStore.setHistoryNavigationLocked(false);
-      finishHistoryRender();
-      clearLazyHistoryMessages();
-      messages.value = [];
-      chatStore.pruneInactiveMessageCache(null);
-      clearActiveSession();
-      return;
-    }
-
-    try {
-      // 케이스 2: 공유 오픈방 열람 페이지인 경우 공유 URL 검증 후 읽기 전용 대화로 로드합니다.
-      if (isSharedPage.value) {
-        beginHistoryRender();
-        await flushConversationSwitchPaint();
-        if (!isCurrentLoad()) return;
-
-        const sharedEntryId = getSharedEntryId();
-        if (sharedEntryId) {
-          const result = await getSharedConversation(sharedEntryId);
-          if (!isCurrentLoad()) return;
-          if (!result.exists) {
-            await redirectSharedNotFound(result);
-            return;
-          }
-          chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
-          if (isHiddenConversationUrlMode(systemSettingsStore.settings)) {
-            await router.replace({name: "shared"}).catch(() => {});
-            // URL 숨김 모드에서는 /shared/:id -> /shared replace 직후 route watcher가
-            // 새 loadRouteConversation을 시작할 수 있습니다. 이 경우 현재 load는 stale
-            // 상태가 되므로 메시지를 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
-            if (!isCurrentLoad()) return;
-          }
-          setHistoryMessagesForInitialRender(result.messages);
-          historyMessagesLoaded.value = true;
-          await nextTick();
-          finishHistoryRender();
-          return;
-        }
-
-        if (!activeHistoryId.value) {
-          clearLazyHistoryMessages();
-          messages.value = [];
-          finishHistoryRender();
-          await router.replace({name: "main"}).catch(() => {});
-          return;
-        }
-
-        const result = await getSharedConversation(activeHistoryId.value);
-        if (!isCurrentLoad()) return;
-        if (!result.exists) {
-          await redirectSharedNotFound(result);
-          return;
-        }
-
-        setHistoryMessagesForInitialRender(result.messages);
-        historyMessagesLoaded.value = true;
-        await nextTick();
-        finishHistoryRender();
-        return;
-      }
-
-      // 케이스 3: 일반 채팅 모드인데 대상 방의 고유 ID가 식별되지 않는 예외 상황 처리
-      if (!activeHistoryId.value) {
-        const hasPendingHiddenNavigation =
-          isHiddenConversationUrlMode(systemSettingsStore.settings) &&
-          Boolean(chatStore.pendingSelectedChatId);
-
-        beginHistoryRender();
-        await flushConversationSwitchPaint();
-        if (!isCurrentLoad()) return;
-        clearLazyHistoryMessages();
-        messages.value = [];
-
-        // URL 숨김 모드에서 좌측 대화방 클릭 직후에는 /chat 라우트가 먼저 감지되고
-        // activeRoomId가 뒤이어 세팅될 수 있습니다. 이 pending 상태에서 clearActiveSession을
-        // 호출하면 pendingSelectedChatId까지 지워져 첫 대화방 진입이 메인 redirect로 바뀌므로
-        // 복원 가능한 방이 없는 진짜 /chat 새로고침/직접 접근일 때만 세션을 정리합니다.
-        if (!hasPendingHiddenNavigation) {
-          clearActiveSession();
-        }
-        finishHistoryRender();
-
-        // URL 노출 모드에서는 /chat 단독 접근이 특정 대화방을 의미하지 않습니다.
-        // URL 숨김 모드에서도 activeRoomId가 없는 /chat 새로고침/직접 접근은
-        // 복원 가능한 대화방이 없으므로 메인으로 되돌립니다. 단, 좌측 대화방 클릭 직후
-        // activeRoomId가 곧 세팅될 pending 상태는 첫 진입 로드를 막지 않기 위해 대기합니다.
-        if (!hasPendingHiddenNavigation) {
-          await router.replace({name: "main"}).catch(() => {});
-        }
-        return;
-      }
-
-      // 케이스 4: 현재 메모리에 인덱싱된 대화 목록 서랍에서 타깃 방 객체를 검증 스캔합니다.
-      const history = findHistory(activeHistoryId.value);
-      if (!history) {
-        clearPendingSelectedOnFailure(activeHistoryId.value);
-        finishHistoryRender();
-        // 이미 유저가 삭제했거나 권한이 박탈된 방 주소로 악성 인입된 경우 메인 페이지로 튕겨내는 가드를 발동합니다.
-        await router.replace({name: "main"}).catch(() => {});
-        return;
-      }
-
-      // 새 대화 생성 직후 라우터가 chat 화면으로 이동하는 경우에는 기존 대화방 입장용
-      // history render overlay를 띄우지 않습니다. 이후 submit 흐름에서 사용자 질문과 기존
-      // typing("...") 표시 로직이 즉시 append되므로 빈 방 복원 처리만 조용히 마칩니다.
-      if (chatStore.consumePendingNewSubmitChat(history.id)) {
-        finishHistoryRender();
-        clearPendingSelectedIfMatched(history.id);
-        clearLazyHistoryMessages();
-        messages.value = runtime.conversations.value?.[history.id] || [];
-        historyMessagesLoaded.value = true;
-        await nextTick();
-        return;
-      }
-
-      // 검증이 완료되면 스토어를 호출해 과거 유저와 주고받았던 기 수립 대화 목록을 정형화 로드합니다.
-      chatStore.setPendingSelectedChatId(history.id);
-      beginHistoryRender();
-      const mermaidWarmupPromise = isMermaidRenderingEnabled()
-        ? warmupMermaidForHistoryRender().catch(() => null)
-        : Promise.resolve(null);
-      await flushConversationSwitchPaint();
-      if (!isCurrentLoad()) return;
-      chatStore.pruneInactiveMessageCache(history.id);
-      const loadedMessages = await ensureConversation(history.id);
-      if (hasMermaidInHistoryMessages(loadedMessages)) {
-        await mermaidWarmupPromise;
-      }
-      if (!isCurrentLoad()) return;
-      setHistoryMessagesForInitialRender(loadedMessages);
-      historyMessagesLoaded.value = true;
-      clearPendingSelectedIfMatched(history.id);
-      await nextTick();
-      chatStore.pruneInactiveMessageCache(history.id);
-    } catch (error) {
-      if (isCurrentLoad()) {
+  const {loadRouteConversation, invalidateRouteLoad} = useChatRouteLoader({
+    isSharedPage,
+    loadSharedRouteConversation,
+    loadHistoryRouteConversation,
+    onLoadError: async (error, {isCurrentLoad} = {}) => {
+      if (typeof isCurrentLoad === "function" && isCurrentLoad()) {
         if (isSharedPage.value) {
           await redirectSharedNotFound({
             message: error?.message || t("chat.sharedNotFoundMessage"),
@@ -682,40 +323,8 @@ ${message?.reasoningContent || ""}`;
         finishHistoryRender();
       }
       logWarn("[useChatDataController] loadRouteConversation 오류:", error);
-    }
-  }
-
-  // ── 🎨 [4. 스트리밍 완결 후 서브 텍스트 변환 파이프라인 코어] ──────────────────
-  /**
-   * @function renderAfterStream
-   * @description AI 문장 조각 스트리밍(SSE) 출력이 완결 종료되는 시점에 트리거됩니다.
-   * 본문 내 마크다운 다이어그램 문법 블록을 분석해 Mermaid 그래픽 레이아웃을 전격 드로잉 변환 처리하고 스크롤 앵커를 최종 동기화합니다.
-   */
-  async function renderAfterStream() {
-    try {
-      if (ui.autoScrollOnAnswer.value) {
-        ui.markForceBottom(1000); // 연산 및 컴포넌트 확장 팽창 시간을 고려하여 1000ms 동안 하단 스크롤 잠금 유지
-      }
-
-      // 마크다운 컨테이너 내부의 Mermaid 코드 블록을 실제 SVG 다이어그램으로 치환합니다.
-      // 시스템에서 Mermaid 렌더링을 끈 경우 일반 코드 블록 fallback을 유지하고 후처리를 생략합니다.
-      if (isMermaidRenderingEnabled()) {
-        await renderMermaidInElement(document.querySelector(".message-list"), {
-          force: true,
-        });
-      }
-
-      // 자동 스크롤 ON은 기존처럼 하단을 추적합니다.
-      // OFF 상태에서는 질문 직후 1회만 사용자 질문으로 이동하고, 스트림/마크다운/머메이드
-      // 후처리 단계에서는 더 이상 위치를 강제하지 않습니다. 그래야 답변 생성 중 사용자가
-      // 아래로 스크롤했을 때 다시 질문 위치로 끌려 올라가지 않습니다.
-      if (ui.autoScrollOnAnswer.value) {
-        ui.scrollBottom({force: true, stable: true, autoAnswer: true});
-      }
-    } catch (error) {
-      logWarn("[useChatDataController] renderAfterStream 오류:", error);
-    }
-  }
+    },
+  });
 
   // ── [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
   const {isGenerating, submit, regenerate} = useChatSubmit({
@@ -813,12 +422,8 @@ ${message?.reasoningContent || ""}`;
     });
 
     onBeforeUnmount(() => {
-      historyRenderFinishSeq += 1;
-      chatStore.setHistoryNavigationLocked(false);
-      if (historyRenderOverlayActive) {
-        apiRequestStore.stopOverlay();
-        historyRenderOverlayActive = false;
-      }
+      invalidateRouteLoad();
+      cleanupHistoryRender();
     });
   }
 

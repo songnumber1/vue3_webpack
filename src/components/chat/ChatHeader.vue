@@ -87,15 +87,12 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject} from "vue";
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
-import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useChatHeaderActions} from "@/composables/chat/header/useChatHeaderActions";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -109,7 +106,7 @@ const props = defineProps({
 });
 
 const {t} = useI18n();
-const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const chatActions = useChatHeaderActions();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 const desktopAssistantIcon = computed(() =>

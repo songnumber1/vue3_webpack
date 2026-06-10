@@ -82,14 +82,16 @@ import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
-  CHAT_ACTIONS_KEY,
   CHAT_WORKSPACE_STATE_KEY,
-  createEmptyChatActions,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
+import {
+  APP_SHELL_ACTIONS_KEY,
+  createEmptyAppShellActions,
+} from "@/composables/app/appShellActionContext";
 
 const {t} = useI18n();
-const chatActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const chatActions = inject(APP_SHELL_ACTIONS_KEY, createEmptyAppShellActions());
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)

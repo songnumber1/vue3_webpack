@@ -38,8 +38,10 @@ import {
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatActionContext";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
-import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
+import {useMainPageActions} from "@/composables/main/useMainPageActions";
+import {useMainPageLock} from "@/composables/main/useMainPageLock";
+import {useMainPromptState} from "@/composables/main/useMainPromptState";
 
 const mainPromptInputRef = ref(null);
 const workspaceState = inject(
@@ -47,8 +49,6 @@ const workspaceState = inject(
   computed(createEmptyWorkspaceState)
 );
 inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
-const {isInteractionBlocked} = useInteractionGuard();
-
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
 const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
@@ -61,16 +61,15 @@ const suggestions = computed(() => workspaceState.value.suggestions || []);
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );
-const mainPromptClass = computed(() =>
-  isMobile.value
-    ? "mobile-keyboard-dock mobile-keyboard-dock--fixed mobile-main-fixed-prompt main-empty-state__prompt tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-prompt tw-box-border tw-w-[100dvw] tw-max-w-[100dvw] tw-overflow-hidden tw-bg-transparent tw-px-3 tw-pb-[max(12px,env(safe-area-inset-bottom))] tw-pt-2 tw-shadow-none"
-    : "desktop-center-prompt tw-w-[min(var(--layout-prompt-width,820px),100%)] tw-max-w-[var(--layout-prompt-width,820px)] tw-border-0 tw-p-0"
-);
+const mainPageLock = useMainPageLock();
+const {mainPromptClass} = useMainPromptState({isMobile});
+const mainPageActions = useMainPageActions({
+  promptInputRef: mainPromptInputRef,
+  lock: mainPageLock,
+});
 
 function handleSuggestionClick(item) {
-  if (isInteractionBlocked.value) return;
-  const prompt = item?.prompt || item?.title || item?.text || "";
-  mainPromptInputRef.value?.setText(prompt, {focus: true});
+  mainPageActions.applySuggestionToPrompt(item);
 }
 </script>
 

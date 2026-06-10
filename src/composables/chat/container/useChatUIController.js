@@ -25,6 +25,8 @@ import {useChatMobileState} from "@/composables/chat/container/useChatMobileStat
 import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
 import {useChatPromptActions} from "@/composables/chat/container/useChatPromptActions";
 import {useChatScrollController} from "@/composables/chat/container/useChatScrollController";
+import {useAppShellActions} from "@/composables/app/useAppShellActions";
+import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
 
 /**
  * @function useChatUIController
@@ -61,12 +63,15 @@ export function useChatUIController({
 
   // 각종 바텀시트 및 오버레이 설정 레이어 모달들의 마운트 플래그 세트
   const assistantSheetOpen = ref(false); // 모바일 전용 AI 어시스턴트 변경 시트
-  const noticeOpen = ref(false); // 공지사항 다이얼로그
-  const privacyOpen = ref(false); // 개인정보 처리방침 모달
-  const personalizationOpen = ref(false); // 서비스 개인화 및 맞춤형 환경설정 창
-  const systemOpen = ref(false); // 시스템 고급 설정 팝업
-  const languageSheetOpen = ref(false); // 언어(ko/en) 팩 변경 시트
-  const mobileSettingsOpen = ref(false); // 모바일 확장 퀵 세팅 제어반
+  const {
+    noticeOpen,
+    privacyOpen,
+    personalizationOpen,
+    systemOpen,
+    languageSheetOpen,
+    mobileSettingsOpen,
+    handleMobileSettingsDesktopOpen,
+  } = useAppShellOverlays();
 
   // AI가 문장을 완성해 나갈 때 스크롤을 자동으로 하향 추적할지 여부를 판별하는 사용자 커스텀 옵션값
   const autoScrollOnAnswer = computed(
@@ -177,6 +182,21 @@ export function useChatUIController({
     scrollBottom,
   });
 
+  const appShellActions = useAppShellActions({
+    router,
+    theme,
+    themeName,
+    isMobile,
+    navigationStore,
+    noticeOpen,
+    privacyOpen,
+    personalizationOpen,
+    systemOpen,
+    languageSheetOpen,
+    mobileSettingsOpen,
+    scrollBottom,
+  });
+
   // ── [9. 반응형 시스템 세팅 변동 동기화 왓처 마운트] ──────────────────
   // 관리자 도구 혹은 유저 설정에서 모바일 판단 중단점(px) 사양을 실시간 커스텀 변경할 시 즉각 시스템 뷰포트를 리프레시합니다.
   watch(
@@ -263,7 +283,9 @@ export function useChatUIController({
     updateMobileState,
     bindUiEvents,
     handleSystemSettingsApplied,
+    handleMobileSettingsDesktopOpen,
     cleanupUiController,
     ...navigationActions, // 네비게이션 액션 분출 팩 전개 주입
+    ...appShellActions, // 앱 shell action은 기존 navigation action을 점진적으로 대체합니다.
   };
 }

@@ -72,9 +72,9 @@ import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
+  APP_SHELL_ACTIONS_KEY,
+  createEmptyAppShellActions,
+} from "@/composables/app/appShellActionContext";
 
 const {t} = useI18n();
 const authStore = useAuthStore();
@@ -82,7 +82,7 @@ const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
-const actions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const actions = inject(APP_SHELL_ACTIONS_KEY, createEmptyAppShellActions());
 
 const displayName = computed(() => userName.value || t("common.user"));
 const userInitial = computed(() => {

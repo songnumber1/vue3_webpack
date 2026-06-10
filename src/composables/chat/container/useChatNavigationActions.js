@@ -20,6 +20,7 @@ import {navigateToConversation} from "@/composables/chat/navigation/conversation
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -74,6 +75,7 @@ export function useChatNavigationActions({
   const chatStreamStore = useChatStreamStore();
   const chatStore = useChatStore();
   const systemSettingsStore = useSystemSettingsStore();
+  const {NAVIGATION_LOCK_SCOPES, releaseLock} = useNavigationLock();
 
   /**
    * @description 답변 스트리밍 또는 대화방 이력 렌더링 중에는 좌측 메뉴/헤더 이동을 차단합니다.
@@ -88,12 +90,14 @@ export function useChatNavigationActions({
   function clearConversationNavigationState() {
     chatStore.clearPendingSelectedChatId();
     chatStore.setHistoryNavigationLocked(false);
+    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
     clearActiveSession();
   }
 
   async function navigateToMainAfterReset() {
     chatStore.clearPendingSelectedChatId();
     chatStore.setHistoryNavigationLocked(false);
+    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
 
     await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
     await nextTick();
@@ -101,6 +105,7 @@ export function useChatNavigationActions({
     if (router.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
       chatStore.clearPendingSelectedChatId();
       chatStore.setHistoryNavigationLocked(false);
+      releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
       await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
     }
   }

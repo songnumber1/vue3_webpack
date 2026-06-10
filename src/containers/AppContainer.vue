@@ -18,10 +18,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, onMounted, provide, watchEffect} from "vue";
+import {computed, provide, watch, watchEffect} from "vue";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
+import {shouldUseServerApi} from "@/constants/apiMode";
+import {useAuthStore} from "@/stores/authStore";
+import {useRoute} from "vue-router";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
@@ -48,10 +51,38 @@ const {
 const viewportStore = useViewportStore();
 const responsiveLayoutStore = useResponsiveLayoutStore();
 const appBootstrap = useAppBootstrap();
+const authStore = useAuthStore();
+const route = useRoute();
 
-onMounted(() => {
+function shouldBootstrapAppForRoute(targetRoute) {
+  if (!targetRoute) return false;
+  if (targetRoute.meta?.skipAuthCheck) return false;
+  return targetRoute.matched?.some((record) => record.meta?.requireAuth);
+}
+
+function canStartAppBootstrap(targetRoute) {
+  if (!shouldBootstrapAppForRoute(targetRoute)) return false;
+
+  if (shouldUseServerApi()) {
+    if (authStore.authChecked && !authStore.isAuthenticated) return false;
+    if (!authStore.isAuthenticated) return false;
+  }
+
+  return true;
+}
+
+function startAppBootstrapIfAllowed(targetRoute = route) {
+  if (!canStartAppBootstrap(targetRoute)) return;
   appBootstrap.initialize().catch(() => {});
-});
+}
+
+watch(
+  () => [route.fullPath, authStore.authChecked, authStore.isAuthenticated],
+  () => {
+    startAppBootstrapIfAllowed(route);
+  },
+  {immediate: true}
+);
 
 /**
  * 현재 애플리케이션이 구동 중인 실행 환경 명칭(env)을 우선 채택하고, 없을 경우 기기 플랫폼 명칭을 폴백으로 지정하는 반응형 변수입니다.
