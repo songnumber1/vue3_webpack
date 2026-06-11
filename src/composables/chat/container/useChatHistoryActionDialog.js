@@ -11,6 +11,7 @@ import {computed, ref} from "vue";
 import {logWarn} from "@/utils/logger";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
 /**
  * @typedef {object} ChatHistoryActionDialogDependencies
@@ -41,6 +42,7 @@ export function useChatHistoryActionDialog({
 }) {
   // LLM AI 답변이 실시간 생성 중(Streaming)인지 상태를 확인하여 메뉴 조작 난입을 원천 차단하기 위한 전역 스트림 스토어 바인딩
   const chatStreamStore = useChatStreamStore();
+  const {NAVIGATION_LOCK_SCOPES, releaseLock} = useNavigationLock();
 
   // 수정/삭제 범용 다이얼로그 모달의 시각적 노출 토글 플래그
   const historyDialogOpen = ref(false);
@@ -112,7 +114,9 @@ export function useChatHistoryActionDialog({
         // 잔존 화면이 굳어 유령 데이터를 보지 않도록 메모리 타임라인 메시지 풀을 증발 비우고 전역 메인 루트 화면으로 강제 이탈 페이지 전환 처리 감행
         if (String(activeHistoryId.value) === String(target.id)) {
           messages.value = [];
+          releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
           await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {}); // 라우팅 중복 에러 전파 방어 가드 체결
+          releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
         }
       }
     } catch (error) {

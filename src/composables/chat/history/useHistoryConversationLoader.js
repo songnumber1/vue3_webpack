@@ -5,7 +5,7 @@
 
 import {nextTick} from "vue";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {hasPendingHiddenChatNavigation} from "@/composables/chat/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useHistoryConversationLoader({
@@ -39,9 +39,10 @@ export function useHistoryConversationLoader({
   }
 
   async function handleMissingHistoryId({isCurrentLoad}) {
-    const hasPendingHiddenNavigation =
-      isHiddenConversationUrlMode(systemSettingsStore.settings) &&
-      Boolean(chatStore.pendingSelectedChatId);
+    const hasPendingHiddenNavigation = hasPendingHiddenChatNavigation({
+      chatStore,
+      settings: systemSettingsStore.settings,
+    });
 
     beginHistoryRender();
     await flushConversationSwitchPaint();

@@ -5,6 +5,9 @@
     :assistant="assistant"
     :conversation-title="conversationTitle"
     :theme-name="themeName"
+    :show-studio-detail-button="showStudioDetailButton"
+    :studio-detail-disabled="studioDetailDisabled"
+    @studio-detail="workspaceActions.openStudioDetail?.()"
   />
 
   <MessageList
@@ -100,23 +103,22 @@
  * @file components/workspace/ChatConversationWorkspace.vue
  * @description 기존 통합 채팅 workspace의 대화방 렌더링만 분리한 라우트 전용 workspace입니다.
  */
-import {computed, inject, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
 import MessageList from "@/components/chat/MessageList.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {
-  CHAT_WORKSPACE_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+  useChatWorkspaceStateContext,
+  useWorkspaceActionsContext,
+} from "@/composables/chat/context/useChatInject";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
 import {useChatConversationActions} from "@/composables/chat/conversation/useChatConversationActions";
 import {useCodeInterpreterPanel} from "@/composables/chat/conversation/useCodeInterpreterPanel";
 import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
+import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 
 const {locale, t} = useI18n();
 const listRef = ref(null);
@@ -125,14 +127,8 @@ const promptComposerRef = ref(null);
 const previewRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
-const workspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const workspaceActions = inject(
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions()
-);
+const workspaceState = useChatWorkspaceStateContext();
+const workspaceActions = useWorkspaceActionsContext();
 const chatStore = useChatStore();
 
 const mode = computed(() => workspaceState.value.mode);
@@ -145,6 +141,15 @@ const conversationTitle = computed(
   () => workspaceState.value.conversationTitle
 );
 const themeName = computed(() => workspaceState.value.themeName);
+const showStudioDetailButton = computed(() =>
+  isStudioAssistant(assistant.value)
+);
+const studioDetailDisabled = computed(
+  () =>
+    isGenerating.value ||
+    isHistoryRendering.value ||
+    workspaceState.value.isActiveModelUnavailable
+);
 const isActiveModelDeleted = computed(
   () => workspaceState.value.isActiveModelDeleted
 );
@@ -203,13 +208,8 @@ const conversationActions = useChatConversationActions({
 const {
   previewHtml,
   isDesktopRuntime,
-  codeInterpreterOpen,
-  canUseDesktopCodeInterpreter,
   showCodeInterpreterPanel,
   closeCodeInterpreterPanel,
-  handleCodeInterpreterViewportChange,
-  updateCodeInterpreterChatWidth,
-  scrollChatWorkspaceToStart,
 } = useCodeInterpreterPanel({
   locale,
   isMobile,

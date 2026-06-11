@@ -4,7 +4,7 @@
  */
 
 import {computed} from "vue";
-import {resolveActiveChatId} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {resolveActiveChatId} from "@/composables/chat/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**

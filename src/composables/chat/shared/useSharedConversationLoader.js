@@ -5,7 +5,7 @@
 
 import {nextTick} from "vue";
 import {getSharedConversation} from "@/composables/chat/useSharedChat";
-import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {isHiddenConversationUrlMode} from "@/composables/chat/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useSharedConversationLoader({

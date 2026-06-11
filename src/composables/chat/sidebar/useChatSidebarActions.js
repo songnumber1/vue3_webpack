@@ -4,7 +4,7 @@
  * Sidebar action은 router/store/runtime을 직접 사용하고, history dialog action만 기존 ChatContainer dialog provider로 위임합니다.
  */
 
-import {inject, nextTick} from "vue";
+import {nextTick} from "vue";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -13,11 +13,15 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
-import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
+import {useChatActionsContext} from "@/composables/chat/context/useChatInject";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
+import {
+  cleanupAfterPortalConversationNavigation,
+  clearConversationNavigationState as clearConversationNavigationStateByPolicy,
+  navigateToMainAfterConversationReset,
+  preparePortalConversationNavigation,
+  resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
+} from "@/composables/chat/navigation/chatNavigationReset";
 import {logWarn} from "@/utils/logger";
 
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
@@ -36,15 +40,19 @@ export function useChatSidebarActions({
   syncViewportMode,
   closeHistoryMenu,
 } = {}) {
-  const historyDialogActions =
-    chatActions || inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+  const historyDialogActions = chatActions || useChatActionsContext();
   const assistantStore = useAssistantStore();
   const chatStore = useChatStore();
   const navigationStore = useNavigationStore();
   const systemSettingsStore = useSystemSettingsStore();
   const runtime = useChatRuntime();
-  const {NAVIGATION_LOCK_SCOPES, acquireLockIfFree, releaseLock} =
-    useNavigationLock();
+  const {
+    NAVIGATION_LOCK_SCOPES,
+    acquireLockIfFree,
+    releaseLock,
+    isGlobalLocked,
+    isStreamingLocked,
+  } = useNavigationLock();
 
   function closeSidebarNavigationPanels() {
     navigationStore.setDrawerOpen(false);
@@ -59,26 +67,45 @@ export function useChatSidebarActions({
     return Boolean(blockedRef?.value);
   }
 
+  function createNavigationResetContext() {
+    return {
+      chatStore,
+      releaseLock,
+      chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
+      clearActiveSession: runtime.clearActiveSession?.bind(runtime),
+      cleanupActiveConversation: cleanupActiveConversationForNavigation,
+      navigationStore,
+      closeAssistantSelector,
+    };
+  }
+
   function clearConversationNavigationState() {
-    chatStore.clearPendingSelectedChatId();
-    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
-    runtime.clearActiveSession?.();
+    clearConversationNavigationStateByPolicy(createNavigationResetContext());
   }
 
   async function navigateMainAfterReset() {
-    await router?.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    await nextTick();
-    if (router?.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
-      await router?.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    }
+    await navigateToMainAfterConversationReset({
+      router,
+      clearBeforeNavigate: clearConversationNavigationState,
+    });
+  }
+
+  function resetConversationStateForRouteChange() {
+    resetConversationStateForRouteChangeByPolicy(
+      createNavigationResetContext()
+    );
+  }
+
+  function preparePortalNavigation() {
+    preparePortalConversationNavigation(createNavigationResetContext());
+  }
+
+  function cleanupAfterPortalNavigation() {
+    cleanupAfterPortalConversationNavigation(createNavigationResetContext());
   }
 
   async function resetChatState({assistantId = null} = {}) {
-    clearConversationNavigationState();
-    cleanupActiveConversationForNavigation();
-    closeSidebarNavigationPanels();
-    closeAssistantSelector();
-    navigationStore.closeTransientPanels();
+    resetConversationStateForRouteChange();
 
     if (assistantId) {
       try {
@@ -98,24 +125,25 @@ export function useChatSidebarActions({
   }
 
   async function selectAssistant(id) {
-    if (isBlocked(lock?.isAssistantSelectBlocked)) return false;
-
     const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
     const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
 
     if (isStudioPortal || isConnectorPortal) {
+      if (isGlobalLocked.value || isStreamingLocked.value) return false;
+      const targetRoute = {
+        name: isConnectorPortal
+          ? ROUTE_NAMES.CONNECTOR_STORE
+          : ROUTE_NAMES.STUDIO,
+      };
+
+      preparePortalNavigation();
       assistantStore.selectAssistant(id);
-      closeAssistantSelector();
-      navigationStore.setDrawerOpen(false);
-      await router
-        ?.push({
-          name: isConnectorPortal
-            ? ROUTE_NAMES.CONNECTOR_STORE
-            : ROUTE_NAMES.STUDIO,
-        })
-        .catch(() => {});
+      await router?.push(targetRoute).catch(() => {});
+      cleanupAfterPortalNavigation();
       return true;
     }
+
+    if (isBlocked(lock?.isAssistantSelectBlocked)) return false;
 
     await resetChatState({assistantId: id});
 

@@ -13,7 +13,7 @@ import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {useChatDataController} from "@/composables/chat/container/useChatDataController";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {resolveActiveChatId} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {resolveActiveChatId} from "@/composables/chat/policy/chatRoutePolicy";
 import {useChatUIController} from "@/composables/chat/container/useChatUIController";
 
 /**

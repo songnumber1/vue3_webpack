@@ -13,22 +13,35 @@
         <span class="icon-lines"></span>
       </button>
 
-      <button
-        v-if="showMobileAssistant"
-        class="model-trigger model-trigger--assistant"
-        type="button"
-        :aria-label="t('chat.assistantSelect')"
-        @click="chatActions.openAssistant()"
-      >
-        <img
-          class="assistant-brand-logo assistant-brand-logo--mobile"
-          :src="mobileAssistantIcon"
-          alt=""
-          aria-hidden="true"
-        />
-        <span>{{ assistantLabel }}</span>
-        <ChevronDownIcon class="chevron chevron--selector" />
-      </button>
+      <template v-if="showMobileAssistant">
+        <button
+          class="model-trigger model-trigger--assistant"
+          type="button"
+          :aria-label="t('chat.assistantSelect')"
+          @click="chatActions.openAssistant()"
+        >
+          <img
+            class="assistant-brand-logo assistant-brand-logo--mobile"
+            :src="mobileAssistantIcon"
+            alt=""
+            aria-hidden="true"
+          />
+          <span>{{ assistantLabel }}</span>
+          <ChevronDownIcon class="chevron chevron--selector" />
+        </button>
+
+        <button
+          v-if="showStudioDetailButton"
+          class="round-icon studio-detail-header-button"
+          type="button"
+          :disabled="studioDetailDisabled"
+          aria-label="Studio 상세 보기"
+          title="Studio 상세 보기"
+          @click.stop="$emit('studio-detail')"
+        >
+          ⓘ
+        </button>
+      </template>
 
       <div
         v-else-if="showDesktopConversationTitle"
@@ -42,9 +55,23 @@
         />
         <strong>{{ assistantLabel }}</strong>
         <span>{{ conversationTitle }}</span>
+        <button
+          v-if="showStudioDetailButton"
+          class="studio-detail-header-button studio-detail-header-button--desktop"
+          type="button"
+          :disabled="studioDetailDisabled"
+          aria-label="Studio 상세 보기"
+          title="Studio 상세 보기"
+          @click.stop="$emit('studio-detail')"
+        >
+          ⓘ
+        </button>
       </div>
 
-      <div v-else class="conversation-title-wrap conversation-title-wrap--main">
+      <div
+        v-else-if="showDesktopMainTitle"
+        class="conversation-title-wrap conversation-title-wrap--main"
+      >
         <img
           class="assistant-brand-logo assistant-brand-logo--desktop"
           :src="desktopAssistantIcon"
@@ -103,7 +130,11 @@ const props = defineProps({
   assistant: {type: Object, default: null},
   conversationTitle: {type: String, default: ""},
   themeName: {type: String, default: "dark"},
+  showStudioDetailButton: {type: Boolean, default: false},
+  studioDetailDisabled: {type: Boolean, default: false},
 });
+
+defineEmits(["studio-detail"]);
 
 const {t} = useI18n();
 const chatActions = useChatHeaderActions();
@@ -125,9 +156,39 @@ const showMobileAssistant = computed(() => isMobile.value);
 const showDesktopConversationTitle = computed(
   () => (props.mode === "chat" || props.mode === "shared") && !isMobile.value
 );
+const showDesktopMainTitle = computed(
+  () => props.mode === "main" && !isMobile.value
+);
 </script>
 
 <style scoped lang="scss">
+.studio-detail-header-button {
+  display: inline-flex;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--app-controlBorder, #d1d5db);
+  border-radius: 999px;
+  background: var(--app-control, #fff);
+  color: var(--app-subtle, #6b7280);
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.studio-detail-header-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.studio-detail-header-button--desktop {
+  width: 24px;
+  height: 24px;
+  font-size: 15px;
+}
+
 /* Compact mobile header sizing is local to ChatHeader. */
 :global(body.mobile-mode) .mobile-topbar {
   height: 44px;

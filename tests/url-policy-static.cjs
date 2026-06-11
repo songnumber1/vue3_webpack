@@ -15,12 +15,17 @@ const systemSettings = read('src/constants/systemSettings.js');
 const systemSettingsView = read('src/views/settings/SystemSettingsView.vue');
 const chatStore = read('src/stores/chatStore.js');
 const urlPolicy = read('src/composables/chat/navigation/conversationUrlPolicy.js');
+const routePolicy = read('src/composables/chat/policy/chatRoutePolicy.js');
 const router = read('src/core/resolver/router.js');
 const routeNames = read('src/constants/routeNames.js');
 const routeComponents = read('src/core/resolver/routeComponents.js');
 const sharedPage = read('src/views/SharedPage.vue');
 const sharedChat = read('src/composables/chat/useSharedChat.js');
 const dataController = read('src/composables/chat/container/useChatDataController.js');
+const historyLoader = read('src/composables/chat/history/useHistoryConversationLoader.js');
+const renderLifecycle = read('src/composables/chat/conversation/useConversationRenderLifecycle.js');
+const navigationLockStore = read('src/stores/navigationLockStore.js');
+const navigationLock = read('src/composables/navigation/useNavigationLock.js');
 const submit = read('src/composables/chat/useChatSubmit.js');
 const chatContainer = read('src/containers/chat/ChatContainer.vue');
 const workspace = read('src/components/workspace/ChatConversationWorkspace.vue');
@@ -66,6 +71,12 @@ assert(
 );
 
 assert(
+  systemSettings.includes('process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE') &&
+    systemSettings.includes('CONVERSATION_URL_MODES.hidden'),
+  'conversationUrlMode default must be hidden while visible remains available for development compatibility'
+);
+
+assert(
   systemSettingsView.includes('hasConversationUrlModeChanged') &&
     systemSettingsView.includes('hasLogoutRequiredSettingChanged') &&
     systemSettingsView.includes('forceLogoutForPolicyChange'),
@@ -83,18 +94,20 @@ assert(
 );
 
 assert(
-  urlPolicy.includes('isHiddenConversationUrlMode') &&
-    urlPolicy.includes('resolveActiveChatId') &&
-    urlPolicy.includes('createConversationRoute') &&
-    urlPolicy.includes('navigateToConversation') &&
-    urlPolicy.includes('applyHiddenConversationActiveRoom') &&
-    urlPolicy.includes('setActiveChatRoom'),
-  'conversation URL visible/hidden policy helpers must be centralized'
+  routePolicy.includes('isHiddenConversationUrlMode') &&
+    routePolicy.includes('resolveActiveChatId') &&
+    routePolicy.includes('createConversationRoute') &&
+    routePolicy.includes('resolveConversationUrlGuard') &&
+    routePolicy.includes('resolveConversationRouteReconciliation') &&
+    routePolicy.includes('applyHiddenConversationActiveRoom') &&
+    routePolicy.includes('setActiveChatRoom'),
+  'conversation URL visible/hidden route policy helpers must be centralized in chatRoutePolicy'
 );
 
 assert(
-  urlPolicy.indexOf('await navigate.call(router, route)') <
-    urlPolicy.lastIndexOf('applyHiddenConversationActiveRoom({chatId, chatStore, settings})'),
+  urlPolicy.includes('navigateToConversation') &&
+    urlPolicy.indexOf('await navigate.call(router, route)') <
+      urlPolicy.lastIndexOf('applyHiddenConversationActiveRoom({chatId, chatStore, settings})'),
   'hidden URL mode must apply activeRoom after navigation attempt to avoid first-chat empty render race'
 );
 
@@ -109,31 +122,34 @@ assert(
 
 assert(
   router.includes('function guardConversationUrlMode') &&
-    router.includes('if (!hiddenMode && to.name === ROUTE_NAMES.CHAT_ENTRY)') &&
-    router.includes('return {name: ROUTE_NAMES.MAIN, replace: true};'),
-  'visible URL mode must redirect bare /chat(chat-entry) to main instead of showing an empty chat room'
+    router.includes('resolveConversationUrlGuard({') &&
+    routePolicy.includes('if (!hiddenMode && to?.name === ROUTE_NAMES.CHAT_ENTRY)') &&
+    routePolicy.includes('name: ROUTE_NAMES.CHAT_DETAIL') &&
+    routePolicy.includes('params: {id: activeChatRoomId}') &&
+    routePolicy.includes('name: ROUTE_NAMES.MAIN'),
+  'visible URL mode must restore bare /chat to /chat/:id through centralized chatRoutePolicy when activeRoom exists and otherwise redirect to main'
 );
 
 assert(
-  dataController.includes('hasPendingHiddenNavigation') &&
-    dataController.includes('router.replace({name: "main"}'),
-  'data controller must guard bare /chat without active id and redirect hidden refresh/direct access to main'
-);
-
-
-
-assert(
-  chatStore.includes('historyNavigationLocked') &&
-    chatStore.includes('setHistoryNavigationLocked') &&
-    chatStore.includes('isNavigationLocked'),
-  'chatStore must keep a ProgressBar-independent navigation lock while history data/rendering is in progress'
+  historyLoader.includes('hasPendingHiddenNavigation') &&
+    historyLoader.includes('router.replace({name: ROUTE_NAMES.MAIN}'),
+  'history loader must guard bare /chat without active id and redirect hidden refresh/direct access to main'
 );
 
 assert(
-  dataController.includes('chatStore.setHistoryNavigationLocked(true)') &&
-    dataController.includes('chatStore.setHistoryNavigationLocked(false)') &&
-    dataController.includes('hasPendingHiddenNavigation'),
-  'history render must lock navigation independently of ProgressBar and hidden /chat without activeRoom must redirect to main except pending internal navigation'
+  navigationLockStore.includes('NAVIGATION_LOCK_SCOPES') &&
+    navigationLockStore.includes('chatHistory') &&
+    navigationLockStore.includes('acquireIfFree') &&
+    navigationLockStore.includes('releaseAll'),
+  'navigationLockStore must keep a ProgressBar-independent chatHistory navigation lock'
+);
+
+assert(
+  renderLifecycle.includes('beginHistoryRender') &&
+    renderLifecycle.includes('navigationLock.acquireLockIfFree') &&
+    renderLifecycle.includes('NAVIGATION_LOCK_SCOPES.chatHistory') &&
+    renderLifecycle.includes('releaseCurrentChatHistoryLock'),
+  'history render must lock navigation via navigationLockStore independently of ProgressBar'
 );
 
 
@@ -149,7 +165,8 @@ assert(
 assert(
   systemSettingsView.includes('useChatStore') &&
     systemSettingsView.includes('useChatStreamStore') &&
-    systemSettingsView.includes('chatStore.setHistoryNavigationLocked(false)') &&
+    systemSettingsView.includes('useNavigationLockStore') &&
+    systemSettingsView.includes('navigationLockStore.releaseAll()') &&
     systemSettingsView.includes('chatStore.clearActiveSession()') &&
     systemSettingsView.includes('chatStreamStore.finish()') &&
     systemSettingsView.includes('router') &&
@@ -160,20 +177,21 @@ assert(
 assert(
   router.includes('isAllowedHistoryLockNavigation') &&
     router.includes('guardHistoryNavigation') &&
-    router.includes('chatStore.isNavigationLocked') &&
-    router.includes('pendingSelectedChatId') &&
+    router.includes('navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)') &&
+    router.includes('getPendingSelectedChatId(chatStore)') &&
     router.includes('isPendingVisibleChatRoute') &&
     router.includes('isPendingHiddenChatRoute') &&
     router.includes('from?.name === ROUTE_NAMES.SHARED_ENTRY') &&
     router.includes('chatStore.isActiveSharedRoom'),
-  'router guard must block user navigation during history rendering even after pendingSelectedChatId is cleared, while allowing internal pending/shared transitions'
+  'router guard must block user navigation during history rendering via navigationLockStore while allowing internal pending/shared transitions'
 );
 
 assert(
-  dataController.includes('if (isHiddenConversationUrlMode(systemSettingsStore.settings))') &&
-    dataController.includes('await router.replace({name: "shared"}') &&
-    dataController.includes('setHistoryMessagesForInitialRender(result.messages)'),
-  'shared URL must keep /shared/:id in visible mode and replace to /shared only in hidden mode'
+  dataController.includes('resolveConversationRouteReconciliation') &&
+    dataController.includes('reconcileConversationUrlModeRoute') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('await router.replace({name: ROUTE_NAMES.SHARED}') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('setHistoryMessagesForInitialRender(result.messages)'),
+  'chat/shared URL reconciliation must use centralized policy and shared URL must keep /shared/:id in visible mode and replace to /shared only in hidden mode'
 );
 
 assert(
@@ -200,11 +218,11 @@ assert(
 
 assert(
   dataController.includes('getSharedEntryId') &&
-    dataController.includes('redirectSharedNotFound') &&
-    dataController.includes('setActiveSharedRoom') &&
-    dataController.includes('router.replace({name: "shared"}') &&
-    dataController.includes('if (!isCurrentLoad()) return') &&
-    dataController.includes('finishHistoryRender()'),
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('redirectSharedNotFound') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('setActiveSharedRoom') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('router.replace({name: ROUTE_NAMES.SHARED}') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('if (!isCurrentLoad()) return') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('finishHistoryRender()'),
   'shared entry load must validate, replace, avoid stale duplicate loads, and finish rendering'
 );
 
@@ -225,15 +243,19 @@ assert(
 assert(
   workspace.includes('ChatReadonlyInput v-if="readonly"') &&
     workspace.includes('function handleRegenerate') &&
-    workspace.includes('readonly.value'),
-  'workspace must show readonly input and block regenerate actions in readonly mode'
+    workspace.includes(':readonly="readonly"'),
+  'workspace must show readonly input and pass readonly mode to MessageList to block regenerate actions'
 );
 
 
+const containerProviders = read('src/composables/chat/container/useChatContainerProviders.js');
+
 assert(
-  chatContainer.includes('isHistoryRendering.value') &&
-    chatContainer.includes('isReadOnly.value || isGenerating.value || isHistoryRendering.value'),
-  'workspace actions must block submit/regenerate while history rendering is in progress'
+  containerProviders.includes('chatPageLock.isSubmitBlocked.value') &&
+    containerProviders.includes('chatPageLock.isRegenerateBlocked.value') &&
+    read('src/composables/chat/conversation/useChatPageLock.js').includes('isHistoryBusy') &&
+    read('src/composables/chat/conversation/useChatPageLock.js').includes('isChatHistoryLocked.value'),
+  'workspace actions must block submit/regenerate while history rendering or chat-history lock is in progress'
 );
 
 assert(
@@ -304,10 +326,11 @@ assert(
 
 
 assert(
-  router.includes('to.name === ROUTE_NAMES.CHAT_ENTRY') &&
-    router.includes('chatStore.activeRoomType === "chat"') &&
-    router.includes('!chatStreamStore.isStreaming'),
-  'hidden URL mode must redirect direct bare /chat to main when there is no active/pending chat room'
+  router.includes('resolveConversationUrlGuard({') &&
+    routePolicy.includes('to?.name === ROUTE_NAMES.CHAT_ENTRY') &&
+    routePolicy.includes('getActiveChatRoomId(chatStore)') &&
+    routePolicy.includes('!chatStreamStore?.isStreaming'),
+  'hidden URL mode must redirect direct bare /chat to main through chatRoutePolicy when there is no active/pending chat room'
 );
 
 
@@ -319,8 +342,8 @@ assert(
 
 
 assert(
-  dataController.includes('function finishHistoryRenderImmediately') &&
-    dataController.includes('finishHistoryRenderImmediately();'),
+  renderLifecycle.includes('function finishHistoryRenderImmediately') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('finishHistoryRenderImmediately();'),
   'shared not-found must immediately release history render lock before main redirect'
 );
 
@@ -335,9 +358,9 @@ assert(
 assert(
   read('src/i18n/domains/chat.js').includes('공유방을 찾을 수 없습니다.') &&
     read('src/composables/chat/useSharedChat.js').includes('공유방을 찾을 수 없습니다.') &&
-    dataController.includes('const message = t("chat.sharedNotFoundMessage")') &&
-    dataController.includes('window.alert(message)') &&
-    dataController.includes('router.replace({name: "main"}'),
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('const message = t("chat.sharedNotFoundMessage")') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('window.alert(message)') &&
+    read('src/composables/chat/shared/useSharedConversationLoader.js').includes('router.replace({name: ROUTE_NAMES.MAIN}'),
   'shared not-found alert message must use the finalized Korean copy'
 );
 

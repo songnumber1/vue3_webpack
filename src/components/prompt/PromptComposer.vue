@@ -125,15 +125,7 @@
  * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
-import {
-  computed,
-  inject,
-  nextTick,
-  onBeforeUnmount,
-  provide,
-  reactive,
-  watch,
-} from "vue";
+import {computed, nextTick, onBeforeUnmount, reactive, watch} from "vue";
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
@@ -142,19 +134,16 @@ import PromptMobileBottomSheets from "@/components/prompt/controls/PromptMobileB
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
 import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePanel.vue";
 import {
-  PROMPT_STATE_KEY,
-  PROMPT_TEXTAREA_STATE_KEY,
-  PROMPT_TOOLBAR_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyPromptState,
-  createEmptyWorkspaceActions,
-} from "@/composables/chat/chatActionContext";
+  usePromptStateContext,
+  useWorkspaceActionsContext,
+} from "@/composables/chat/context/useChatInject";
+import {
+  providePromptTextareaState,
+  providePromptToolbarState,
+} from "@/composables/chat/context/useChatProvider";
 
-const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
-const workspaceActions = inject(
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions()
-);
+const promptState = usePromptStateContext();
+const workspaceActions = useWorkspaceActionsContext();
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -293,7 +282,7 @@ const resolvedToolbarComponent = computed(() =>
   isMobileSheet.value ? PromptToolbarMobile : PromptToolbarDesktop
 );
 
-provide(PROMPT_TEXTAREA_STATE_KEY, {
+providePromptTextareaState({
   text,
   placeholder: computed(() => placeholder.value || t("chat.promptPlaceholder")),
   disabled: computed(() => Boolean(props.disabled)),
@@ -302,8 +291,7 @@ provide(PROMPT_TEXTAREA_STATE_KEY, {
   expanded: computed(() => Boolean(isPromptExpanded.value)),
 });
 
-provide(
-  PROMPT_TOOLBAR_STATE_KEY,
+providePromptToolbarState(
   computed(() => ({
     disabled: actionDisabled.value,
     modelReadonly: props.modelReadonly,

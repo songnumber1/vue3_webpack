@@ -12,7 +12,7 @@
       >
         <SidebarAssistantSelector
           ref="assistantSelectorRef"
-          :assistants="assistants"
+          :assistants="visibleAssistants"
           :selected-assistant-id="selectedAssistantId"
           :open="assistantMenuOpen"
           @toggle="openAssistantSelector"
@@ -98,7 +98,7 @@
           class="sidebar-top tw-flex tw-items-center tw-justify-between tw-gap-2"
         >
           <SidebarAssistantSelector
-            :assistants="assistants"
+            :assistants="visibleAssistants"
             :selected-assistant-id="selectedAssistantId"
             mobile
             @toggle="openAssistantSelector"
@@ -160,7 +160,7 @@
     @close="assistantMenuOpen = false"
   >
     <button
-      v-for="assistant in assistants"
+      v-for="assistant in visibleAssistants"
       :key="assistant.id"
       class="bottom-sheet-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left"
       :class="{active: assistant.id === selectedAssistantId}"
@@ -221,6 +221,7 @@ import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
+import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useChatSidebarLock} from "@/composables/chat/sidebar/useChatSidebarLock";
 import {useChatSidebarActions} from "@/composables/chat/sidebar/useChatSidebarActions";
@@ -231,6 +232,7 @@ const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const navigationStore = useNavigationStore();
+const studioRuntimeStore = useStudioRuntimeStore();
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
@@ -238,6 +240,20 @@ const {histories, pendingSelectedChatId, selectedChatId} =
   storeToRefs(chatStore);
 const {sidebarCollapsed, drawerOpen, collapsedRecentOpen} =
   storeToRefs(navigationStore);
+
+function isDeletedRuntimeStudio(assistant = null) {
+  const id = String(assistant?.id || "").trim();
+  if (!id) return false;
+  const isStudio =
+    assistant?.type === "studio" ||
+    assistant?.isStudio === true ||
+    assistant?.studio === true;
+  return Boolean(isStudio && studioRuntimeStore.isStudioDeleted(id));
+}
+
+const visibleAssistants = computed(() =>
+  assistants.value.filter((assistant) => !isDeletedRuntimeStudio(assistant))
+);
 const assistantMenuOpen = ref(false);
 const isMobileSheet = ref(false);
 const assistantSelectorRef = ref(null);
@@ -250,7 +266,6 @@ const effectiveSelectedChatId = computed(
 );
 const sidebarLock = useChatSidebarLock();
 const {
-  isAssistantSelectBlocked,
   isChatSearchBlocked,
   isHistoryMenuBlocked,
   isHistorySelectBlocked,

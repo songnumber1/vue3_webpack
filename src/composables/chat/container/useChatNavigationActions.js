@@ -1,3 +1,4 @@
+import {nextTick} from "vue";
 /**
  * @file composables/chat/container/useChatNavigationActions.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
@@ -7,7 +8,6 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {nextTick} from "vue";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {authApiLive} from "@/api/live/authApi.live";
@@ -21,6 +21,10 @@ import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  clearConversationNavigationState as clearConversationNavigationStateByPolicy,
+  navigateToMainAfterConversationReset,
+} from "@/composables/chat/navigation/chatNavigationReset";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies
@@ -89,23 +93,19 @@ export function useChatNavigationActions({
   }
 
   function clearConversationNavigationState() {
-    chatStore.clearPendingSelectedChatId();
-    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
-    clearActiveSession();
+    clearConversationNavigationStateByPolicy({
+      chatStore,
+      releaseLock,
+      chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
+      clearActiveSession,
+    });
   }
 
   async function navigateToMainAfterReset() {
-    chatStore.clearPendingSelectedChatId();
-    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
-
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    await nextTick();
-
-    if (router.currentRoute?.value?.name !== ROUTE_NAMES.MAIN) {
-      chatStore.clearPendingSelectedChatId();
-      releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
-      await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    }
+    await navigateToMainAfterConversationReset({
+      router,
+      clearBeforeNavigate: clearConversationNavigationState,
+    });
   }
 
   /**

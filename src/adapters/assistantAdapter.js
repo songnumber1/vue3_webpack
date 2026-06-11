@@ -91,6 +91,8 @@ export function adaptAssistant(raw = {}) {
     // 3. 우선순위 정렬 인덱스 정수 파싱: 수치화할 수 없는 데이터가 올 경우 정렬 순위 최하위권(999)으로 안전 밀어내기 처리
     order: Number(raw[ASSISTANT_KEYS.ORDER] ?? 999),
     isStudio,
+    studio: isStudio,
+    mcp: isMcp,
 
     // 4. 비즈니스 상태값 원시화 트랜스파일링
     isAuthorized: toBoolean(raw[ASSISTANT_KEYS.AUTH_YN]), // 접근 인가 유무

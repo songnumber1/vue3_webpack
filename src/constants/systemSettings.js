@@ -147,7 +147,7 @@ export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
 ]);
 
 // 일반 대화방 URL에 chatId를 노출할지 여부를 제어하는 정책 모드입니다.
-// visible은 기존 /chat/:id 방식을 유지하고, hidden은 이후 단계에서 /chat + Pinia activeRoomId 기반으로 전환합니다.
+// 운영 기본값은 hidden이며, visible은 개발/디버깅 호환용으로만 유지합니다.
 export const CONVERSATION_URL_MODES = Object.freeze({
   visible: "visible",
   hidden: "hidden",
@@ -313,7 +313,7 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   ),
   [SYSTEM_SETTING_KEYS.conversationUrlMode]: readStringEnv(
     process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE,
-    CONVERSATION_URL_MODES.visible
+    CONVERSATION_URL_MODES.hidden
   ),
   [SYSTEM_SETTING_KEYS.showMermaidHeader]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER,

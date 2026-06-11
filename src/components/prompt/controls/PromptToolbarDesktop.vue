@@ -235,13 +235,10 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject, nextTick, reactive, ref, toRefs, watch} from "vue";
+import {computed, nextTick, reactive, ref, toRefs, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
 import {useI18n} from "vue-i18n";
-import {
-  PROMPT_TOOLBAR_STATE_KEY,
-  createEmptyPromptToolbarState,
-} from "@/composables/chat/chatActionContext";
+import {usePromptToolbarStateContext} from "@/composables/chat/context/useChatInject";
 import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.vue";
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
 import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
@@ -278,10 +275,7 @@ const toolMenuStyle = computed(() => ({
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
-const toolbarState = inject(
-  PROMPT_TOOLBAR_STATE_KEY,
-  computed(createEmptyPromptToolbarState)
-);
+const toolbarState = usePromptToolbarStateContext();
 const props = reactive({
   get disabled() {
     return toolbarState.value.disabled;

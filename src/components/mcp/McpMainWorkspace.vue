@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import {computed, inject, ref, watch} from "vue";
+import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import McpMainPage from "@/components/mcp/McpMainPage.vue";
@@ -90,10 +90,8 @@ import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+import {createEmptyWorkspaceState} from "@/composables/chat/chatActionContext";
+import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
 
 const {t} = useI18n();
 const props = defineProps({
@@ -120,10 +118,7 @@ const emit = defineEmits([
 
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
+const injectedWorkspaceState = useChatWorkspaceStateContext();
 const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );

@@ -1,60 +1,30 @@
 /**
  * @file composables/chat/navigation/conversationUrlPolicy.js
- * @description 일반 대화방 URL 노출/숨김 정책을 한 곳에서 관리합니다.
+ * @description 일반 대화방 URL 이동 유틸입니다. route 판단 정책은 chatRoutePolicy가 담당합니다.
  */
 
-import {CONVERSATION_URL_MODES} from "@/constants/systemSettings";
-import {ROUTE_NAMES} from "@/constants/routeNames";
+export {
+  ACTIVE_ROOM_TYPE_CHAT,
+  CHAT_DETAIL_ROUTE_NAME,
+  CHAT_ENTRY_ROUTE_NAME,
+  applyHiddenConversationActiveRoom,
+  createChatEntryRoute,
+  createChatRoomRoute,
+  createConversationRoute,
+  getActiveChatRoomId,
+  getPendingSelectedChatId,
+  hasPendingHiddenChatNavigation,
+  isHiddenConversationUrlMode,
+  normalizeChatRouteId,
+  resolveActiveChatId,
+  resolveConversationRouteReconciliation,
+  resolveConversationUrlGuard,
+} from "@/composables/chat/policy/chatRoutePolicy";
 
-export const CHAT_ENTRY_ROUTE_NAME = ROUTE_NAMES.CHAT_ENTRY;
-export const CHAT_DETAIL_ROUTE_NAME = ROUTE_NAMES.CHAT_DETAIL;
-export const ACTIVE_ROOM_TYPE_CHAT = "chat";
-
-export function isHiddenConversationUrlMode(settings = {}) {
-  return settings?.conversationUrlMode === CONVERSATION_URL_MODES.hidden;
-}
-
-export function resolveActiveChatId({route, chatStore, settings} = {}) {
-  if (isHiddenConversationUrlMode(settings)) {
-    return chatStore?.activeRoomType === ACTIVE_ROOM_TYPE_CHAT
-      ? String(chatStore?.activeRoomId || "").trim()
-      : "";
-  }
-
-  return String(route?.params?.id || "").trim();
-}
-
-export function createChatRoomRoute(chatId) {
-  return {
-    name: CHAT_DETAIL_ROUTE_NAME,
-    params: {id: String(chatId || "").trim()},
-  };
-}
-
-export function createChatEntryRoute() {
-  return {name: CHAT_ENTRY_ROUTE_NAME};
-}
-
-export function createConversationRoute({chatId, settings} = {}) {
-  const id = String(chatId || "").trim();
-
-  if (isHiddenConversationUrlMode(settings)) {
-    return createChatEntryRoute();
-  }
-
-  return createChatRoomRoute(id);
-}
-
-export function applyHiddenConversationActiveRoom({
-  chatId,
-  chatStore,
-  settings,
-} = {}) {
-  if (!isHiddenConversationUrlMode(settings)) return;
-  const id = String(chatId || "").trim();
-  if (!id) return;
-  chatStore?.setActiveChatRoom?.(id);
-}
+import {
+  applyHiddenConversationActiveRoom,
+  createConversationRoute,
+} from "@/composables/chat/policy/chatRoutePolicy";
 
 export async function navigateToConversation({
   router,

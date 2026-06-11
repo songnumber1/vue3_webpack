@@ -7,7 +7,11 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {isHiddenConversationUrlMode} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {
+  getPendingSelectedChatId,
+  isHiddenConversationUrlMode,
+  resolveConversationUrlGuard,
+} from "@/composables/chat/policy/chatRoutePolicy";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -182,7 +186,17 @@ function isRouteGuardBypassRoute(to = {}) {
 }
 
 function isAllowedHistoryLockNavigation({to, from, chatStore, settings}) {
-  const pendingHistoryId = String(chatStore.pendingSelectedChatId || "").trim();
+  const pendingHistoryId = getPendingSelectedChatId(chatStore);
+
+  // 새대화/Assistant/Studio/MCP 선택은 현재 대화방 로딩을 취소하고 이탈하는 동작입니다.
+  // 늦게 들어온 history render lock이 남아 있어도 명시적인 포털 이동은 허용합니다.
+  if (
+    to.name === ROUTE_NAMES.MAIN ||
+    to.name === ROUTE_NAMES.STUDIO ||
+    to.name === ROUTE_NAMES.CONNECTOR_STORE
+  ) {
+    return true;
+  }
 
   // Allow the internal route that opens the currently pending chat.
   if (pendingHistoryId) {
@@ -271,30 +285,12 @@ function guardSharedRoute(to, chatStore) {
 }
 
 function guardConversationUrlMode({to, chatStore, chatStreamStore, settings}) {
-  const hiddenMode = isHiddenConversationUrlMode(settings);
-
-  if (!hiddenMode && to.name === ROUTE_NAMES.CHAT_ENTRY) {
-    return {name: ROUTE_NAMES.MAIN, replace: true};
-  }
-
-  if (
-    hiddenMode &&
-    to.name === ROUTE_NAMES.CHAT_ENTRY &&
-    !(
-      chatStore.activeRoomType === "chat" &&
-      String(chatStore.activeRoomId || "").trim()
-    ) &&
-    !String(chatStore.pendingSelectedChatId || "").trim() &&
-    !chatStreamStore.isStreaming
-  ) {
-    return {name: ROUTE_NAMES.MAIN, replace: true};
-  }
-
-  if (hiddenMode && to.name === ROUTE_NAMES.CHAT_DETAIL) {
-    return {name: ROUTE_NAMES.MAIN, replace: true};
-  }
-
-  return true;
+  return resolveConversationUrlGuard({
+    to,
+    chatStore,
+    chatStreamStore,
+    settings,
+  });
 }
 
 async function guardAuth({to, authAxios}) {

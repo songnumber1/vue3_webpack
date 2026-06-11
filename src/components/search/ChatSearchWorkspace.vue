@@ -138,21 +138,22 @@
  * @file components/search/ChatSearchWorkspace.vue
  * @description Studio 목록 레이아웃 리듬을 사용하는 채팅 검색 화면입니다.
  */
-import {computed, inject, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {
+  isHiddenConversationUrlMode,
+  navigateToConversation,
+} from "@/composables/chat/navigation/conversationUrlPolicy";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useChatSearch} from "@/composables/search/useChatSearch";
 import {createHistoryFromSearchResult} from "@/adapters/chatResponseAdapter";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+import {createEmptyWorkspaceState} from "@/composables/chat/chatActionContext";
+import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
 
 const {t, locale} = useI18n();
 const chatSearch = useChatSearch({
@@ -164,10 +165,7 @@ const chatStore = useChatStore();
 const systemSettingsStore = useSystemSettingsStore();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
+const injectedWorkspaceState = useChatWorkspaceStateContext();
 const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );
@@ -267,29 +265,38 @@ function createVisiblePages(current, total) {
   return Array.from({length: end - start + 1}, (_, index) => start + index);
 }
 
-function openChat(result) {
+async function openChat(result) {
   const chatId = String(result?.chatId || result?.id || "").trim();
   if (!chatId) return;
 
   ensureSearchResultHistory(result, chatId);
 
+  const hiddenMode = isHiddenConversationUrlMode(systemSettingsStore.settings);
+  if (hiddenMode) {
+    chatStore.setPendingSelectedChatId(chatId);
+  }
+
   const messageId = String(
     result?.messageId || result?.targetMessageId || ""
   ).trim();
   const query = isSearchMode.value && messageId ? {messageId} : undefined;
-  navigateToConversation({
-    router,
-    chatStore,
-    settings: systemSettingsStore.settings,
-    chatId,
-  })
-    .then(() => {
-      if (query && Object.keys(query).length) {
-        return router.replace({query}).catch(() => {});
-      }
-      return undefined;
-    })
-    .catch(() => {});
+
+  try {
+    await navigateToConversation({
+      router,
+      chatStore,
+      settings: systemSettingsStore.settings,
+      chatId,
+    });
+
+    if (query && Object.keys(query).length) {
+      await router.replace({query}).catch(() => {});
+    }
+  } catch (_error) {
+    if (hiddenMode && String(chatStore.pendingSelectedChatId) === chatId) {
+      chatStore.clearPendingSelectedChatId();
+    }
+  }
 }
 
 function ensureSearchResultHistory(result = {}, chatId = "") {

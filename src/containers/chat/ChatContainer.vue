@@ -16,7 +16,7 @@
 
     <AssistantSelectSheet
       :open="assistantSheetOpen"
-      :assistants="assistants"
+      :assistants="visibleAssistants"
       :selected-assistant-id="selectedAssistantId"
       @close="assistantSheetOpen = false"
       @select="handleAssistantNewChat"
@@ -72,6 +72,17 @@
       @applied="handleSystemSettingsApplied"
     />
 
+    <StudioDetailViewer
+      :open="studioDetailOpen"
+      :studio="studioDetailStudio"
+      :is-mobile="isMobile"
+      :allow-actions="true"
+      :actions-disabled="isStudioDetailBlocked"
+      @close="closeStudioDetail"
+      @edit="handleStudioDetailEdit"
+      @delete="handleStudioDetailDelete"
+    />
+
     <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
 
     <ChatHistoryActionDialog
@@ -120,17 +131,13 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, provide, watch} from "vue";
+import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
-import {
-  CHAT_ACTIONS_KEY,
-  CHAT_WORKSPACE_STATE_KEY,
-  PROMPT_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
-} from "@/composables/chat/chatActionContext";
+import {useChatContainerProviders} from "@/composables/chat/container/useChatContainerProviders";
+import {useChatContainerInteractionLocks} from "@/composables/chat/container/useChatContainerInteractionLocks";
 import AssistantSelectSheet from "@/components/assistant/AssistantSelectSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -144,11 +151,10 @@ import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import ChatHistoryActionDialog from "@/components/navigation/controls/ChatHistoryActionDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
+import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useAssistantStore} from "@/stores/assistantStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
-import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
-import {ROUTE_NAMES} from "@/constants/routeNames";
+import {useChatStudioPortalActions} from "@/composables/chat/studio/useChatStudioPortalActions";
 
 /**
  * [ChatContainer 연결 구조]
@@ -161,67 +167,13 @@ const route = useRoute();
 const router = useRouter();
 const appRuntimeStore = useAppRuntimeStore();
 const systemSettingsStore = useSystemSettingsStore();
-const assistantStore = useAssistantStore();
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
-const PORTAL_ASSISTANT_IDS = [
-  ASSISTANT_STUDIO_PORTAL_ID,
-  CONNECTOR_STORE_PORTAL_ID,
-];
-
-function isPortalAssistantId(assistantId) {
-  return PORTAL_ASSISTANT_IDS.includes(assistantId);
-}
-
 const routeMode = useRouteMode(route);
 const controllerProps = {
   get mode() {
     return routeMode.value;
   },
 };
-
-function syncAssistantSelectionWithRoute() {
-  const studioAssistant =
-    assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
-  const connectorAssistant =
-    assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
-  if (route.name === ROUTE_NAMES.STUDIO) {
-    if (
-      studioAssistant &&
-      assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
-    ) {
-      assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
-    }
-    return;
-  }
-  if (route.name === ROUTE_NAMES.CONNECTOR_STORE) {
-    if (
-      connectorAssistant &&
-      assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID
-    ) {
-      assistantStore.selectAssistant(CONNECTOR_STORE_PORTAL_ID);
-    }
-    return;
-  }
-
-  if (isPortalAssistantId(assistantStore.selectedAssistantId)) {
-    const fallbackAssistant = assistantStore.assistants.find(
-      (assistant) =>
-        !isPortalAssistantId(assistant.id) &&
-        assistant.type !== "studio" &&
-        assistant.type !== "mcp" &&
-        !assistant.isStudio
-    );
-    if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);
-  }
-}
-
-watch(
-  [() => route.name, () => assistantStore.assistants.length],
-  syncAssistantSelectionWithRoute,
-  {immediate: true}
-);
 
 const {
   t,
@@ -297,116 +249,78 @@ const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
-const chatPageLock = useChatPageLock({
-  readonly: isReadOnly,
+const {chatPageLock, isStudioDetailBlocked} = useChatContainerInteractionLocks({
+  isReadOnly,
   isGenerating,
   isHistoryRendering,
   isActiveModelUnavailable,
 });
 
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-async function handleAssistantNewChat(assistantId) {
-  if (isPortalAssistantId(assistantId)) {
-    assistantStore.selectAssistant(assistantId);
-    assistantSheetOpen.value = false;
-    router
-      .push({
-        name:
-          assistantId === CONNECTOR_STORE_PORTAL_ID
-            ? ROUTE_NAMES.CONNECTOR_STORE
-            : ROUTE_NAMES.STUDIO,
-      })
-      .catch(() => {});
-    return;
-  }
-  await startNewChat({assistantId});
-}
+const {
+  visibleAssistants,
+  studioDetailStudio,
+  studioDetailOpen,
+  closeStudioDetail,
+  openStudioDetail,
+  handleStudioDetailEdit,
+  handleStudioDetailDelete,
+  handleAssistantNewChat,
+} = useChatStudioPortalActions({
+  route,
+  router,
+  assistants,
+  currentAssistant,
+  selectedModel,
+  assistantSheetOpen,
+  isStudioDetailBlocked,
+  startNewChat,
+});
 
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function handleWorkspaceScrollBottom() {
-  scrollBottom({force: true, behavior: "smooth", stable: true});
-}
-
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
-
 function setWorkspaceRef(el) {
   workspaceRef.value = el;
 }
 
-provide(CHAT_ACTIONS_KEY, {
-  historyMenuAction: handleHistoryMenuAction,
-});
-
-provide(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(() => ({
-    mode: routeMode.value,
-    readonly: isReadOnly.value,
-    isMobile: isMobile.value,
-    assistantLabel: workspaceAssistantLabel.value,
-    assistant: currentAssistant.value,
-    conversationTitle: activeConversationTitle.value,
-    themeName: themeName.value,
-    suggestions: suggestions.value,
-    isActiveModelDeleted: false,
-    isActiveModelUnavailable: isActiveModelUnavailable.value,
-    isGenerating: isGenerating.value,
-    messages: messages.value,
-    showScrollBottom: showScrollBottom.value,
-    autoScrollOnAnswer: autoScrollOnAnswer.value,
-    isHistoryRendering: isHistoryRendering.value,
-    historyMessagesLoaded: historyMessagesLoaded.value,
-    hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
-    historyLazyTopThreshold: historyLazyTopThreshold.value,
-    historyLazyChunkSize: historyLazyChunkSize.value,
-    messageRenderPolicy: messageRenderPolicy.value,
-    pcHistoryLazyInitialCount: pcHistoryLazyInitialCount.value,
-    pcHistoryLazyAppendCount: pcHistoryLazyAppendCount.value,
-    pcHistoryLazyTopThresholdPx: pcHistoryLazyTopThresholdPx.value,
-    mobileHistoryLazyInitialCount: mobileHistoryLazyInitialCount.value,
-    mobileHistoryLazyAppendCount: mobileHistoryLazyAppendCount.value,
-  }))
-);
-
-provide(
-  PROMPT_STATE_KEY,
-  computed(() => ({
-    isMobile: isMobile.value,
-    floating: false,
-    showHelp: false,
-    selectedModel: selectedModel.value,
-    models: models.value,
-    disabled: isReadOnly.value,
-    generating: isGenerating.value,
-    modelReadonly: isModelLocked.value,
-    placeholder: "",
-  }))
-);
-
-provide(WORKSPACE_ACTIONS_KEY, {
-  submit: (payload) => {
-    if (chatPageLock.isSubmitBlocked.value) return;
-    submit(payload);
-  },
-  regenerate: (message) => {
-    if (chatPageLock.isRegenerateBlocked.value) return;
-    regenerate(message);
-  },
-  updateSelectedModel: (val) => {
-    selectedModel.value = val;
-  },
-  handlePromptFocus: refreshPromptViewport,
-  handlePromptResize: refreshPromptViewport,
+useChatContainerProviders({
+  routeMode,
+  isReadOnly,
+  isMobile,
+  workspaceAssistantLabel,
+  currentAssistant,
+  activeConversationTitle,
+  themeName,
+  suggestions,
+  isActiveModelUnavailable,
+  isGenerating,
+  messages,
+  showScrollBottom,
+  autoScrollOnAnswer,
+  isHistoryRendering,
+  historyMessagesLoaded,
+  hasPreviousHistoryMessages,
+  historyLazyTopThreshold,
+  historyLazyChunkSize,
+  messageRenderPolicy,
+  pcHistoryLazyInitialCount,
+  pcHistoryLazyAppendCount,
+  pcHistoryLazyTopThresholdPx,
+  mobileHistoryLazyInitialCount,
+  mobileHistoryLazyAppendCount,
+  selectedModel,
+  models,
+  isModelLocked,
+  chatPageLock,
+  handleHistoryMenuAction,
+  submit,
+  regenerate,
+  refreshPromptViewport,
   handleMessageContentRendered,
-  scrollBottom: handleWorkspaceScrollBottom,
-  handleHistoryRendered: finishHistoryRender,
+  scrollBottom,
+  finishHistoryRender,
   loadPreviousHistoryMessages,
+  openStudioDetail,
 });
 </script>
 

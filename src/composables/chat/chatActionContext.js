@@ -176,5 +176,6 @@ export function createEmptyWorkspaceActions() {
     scrollBottom: () => {}, // 타임라인 최하단 스크롤 강제 하향 무동작 스텁
     handleHistoryRendered: () => {}, // 대화방 초기 렌더 완료 후 표시 전환 무동작 스텁
     loadPreviousHistoryMessages: () => false, // lazy 이력에서 이전 메시지 묶음 로드 무동작 스텁
+    openStudioDetail: () => {}, // Studio 상세 팝업 개통 무동작 스텁
   };
 }

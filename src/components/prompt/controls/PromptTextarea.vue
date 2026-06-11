@@ -30,14 +30,14 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject, nextTick, ref} from "vue";
-import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatActionContext";
+import {computed, nextTick, ref} from "vue";
+import {usePromptTextareaStateContext} from "@/composables/chat/context/useChatInject";
 
 const textareaRef = ref(null);
 const localText = ref("");
 const isComposing = ref(false);
 
-const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
+const textareaState = usePromptTextareaStateContext();
 const textareaValue = computed(
   () => textareaState?.text?.value ?? localText.value
 );

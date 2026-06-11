@@ -33,6 +33,12 @@
       @toggle-authority="toggleAuthority"
     />
 
+    <div
+      v-else-if="isResolvingEdit"
+      class="studio-edit-bootstrap tw-flex tw-min-h-0 tw-flex-1 tw-bg-studio-bg"
+      aria-hidden="true"
+    ></div>
+
     <StudioMainWorkspace
       v-else
       :search-text="searchText"
@@ -63,12 +69,18 @@
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
 import {computed, onMounted, reactive, ref, watch} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
 import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
 import {useStudioWorkspaceData} from "@/composables/studio/useStudioWorkspaceData";
+import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
+import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
 
 const {t, locale} = useI18n();
+const route = useRoute();
+const router = useRouter();
+const studioRuntimeStore = useStudioRuntimeStore();
 const studioData = useStudioWorkspaceData({
   allLabel: t("studio.defaults.all"),
   allDescription: t("studio.defaults.allDescription"),
@@ -90,6 +102,7 @@ const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
 const editingStudioId = ref(null);
+const isResolvingEdit = ref(false);
 
 const studioCategoryOptions = ref(createDefaultCategoryOptions());
 const categoryOptions = ref(
@@ -143,6 +156,7 @@ const allAuthoritiesChecked = computed(
 const filteredStudios = computed(() => {
   const keyword = submittedSearchText.value.trim().toLowerCase();
   return studios.value.filter((studio) => {
+    if (studioRuntimeStore.isStudioDeleted(studio.id)) return false;
     const matchedTab = activeTab.value === "all" || Boolean(studio.isMine);
     const matchedCategory =
       activeTab.value !== "all" ||
@@ -214,7 +228,11 @@ watch(locale, () => {
     studios.value = createDefaultStudios();
   }
 });
-onMounted(loadStudioData);
+onMounted(async () => {
+  isResolvingEdit.value = hasPendingEditRouteOrStore();
+  await loadStudioData();
+  await applyPendingEditQuery();
+});
 
 function createDefaultCategoryOptions() {
   return [
@@ -602,6 +620,42 @@ function createDefaultStudios() {
   ];
 }
 
+function hasPendingEditRouteOrStore() {
+  return Boolean(
+    (route.query?.mode === "edit" && route.query?.studioId) ||
+    studioRuntimeStore.pendingEditStudioId
+  );
+}
+
+async function applyPendingEditQuery() {
+  const queryStudioId = String(route.query?.studioId || "").trim();
+  const shouldEditByQuery = route.query?.mode === "edit" && queryStudioId;
+  const pending = studioRuntimeStore.consumePendingEditStudio();
+  const pendingStudioId = String(pending.studioId || "").trim();
+  const targetStudioId = shouldEditByQuery ? queryStudioId : pendingStudioId;
+
+  if (!targetStudioId) {
+    isResolvingEdit.value = false;
+    return;
+  }
+
+  const pendingStudio =
+    pendingStudioId && pendingStudioId === targetStudioId
+      ? pending.studio
+      : null;
+  const target =
+    normalizeStudioDetail(pendingStudio) ||
+    normalizeStudioDetail(
+      studios.value.find((studio) => String(studio.id) === targetStudioId)
+    );
+
+  if (target) openEdit(target);
+  isResolvingEdit.value = false;
+  if (shouldEditByQuery) {
+    await router.replace({name: route.name, query: {}}).catch(() => {});
+  }
+}
+
 async function loadStudioData() {
   await Promise.allSettled([
     loadMainInfo(),
@@ -738,8 +792,12 @@ function createDraftFromStudio(studio) {
   };
 }
 function deleteStudio(studio) {
-  if (!studio) return;
-  studios.value = studios.value.filter((item) => item.id !== studio.id);
+  const target = normalizeStudioDetail(studio) || studio;
+  const id = String(target?.id || "").trim();
+  if (!id) return;
+
+  studioRuntimeStore.markStudioDeleted(id);
+  studios.value = studios.value.filter((item) => String(item.id) !== id);
   currentPage.value = Math.min(currentPage.value, maxPage.value);
 }
 function applyPreview() {

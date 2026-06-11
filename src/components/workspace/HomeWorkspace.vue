@@ -13,7 +13,10 @@
     :assistant-icon="mainAssistantIcon"
     :assistant-label="assistantLabel"
     :suggestions="suggestions"
+    :show-studio-detail-button="showStudioDetailButton"
+    :studio-detail-disabled="studioDetailDisabled"
     @suggestion-click="handleSuggestionClick"
+    @studio-detail="workspaceActions.openStudioDetail?.()"
   >
     <template #composer>
       <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
@@ -27,28 +30,24 @@
  * @description 실제 메인 라우트 전용 workspace입니다. 메인 빈 화면 UI는 MainEmptyState를 공유하고,
  * 실제 PromptComposer만 slot으로 주입하여 Studio 미리보기와 UI를 함께 관리합니다.
  */
-import {computed, inject, ref} from "vue";
+import {computed, ref} from "vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {
-  CHAT_WORKSPACE_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+  useChatWorkspaceStateContext,
+  useWorkspaceActionsContext,
+} from "@/composables/chat/context/useChatInject";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
+import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
 import {useMainPageActions} from "@/composables/main/useMainPageActions";
 import {useMainPageLock} from "@/composables/main/useMainPageLock";
 import {useMainPromptState} from "@/composables/main/useMainPromptState";
 
 const mainPromptInputRef = ref(null);
-const workspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
+const workspaceState = useChatWorkspaceStateContext();
+const workspaceActions = useWorkspaceActionsContext();
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
 const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
@@ -58,6 +57,13 @@ const conversationTitle = computed(
 );
 const themeName = computed(() => workspaceState.value.themeName);
 const suggestions = computed(() => workspaceState.value.suggestions || []);
+const showStudioDetailButton = computed(() =>
+  isStudioAssistant(assistant.value)
+);
+const studioDetailDisabled = computed(
+  () =>
+    workspaceState.value.isGenerating || workspaceState.value.isHistoryRendering
+);
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );

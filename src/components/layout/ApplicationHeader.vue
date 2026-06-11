@@ -81,10 +81,7 @@ import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
 import {
   APP_SHELL_ACTIONS_KEY,
   createEmptyAppShellActions,
@@ -92,10 +89,7 @@ import {
 
 const {t} = useI18n();
 const chatActions = inject(APP_SHELL_ACTIONS_KEY, createEmptyAppShellActions());
-const workspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
+const workspaceState = useChatWorkspaceStateContext();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const themeName = computed(() => workspaceState.value.themeName || "light");

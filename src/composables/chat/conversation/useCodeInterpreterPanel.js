@@ -6,7 +6,7 @@ function escapeHtml(value) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
 
@@ -25,8 +25,12 @@ export function useCodeInterpreterPanel({
   const selectedInterpreterLanguage = ref("text");
   let codeInterpreterBodyClassObserver = null;
 
+  function getModeValue() {
+    return typeof mode === "string" ? mode : mode?.value;
+  }
+
   const canUseDesktopCodeInterpreter = computed(
-    () => isDesktopRuntime.value && !isMobile.value && mode.value === "chat"
+    () => isDesktopRuntime.value && !isMobile.value && getModeValue() === "chat"
   );
   const showCodeInterpreterPanel = computed(
     () => canUseDesktopCodeInterpreter.value && codeInterpreterOpen.value

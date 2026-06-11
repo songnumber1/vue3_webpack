@@ -19,6 +19,7 @@ import {
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
+import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {adaptChatHistory} from "@/adapters/chatAdapter";
 import {
   createLocalHistory,
@@ -29,6 +30,7 @@ import {
   revokeMessageAttachments,
 } from "@/composables/chat/runtime/useMessageAppender";
 import {createChatHistoryRuntime} from "@/composables/chat/runtime/useChatHistoryRuntime";
+import {resolveConversationSessionState} from "@/composables/chat/policy/chatSessionPolicy";
 
 /**
  * [Chat runtime facade]
@@ -48,6 +50,7 @@ export function useChatRuntime() {
   const appBootstrap = useAppBootstrap();
   const assistantStore = useAssistantStore();
   const chatStore = useChatStore();
+  const studioRuntimeStore = useStudioRuntimeStore();
 
   // 구조분해 Destructuring으로 인한 리액티비티(반응성) 깨짐을 방지하기 위해 storeToRefs 래핑 적용
   const {assistants, selectedAssistantId, selectedModelId, examplePromptMap} =
@@ -185,39 +188,30 @@ export function useChatRuntime() {
       assistantStore.assistantMap
     );
 
-    const fallbackAssistant = assistantStore.assistants[0] || null; // 인프라 붕괴 방지용 0순위 원초적 기본형 대안 어시스턴트 선점
+    const sessionState = resolveConversationSessionState({
+      history,
+      session,
+      assistantMap: assistantStore.assistantMap,
+      assistants: assistantStore.assistants,
+      studioRuntimeStore,
+      preserveSidebarAssistant: shouldPreserveSidebarAssistantOnHistoryOpen(),
+    });
+    const resolvedSession = sessionState.session || session;
 
-    // 검증 결과: 사용하던 AI 모델이 소멸했거나, 세션 구조상 어시스턴트 바인딩 링크가 통째로 깨져 실재하지 않는 위험 상태라면 폴백 가동을 선언합니다.
-    const shouldUseFallbackAssistant = Boolean(
-      session?.isModelDeleted ||
-      session?.isModelMissing ||
-      session?.isAssistantMissing ||
-      !session?.assistantId
-    );
-
-    // 폴백 모드가 켜졌다면 강제로 기본형 페르소나(displayAssistant)를 강제 배정하여 화면 크래시를 방어합니다.
-    const displayAssistant = shouldUseFallbackAssistant
-      ? fallbackAssistant
-      : assistantStore.assistantMap[session.assistantId] || fallbackAssistant;
-
-    if (displayAssistant?.id) {
-      if (!shouldPreserveSidebarAssistantOnHistoryOpen()) {
-        assistantStore.selectAssistant(displayAssistant.id); // 모바일에서는 기존처럼 현재 방의 어시스턴트로 동기화
-      }
-      session.displayAssistantId = displayAssistant.id; // 화면 보정 표기용 닉네임 ID 매핑 임베딩
-      session.displayAssistantLabel = displayAssistant.label;
+    if (sessionState.nextSelectedAssistantId) {
+      assistantStore.selectAssistant(sessionState.nextSelectedAssistantId); // 모바일에서는 기존처럼 현재 방의 어시스턴트로 동기화
     }
 
     // 2. 검증 보정 세팅이 완료된 액티브 세션 객체를 최종 기동 상태로 격상 안착시킵니다.
-    chatStore.setActiveSession(session);
+    chatStore.setActiveSession(resolvedSession);
 
     // 3. 만약 해당 방의 대화 말풍선 메시지 내용물들이 로컬 메모리 배열 맵에 로드된 적이 없는 순수 미개봉 상태라면 비동기 API 요청을 통해 긁어옵니다.
     if (!chatStore.messageMap[history.id]) {
       const messages = await loadChatMessageRouters({
         chatId: history.id,
-        assistId: session?.assistantId || history.assistantId,
-        modelId: session?.modelId || history.modelId,
-        studio: session?.assistantType === "studio",
+        assistId: resolvedSession?.assistantId || history.assistantId,
+        modelId: resolvedSession?.modelId || history.modelId,
+        studio: resolvedSession?.assistantType === "studio",
       });
       chatStore.setMessages(history.id, messages); // 스토어 인메모리 배열 슬롯 장착 완결
     }

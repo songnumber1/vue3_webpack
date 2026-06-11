@@ -15,7 +15,20 @@
         :src="assistantIcon"
         :alt="assistantLabel"
       />
-      <h1>{{ resolvedTitle }}</h1>
+      <h1 class="main-empty-state__title">
+        <span>{{ resolvedTitle }}</span>
+        <button
+          v-if="showStudioDetailButton"
+          class="studio-detail-trigger main-empty-state__studio-detail"
+          type="button"
+          :disabled="studioDetailDisabled"
+          aria-label="Studio 상세 보기"
+          title="Studio 상세 보기"
+          @click.stop="emit('studio-detail')"
+        >
+          ⓘ
+        </button>
+      </h1>
       <p
         v-if="subtitle"
         class="main-empty-state__subtitle tw-mx-auto tw-max-w-[420px] tw-text-sm tw-leading-6 tw-text-app-subtle"
@@ -75,9 +88,11 @@ const props = defineProps({
   title: {type: String, default: ""},
   subtitle: {type: String, default: ""},
   suggestions: {type: Array, default: () => []},
+  showStudioDetailButton: {type: Boolean, default: false},
+  studioDetailDisabled: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(["suggestion-click"]);
+const emit = defineEmits(["suggestion-click", "studio-detail"]);
 
 const resolvedTitle = computed(() => props.title || t("chat.startQuestion"));
 const normalizedSuggestions = computed(() =>
@@ -111,6 +126,33 @@ function handleSuggestionClick(item) {
 </script>
 
 <style scoped lang="scss">
+.main-empty-state__title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.studio-detail-trigger {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--app-controlBorder, #d1d5db);
+  border-radius: 999px;
+  background: var(--app-control, #fff);
+  color: var(--app-subtle, #6b7280);
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.studio-detail-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 /*
  * Mobile main composer owns a separate dock outside .empty-center.
  * This prevents the prompt from staying in the desktop empty-state flow when

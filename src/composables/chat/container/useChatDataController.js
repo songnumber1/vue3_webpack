@@ -7,12 +7,11 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
 import {logWarn} from "@/utils/logger";
-import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
@@ -21,14 +20,21 @@ import {
   isSharedChat,
   resolveMessageRenderPolicy,
 } from "@/composables/chat/message-list/useMessageRenderPolicy";
-import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRouteController} from "@/composables/chat/route/useChatRouteController";
 import {useChatRouteLoader} from "@/composables/chat/route/useChatRouteLoader";
+import {useChatPromptSuggestions} from "@/composables/chat/container/useChatPromptSuggestions";
+import {useChatHistoryState} from "@/composables/chat/container/useChatHistoryState";
+import {useChatMermaidHistoryGuards} from "@/composables/chat/container/useChatMermaidHistoryGuards";
 import {useHistoryConversationLoader} from "@/composables/chat/history/useHistoryConversationLoader";
 import {useSharedConversationLoader} from "@/composables/chat/shared/useSharedConversationLoader";
 import {useConversationLazyHistory} from "@/composables/chat/conversation/useConversationLazyHistory";
 import {useConversationRenderLifecycle} from "@/composables/chat/conversation/useConversationRenderLifecycle";
+import {resolveConversationRouteReconciliation} from "@/composables/chat/policy/chatRoutePolicy";
+import {
+  resolveConversationTitle,
+  resolveWorkspaceAssistantLabel,
+} from "@/composables/chat/policy/chatHeaderPolicy";
 
 /**
  * [Route/Data controller]
@@ -101,65 +107,47 @@ export function useChatDataController({props, ui, runtime, messages}) {
     isModelLocked,
     isActiveModelUnavailable,
     activeSession,
-    ensureConversation,
     setMessages,
     createRemoteConversation,
     createLocalConversation,
-    clearActiveSession,
     appendUserAndAssistantMessages,
     currentExamplePrompts,
     syncHistoriesInBackground,
   } = runtime;
 
-  /**
-   * 전역 히스토리 서랍 데이터 내부에서 특정 ID를 가진 채팅방 레코드를 검색합니다.
-   */
-  function findHistory(id) {
-    if (!id) return null;
-    return (
-      histories.value.find((history) => String(history.id) === String(id)) ||
-      null
-    );
-  }
+  const {
+    activeHistory,
+    findHistory,
+    clearPendingSelectedIfMatched,
+    clearPendingSelectedOnFailure,
+  } = useChatHistoryState({
+    histories,
+    activeHistoryId,
+    chatStore,
+  });
 
-  const activeHistory = computed(() => findHistory(activeHistoryId.value));
-
-  /**
-   * 대화방 이동 클릭 직후 표시용 pending id는 실제 history load 성공/실패 시점에만 정리합니다.
-   * pendingSelectedChatId는 lock이 아니라 좌측 메뉴 선택 색상 선반영용 상태입니다.
-   */
-  function clearPendingSelectedIfMatched(chatId) {
-    const pendingId = String(chatStore.pendingSelectedChatId || "").trim();
-    const targetId = String(chatId || "").trim();
-    if (!pendingId || pendingId === targetId) {
-      chatStore.clearPendingSelectedChatId();
-    }
-  }
-
-  function clearPendingSelectedOnFailure(chatId) {
-    const pendingId = String(chatStore.pendingSelectedChatId || "").trim();
-    const targetId = String(chatId || "").trim();
-    if (!pendingId || pendingId === targetId) {
-      chatStore.clearPendingSelectedChatId();
-    }
-  }
-
-  function isMermaidRenderingEnabled() {
-    return isMermaidRenderingEnabledForPlatform(
-      systemSettingsStore.settings,
-      Boolean(ui.isMobile?.value)
-    );
-  }
-
-  function hasMermaidInHistoryMessages(sourceMessages = []) {
-    if (!isMermaidRenderingEnabled()) return false;
-    const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-    return list.some((message) => {
-      const content = `${message?.content || ""}
-${message?.reasoningContent || ""}`;
-      return /```\s*mermaid/i.test(content);
+  async function reconcileConversationUrlModeRoute() {
+    const result = resolveConversationRouteReconciliation({
+      route,
+      chatStore,
+      settings: systemSettingsStore.settings,
     });
+
+    if (!result.shouldRedirect) return false;
+
+    if (result.nextActiveChatId) {
+      chatStore.setActiveChatRoom(result.nextActiveChatId);
+    }
+
+    await router.replace(result.nextRoute).catch(() => {});
+    return true;
   }
+
+  const {isMermaidRenderingEnabled, hasMermaidInHistoryMessages} =
+    useChatMermaidHistoryGuards({
+      systemSettingsStore,
+      isMobile: ui.isMobile,
+    });
 
   const renderLifecycle = useConversationRenderLifecycle({
     ui,
@@ -203,7 +191,6 @@ ${message?.reasoningContent || ""}`;
 
   const {
     hasPreviousHistoryMessages,
-    getHistoryLazyInitialCount,
     getHistoryLazyAppendCount,
     getHistoryLazyTopThresholdPx,
     clearLazyHistoryMessages,
@@ -215,57 +202,27 @@ ${message?.reasoningContent || ""}`;
   } = lazyHistory;
 
   // 현재 진입한 대화방 상단 헤더 영역에 바인딩할 타이틀 텍스트를 산출합니다.
-  const activeConversationTitle = computed(() => {
-    if (isSharedPage.value) {
-      return t("chat.sharedConversationTitle", {
-        id: activeHistoryId.value || "",
-      }).trim();
-    }
-    return activeHistory.value?.title || "";
-  });
+  const activeConversationTitle = computed(() =>
+    resolveConversationTitle({
+      isSharedPage: isSharedPage.value,
+      activeHistoryId: activeHistoryId.value,
+      activeHistory: activeHistory.value,
+      t,
+    })
+  );
 
   // 워크스페이스 대화창 메인에 마운트할 어시스턴트 명칭 라벨을 동적으로 결정합니다.
-  const workspaceAssistantLabel = computed(() => {
-    if (activeSession.value?.displayAssistantLabel) {
-      return activeSession.value.displayAssistantLabel;
-    }
-    if (
-      activeSession.value?.assistantLabel &&
-      !activeSession.value?.isModelUnavailable
-    ) {
-      return activeSession.value.assistantLabel;
-    }
-    return currentAssistant.value?.label || t("chat.assistant");
-  });
+  const workspaceAssistantLabel = computed(() =>
+    resolveWorkspaceAssistantLabel({
+      activeSession: activeSession.value,
+      currentAssistant: currentAssistant.value,
+      fallbackLabel: t("chat.assistant"),
+    })
+  );
 
-  // ── [2. 글로벌 다국어 지원 추천 칩 가공 파트] ──────────────────
-  // 현재 페르소나가 보유한 추천 예시 힌트 질문 리스트를 감지하여 다국어 설정(ko/en)에 부합하는 프로필 카드로 정형화합니다.
-  const suggestions = computed(() => {
-    const assistantPrompts = currentExamplePrompts.value || [];
-    const isEnglish = locale.value === "en";
-
-    return assistantPrompts
-      .slice(0, PROMPT_SUGGESTION_LIMIT) // 시스템 최대 노출 리밋(개수) 가드를 적용합니다.
-      .map((prompt) => {
-        // 브라우저 로케일 상태에 따라 영문 정보 및 국문 정보를 유연하게 크로스 매핑 및 폴백 가드 처리합니다.
-        const localizedTitle = isEnglish
-          ? prompt.titleEn || prompt.titleKo
-          : prompt.titleKo || prompt.titleEn;
-        const localizedContent = isEnglish
-          ? prompt.contentEn || prompt.contentKo || localizedTitle
-          : prompt.contentKo || prompt.contentEn || localizedTitle;
-
-        const text = localizedTitle || localizedContent;
-        const content = localizedContent || localizedTitle;
-
-        return {
-          id: prompt.id,
-          text, // 추천 칩 상단 노출용 숏 텍스트 제목
-          title: content || text, // 전체 마우스 호버 가이드 툴팁
-          prompt: content || text, // 클릭 시 실제 하단 텍스트 인풋 창에 자동 복사 임베딩될 최종 본문 프롬프트 문장
-        };
-      })
-      .filter((item) => item.text && item.prompt); // 비정상 공백 질문은 필터링 제거합니다.
+  const suggestions = useChatPromptSuggestions({
+    currentExamplePrompts,
+    locale,
   });
 
   const {loadSharedRouteConversation, redirectSharedNotFound} =
@@ -326,6 +283,10 @@ ${message?.reasoningContent || ""}`;
     },
   });
 
+  function shouldLoadRouteConversation() {
+    return isMainPage.value || isConversationPage.value;
+  }
+
   // ── [5. 비동기 프롬프트 질문 전송 코어 브릿지 바인딩] ──────────────────
   const {isGenerating, submit, regenerate} = useChatSubmit({
     router,
@@ -378,8 +339,14 @@ ${message?.reasoningContent || ""}`;
         route.query?.messageId,
         currentMode.value,
       ],
-      () => {
-        if (runtimeReady.value) loadRouteConversation();
+      async () => {
+        if (!runtimeReady.value) return;
+        if (!shouldLoadRouteConversation()) {
+          invalidateRouteLoad();
+          return;
+        }
+        if (await reconcileConversationUrlModeRoute()) return;
+        loadRouteConversation();
       }
     );
 
@@ -417,7 +384,14 @@ ${message?.reasoningContent || ""}`;
       } catch (error) {
         logWarn("[useChatDataController] runtime.initialize 오류:", error);
       }
-      await loadRouteConversation(); // 3단계: 현재 주소창에 박제되어 있는 대화 내역 원격 자동 동기화 복원
+      if (shouldLoadRouteConversation()) {
+        if (await reconcileConversationUrlModeRoute()) {
+          await nextTick();
+        }
+        await loadRouteConversation(); // 3단계: 현재 주소창에 박제되어 있는 대화 내역 원격 자동 동기화 복원
+      } else {
+        invalidateRouteLoad();
+      }
       runtimeReady.value = true; // 4단계: 전체 프로세스 정상 가동 청신호 개통 선언
     });
 
