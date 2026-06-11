@@ -31,7 +31,7 @@ export const PERFORMANCE_CHAT_HISTORY_RAW = [
     testMessageCount: 750,
   },
   {
-    chatTitle: "공유 - 성능 테스트 500개 질의답변 + Mermaid",
+    chatTitle: "성능 테스트 500개 질의답변 + Mermaid",
     chatId: "perf-chat-qa-500",
     modeId: "model-ds-fast",
     modelId: "model-ds-fast",
@@ -39,7 +39,7 @@ export const PERFORMANCE_CHAT_HISTORY_RAW = [
     dayGroup: 0,
     chatEndDt: "2026-06-02T11:00:00Z",
     userId: "user-1234",
-    sharedId: "4ee53a45-a3b4-493d-8728-1b31a7e2d7c9",
+    // sharedId: "4ee53a45-a3b4-493d-8728-1b31a7e2d7c9",
     testPairCount: 500,
     testMessageCount: 1000,
   },

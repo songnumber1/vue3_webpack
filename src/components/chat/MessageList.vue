@@ -3,10 +3,11 @@
     ref="scrollRef"
     class="message-list"
     :class="{
-      'message-list--history-rendering': historyRendering,
+      'message-list--history-rendering':
+        historyRendering && !historyMarkdownVisible,
       'message-list--manual-stream': loading && !autoScrollOnAnswer,
     }"
-    :inert="historyRendering ? '' : null"
+    :inert="historyRendering && !historyMarkdownVisible ? '' : null"
     aria-live="polite"
     :aria-busy="historyRendering ? 'true' : 'false'"
     @scroll.passive="handleScroll"
@@ -61,6 +62,7 @@ const props = defineProps({
   loading: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
   historyRendering: {type: Boolean, default: false},
+  historyMarkdownVisible: {type: Boolean, default: false},
   historyMessagesReady: {type: Boolean, default: false},
   hasPreviousHistoryMessages: {type: Boolean, default: false},
   historyLazyTopThreshold: {type: Number, default: 300},
@@ -76,6 +78,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   "content-rendered",
+  "history-markdown-rendered",
   "history-rendered",
   "load-previous-history",
   "regenerate",

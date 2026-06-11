@@ -30,9 +30,7 @@ export function useChatWorkspaceStateContext(
   return inject(CHAT_WORKSPACE_STATE_KEY, fallback);
 }
 
-export function usePromptStateContext(
-  fallback = computed(createEmptyPromptState)
-) {
+export function usePromptStateContext(fallback = computed(createEmptyPromptState)) {
   return inject(PROMPT_STATE_KEY, fallback);
 }
 

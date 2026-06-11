@@ -25,6 +25,10 @@ export function useChatConversationActions({workspaceActions, lock} = {}) {
     workspaceActions?.handleMessageContentRendered?.();
   }
 
+  function handleHistoryMarkdownRendered() {
+    workspaceActions?.handleHistoryMarkdownRendered?.();
+  }
+
   function handleHistoryRendered() {
     workspaceActions?.handleHistoryRendered?.();
   }
@@ -34,6 +38,7 @@ export function useChatConversationActions({workspaceActions, lock} = {}) {
     regenerate,
     loadPreviousHistoryMessages,
     handleMessageContentRendered,
+    handleHistoryMarkdownRendered,
     handleHistoryRendered,
   };
 }

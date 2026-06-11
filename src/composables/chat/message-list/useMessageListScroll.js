@@ -181,6 +181,9 @@ export function useMessageListScroll({props, emit}) {
   let historyLazyScrollRestoreUntil = 0;
   let manualHistoryAnchorLockCleanup = null;
   let manualHistoryAnchorLockToken = 0;
+  let progressiveHistoryMarkdownRevealed = false;
+  let progressiveNormalBottomFollowActive = false;
+  let progressiveNormalBottomFollowCancelled = false;
 
   function isHistoryLazyScrollRestoreSuppressed() {
     return (
@@ -374,6 +377,55 @@ export function useMessageListScroll({props, emit}) {
 
   function refreshManualHistoryLoadMode() {
     androidManualHistoryLoadMode.value = shouldUseManualHistoryLoadMode();
+  }
+
+  function getHistoryRenderStrategy() {
+    return String(props.messageRenderPolicy?.historyRenderStrategy || "");
+  }
+
+  function isProgressiveHistoryRender() {
+    return getHistoryRenderStrategy().startsWith("pc-progressive-");
+  }
+
+  function isProgressiveNormalHistoryRender() {
+    return getHistoryRenderStrategy() === "pc-progressive-normal";
+  }
+
+  function cancelProgressiveNormalBottomFollow() {
+    if (!progressiveNormalBottomFollowActive) return;
+    progressiveNormalBottomFollowCancelled = true;
+  }
+
+  function shouldApplyHistoryRenderScroll(options = {}) {
+    if (props.historyRendering !== true) return false;
+    if (!isProgressiveHistoryRender()) return true;
+    if (options.initialReveal === true) return true;
+    if (!progressiveHistoryMarkdownRevealed) return true;
+    if (!isProgressiveNormalHistoryRender()) return false;
+    return !progressiveNormalBottomFollowCancelled;
+  }
+
+  function isKeyboardScrollEvent(event) {
+    if (event?.type !== "keydown") return false;
+    return [
+      "ArrowUp",
+      "ArrowDown",
+      "PageUp",
+      "PageDown",
+      "Home",
+      "End",
+      "Space",
+      " ",
+    ].includes(event.key || event.code);
+  }
+
+  function isUserScrollIntentEvent(event) {
+    const type = event?.type || "";
+    return (
+      type === "wheel" ||
+      type === "touchstart" ||
+      isKeyboardScrollEvent(event)
+    );
   }
 
   function handleScroll() {
@@ -648,6 +700,9 @@ export function useMessageListScroll({props, emit}) {
     historyRenderRunId += 1;
     clearTrackedAnimationFrames();
     historyRenderCompleting = false;
+    progressiveHistoryMarkdownRevealed = false;
+    progressiveNormalBottomFollowActive = false;
+    progressiveNormalBottomFollowCancelled = false;
   }
 
   async function requestPreviousHistoryMessagesIfNeeded(options = {}) {
@@ -753,7 +808,10 @@ export function useMessageListScroll({props, emit}) {
       .map(({message, index}) => getHistoryRenderMessageKey(message, index));
   }
 
-  function handleUserScrollIntent() {
+  function handleUserScrollIntent(event) {
+    if (isUserScrollIntentEvent(event)) {
+      cancelProgressiveNormalBottomFollow();
+    }
     cancelManualHistoryAnchorLock();
     clearStableTimers();
     clearAfterRenderScrollState();
@@ -774,8 +832,9 @@ export function useMessageListScroll({props, emit}) {
     return props.historyRendering === true;
   }
 
-  function applyHistoryRenderInitialScrollTarget() {
+  function applyHistoryRenderInitialScrollTarget(options = {}) {
     if (!shouldAutoHistoryRenderBottomScroll()) return;
+    if (!shouldApplyHistoryRenderScroll(options)) return;
 
     const target = props.messageRenderPolicy?.scrollTarget || {type: "bottom"};
     const applied = messageScrollTarget.applyScrollTarget(target, {
@@ -1119,6 +1178,28 @@ export function useMessageListScroll({props, emit}) {
     );
   }
 
+  function revealProgressiveHistoryMarkdownIfReady() {
+    if (!isProgressiveHistoryRender() || progressiveHistoryMarkdownRevealed) {
+      return false;
+    }
+
+    const domIndex = createHistoryRenderDomIndex();
+    if (
+      !isHistoryRenderDomReady(domIndex) ||
+      !isHistoryRenderContentReady(domIndex) ||
+      !isHistoryRenderMermaidDomReady(domIndex.root)
+    ) {
+      return false;
+    }
+
+    applyHistoryRenderInitialScrollTarget({initialReveal: true});
+    progressiveHistoryMarkdownRevealed = true;
+    progressiveNormalBottomFollowActive = isProgressiveNormalHistoryRender();
+    progressiveNormalBottomFollowCancelled = false;
+    emit("history-markdown-rendered");
+    return true;
+  }
+
   async function renderHistoryRoomPendingMermaidSequentially(runId) {
     await nextTick();
     if (runId !== historyRenderRunId || !props.historyRendering) return false;
@@ -1247,6 +1328,8 @@ export function useMessageListScroll({props, emit}) {
 
       await waitForHistoryRenderDomReady(runId);
       if (runId !== historyRenderRunId || !props.historyRendering) return;
+
+      revealProgressiveHistoryMarkdownIfReady();
 
       await renderHistoryRoomPendingMermaidSequentially(runId);
       if (runId !== historyRenderRunId || !props.historyRendering) return;
@@ -1517,6 +1600,7 @@ export function useMessageListScroll({props, emit}) {
       passive: true,
     });
     window.addEventListener("wheel", handleUserScrollIntent, {passive: true});
+    window.addEventListener("keydown", handleUserScrollIntent);
   });
 
   onBeforeUnmount(() => {
@@ -1536,6 +1620,7 @@ export function useMessageListScroll({props, emit}) {
     );
     window.removeEventListener("touchstart", handleUserScrollIntent);
     window.removeEventListener("wheel", handleUserScrollIntent);
+    window.removeEventListener("keydown", handleUserScrollIntent);
   });
 
   return {

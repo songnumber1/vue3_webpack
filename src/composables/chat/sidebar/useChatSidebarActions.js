@@ -91,9 +91,7 @@ export function useChatSidebarActions({
   }
 
   function resetConversationStateForRouteChange() {
-    resetConversationStateForRouteChangeByPolicy(
-      createNavigationResetContext()
-    );
+    resetConversationStateForRouteChangeByPolicy(createNavigationResetContext());
   }
 
   function preparePortalNavigation() {

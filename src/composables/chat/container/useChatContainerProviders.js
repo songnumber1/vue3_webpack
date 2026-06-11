@@ -22,6 +22,7 @@ export function useChatContainerProviders({
   showScrollBottom,
   autoScrollOnAnswer,
   isHistoryRendering,
+  historyMarkdownVisible,
   historyMessagesLoaded,
   hasPreviousHistoryMessages,
   historyLazyTopThreshold,
@@ -43,6 +44,7 @@ export function useChatContainerProviders({
   handleMessageContentRendered,
   scrollBottom,
   finishHistoryRender,
+  revealHistoryMarkdown,
   loadPreviousHistoryMessages,
   openStudioDetail,
 }) {
@@ -69,6 +71,7 @@ export function useChatContainerProviders({
       showScrollBottom: showScrollBottom.value,
       autoScrollOnAnswer: autoScrollOnAnswer.value,
       isHistoryRendering: isHistoryRendering.value,
+      historyMarkdownVisible: historyMarkdownVisible.value,
       historyMessagesLoaded: historyMessagesLoaded.value,
       hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
       historyLazyTopThreshold: historyLazyTopThreshold.value,
@@ -115,6 +118,7 @@ export function useChatContainerProviders({
       scrollBottom({force: true, behavior: "smooth", stable: true});
     },
     handleHistoryRendered: finishHistoryRender,
+    handleHistoryMarkdownRendered: revealHistoryMarkdown,
     loadPreviousHistoryMessages,
     openStudioDetail,
   });

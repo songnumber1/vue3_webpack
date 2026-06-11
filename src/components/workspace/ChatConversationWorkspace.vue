@@ -17,6 +17,7 @@
     :loading="isGenerating"
     :auto-scroll-on-answer="autoScrollOnAnswer"
     :history-rendering="isHistoryRendering"
+    :history-markdown-visible="historyMarkdownVisible"
     :history-messages-ready="historyMessagesLoaded"
     :has-previous-history-messages="hasPreviousHistoryMessages"
     :history-lazy-top-threshold="historyLazyTopThreshold"
@@ -29,6 +30,7 @@
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     :readonly="readonly"
     @content-rendered="handleMessageContentRendered"
+    @history-markdown-rendered="handleHistoryMarkdownRendered"
     @history-rendered="handleHistoryRendered"
     @load-previous-history="handleLoadPreviousHistory"
     @regenerate="handleRegenerate"
@@ -48,10 +50,10 @@
     ↓
   </button>
   <div
-    v-show="!isHistoryRendering"
+    v-show="isComposerVisible"
     ref="composerSlotRef"
     class="chat-composer-slot"
-    :aria-hidden="isHistoryRendering ? 'true' : null"
+    :aria-hidden="isComposerVisible ? null : 'true'"
   >
     <ChatReadonlyInput v-if="readonly" />
     <ChatReadonlyInput
@@ -165,6 +167,12 @@ const autoScrollOnAnswer = computed(
 const isHistoryRendering = computed(
   () => workspaceState.value.isHistoryRendering
 );
+const historyMarkdownVisible = computed(
+  () => workspaceState.value.historyMarkdownVisible
+);
+const isComposerVisible = computed(
+  () => !isHistoryRendering.value || historyMarkdownVisible.value
+);
 const historyMessagesLoaded = computed(
   () => workspaceState.value.historyMessagesLoaded
 );
@@ -257,6 +265,11 @@ function handleMessageContentRendered() {
   }
 
   conversationActions.handleMessageContentRendered();
+  scheduleComposerHeightUpdate();
+}
+
+function handleHistoryMarkdownRendered() {
+  conversationActions.handleHistoryMarkdownRendered();
   scheduleComposerHeightUpdate();
 }
 

@@ -9,6 +9,14 @@ export const MESSAGE_SCROLL_TARGET_TYPES = Object.freeze({
   message: "message",
 });
 
+export const HISTORY_RENDER_STRATEGIES = Object.freeze({
+  mobileCurrent: "mobile-current",
+  pcBlockingCurrent: "pc-blocking-current",
+  pcProgressiveShared: "pc-progressive-shared",
+  pcProgressiveNormal: "pc-progressive-normal",
+  pcProgressiveSearch: "pc-progressive-search",
+});
+
 function hasSharedId(chat) {
   return String(chat?.sharedId || "").trim().length > 0;
 }
@@ -32,13 +40,16 @@ export function resolveMessageRenderPolicy({
   isMobile = false,
   selectedChat = null,
   searchTargetMessageId = null,
+  showPcProgress = true,
 } = {}) {
   const targetMessageId = normalizeMessageId(searchTargetMessageId);
+  const usePcProgressiveRender = !isMobile && showPcProgress !== true;
 
   if (isMobile) {
     return {
       useLazyLoading: true,
       scrollTarget: {type: MESSAGE_SCROLL_TARGET_TYPES.bottom},
+      historyRenderStrategy: HISTORY_RENDER_STRATEGIES.mobileCurrent,
     };
   }
 
@@ -49,6 +60,9 @@ export function resolveMessageRenderPolicy({
         type: MESSAGE_SCROLL_TARGET_TYPES.message,
         messageId: targetMessageId,
       },
+      historyRenderStrategy: usePcProgressiveRender
+        ? HISTORY_RENDER_STRATEGIES.pcProgressiveSearch
+        : HISTORY_RENDER_STRATEGIES.pcBlockingCurrent,
     };
   }
 
@@ -56,11 +70,17 @@ export function resolveMessageRenderPolicy({
     return {
       useLazyLoading: false,
       scrollTarget: {type: MESSAGE_SCROLL_TARGET_TYPES.first},
+      historyRenderStrategy: usePcProgressiveRender
+        ? HISTORY_RENDER_STRATEGIES.pcProgressiveShared
+        : HISTORY_RENDER_STRATEGIES.pcBlockingCurrent,
     };
   }
 
   return {
     useLazyLoading: true,
     scrollTarget: {type: MESSAGE_SCROLL_TARGET_TYPES.bottom},
+    historyRenderStrategy: usePcProgressiveRender
+      ? HISTORY_RENDER_STRATEGIES.pcProgressiveNormal
+      : HISTORY_RENDER_STRATEGIES.pcBlockingCurrent,
   };
 }

@@ -30,7 +30,9 @@ import {useHistoryConversationLoader} from "@/composables/chat/history/useHistor
 import {useSharedConversationLoader} from "@/composables/chat/shared/useSharedConversationLoader";
 import {useConversationLazyHistory} from "@/composables/chat/conversation/useConversationLazyHistory";
 import {useConversationRenderLifecycle} from "@/composables/chat/conversation/useConversationRenderLifecycle";
-import {resolveConversationRouteReconciliation} from "@/composables/chat/policy/chatRoutePolicy";
+import {
+  resolveConversationRouteReconciliation,
+} from "@/composables/chat/policy/chatRoutePolicy";
 import {
   resolveConversationTitle,
   resolveWorkspaceAssistantLabel,
@@ -70,6 +72,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       isMobile: Boolean(ui.isMobile?.value),
       selectedChat: activeHistory.value,
       searchTargetMessageId: route.query?.messageId,
+      showPcProgress: systemSettingsStore.settings.showPcProgress,
     })
   );
 
@@ -163,10 +166,12 @@ export function useChatDataController({props, ui, runtime, messages}) {
 
   const {
     isHistoryRendering,
+    historyMarkdownVisible,
     historyMessagesLoaded,
     beginHistoryRender,
     finishHistoryRender,
     finishHistoryRenderImmediately,
+    revealHistoryMarkdown,
     renderAfterStream,
     cleanupHistoryRender,
   } = renderLifecycle;
@@ -423,6 +428,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     suggestions,
     isGenerating,
     isHistoryRendering,
+    historyMarkdownVisible,
     historyMessagesLoaded,
     hasPreviousHistoryMessages,
     messageRenderPolicy,
@@ -445,6 +451,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
     ),
     loadPreviousHistoryMessages,
     finishHistoryRender,
+    revealHistoryMarkdown,
     submit,
     regenerate,
     bindDataEvents,

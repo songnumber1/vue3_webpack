@@ -27,17 +27,13 @@ export function resolveHistoryAssistantLabel(history = {}, session = {}) {
   );
 }
 
-export function isStudioConversationSession({
-  history = {},
-  session = {},
-  assistant = null,
-} = {}) {
+export function isStudioConversationSession({history = {}, session = {}, assistant = null} = {}) {
   return Boolean(
     session?.assistantType === "studio" ||
-    history?.assistantType === "studio" ||
-    assistant?.type === "studio" ||
-    assistant?.isStudio === true ||
-    assistant?.studio === true
+      history?.assistantType === "studio" ||
+      assistant?.type === "studio" ||
+      assistant?.isStudio === true ||
+      assistant?.studio === true
   );
 }
 
@@ -49,24 +45,16 @@ export function resolveDeletedStudioSessionState({
 } = {}) {
   const assistantId = normalizeId(session?.assistantId || history?.assistantId);
   const assistant = assistantMap?.[assistantId] || null;
-  const isStudioSession = isStudioConversationSession({
-    history,
-    session,
-    assistant,
-  });
+  const isStudioSession = isStudioConversationSession({history, session, assistant});
   const isDeleted = Boolean(
-    isStudioSession &&
-    assistantId &&
-    studioRuntimeStore?.isStudioDeleted?.(assistantId)
+    isStudioSession && assistantId && studioRuntimeStore?.isStudioDeleted?.(assistantId)
   );
 
   return {
     assistantId,
     isStudioSession,
     isDeleted,
-    displayLabel: isDeleted
-      ? resolveHistoryAssistantLabel(history, session)
-      : "",
+    displayLabel: isDeleted ? resolveHistoryAssistantLabel(history, session) : "",
   };
 }
 
@@ -90,8 +78,7 @@ export function markSessionAsMissingAssistant({
     assistantType: session?.assistantType || assistantType,
     assistantLabel: session?.assistantLabel || deletedAssistantLabel,
     displayAssistantId: session?.displayAssistantId || deletedAssistantId,
-    displayAssistantLabel:
-      session?.displayAssistantLabel || deletedAssistantLabel,
+    displayAssistantLabel: session?.displayAssistantLabel || deletedAssistantLabel,
     isAssistantMissing: true,
     isModelUnavailable: true,
     modelUnavailableReason: "missing-assistant",
@@ -137,15 +124,13 @@ export function resolveConversationSessionState({
     );
   }
 
-  const fallbackAssistant = Array.isArray(assistants)
-    ? assistants[0] || null
-    : null;
+  const fallbackAssistant = Array.isArray(assistants) ? assistants[0] || null : null;
   const shouldUseFallbackAssistant = Boolean(
     nextSession?.isModelDeleted ||
-    nextSession?.isModelMissing ||
-    nextSession?.isAssistantMissing ||
-    deletedStudio.isDeleted ||
-    !nextSession?.assistantId
+      nextSession?.isModelMissing ||
+      nextSession?.isAssistantMissing ||
+      deletedStudio.isDeleted ||
+      !nextSession?.assistantId
   );
   const displayAssistant = shouldUseFallbackAssistant
     ? fallbackAssistant
@@ -166,9 +151,7 @@ export function resolveConversationSessionState({
     isRuntimeDeletedStudioSession: deletedStudio.isDeleted,
     deletedStudioAssistantLabel: deletedStudio.displayLabel,
     nextSelectedAssistantId:
-      !preserveSidebarAssistant &&
-      !deletedStudio.displayLabel &&
-      displayAssistant?.id
+      !preserveSidebarAssistant && !deletedStudio.displayLabel && displayAssistant?.id
         ? displayAssistant.id
         : "",
   };

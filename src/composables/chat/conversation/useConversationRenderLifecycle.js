@@ -15,6 +15,7 @@ export function useConversationRenderLifecycle({
   navigationLock,
 }) {
   const isHistoryRendering = ref(false);
+  const historyMarkdownVisible = ref(false);
   const historyMessagesLoaded = ref(false);
   let historyRenderOverlayActive = false;
   let historyRenderFinishSeq = 0;
@@ -83,6 +84,7 @@ export function useConversationRenderLifecycle({
   function beginHistoryRender() {
     historyRenderFinishSeq += 1;
     historyMessagesLoaded.value = false;
+    historyMarkdownVisible.value = false;
     isHistoryRendering.value = true;
     navigationLock.acquireLockIfFree(
       navigationLock.NAVIGATION_LOCK_SCOPES.chatHistory,
@@ -109,6 +111,7 @@ export function useConversationRenderLifecycle({
   function finishHistoryRenderImmediately() {
     historyRenderFinishSeq += 1;
     historyMessagesLoaded.value = false;
+    historyMarkdownVisible.value = false;
     isHistoryRendering.value = false;
     releaseCurrentChatHistoryLock();
     if (historyRenderOverlayActive) {
@@ -126,8 +129,12 @@ export function useConversationRenderLifecycle({
         await waitForNextPaint();
         if (finishSeq !== historyRenderFinishSeq) return;
 
+        const skipFinalScrollTarget = historyMarkdownVisible.value;
         isHistoryRendering.value = false;
+        historyMarkdownVisible.value = false;
         releaseCurrentChatHistoryLock();
+
+        if (skipFinalScrollTarget) return;
 
         await nextTick();
         if (finishSeq !== historyRenderFinishSeq) return;
@@ -160,6 +167,22 @@ export function useConversationRenderLifecycle({
     void revealAfterPaint();
   }
 
+
+  function isPcProgressiveHistoryRender() {
+    return String(messageRenderPolicy.value?.historyRenderStrategy || "").startsWith(
+      "pc-progressive-"
+    );
+  }
+
+  function revealHistoryMarkdown() {
+    if (!isHistoryRendering.value || !isPcProgressiveHistoryRender()) return;
+    historyMarkdownVisible.value = true;
+    if (historyRenderOverlayActive) {
+      apiRequestStore.stopOverlay();
+      historyRenderOverlayActive = false;
+    }
+  }
+
   async function renderAfterStream() {
     try {
       if (ui.autoScrollOnAnswer.value) {
@@ -189,6 +212,7 @@ export function useConversationRenderLifecycle({
 
   function cleanupHistoryRender() {
     invalidateHistoryRender();
+    historyMarkdownVisible.value = false;
     forceReleaseChatHistoryLock();
     if (historyRenderOverlayActive) {
       apiRequestStore.stopOverlay();
@@ -198,12 +222,14 @@ export function useConversationRenderLifecycle({
 
   return {
     isHistoryRendering,
+    historyMarkdownVisible,
     historyMessagesLoaded,
     waitForNextPaint,
     flushConversationSwitchPaint,
     beginHistoryRender,
     finishHistoryRender,
     finishHistoryRenderImmediately,
+    revealHistoryMarkdown,
     renderAfterStream,
     invalidateHistoryRender,
     cleanupHistoryRender,
