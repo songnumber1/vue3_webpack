@@ -24,6 +24,7 @@ export function useCodeInterpreterPanel({
   const selectedInterpreterCode = ref("");
   const selectedInterpreterLanguage = ref("text");
   let codeInterpreterBodyClassObserver = null;
+  let codeInterpreterUpdateTimerIds = [];
 
   function getModeValue() {
     return typeof mode === "string" ? mode : mode?.value;
@@ -238,14 +239,35 @@ export function useCodeInterpreterPanel({
     codeInterpreterBodyClassObserver = null;
   }
 
+  function clearCodeInterpreterUpdateTimers() {
+    if (typeof window !== "undefined") {
+      codeInterpreterUpdateTimerIds.forEach((timerId) =>
+        window.clearTimeout(timerId)
+      );
+    }
+    codeInterpreterUpdateTimerIds = [];
+  }
+
+  function scheduleCodeInterpreterScrollbarUpdate(delay) {
+    if (typeof window === "undefined") return;
+    const timerId = window.setTimeout(() => {
+      codeInterpreterUpdateTimerIds = codeInterpreterUpdateTimerIds.filter(
+        (id) => id !== timerId
+      );
+      if (!showCodeInterpreterPanel.value) return;
+      codeInterpreterScrollbar.update();
+    }, delay);
+    codeInterpreterUpdateTimerIds.push(timerId);
+  }
+
   async function renderCodeInterpreterPreview() {
+    clearCodeInterpreterUpdateTimers();
     previewHtml.value = buildCodeInterpreterPreviewHtml();
     await nextTick();
+    if (!showCodeInterpreterPanel.value) return;
     codeInterpreterScrollbar.update();
-    if (typeof window !== "undefined") {
-      window.setTimeout(() => codeInterpreterScrollbar.update(), 0);
-      window.setTimeout(() => codeInterpreterScrollbar.update(), 120);
-    }
+    scheduleCodeInterpreterScrollbarUpdate(0);
+    scheduleCodeInterpreterScrollbarUpdate(120);
   }
 
   function openCodeInterpreterPanel(event) {
@@ -295,6 +317,7 @@ export function useCodeInterpreterPanel({
   });
 
   onBeforeUnmount(() => {
+    clearCodeInterpreterUpdateTimers();
     cleanupCodeInterpreterRuntimeClasses();
     if (typeof document !== "undefined") {
       document.body.classList.remove("code-interpreter-panel-open");
