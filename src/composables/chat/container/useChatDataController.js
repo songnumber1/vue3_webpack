@@ -73,6 +73,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
       selectedChat: activeHistory.value,
       searchTargetMessageId: route.query?.messageId,
       showPcProgress: systemSettingsStore.settings.showPcProgress,
+      settings: systemSettingsStore.settings,
     })
   );
 
@@ -192,6 +193,11 @@ export function useChatDataController({props, ui, runtime, messages}) {
     isMobile: ui.isMobile,
     setMessages,
     appendUserAndAssistantMessages,
+    isHistoryRendering,
+    onProgressiveInitialChunkRendered: async () => {
+      if (!isHistoryRendering.value || !historyMarkdownVisible.value) return;
+      await ui.scrollBottom({force: true, behavior: "auto"});
+    },
   });
 
   const {
@@ -200,11 +206,21 @@ export function useChatDataController({props, ui, runtime, messages}) {
     getHistoryLazyTopThresholdPx,
     clearLazyHistoryMessages,
     setHistoryMessagesForInitialRender,
+    continueProgressiveInitialHistoryRender,
     syncVisibleHistoryMessagesFromFull,
     loadPreviousHistoryMessages,
     setConversationPreservingLazyHistory,
     appendUserAndAssistantMessagesPreservingLazyHistory,
   } = lazyHistory;
+
+  watch(
+    historyMarkdownVisible,
+    (visible) => {
+      if (!visible) return;
+      void continueProgressiveInitialHistoryRender();
+    },
+    {flush: "post"}
+  );
 
   // 현재 진입한 대화방 상단 헤더 영역에 바인딩할 타이틀 텍스트를 산출합니다.
   const activeConversationTitle = computed(() =>

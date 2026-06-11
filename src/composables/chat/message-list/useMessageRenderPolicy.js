@@ -3,6 +3,8 @@
  * @description 채팅방 진입 시점의 메시지 lazy 렌더링 사용 여부와 최초 스크롤 대상을 계산합니다.
  */
 
+import {isForcedMobilePlatformOverride} from "@/composables/chat/message-list/useMessageLazyRange";
+
 export const MESSAGE_SCROLL_TARGET_TYPES = Object.freeze({
   bottom: "bottom",
   first: "first",
@@ -41,9 +43,13 @@ export function resolveMessageRenderPolicy({
   selectedChat = null,
   searchTargetMessageId = null,
   showPcProgress = true,
+  settings = {},
 } = {}) {
   const targetMessageId = normalizeMessageId(searchTargetMessageId);
-  const usePcProgressiveRender = !isMobile && showPcProgress !== true;
+  const isPcHistoryRenderPlatform =
+    !isMobile && !isForcedMobilePlatformOverride(settings?.platformOverride);
+  const usePcProgressiveRender =
+    isPcHistoryRenderPlatform && showPcProgress !== true;
 
   if (isMobile) {
     return {

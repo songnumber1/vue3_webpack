@@ -1,4 +1,4 @@
-import {computed, ref} from "vue";
+import {computed, nextTick, ref} from "vue";
 import {
   resolveInitialMessageLazyRange,
   resolveMessageLazySettings,
@@ -14,9 +14,44 @@ export function useConversationLazyHistory({
   isMobile,
   setMessages,
   appendUserAndAssistantMessages,
+  isHistoryRendering = {value: false},
+  onProgressiveInitialChunkRendered,
 }) {
   const fullHistoryMessages = ref([]);
   const historyVisibleStartIndex = ref(0);
+  const progressiveInitialTargetStartIndex = ref(0);
+  let progressiveInitialRenderSeq = 0;
+  let progressiveInitialRenderRunning = false;
+
+
+  function waitForProgressiveInitialFrame() {
+    if (typeof window === "undefined") return Promise.resolve();
+    return new Promise((resolve) => {
+      window.requestAnimationFrame(() => resolve());
+    });
+  }
+
+  function cancelProgressiveInitialHistoryRender() {
+    progressiveInitialRenderSeq += 1;
+    progressiveInitialRenderRunning = false;
+    progressiveInitialTargetStartIndex.value = 0;
+  }
+
+  function isPcProgressiveNormalHistoryRender() {
+    return (
+      messageRenderPolicy.value?.historyRenderStrategy ===
+        "pc-progressive-normal"
+    );
+  }
+
+  function shouldUseProgressiveInitialHistoryRender() {
+    return (
+      isHistoryRendering.value === true &&
+      isChatPage.value &&
+      messageRenderPolicy.value.useLazyLoading !== false &&
+      isPcProgressiveNormalHistoryRender()
+    );
+  }
 
   function getMessageLazySettings() {
     return resolveMessageLazySettings(
@@ -45,6 +80,7 @@ export function useConversationLazyHistory({
   );
 
   function clearLazyHistoryMessages() {
+    cancelProgressiveInitialHistoryRender();
     fullHistoryMessages.value = [];
     historyVisibleStartIndex.value = 0;
   }
@@ -59,8 +95,23 @@ export function useConversationLazyHistory({
   }
 
   function setHistoryMessagesForInitialRender(sourceMessages = []) {
+    cancelProgressiveInitialHistoryRender();
+
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
     fullHistoryMessages.value = list;
+
+    if (shouldUseProgressiveInitialHistoryRender()) {
+      const initialCount = Math.min(getHistoryLazyInitialCount(), list.length);
+      const firstCount = Math.min(getHistoryLazyAppendCount(), initialCount);
+      const targetStart = Math.max(list.length - initialCount, 0);
+      const firstStart = Math.max(list.length - firstCount, targetStart);
+
+      progressiveInitialTargetStartIndex.value = targetStart;
+      historyVisibleStartIndex.value = firstStart;
+      messages.value = list.slice(firstStart);
+      return;
+    }
+
     const {start, visibleMessages} = getInitialLazyHistorySlice(list);
     historyVisibleStartIndex.value = start;
     messages.value = visibleMessages;
@@ -200,6 +251,58 @@ export function useConversationLazyHistory({
     };
   }
 
+
+  async function continueProgressiveInitialHistoryRender() {
+    if (!shouldUseProgressiveInitialHistoryRender()) return false;
+    if (progressiveInitialRenderRunning) return false;
+
+    const list = Array.isArray(fullHistoryMessages.value)
+      ? fullHistoryMessages.value
+      : [];
+    if (!list.length) return false;
+
+    const targetStart = Math.max(0, progressiveInitialTargetStartIndex.value);
+    if (historyVisibleStartIndex.value <= targetStart) return false;
+
+    const seq = ++progressiveInitialRenderSeq;
+    progressiveInitialRenderRunning = true;
+
+    try {
+      while (
+        seq === progressiveInitialRenderSeq &&
+        shouldUseProgressiveInitialHistoryRender() &&
+        historyVisibleStartIndex.value > targetStart
+      ) {
+        await waitForProgressiveInitialFrame();
+        if (seq !== progressiveInitialRenderSeq) break;
+
+        const previousStart = historyVisibleStartIndex.value;
+        const nextStart = Math.max(
+          targetStart,
+          previousStart - getHistoryLazyAppendCount()
+        );
+        if (nextStart === previousStart) break;
+
+        historyVisibleStartIndex.value = nextStart;
+        messages.value = list.slice(nextStart);
+
+        await nextTick();
+        if (seq !== progressiveInitialRenderSeq) break;
+        if (typeof onProgressiveInitialChunkRendered === "function") {
+          await onProgressiveInitialChunkRendered();
+        }
+
+        await waitForProgressiveInitialFrame();
+      }
+    } finally {
+      if (seq === progressiveInitialRenderSeq) {
+        progressiveInitialRenderRunning = false;
+      }
+    }
+
+    return true;
+  }
+
   return {
     fullHistoryMessages,
     historyVisibleStartIndex,
@@ -209,6 +312,7 @@ export function useConversationLazyHistory({
     getHistoryLazyTopThresholdPx,
     clearLazyHistoryMessages,
     setHistoryMessagesForInitialRender,
+    continueProgressiveInitialHistoryRender,
     syncVisibleHistoryMessagesFromFull,
     loadPreviousHistoryMessages,
     setConversationPreservingLazyHistory,
