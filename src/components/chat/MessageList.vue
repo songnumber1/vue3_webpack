@@ -29,9 +29,13 @@
       </button>
     </div>
     <div
-      v-for="sector in messageTurnSectors"
+      v-for="(sector, sectorIndex) in messageTurnSectors"
       :key="sector.id"
       class="message-turn-sector"
+      :class="{
+        'message-turn-sector--last': shouldApplyLastTurnSectorMinHeight(sectorIndex),
+      }"
+      :style="getTurnSectorStyle(sectorIndex)"
     >
       <ChatMessageRouter
         v-for="message in sector.messages"
@@ -59,7 +63,7 @@
 </template>
 
 <script setup>
-import {computed} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import ChatMessageRouter from "./ChatMessageRouter.vue";
 import {useMessageListScroll} from "@/composables/chat/message-list/useMessageListScroll";
 
@@ -119,6 +123,38 @@ const messageTurnSectors = computed(() =>
   createMessageTurnSectors(props.messages)
 );
 
+const lastTurnSectorMinHeight = ref(0);
+let lastTurnSectorResizeObserver = null;
+let lastTurnSectorResizeFrame = 0;
+
+function isLastTurnSector(sectorIndex) {
+  return (
+    sectorIndex >= 0 && sectorIndex === messageTurnSectors.value.length - 1
+  );
+}
+
+function shouldApplyLastTurnSectorMinHeight(sectorIndex) {
+  if (props.loading || !isLastTurnSector(sectorIndex)) {
+    return false;
+  }
+
+  const sector = messageTurnSectors.value[sectorIndex];
+  return sector?.messages?.some((message) => message?.role === "assistant");
+}
+
+function getTurnSectorStyle(sectorIndex) {
+  if (
+    !shouldApplyLastTurnSectorMinHeight(sectorIndex) ||
+    lastTurnSectorMinHeight.value <= 0
+  ) {
+    return null;
+  }
+
+  return {
+    minHeight: `${lastTurnSectorMinHeight.value}px`,
+  };
+}
+
 function isLastAssistantMessage(message) {
   if (!message || message.role !== "assistant") {
     return false;
@@ -152,6 +188,67 @@ const {
   getScrollElement,
 } = useMessageListScroll({props, emit});
 
+function getMessageListVerticalPadding(element) {
+  if (!element || typeof window === "undefined") {
+    return 0;
+  }
+
+  const style = window.getComputedStyle(element);
+  const paddingTop = Number.parseFloat(style.paddingTop || "0") || 0;
+  const paddingBottom = Number.parseFloat(style.paddingBottom || "0") || 0;
+
+  return paddingTop + paddingBottom;
+}
+
+function updateLastTurnSectorMinHeight() {
+  if (lastTurnSectorResizeFrame) {
+    cancelAnimationFrame(lastTurnSectorResizeFrame);
+  }
+
+  lastTurnSectorResizeFrame = requestAnimationFrame(() => {
+    lastTurnSectorResizeFrame = 0;
+    const element = scrollRef.value;
+    const viewportHeight = Math.floor(element?.clientHeight || 0);
+    const verticalPadding = Math.ceil(getMessageListVerticalPadding(element));
+    const bottomAnchorHeight = Math.ceil(bottomRef.value?.offsetHeight || 0);
+
+    lastTurnSectorMinHeight.value = Math.max(
+      0,
+      viewportHeight - verticalPadding - bottomAnchorHeight
+    );
+  });
+}
+
+onMounted(() => {
+  nextTick(updateLastTurnSectorMinHeight);
+
+  if (typeof ResizeObserver !== "undefined" && scrollRef.value) {
+    lastTurnSectorResizeObserver = new ResizeObserver(() => {
+      updateLastTurnSectorMinHeight();
+    });
+    lastTurnSectorResizeObserver.observe(scrollRef.value);
+  }
+});
+
+onBeforeUnmount(() => {
+  if (lastTurnSectorResizeFrame) {
+    cancelAnimationFrame(lastTurnSectorResizeFrame);
+    lastTurnSectorResizeFrame = 0;
+  }
+
+  if (lastTurnSectorResizeObserver) {
+    lastTurnSectorResizeObserver.disconnect();
+    lastTurnSectorResizeObserver = null;
+  }
+});
+
+watch(
+  () => [props.messages.length, props.loading],
+  () => {
+    nextTick(updateLastTurnSectorMinHeight);
+  }
+);
+
 const showAndroidHistoryLoadMore = computed(
   () =>
     androidManualHistoryLoadMode.value &&
@@ -178,11 +275,14 @@ defineExpose({
 }
 
 .message-turn-sector {
-  /*
-   * Step 1: 질문/답변을 논리 섹터로 묶되 기존 레이아웃은 변경하지 않습니다.
-   * 마지막 섹터 높이 보정은 다음 단계에서 block 레이아웃으로 전환해 적용합니다.
-   */
   display: contents;
+}
+
+.message-turn-sector--last {
+  display: flow-root;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
 }
 
 .message-list--history-prepend-locking {

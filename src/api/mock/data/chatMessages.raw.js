@@ -1119,8 +1119,7 @@ export const CHAT_MESSAGES_RAW = {
   "chat-search-sample-039": [
     {
       role: "user",
-      content:
-        "Foreground Service 위치 전송 안정화 내용을 이전 대화 상세 화면에서 확인할 수 있게 샘플로 정리해줘",
+      content: "안녕",
       id: "chat-search-sample-039-user-1",
       isSend: true,
       isRAG: false,
@@ -1132,8 +1131,7 @@ export const CHAT_MESSAGES_RAW = {
     },
     {
       role: "assistant",
-      content:
-        "# Foreground Service 위치 전송 안정화\n\n요청하신 **모바일** 관점으로 샘플 대화 내용을 구성했습니다.\n\nAndroid Chrome/WebView에서 높이, 스크롤, bottom sheet 동작을 점검합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n모바일 점검 항목입니다.\n\n1. 헤더 높이가 다른 Assistant 화면과 동일한지 확인합니다.\n2. 리스트 영역만 스크롤되는지 확인합니다.\n3. 하단 페이징이 화면 아래에 고정되는지 확인합니다.\n\n```mermaid\nsequenceDiagram\n  participant User\n  participant MobileUI\n  participant MockAPI\n  User->>MobileUI: 검색 결과 선택\n  MobileUI->>MockAPI: history.do(chatId)\n  MockAPI-->>MobileUI: messages[]\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+      content: "그래",
       id: "chat-search-sample-039-assistant-1",
       isSend: true,
       isRAG: false,
