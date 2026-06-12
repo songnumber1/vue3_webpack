@@ -29,6 +29,7 @@
     :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     :readonly="readonly"
+    :continue-progressive-initial-history-render="conversationActions.continueProgressiveInitialHistoryRender"
     @content-rendered="handleMessageContentRendered"
     @history-markdown-rendered="handleHistoryMarkdownRendered"
     @history-rendered="handleHistoryRendered"

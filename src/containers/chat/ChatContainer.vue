@@ -224,6 +224,7 @@ const {
   mobileHistoryLazyInitialCount,
   mobileHistoryLazyAppendCount,
   loadPreviousHistoryMessages,
+  continueProgressiveInitialHistoryRender,
   finishHistoryRender,
   revealHistoryMarkdown,
   autoScrollOnAnswer,
@@ -324,6 +325,7 @@ useChatContainerProviders({
   finishHistoryRender,
   revealHistoryMarkdown,
   loadPreviousHistoryMessages,
+  continueProgressiveInitialHistoryRender,
   openStudioDetail,
 });
 </script>

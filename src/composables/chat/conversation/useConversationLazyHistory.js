@@ -4,6 +4,35 @@ import {
   resolveMessageLazySettings,
   resolvePreviousMessageLazyStart,
 } from "@/composables/chat/message-list/useMessageLazyRange";
+import {
+  HISTORY_RENDER_STRATEGIES,
+  MESSAGE_SCROLL_TARGET_TYPES,
+} from "@/composables/chat/message-list/useMessageRenderPolicy";
+
+function waitAnimationFrame() {
+  if (typeof window === "undefined") return Promise.resolve();
+  return new Promise((resolve) => window.requestAnimationFrame(resolve));
+}
+
+function normalizeMessageId(value) {
+  const id = String(value || "").trim();
+  return id || null;
+}
+
+function findMessageIndexById(messages = [], messageId) {
+  const targetId = normalizeMessageId(messageId);
+  if (!targetId) return -1;
+
+  return messages.findIndex(
+    (message) => String(message?.id || "") === targetId
+  );
+}
+
+function clampRangeStart(start, count, length) {
+  if (length <= 0) return 0;
+  const normalizedCount = Math.max(1, Math.min(count, length));
+  return Math.max(0, Math.min(start, length - normalizedCount));
+}
 
 export function useConversationLazyHistory({
   messages,
@@ -14,43 +43,17 @@ export function useConversationLazyHistory({
   isMobile,
   setMessages,
   appendUserAndAssistantMessages,
-  isHistoryRendering = {value: false},
-  onProgressiveInitialChunkRendered,
 }) {
   const fullHistoryMessages = ref([]);
   const historyVisibleStartIndex = ref(0);
-  const progressiveInitialTargetStartIndex = ref(0);
-  let progressiveInitialRenderSeq = 0;
-  let progressiveInitialRenderRunning = false;
-
-
-  function waitForProgressiveInitialFrame() {
-    if (typeof window === "undefined") return Promise.resolve();
-    return new Promise((resolve) => {
-      window.requestAnimationFrame(() => resolve());
-    });
-  }
+  const progressiveInitialHistoryState = ref(null);
+  let progressiveInitialHistoryToken = 0;
+  let progressiveInitialHistoryRunning = false;
 
   function cancelProgressiveInitialHistoryRender() {
-    progressiveInitialRenderSeq += 1;
-    progressiveInitialRenderRunning = false;
-    progressiveInitialTargetStartIndex.value = 0;
-  }
-
-  function isPcProgressiveNormalHistoryRender() {
-    return (
-      messageRenderPolicy.value?.historyRenderStrategy ===
-        "pc-progressive-normal"
-    );
-  }
-
-  function shouldUseProgressiveInitialHistoryRender() {
-    return (
-      isHistoryRendering.value === true &&
-      isChatPage.value &&
-      messageRenderPolicy.value.useLazyLoading !== false &&
-      isPcProgressiveNormalHistoryRender()
-    );
+    progressiveInitialHistoryToken += 1;
+    progressiveInitialHistoryRunning = false;
+    progressiveInitialHistoryState.value = null;
   }
 
   function getMessageLazySettings() {
@@ -70,6 +73,93 @@ export function useConversationLazyHistory({
 
   function getHistoryLazyTopThresholdPx() {
     return getMessageLazySettings().topThresholdPx;
+  }
+
+  function getHistoryRenderStrategy() {
+    return String(messageRenderPolicy.value?.historyRenderStrategy || "");
+  }
+
+  function isPcProgressiveHistoryRender() {
+    return getHistoryRenderStrategy().startsWith("pc-progressive-");
+  }
+
+  function createProgressiveInitialHistoryState(list = []) {
+    if (!isPcProgressiveHistoryRender()) return null;
+    if (!Array.isArray(list) || !list.length) return null;
+
+    const strategy = getHistoryRenderStrategy();
+    const appendCount = Math.max(1, getHistoryLazyAppendCount());
+    const initialCount = Math.max(1, getHistoryLazyInitialCount());
+    const target = messageRenderPolicy.value?.scrollTarget || {};
+    const chunkCount = Math.min(appendCount, list.length);
+
+    if (strategy === HISTORY_RENDER_STRATEGIES.pcProgressiveShared) {
+      const end = Math.min(chunkCount, list.length);
+      return {
+        mode: "forward",
+        start: 0,
+        end,
+        nextAfter: end,
+        finalStart: 0,
+        finalEnd: list.length,
+        chunkSize: appendCount,
+      };
+    }
+
+    if (strategy === HISTORY_RENDER_STRATEGIES.pcProgressiveSearch) {
+      const targetIndex = findMessageIndexById(list, target.messageId);
+      if (targetIndex < 0) return null;
+
+      const start = clampRangeStart(
+        targetIndex - Math.floor(chunkCount / 2),
+        chunkCount,
+        list.length
+      );
+      const end = Math.min(start + chunkCount, list.length);
+      return {
+        mode: "target-window",
+        start,
+        end,
+        nextBefore: start,
+        nextAfter: end,
+        finalStart: 0,
+        finalEnd: list.length,
+        chunkSize: appendCount,
+        growForwardNext: true,
+      };
+    }
+
+    if (
+      strategy === HISTORY_RENDER_STRATEGIES.pcProgressiveNormal &&
+      target.type === MESSAGE_SCROLL_TARGET_TYPES.bottom
+    ) {
+      const finalCount = Math.min(initialCount, list.length);
+      const finalStart = Math.max(list.length - finalCount, 0);
+      const start = Math.max(list.length - Math.min(chunkCount, finalCount), 0);
+      return {
+        mode: "backward",
+        start,
+        end: list.length,
+        nextBefore: start,
+        finalStart,
+        finalEnd: list.length,
+        chunkSize: appendCount,
+      };
+    }
+
+    return null;
+  }
+
+  function applyProgressiveInitialWindow(state) {
+    if (!state) return false;
+    const list = Array.isArray(fullHistoryMessages.value)
+      ? fullHistoryMessages.value
+      : [];
+    const start = Math.max(0, state.start || 0);
+    const end = Math.min(list.length, Math.max(start, state.end || 0));
+    historyVisibleStartIndex.value = start;
+    messages.value = list.slice(start, end);
+    return true;
   }
 
   const hasPreviousHistoryMessages = computed(
@@ -100,15 +190,10 @@ export function useConversationLazyHistory({
     const list = Array.isArray(sourceMessages) ? sourceMessages : [];
     fullHistoryMessages.value = list;
 
-    if (shouldUseProgressiveInitialHistoryRender()) {
-      const initialCount = Math.min(getHistoryLazyInitialCount(), list.length);
-      const firstCount = Math.min(getHistoryLazyAppendCount(), initialCount);
-      const targetStart = Math.max(list.length - initialCount, 0);
-      const firstStart = Math.max(list.length - firstCount, targetStart);
-
-      progressiveInitialTargetStartIndex.value = targetStart;
-      historyVisibleStartIndex.value = firstStart;
-      messages.value = list.slice(firstStart);
+    const progressiveState = createProgressiveInitialHistoryState(list);
+    if (progressiveState && applyProgressiveInitialWindow(progressiveState)) {
+      progressiveInitialHistoryToken += 1;
+      progressiveInitialHistoryState.value = progressiveState;
       return;
     }
 
@@ -251,56 +336,76 @@ export function useConversationLazyHistory({
     };
   }
 
+  function expandProgressiveStateForward(state) {
+    if (state.nextAfter >= state.finalEnd) return false;
+    state.end = Math.min(state.nextAfter + state.chunkSize, state.finalEnd);
+    state.nextAfter = state.end;
+    return true;
+  }
+
+  function expandProgressiveStateBackward(state) {
+    if (state.nextBefore <= state.finalStart) return false;
+    state.start = Math.max(state.nextBefore - state.chunkSize, state.finalStart);
+    state.nextBefore = state.start;
+    return true;
+  }
+
+  function expandProgressiveStateTargetWindow(state) {
+    if (state.growForwardNext && expandProgressiveStateForward(state)) {
+      state.growForwardNext = false;
+      return true;
+    }
+    if (expandProgressiveStateBackward(state)) {
+      state.growForwardNext = true;
+      return true;
+    }
+    if (expandProgressiveStateForward(state)) {
+      state.growForwardNext = false;
+      return true;
+    }
+    return false;
+  }
+
+  function expandProgressiveInitialState(state, list) {
+    if (!state || !Array.isArray(list) || !list.length) return false;
+    if (state.mode === "forward") return expandProgressiveStateForward(state);
+    if (state.mode === "backward") return expandProgressiveStateBackward(state);
+    if (state.mode === "target-window") {
+      return expandProgressiveStateTargetWindow(state);
+    }
+    return false;
+  }
 
   async function continueProgressiveInitialHistoryRender() {
-    if (!shouldUseProgressiveInitialHistoryRender()) return false;
-    if (progressiveInitialRenderRunning) return false;
+    const state = progressiveInitialHistoryState.value;
+    if (!state || progressiveInitialHistoryRunning) return false;
 
-    const list = Array.isArray(fullHistoryMessages.value)
-      ? fullHistoryMessages.value
-      : [];
-    if (!list.length) return false;
-
-    const targetStart = Math.max(0, progressiveInitialTargetStartIndex.value);
-    if (historyVisibleStartIndex.value <= targetStart) return false;
-
-    const seq = ++progressiveInitialRenderSeq;
-    progressiveInitialRenderRunning = true;
+    const token = progressiveInitialHistoryToken;
+    progressiveInitialHistoryRunning = true;
 
     try {
+      const list = Array.isArray(fullHistoryMessages.value)
+        ? fullHistoryMessages.value
+        : [];
       while (
-        seq === progressiveInitialRenderSeq &&
-        shouldUseProgressiveInitialHistoryRender() &&
-        historyVisibleStartIndex.value > targetStart
+        token === progressiveInitialHistoryToken &&
+        progressiveInitialHistoryState.value &&
+        expandProgressiveInitialState(state, list)
       ) {
-        await waitForProgressiveInitialFrame();
-        if (seq !== progressiveInitialRenderSeq) break;
-
-        const previousStart = historyVisibleStartIndex.value;
-        const nextStart = Math.max(
-          targetStart,
-          previousStart - getHistoryLazyAppendCount()
-        );
-        if (nextStart === previousStart) break;
-
-        historyVisibleStartIndex.value = nextStart;
-        messages.value = list.slice(nextStart);
-
+        applyProgressiveInitialWindow(state);
         await nextTick();
-        if (seq !== progressiveInitialRenderSeq) break;
-        if (typeof onProgressiveInitialChunkRendered === "function") {
-          await onProgressiveInitialChunkRendered();
-        }
-
-        await waitForProgressiveInitialFrame();
+        await waitAnimationFrame();
       }
+
+      if (token === progressiveInitialHistoryToken) {
+        progressiveInitialHistoryState.value = null;
+      }
+      return true;
     } finally {
-      if (seq === progressiveInitialRenderSeq) {
-        progressiveInitialRenderRunning = false;
+      if (token === progressiveInitialHistoryToken) {
+        progressiveInitialHistoryRunning = false;
       }
     }
-
-    return true;
   }
 
   return {

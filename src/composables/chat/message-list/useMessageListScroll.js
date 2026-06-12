@@ -14,6 +14,7 @@ import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {createMessageScrollTargetController} from "./useMessageScrollTarget";
+import {MESSAGE_SCROLL_TARGET_TYPES} from "./useMessageRenderPolicy";
 
 const BOTTOM_THRESHOLD = 48;
 const DEFAULT_HISTORY_LAZY_TOP_THRESHOLD = 96;
@@ -182,8 +183,6 @@ export function useMessageListScroll({props, emit}) {
   let manualHistoryAnchorLockCleanup = null;
   let manualHistoryAnchorLockToken = 0;
   let progressiveHistoryMarkdownRevealed = false;
-  let progressiveNormalBottomFollowActive = false;
-  let progressiveNormalBottomFollowCancelled = false;
 
   function isHistoryLazyScrollRestoreSuppressed() {
     return (
@@ -387,46 +386,18 @@ export function useMessageListScroll({props, emit}) {
     return getHistoryRenderStrategy().startsWith("pc-progressive-");
   }
 
-  function isProgressiveNormalHistoryRender() {
-    return getHistoryRenderStrategy() === "pc-progressive-normal";
-  }
-
-  function cancelProgressiveNormalBottomFollow() {
-    if (!progressiveNormalBottomFollowActive) return;
-    progressiveNormalBottomFollowCancelled = true;
-  }
-
   function shouldApplyHistoryRenderScroll(options = {}) {
     if (props.historyRendering !== true) return false;
     if (!isProgressiveHistoryRender()) return true;
     if (options.initialReveal === true) return true;
     if (!progressiveHistoryMarkdownRevealed) return true;
-    if (!isProgressiveNormalHistoryRender()) return false;
-    return !progressiveNormalBottomFollowCancelled;
+
+    // PC progress OFF mode reveals Markdown first and applies the target scroll once.
+    // Mermaid/table/code post-processing may change heights afterward, but should not
+    // force the viewport again because fast content visibility is the priority.
+    return false;
   }
 
-  function isKeyboardScrollEvent(event) {
-    if (event?.type !== "keydown") return false;
-    return [
-      "ArrowUp",
-      "ArrowDown",
-      "PageUp",
-      "PageDown",
-      "Home",
-      "End",
-      "Space",
-      " ",
-    ].includes(event.key || event.code);
-  }
-
-  function isUserScrollIntentEvent(event) {
-    const type = event?.type || "";
-    return (
-      type === "wheel" ||
-      type === "touchstart" ||
-      isKeyboardScrollEvent(event)
-    );
-  }
 
   function handleScroll() {
     updateBottomState();
@@ -701,8 +672,6 @@ export function useMessageListScroll({props, emit}) {
     clearTrackedAnimationFrames();
     historyRenderCompleting = false;
     progressiveHistoryMarkdownRevealed = false;
-    progressiveNormalBottomFollowActive = false;
-    progressiveNormalBottomFollowCancelled = false;
   }
 
   async function requestPreviousHistoryMessagesIfNeeded(options = {}) {
@@ -808,10 +777,7 @@ export function useMessageListScroll({props, emit}) {
       .map(({message, index}) => getHistoryRenderMessageKey(message, index));
   }
 
-  function handleUserScrollIntent(event) {
-    if (isUserScrollIntentEvent(event)) {
-      cancelProgressiveNormalBottomFollow();
-    }
+  function handleUserScrollIntent() {
     cancelManualHistoryAnchorLock();
     clearStableTimers();
     clearAfterRenderScrollState();
@@ -1049,43 +1015,97 @@ export function useMessageListScroll({props, emit}) {
     );
   }
 
+  function isHistoryRenderMessageMarkdownReady(domIndex, index) {
+    const message = domIndex?.messages?.[index];
+    if (!message) return false;
+
+    const element = getHistoryRenderMessageElementFromIndex(
+      domIndex,
+      message,
+      index
+    );
+    if (!element?.isConnected) return false;
+
+    if (message?.role !== "assistant" || isAssistantErrorMessage(message)) {
+      return true;
+    }
+
+    if (message?.reasoningContent) {
+      if (
+        !hasRenderedMarkdownElement(element, ".reasoning-content.markdown-body")
+      ) {
+        return false;
+      }
+    }
+
+    if (message?.content) {
+      if (!hasRenderedMarkdownElement(element, ".bubble-content.markdown-body")) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   function isHistoryRenderContentReady(
     domIndex = createHistoryRenderDomIndex()
   ) {
     const {messages} = domIndex;
     for (let index = 0; index < messages.length; index += 1) {
-      const message = messages[index];
-      const element = getHistoryRenderMessageElementFromIndex(
-        domIndex,
-        message,
-        index
-      );
-      if (!element?.isConnected) return false;
-
-      if (message?.role !== "assistant" || isAssistantErrorMessage(message)) {
-        continue;
-      }
-
-      if (message?.reasoningContent) {
-        if (
-          !hasRenderedMarkdownElement(
-            element,
-            ".reasoning-content.markdown-body"
-          )
-        ) {
-          return false;
-        }
-      }
-
-      if (message?.content) {
-        if (
-          !hasRenderedMarkdownElement(element, ".bubble-content.markdown-body")
-        ) {
-          return false;
-        }
+      if (!isHistoryRenderMessageMarkdownReady(domIndex, index)) {
+        return false;
       }
     }
     return true;
+  }
+
+  function getProgressiveInitialReadyMessageIndexes(domIndex) {
+    const messages = domIndex?.messages || [];
+    if (!messages.length) return [];
+
+    const target = props.messageRenderPolicy?.scrollTarget || {
+      type: MESSAGE_SCROLL_TARGET_TYPES.bottom,
+    };
+
+    if (target.type === MESSAGE_SCROLL_TARGET_TYPES.first) {
+      return [0];
+    }
+
+    if (target.type === MESSAGE_SCROLL_TARGET_TYPES.message) {
+      const messageId = String(target.messageId || "").trim();
+      const targetIndex = messages.findIndex(
+        (message, index) =>
+          String(message?.id || "") === messageId ||
+          getHistoryRenderMessageKey(message, index) === messageId
+      );
+      return targetIndex >= 0 ? [targetIndex] : [];
+    }
+
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      if (messages[index]?.role === "assistant") return [index];
+    }
+    return [messages.length - 1];
+  }
+
+  function isHistoryRenderBaseReady(domIndex = createHistoryRenderDomIndex()) {
+    const {root} = domIndex;
+    if (!root?.isConnected) return false;
+    if (!isHistoryRenderRootLayoutReady(root)) return false;
+    if (!props.historyMessagesReady) return false;
+    return true;
+  }
+
+  function isProgressiveHistoryRenderInitialReady(
+    domIndex = createHistoryRenderDomIndex()
+  ) {
+    if (!isHistoryRenderBaseReady(domIndex)) return false;
+
+    const indexes = getProgressiveInitialReadyMessageIndexes(domIndex);
+    if (!indexes.length) return true;
+
+    return indexes.every((index) =>
+      isHistoryRenderMessageMarkdownReady(domIndex, index)
+    );
   }
 
   function isHistoryRenderRootLayoutReady(root) {
@@ -1142,26 +1162,49 @@ export function useMessageListScroll({props, emit}) {
     await waitAnimationFrames(1);
   }
 
+  function isHistoryRenderMarkdownReady(
+    domIndex = createHistoryRenderDomIndex()
+  ) {
+    return (
+      isHistoryRenderDomReady(domIndex) &&
+      isHistoryRenderContentReady(domIndex)
+    );
+  }
+
+  function isHistoryRenderPostProcessReady(
+    domIndex = createHistoryRenderDomIndex()
+  ) {
+    return (
+      isHistoryRenderMarkdownReady(domIndex) &&
+      isHistoryRenderMermaidDomReady(domIndex.root)
+    );
+  }
+
   async function waitForHistoryRenderDomReady(runId) {
     const maxFrames = isAndroidHistoryRenderRuntime()
       ? HISTORY_RENDER_ANDROID_DOM_READY_MAX_FRAMES
       : HISTORY_RENDER_DOM_READY_MAX_FRAMES;
+    const isProgressiveRender = isProgressiveHistoryRender();
+    const requiredStableFrames = isProgressiveRender
+      ? 1
+      : HISTORY_RENDER_READY_STABLE_FRAMES;
     let stableFrames = 0;
 
     for (let frame = 0; frame < maxFrames; frame += 1) {
       if (runId !== historyRenderRunId || !props.historyRendering) return false;
 
       await nextTick();
-      updateOverlayScrollbarFrame();
+      if (!isProgressiveRender) {
+        updateOverlayScrollbarFrame();
+      }
 
       const domIndex = createHistoryRenderDomIndex();
-      const ready =
-        isHistoryRenderDomReady(domIndex) &&
-        isHistoryRenderContentReady(domIndex) &&
-        isHistoryRenderMermaidDomReady(domIndex.root);
+      const ready = isProgressiveRender
+        ? isProgressiveHistoryRenderInitialReady(domIndex)
+        : isHistoryRenderPostProcessReady(domIndex);
       if (ready) {
         stableFrames += 1;
-        if (stableFrames >= HISTORY_RENDER_READY_STABLE_FRAMES) return true;
+        if (stableFrames >= requiredStableFrames) return true;
       } else {
         stableFrames = 0;
       }
@@ -1172,31 +1215,29 @@ export function useMessageListScroll({props, emit}) {
     // 비정상 메시지/마크다운 이벤트 누락이 있어도 progress가 고착되지 않도록
     // 현재 DOM 기준으로 가능한 후처리만 수행하고 finally에서 화면을 해제합니다.
     const fallbackIndex = createHistoryRenderDomIndex();
-    return (
-      isHistoryRenderDomReady(fallbackIndex) &&
-      isHistoryRenderMermaidDomReady(fallbackIndex.root)
-    );
+    return isProgressiveRender
+      ? isProgressiveHistoryRenderInitialReady(fallbackIndex)
+      : isHistoryRenderPostProcessReady(fallbackIndex);
   }
 
-  function revealProgressiveHistoryMarkdownIfReady() {
+  async function revealProgressiveHistoryMarkdownIfReady() {
     if (!isProgressiveHistoryRender() || progressiveHistoryMarkdownRevealed) {
       return false;
     }
 
     const domIndex = createHistoryRenderDomIndex();
-    if (
-      !isHistoryRenderDomReady(domIndex) ||
-      !isHistoryRenderContentReady(domIndex) ||
-      !isHistoryRenderMermaidDomReady(domIndex.root)
-    ) {
+    if (!isProgressiveHistoryRenderInitialReady(domIndex)) {
       return false;
     }
 
-    applyHistoryRenderInitialScrollTarget({initialReveal: true});
     progressiveHistoryMarkdownRevealed = true;
-    progressiveNormalBottomFollowActive = isProgressiveNormalHistoryRender();
-    progressiveNormalBottomFollowCancelled = false;
     emit("history-markdown-rendered");
+
+    // MessageList/Input이 실제로 표시된 뒤 viewport 높이가 확정되어야
+    // 일반 채팅방 bottom, 공유방 first, 검색 msgId 초기 스크롤이 정확해집니다.
+    await nextTick();
+    updateOverlayScrollbarFrame();
+    applyHistoryRenderInitialScrollTarget({initialReveal: true});
     return true;
   }
 
@@ -1329,7 +1370,20 @@ export function useMessageListScroll({props, emit}) {
       await waitForHistoryRenderDomReady(runId);
       if (runId !== historyRenderRunId || !props.historyRendering) return;
 
-      revealProgressiveHistoryMarkdownIfReady();
+      const didRevealProgressiveMarkdown =
+        await revealProgressiveHistoryMarkdownIfReady();
+      if (
+        didRevealProgressiveMarkdown &&
+        runId === historyRenderRunId &&
+        props.historyRendering &&
+        typeof props.continueProgressiveInitialHistoryRender === "function"
+      ) {
+        await props.continueProgressiveInitialHistoryRender();
+        if (runId !== historyRenderRunId || !props.historyRendering) return;
+        await nextTick();
+        updateOverlayScrollbarFrame();
+        applyHistoryRenderInitialScrollTarget({initialReveal: true});
+      }
 
       await renderHistoryRoomPendingMermaidSequentially(runId);
       if (runId !== historyRenderRunId || !props.historyRendering) return;
@@ -1338,14 +1392,16 @@ export function useMessageListScroll({props, emit}) {
       updateOverlayScrollbarFrame();
       applyHistoryRenderBottomScroll();
 
-      await waitForHistoryRenderLayoutStability(runId);
-      if (runId !== historyRenderRunId || !props.historyRendering) return;
+      if (!isProgressiveHistoryRender()) {
+        await waitForHistoryRenderLayoutStability(runId);
+        if (runId !== historyRenderRunId || !props.historyRendering) return;
 
-      updateOverlayScrollbarFrame();
-      applyHistoryRenderBottomScroll();
-      await nextTick();
-      await waitAnimationFrames(2);
-      applyHistoryRenderBottomScroll();
+        updateOverlayScrollbarFrame();
+        applyHistoryRenderBottomScroll();
+        await nextTick();
+        await waitAnimationFrames(2);
+        applyHistoryRenderBottomScroll();
+      }
       updateBottomState();
     } finally {
       historyRenderCompleting = false;

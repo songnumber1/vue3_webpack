@@ -46,6 +46,7 @@ export function useChatContainerProviders({
   finishHistoryRender,
   revealHistoryMarkdown,
   loadPreviousHistoryMessages,
+  continueProgressiveInitialHistoryRender,
   openStudioDetail,
 }) {
   const chatStore = useChatStore();
@@ -119,6 +120,7 @@ export function useChatContainerProviders({
     },
     handleHistoryRendered: finishHistoryRender,
     handleHistoryMarkdownRendered: revealHistoryMarkdown,
+    continueProgressiveInitialHistoryRender,
     loadPreviousHistoryMessages,
     openStudioDetail,
   });

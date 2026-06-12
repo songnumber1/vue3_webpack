@@ -33,6 +33,10 @@ export function useChatConversationActions({workspaceActions, lock} = {}) {
     workspaceActions?.handleHistoryRendered?.();
   }
 
+  function continueProgressiveInitialHistoryRender() {
+    return workspaceActions?.continueProgressiveInitialHistoryRender?.() ?? false;
+  }
+
   return {
     scrollBottom,
     regenerate,
@@ -40,5 +44,6 @@ export function useChatConversationActions({workspaceActions, lock} = {}) {
     handleMessageContentRendered,
     handleHistoryMarkdownRendered,
     handleHistoryRendered,
+    continueProgressiveInitialHistoryRender,
   };
 }

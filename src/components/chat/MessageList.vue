@@ -74,6 +74,7 @@ const props = defineProps({
   mobileHistoryLazyInitialCount: {type: Number, default: 50},
   mobileHistoryLazyAppendCount: {type: Number, default: 25},
   readonly: {type: Boolean, default: false},
+  continueProgressiveInitialHistoryRender: {type: Function, default: null},
 });
 
 const emit = defineEmits([
