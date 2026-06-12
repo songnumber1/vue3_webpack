@@ -28,17 +28,23 @@
         <span v-else>이전 대화 {{ historyLazyChunkSize }}개 더 보기</span>
       </button>
     </div>
-    <ChatMessageRouter
-      v-for="message in messages"
-      :key="message.id"
-      :message="message"
-      :show-regenerate="!readonly && isLastAssistantMessage(message)"
-      :message-dom-id="String(message.id || '')"
-      :message-dom-role="message.role"
-      :defer-mermaid-enhancement="historyRendering"
-      @rendered="handleMessageRendered(message.id, $event)"
-      @regenerate="$emit('regenerate', $event)"
-    />
+    <div
+      v-for="sector in messageTurnSectors"
+      :key="sector.id"
+      class="message-turn-sector"
+    >
+      <ChatMessageRouter
+        v-for="message in sector.messages"
+        :key="message.id"
+        :message="message"
+        :show-regenerate="!readonly && isLastAssistantMessage(message)"
+        :message-dom-id="String(message.id || '')"
+        :message-dom-role="message.role"
+        :defer-mermaid-enhancement="historyRendering"
+        @rendered="handleMessageRendered(message.id, $event)"
+        @regenerate="$emit('regenerate', $event)"
+      />
+    </div>
     <div v-if="loading" class="typing-row">
       <span></span><span></span><span></span>
     </div>
@@ -84,6 +90,34 @@ const emit = defineEmits([
   "load-previous-history",
   "regenerate",
 ]);
+
+function createMessageTurnSectors(messages = []) {
+  const sectors = [];
+
+  for (let index = 0; index < messages.length; index += 1) {
+    const message = messages[index];
+    const nextMessage = messages[index + 1];
+    const sectorMessages = [message];
+
+    if (message?.role === "user" && nextMessage?.role === "assistant") {
+      sectorMessages.push(nextMessage);
+      index += 1;
+    }
+
+    sectors.push({
+      id: sectorMessages
+        .map((item, itemIndex) => String(item?.id || `${index}-${itemIndex}`))
+        .join("__"),
+      messages: sectorMessages,
+    });
+  }
+
+  return sectors;
+}
+
+const messageTurnSectors = computed(() =>
+  createMessageTurnSectors(props.messages)
+);
 
 function isLastAssistantMessage(message) {
   if (!message || message.role !== "assistant") {
@@ -141,6 +175,14 @@ defineExpose({
   min-width: 0;
   min-height: 0;
   overflow-anchor: none;
+}
+
+.message-turn-sector {
+  /*
+   * Step 1: 질문/답변을 논리 섹터로 묶되 기존 레이아웃은 변경하지 않습니다.
+   * 마지막 섹터 높이 보정은 다음 단계에서 block 레이아웃으로 전환해 적용합니다.
+   */
+  display: contents;
 }
 
 .message-list--history-prepend-locking {
