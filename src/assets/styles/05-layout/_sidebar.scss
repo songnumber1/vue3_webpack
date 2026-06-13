@@ -538,6 +538,29 @@ body.mobile-mode .sidebar-history--main {
   outline: none;
 }
 
+.sidebar-history-tooltip {
+  z-index: var(--z-chat-history-menu, 2147483000);
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 7px 10px;
+  border: 1px solid var(--menu-border, rgba(127, 127, 127, 0.2));
+  border-radius: 8px;
+  background: var(--menu-bg, #ffffff);
+  color: var(--text, #111827);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  font-size: var(--font-size-fixed-13);
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  pointer-events: none;
+}
+
+body.mobile-mode .sidebar-history-tooltip,
+.app-container--compact .sidebar-history-tooltip {
+  display: none;
+}
+
 .context-menu-fade-enter-active,
 .context-menu-fade-leave-active {
   transition:
