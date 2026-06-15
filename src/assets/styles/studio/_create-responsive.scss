@@ -611,6 +611,7 @@ body.mobile-mode
   min-height: 0 !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
+  overflow-anchor: none !important;
 }
 
 body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea {

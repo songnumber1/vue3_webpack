@@ -13,5 +13,7 @@ require('./chat-navigation-reset-static.cjs');
 require('./chat-studio-portal-actions-static.cjs');
 require('./chat-data-controller-static.cjs');
 require('./chat-container-static.cjs');
+require('./chat-public-entrypoints-static.cjs');
+require('./chat-message-list-scroll-static.cjs');
 
 console.log('all regression checks passed');

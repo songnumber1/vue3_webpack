@@ -30,7 +30,7 @@ import {
   revokeMessageAttachments,
 } from "@/composables/chat/runtime/useMessageAppender";
 import {createChatHistoryRuntime} from "@/composables/chat/runtime/useChatHistoryRuntime";
-import {resolveConversationSessionState} from "@/composables/chat/policy/chatSessionPolicy";
+import {resolveConversationSessionState} from "@/composables/chat/internal/policy/chatSessionPolicy";
 
 /**
  * [Chat runtime facade]

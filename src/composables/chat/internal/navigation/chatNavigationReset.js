@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/navigation/chatNavigationReset.js
+ * @file composables/chat/internal/navigation/chatNavigationReset.js
  * @description 채팅 화면을 벗어나거나 새 대화/포털로 이동할 때 필요한 reset 순서를 한 곳에서 관리합니다.
  * 이 파일은 UI를 변경하지 않고, 기존에 Sidebar/ChatContainer/NavigationActions에 흩어진
  * pending chat, history lock, active session, transient panel 정리 순서만 공통화합니다.

@@ -3,6 +3,8 @@
     ref="createPageRef"
     :class="createPageClass"
     :aria-label="t('studio.createPage.title')"
+    @pointerdown.capture="handleCreatePointerDown"
+    @touchstart.capture="handleCreatePointerDown"
     @focusin="handleCreateFocusIn"
     @focusout="handleCreateFocusOut"
   >
@@ -223,7 +225,7 @@
 import StudioBasicInfoTab from "@/components/studio/StudioBasicInfoTab.vue";
 import StudioFeatureTab from "@/components/studio/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
-import {computed, ref} from "vue";
+import {computed, onBeforeUnmount, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
@@ -301,18 +303,181 @@ const contentScrollbar = useOverlayScrollbar(
 );
 
 const {
-  handleKeyboardFocusIn: handleCreateFocusIn,
-  handleKeyboardFocusOut: handleCreateFocusOut,
+  handleKeyboardFocusIn: handleCreateFocusGuardIn,
+  handleKeyboardFocusOut: handleCreateFocusGuardOut,
 } = useKeyboardFocusGuard({
   enabled: isMobile,
   scrollContainer: () => contentScrollbar.getViewport(),
   ignoreInput: true,
+  // Studio create keeps textarea scrolling local to its content viewport.
+  // Android Chrome can otherwise scroll the document itself when a top textarea
+  // receives focus, hiding the Studio header and leaving a large blank area.
   ignoreTextarea: true,
   fieldSelector: "label, fieldset",
   delays: [80, 180, 340, 560],
   edgePaddingTop: 14,
   edgePaddingBottom: 24,
 });
+let textareaFocusTimers = [];
+let focusedTextarea = null;
+let textareaFocusState = null;
+
+const TEXTAREA_TOP_SCROLL_SENTINEL = 12;
+
+function isTextareaElement(element) {
+  return element?.tagName === "TEXTAREA";
+}
+
+function clearTextareaFocusTimers() {
+  if (typeof window === "undefined") return;
+  textareaFocusTimers.forEach((timer) => window.clearTimeout(timer));
+  textareaFocusTimers = [];
+}
+
+function clearTextareaFocusState() {
+  focusedTextarea = null;
+  textareaFocusState = null;
+  clearTextareaFocusTimers();
+}
+
+function getCreateScrollViewport() {
+  return contentScrollbar.getViewport() || createContentRef.value;
+}
+
+function restoreDocumentScrollPosition() {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
+  }
+
+  // The Studio create page owns its own scroll viewport. If Android Chrome moves
+  // the document while opening the keyboard, the header/tabs can disappear above
+  // the address bar. Keep the document fixed and only move the form viewport.
+  if (window.scrollX !== 0 || window.scrollY !== 0) {
+    window.scrollTo({top: 0, left: 0, behavior: "auto"});
+  }
+  if (document.documentElement?.scrollTop) {
+    document.documentElement.scrollTop = 0;
+  }
+  if (document.body?.scrollTop) {
+    document.body.scrollTop = 0;
+  }
+}
+
+function ensureTextareaVisibleInCreateViewport(textarea) {
+  const scroller = getCreateScrollViewport();
+  if (!textarea || !scroller) return;
+
+  const field = textarea.closest?.("label, fieldset") || textarea;
+  const visualViewport = window.visualViewport;
+  const scrollerRect = scroller.getBoundingClientRect();
+  const fieldRect = field.getBoundingClientRect();
+  const viewportOffsetTop = Math.round(visualViewport?.offsetTop || 0);
+  const viewportHeight = Math.round(
+    visualViewport?.height || window.innerHeight || scrollerRect.bottom
+  );
+  const visibleBottom = Math.min(
+    scrollerRect.bottom,
+    viewportOffsetTop + viewportHeight
+  );
+  const bottomPadding = 28;
+  const overflowBottom = fieldRect.bottom - (visibleBottom - bottomPadding);
+
+  // Only move down when the textarea is actually covered by the keyboard.
+  // Do not auto-scroll upward for top textarea fields because Chrome may already
+  // be adjusting the visual viewport; doing both causes the header to be hidden.
+  if (overflowBottom > 3) {
+    scroller.scrollBy?.({top: overflowBottom, left: 0, behavior: "auto"});
+  }
+}
+
+function restoreTextareaTopFocusScroll(textarea) {
+  const scroller = getCreateScrollViewport();
+  const state = textareaFocusState;
+  if (!textarea || !scroller || !state || state.element !== textarea) return;
+
+  // When the field was touched while the create viewport was at the very top,
+  // Android Chrome may auto-scroll the internal viewport so the textarea sits at
+  // the top edge, which hides the Studio header/tabs. Restore the pre-focus
+  // top sentinel first, then only move down again if the keyboard actually
+  // covers the field.
+  if (state.lockTopScroll && scroller.scrollTop > state.scrollTop + 2) {
+    scroller.scrollTop = state.scrollTop;
+    contentScrollbar.update();
+  }
+}
+
+function runTextareaFocusCorrection(textarea) {
+  if (!isMobile.value || typeof window === "undefined") return;
+  if (textarea !== focusedTextarea) return;
+
+  contentScrollbar.update();
+  restoreDocumentScrollPosition();
+  restoreTextareaTopFocusScroll(textarea);
+  ensureTextareaVisibleInCreateViewport(textarea);
+}
+
+function scheduleTextareaFocusCorrection(textarea) {
+  if (!isMobile.value || typeof window === "undefined") return;
+  clearTextareaFocusTimers();
+  focusedTextarea = textarea;
+  textareaFocusTimers = [0, 40, 90, 160, 260, 420, 620].map((delay) =>
+    window.setTimeout(() => runTextareaFocusCorrection(textarea), delay)
+  );
+}
+
+function primeTextareaFocusScroll(textarea) {
+  if (!isMobile.value || !isTextareaElement(textarea)) return;
+
+  const scroller = getCreateScrollViewport();
+  if (!scroller) return;
+
+  restoreDocumentScrollPosition();
+  contentScrollbar.update();
+
+  const currentScrollTop = Math.max(0, scroller.scrollTop || 0);
+  const lockTopScroll = currentScrollTop <= TEXTAREA_TOP_SCROLL_SENTINEL;
+
+  // Android Chrome has a native focus-scroll edge case when a textarea receives
+  // focus while the internal Studio create viewport is at the very top. Move the
+  // internal viewport to a small, stable sentinel before focus and remember it.
+  // If Chrome later auto-scrolls the viewport upward/downward while opening the
+  // keyboard, the scheduled correction restores this sentinel instead of letting
+  // the Studio header/tabs disappear.
+  if (lockTopScroll) {
+    scroller.scrollTop = TEXTAREA_TOP_SCROLL_SENTINEL;
+    contentScrollbar.update();
+  }
+
+  textareaFocusState = {
+    element: textarea,
+    scrollTop: lockTopScroll ? TEXTAREA_TOP_SCROLL_SENTINEL : currentScrollTop,
+    lockTopScroll,
+  };
+}
+
+function handleCreatePointerDown(event) {
+  const target = event?.target;
+  if (isTextareaElement(target)) {
+    primeTextareaFocusScroll(target);
+  }
+}
+
+function handleCreateFocusIn(event) {
+  handleCreateFocusGuardIn(event);
+
+  if (isTextareaElement(event?.target)) {
+    scheduleTextareaFocusCorrection(event.target);
+  }
+}
+
+function handleCreateFocusOut(event) {
+  handleCreateFocusGuardOut(event);
+  if (event?.target === focusedTextarea) {
+    clearTextareaFocusState();
+  }
+}
+
+onBeforeUnmount(clearTextareaFocusState);
 
 const emit = defineEmits([
   "close",

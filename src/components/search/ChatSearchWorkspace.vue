@@ -145,7 +145,7 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   isHiddenConversationUrlMode,
   navigateToConversation,
-} from "@/composables/chat/navigation/conversationUrlPolicy";
+} from "@/composables/chat/useChatRoute";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";

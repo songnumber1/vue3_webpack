@@ -83,6 +83,7 @@ import {
   enhanceMarkdownScrollbars,
 } from "@/utils/overlayScrollbar";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
@@ -114,6 +115,7 @@ const reasoningOpen = ref(false);
 const {handleMarkdownClick} = useMarkdownTools(contentRef);
 const {handleMarkdownClick: handleReasoningClick} =
   useMarkdownTools(reasoningRef);
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 let componentAlive = true;
@@ -182,7 +184,9 @@ async function enhanceRenderedMarkdown({
     }
     if (!componentAlive || !root?.isConnected) return;
     if (currentVersion !== getVersion()) return;
-    enhanceMarkdownScrollbars(root);
+    enhanceMarkdownScrollbars(root, {
+      enabled: () => shouldUseOverlayScrollbar.value,
+    });
     emit("rendered", "enhanced");
   } catch (error) {
     if (componentAlive) {

@@ -12,7 +12,7 @@ function assert(condition, message) {
 }
 
 const viewportGuard = read('src/platform/viewport/useViewportGuard.js');
-const mobileState = read('src/composables/chat/container/useChatMobileState.js');
+const mobileState = read('src/composables/chat/internal/container/useChatMobileState.js');
 const viewportUtils = read('src/platform/viewport/viewport.js');
 const promptComposer = read('src/composables/prompt/usePromptComposer.js');
 

@@ -23,6 +23,7 @@ const DEFAULT_EDGE_PADDING = {
   bottom: 24,
 };
 const DEFAULT_FIELD_SELECTOR = "label, fieldset";
+const DEFAULT_SCROLL_BEHAVIOR = null;
 const EDITABLE_SELECTOR = "input, textarea, select, [contenteditable='true']";
 const KEYBOARD_INPUT_TYPES = new Set([
   "text",
@@ -166,6 +167,7 @@ export function useKeyboardFocusGuard(options = {}) {
     delays: DEFAULT_DELAYS,
     edgePaddingTop: DEFAULT_EDGE_PADDING.top,
     edgePaddingBottom: DEFAULT_EDGE_PADDING.bottom,
+    scrollBehavior: DEFAULT_SCROLL_BEHAVIOR,
     ...options,
   };
   let focusedElement = null;
@@ -222,7 +224,10 @@ export function useKeyboardFocusGuard(options = {}) {
       : DEFAULT_DELAYS;
     repeatedFocusTimers = delays.map((delay, index) =>
       window.setTimeout(() => {
-        ensureFocusedElementVisible(index === 0 ? "auto" : "smooth");
+        const configuredBehavior = resolveMaybeRef(guardOptions.scrollBehavior);
+        ensureFocusedElementVisible(
+          configuredBehavior || (index === 0 ? "auto" : "smooth")
+        );
       }, delay)
     );
   }

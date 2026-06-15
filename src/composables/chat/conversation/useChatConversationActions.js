@@ -34,7 +34,9 @@ export function useChatConversationActions({workspaceActions, lock} = {}) {
   }
 
   function continueProgressiveInitialHistoryRender() {
-    return workspaceActions?.continueProgressiveInitialHistoryRender?.() ?? false;
+    return (
+      workspaceActions?.continueProgressiveInitialHistoryRender?.() ?? false
+    );
   }
 
   return {

@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatUIController.js
+ * @file composables/chat/internal/container/useChatUIController.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
  *
  * 프리징 코드 주석 기준:
@@ -20,11 +20,11 @@ import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
-import {useChatHistoryActionDialog} from "@/composables/chat/container/useChatHistoryActionDialog";
-import {useChatMobileState} from "@/composables/chat/container/useChatMobileState";
-import {useChatNavigationActions} from "@/composables/chat/container/useChatNavigationActions";
-import {useChatPromptActions} from "@/composables/chat/container/useChatPromptActions";
-import {useChatScrollController} from "@/composables/chat/container/useChatScrollController";
+import {useChatHistoryActionDialog} from "@/composables/chat/internal/container/useChatHistoryActionDialog";
+import {useChatMobileState} from "@/composables/chat/internal/container/useChatMobileState";
+import {useChatNavigationActions} from "@/composables/chat/internal/container/useChatNavigationActions";
+import {useChatPromptActions} from "@/composables/chat/internal/container/useChatPromptActions";
+import {useChatScrollController} from "@/composables/chat/internal/container/useChatScrollController";
 import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
 import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
 import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";

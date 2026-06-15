@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatMermaidHistoryGuards.js
+ * @file composables/chat/internal/container/useChatMermaidHistoryGuards.js
  * @description history 메시지의 Mermaid 렌더 필요 여부를 판단합니다.
  */
 

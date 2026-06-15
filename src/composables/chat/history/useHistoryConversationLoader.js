@@ -5,7 +5,7 @@
 
 import {nextTick} from "vue";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {hasPendingHiddenChatNavigation} from "@/composables/chat/policy/chatRoutePolicy";
+import {hasPendingHiddenChatNavigation} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useHistoryConversationLoader({

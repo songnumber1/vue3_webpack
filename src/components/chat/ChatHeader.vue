@@ -119,7 +119,7 @@ import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
-import {useChatHeaderActions} from "@/composables/chat/header/useChatHeaderActions";
+import {useChatHeaderActions} from "@/composables/chat/useChatUi";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.

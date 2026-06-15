@@ -11,10 +11,10 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const dataController = read('src/composables/chat/container/useChatDataController.js');
-const promptSuggestions = read('src/composables/chat/container/useChatPromptSuggestions.js');
-const historyState = read('src/composables/chat/container/useChatHistoryState.js');
-const mermaidGuards = read('src/composables/chat/container/useChatMermaidHistoryGuards.js');
+const dataController = read('src/composables/chat/internal/container/useChatDataController.js');
+const promptSuggestions = read('src/composables/chat/internal/container/useChatPromptSuggestions.js');
+const historyState = read('src/composables/chat/internal/container/useChatHistoryState.js');
+const mermaidGuards = read('src/composables/chat/internal/container/useChatMermaidHistoryGuards.js');
 
 assert(
   dataController.includes('useChatPromptSuggestions({') &&

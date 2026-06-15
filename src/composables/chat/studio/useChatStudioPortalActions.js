@@ -16,9 +16,9 @@ import {cleanupActiveConversationForNavigation} from "@/composables/chat/convers
 import {
   cleanupAfterPortalConversationNavigation,
   preparePortalConversationNavigation,
-} from "@/composables/chat/navigation/chatNavigationReset";
-import {isHiddenConversationUrlMode} from "@/composables/chat/policy/chatRoutePolicy";
-import {markSessionAsMissingAssistant} from "@/composables/chat/policy/chatSessionPolicy";
+} from "@/composables/chat/internal/navigation/chatNavigationReset";
+import {isHiddenConversationUrlMode} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {deleteStudio} from "@/services/studioDetailService";
 import {
   isStudioAssistant,
@@ -59,7 +59,9 @@ export function useChatStudioPortalActions({
   function isDeletedRuntimeStudioAssistant(assistant = null) {
     const id = String(assistant?.id || "").trim();
     return Boolean(
-      id && isStudioAssistant(assistant) && studioRuntimeStore.isStudioDeleted(id)
+      id &&
+      isStudioAssistant(assistant) &&
+      studioRuntimeStore.isStudioDeleted(id)
     );
   }
 
@@ -178,7 +180,9 @@ export function useChatStudioPortalActions({
   }
 
   function cleanupAfterPortalNavigation() {
-    cleanupAfterPortalConversationNavigation(createPortalNavigationResetContext());
+    cleanupAfterPortalConversationNavigation(
+      createPortalNavigationResetContext()
+    );
   }
 
   async function openPortalAssistant(assistantId) {
@@ -216,7 +220,8 @@ export function useChatStudioPortalActions({
   }
 
   function syncAssistantSelectionWithRoute() {
-    const studioAssistant = assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
+    const studioAssistant =
+      assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
     const connectorAssistant =
       assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
 
@@ -242,7 +247,8 @@ export function useChatStudioPortalActions({
 
     if (isPortalAssistantId(assistantStore.selectedAssistantId)) {
       const fallbackAssistant = findFirstNormalAssistant();
-      if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);
+      if (fallbackAssistant)
+        assistantStore.selectAssistant(fallbackAssistant.id);
     }
   }
 

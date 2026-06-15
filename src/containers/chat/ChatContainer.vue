@@ -136,8 +136,11 @@ import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
-import {useChatContainerProviders} from "@/composables/chat/container/useChatContainerProviders";
-import {useChatContainerInteractionLocks} from "@/composables/chat/container/useChatContainerInteractionLocks";
+import {
+  useChatContainerInteractionLocks,
+  useChatContainerProviders,
+  useChatStudioPortalActions,
+} from "@/composables/chat/useChatUi";
 import AssistantSelectSheet from "@/components/assistant/AssistantSelectSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -154,7 +157,6 @@ import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useRouteMode} from "@/composables/route/useRouteMode";
-import {useChatStudioPortalActions} from "@/composables/chat/studio/useChatStudioPortalActions";
 
 /**
  * [ChatContainer 연결 구조]

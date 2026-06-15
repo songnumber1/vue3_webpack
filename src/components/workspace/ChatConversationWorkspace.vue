@@ -29,7 +29,9 @@
     :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     :readonly="readonly"
-    :continue-progressive-initial-history-render="conversationActions.continueProgressiveInitialHistoryRender"
+    :continue-progressive-initial-history-render="
+      conversationActions.continueProgressiveInitialHistoryRender
+    "
     @content-rendered="handleMessageContentRendered"
     @history-markdown-rendered="handleHistoryMarkdownRendered"
     @history-rendered="handleHistoryRendered"
@@ -119,8 +121,8 @@ import {
 import {useChatStore} from "@/stores/chatStore";
 import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
 import {useChatConversationActions} from "@/composables/chat/conversation/useChatConversationActions";
-import {useCodeInterpreterPanel} from "@/composables/chat/conversation/useCodeInterpreterPanel";
-import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
+import {useCodeInterpreterPanel} from "@/composables/chat/useChatUi";
+import {useConversationComposerHeight} from "@/composables/chat/useChatUi";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 
 const {locale, t} = useI18n();

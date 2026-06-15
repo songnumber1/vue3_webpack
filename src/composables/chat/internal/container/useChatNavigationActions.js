@@ -1,6 +1,6 @@
 import {nextTick} from "vue";
 /**
- * @file composables/chat/container/useChatNavigationActions.js
+ * @file composables/chat/internal/container/useChatNavigationActions.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
  *
  * 프리징 코드 주석 기준:
@@ -16,7 +16,7 @@ import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {ROUTE_NAMES} from "@/constants/routeNames";
@@ -24,7 +24,7 @@ import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   navigateToMainAfterConversationReset,
-} from "@/composables/chat/navigation/chatNavigationReset";
+} from "@/composables/chat/internal/navigation/chatNavigationReset";
 
 /**
  * @typedef {object} ChatNavigationActionsDependencies

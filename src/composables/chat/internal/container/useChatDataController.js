@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatDataController.js
+ * @file composables/chat/internal/container/useChatDataController.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
  *
  * 프리징 코드 주석 기준:
@@ -19,24 +19,22 @@ import {useChatStore} from "@/stores/chatStore";
 import {
   isSharedChat,
   resolveMessageRenderPolicy,
-} from "@/composables/chat/message-list/useMessageRenderPolicy";
+} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
-import {useChatRouteController} from "@/composables/chat/route/useChatRouteController";
-import {useChatRouteLoader} from "@/composables/chat/route/useChatRouteLoader";
-import {useChatPromptSuggestions} from "@/composables/chat/container/useChatPromptSuggestions";
-import {useChatHistoryState} from "@/composables/chat/container/useChatHistoryState";
-import {useChatMermaidHistoryGuards} from "@/composables/chat/container/useChatMermaidHistoryGuards";
+import {useChatRouteController} from "@/composables/chat/internal/route/useChatRouteController";
+import {useChatRouteLoader} from "@/composables/chat/internal/route/useChatRouteLoader";
+import {useChatPromptSuggestions} from "@/composables/chat/internal/container/useChatPromptSuggestions";
+import {useChatHistoryState} from "@/composables/chat/internal/container/useChatHistoryState";
+import {useChatMermaidHistoryGuards} from "@/composables/chat/internal/container/useChatMermaidHistoryGuards";
 import {useHistoryConversationLoader} from "@/composables/chat/history/useHistoryConversationLoader";
 import {useSharedConversationLoader} from "@/composables/chat/shared/useSharedConversationLoader";
 import {useConversationLazyHistory} from "@/composables/chat/conversation/useConversationLazyHistory";
 import {useConversationRenderLifecycle} from "@/composables/chat/conversation/useConversationRenderLifecycle";
-import {
-  resolveConversationRouteReconciliation,
-} from "@/composables/chat/policy/chatRoutePolicy";
+import {resolveConversationRouteReconciliation} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {
   resolveConversationTitle,
   resolveWorkspaceAssistantLabel,
-} from "@/composables/chat/policy/chatHeaderPolicy";
+} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 
 /**
  * [Route/Data controller]
@@ -207,7 +205,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
     setConversationPreservingLazyHistory,
     appendUserAndAssistantMessagesPreservingLazyHistory,
   } = lazyHistory;
-
 
   // 현재 진입한 대화방 상단 헤더 영역에 바인딩할 타이틀 텍스트를 산출합니다.
   const activeConversationTitle = computed(() =>

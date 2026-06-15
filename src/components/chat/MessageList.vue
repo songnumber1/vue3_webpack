@@ -33,7 +33,8 @@
       :key="sector.id"
       class="message-turn-sector"
       :class="{
-        'message-turn-sector--last': shouldApplyLastTurnSectorMinHeight(sectorIndex),
+        'message-turn-sector--last':
+          shouldApplyLastTurnSectorMinHeight(sectorIndex),
       }"
       :style="getTurnSectorStyle(sectorIndex)"
     >
@@ -65,7 +66,7 @@
 <script setup>
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import ChatMessageRouter from "./ChatMessageRouter.vue";
-import {useMessageListScroll} from "@/composables/chat/message-list/useMessageListScroll";
+import {useMessageListScroll} from "@/composables/chat/useChatScroll";
 
 const props = defineProps({
   messages: {type: Array, required: true},

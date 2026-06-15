@@ -4,6 +4,7 @@
  * body/html, textarea, input 등 키보드/입력과 직접 연결되는 영역은 호출부에서 제외합니다.
  */
 import {OverlayScrollbars} from "overlayscrollbars";
+import {shouldUseOverlayScrollbarForRuntime} from "@/utils/overlayScrollPolicy";
 import "overlayscrollbars/overlayscrollbars.css";
 
 export const OVERLAY_SCROLLBAR_OPTIONS = Object.freeze({
@@ -25,16 +26,29 @@ function canUseDom() {
   return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
-function isActualAndroidRuntime() {
-  if (!canUseDom()) return false;
-  return Boolean(
-    window.AndroidBridge || /Android/i.test(navigator.userAgent || "")
-  );
+function getDomRuntimeInfo() {
+  if (!canUseDom()) return {};
+
+  return {
+    actualEnv: window.AndroidBridge ? "android" : "",
+    isAndroidApp: Boolean(window.AndroidBridge),
+    userAgent: navigator.userAgent || "",
+  };
+}
+
+function resolveConfigEnabled(config = {}) {
+  if (Object.prototype.hasOwnProperty.call(config, "enabled")) {
+    return typeof config.enabled === "function"
+      ? Boolean(config.enabled())
+      : Boolean(config.enabled);
+  }
+
+  // 정책을 전달받지 않은 과거 직접 호출 경로도 현재 전역 정책을 따릅니다.
+  return shouldUseOverlayScrollbarForRuntime(getDomRuntimeInfo(), "all");
 }
 
 function isUnsafeTarget(element) {
   if (!element || !canUseDom()) return true;
-  if (isActualAndroidRuntime()) return true;
   const tagName = String(element.tagName || "").toLowerCase();
   return (
     element === document.body ||
@@ -48,6 +62,24 @@ function isUnsafeTarget(element) {
   );
 }
 
+function shouldUseTouchOverlayDefaults() {
+  if (!canUseDom()) return false;
+  const bodyClassList = document.body?.classList;
+  return Boolean(
+    bodyClassList?.contains("actual-android-runtime") &&
+    bodyClassList?.contains("overlay-scroll-runtime")
+  );
+}
+
+function getDefaultScrollbarOptions() {
+  return {
+    ...OVERLAY_SCROLLBAR_OPTIONS.scrollbars,
+    autoHide: shouldUseTouchOverlayDefaults()
+      ? "scroll"
+      : OVERLAY_SCROLLBAR_OPTIONS.scrollbars.autoHide,
+  };
+}
+
 function mergeOptions(options = {}) {
   return {
     ...OVERLAY_SCROLLBAR_OPTIONS,
@@ -57,13 +89,14 @@ function mergeOptions(options = {}) {
       ...(options.overflow || {}),
     },
     scrollbars: {
-      ...OVERLAY_SCROLLBAR_OPTIONS.scrollbars,
+      ...getDefaultScrollbarOptions(),
       ...(options.scrollbars || {}),
     },
   };
 }
 
-export function initOverlayScrollbar(element, options = {}) {
+export function initOverlayScrollbar(element, options = {}, config = {}) {
+  if (!resolveConfigEnabled(config)) return null;
   if (isUnsafeTarget(element)) return null;
 
   const cached = overlayInstances.get(element);
@@ -114,16 +147,21 @@ const MARKDOWN_SCROLL_SELECTOR = [
   ".markdown-body .katex-display",
 ].join(",");
 
-export function enhanceMarkdownScrollbars(rootElement) {
+export function enhanceMarkdownScrollbars(rootElement, config = {}) {
   if (!rootElement || !canUseDom()) return;
+  if (!resolveConfigEnabled(config)) return;
   const targets = rootElement.matches?.(MARKDOWN_SCROLL_SELECTOR)
     ? [rootElement]
     : Array.from(rootElement.querySelectorAll(MARKDOWN_SCROLL_SELECTOR));
 
   targets.forEach((target) => {
-    initOverlayScrollbar(target, {
-      overflow: {x: "scroll", y: "hidden"},
-      scrollbars: {autoHide: "leave", autoHideDelay: 350},
-    });
+    initOverlayScrollbar(
+      target,
+      {
+        overflow: {x: "scroll", y: "hidden"},
+        scrollbars: {autoHide: "leave", autoHideDelay: 350},
+      },
+      config
+    );
   });
 }

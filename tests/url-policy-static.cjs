@@ -14,14 +14,14 @@ function assert(condition, message) {
 const systemSettings = read('src/constants/systemSettings.js');
 const systemSettingsView = read('src/views/settings/SystemSettingsView.vue');
 const chatStore = read('src/stores/chatStore.js');
-const urlPolicy = read('src/composables/chat/navigation/conversationUrlPolicy.js');
-const routePolicy = read('src/composables/chat/policy/chatRoutePolicy.js');
+const urlPolicy = read('src/composables/chat/internal/navigation/conversationUrlPolicy.js');
+const routePolicy = read('src/composables/chat/internal/policy/chatRoutePolicy.js');
 const router = read('src/core/resolver/router.js');
 const routeNames = read('src/constants/routeNames.js');
 const routeComponents = read('src/core/resolver/routeComponents.js');
 const sharedPage = read('src/views/SharedPage.vue');
 const sharedChat = read('src/composables/chat/useSharedChat.js');
-const dataController = read('src/composables/chat/container/useChatDataController.js');
+const dataController = read('src/composables/chat/internal/container/useChatDataController.js');
 const historyLoader = read('src/composables/chat/history/useHistoryConversationLoader.js');
 const renderLifecycle = read('src/composables/chat/conversation/useConversationRenderLifecycle.js');
 const navigationLockStore = read('src/stores/navigationLockStore.js');
@@ -30,7 +30,7 @@ const submit = read('src/composables/chat/useChatSubmit.js');
 const chatContainer = read('src/containers/chat/ChatContainer.vue');
 const workspace = read('src/components/workspace/ChatConversationWorkspace.vue');
 const messageList = read('src/components/chat/MessageList.vue');
-const renderPolicy = read('src/composables/chat/message-list/useMessageRenderPolicy.js');
+const renderPolicy = read('src/composables/chat/internal/message-list/useMessageRenderPolicy.js');
 const chatResponseAdapter = read('src/adapters/chatResponseAdapter.js');
 const progressPolicy = read('src/composables/progress/progressPolicy.js');
 const progressOverlay = read('src/components/overlay/ProgressOverlay.vue');
@@ -248,7 +248,7 @@ assert(
 );
 
 
-const containerProviders = read('src/composables/chat/container/useChatContainerProviders.js');
+const containerProviders = read('src/composables/chat/internal/container/useChatContainerProviders.js');
 
 assert(
   containerProviders.includes('chatPageLock.isSubmitBlocked.value') &&

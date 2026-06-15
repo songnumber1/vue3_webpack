@@ -12,8 +12,8 @@ function assert(condition, message) {
 }
 
 const container = read('src/containers/chat/ChatContainer.vue');
-const providers = read('src/composables/chat/container/useChatContainerProviders.js');
-const locks = read('src/composables/chat/container/useChatContainerInteractionLocks.js');
+const providers = read('src/composables/chat/internal/container/useChatContainerProviders.js');
+const locks = read('src/composables/chat/internal/container/useChatContainerInteractionLocks.js');
 
 assert(
   container.includes('useChatContainerProviders({') &&

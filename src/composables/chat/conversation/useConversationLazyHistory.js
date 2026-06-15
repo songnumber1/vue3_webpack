@@ -3,11 +3,11 @@ import {
   resolveInitialMessageLazyRange,
   resolveMessageLazySettings,
   resolvePreviousMessageLazyStart,
-} from "@/composables/chat/message-list/useMessageLazyRange";
+} from "@/composables/chat/internal/message-list/useMessageLazyRange";
 import {
   HISTORY_RENDER_STRATEGIES,
   MESSAGE_SCROLL_TARGET_TYPES,
-} from "@/composables/chat/message-list/useMessageRenderPolicy";
+} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
 
 function waitAnimationFrame() {
   if (typeof window === "undefined") return Promise.resolve();
@@ -345,7 +345,10 @@ export function useConversationLazyHistory({
 
   function expandProgressiveStateBackward(state) {
     if (state.nextBefore <= state.finalStart) return false;
-    state.start = Math.max(state.nextBefore - state.chunkSize, state.finalStart);
+    state.start = Math.max(
+      state.nextBefore - state.chunkSize,
+      state.finalStart
+    );
     state.nextBefore = state.start;
     return true;
   }

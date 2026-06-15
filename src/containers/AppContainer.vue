@@ -32,6 +32,7 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
 import {useAppShellActions} from "@/composables/app/useAppShellActions";
 import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {APP_SHELL_ACTIONS_KEY} from "@/composables/app/appShellActionContext";
 
 /**
@@ -135,18 +136,11 @@ const appShellActions = useAppShellActions({
 
 provide(APP_SHELL_ACTIONS_KEY, appShellActions);
 
-const isActualAndroidRuntime = computed(() => {
-  const info = platformInfo.value || {};
-  const userAgent = String(info.userAgent || "");
-  return Boolean(
-    info.actualEnv === "android" ||
-    info.actualDevice === "android" ||
-    info.actualDevice === "android-webview" ||
-    info.actualBrowser === "android-webview" ||
-    info.isAndroidApp ||
-    /Android/i.test(userAgent)
-  );
-});
+const {
+  isActualAndroidRuntime,
+  shouldUseOverlayScrollbar,
+  shouldUseNativeScrollbar,
+} = useOverlayScrollPolicy();
 
 /**
  * 상기 계산된 개별 플랫폼 속성값들을 조합하여 템플릿의 컨테이너 Div에 실시간 매핑할 CSS 클래스 객체를 빌드합니다.
@@ -170,20 +164,28 @@ watchEffect(() => {
 
 provide(RESPONSIVE_CONTEXT_KEY, responsiveContext);
 
-function syncActualScrollRuntimeClasses(isAndroidRuntime) {
+function syncScrollRuntimeClasses(isAndroidRuntime, useOverlayScrollbar) {
   if (typeof document === "undefined") return;
+
+  const useNativeScrollbar = !useOverlayScrollbar;
   const roots = [document.documentElement, document.body].filter(Boolean);
+
   roots.forEach((root) => {
     root.classList.toggle("actual-android-runtime", isAndroidRuntime);
-    root.classList.toggle("native-scroll-runtime", isAndroidRuntime);
     root.classList.toggle("actual-pc-runtime", !isAndroidRuntime);
-    root.classList.toggle("overlay-scroll-runtime", !isAndroidRuntime);
-    root.dataset.actualRuntimeScroll = isAndroidRuntime ? "native" : "overlay";
+    root.classList.toggle("native-scroll-runtime", useNativeScrollbar);
+    root.classList.toggle("overlay-scroll-runtime", useOverlayScrollbar);
+    root.dataset.actualRuntimeScroll = useOverlayScrollbar
+      ? "overlay"
+      : "native";
   });
 }
 
 watchEffect(() => {
-  syncActualScrollRuntimeClasses(isActualAndroidRuntime.value);
+  syncScrollRuntimeClasses(
+    isActualAndroidRuntime.value,
+    shouldUseOverlayScrollbar.value
+  );
 });
 
 const containerClasses = computed(() => ({
@@ -205,11 +207,11 @@ const containerClasses = computed(() => ({
   // 현재 접속한 하드웨어 디바이스 종류 명칭에 매칭되는 동적 클래스를 항상 true 상태로 바인딩합니다. (예: app-container--device-pc)
   [`app-container--device-${deviceName.value}`]: true,
 
-  // 실제 런타임 기준 스크롤 정책 분기용 클래스입니다. 화면 크기(mobile-mode)가 아니라 실제 기기 환경 기준입니다.
+  // 실제 런타임 판별 클래스와 스크롤 정책 클래스는 분리합니다.
   "app-container--actual-android-runtime": isActualAndroidRuntime.value,
-  "app-container--native-scroll-runtime": isActualAndroidRuntime.value,
   "app-container--actual-pc-runtime": !isActualAndroidRuntime.value,
-  "app-container--overlay-scroll-runtime": !isActualAndroidRuntime.value,
+  "app-container--native-scroll-runtime": shouldUseNativeScrollbar.value,
+  "app-container--overlay-scroll-runtime": shouldUseOverlayScrollbar.value,
   [`app-container--actual-env-${platformInfo.value.actualEnv || "unknown"}`]: true,
   [`app-container--actual-device-${platformInfo.value.actualDevice || "unknown"}`]: true,
   [`app-container--actual-browser-${platformInfo.value.actualBrowser || "unknown"}`]: true,

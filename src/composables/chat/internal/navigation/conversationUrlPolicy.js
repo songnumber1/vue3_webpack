@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/navigation/conversationUrlPolicy.js
+ * @file composables/chat/internal/navigation/conversationUrlPolicy.js
  * @description 일반 대화방 URL 이동 유틸입니다. route 판단 정책은 chatRoutePolicy가 담당합니다.
  */
 
@@ -19,12 +19,12 @@ export {
   resolveActiveChatId,
   resolveConversationRouteReconciliation,
   resolveConversationUrlGuard,
-} from "@/composables/chat/policy/chatRoutePolicy";
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 
 import {
   applyHiddenConversationActiveRoom,
   createConversationRoute,
-} from "@/composables/chat/policy/chatRoutePolicy";
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 
 export async function navigateToConversation({
   router,

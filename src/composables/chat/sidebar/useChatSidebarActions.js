@@ -12,7 +12,7 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
-import {navigateToConversation} from "@/composables/chat/navigation/conversationUrlPolicy";
+import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
 import {useChatActionsContext} from "@/composables/chat/context/useChatInject";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
@@ -21,7 +21,7 @@ import {
   navigateToMainAfterConversationReset,
   preparePortalConversationNavigation,
   resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
-} from "@/composables/chat/navigation/chatNavigationReset";
+} from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {logWarn} from "@/utils/logger";
 
 const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
@@ -91,7 +91,9 @@ export function useChatSidebarActions({
   }
 
   function resetConversationStateForRouteChange() {
-    resetConversationStateForRouteChangeByPolicy(createNavigationResetContext());
+    resetConversationStateForRouteChangeByPolicy(
+      createNavigationResetContext()
+    );
   }
 
   function preparePortalNavigation() {

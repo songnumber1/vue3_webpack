@@ -167,11 +167,10 @@ export function useConversationRenderLifecycle({
     void revealAfterPaint();
   }
 
-
   function isPcProgressiveHistoryRender() {
-    return String(messageRenderPolicy.value?.historyRenderStrategy || "").startsWith(
-      "pc-progressive-"
-    );
+    return String(
+      messageRenderPolicy.value?.historyRenderStrategy || ""
+    ).startsWith("pc-progressive-");
   }
 
   function revealHistoryMarkdown() {

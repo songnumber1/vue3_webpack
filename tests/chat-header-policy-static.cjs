@@ -9,8 +9,8 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const headerPolicy = read('src/composables/chat/policy/chatHeaderPolicy.js');
-const dataController = read('src/composables/chat/container/useChatDataController.js');
+const headerPolicy = read('src/composables/chat/internal/policy/chatHeaderPolicy.js');
+const dataController = read('src/composables/chat/internal/container/useChatDataController.js');
 const flowBaseline = read('tests/chat-flow-baseline.cjs');
 const runAll = read('tests/run-all.cjs');
 

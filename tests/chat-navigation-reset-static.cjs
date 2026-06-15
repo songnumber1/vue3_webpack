@@ -19,9 +19,9 @@ function assertOrder(source, before, after, message) {
   assert(beforeIndex < afterIndex, message);
 }
 
-const resetPolicy = read('src/composables/chat/navigation/chatNavigationReset.js');
+const resetPolicy = read('src/composables/chat/internal/navigation/chatNavigationReset.js');
 const sidebarActions = read('src/composables/chat/sidebar/useChatSidebarActions.js');
-const navigationActions = read('src/composables/chat/container/useChatNavigationActions.js');
+const navigationActions = read('src/composables/chat/internal/container/useChatNavigationActions.js');
 const chatContainer = read('src/containers/chat/ChatContainer.vue');
 const studioPortalActions = read('src/composables/chat/studio/useChatStudioPortalActions.js');
 

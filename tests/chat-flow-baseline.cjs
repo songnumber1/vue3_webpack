@@ -28,8 +28,8 @@ function assertLastOrder(source, before, after, message) {
 }
 
 const chatSearchWorkspace = read('src/components/search/ChatSearchWorkspace.vue');
-const conversationUrlPolicy = read('src/composables/chat/navigation/conversationUrlPolicy.js');
-const routePolicy = read('src/composables/chat/policy/chatRoutePolicy.js');
+const conversationUrlPolicy = read('src/composables/chat/internal/navigation/conversationUrlPolicy.js');
+const routePolicy = read('src/composables/chat/internal/policy/chatRoutePolicy.js');
 const systemSettings = read('src/constants/systemSettings.js');
 
 assert(
@@ -43,9 +43,9 @@ const sidebarActions = read('src/composables/chat/sidebar/useChatSidebarActions.
 const chatContainer = read('src/containers/chat/ChatContainer.vue');
 const studioPortalActions = read('src/composables/chat/studio/useChatStudioPortalActions.js');
 const chatRuntime = read('src/composables/chat/useChatRuntime.js');
-const sessionPolicy = read('src/composables/chat/policy/chatSessionPolicy.js');
-const chatHeaderPolicy = read('src/composables/chat/policy/chatHeaderPolicy.js');
-const dataController = read('src/composables/chat/container/useChatDataController.js');
+const sessionPolicy = read('src/composables/chat/internal/policy/chatSessionPolicy.js');
+const chatHeaderPolicy = read('src/composables/chat/internal/policy/chatHeaderPolicy.js');
+const dataController = read('src/composables/chat/internal/container/useChatDataController.js');
 const runAll = read('tests/run-all.cjs');
 
 assert(

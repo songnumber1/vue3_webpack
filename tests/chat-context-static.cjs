@@ -52,7 +52,7 @@ const chatContainer = fs.readFileSync(
   'utf8'
 );
 const chatContainerProviders = fs.readFileSync(
-  path.join(root, 'src/composables/chat/container/useChatContainerProviders.js'),
+  path.join(root, 'src/composables/chat/internal/container/useChatContainerProviders.js'),
   'utf8'
 );
 if (

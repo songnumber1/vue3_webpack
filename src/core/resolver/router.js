@@ -11,7 +11,7 @@ import {
   getPendingSelectedChatId,
   isHiddenConversationUrlMode,
   resolveConversationUrlGuard,
-} from "@/composables/chat/policy/chatRoutePolicy";
+} from "@/composables/chat/useChatRoute";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";

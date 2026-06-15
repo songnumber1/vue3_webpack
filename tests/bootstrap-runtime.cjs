@@ -21,7 +21,7 @@ const chatContainerController = read(
   "src/composables/chat/useChatContainerController.js"
 );
 const chatDataController = read(
-  "src/composables/chat/container/useChatDataController.js"
+  "src/composables/chat/internal/container/useChatDataController.js"
 );
 
 const chatSearch = read("src/composables/search/useChatSearch.js");

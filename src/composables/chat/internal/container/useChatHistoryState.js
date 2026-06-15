@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatHistoryState.js
+ * @file composables/chat/internal/container/useChatHistoryState.js
  * @description active history 조회와 pending selected chat 정리를 담당하는 작은 상태 유틸입니다.
  */
 

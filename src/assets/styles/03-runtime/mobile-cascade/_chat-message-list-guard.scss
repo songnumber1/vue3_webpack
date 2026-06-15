@@ -11,3 +11,79 @@ body.mobile-mode .chat-container-root--mode-chat .message-list,
 body.mobile-mode .chat-container-root--mode-shared .message-list {
   font-size: var(--message-plain-mobile-font-size, var(--font-size-fixed-15));
 }
+
+/* Android OverlayScrollbars runtime guard for chat/shared message lists.
+   This file is imported after the mobile chat cascade, so it restores the
+   OverlayScrollbars host/viewport sizing that mobile native-scroll guards can
+   otherwise override. */
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list,
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list,
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list,
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list {
+  position: relative !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list[data-overlayscrollbars],
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list[data-overlayscrollbars],
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list[data-overlay-scrollbar-enhanced="true"],
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list[data-overlay-scrollbar-enhanced="true"],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list[data-overlayscrollbars],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list[data-overlayscrollbars],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list[data-overlay-scrollbar-enhanced="true"],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list[data-overlay-scrollbar-enhanced="true"] {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list
+  [data-overlayscrollbars-viewport],
+body.mobile-mode.overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list
+  [data-overlayscrollbars-viewport],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-chat
+  .message-list
+  [data-overlayscrollbars-viewport],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-shared
+  .message-list
+  [data-overlayscrollbars-viewport] {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}

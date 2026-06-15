@@ -1,10 +1,10 @@
 /**
- * @file composables/chat/route/useChatRouteController.js
+ * @file composables/chat/internal/route/useChatRouteController.js
  * @description ChatContainer route mode와 active conversation id를 계산하는 순수 route-state composable입니다.
  */
 
 import {computed} from "vue";
-import {resolveActiveChatId} from "@/composables/chat/policy/chatRoutePolicy";
+import {resolveActiveChatId} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**

@@ -3,7 +3,7 @@
  * @description Vue ref 대상에 OverlayScrollbars를 안전하게 연결합니다.
  */
 import {nextTick, onBeforeUnmount, onMounted, watch} from "vue";
-import {usePlatformStore} from "@/stores/platformStore";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {
   destroyOverlayScrollbar,
   getOverlayScrollbarViewport,
@@ -17,30 +17,15 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   let resizeObserver = null;
   let removeWindowResizeListener = null;
   const enabled = config.enabled ?? true;
-  const disableOnMobile = config.disableOnMobile ?? true;
   const reserveScrollbarGap = config.reserveScrollbarGap ?? true;
-  const platformStore = usePlatformStore();
+  const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 
-  function isActualAndroidRuntime() {
-    const info = platformStore.info || {};
-    const userAgent = String(info.userAgent || "");
-    return Boolean(
-      info.actualEnv === "android" ||
-      info.actualDevice === "android" ||
-      info.actualDevice === "android-webview" ||
-      info.actualBrowser === "android-webview" ||
-      info.isAndroidApp ||
-      /Android/i.test(userAgent)
-    );
-  }
-
-  function isNativeScrollPlatform() {
-    return disableOnMobile && isActualAndroidRuntime();
+  function resolveLocalEnabled() {
+    return typeof enabled === "function" ? enabled() : Boolean(enabled);
   }
 
   function resolveEnabled() {
-    if (isNativeScrollPlatform()) return false;
-    return typeof enabled === "function" ? enabled() : Boolean(enabled);
+    return resolveLocalEnabled() && shouldUseOverlayScrollbar.value;
   }
 
   async function setup() {
@@ -51,7 +36,9 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     if (instanceElement && instanceElement !== element) {
       destroy();
     }
-    instance = initOverlayScrollbar(element, options);
+    instance = initOverlayScrollbar(element, options, {
+      enabled: resolveEnabled,
+    });
     instanceElement = instance ? element : null;
     if (instance && reserveScrollbarGap && element?.dataset) {
       element.dataset.overlayScrollbarGap = "true";
@@ -62,6 +49,7 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
       resizeObserver = new ResizeObserver(() => update());
       resizeObserver.observe(element);
     }
+    if (instance) schedulePostSetupUpdates();
   }
 
   function update() {
@@ -85,6 +73,18 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
     }
     instance = null;
     instanceElement = null;
+  }
+
+  function schedulePostSetupUpdates() {
+    if (!instance || typeof window === "undefined") {
+      update();
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      update();
+      window.requestAnimationFrame(() => update());
+    });
   }
 
   function bindWindowResizeUpdate() {

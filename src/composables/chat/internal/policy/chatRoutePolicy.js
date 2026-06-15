@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/policy/chatRoutePolicy.js
+ * @file composables/chat/internal/policy/chatRoutePolicy.js
  * @description Chat route의 source of truth를 hidden URL 기준으로 정리하는 순수 정책 모듈입니다.
  */
 

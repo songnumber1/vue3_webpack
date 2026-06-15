@@ -22,7 +22,7 @@ import {
   applyHiddenConversationActiveRoom,
   createConversationRoute,
   resolveActiveChatId,
-} from "@/composables/chat/navigation/conversationUrlPolicy";
+} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
 // chatStreamStore.isStreaming을 생성 중 상태의 단일 기준으로 사용합니다.
 
 function normalizeChatId(chatId) {

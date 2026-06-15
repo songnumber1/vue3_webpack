@@ -320,3 +320,110 @@ body.actual-pc-runtime
 body.actual-pc-runtime .chat-container-root--mode-studio .studio-pagination {
   flex: 0 0 auto !important;
 }
+
+/* Android OverlayScrollbars runtime guard.
+   When the global policy is ALL, actual Android must receive the same fixed
+   scroll viewport sizing that PC OverlayScrollbars already uses. Without this,
+   the mobile Studio/MCP cascade can leave .studio-list-area visible/auto-height,
+   so OverlayScrollbars owns a viewport with no scrollable height. */
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace,
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace {
+  height: 100% !important;
+  min-height: 0 !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace__scroll,
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-workspace__scroll {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-shell,
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-shell {
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: auto !important;
+  max-height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area,
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area {
+  position: relative !important;
+  flex: 1 1 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  display: block !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlayscrollbars],
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlay-scrollbar-enhanced="true"],
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlayscrollbars],
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area[data-overlay-scrollbar-enhanced="true"] {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area
+  [data-overlayscrollbars-viewport],
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-list-area
+  [data-overlayscrollbars-viewport] {
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.app-container--overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-pagination,
+body.overlay-scroll-runtime
+  .chat-container-root--mode-studio
+  .studio-pagination {
+  flex: 0 0 auto !important;
+}

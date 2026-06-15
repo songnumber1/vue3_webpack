@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatPromptActions.js
+ * @file composables/chat/internal/container/useChatPromptActions.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
  *
  * 프리징 코드 주석 기준:

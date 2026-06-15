@@ -9,7 +9,7 @@ function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const sessionPolicy = read('src/composables/chat/policy/chatSessionPolicy.js');
+const sessionPolicy = read('src/composables/chat/internal/policy/chatSessionPolicy.js');
 const chatRuntime = read('src/composables/chat/useChatRuntime.js');
 const chatContainer = read('src/containers/chat/ChatContainer.vue');
 const studioPortalActions = read('src/composables/chat/studio/useChatStudioPortalActions.js');

@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/container/useChatPromptSuggestions.js
+ * @file composables/chat/internal/container/useChatPromptSuggestions.js
  * @description Chat main 화면 추천 프롬프트를 현재 locale 기준 표시 데이터로 변환합니다.
  */
 

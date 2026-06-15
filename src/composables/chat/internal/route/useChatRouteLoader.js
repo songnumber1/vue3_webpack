@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/route/useChatRouteLoader.js
+ * @file composables/chat/internal/route/useChatRouteLoader.js
  * @description route 전환 시 shared/history loader를 선택하고 stale load를 차단합니다.
  */
 
