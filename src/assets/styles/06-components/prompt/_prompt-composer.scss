@@ -1,6 +1,10 @@
 /* Prompt composer, Gemini prompt, send/voice button and prompt menu extracted from 05-layout/_chat-core.scss.
    Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
 @use "../../00-abstracts/mixins" as *;
+
+// -----------------------------------------------------------------------------
+// Prompt layout foundations
+// -----------------------------------------------------------------------------
 .chat-container-root,
 .chat-container-root--mode-main,
 .chat-container-root--mode-chat,
@@ -74,6 +78,9 @@ body.mobile-mode .prompt-wrap {
 .prompt-wrap--floating,
 body.mobile-mode .prompt-wrap--floating,
 .mobile-bottom-prompt,
+// -----------------------------------------------------------------------------
+// Mobile runtime composer guards
+// -----------------------------------------------------------------------------
 body.mobile-mode .mobile-bottom-prompt {
   position: fixed !important;
   left: 0 !important;
@@ -163,6 +170,9 @@ body.mobile-mode .prompt-box textarea {
   padding-bottom: 8px;
 }
 
+// -----------------------------------------------------------------------------
+// Floating menu base
+// -----------------------------------------------------------------------------
 .assistant-menu,
 .prompt-popover {
   position: absolute;
@@ -180,6 +190,9 @@ body.mobile-mode .prompt-box textarea {
   order: 3;
 }
 
+// -----------------------------------------------------------------------------
+// Gemini-style composer shell
+// -----------------------------------------------------------------------------
 .prompt-box--gemini,
 body.mobile-mode .prompt-box--gemini {
   width: min(100%, var(--layout-prompt-width, 880px));
@@ -209,6 +222,9 @@ body.mobile-mode .prompt-box--gemini textarea {
   line-height: 1.5;
 }
 
+// -----------------------------------------------------------------------------
+// Composer action row
+// -----------------------------------------------------------------------------
 .prompt-action-row {
   display: flex;
   align-items: center;
@@ -237,6 +253,9 @@ body.mobile-mode .prompt-box--gemini textarea {
   box-shadow: none;
 }
 
+// -----------------------------------------------------------------------------
+// Composer icon and primary action controls
+// -----------------------------------------------------------------------------
 .prompt-icon-action,
 .prompt-box--gemini .send-button,
 body.mobile-mode .prompt-box--gemini .send-button,
@@ -270,6 +289,9 @@ body.mobile-mode .prompt-box--gemini .voice-button {
   background: var(--control-hover);
 }
 
+// -----------------------------------------------------------------------------
+// Send button and loading spinner
+// -----------------------------------------------------------------------------
 .prompt-box--gemini .send-button,
 body.mobile-mode .prompt-box--gemini .send-button {
   flex: 0 0 auto;
@@ -308,6 +330,9 @@ body.mobile-mode .prompt-box--gemini .send-button--loading {
   }
 }
 
+// -----------------------------------------------------------------------------
+// Tool and attach menus
+// -----------------------------------------------------------------------------
 .prompt-model-menu,
 .prompt-tool-menu,
 .attach-menu {
@@ -428,6 +453,9 @@ body.desktop-mode .desktop-center-prompt {
   width: min(var(--layout-prompt-width, 880px), calc(100vw - 420px));
 }
 
+// -----------------------------------------------------------------------------
+// Voice controls
+// -----------------------------------------------------------------------------
 .prompt-box--gemini .voice-button,
 body.mobile-mode .prompt-box--gemini .voice-button {
   width: var(--prompt-action-size);
@@ -571,6 +599,9 @@ body.mobile-mode .send-button {
 /* Prompt input expand/collapse toggle.
    Keep this feature isolated behind --expanded classes so the frozen prompt,
    toolbar, attachment, and keyboard rules remain unchanged while collapsed. */
+// -----------------------------------------------------------------------------
+// Mobile expand controls
+// -----------------------------------------------------------------------------
 .prompt-expand-toggle,
 body.mobile-mode .prompt-expand-toggle {
   position: absolute;
@@ -609,6 +640,9 @@ body.mobile-mode .prompt-expand-toggle svg {
   pointer-events: none;
 }
 
+// -----------------------------------------------------------------------------
+// Expanded textarea and attachment preview
+// -----------------------------------------------------------------------------
 .prompt-box--gemini > .prompt-textarea,
 body.mobile-mode .prompt-box--gemini > .prompt-textarea {
   padding-right: 38px;

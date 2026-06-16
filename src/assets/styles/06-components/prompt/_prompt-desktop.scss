@@ -11,7 +11,7 @@
  * - The chat route used a rounded composer surface that no longer matched the
  *   main route prompt border after the mobile freeze guards were introduced.
  *
- * Keep this import after mobile-cascade-hotfix so it can safely normalize desktop
+ * Keep this import after mobile-cascade-guards so it can safely normalize desktop
  * prompt geometry without changing mobile, Android WebView, bottom sheet, Studio,
  * MCP, or OverlayScrollbars behavior.
  */

@@ -18,7 +18,7 @@ export const useChatStreamStore = defineStore("chatStream", {
   state: () => ({
     isStreaming: false, // 현재 AI 모델 인프라가 대화 패킷을 타이핑 중인지 판별 플래그
     /**
-     * 새 채팅 생성 직후 프론트 내부에서 수행하는 /chat/:id 또는 /chat 라우팅만
+     * 새 채팅 생성 직후 프론트 내부에서 수행하는 hidden-only /chat entry 라우팅만
      * 스트리밍 중 1회 통과시키기 위한 임시 허용권입니다.
      * 사용자 클릭 이동, 다른 대화방 이동, Studio/MCP 이동 허용 용도가 아닙니다.
      */
@@ -39,7 +39,7 @@ export const useChatStreamStore = defineStore("chatStream", {
       this.clearAllowedNavigation();
     },
     /**
-     * 새 채팅 생성 직후 URL 정책에 맞춰 /chat/:id 또는 /chat으로 이동하는 내부 라우팅만 1회 허용합니다.
+     * 새 채팅 생성 직후 hidden-only /chat entry로 이동하는 내부 라우팅만 1회 허용합니다.
      * 이 허용권은 새 채팅 생성 후 router.push/replace 직전에만 설정되며,
      * 사용자 클릭/다른 라우트 이동은 기존처럼 스트리밍 가드가 차단합니다.
      * @param {object} route - 허용할 라우트 대상

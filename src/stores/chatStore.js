@@ -123,8 +123,8 @@ export const useChatStore = defineStore("chat", {
       );
     },
     /**
-     * URL 표시/숨김 정책에 관계없이 현재 채팅 화면에 표시할 방을 단일 activeRoom 상태로 기록합니다.
-     * 기존 selectedChatId는 현행 /chat/:id 기반 로직 호환을 위해 유지하고, 후속 단계에서 점진 전환합니다.
+     * 일반 채팅은 hidden-only /chat entry를 사용하므로 현재 화면에 표시할 방을 단일 activeRoom 상태로 기록합니다.
+     * selectedChatId는 URL param 대신 Pinia 기준의 현재 일반 대화방 id로 유지합니다.
      */
     setActiveRoom(roomId, roomType = ACTIVE_ROOM_TYPES.chat) {
       const id = String(roomId || "").trim();

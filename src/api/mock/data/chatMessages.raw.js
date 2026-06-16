@@ -108,7 +108,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# 개인 PC IP 노출 보안 위험\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# 개인 PC IP 노출 보안 위험\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-004-assistant-1",
       isSend: true,
       isRAG: true,
@@ -403,7 +403,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# 마케팅 스튜디오 출시 안내 문구 생성\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# 마케팅 스튜디오 출시 안내 문구 생성\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-014-assistant-1",
       isSend: true,
       isRAG: false,
@@ -693,7 +693,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# KaTeX rehype sanitize markdown pipeline\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# KaTeX rehype sanitize markdown pipeline\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-024-assistant-1",
       isSend: true,
       isRAG: true,
@@ -988,7 +988,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# PlantUML 오프라인 렌더링 구조\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# PlantUML 오프라인 렌더링 구조\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-034-assistant-1",
       isSend: true,
       isRAG: false,
@@ -1276,7 +1276,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# 프론트엔드 인증 가드 환경변수 정리\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# 프론트엔드 인증 가드 환경변수 정리\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-044-assistant-1",
       isSend: true,
       isRAG: true,
@@ -1571,7 +1571,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# Assistant 만들기 미리보기 공통 컴포넌트\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# Assistant 만들기 미리보기 공통 컴포넌트\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-054-assistant-1",
       isSend: true,
       isRAG: false,
@@ -1861,7 +1861,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# iOS Safari 미지원 범위 정리\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# iOS Safari 미지원 범위 정리\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-064-assistant-1",
       isSend: true,
       isRAG: true,
@@ -2156,7 +2156,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# 채팅 검색 페이징 하단 고정\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# 채팅 검색 페이징 하단 고정\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-074-assistant-1",
       isSend: true,
       isRAG: false,
@@ -2446,7 +2446,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# ConnectionProvider dispose 방지 전략\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# ConnectionProvider dispose 방지 전략\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-084-assistant-1",
       isSend: true,
       isRAG: true,
@@ -2741,7 +2741,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# CSS specificity 충돌 제거 계획\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, router) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  router.push({ name: 'chat', params: { id: chatId } });\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
+        "# CSS specificity 충돌 제거 계획\n\n요청하신 **코드** 관점으로 샘플 대화 내용을 구성했습니다.\n\nJavaScript, CSS, Java 코드 블록과 복사 버튼, 하이라이트를 확인합니다.\n\n## 핵심 정리\n\n- 대화 목록의 `chatId`와 상세 메시지 mock key가 동일해야 합니다.\n- 검색 결과에서 이동한 채팅방도 같은 `chatId`로 상세 API를 호출해야 합니다.\n- 본문에는 실제 렌더링 검증에 필요한 요소를 다양하게 포함했습니다.\n\n```js\nexport function openChat(result, navigateToConversation) {\n  const chatId = result.chatId || result.id;\n  if (!chatId) return;\n  navigateToConversation(chatId);\n}\n```\n\n```css\n.chat-search-list-area {\n  overflow-y: auto;\n  min-height: 0;\n}\n```\n\n---\n\n이 샘플은 목록, 검색, 상세 진입까지 같은 `chatId`로 이어지는지 확인하기 위한 데이터입니다.",
       id: "chat-search-sample-094-assistant-1",
       isSend: true,
       isRAG: false,

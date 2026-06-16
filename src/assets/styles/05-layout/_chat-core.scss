@@ -11,5 +11,5 @@
 @use "../06-components/prompt/prompt-composer" as *;
 @use "chat/topbar-collapsed" as *;
 @use "../06-components/prompt/prompt-buttons" as *;
-@use "chat/assistant-empty-bottom-sheet-legacy" as *;
+@use "chat/assistant-empty-bottom-sheet" as *;
 @use "chat/topbar-title-scroll-history" as *;

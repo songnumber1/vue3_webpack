@@ -13,7 +13,7 @@ const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 /**
  * @typedef {object} ChatScrollControllerDependencies
- * @property {import('vue').Ref<boolean>} isConversationPage - 현재 사용자가 메인 홈이 아닌 실제 대화방 내부(/chat/:id)에 진입해 있는지 판별하는 플래그
+ * @property {import('vue').Ref<boolean>} isConversationPage - 현재 사용자가 메인 홈이 아닌 hidden-only /chat 대화 화면에 진입해 있는지 판별하는 플래그
  * @property {import('vue').Ref<object|null>} workspaceRef - 메인 채팅 워크스페이스 컴포넌트의 돔/인스턴스 레퍼런스 포인터
  * @property {function(object=): Promise<void>} scrollToBottom - 워크스페이스가 제공하는 네이티브 기본 최하단 스크롤 조작 함수
  * @property {import('vue').Ref<boolean>} [autoScrollEnabled={value: true}] - 사용자의 실시간 AI 답변 자동 스크롤 추적 기능 활성화/수동 잠금 상태 플래그

@@ -258,8 +258,23 @@ import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
 import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
-const {t} = useI18n();
+const LAYOUT_MODES = Object.freeze({
+  DEFAULT: "default",
+  TOP_ACTIONS: "top-actions",
+  SUBMIT_ONLY: "submit-only",
+});
 
+const TOOL_MENU_FLOATING_OFFSET = 10;
+const TOOL_MENU_FLOATING_PADDING = 12;
+const TOOL_SUBMENU_WIDTH = 248;
+const TOOL_SUBMENU_PLACEMENT = Object.freeze({
+  LEFT: "left",
+  RIGHT: "right",
+});
+
+// -----------------------------------------------------------------------------
+// Props and emits
+// -----------------------------------------------------------------------------
 const componentProps = defineProps({
   layoutMode: {
     type: String,
@@ -269,19 +284,28 @@ const componentProps = defineProps({
   },
 });
 
-const isTopActionsOnly = computed(
-  () => componentProps.layoutMode === "top-actions"
-);
-const isSubmitOnly = computed(
-  () => componentProps.layoutMode === "submit-only"
-);
+const emit = defineEmits([
+  "open-model",
+  "open-tool",
+  "open-attach",
+  "select-model",
+  "apply-tool",
+  "open-file-picker",
+  "start-voice",
+  "stop-voice",
+]);
 
+const {t} = useI18n();
+
+// -----------------------------------------------------------------------------
+// Local refs and floating menu positioning
+// -----------------------------------------------------------------------------
 const modelSelectorRef = ref(null);
 const toolRoot = ref(null);
 const attachButtonRef = ref(null);
 const toolMenuRef = ref(null);
 const toolPositionReady = ref(false);
-const submenuPlacement = ref("right");
+const submenuPlacement = ref(TOOL_SUBMENU_PLACEMENT.RIGHT);
 
 const toolReferenceRef = computed(() => toolRoot.value || null);
 
@@ -292,9 +316,9 @@ const {floatingStyles: toolFloatingStyles, update: updateToolFloating} =
     transform: false,
     whileElementsMounted: autoUpdate,
     middleware: [
-      offset(10),
+      offset(TOOL_MENU_FLOATING_OFFSET),
       flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-      shift({padding: 12}),
+      shift({padding: TOOL_MENU_FLOATING_PADDING}),
     ],
   });
 
@@ -303,6 +327,9 @@ const toolMenuStyle = computed(() => ({
   visibility: toolPositionReady.value ? "visible" : "hidden",
 }));
 
+// -----------------------------------------------------------------------------
+// Context-backed toolbar state
+// -----------------------------------------------------------------------------
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
@@ -418,21 +445,40 @@ const {
   modelSelectLabel,
 } = toRefs(props);
 
-const emit = defineEmits([
-  "open-model",
-  "open-tool",
-  "open-attach",
-  "select-model",
-  "apply-tool",
-  "open-file-picker",
-  "start-voice",
-  "stop-voice",
-]);
+// -----------------------------------------------------------------------------
+// Computed state
+// -----------------------------------------------------------------------------
+const isTopActionsOnly = computed(
+  () => componentProps.layoutMode === LAYOUT_MODES.TOP_ACTIONS
+);
+const isSubmitOnly = computed(
+  () => componentProps.layoutMode === LAYOUT_MODES.SUBMIT_ONLY
+);
 
 const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );
 
+const showVoiceStartButton = computed(
+  () =>
+    !props.hideVoiceAction &&
+    !props.generating &&
+    props.isMicEnabled &&
+    props.isSpeechSupported &&
+    !props.hasPromptText &&
+    !props.isVoiceListening
+);
+const showVoiceStopButton = computed(
+  () =>
+    !props.hideVoiceAction &&
+    !props.generating &&
+    props.isMicEnabled &&
+    props.isVoiceListening
+);
+
+// -----------------------------------------------------------------------------
+// Tool menu handlers
+// -----------------------------------------------------------------------------
 const {
   activeToolGroupId,
   activeToolGroup,
@@ -453,39 +499,30 @@ const {
   },
 });
 
-const showVoiceStartButton = computed(
-  () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isSpeechSupported &&
-    !props.hasPromptText &&
-    !props.isVoiceListening
-);
-const showVoiceStopButton = computed(
-  () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isVoiceListening
-);
-
+// -----------------------------------------------------------------------------
+// Floating submenu placement handlers
+// -----------------------------------------------------------------------------
 function resolveSubmenuPlacement() {
   const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
   if (!menuRect) {
-    submenuPlacement.value = "right";
+    submenuPlacement.value = TOOL_SUBMENU_PLACEMENT.RIGHT;
     return;
   }
 
-  const submenuWidth = 248;
+  const submenuWidth = TOOL_SUBMENU_WIDTH;
   const viewportWidth =
     window.innerWidth || document.documentElement.clientWidth;
   const rightSpace = viewportWidth - menuRect.right;
   const leftSpace = menuRect.left;
   submenuPlacement.value =
-    rightSpace >= submenuWidth || rightSpace >= leftSpace ? "right" : "left";
+    rightSpace >= submenuWidth || rightSpace >= leftSpace
+      ? TOOL_SUBMENU_PLACEMENT.RIGHT
+      : TOOL_SUBMENU_PLACEMENT.LEFT;
 }
 
+// -----------------------------------------------------------------------------
+// Watchers
+// -----------------------------------------------------------------------------
 watch(
   () => props.toolMenuOpen,
   async (open) => {
@@ -522,6 +559,9 @@ const attachRoot = computed(
     null
 );
 
+// -----------------------------------------------------------------------------
+// Public component contract
+// -----------------------------------------------------------------------------
 defineExpose({modelRoot, toolRoot, attachRoot});
 </script>
 

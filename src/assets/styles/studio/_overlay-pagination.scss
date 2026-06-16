@@ -1,7 +1,7 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
-/* --- pagination/_overlay-pagination-fixes-01.scss --- */
+/* --- pagination/_overlay-pagination-01.scss --- */
 /* Final Studio / Connector Store layout fixes after mobile legacy patches.
    Pagination stays anchored; only card list and category strip scroll. */
 .studio-workspace .studio-workspace__scroll {
@@ -50,7 +50,7 @@
   padding-bottom: 4px;
 }
 
-/* --- mobile/_overlay-pagination-fixes-02.scss --- */
+/* --- mobile/_overlay-pagination-02.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-workspace {
   height: 100%;
   min-height: 0;
@@ -100,7 +100,7 @@ body.mobile-mode .chat-container-root--mode-studio .studio-pagination {
   padding: 14px 0 calc(18px + env(safe-area-inset-bottom, 0px)) !important;
 }
 
-/* --- pagination/_overlay-pagination-fixes-03.scss --- */
+/* --- pagination/_overlay-pagination-03.scss --- */
 /* Regression guard: Studio / Connector Store categories must wrap like chips, not become a horizontal scroller. */
 body.desktop-mode
   .app-container:not(.app-container--native-scroll-runtime)
@@ -171,7 +171,7 @@ body.desktop-mode .chat-container-root--mode-studio .studio-pagination {
   margin-top: 14px;
 }
 
-/* --- mobile/_overlay-pagination-fixes-04.scss --- */
+/* --- mobile/_overlay-pagination-04.scss --- */
 /* PC runtime must keep the Studio / MCP card list as the scroll viewport even when the browser is resized to mobile width. */
 .app-container--actual-pc-runtime .studio-workspace .studio-workspace__scroll,
 body.mobile-mode
@@ -223,7 +223,7 @@ body.mobile-mode
   align-content: start !important;
 }
 
-/* --- overlay/_overlay-pagination-fixes-05.scss --- */
+/* --- overlay/_overlay-pagination-05.scss --- */
 /* Studio/MCP list scroll hardening.
    PC runtime must keep the card list as the only scroll viewport even when the
    browser is resized into mobile layout. The selector is scoped to Studio/MCP
@@ -240,7 +240,7 @@ body.actual-pc-runtime .chat-container-root--mode-studio .studio-workspace {
   overflow: hidden !important;
 }
 
-/* --- pagination/_overlay-pagination-fixes-06.scss --- */
+/* --- pagination/_overlay-pagination-06.scss --- */
 .app-container--actual-pc-runtime
   .chat-container-root--mode-studio
   .studio-workspace__scroll,
