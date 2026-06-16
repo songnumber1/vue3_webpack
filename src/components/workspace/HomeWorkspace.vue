@@ -15,11 +15,16 @@
     :suggestions="suggestions"
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
+    :composer-expanded="isMainPromptExpanded"
     @suggestion-click="handleSuggestionClick"
     @studio-detail="workspaceActions.openStudioDetail?.()"
   >
     <template #composer>
-      <PromptComposer ref="mainPromptInputRef" :class="mainPromptClass" />
+      <PromptComposer
+        ref="mainPromptInputRef"
+        :class="mainPromptClass"
+        @expanded-change="handleMainPromptExpandedChange"
+      />
     </template>
   </MainEmptyState>
 </template>
@@ -46,6 +51,7 @@ import {useMainPageLock} from "@/composables/main/useMainPageLock";
 import {useMainPromptState} from "@/composables/main/useMainPromptState";
 
 const mainPromptInputRef = ref(null);
+const isMainPromptExpanded = ref(false);
 const workspaceState = useChatWorkspaceStateContext();
 const workspaceActions = useWorkspaceActionsContext();
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
@@ -76,6 +82,10 @@ const mainPageActions = useMainPageActions({
 
 function handleSuggestionClick(item) {
   mainPageActions.applySuggestionToPrompt(item);
+}
+
+function handleMainPromptExpandedChange(expanded) {
+  isMainPromptExpanded.value = Boolean(expanded);
 }
 </script>
 

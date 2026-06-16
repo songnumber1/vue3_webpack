@@ -22,5 +22,7 @@ require('./overlay-scroll-container-static.cjs');
 require('./studio-create-overlay-container-static.cjs');
 require('./runtime-mode-helpers-static.cjs');
 require('./layout-mode-helpers-static.cjs');
+require('./main-empty-state-desktop-order-static.cjs');
+require('./prompt-submit-disabled-static.cjs');
 
 console.log('all regression checks passed');

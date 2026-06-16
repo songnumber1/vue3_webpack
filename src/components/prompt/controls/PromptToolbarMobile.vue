@@ -28,7 +28,11 @@
         </button>
       </div>
 
-      <div ref="toolRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
+      <div
+        v-if="!hideToolActions"
+        ref="toolRoot"
+        class="prompt-selector-wrap tw-relative tw-min-w-0"
+      >
         <button
           class="prompt-icon-action prompt-tool-mobile-trigger tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-transition"
           :class="{
@@ -55,6 +59,7 @@
       </div>
 
       <div
+        v-if="!hideAttachActions"
         ref="attachRoot"
         class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0"
       >
@@ -201,6 +206,15 @@ const props = reactive({
   get isMobileSheet() {
     return toolbarState.value.isMobileSheet;
   },
+  get hideToolActions() {
+    return toolbarState.value.hideToolActions;
+  },
+  get hideAttachActions() {
+    return toolbarState.value.hideAttachActions;
+  },
+  get hideVoiceAction() {
+    return toolbarState.value.hideVoiceAction;
+  },
   get canSubmit() {
     return toolbarState.value.canSubmit;
   },
@@ -248,6 +262,8 @@ const {
   toolMenuOpen,
   attachMenuOpen,
   selectedTemplateTool,
+  hideToolActions,
+  hideAttachActions,
   canSubmit,
   generating,
   isSpeechSupported,
@@ -274,6 +290,7 @@ const resolvedReadonlyTitle = computed(
 );
 const showVoiceStartButton = computed(
   () =>
+    !props.hideVoiceAction &&
     !props.generating &&
     props.isMicEnabled &&
     props.isSpeechSupported &&
@@ -281,7 +298,11 @@ const showVoiceStartButton = computed(
     !props.isVoiceListening
 );
 const showVoiceStopButton = computed(
-  () => !props.generating && props.isMicEnabled && props.isVoiceListening
+  () =>
+    !props.hideVoiceAction &&
+    !props.generating &&
+    props.isMicEnabled &&
+    props.isVoiceListening
 );
 
 defineExpose({modelRoot, toolRoot, attachRoot});

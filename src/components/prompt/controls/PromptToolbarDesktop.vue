@@ -20,7 +20,11 @@
         @select-model="$emit('select-model', $event)"
       />
 
-      <div ref="toolRoot" class="prompt-selector-wrap tw-relative tw-min-w-0">
+      <div
+        v-if="!hideToolActions"
+        ref="toolRoot"
+        class="prompt-selector-wrap tw-relative tw-min-w-0"
+      >
         <button
           v-if="!selectedTemplateTool"
           class="prompt-icon-action tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-transition"
@@ -154,6 +158,7 @@
       </div>
 
       <PromptAttachButton
+        v-if="!hideAttachActions"
         ref="attachButtonRef"
         :disabled="disabled"
         :attach-options="attachOptions"
@@ -313,6 +318,15 @@ const props = reactive({
   get isMobileSheet() {
     return toolbarState.value.isMobileSheet;
   },
+  get hideToolActions() {
+    return toolbarState.value.hideToolActions;
+  },
+  get hideAttachActions() {
+    return toolbarState.value.hideAttachActions;
+  },
+  get hideVoiceAction() {
+    return toolbarState.value.hideVoiceAction;
+  },
   get canSubmit() {
     return toolbarState.value.canSubmit;
   },
@@ -366,6 +380,8 @@ const {
   attachMenuOpen,
   isMobileSheet,
   selectedTemplateTool,
+  hideToolActions,
+  hideAttachActions,
   canSubmit,
   generating,
   isSpeechSupported,
@@ -413,6 +429,7 @@ const {
 
 const showVoiceStartButton = computed(
   () =>
+    !props.hideVoiceAction &&
     !props.generating &&
     props.isMicEnabled &&
     props.isSpeechSupported &&
@@ -420,7 +437,11 @@ const showVoiceStartButton = computed(
     !props.isVoiceListening
 );
 const showVoiceStopButton = computed(
-  () => !props.generating && props.isMicEnabled && props.isVoiceListening
+  () =>
+    !props.hideVoiceAction &&
+    !props.generating &&
+    props.isMicEnabled &&
+    props.isVoiceListening
 );
 
 function resolveSubmenuPlacement() {

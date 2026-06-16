@@ -42,6 +42,9 @@ export function usePromptComposer(props, emit) {
   const {t, locale} = useI18n();
   // 2. 외부 Props의 변경 사항을 하위 서브 훅들이 안전하게 반응형 추적할 수 있도록 `toRef` 단방향 참조 처리를 수행합니다.
   const disabled = toRef(props, "disabled");
+  const attachmentDisabled = computed(
+    () => Boolean(disabled.value || props.submitDisabled || props.hideAttachActions)
+  );
 
   // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 전역 채팅 Pinia 스토어를 로드합니다.
   const chatStore = useChatStore();
@@ -97,7 +100,7 @@ export function usePromptComposer(props, emit) {
     resize,
     getLastHeight,
     emit,
-    disabled,
+    disabled: attachmentDisabled,
     toggleMenu,
   });
 
@@ -176,7 +179,9 @@ export function usePromptComposer(props, emit) {
 
   /** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 useChatSubmit에서 generating으로 방어합니다. */
   const canSubmit = computed(
-    () => hasPromptText.value || attachments.value.length > 0
+    () =>
+      !props.submitDisabled &&
+      (hasPromptText.value || attachments.value.length > 0)
   );
 
   /**
@@ -277,6 +282,7 @@ export function usePromptComposer(props, emit) {
 
     // 텍스트 공백 상태 및 첨부파일이 전무하거나 컴포넌트 락(Lock) 상태라면 예외 처리로 전송을 거부합니다.
     if (
+      props.submitDisabled ||
       (!value && attachments.value.length === 0) ||
       props.disabled ||
       props.generating
@@ -319,6 +325,7 @@ export function usePromptComposer(props, emit) {
    * @param {ClipboardEvent} event - 브라우저 네이티브 클립보드 붙여넣기 이벤트 객체
    */
   function handlePaste(event) {
+    if (props.submitDisabled || props.hideAttachActions) return;
     // 텍스트 서브 모듈 유틸을 통해 클립보드 내 바이트 스트림 데이터(이미지 파일 등)를 먼저 확보합니다.
     const files = getRawPastedFiles(event);
     // 확보된 이미지나 스크린샷 캡처 파일 객체가 실재한다면 즉시 첨부 파일 업로드 큐에 가동 주입합니다.

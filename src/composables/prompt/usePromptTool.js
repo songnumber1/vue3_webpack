@@ -86,6 +86,7 @@ export function usePromptTool({
   // ── 📊 [동적/정적 확장 도구 통합 빌드 파이프라인] ──────────────────
   // 가상 돔 템플릿 뷰 영역이 복잡한 분기문 없이 v-for 단일 루프로 툴 목록을 매끄럽게 그릴 수 있도록 포맷을 표준화 매핑합니다.
   const tools = computed(() => {
+    if (props.hideToolActions) return [];
     const settings = chatStore.activePromptToolSettings;
     const modelId = props.modelValue || assistantStore.selectedModelId || "";
 
@@ -147,7 +148,7 @@ export function usePromptTool({
    * 유저가 툴바의 도구 설정 아이콘을 클릭했을 때 드롭다운/바텀시트 메뉴 서랍을 트리거합니다.
    */
   function openToolSelector() {
-    if (props.disabled) return;
+    if (props.disabled || props.submitDisabled || props.hideToolActions) return;
     syncViewportMode();
     toggleMenu(PROMPT_MENU_TYPE.tool);
   }
@@ -159,6 +160,7 @@ export function usePromptTool({
    * @param {Object} tool - 사용자가 제어 클릭한 대상 도구의 설정 유닛 스냅샷 데이터
    */
   function applyTool(tool) {
+    if (props.submitDisabled || props.hideToolActions) return;
     // 분기 1: 시스템 프롬프트 템플릿 카드(메일 작성 등)를 선택한 경우
     if (tool?.promptTemplateKey) {
       chatStore.setActivePromptTemplate(tool.id); // 전역 템플릿 아이디 수립 매핑

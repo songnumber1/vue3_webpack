@@ -4,6 +4,7 @@
     :class="{
       'empty-stage--mobile-main': isMobile,
       'main-empty-state--preview': preview,
+      'main-empty-state--composer-expanded': composerExpanded,
     }"
     style="display: flex"
   >
@@ -40,7 +41,7 @@
         v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
         :class="{
-          'main-empty-state__suggestions--desktop-list': !isMobile && !preview,
+          'main-empty-state__suggestions--desktop-list': !isMobile,
         }"
       >
         <button
@@ -83,6 +84,7 @@ const props = defineProps({
   isMobile: {type: Boolean, default: false},
   preview: {type: Boolean, default: false},
   disableInteractions: {type: Boolean, default: false},
+  composerExpanded: {type: Boolean, default: false},
   assistantIcon: {
     type: String,
     default: DEFAULT_ASSISTANT_IMAGE.Image48Src,
@@ -237,6 +239,96 @@ function handleSuggestionClick(item) {
   white-space: nowrap !important;
 }
 
+
+/*
+ * When the PC main composer is expanded, hide the surrounding empty-state
+ * content and let the input occupy the same vertical space including the
+ * suggestion area. This class-based fallback avoids relying only on :has().
+ */
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+) {
+  align-items: stretch !important;
+  justify-content: stretch !important;
+  padding: 16px 24px !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__center
+) {
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  justify-content: stretch !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  transform: none !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__logo
+),
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__title
+),
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__subtitle
+),
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__suggestions
+) {
+  display: none !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .desktop-center-prompt.prompt-wrap--expanded
+) {
+  order: 10 !important;
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+}
+
 /*
  * Mobile main composer owns a separate dock outside .empty-center.
  * This prevents the prompt from staying in the desktop empty-state flow when
@@ -322,11 +414,30 @@ function handleSuggestionClick(item) {
 }
 
 .main-empty-state--preview .main-empty-state__suggestions {
+  order: 20 !important;
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
   width: min(100%, 520px);
   margin: 8px auto 0;
 }
 
 .main-empty-state--preview .suggestion-chip {
+  width: 100% !important;
+  max-width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
   cursor: default;
+}
+
+.main-empty-state--preview .suggestion-chip-text {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 </style>

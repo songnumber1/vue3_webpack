@@ -142,6 +142,13 @@ import {
   providePromptToolbarState,
 } from "@/composables/chat/context/useChatProvider";
 
+const componentProps = defineProps({
+  submitDisabled: {type: Boolean, default: false},
+  hideToolActions: {type: Boolean, default: false},
+  hideAttachActions: {type: Boolean, default: false},
+  hideVoiceAction: {type: Boolean, default: false},
+});
+
 const promptState = usePromptStateContext();
 const workspaceActions = useWorkspaceActionsContext();
 const props = reactive({
@@ -150,6 +157,18 @@ const props = reactive({
   },
   get generating() {
     return promptState.value.generating;
+  },
+  get submitDisabled() {
+    return componentProps.submitDisabled;
+  },
+  get hideToolActions() {
+    return componentProps.hideToolActions;
+  },
+  get hideAttachActions() {
+    return componentProps.hideAttachActions;
+  },
+  get hideVoiceAction() {
+    return componentProps.hideVoiceAction;
   },
   get floating() {
     return promptState.value.floating;
@@ -175,8 +194,18 @@ const emit = defineEmits(["blur", "expanded-change"]);
 
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
+    if (componentProps.submitDisabled) return;
     workspaceActions.submit(payload);
     return;
+  }
+  if (eventName === "open-tool" || eventName === "apply-tool") {
+    if (componentProps.hideToolActions) return;
+  }
+  if (eventName === "open-attach" || eventName === "open-file-picker") {
+    if (componentProps.hideAttachActions) return;
+  }
+  if (eventName === "start-voice" || eventName === "stop-voice") {
+    if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
     workspaceActions.updateSelectedModel(payload);
@@ -307,6 +336,9 @@ providePromptToolbarState(
     isMobileSheet: isMobileSheet.value,
     canSubmit: canSubmit.value,
     hasPromptText: hasPromptText.value,
+    hideToolActions: componentProps.hideToolActions,
+    hideAttachActions: componentProps.hideAttachActions,
+    hideVoiceAction: componentProps.hideVoiceAction,
     isMicEnabled: isMicEnabled.value,
     isVoiceListening: isVoiceListening.value,
     hasVoiceStopped: hasVoiceStopped.value,
