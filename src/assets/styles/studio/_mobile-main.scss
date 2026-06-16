@@ -1,6 +1,9 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
+/* -----------------------------------------------------------------------------
+   Mobile Studio list shell and action entry
+----------------------------------------------------------------------------- */
 /* --- mobile/_mobile-main-01.scss --- */
 .studio-pagination {
   max-width: 980px;
@@ -152,6 +155,9 @@ body.mobile-mode .chat-container-root--mode-studio .studio-card {
   box-sizing: border-box;
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile category picker bottom sheet
+----------------------------------------------------------------------------- */
 /* Category selector is a bottom sheet on mobile. */
 body.mobile-mode .chat-container-root--mode-studio .studio-picker-backdrop {
   align-items: flex-end;
@@ -169,6 +175,9 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--category {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile Studio sheet and pagination guards
+----------------------------------------------------------------------------- */
 /* Studio mobile bug fixes: keep PC unchanged and align mobile with existing sheet/list behavior. */
 body.mobile-mode .chat-container-root--mode-studio .studio-workspace {
   height: 100%;
@@ -351,6 +360,9 @@ body.mobile-mode
   line-height: 1.35;
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile detail page and Android clipping guards
+----------------------------------------------------------------------------- */
 /* Final mobile Studio fixes: reuse shared BaseBottomSheet, prevent Android clipping, and align detail page with notice overlay pages. */
 body.mobile-mode .studio-category-bottom-sheet.bottom-sheet,
 body.mobile-mode .studio-category-bottom-sheet.app-bottom-sheet-panel {
@@ -492,6 +504,9 @@ body.mobile-mode
   padding: 0;
 }
 
+/* -----------------------------------------------------------------------------
+   Final mobile Studio alignment and scroll parity
+----------------------------------------------------------------------------- */
 /* Studio mobile final fixes: category sheet alignment, detail-page header ownership, and Android scroll parity. */
 body.mobile-mode .studio-category-bottom-sheet .studio-category-sheet-option {
   width: 100%;

@@ -1,6 +1,9 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
+/* -----------------------------------------------------------------------------
+   Shared create controls and desktop preview
+----------------------------------------------------------------------------- */
 /* --- create/_create-responsive-01.scss --- */
 /* Studio create final responsive polish: PC preview suppression, mobile icon toolbar, keyboard-safe scrolling. */
 .studio-icon--back {
@@ -147,6 +150,9 @@ body.desktop-mode .studio-create-page .studio-prompt-grid--preview:empty {
   display: none;
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile create layout and safe-area guards
+----------------------------------------------------------------------------- */
 /* --- mobile/_create-responsive-06.scss --- */
 
 body.mobile-mode .chat-container-root--mode-studio .studio-create-panel__head {
@@ -227,6 +233,9 @@ body.mobile-mode
   height: 17px;
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile tab and content scroll guards
+----------------------------------------------------------------------------- */
 /* Step 5-7 hotfix: mobile Assistant create tabs/content scroll parity.
    Keep tab header as a tab strip with a single bottom border and make the
    tab content scroll through OverlayScrollbars on the layout container. */
@@ -361,6 +370,9 @@ body.mobile-mode
   );
 }
 
+/* -----------------------------------------------------------------------------
+   Desktop preview and Android keyboard stability guards
+----------------------------------------------------------------------------- */
 /* Targeted fix: keep Studio create preview visible on desktop and make Android keyboard focus stable. */
 
 body.mobile-mode
@@ -471,6 +483,9 @@ body.mobile-mode
   ) !important;
 }
 
+/* -----------------------------------------------------------------------------
+   Create/detail control normalization
+----------------------------------------------------------------------------- */
 /* --- create/_create-responsive-07.scss --- */
 /* Studio targeted UI polish: keep existing layouts, only normalize create/detail controls. */
 .studio-button--primary:hover,
@@ -489,6 +504,9 @@ body.mobile-mode
 
 /* --- mobile/_create-responsive-08.scss --- */
 
+/* -----------------------------------------------------------------------------
+   Mobile scroll and focus stability guards
+----------------------------------------------------------------------------- */
 /* Step 5-8 mobile scroll/focus hotfix: keep the create header and tab strip
    outside of the scrollable region. Only the active tab content scrolls. */
 body.mobile-mode .chat-container-root--mode-studio .studio-create-layout,
@@ -587,6 +605,9 @@ body.mobile-mode
   ) !important;
 }
 
+/* -----------------------------------------------------------------------------
+   Final tab header and textarea paint guards
+----------------------------------------------------------------------------- */
 /* Studio create scroll/focus correction: keep both PC and mobile tab headers out of the scroll container.
    Only the active tab content scrolls; this also keeps Android textarea focus behavior consistent. */
 body.desktop-mode .studio-create-page .studio-create-form {

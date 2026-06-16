@@ -1,6 +1,9 @@
 /* Consolidated from Step 7-C split files.
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
+/* -----------------------------------------------------------------------------
+   Multi-select panel density
+----------------------------------------------------------------------------- */
 /* --- authority/_create-polish-01.scss --- */
 /* Studio create UI/UX alignment: compact multi-select rows, stable mobile sheets, and authority grids. */
 body.desktop-mode .studio-create-page .studio-multi-select__panel {
@@ -105,6 +108,9 @@ body.mobile-mode
   padding: 10px 0 0 !important;
 }
 
+/* -----------------------------------------------------------------------------
+   Authority picker grid and controls
+----------------------------------------------------------------------------- */
 /* --- authority/_create-polish-04.scss --- */
 body.desktop-mode .studio-picker--authority {
   width: min(620px, calc(100vw - 48px));
@@ -151,6 +157,9 @@ body.desktop-mode .studio-picker--authority {
   background: color-mix(in srgb, var(--studio-primary-soft) 28%, transparent);
 }
 
+/* -----------------------------------------------------------------------------
+   Picker overlay controls
+----------------------------------------------------------------------------- */
 /* --- overlay/_create-polish-05.scss --- */
 .studio-picker__close {
   width: 38px;
@@ -237,6 +246,9 @@ body.mobile-mode
   padding: 10px 12px;
 }
 
+/* -----------------------------------------------------------------------------
+   Desktop create form alignment
+----------------------------------------------------------------------------- */
 /* Studio create final alignment pass: normalize feature/share tabs with existing project rhythm. */
 body.desktop-mode .studio-create-page .studio-model-fieldset,
 body.mobile-mode .chat-container-root--mode-studio .studio-model-fieldset,
@@ -413,6 +425,9 @@ body.mobile-mode
   font-weight: 800;
 }
 
+/* -----------------------------------------------------------------------------
+   Mobile bottom-sheet option alignment
+----------------------------------------------------------------------------- */
 /* RAG/MCP BaseBottomSheet: match model sheet spacing, left alignment, and readable type scale. */
 body.mobile-mode .studio-multi-select-bottom-sheet.bottom-sheet,
 body.mobile-mode .studio-multi-select-bottom-sheet.app-bottom-sheet-panel {
@@ -600,6 +615,9 @@ body.desktop-mode
   justify-content: center;
 }
 
+/* -----------------------------------------------------------------------------
+   Pagination and final create-page polish
+----------------------------------------------------------------------------- */
 /* --- pagination/_create-polish-10.scss --- */
 body.desktop-mode .studio-picker--authority .studio-authority-pagination {
   padding: 0 16px 16px;

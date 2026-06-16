@@ -21,6 +21,10 @@ import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
 import {i18n} from "@/i18n";
 
+// -----------------------------------------------------------------------------
+// Sanitizer schema
+// -----------------------------------------------------------------------------
+
 const COMMON_SAFE_ATTRIBUTES = [
   "ariaDescribedBy",
   "ariaHidden",
@@ -101,6 +105,10 @@ const markdownSanitizeSchema = {
   },
 };
 
+// -----------------------------------------------------------------------------
+// Text and localization helpers
+// -----------------------------------------------------------------------------
+
 /**
  * [Markdown render pipeline]
  * assistant message content를 HTML로 변환합니다.
@@ -119,9 +127,6 @@ function textContent(node) {
 
   return node.children.map(textContent).join("");
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function mdLabel(key) {
   return i18n.global.t(key);
 }
@@ -129,6 +134,10 @@ function mdLabel(key) {
  * rehype tree에 삽입할 table toolbar 버튼 node를 생성합니다.
  * 실제 copy/csv 동작은 렌더 후 DOM event 위임에서 처리됩니다.
  */
+// -----------------------------------------------------------------------------
+// Toolbar AST node factories
+// -----------------------------------------------------------------------------
+
 function tableActionButton(action, label) {
   return {
     type: "element",
@@ -162,9 +171,6 @@ function tableActionButton(action, label) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function svgElement(children) {
   return {
     type: "element",
@@ -184,9 +190,6 @@ function svgElement(children) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function svgPath(d) {
   return {
     type: "element",
@@ -196,9 +199,6 @@ function svgPath(d) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function svgLine(x1, y1, x2, y2) {
   return {
     type: "element",
@@ -208,9 +208,6 @@ function svgLine(x1, y1, x2, y2) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function svgPolyline(points) {
   return {
     type: "element",
@@ -220,9 +217,6 @@ function svgPolyline(points) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function svgRect(x, y, width, height, rx = "2") {
   return {
     type: "element",
@@ -232,9 +226,6 @@ function svgRect(x, y, width, height, rx = "2") {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function mermaidIcon(action) {
   const icons = {
     copy: svgElement([
@@ -319,6 +310,10 @@ function codeActionButton(action, label) {
   };
 }
 
+// -----------------------------------------------------------------------------
+// Rehype transforms
+// -----------------------------------------------------------------------------
+
 /**
  * table을 toolbar + scroll wrapper가 있는 카드 구조로 변환합니다.
  * CSV 다운로드/복사 버튼을 붙이기 위해 원본 table node를 md-table-card 안으로 감쌉니다.
@@ -372,9 +367,6 @@ function rehypeTableWrapper() {
  *
  * renderMermaid=false일 때는 이 변환을 건너뛰고 mermaid 코드를 일반 코드 블록으로 유지합니다.
  * renderMermaid=true이면 답변 완료 후 renderMermaidInElement가 data-mermaid-pending 노드를 실제 SVG로 렌더합니다.
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function rehypeMermaidBlock({showMermaidHeader = true} = {}) {
   return (tree) => {
@@ -440,9 +432,6 @@ function rehypeMermaidBlock({showMermaidHeader = true} = {}) {
   };
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function detectCodeLanguage(codeNode) {
   const classNames = codeNode?.properties?.className || [];
   const languageClass = classNames.find((item) =>
@@ -510,14 +499,15 @@ function rehypeCodeBlockWrapper() {
   };
 }
 
+// -----------------------------------------------------------------------------
+// Processor factory
+// -----------------------------------------------------------------------------
+
 /**
  * Markdown processor를 생성합니다.
  *
  * renderMermaid=false는 SSE streaming 중이거나 시스템 설정에서 Mermaid 렌더링을 끈 경우 사용됩니다.
  * Mermaid 변환을 생략하면 mermaid 코드 블록은 일반 코드 카드로 표시됩니다.
- */
-/**
- * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
 function createProcessor({
   renderMermaid = true,
@@ -548,6 +538,10 @@ function createProcessor({
     .use(rehypeStringify);
 }
 
+// -----------------------------------------------------------------------------
+// Processor instances
+// -----------------------------------------------------------------------------
+
 const defaultProcessor = createProcessor({
   renderMermaid: true,
   showMermaidHeader: true,
@@ -557,6 +551,10 @@ const noMermaidHeaderProcessor = createProcessor({
   showMermaidHeader: false,
 });
 const noMermaidProcessor = createProcessor({renderMermaid: false});
+
+// -----------------------------------------------------------------------------
+// Public API
+// -----------------------------------------------------------------------------
 
 /**
  * assistant/user message content를 HTML 문자열로 변환합니다.

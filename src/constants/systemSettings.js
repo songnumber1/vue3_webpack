@@ -7,6 +7,10 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+// -----------------------------------------------------------------------------
+// Responsive breakpoint ranges
+// -----------------------------------------------------------------------------
+
 // PC에서도 모바일 화면을 검증할 수 있도록 시스템 기본 반응형 전환 기준은 1400px로 둡니다.
 const RAW_DEFAULT_MOBILE_BREAKPOINT_PX = Number(
   process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT
@@ -39,6 +43,10 @@ export const MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT = 200;
 
 // PC 브라우저에서 Android 강제 플랫폼을 선택하면 모바일 레이아웃을 즉시 확인할 수 있도록 사용하는 전환 기준입니다.
 export const FORCED_MOBILE_PLATFORM_BREAKPOINT_PX = 8888;
+
+// -----------------------------------------------------------------------------
+// Runtime mode options
+// -----------------------------------------------------------------------------
 
 /**
  * 모바일 가상 키보드가 전격 팝업될 때 화면 뷰포트를 어떤 레이아웃 공식으로 반응형 밀어내기 처리할지 규정하는 불변 모드 상수입니다.
@@ -86,9 +94,9 @@ function normalizeAuthMode(value, fallback) {
   return AUTH_MODE_OPTIONS.includes(value) ? value : fallback;
 }
 
-/**
- * 플랫폼 오버라이드 셀렉터 컴포넌트 데이터 하이드레이션 딕셔너리 배열입니다.
- */
+// -----------------------------------------------------------------------------
+// Environment value readers
+// -----------------------------------------------------------------------------
 
 /**
  * @description Vue CLI 환경 변수 문자열을 불리언 값으로 안전하게 변환합니다.
@@ -126,6 +134,10 @@ function readStringEnv(value, fallback) {
   return String(value);
 }
 
+// -----------------------------------------------------------------------------
+// Select option metadata
+// -----------------------------------------------------------------------------
+
 export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
   {
     value: PLATFORM_OVERRIDE_MODES.auto,
@@ -145,6 +157,10 @@ export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
       "웹 브라우저에서도 Android WebView 유사 분기를 적용합니다. Native Bridge는 실제 앱에서만 호출됩니다.",
   },
 ]);
+
+// -----------------------------------------------------------------------------
+// Setting keys
+// -----------------------------------------------------------------------------
 
 /**
  * 전체 로컬 스토리지 데이터 적재 및 API 패킷 직렬화 매핑 시 오타로 인한 런타임 참사를 차단하기 위해 유일 출처로 정의된 키 상수의 묶음 집합입니다.
@@ -196,6 +212,10 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   jwtRefreshUrl: "jwtRefreshUrl", // JWT access token 재발급 URL
   jwtWithCredentials: "jwtWithCredentials", // JWT 모드에서도 쿠키 credential을 함께 보낼지 여부
 });
+
+// -----------------------------------------------------------------------------
+// Default settings
+// -----------------------------------------------------------------------------
 
 /**
  * 인앱 대시보드 저장소에 아무런 데이터 설정 메타 정보가 매핑되지 않았을 때 수립되는 절대 보정 디폴트 기준 데이터 테이블 세트입니다.
@@ -383,6 +403,42 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
   ),
 });
 
+// -----------------------------------------------------------------------------
+// Normalization lookup tables
+// -----------------------------------------------------------------------------
+
+const STRING_URL_SETTING_KEYS = Object.freeze([
+  SYSTEM_SETTING_KEYS.webLoginUrl,
+  SYSTEM_SETTING_KEYS.mobileLoginUrl,
+  SYSTEM_SETTING_KEYS.tempLoginUrl,
+  SYSTEM_SETTING_KEYS.accessInfoUrl,
+  SYSTEM_SETTING_KEYS.logoutUrl,
+  SYSTEM_SETTING_KEYS.jwtRefreshUrl,
+]);
+
+const HISTORY_LAZY_COUNT_RANGES = Object.freeze({
+  [SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount]: [
+    MIN_PC_HISTORY_LAZY_INITIAL_COUNT,
+    MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
+  ],
+  [SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount]: [
+    MIN_PC_HISTORY_LAZY_APPEND_COUNT,
+    MAX_PC_HISTORY_LAZY_APPEND_COUNT,
+  ],
+  [SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount]: [
+    MIN_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
+    MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
+  ],
+  [SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount]: [
+    MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT,
+    MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT,
+  ],
+});
+
+// -----------------------------------------------------------------------------
+// Setting normalizers
+// -----------------------------------------------------------------------------
+
 /**
  * 외부 입력 또는 API 응답을 내부 화면 모델에 맞게 정규화합니다.
  */
@@ -512,16 +568,7 @@ export function normalizeSystemSettings(value = {}) {
       return;
     }
 
-    if (
-      [
-        SYSTEM_SETTING_KEYS.webLoginUrl,
-        SYSTEM_SETTING_KEYS.mobileLoginUrl,
-        SYSTEM_SETTING_KEYS.tempLoginUrl,
-        SYSTEM_SETTING_KEYS.accessInfoUrl,
-        SYSTEM_SETTING_KEYS.logoutUrl,
-        SYSTEM_SETTING_KEYS.jwtRefreshUrl,
-      ].includes(key)
-    ) {
+    if (STRING_URL_SETTING_KEYS.includes(key)) {
       next[key] = readStringEnv(source[key], DEFAULT_SYSTEM_SETTINGS[key]);
       return;
     }
@@ -582,24 +629,7 @@ export function normalizeSystemSettings(value = {}) {
       key === SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount
     ) {
       const numeric = Number(source[key]);
-      const range = {
-        [SYSTEM_SETTING_KEYS.pcHistoryLazyInitialCount]: [
-          MIN_PC_HISTORY_LAZY_INITIAL_COUNT,
-          MAX_PC_HISTORY_LAZY_INITIAL_COUNT,
-        ],
-        [SYSTEM_SETTING_KEYS.pcHistoryLazyAppendCount]: [
-          MIN_PC_HISTORY_LAZY_APPEND_COUNT,
-          MAX_PC_HISTORY_LAZY_APPEND_COUNT,
-        ],
-        [SYSTEM_SETTING_KEYS.mobileHistoryLazyInitialCount]: [
-          MIN_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
-          MAX_MOBILE_HISTORY_LAZY_INITIAL_COUNT,
-        ],
-        [SYSTEM_SETTING_KEYS.mobileHistoryLazyAppendCount]: [
-          MIN_MOBILE_HISTORY_LAZY_APPEND_COUNT,
-          MAX_MOBILE_HISTORY_LAZY_APPEND_COUNT,
-        ],
-      }[key];
+      const range = HISTORY_LAZY_COUNT_RANGES[key];
       next[key] = Number.isFinite(numeric)
         ? Math.min(Math.max(Math.round(numeric), range[0]), range[1])
         : DEFAULT_SYSTEM_SETTINGS[key];

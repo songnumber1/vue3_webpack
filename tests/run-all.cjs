@@ -35,5 +35,8 @@ require('./hidden-url-comments-static.cjs');
 require('./renamed-scss-files-static.cjs');
 require('./large-file-internal-structure-static.cjs');
 require('./overlay-layout-tokens-static.cjs');
+require('./system-settings-structure-static.cjs');
+require('./studio-scss-internal-structure-static.cjs');
+require('./markdown-mermaid-internal-structure-static.cjs');
 
 console.log("all regression checks passed");

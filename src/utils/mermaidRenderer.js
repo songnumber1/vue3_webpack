@@ -11,10 +11,18 @@ import mermaid from "mermaid";
 import {logWarn} from "@/utils/logger";
 import {destroyOverlayScrollbar} from "@/platform/scroll/overlayScrollbarController";
 
+// -----------------------------------------------------------------------------
+// Render constants
+// -----------------------------------------------------------------------------
+
 const DEFAULT_MERMAID_RENDER_RETRY_COUNT = 0;
 const DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP = 1;
 const MERMAID_FONT_STACK =
   '"Roboto", "Noto Sans KR", Inter, ui-sans-serif, system-ui, Arial, sans-serif';
+
+// -----------------------------------------------------------------------------
+// Runtime and frame helpers
+// -----------------------------------------------------------------------------
 
 function isAndroidMermaidRuntime() {
   if (
@@ -57,6 +65,10 @@ function waitAnimationFrames(frameCount = 1) {
     window.requestAnimationFrame(step);
   });
 }
+
+// -----------------------------------------------------------------------------
+// Mermaid configuration
+// -----------------------------------------------------------------------------
 
 /**
  * [Mermaid 후처리 렌더러]
@@ -188,8 +200,12 @@ async function ensureMermaid() {
   return mermaid;
 }
 
+// -----------------------------------------------------------------------------
+// Mermaid target state and source helpers
+// -----------------------------------------------------------------------------
+
 /**
- * 현재 runtime, route, 설정 값에 따라 사용할 값을 결정합니다.
+ * mermaid render target이 속한 카드 wrapper를 찾습니다.
  */
 function resolveMermaidCard(target) {
   return target?.closest?.(".md-mermaid-card") || null;
@@ -249,6 +265,10 @@ function showMermaidSourceAsCode(target, source = getMermaidSource(target)) {
   markMermaidCardState(target, "error");
 }
 
+// -----------------------------------------------------------------------------
+// Mermaid validation helpers
+// -----------------------------------------------------------------------------
+
 function createMermaidRenderId() {
   const random = Math.random().toString(36).slice(2);
   return `ds-mermaid-${Date.now()}-${random}`;
@@ -282,6 +302,10 @@ async function isMermaidSourceRenderable(mermaid, source) {
     return false;
   }
 }
+
+// -----------------------------------------------------------------------------
+// SVG normalization helpers
+// -----------------------------------------------------------------------------
 
 function parseSvgNumber(value) {
   const match = String(value || "").match(/-?\d+(?:\.\d+)?/);
@@ -411,6 +435,10 @@ function applyMermaidSvgTextGuards(target) {
   normalizeMermaidSvgBounds(target);
 }
 
+// -----------------------------------------------------------------------------
+// Single target render flow
+// -----------------------------------------------------------------------------
+
 async function renderMermaidTargetWithRenderApi(mermaid, target) {
   if (!mermaid?.render || !target?.isConnected) return false;
 
@@ -476,6 +504,10 @@ async function renderMermaidTargetWithRetries(mermaid, target, options = {}) {
 
   return false;
 }
+
+// -----------------------------------------------------------------------------
+// Batch render flow
+// -----------------------------------------------------------------------------
 
 async function renderMermaidTargetsWithRenderApi(
   mermaid,
@@ -579,6 +611,10 @@ async function renderMermaidTargets(root, options = {}) {
 
   await renderMermaidTargetsWithRenderApi(mermaid, liveTargets, options);
 }
+
+// -----------------------------------------------------------------------------
+// Public API
+// -----------------------------------------------------------------------------
 
 export function fallbackPendingMermaidToCode(root) {
   if (!root) return;
