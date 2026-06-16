@@ -619,9 +619,9 @@ body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea {
   resize: none !important;
 }
 
-/* Android textarea keyboard stability: keep native textarea painting predictable.
-   The Studio create page does not run custom VisualViewport scrolling for textarea
-   focus; these guards prevent Chrome/WebView from drawing a native black outline
+/* Android textarea keyboard stability: keep textarea painting predictable.
+   Studio create keyboard correction is now owned by OverlayScrollContainer;
+   these guards prevent Chrome/WebView from drawing a native black outline
    or changing textarea box metrics when the keyboard opens. */
 body.mobile-mode .chat-container-root--mode-studio .studio-form-stack textarea {
   display: block !important;

@@ -9,7 +9,7 @@ import {
   getOverlayScrollbarViewport,
   initOverlayScrollbar,
   updateOverlayScrollbar,
-} from "@/utils/overlayScrollbar";
+} from "@/platform/scroll/overlayScrollbarController";
 
 export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   let instance = null;

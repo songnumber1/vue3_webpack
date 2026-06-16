@@ -9,7 +9,7 @@
 
 import mermaid from "mermaid";
 import {logWarn} from "@/utils/logger";
-import {destroyOverlayScrollbar} from "@/utils/overlayScrollbar";
+import {destroyOverlayScrollbar} from "@/platform/scroll/overlayScrollbarController";
 
 const DEFAULT_MERMAID_RENDER_RETRY_COUNT = 0;
 const DEFAULT_MERMAID_RENDER_RETRY_FRAME_GAP = 1;

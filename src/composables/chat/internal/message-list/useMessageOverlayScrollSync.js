@@ -3,7 +3,7 @@ import {
   getOverlayScrollbarViewport,
   initOverlayScrollbar,
   updateOverlayScrollbar,
-} from "@/utils/overlayScrollbar";
+} from "@/platform/scroll/overlayScrollbarController";
 
 export function createMessageOverlayScrollSyncController({
   scrollRef,

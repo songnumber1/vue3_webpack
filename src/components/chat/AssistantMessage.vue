@@ -81,7 +81,7 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {
   destroyMarkdownScrollbars,
   enhanceMarkdownScrollbars,
-} from "@/utils/overlayScrollbar";
+} from "@/platform/scroll/overlayScrollbarController";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";

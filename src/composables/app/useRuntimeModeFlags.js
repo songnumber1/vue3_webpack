@@ -11,22 +11,16 @@ import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useViewportStore} from "@/stores/viewportStore";
-
-/**
- * HTML의 `<body>` 태그가 모바일 클래스(`mobile-mode`)를 가지고 있는지 직접 판별합니다.
- * @returns {boolean} body 태그에 모바일 모드 클래스가 포함되어 있다면 true, 아니면 false
- * @see {@link installViewportModeClass} 최상단 진입점에서 전역 클래스를 주입하는 유틸리티
- */
-/**
- * 현재 상태가 특정 조건을 만족하는지 판단합니다.
- */
-function hasBodyMobileMode() {
-  // 브라우저 런타임 환경(document 객체가 존재)이면서, body 객체의 classList 배열 내에 'mobile-mode'가 존재하는지 검사합니다.
-  return (
-    typeof document !== "undefined" &&
-    document.body?.classList?.contains("mobile-mode")
-  );
-}
+import {
+  isActualAndroidRuntimeInfo,
+  isActualAndroidWebViewRuntimeInfo,
+} from "@/platform/runtime/runtimeModeHelpers";
+import {
+  hasBodyMobileLayoutMode,
+  resolveCompactViewportFlag,
+  resolveLayoutMode,
+  shouldUseMobileLayoutForFlags,
+} from "@/platform/layout/layoutModeHelpers";
 
 /**
  * 플랫폼 환경 상태 스토어 및 뷰포트 상태 스토어를 결합하여 현재 기기 조건에 알맞은 다양한 레이아웃/런타임 반응형 플래그들을 제공합니다.
@@ -57,8 +51,11 @@ export function useRuntimeModeFlags() {
    * @type {import("vue").ComputedRef<boolean>}
    */
   const isCompactViewport = computed(() =>
-    // 뷰포트 스토어 기준 컴팩트 해상도이거나, DOM 바디의 클래스 조건이 참인 경우를 단언(Boolean)하여 캐싱합니다.
-    Boolean(viewportStore.isCompact || hasBodyMobileMode())
+    // 뷰포트 스토어 기준 컴팩트 해상도이거나, DOM 바디의 클래스 조건이 참인 경우를 helper에서 결합합니다.
+    resolveCompactViewportFlag({
+      isCompactViewport: viewportStore.isCompact,
+      hasBodyMobileMode: hasBodyMobileLayoutMode(),
+    })
   );
 
   /**
@@ -80,6 +77,22 @@ export function useRuntimeModeFlags() {
   const isAndroidApp = computed(() => Boolean(platformInfo.value.isAndroidApp));
 
   /**
+   * 실제 Android 런타임 여부를 화면 크기와 분리하여 제공합니다.
+   * @type {import("vue").ComputedRef<boolean>}
+   */
+  const isActualAndroidRuntime = computed(() =>
+    isActualAndroidRuntimeInfo(platformInfo.value)
+  );
+
+  /**
+   * 실제 Android WebView/App 런타임 여부를 화면 크기와 분리하여 제공합니다.
+   * @type {import("vue").ComputedRef<boolean>}
+   */
+  const isActualAndroidWebViewRuntime = computed(() =>
+    isActualAndroidWebViewRuntimeInfo(platformInfo.value)
+  );
+
+  /**
    * 네이티브 앱이 아닌, 모바일 기기의 지원 대상 Chrome 브라우저 환경인지 판별합니다.
    * 플랫폼 강제 설정은 런타임 테스트용으로만 사용하고, 레이아웃 전환은 실제 뷰포트/실제 모바일 런타임 기준을 따릅니다.
    * @type {import("vue").ComputedRef<boolean>}
@@ -89,7 +102,8 @@ export function useRuntimeModeFlags() {
     const info = platformInfo.value;
     if (!info.isPlatformForced) return Boolean(info.isMobileBrowser);
     return Boolean(
-      info.actualEnv === "android" && info.actualRuntime !== "native"
+      isActualAndroidRuntimeInfo(info) &&
+      !isActualAndroidWebViewRuntimeInfo(info)
     );
   });
 
@@ -99,14 +113,25 @@ export function useRuntimeModeFlags() {
    * @type {import("vue").ComputedRef<boolean>}
    */
   const shouldUseMobileLayout = computed(() =>
-    // 반응형 변수들의 내부 프리미티브 값을 추출(.value)하여 결합 연산을 진행합니다.
-    Boolean(
-      isCompactViewport.value ||
-      isAndroidApp.value ||
-      isMobileBrowser.value ||
-      platformInfo.value.isAndroidWebView
-    )
+    // 반응형 변수들의 내부 프리미티브 값을 helper에 전달해 모바일 레이아웃 채택 여부를 계산합니다.
+    shouldUseMobileLayoutForFlags({
+      isCompactViewport: isCompactViewport.value,
+      isAndroidApp: isAndroidApp.value,
+      isMobileBrowser: isMobileBrowser.value,
+      isAndroidWebView: platformInfo.value.isAndroidWebView,
+    })
   );
+
+  /**
+   * 현재 레이아웃 모드를 문자열로 제공합니다.
+   * @type {import("vue").ComputedRef<"mobile"|"desktop">}
+   */
+  const layoutMode = computed(() =>
+    resolveLayoutMode({shouldUseMobileLayout: shouldUseMobileLayout.value})
+  );
+
+  const isMobileLayout = computed(() => layoutMode.value === "mobile");
+  const isDesktopLayout = computed(() => layoutMode.value === "desktop");
 
   // 컴포넌트 내부의 <template> 또는 script 블록에서 유연하게 반응형 비즈니스 분기를 할 수 있도록 플래그 셋을 최종 반환합니다.
   return {
@@ -114,7 +139,12 @@ export function useRuntimeModeFlags() {
     isCompactViewport,
     isNativeRuntime,
     isAndroidApp,
+    isActualAndroidRuntime,
+    isActualAndroidWebViewRuntime,
     isMobileBrowser,
     shouldUseMobileLayout,
+    layoutMode,
+    isMobileLayout,
+    isDesktopLayout,
   };
 }

@@ -1,0 +1,54 @@
+/*
+ * OverlayScrollContainer runtime cascade.
+ *
+ * This file is intentionally imported last.  Earlier page/component SCSS can
+ * still own visual layout, but the shared OverlayScrollContainer must keep one
+ * predictable OverlayScrollbars viewport for Android keyboard correction.
+ */
+.overlay-scroll-container {
+  min-width: 0;
+  min-height: 0;
+}
+
+.overlay-scroll-container[data-overlayscrollbars-initialize],
+.overlay-scroll-container[data-overlay-scrollbar-enhanced="true"] {
+  overflow: hidden !important;
+}
+
+.overlay-scroll-container [data-overlayscrollbars-viewport] {
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
+
+body.overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"],
+.app-container--overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"] {
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+}
+
+body.actual-android-runtime.overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"]
+  [data-overlayscrollbars-viewport],
+.app-container--actual-android-runtime.app-container--overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"]
+  [data-overlayscrollbars-viewport] {
+  overscroll-behavior: contain !important;
+  -webkit-overflow-scrolling: touch;
+  scroll-padding-top: 14px;
+  scroll-padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}
+
+body.actual-android-runtime.overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"]
+  textarea,
+body.actual-android-runtime.overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"]
+  input,
+body.actual-android-runtime.overlay-scroll-runtime
+  .overlay-scroll-container[data-keyboard-aware="true"]
+  select {
+  scroll-margin-top: 14px;
+  scroll-margin-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+}

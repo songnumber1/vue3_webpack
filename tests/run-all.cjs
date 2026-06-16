@@ -15,5 +15,12 @@ require('./chat-data-controller-static.cjs');
 require('./chat-container-static.cjs');
 require('./chat-public-entrypoints-static.cjs');
 require('./chat-message-list-scroll-static.cjs');
+require('./overlay-scroll-policy-static.cjs');
+require('./overlay-scrollbar-controller-static.cjs');
+require('./overlay-keyboard-controller-static.cjs');
+require('./overlay-scroll-container-static.cjs');
+require('./studio-create-overlay-container-static.cjs');
+require('./runtime-mode-helpers-static.cjs');
+require('./layout-mode-helpers-static.cjs');
 
 console.log('all regression checks passed');
