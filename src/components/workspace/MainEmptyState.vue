@@ -35,9 +35,13 @@
       >
         {{ subtitle }}
       </p>
+      <slot v-if="!isMobile" name="composer"></slot>
       <div
         v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
+        :class="{
+          'main-empty-state__suggestions--desktop-list': !isMobile && !preview,
+        }"
       >
         <button
           v-for="item in normalizedSuggestions"
@@ -52,7 +56,6 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
-      <slot v-if="!isMobile" name="composer"></slot>
     </div>
     <div
       v-if="isMobile"
@@ -151,6 +154,87 @@ function handleSuggestionClick(item) {
 .studio-detail-trigger:disabled {
   cursor: not-allowed;
   opacity: 0.45;
+}
+
+/*
+ * Desktop main page order is title -> composer -> suggestions.
+ * Keep this selector global and restricted to the real main route so global
+ * suggestion-row grid rules and Studio preview styles cannot move the prompt
+ * suggestions back above the composer.
+ */
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__center
+) {
+  align-items: center !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .desktop-center-prompt
+) {
+  order: 10 !important;
+  width: min(var(--layout-prompt-width, 820px), 100%) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__suggestions--desktop-list
+) {
+  order: 20 !important;
+  display: flex !important;
+  grid-template-columns: none !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  width: min(var(--layout-prompt-width, 820px), 100%) !important;
+  max-width: var(--layout-prompt-width, 820px) !important;
+  margin-top: 4px !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__suggestions--desktop-list
+    .suggestion-chip
+) {
+  width: 100% !important;
+  max-width: 100% !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+:global(
+  body.desktop-mode
+    .chat-container-root--mode-main
+    .main-empty-state:not(.main-empty-state--preview):not(
+      .empty-stage--mobile-main
+    )
+    .main-empty-state__suggestions--desktop-list
+    .suggestion-chip-text
+) {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 /*
