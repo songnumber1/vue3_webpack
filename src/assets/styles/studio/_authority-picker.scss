@@ -4,7 +4,10 @@
 /* --- authority/_authority-picker-01.scss --- */
 /* Authority add popup: selectable grid with footer confirm/close, matching the selected-authority grid. */
 .studio-picker--authority {
-  width: min(760px, calc(100vw - 48px)) !important;
+  width: min(
+    var(--layout-studio-modal-width, 760px),
+    calc(100vw - 48px)
+  ) !important;
 }
 
 .studio-picker__footer--authority {
@@ -267,7 +270,10 @@ body.mobile-mode
 /* Authority picker grid sizing fix: avoid mobile horizontal scroll and give desktop description enough room. */
 body.desktop-mode .studio-picker--authority {
   width: min(860px, calc(100vw - 48px)) !important;
-  max-height: min(820px, calc(100vh - 48px)) !important;
+  max-height: min(
+    var(--layout-studio-authority-max-height, 820px),
+    calc(100vh - 48px)
+  ) !important;
 }
 
 body.desktop-mode .studio-picker--authority .studio-authority-picker__body {

@@ -531,7 +531,10 @@ body.desktop-mode .studio-picker-backdrop:has(.studio-picker--authority) {
 }
 
 body.desktop-mode .studio-picker--authority {
-  width: min(760px, calc(100vw - 48px)) !important;
+  width: min(
+    var(--layout-studio-modal-width, 760px),
+    calc(100vw - 48px)
+  ) !important;
   max-height: min(620px, calc(100vh - 48px)) !important;
   border-radius: 5px !important;
   background: var(--studio-surface) !important;

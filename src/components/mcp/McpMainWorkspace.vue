@@ -43,7 +43,7 @@
   >
     <article
       ref="detailDialogRef"
-      class="studio-dialog tw-relative tw-box-border tw-flex tw-max-h-[calc(100vh-48px)] tw-w-[min(760px,calc(100vw-32px))] tw-flex-col tw-overflow-y-auto tw-rounded-dialog tw-bg-studio-surface tw-p-6 tw-text-studio-text tw-shadow-dialog"
+      class="studio-dialog tw-relative tw-box-border tw-flex tw-max-h-[calc(100vh-48px)] tw-w-[min(var(--layout-studio-modal-width,760px),calc(100vw-32px))] tw-flex-col tw-overflow-y-auto tw-rounded-dialog tw-bg-studio-surface tw-p-6 tw-text-studio-text tw-shadow-dialog"
       role="dialog"
       aria-modal="true"
       :aria-label="t('mcp.detail.title')"

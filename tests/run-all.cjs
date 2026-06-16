@@ -34,5 +34,6 @@ require('./mock-hidden-url-samples-static.cjs');
 require('./hidden-url-comments-static.cjs');
 require('./renamed-scss-files-static.cjs');
 require('./large-file-internal-structure-static.cjs');
+require('./overlay-layout-tokens-static.cjs');
 
 console.log("all regression checks passed");

@@ -341,13 +341,16 @@ body.mobile-mode .responsive-panel--system-settings .system-settings-scroll {
 body.desktop-mode
   .responsive-overlay--desktop
   .responsive-panel--system-settings {
-  height: min(760px, calc(100vh - 56px));
+  height: min(var(--layout-system-dialog-height, 760px), calc(100vh - 56px));
 }
 
 body.mobile-mode
   .responsive-overlay--mobile-dialog
   .responsive-panel--system-settings {
-  height: min(760px, calc(var(--app-height, 100vh) - 48px));
+  height: min(
+    var(--layout-system-dialog-height, 760px),
+    calc(var(--app-height, 100vh) - 48px)
+  );
   max-height: calc(var(--app-height, 100vh) - 48px);
 }
 
@@ -485,8 +488,14 @@ body.desktop-mode
   width: min(960px, calc(100vw - 64px)) !important;
   max-width: min(960px, calc(100vw - 64px)) !important;
   min-width: min(720px, calc(100vw - 64px)) !important;
-  height: min(760px, calc(100vh - 56px)) !important;
-  max-height: min(760px, calc(100vh - 56px)) !important;
+  height: min(
+    var(--layout-system-dialog-height, 760px),
+    calc(100vh - 56px)
+  ) !important;
+  max-height: min(
+    var(--layout-system-dialog-height, 760px),
+    calc(100vh - 56px)
+  ) !important;
 }
 
 body.desktop-mode

@@ -17,7 +17,10 @@
 .responsive-panel {
   position: relative;
   width: min(720px, 100%);
-  max-height: min(760px, calc(100vh - 56px));
+  max-height: min(
+    var(--layout-responsive-overlay-max-height, 760px),
+    calc(100vh - 56px)
+  );
   overflow: hidden;
   border: 1px solid var(--control-border);
   border-radius: var(--dialog-radius);

@@ -305,7 +305,7 @@
   gap: 10px;
 }
 .empty-center {
-  width: min(760px, calc(100% - 40px));
+  width: min(var(--layout-chat-empty-state-width, 760px), calc(100% - 40px));
   display: flex;
   flex-direction: column;
   align-items: center;

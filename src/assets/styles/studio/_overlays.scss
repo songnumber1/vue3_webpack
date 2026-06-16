@@ -31,7 +31,7 @@
 
 .studio-create-panel {
   width: min(1180px, calc(100vw - 48px));
-  height: min(760px, calc(100vh - 48px));
+  height: min(var(--layout-studio-modal-height, 760px), calc(100vh - 48px));
   display: flex;
   flex-direction: column;
   overflow: hidden;

@@ -28,7 +28,7 @@
   width: min(720px, 100%);
   height: auto;
   max-width: calc(100vw - 48px);
-  max-height: min(760px, calc(100vh - 56px));
+  max-height: min(var(--layout-dialog-max-height, 760px), calc(100vh - 56px));
   border: 1px solid var(--dialog-panel-border);
   border-radius: var(--dialog-radius);
 }
@@ -58,7 +58,7 @@ body.desktop-mode
   width: min(720px, 100%);
   height: auto;
   max-width: calc(100vw - 48px);
-  max-height: min(760px, calc(100vh - 56px));
+  max-height: min(var(--layout-dialog-max-height, 760px), calc(100vh - 56px));
   border: 1px solid var(--dialog-panel-border);
   border-radius: var(--dialog-radius);
 }
@@ -199,7 +199,10 @@ body.mobile-mode
   width: min(720px, 100%) !important;
   height: auto !important;
   max-width: calc(100vw - 48px) !important;
-  max-height: min(760px, calc(100vh - 56px)) !important;
+  max-height: min(
+    var(--layout-dialog-max-height, 760px),
+    calc(100vh - 56px)
+  ) !important;
   margin: auto !important;
   border: 1px solid var(--dialog-panel-border) !important;
   border-radius: var(--dialog-radius) !important;

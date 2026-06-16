@@ -288,7 +288,7 @@ function confirmDelete() {
 .studio-detail-viewer__panel--desktop {
   top: 50%;
   left: 50%;
-  width: min(760px, calc(100vw - 32px));
+  width: min(var(--layout-studio-modal-width, 760px), calc(100vw - 32px));
   max-height: calc(100vh - 48px);
   transform: translate(-50%, -50%);
   border-radius: var(--radius-dialog, 8px);
