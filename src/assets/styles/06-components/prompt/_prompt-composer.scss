@@ -486,6 +486,55 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   box-shadow: none;
 }
 
+/* Desktop prompt top action row. Applies only to PC layouts; mobile keeps the
+   existing textarea-first/toolbar-bottom structure and keyboard rules. */
+body.desktop-mode .prompt-box--desktop-top-actions .prompt-desktop-top-row {
+  display: flex !important;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+}
+
+body.desktop-mode .prompt-box--desktop-top-actions .prompt-toolbar-desktop-top {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-expand-toggle--desktop-row {
+  position: static !important;
+  inset: auto !important;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+body.desktop-mode .prompt-box--desktop-top-actions > .prompt-textarea {
+  padding-right: 0 !important;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions.prompt-box--expanded
+  > .prompt-textarea--expanded {
+  padding-top: 4px !important;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-toolbar-desktop-submit {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-toolbar-desktop-submit
+  .prompt-action-row {
+  justify-content: flex-end !important;
+}
+
 .prompt-tool-menu .prompt-submenu-arrow,
 .prompt-tool-submenu .prompt-submenu-arrow,
 .bottom-sheet-submenu-arrow {
@@ -820,4 +869,36 @@ body.actual-android-runtime .prompt-box--expanded > .prompt-textarea--expanded {
 
 body.prompt-input-expanded .scroll-bottom-button {
   display: none !important;
+}
+
+/* PC top-action prompt corrections. Keep mobile composer unchanged. */
+body.desktop-mode
+  .prompt-box--desktop-top-actions.prompt-box--expanded
+  .prompt-model-menu {
+  top: calc(100% + 10px) !important;
+  bottom: auto !important;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-attachment-preview--desktop-top-actions {
+  order: 2;
+  width: 100%;
+  align-self: stretch;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-desktop-top-row {
+  order: 1;
+}
+
+body.desktop-mode .prompt-box--desktop-top-actions > .prompt-textarea {
+  order: 3;
+}
+
+body.desktop-mode
+  .prompt-box--desktop-top-actions
+  .prompt-toolbar-desktop-submit {
+  order: 4;
 }

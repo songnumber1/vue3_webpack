@@ -8,10 +8,14 @@
   >
     <form
       class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt"
-      :class="{'prompt-box--expanded': isPromptExpanded}"
+      :class="{
+        'prompt-box--expanded': isPromptExpanded,
+        'prompt-box--desktop-top-actions': usesDesktopTopActions,
+      }"
       @submit.prevent="submit"
     >
       <PromptAttachmentPreviewList
+        v-if="!usesDesktopTopActions"
         :attachments="attachments"
         @preview="previewImage"
         @remove="removeAttachment"
@@ -29,7 +33,65 @@
         @close-mobile-group="closeTemplateOptionSheet"
       />
 
+      <div
+        v-if="usesDesktopTopActions"
+        class="prompt-desktop-top-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+      >
+        <PromptToolbarDesktop
+          ref="toolbarRef"
+          layout-mode="top-actions"
+          class="prompt-toolbar-desktop-top"
+          @open-model="openModelSelector"
+          @open-tool="openToolSelector"
+          @open-attach="openAttachSelector"
+          @select-model="selectModel"
+          @apply-tool="applyTool"
+          @open-file-picker="openFilePicker"
+          @start-voice="startVoiceInput"
+          @stop-voice="stopVoiceInput"
+        />
+        <button
+          class="prompt-expand-toggle prompt-expand-toggle--desktop-row"
+          type="button"
+          :title="promptExpandToggleLabel"
+          :aria-label="promptExpandToggleLabel"
+          :aria-pressed="isPromptExpanded"
+          @click="togglePromptExpanded"
+        >
+          <svg v-if="!isPromptExpanded" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <svg v-else viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <PromptAttachmentPreviewList
+        v-if="usesDesktopTopActions"
+        class="prompt-attachment-preview--desktop-top-actions"
+        :attachments="attachments"
+        @preview="previewImage"
+        @remove="removeAttachment"
+        @preview-error="markPreviewError"
+      />
+
       <button
+        v-else
         class="prompt-expand-toggle"
         type="button"
         :title="promptExpandToggleLabel"
@@ -68,8 +130,23 @@
         @paste="handlePaste"
       />
 
+      <PromptToolbarDesktop
+        v-if="usesDesktopTopActions"
+        layout-mode="submit-only"
+        class="prompt-toolbar-desktop-submit"
+        @open-model="openModelSelector"
+        @open-tool="openToolSelector"
+        @open-attach="openAttachSelector"
+        @select-model="selectModel"
+        @apply-tool="applyTool"
+        @open-file-picker="openFilePicker"
+        @start-voice="startVoiceInput"
+        @stop-voice="stopVoiceInput"
+      />
+
       <component
         :is="resolvedToolbarComponent"
+        v-else
         ref="toolbarRef"
         @open-model="openModelSelector"
         @open-tool="openToolSelector"
@@ -310,6 +387,7 @@ onBeforeUnmount(() => {
 const resolvedToolbarComponent = computed(() =>
   isMobileSheet.value ? PromptToolbarMobile : PromptToolbarDesktop
 );
+const usesDesktopTopActions = computed(() => !isMobileSheet.value);
 
 providePromptTextareaState({
   text,

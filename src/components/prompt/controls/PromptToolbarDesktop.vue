@@ -1,8 +1,13 @@
 <template>
   <div
     class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+    :class="{
+      'prompt-action-row--top-actions': isTopActionsOnly,
+      'prompt-action-row--submit-only': isSubmitOnly,
+    }"
   >
     <div
+      v-if="!isSubmitOnly"
       class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2"
     >
       <PromptModelSelector
@@ -170,63 +175,68 @@
       />
     </div>
 
-    <button
-      v-if="showVoiceStartButton"
-      class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
-      type="button"
-      :disabled="disabled || !isSpeechSupported"
-      :title="voiceStartLabel"
-      :aria-label="voiceStartLabel"
-      @click="$emit('start-voice')"
+    <div
+      v-if="!isTopActionsOnly"
+      class="prompt-submit-actions tw-flex tw-min-w-0 tw-items-center tw-justify-end"
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-        <path
-          d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        />
-      </svg>
-    </button>
+      <button
+        v-if="showVoiceStartButton"
+        class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
+        type="button"
+        :disabled="disabled || !isSpeechSupported"
+        :title="voiceStartLabel"
+        :aria-label="voiceStartLabel"
+        @click="$emit('start-voice')"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
 
-    <button
-      v-else-if="showVoiceStopButton"
-      class="voice-button voice-button--stop tw-inline-flex tw-items-center tw-justify-center"
-      type="button"
-      :disabled="disabled"
-      :title="voiceStopLabel"
-      :aria-label="voiceStopLabel"
-      @click="$emit('stop-voice')"
-    >
-      <span aria-hidden="true"></span>
-    </button>
+      <button
+        v-else-if="showVoiceStopButton"
+        class="voice-button voice-button--stop tw-inline-flex tw-items-center tw-justify-center"
+        type="button"
+        :disabled="disabled"
+        :title="voiceStopLabel"
+        :aria-label="voiceStopLabel"
+        @click="$emit('stop-voice')"
+      >
+        <span aria-hidden="true"></span>
+      </button>
 
-    <button
-      v-else
-      class="send-button tw-inline-flex tw-items-center tw-justify-center"
-      :class="{'send-button--loading': generating}"
-      type="submit"
-      :disabled="disabled || generating || !canSubmit"
-      :title="sendLabel"
-      :aria-label="sendLabel"
-    >
-      <span
-        v-if="generating"
-        class="send-button-spinner"
-        aria-hidden="true"
-      ></span>
-      <span v-else aria-hidden="true">↗</span>
-    </button>
+      <button
+        v-else
+        class="send-button tw-inline-flex tw-items-center tw-justify-center"
+        :class="{'send-button--loading': generating}"
+        type="submit"
+        :disabled="disabled || generating || !canSubmit"
+        :title="sendLabel"
+        :aria-label="sendLabel"
+      >
+        <span
+          v-if="generating"
+          class="send-button-spinner"
+          aria-hidden="true"
+        ></span>
+        <span v-else aria-hidden="true">↗</span>
+      </button>
+    </div>
   </div>
 </template>
 
@@ -249,6 +259,22 @@ import PromptModelSelector from "@/components/prompt/controls/PromptModelSelecto
 import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
 const {t} = useI18n();
+
+const componentProps = defineProps({
+  layoutMode: {
+    type: String,
+    default: "default",
+    validator: (value) =>
+      ["default", "top-actions", "submit-only"].includes(value),
+  },
+});
+
+const isTopActionsOnly = computed(
+  () => componentProps.layoutMode === "top-actions"
+);
+const isSubmitOnly = computed(
+  () => componentProps.layoutMode === "submit-only"
+);
 
 const modelSelectorRef = ref(null);
 const toolRoot = ref(null);
@@ -502,6 +528,18 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 <style scoped lang="scss">
 .prompt-action-row {
   min-width: 0;
+}
+
+.prompt-action-row--top-actions {
+  justify-content: flex-start;
+}
+
+.prompt-action-row--submit-only {
+  justify-content: flex-end;
+}
+
+.prompt-submit-actions {
+  margin-left: auto;
 }
 
 .prompt-left-actions {

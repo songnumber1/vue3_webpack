@@ -24,5 +24,7 @@ require('./runtime-mode-helpers-static.cjs');
 require('./layout-mode-helpers-static.cjs');
 require('./main-empty-state-desktop-order-static.cjs');
 require('./prompt-submit-disabled-static.cjs');
+require('./prompt-desktop-top-actions-static.cjs');
+require('./prompt-desktop-top-actions-placement-static.cjs');
 
-console.log('all regression checks passed');
+console.log("all regression checks passed");
