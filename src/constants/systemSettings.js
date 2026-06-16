@@ -146,27 +146,6 @@ export const PLATFORM_OVERRIDE_OPTIONS = Object.freeze([
   },
 ]);
 
-// 일반 대화방 URL에 chatId를 노출할지 여부를 제어하는 정책 모드입니다.
-// 운영 기본값은 hidden이며, visible은 개발/디버깅 호환용으로만 유지합니다.
-export const CONVERSATION_URL_MODES = Object.freeze({
-  visible: "visible",
-  hidden: "hidden",
-});
-
-export const CONVERSATION_URL_MODE_OPTIONS = Object.freeze([
-  {
-    value: CONVERSATION_URL_MODES.visible,
-    label: "URL에 표시",
-    description: "기존처럼 /chat/:id 주소를 사용합니다.",
-  },
-  {
-    value: CONVERSATION_URL_MODES.hidden,
-    label: "URL에서 숨김",
-    description:
-      "대화방 주소를 /chat으로 유지하고 chatId는 내부 상태로 관리합니다.",
-  },
-]);
-
 /**
  * 전체 로컬 스토리지 데이터 적재 및 API 패킷 직렬화 매핑 시 오타로 인한 런타임 참사를 차단하기 위해 유일 출처로 정의된 키 상수의 묶음 집합입니다.
  */
@@ -193,7 +172,6 @@ export const SYSTEM_SETTING_KEYS = Object.freeze({
   showPcProgress: "showPcProgress", // PC 플랫폼에서 전역 ProgressBar 표시 허용 여부
   showMobileProgress: "showMobileProgress", // 모바일 플랫폼에서 전역 ProgressBar 표시 허용 여부
   autoScrollOnAnswer: "autoScrollOnAnswer", // AI 실시간 타이핑 스트리밍 출력 시 스크롤 하단 밀어내기 자동 추적 옵션
-  conversationUrlMode: "conversationUrlMode", // 일반 대화방 URL에 chatId를 노출할지 여부(visible/hidden)
   showMermaidHeader: "showMermaidHeader", // Mermaid 헤더 표시 여부(하위 호환)
   enableMermaidRendering: "enableMermaidRendering", // Mermaid 렌더링 사용 여부(하위 호환)
   pcShowMermaidHeader: "pcShowMermaidHeader", // PC Mermaid 다이어그램 카드 상단 헤더 및 액션 버튼 노출 여부
@@ -311,10 +289,6 @@ export const DEFAULT_SYSTEM_SETTINGS = Object.freeze({
     process.env.VUE_APP_SYSTEM_AUTO_SCROLL_ON_ANSWER,
     false
   ),
-  [SYSTEM_SETTING_KEYS.conversationUrlMode]: readStringEnv(
-    process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE,
-    CONVERSATION_URL_MODES.hidden
-  ),
   [SYSTEM_SETTING_KEYS.showMermaidHeader]: readBooleanEnv(
     process.env.VUE_APP_SYSTEM_SHOW_MERMAID_HEADER,
     true
@@ -429,12 +403,6 @@ function normalizeKeyboardMode(value) {
     : DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.keyboardMode];
 }
 
-function normalizeConversationUrlMode(value) {
-  return Object.values(CONVERSATION_URL_MODES).includes(value)
-    ? value
-    : DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.conversationUrlMode];
-}
-
 function normalizeMobileBreakpoint(value) {
   if (value === undefined || value === null || value === "") {
     return DEFAULT_SYSTEM_SETTINGS[SYSTEM_SETTING_KEYS.mobileBreakpoint];
@@ -531,11 +499,6 @@ export function normalizeSystemSettings(value = {}) {
     // 세부 정규화 3구역: 가상 키보드 뷰포트 충돌 알고리즘 유형 유효 구문 대조
     if (key === SYSTEM_SETTING_KEYS.keyboardMode) {
       next[key] = normalizeKeyboardMode(source[key]);
-      return;
-    }
-
-    if (key === SYSTEM_SETTING_KEYS.conversationUrlMode) {
-      next[key] = normalizeConversationUrlMode(source[key]);
       return;
     }
 

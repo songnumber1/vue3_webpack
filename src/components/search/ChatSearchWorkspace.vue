@@ -141,11 +141,7 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {
-  isHiddenConversationUrlMode,
-  navigateToConversation,
-} from "@/composables/chat/useChatRoute";
+import {navigateToConversation} from "@/composables/chat/useChatRoute";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
@@ -162,7 +158,6 @@ const chatSearch = useChatSearch({
 });
 const router = useRouter();
 const chatStore = useChatStore();
-const systemSettingsStore = useSystemSettingsStore();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
 const injectedWorkspaceState = useChatWorkspaceStateContext();
@@ -271,10 +266,7 @@ async function openChat(result) {
 
   ensureSearchResultHistory(result, chatId);
 
-  const hiddenMode = isHiddenConversationUrlMode(systemSettingsStore.settings);
-  if (hiddenMode) {
-    chatStore.setPendingSelectedChatId(chatId);
-  }
+  chatStore.setPendingSelectedChatId(chatId);
 
   const messageId = String(
     result?.messageId || result?.targetMessageId || ""
@@ -285,7 +277,6 @@ async function openChat(result) {
     await navigateToConversation({
       router,
       chatStore,
-      settings: systemSettingsStore.settings,
       chatId,
     });
 
@@ -293,7 +284,7 @@ async function openChat(result) {
       await router.replace({query}).catch(() => {});
     }
   } catch (_error) {
-    if (hiddenMode && String(chatStore.pendingSelectedChatId) === chatId) {
+    if (String(chatStore.pendingSelectedChatId) === chatId) {
       chatStore.clearPendingSelectedChatId();
     }
   }

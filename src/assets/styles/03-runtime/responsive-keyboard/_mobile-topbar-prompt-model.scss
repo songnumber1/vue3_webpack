@@ -1,5 +1,5 @@
 /* Mobile topbar, model picker, prompt and send button sizing guard.
-   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+   Keep imported through 03-runtime/_responsive-keyboard-patches.scss to preserve cascade order. */
 @use "../../00-abstracts/mixins" as *;
 .project-item.new-project span {
   font-size: var(--keyboard-font-size-xl);

@@ -16,9 +16,10 @@ import {
   adaptPromptTemplateList,
 } from "@/adapters/promptAdapter";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
+const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
+const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 
 function createAssistantStudioPortal() {
   return {

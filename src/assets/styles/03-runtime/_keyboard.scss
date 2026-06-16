@@ -6,4 +6,4 @@
   @include keyboard-font-token-aliases;
 }
 
-/* Keyboard-owned rules end here. Non-keyboard migrated patches were moved to 99-legacy/_responsive-keyboard-extracted-patches.scss and are imported immediately after this file to preserve cascade order. */
+/* Keyboard-owned rules end here. Non-keyboard responsive patches are imported immediately after this file through 03-runtime/_responsive-keyboard-patches.scss to preserve cascade order. */

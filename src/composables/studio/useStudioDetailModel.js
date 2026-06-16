@@ -1,6 +1,5 @@
 import {ASSISTANT_TYPES} from "@/constants/domain";
-
-const PORTAL_ASSISTANT_IDS = new Set(["assistant-studio", "connector-store"]);
+import {isPortalAssistantId} from "@/constants/assistantPortal";
 
 function normalizeString(value) {
   return String(value ?? "").trim();
@@ -11,7 +10,7 @@ function firstNonEmpty(...values) {
 }
 
 export function isStudioAssistant(assistant = null) {
-  if (!assistant || PORTAL_ASSISTANT_IDS.has(String(assistant.id || ""))) {
+  if (!assistant || isPortalAssistantId(assistant.id)) {
     return false;
   }
 

@@ -6,11 +6,9 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   getPendingSelectedChatId,
-  isHiddenConversationUrlMode,
-  resolveConversationUrlGuard,
+  resolveConversationEntryGuard,
 } from "@/composables/chat/useChatRoute";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
@@ -185,7 +183,7 @@ function isRouteGuardBypassRoute(to = {}) {
   );
 }
 
-function isAllowedHistoryLockNavigation({to, from, chatStore, settings}) {
+function isAllowedHistoryLockNavigation({to, from, chatStore}) {
   const pendingHistoryId = getPendingSelectedChatId(chatStore);
 
   // 새대화/Assistant/Studio/MCP 선택은 현재 대화방 로딩을 취소하고 이탈하는 동작입니다.
@@ -200,14 +198,7 @@ function isAllowedHistoryLockNavigation({to, from, chatStore, settings}) {
 
   // Allow the internal route that opens the currently pending chat.
   if (pendingHistoryId) {
-    const isPendingVisibleChatRoute =
-      to.name === ROUTE_NAMES.CHAT_DETAIL &&
-      String(to.params?.id || "") === pendingHistoryId;
-    const isPendingHiddenChatRoute =
-      to.name === ROUTE_NAMES.CHAT_ENTRY &&
-      isHiddenConversationUrlMode(settings);
-
-    return isPendingVisibleChatRoute || isPendingHiddenChatRoute;
+    return to.name === ROUTE_NAMES.CHAT_ENTRY;
   }
 
   if (to.fullPath && from?.fullPath && to.fullPath === from.fullPath) {
@@ -261,19 +252,11 @@ function guardStreamingNavigation(to, chatStreamStore) {
   return chatStreamStore.consumeAllowedNavigation(to) ? true : false;
 }
 
-function guardHistoryNavigation({
-  to,
-  from,
-  chatStore,
-  settings,
-  navigationLockStore,
-}) {
+function guardHistoryNavigation({to, from, chatStore, navigationLockStore}) {
   if (!navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)) {
     return true;
   }
-  return isAllowedHistoryLockNavigation({to, from, chatStore, settings})
-    ? true
-    : false;
+  return isAllowedHistoryLockNavigation({to, from, chatStore}) ? true : false;
 }
 
 function guardSharedRoute(to, chatStore) {
@@ -284,12 +267,11 @@ function guardSharedRoute(to, chatStore) {
   return true;
 }
 
-function guardConversationUrlMode({to, chatStore, chatStreamStore, settings}) {
-  return resolveConversationUrlGuard({
+function guardHiddenConversationEntry({to, chatStore, chatStreamStore}) {
+  return resolveConversationEntryGuard({
     to,
     chatStore,
     chatStreamStore,
-    settings,
   });
 }
 
@@ -339,7 +321,6 @@ function registerRouteGuard(router, appInfo, context = {}) {
     const platformStore = usePlatformStore();
     const chatStreamStore = useChatStreamStore();
     const chatStore = useChatStore();
-    const systemSettingsStore = useSystemSettingsStore();
     const navigationLockStore = useNavigationLockStore();
 
     platformStore.refresh(appInfo);
@@ -353,15 +334,13 @@ function registerRouteGuard(router, appInfo, context = {}) {
         to,
         from,
         chatStore,
-        settings: systemSettingsStore.settings,
         navigationLockStore,
       }),
       guardSharedRoute(to, chatStore),
-      guardConversationUrlMode({
+      guardHiddenConversationEntry({
         to,
         chatStore,
         chatStreamStore,
-        settings: systemSettingsStore.settings,
       }),
       await guardAuth({to, authAxios}),
       guardVersion({to, platformStore, appInfo}),

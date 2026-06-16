@@ -33,9 +33,10 @@ const routePolicy = read('src/composables/chat/internal/policy/chatRoutePolicy.j
 const systemSettings = read('src/constants/systemSettings.js');
 
 assert(
-  systemSettings.includes('process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE') &&
-    systemSettings.includes('CONVERSATION_URL_MODES.hidden'),
-  'conversationUrlMode default must remain hidden for operation baseline'
+  !systemSettings.includes('process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE') &&
+    !systemSettings.includes('CONVERSATION_URL_MODES') &&
+    !systemSettings.includes('conversationUrlMode'),
+  'conversation URL mode setting must be removed because normal chat URLs are hidden-only'
 );
 const router = read('src/core/resolver/router.js');
 const historyLoader = read('src/composables/chat/history/useHistoryConversationLoader.js');
@@ -57,7 +58,6 @@ assert(
 assert(
   chatSearchWorkspace.includes('async function openChat(result)') &&
     chatSearchWorkspace.includes('ensureSearchResultHistory(result, chatId)') &&
-    chatSearchWorkspace.includes('const hiddenMode = isHiddenConversationUrlMode(systemSettingsStore.settings)') &&
     chatSearchWorkspace.includes('chatStore.setPendingSelectedChatId(chatId)') &&
     chatSearchWorkspace.includes('navigateToConversation({') &&
     chatSearchWorkspace.includes('await router.replace({query}).catch(() => {})'),
@@ -83,23 +83,22 @@ assert(
 assert(
   routePolicy.includes('createConversationRoute') &&
     routePolicy.includes('createChatEntryRoute()') &&
-    routePolicy.includes('createChatRoomRoute(id)') &&
-    routePolicy.includes('resolveConversationUrlGuard') &&
-    routePolicy.includes('resolveConversationRouteReconciliation') &&
-    routePolicy.includes('applyHiddenConversationActiveRoom') &&
+    routePolicy.includes('resolveConversationEntryGuard') &&
+    routePolicy.includes('resolveHiddenConversationRoute') &&
+    routePolicy.includes('applyConversationActiveRoom') &&
     routePolicy.includes('setActiveChatRoom'),
   'conversation URL route decisions must be centralized in chatRoutePolicy'
 );
 assertLastOrder(
   conversationUrlPolicy,
   'return await navigate.call(router, route)',
-  'applyHiddenConversationActiveRoom({chatId, chatStore, settings})',
+  'applyConversationActiveRoom({chatId, chatStore})',
   'hidden URL activeRoom must be applied after navigation attempt to avoid route watcher races'
 );
 
 assert(
-  router.includes('function guardConversationUrlMode') &&
-    router.includes('resolveConversationUrlGuard({') &&
+  router.includes('function guardHiddenConversationEntry') &&
+    router.includes('resolveConversationEntryGuard({') &&
     routePolicy.includes('to?.name === ROUTE_NAMES.CHAT_ENTRY') &&
     routePolicy.includes('getActiveChatRoomId(chatStore)') &&
     routePolicy.includes('name: ROUTE_NAMES.MAIN') &&
@@ -110,23 +109,22 @@ assert(
   router.includes('function isAllowedHistoryLockNavigation') &&
     router.includes('to.name === ROUTE_NAMES.STUDIO') &&
     router.includes('to.name === ROUTE_NAMES.CONNECTOR_STORE') &&
-    router.includes('isPendingHiddenChatRoute') &&
     router.includes('getPendingSelectedChatId(chatStore)'),
-  'history lock guard must allow explicit Studio/MCP exits and internal hidden pending chat navigation'
+  'history lock guard must allow explicit Studio/MCP exits and internal hidden-only pending chat navigation'
 );
 
 assert(
-  historyLoader.includes('hasPendingHiddenNavigation') &&
-    historyLoader.includes('hasPendingHiddenChatNavigation({') &&
-    historyLoader.includes('if (!hasPendingHiddenNavigation) {') &&
+  historyLoader.includes('hasPendingChatEntryNavigation') &&
+    historyLoader.includes('hasPendingChatNavigation({') &&
+    historyLoader.includes('if (!hasPendingChatEntryNavigation) {') &&
     historyLoader.includes('clearActiveSession();') &&
     historyLoader.includes('await router.replace({name: ROUTE_NAMES.MAIN}'),
   'history loader must distinguish hidden pending navigation from true /chat refresh/direct access through chatRoutePolicy'
 );
 assertOrder(
   historyLoader,
-  'const hasPendingHiddenNavigation',
-  'if (!hasPendingHiddenNavigation) {\n      clearActiveSession();',
+  'const hasPendingChatEntryNavigation',
+  'if (!hasPendingChatEntryNavigation) {\n      clearActiveSession();',
   'hidden pending navigation guard must be calculated before clearing active session'
 );
 

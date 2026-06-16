@@ -2,7 +2,6 @@ import {computed, nextTick} from "vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -19,7 +18,7 @@ import {
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {
-  applyHiddenConversationActiveRoom,
+  applyConversationActiveRoom,
   createConversationRoute,
   resolveActiveChatId,
 } from "@/composables/chat/internal/navigation/conversationUrlPolicy";
@@ -62,8 +61,7 @@ async function createConversationForSubmit(options, normalized) {
 function shouldCreateConversation(options, targetHistoryId) {
   // URL 숨김 모드에서는 기존 대화방도 /chat(chat-entry) 라우트를 사용합니다.
   // 따라서 라우트 이름만으로 새 대화 여부를 판단하면 기존 대화방 추가 질문이
-  // new.do로 잘못 분기될 수 있습니다. visible/hidden 정책을 모두 반영한
-  // active chat id가 있으면 항상 기존 대화방으로 처리합니다.
+  // new.do로 잘못 분기될 수 있습니다. active chat id가 있으면 항상 기존 대화방으로 처리합니다.
   if (targetHistoryId) return false;
 
   return (
@@ -138,7 +136,6 @@ export function useChatSubmit(options) {
   const isGenerating = computed(() => chatStreamStore.isStreaming);
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
-  const systemSettingsStore = useSystemSettingsStore();
 
   async function submitPrompt(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -157,7 +154,6 @@ export function useChatSubmit(options) {
       resolveActiveChatId({
         route: options.route,
         chatStore,
-        settings: systemSettingsStore.settings,
       })
     );
     const isNewConversationSubmit = shouldCreateConversation(
@@ -198,19 +194,17 @@ export function useChatSubmit(options) {
       if (isNewConversationSubmit) {
         const nextRoute = createConversationRoute({
           chatId: targetHistoryId,
-          settings: systemSettingsStore.settings,
         });
         // chatStreamStore.isStreaming 상태에서 새 채팅방으로 입장해야 하므로,
-        // URL 정책에 따라 내부 /chat/:id 또는 /chat 라우팅만 1회 허용합니다.
+        // hidden-only 정책에 따라 /chat 라우팅만 1회 허용합니다.
         // 사용자가 클릭한 다른 대화방/Studio/MCP 이동은 router guard에서 계속 차단됩니다.
         chatStreamStore.allowNavigationTo(nextRoute);
         await options.router.push(nextRoute).catch(() => {
           chatStreamStore.clearAllowedNavigation();
         });
-        applyHiddenConversationActiveRoom({
+        applyConversationActiveRoom({
           chatId: targetHistoryId,
           chatStore,
-          settings: systemSettingsStore.settings,
         });
       }
 
@@ -251,7 +245,6 @@ export function useChatSubmit(options) {
       resolveActiveChatId({
         route: options.route,
         chatStore,
-        settings: systemSettingsStore.settings,
       })
     );
     if (!targetHistoryId) return;

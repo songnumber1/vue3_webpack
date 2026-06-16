@@ -131,6 +131,6 @@ body.mobile-mode
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box,
 body.mobile-mode .mobile-main-fixed-prompt .prompt-box--gemini {
   width: 100% !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 880px)) !important;
   margin: 0 auto !important;
 }

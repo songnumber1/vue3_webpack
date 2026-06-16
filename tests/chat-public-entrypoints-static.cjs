@@ -100,7 +100,7 @@ assertContains('src/composables/chat/useChatRoute.js', [
   'export {useChatRouteController} from "@/composables/chat/internal/route/useChatRouteController";',
   'export {useChatRouteLoader} from "@/composables/chat/internal/route/useChatRouteLoader";',
   'export {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";',
-  'resolveConversationRouteReconciliation,',
+  'resolveHiddenConversationRoute,',
   'resolveConversationSessionState,',
 ]);
 

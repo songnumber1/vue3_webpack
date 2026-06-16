@@ -4,15 +4,15 @@
 
 .chat-container-root--mode-main .empty-center {
   @include desktop-mode {
-    width: min(var(--layout-prompt-width, 820px), calc(100% - 40px)) !important;
-    max-width: var(--layout-prompt-width, 820px) !important;
+    width: min(var(--layout-prompt-width, 880px), calc(100% - 40px)) !important;
+    max-width: var(--layout-prompt-width, 880px) !important;
   }
 }
 
 .chat-container-root--mode-main .desktop-center-prompt {
   @include desktop-mode {
-    width: min(var(--layout-prompt-width, 820px), 100%) !important;
-    max-width: var(--layout-prompt-width, 820px) !important;
+    width: min(var(--layout-prompt-width, 880px), 100%) !important;
+    max-width: var(--layout-prompt-width, 880px) !important;
   }
 }
 
@@ -20,7 +20,7 @@
 .chat-container-root--mode-main .desktop-center-prompt .prompt-box--gemini {
   @include desktop-mode {
     width: 100% !important;
-    max-width: var(--layout-prompt-width, 820px) !important;
+    max-width: var(--layout-prompt-width, 880px) !important;
   }
 }
 

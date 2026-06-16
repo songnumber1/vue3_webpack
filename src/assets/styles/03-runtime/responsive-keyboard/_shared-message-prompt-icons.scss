@@ -1,5 +1,5 @@
 /* Shared legacy message/prompt/icon baseline extracted from responsive keyboard patches.
-   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+   Keep imported through 03-runtime/_responsive-keyboard-patches.scss to preserve cascade order. */
 @use "../../00-abstracts/mixins" as *;
 .message--user .avatar {
   background: var(--primary);

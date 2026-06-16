@@ -16,8 +16,9 @@ import {storeToRefs} from "pinia";
 import ChatContainer from "@/containers/chat/ChatContainer.vue";
 import McpWorkspace from "@/components/workspace/McpWorkspace.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
+const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 const assistantStore = useAssistantStore();
 const {assistants} = storeToRefs(assistantStore);
 

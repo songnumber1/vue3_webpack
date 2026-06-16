@@ -133,7 +133,6 @@ body.desktop-mode
   line-height: 1.25;
 }
 
-
 body.desktop-mode
   .studio-create-page
   .studio-preview
@@ -171,7 +170,6 @@ body.desktop-mode
   .suggestion-chip {
   pointer-events: none;
 }
-
 
 body.desktop-mode
   .studio-create-page
@@ -272,5 +270,4 @@ body.desktop-mode
   height: 100% !important;
   max-height: 100% !important;
 }
-
 </style>

@@ -155,7 +155,6 @@ import {
   PLATFORM_OVERRIDE_OPTIONS,
   PLATFORM_OVERRIDE_MODES,
   AUTH_MODE_OPTIONS,
-  CONVERSATION_URL_MODE_OPTIONS,
 } from "@/constants/systemSettings";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
@@ -254,13 +253,7 @@ const commonGroups = computed(() => [
   {
     kicker: "CHAT",
     title: t("systemSettings.groups.chat"),
-    items: [
-      settingItem("autoScrollOnAnswer"),
-      settingItem("conversationUrlMode", {
-        type: "select",
-        options: CONVERSATION_URL_MODE_OPTIONS,
-      }),
-    ],
+    items: [settingItem("autoScrollOnAnswer")],
   },
   {
     kicker: "ACTION",
@@ -409,12 +402,8 @@ function hasAuthModeChanged() {
   );
 }
 
-function hasConversationUrlModeChanged() {
-  return draft.conversationUrlMode !== settings.value.conversationUrlMode;
-}
-
 function hasLogoutRequiredSettingChanged() {
-  return hasAuthModeChanged() || hasConversationUrlModeChanged();
+  return hasAuthModeChanged();
 }
 
 /**

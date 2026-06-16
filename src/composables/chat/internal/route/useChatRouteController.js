@@ -11,12 +11,7 @@ import {ROUTE_NAMES} from "@/constants/routeNames";
  * main/chat/shared route 상태와 현재 active id를 계산합니다.
  * API 호출, router 이동, store mutation은 하지 않습니다.
  */
-export function useChatRouteController({
-  props,
-  route,
-  chatStore,
-  systemSettingsStore,
-}) {
+export function useChatRouteController({props, route, chatStore}) {
   const currentMode = computed(() => props.mode);
   const isMainPage = computed(() => currentMode.value === "main");
   const isChatPage = computed(() => currentMode.value === "chat");
@@ -30,7 +25,6 @@ export function useChatRouteController({
       return resolveActiveChatId({
         route,
         chatStore,
-        settings: systemSettingsStore.settings,
       });
     }
 

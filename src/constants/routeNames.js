@@ -3,13 +3,15 @@
  * @description Vue Router route name constants used by routing and chat URL policies.
  */
 
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
+
 export const ROUTE_NAMES = Object.freeze({
   MAIN: "main",
   CHAT_ENTRY: "chat-entry",
   CHAT_DETAIL: "chat",
   CHAT_SEARCH: "chat-search",
   STUDIO: "studio",
-  CONNECTOR_STORE: "connector-store",
+  CONNECTOR_STORE: ASSISTANT_PORTAL_IDS.CONNECTOR_STORE,
   SWAGGER: "swagger",
   GUIDE: "guide",
   SHARED: "shared",

@@ -142,11 +142,6 @@ export const settingsMessages = {
           label: "자동 스크롤",
           description: "답변 시 스크롤 자동 이동 여부입니다.",
         },
-        conversationUrlMode: {
-          label: "대화방 URL 표시 방식",
-          description:
-            "일반 대화방 주소에 chatId를 표시할지, /chat 주소로 숨길지 선택합니다. 숨김 모드는 새로고침 시 채팅 메인으로 이동합니다.",
-        },
         showMermaidHeader: {
           label: "Mermaid 헤더 표시",
           description:
@@ -514,11 +509,6 @@ export const settingsMessages = {
           label: "Auto scroll",
           description:
             "Automatically scroll to the bottom while answers arrive.",
-        },
-        conversationUrlMode: {
-          label: "Conversation URL mode",
-          description:
-            "Choose whether normal chat URLs expose the chatId or stay on /chat. Hidden mode returns to the chat main screen after refresh.",
         },
         showMermaidHeader: {
           label: "Show Mermaid header",

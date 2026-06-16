@@ -125,8 +125,8 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  width: min(100%, var(--layout-prompt-width, 820px));
-  max-width: min(100%, var(--layout-prompt-width, 820px));
+  width: min(100%, var(--layout-prompt-width, 880px));
+  max-width: min(100%, var(--layout-prompt-width, 880px));
   margin: 0 auto;
 }
 body.mobile-mode .mobile-main-fixed-prompt textarea,

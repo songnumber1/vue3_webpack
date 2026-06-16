@@ -1,5 +1,5 @@
 /* Mobile shell visibility, floating prompt and drawer backdrop guard.
-   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+   Keep imported through 03-runtime/_responsive-keyboard-patches.scss to preserve cascade order. */
 @use "../../00-abstracts/mixins" as *;
 body.mobile-mode .sidebar-content--mobile .quick-menu,
 body.mobile-mode .sidebar-content--mobile .project-list,

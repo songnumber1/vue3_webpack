@@ -108,7 +108,7 @@
   z-index: auto !important;
   box-sizing: border-box !important;
   width: 100% !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 880px)) !important;
   height: auto !important;
   max-height: none !important;
   margin: 0 auto !important;
@@ -129,6 +129,6 @@
   .main-empty-state__composer-dock
   .prompt-box--gemini {
   width: 100% !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 880px)) !important;
   margin: 0 auto !important;
 }

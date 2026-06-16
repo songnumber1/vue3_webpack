@@ -37,6 +37,9 @@ const progressOverlay = read('src/components/overlay/ProgressOverlay.vue');
 const apiRequestStore = read('src/stores/apiRequestStore.js');
 const httpClient = read('src/api/clients/httpClient.js');
 const streamRequest = read('src/api/sse/common/streamRequest.js');
+const sidebarActions = read('src/composables/chat/sidebar/useChatSidebarActions.js');
+const chatRouteController = read('src/composables/chat/internal/route/useChatRouteController.js');
+const chatSubmit = read('src/composables/chat/useChatSubmit.js');
 
 
 assert(
@@ -63,24 +66,18 @@ assert(
 );
 
 assert(
-  systemSettings.includes('CONVERSATION_URL_MODES') &&
-    systemSettings.includes('conversationUrlMode') &&
-    systemSettings.includes('visible') &&
-    systemSettings.includes('hidden'),
-  'conversationUrlMode visible/hidden system setting must exist'
+  !systemSettings.includes('CONVERSATION_URL_MODES') &&
+    !systemSettings.includes('conversationUrlMode') &&
+    !systemSettings.includes('VUE_APP_SYSTEM_CONVERSATION_URL_MODE') &&
+    !systemSettingsView.includes('conversationUrlMode'),
+  'conversation URL mode setting must be removed; normal chat URLs are hidden-only'
 );
 
 assert(
-  systemSettings.includes('process.env.VUE_APP_SYSTEM_CONVERSATION_URL_MODE') &&
-    systemSettings.includes('CONVERSATION_URL_MODES.hidden'),
-  'conversationUrlMode default must be hidden while visible remains available for development compatibility'
-);
-
-assert(
-  systemSettingsView.includes('hasConversationUrlModeChanged') &&
+  !systemSettingsView.includes('hasConversationUrlModeChanged') &&
     systemSettingsView.includes('hasLogoutRequiredSettingChanged') &&
     systemSettingsView.includes('forceLogoutForPolicyChange'),
-  'conversationUrlMode changes must require logout policy handling'
+  'URL mode changes are no longer configurable; logout policy must remain for auth policy changes'
 );
 
 assert(
@@ -94,21 +91,51 @@ assert(
 );
 
 assert(
-  routePolicy.includes('isHiddenConversationUrlMode') &&
+  routePolicy.includes('resolveConversationEntryGuard') &&
     routePolicy.includes('resolveActiveChatId') &&
     routePolicy.includes('createConversationRoute') &&
-    routePolicy.includes('resolveConversationUrlGuard') &&
-    routePolicy.includes('resolveConversationRouteReconciliation') &&
-    routePolicy.includes('applyHiddenConversationActiveRoom') &&
+    routePolicy.includes('resolveConversationEntryGuard') &&
+    routePolicy.includes('resolveHiddenConversationRoute') &&
+    routePolicy.includes('applyConversationActiveRoom') &&
     routePolicy.includes('setActiveChatRoom'),
-  'conversation URL visible/hidden route policy helpers must be centralized in chatRoutePolicy'
+  'hidden-only conversation route policy helpers must be centralized in chatRoutePolicy'
 );
 
 assert(
   urlPolicy.includes('navigateToConversation') &&
     urlPolicy.indexOf('await navigate.call(router, route)') <
-      urlPolicy.lastIndexOf('applyHiddenConversationActiveRoom({chatId, chatStore, settings})'),
+      urlPolicy.lastIndexOf('applyConversationActiveRoom({chatId, chatStore})'),
   'hidden URL mode must apply activeRoom after navigation attempt to avoid first-chat empty render race'
+);
+
+assert(
+  urlPolicy.includes('chatStore?.setPendingSelectedChatId?.(chatId)') &&
+    urlPolicy.indexOf('chatStore?.setPendingSelectedChatId?.(chatId)') <
+      urlPolicy.indexOf('await navigate.call(router, route)'),
+  'navigateToConversation must set pending chat id before /chat navigation so every hidden-only entry flow passes the route guard'
+);
+
+assert(
+  routePolicy.includes('import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom"') &&
+    routePolicy.includes('export const ACTIVE_ROOM_TYPE_CHAT = ACTIVE_ROOM_TYPES.chat'),
+  'chat route policy must reuse centralized room type constants instead of duplicating chat room type strings'
+);
+
+assert(
+  routePolicy.includes('if (activeChatRoomId || pendingChatRoomId)') &&
+    routePolicy.includes('return {name: ROUTE_NAMES.CHAT_ENTRY, replace: true}') &&
+    routePolicy.includes('return {name: ROUTE_NAMES.MAIN, replace: true}'),
+  '/chat/:id must never expose normal chat ids; active/pending app navigation normalizes to /chat and direct access falls back to main'
+);
+
+assert(
+  !sidebarActions.includes('useSystemSettingsStore') &&
+    !sidebarActions.includes('settings: systemSettingsStore.settings') &&
+    !historyLoader.includes('systemSettingsStore') &&
+    !chatRouteController.includes('systemSettingsStore') &&
+    !chatSubmit.includes('useSystemSettingsStore') &&
+    !chatSubmit.includes('settings: systemSettingsStore.settings'),
+  'hidden-only route helpers must not keep obsolete conversation URL mode settings dependencies in sidebar/history/route/submit flows'
 );
 
 assert(
@@ -121,17 +148,17 @@ assert(
 
 
 assert(
-  router.includes('function guardConversationUrlMode') &&
-    router.includes('resolveConversationUrlGuard({') &&
-    routePolicy.includes('if (!hiddenMode && to?.name === ROUTE_NAMES.CHAT_ENTRY)') &&
-    routePolicy.includes('name: ROUTE_NAMES.CHAT_DETAIL') &&
-    routePolicy.includes('params: {id: activeChatRoomId}') &&
+  router.includes('function guardHiddenConversationEntry') &&
+    router.includes('resolveConversationEntryGuard({') &&
+    routePolicy.includes('function resolveConversationEntryGuard({') &&
+    routePolicy.includes('return true;') &&
+    routePolicy.includes('if (to?.name === ROUTE_NAMES.CHAT_DETAIL)') &&
     routePolicy.includes('name: ROUTE_NAMES.MAIN'),
-  'visible URL mode must restore bare /chat to /chat/:id through centralized chatRoutePolicy when activeRoom exists and otherwise redirect to main'
+  'normal chat URL policy must be hidden-only and block /chat/:id exposure through centralized chatRoutePolicy'
 );
 
 assert(
-  historyLoader.includes('hasPendingHiddenNavigation') &&
+  historyLoader.includes('hasPendingChatEntryNavigation') &&
     historyLoader.includes('router.replace({name: ROUTE_NAMES.MAIN}'),
   'history loader must guard bare /chat without active id and redirect hidden refresh/direct access to main'
 );
@@ -179,19 +206,20 @@ assert(
     router.includes('guardHistoryNavigation') &&
     router.includes('navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)') &&
     router.includes('getPendingSelectedChatId(chatStore)') &&
-    router.includes('isPendingVisibleChatRoute') &&
-    router.includes('isPendingHiddenChatRoute') &&
+    router.includes('to.name === ROUTE_NAMES.CHAT_ENTRY') &&
+    !router.includes('isPendingVisibleChatRoute') &&
+    !router.includes('isPendingHiddenChatRoute') &&
     router.includes('from?.name === ROUTE_NAMES.SHARED_ENTRY') &&
     router.includes('chatStore.isActiveSharedRoom'),
-  'router guard must block user navigation during history rendering via navigationLockStore while allowing internal pending/shared transitions'
+  'router guard must block user navigation during history rendering while allowing hidden-only pending/shared transitions'
 );
 
 assert(
-  dataController.includes('resolveConversationRouteReconciliation') &&
-    dataController.includes('reconcileConversationUrlModeRoute') &&
+  dataController.includes('resolveHiddenConversationRoute') &&
+    dataController.includes('reconcileHiddenConversationRoute') &&
     read('src/composables/chat/shared/useSharedConversationLoader.js').includes('await router.replace({name: ROUTE_NAMES.SHARED}') &&
     read('src/composables/chat/shared/useSharedConversationLoader.js').includes('setHistoryMessagesForInitialRender(result.messages)'),
-  'chat/shared URL reconciliation must use centralized policy and shared URL must keep /shared/:id in visible mode and replace to /shared only in hidden mode'
+  'chat/shared URL reconciliation must use centralized hidden-only policy and shared entry URLs must replace to /shared after validation'
 );
 
 assert(
@@ -326,7 +354,7 @@ assert(
 
 
 assert(
-  router.includes('resolveConversationUrlGuard({') &&
+  router.includes('resolveConversationEntryGuard({') &&
     routePolicy.includes('to?.name === ROUTE_NAMES.CHAT_ENTRY') &&
     routePolicy.includes('getActiveChatRoomId(chatStore)') &&
     routePolicy.includes('!chatStreamStore?.isStreaming'),

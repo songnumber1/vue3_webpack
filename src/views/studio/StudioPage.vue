@@ -16,8 +16,9 @@ import ChatContainer from "@/containers/chat/ChatContainer.vue";
 import StudioWorkspace from "@/components/workspace/StudioWorkspace.vue";
 import {storeToRefs} from "pinia";
 import {useAssistantStore} from "@/stores/assistantStore";
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
+const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
 const assistantStore = useAssistantStore();
 const {assistants} = storeToRefs(assistantStore);
 

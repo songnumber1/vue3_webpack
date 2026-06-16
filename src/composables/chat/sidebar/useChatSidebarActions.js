@@ -5,11 +5,11 @@
  */
 
 import {nextTick} from "vue";
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
@@ -24,8 +24,8 @@ import {
 } from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {logWarn} from "@/utils/logger";
 
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
+const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
+const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 
 function getHistoryId(item) {
   return String(item?.id || "").trim();
@@ -44,7 +44,6 @@ export function useChatSidebarActions({
   const assistantStore = useAssistantStore();
   const chatStore = useChatStore();
   const navigationStore = useNavigationStore();
-  const systemSettingsStore = useSystemSettingsStore();
   const runtime = useChatRuntime();
   const {
     NAVIGATION_LOCK_SCOPES,
@@ -202,7 +201,6 @@ export function useChatSidebarActions({
       await navigateToConversation({
         router,
         chatStore,
-        settings: systemSettingsStore.settings,
         chatId: historyId,
         replace: true,
       }).catch(() => {});

@@ -1,53 +1,54 @@
 /**
  * @file composables/chat/internal/navigation/conversationUrlPolicy.js
- * @description 일반 대화방 URL 이동 유틸입니다. route 판단 정책은 chatRoutePolicy가 담당합니다.
+ * @description 일반 대화방을 항상 /chat 엔트리 URL로 이동시키는 유틸입니다.
  */
 
 export {
   ACTIVE_ROOM_TYPE_CHAT,
   CHAT_DETAIL_ROUTE_NAME,
   CHAT_ENTRY_ROUTE_NAME,
-  applyHiddenConversationActiveRoom,
+  applyConversationActiveRoom,
   createChatEntryRoute,
-  createChatRoomRoute,
   createConversationRoute,
   getActiveChatRoomId,
   getPendingSelectedChatId,
-  hasPendingHiddenChatNavigation,
-  isHiddenConversationUrlMode,
+  hasPendingChatNavigation,
   normalizeChatRouteId,
   resolveActiveChatId,
-  resolveConversationRouteReconciliation,
-  resolveConversationUrlGuard,
+  resolveConversationEntryGuard,
+  resolveHiddenConversationRoute,
 } from "@/composables/chat/internal/policy/chatRoutePolicy";
 
 import {
-  applyHiddenConversationActiveRoom,
+  applyConversationActiveRoom,
   createConversationRoute,
 } from "@/composables/chat/internal/policy/chatRoutePolicy";
 
 export async function navigateToConversation({
   router,
   chatStore,
-  settings,
   chatId,
   replace = false,
 } = {}) {
-  const route = createConversationRoute({chatId, settings});
+  const route = createConversationRoute({chatId});
+
+  // /chat 엔트리는 URL에 방 ID를 담지 않기 때문에 라우터 가드가
+  // 정상적인 사용자 이동과 새로고침/직접 접근을 구분하려면 pending ID가 먼저 필요합니다.
+  // 기존 호출부가 pending을 세팅하더라도 이 helper에서 한 번 더 보장해
+  // sidebar/search/history 등 모든 일반 대화방 이동 경로의 첫 진입 race를 차단합니다.
+  chatStore?.setPendingSelectedChatId?.(chatId);
+
   const navigate = replace ? router?.replace : router?.push;
   if (typeof navigate !== "function") {
-    applyHiddenConversationActiveRoom({chatId, chatStore, settings});
+    applyConversationActiveRoom({chatId, chatStore});
     return;
   }
 
   try {
     return await navigate.call(router, route);
   } finally {
-    // URL 숨김 모드에서는 /chat 라우트 자체가 여러 대화방을 공유합니다.
-    // activeRoomId를 라우팅 이전에 먼저 바꾸면 현재 라우트가 아직 main인 상태에서
-    // loadRouteConversation이 실행되어 첫 대화방 선택이 빈 화면으로 끝날 수 있습니다.
-    // 따라서 라우팅 시도 이후에 activeRoom을 갱신하여 /chat 기준 로드가 한 번 더
-    // 발생하도록 보장합니다. 중복 navigation인 경우에도 finally에서 activeRoom 갱신은 수행됩니다.
-    applyHiddenConversationActiveRoom({chatId, chatStore, settings});
+    // /chat 라우트 하나가 모든 일반 대화방을 공유하므로, 라우터 이동 시도 후
+    // activeRoom을 갱신해 route watcher가 현재 방을 다시 로드하도록 보장합니다.
+    applyConversationActiveRoom({chatId, chatStore});
   }
 }

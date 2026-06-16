@@ -1,6 +1,6 @@
-/* Legacy responsive keyboard patch aggregator.
+/* Responsive keyboard patch aggregator.
    The original payload was split by responsibility in Step 7-B.
-   Keep this file imported from index.scss so the historical cascade position is preserved. */
+   Keep this file imported immediately after 03-runtime/keyboard so the historical cascade position is preserved. */
 @use "./responsive-keyboard/shared-message-prompt-icons" as *;
 @use "./responsive-keyboard/desktop-topbar-model" as *;
 @use "./responsive-keyboard/mobile-shell-visibility" as *;

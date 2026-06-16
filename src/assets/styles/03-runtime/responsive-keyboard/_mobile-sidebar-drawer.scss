@@ -1,5 +1,5 @@
 /* Mobile drawer/sidebar sizing and spacing guard.
-   Keep imported through 99-legacy/_responsive-keyboard-extracted-patches.scss to preserve cascade order. */
+   Keep imported through 03-runtime/_responsive-keyboard-patches.scss to preserve cascade order. */
 @use "../../00-abstracts/mixins" as *;
 body.mobile-mode .mobile-drawer {
   display: block;

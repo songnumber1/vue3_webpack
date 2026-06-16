@@ -1,3 +1,5 @@
+import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
+
 /**
  * @file api/mock/data/assistants.raw.js
  * @description 개발/데모용 mock API 또는 mock 데이터입니다. 실제 API 비활성화 시 화면 동작을 보장합니다.
@@ -91,7 +93,7 @@ export const ASSISTANTS_RAW = [
     studioYN: true,
     assistOrder: 9999,
     ragYN: false,
-    assistId: "assistant-studio",
+    assistId: ASSISTANT_PORTAL_IDS.STUDIO,
     ...DEFAULT_ASSISTANT_IMAGE,
   },
   {
@@ -105,7 +107,7 @@ export const ASSISTANTS_RAW = [
     studioYN: true,
     assistOrder: 10000,
     ragYN: false,
-    assistId: "connector-store",
+    assistId: ASSISTANT_PORTAL_IDS.CONNECTOR_STORE,
     ...DEFAULT_ASSISTANT_IMAGE,
   },
 ];

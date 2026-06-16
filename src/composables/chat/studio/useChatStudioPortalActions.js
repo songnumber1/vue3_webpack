@@ -5,19 +5,21 @@
  */
 
 import {computed, ref, watch} from "vue";
+import {
+  ASSISTANT_PORTAL_IDS,
+  isPortalAssistantId,
+} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
   cleanupAfterPortalConversationNavigation,
   preparePortalConversationNavigation,
 } from "@/composables/chat/internal/navigation/chatNavigationReset";
-import {isHiddenConversationUrlMode} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {deleteStudio} from "@/services/studioDetailService";
 import {
@@ -25,16 +27,8 @@ import {
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
 
-const ASSISTANT_STUDIO_PORTAL_ID = "assistant-studio";
-const CONNECTOR_STORE_PORTAL_ID = "connector-store";
-const PORTAL_ASSISTANT_IDS = [
-  ASSISTANT_STUDIO_PORTAL_ID,
-  CONNECTOR_STORE_PORTAL_ID,
-];
-
-function isPortalAssistantId(assistantId) {
-  return PORTAL_ASSISTANT_IDS.includes(String(assistantId || ""));
-}
+const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
+const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 
 export function useChatStudioPortalActions({
   route,
@@ -50,7 +44,6 @@ export function useChatStudioPortalActions({
   const chatStore = useChatStore();
   const navigationStore = useNavigationStore();
   const studioRuntimeStore = useStudioRuntimeStore();
-  const systemSettingsStore = useSystemSettingsStore();
   const {NAVIGATION_LOCK_SCOPES, releaseLock} = useNavigationLock();
 
   const studioDetailStudio = ref(null);
@@ -97,12 +90,8 @@ export function useChatStudioPortalActions({
     );
   }
 
-  function createStudioEditRoute(studioId) {
-    const routeConfig = {name: ROUTE_NAMES.STUDIO};
-    if (!isHiddenConversationUrlMode(systemSettingsStore.settings)) {
-      routeConfig.query = {mode: "edit", studioId};
-    }
-    return routeConfig;
+  function createStudioEditRoute() {
+    return {name: ROUTE_NAMES.STUDIO};
   }
 
   function handleStudioDetailEdit(studio) {

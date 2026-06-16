@@ -6,7 +6,7 @@
   background: var(--chat-bg);
 }
 .prompt-box {
-  max-width: 760px;
+  max-width: var(--layout-prompt-width, 880px);
   margin: 0 auto;
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr) 36px 44px;

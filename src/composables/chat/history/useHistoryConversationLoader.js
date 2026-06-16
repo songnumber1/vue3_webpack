@@ -5,13 +5,12 @@
 
 import {nextTick} from "vue";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {hasPendingHiddenChatNavigation} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {hasPendingChatNavigation} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useHistoryConversationLoader({
   router,
   runtime,
-  systemSettingsStore,
   chatStore,
   messages,
   isMainPage,
@@ -39,9 +38,8 @@ export function useHistoryConversationLoader({
   }
 
   async function handleMissingHistoryId({isCurrentLoad}) {
-    const hasPendingHiddenNavigation = hasPendingHiddenChatNavigation({
+    const hasPendingChatEntryNavigation = hasPendingChatNavigation({
       chatStore,
-      settings: systemSettingsStore.settings,
     });
 
     beginHistoryRender();
@@ -50,20 +48,19 @@ export function useHistoryConversationLoader({
     clearLazyHistoryMessages();
     messages.value = [];
 
-    // URL 숨김 모드에서 좌측 대화방 클릭 직후에는 /chat 라우트가 먼저 감지되고
+    // 좌측 대화방 클릭 직후에는 /chat 라우트가 먼저 감지되고
     // activeRoomId가 뒤이어 세팅될 수 있습니다. 이 pending 상태에서 clearActiveSession을
     // 호출하면 pendingSelectedChatId까지 지워져 첫 대화방 진입이 메인 redirect로 바뀌므로
     // 복원 가능한 방이 없는 진짜 /chat 새로고침/직접 접근일 때만 세션을 정리합니다.
-    if (!hasPendingHiddenNavigation) {
+    if (!hasPendingChatEntryNavigation) {
       clearActiveSession();
     }
     finishHistoryRender();
 
-    // URL 노출 모드에서는 /chat 단독 접근이 특정 대화방을 의미하지 않습니다.
-    // URL 숨김 모드에서도 activeRoomId가 없는 /chat 새로고침/직접 접근은
+    // activeRoomId가 없는 /chat 새로고침/직접 접근은
     // 복원 가능한 대화방이 없으므로 메인으로 되돌립니다. 단, 좌측 대화방 클릭 직후
     // activeRoomId가 곧 세팅될 pending 상태는 첫 진입 로드를 막지 않기 위해 대기합니다.
-    if (!hasPendingHiddenNavigation) {
+    if (!hasPendingChatEntryNavigation) {
       await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
     }
   }

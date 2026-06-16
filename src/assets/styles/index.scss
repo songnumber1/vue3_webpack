@@ -25,7 +25,7 @@
 /* 2. Scroll/runtime/platform guards: OverlayScrollbars ALL runtime + Android Chrome/WebView keyboard baseline. */
 @use "./00-abstracts/overlay-scrollbar" as *;
 @use "./03-runtime/keyboard" as *;
-@use "./99-legacy/responsive-keyboard-extracted-patches" as *;
+@use "./03-runtime/responsive-keyboard-patches" as *;
 @use "./03-runtime/mobile-mode" as *;
 @use "./03-runtime/safe-area" as *;
 @use "./03-runtime/viewport-keyboard" as *;
@@ -86,10 +86,9 @@
 @use "./03-runtime/mobile-cascade-hotfix" as *;
 
 /* 8. PC prompt consistency guard: main/chat prompt border alignment only. */
-@use "./06-components/prompt/desktop-prompt-border" as *;
+@use "./06-components/prompt/prompt-desktop" as *;
 @use "./06-components/code-interpreter/panel" as *;
-@use "./06-components/prompt/prompt-expanded-mobile-height-fix" as *;
-@use "./06-components/prompt/prompt-expanded-text-top-gap-fix" as *;
+@use "./06-components/prompt/prompt-expanded" as *;
 
 /* 9. Final OverlayScrollContainer cascade guard: keep last so page/mobile hotfixes cannot override shared viewport rules. */
 @use "./03-runtime/overlay-scroll-container-runtime" as *;

@@ -220,7 +220,7 @@ body.mobile-mode
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
   margin: 0 auto;
-  max-width: min(100%, var(--layout-prompt-width, 760px));
+  max-width: min(100%, var(--layout-prompt-width, 880px));
 }
 
 body.mobile-mode .chat-container-root--mode-main,
@@ -278,7 +278,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .desktop-center-prompt.prompt-wrap--floating
   .prompt-box {
-  max-width: min(100%, var(--layout-prompt-width, 760px));
+  max-width: min(100%, var(--layout-prompt-width, 880px));
   margin: 0 auto;
 }
 html:has(> body.mobile-mode),
@@ -367,7 +367,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  max-width: min(100%, var(--layout-prompt-width, 760px));
+  max-width: min(100%, var(--layout-prompt-width, 880px));
   margin: 0 auto;
 }
 body.mobile-mode

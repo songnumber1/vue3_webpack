@@ -33,7 +33,7 @@ body.mobile-mode
   .chat-container-root--mode-main
   .mobile-main-fixed-prompt
   .prompt-box {
-  width: min(100%, var(--layout-prompt-width, 820px)) !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  width: min(100%, var(--layout-prompt-width, 880px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 880px)) !important;
   margin: 0 auto !important;
 }

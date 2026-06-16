@@ -4,7 +4,7 @@
   background: var(--chat-bg);
 }
 .shared-readonly-box {
-  max-width: 760px;
+  max-width: var(--layout-prompt-width, 880px);
   min-height: 58px;
   margin: 0 auto;
   display: flex;

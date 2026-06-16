@@ -5,14 +5,12 @@
 
 import {nextTick} from "vue";
 import {getSharedConversation} from "@/composables/chat/useSharedChat";
-import {isHiddenConversationUrlMode} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 export function useSharedConversationLoader({
   t,
   router,
   chatStore,
-  systemSettingsStore,
   messages,
   activeHistoryId,
   getSharedEntryId,
@@ -54,13 +52,11 @@ export function useSharedConversationLoader({
         return;
       }
       chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
-      if (isHiddenConversationUrlMode(systemSettingsStore.settings)) {
-        await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
-        // URL 숨김 모드에서는 /shared/:id -> /shared replace 직후 route watcher가
-        // 새 loadRouteConversation을 시작할 수 있습니다. 이 경우 현재 load는 stale
-        // 상태가 되므로 메시지를 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
-        if (!isCurrentLoad()) return;
-      }
+      await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
+      // /shared/:id -> /shared replace 직후 route watcher가 새 loadRouteConversation을
+      // 시작할 수 있습니다. 이 경우 현재 load는 stale 상태가 되므로 메시지를
+      // 중복 세팅하지 않고 새 라우트 기준 로드에게 넘깁니다.
+      if (!isCurrentLoad()) return;
       setHistoryMessagesForInitialRender(result.messages);
       historyMessagesLoaded.value = true;
       await nextTick();

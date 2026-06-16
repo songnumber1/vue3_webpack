@@ -1,5 +1,6 @@
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {LAYOUT_WIDTH} from "@/constants/layout";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -155,7 +156,13 @@ export function useCodeInterpreterPanel({
       ? fallbackWidth || composerWidth
       : composerWidth || fallbackWidth;
     const measuredWidth = Math.round(
-      Math.min(880, Math.max(420, baseWidth || 880))
+      Math.min(
+        LAYOUT_WIDTH.chatLane,
+        Math.max(
+          LAYOUT_WIDTH.minCodePanelChat,
+          baseWidth || LAYOUT_WIDTH.chatLane
+        )
+      )
     );
 
     workspace.style.setProperty(

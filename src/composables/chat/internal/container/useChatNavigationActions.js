@@ -15,7 +15,6 @@ import {useAuthStore} from "@/stores/authStore";
 import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
 import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
@@ -78,7 +77,6 @@ export function useChatNavigationActions({
   // AI 답변 타이핑 도중 부가 기능 조작 난입을 통제하기 위해 실시간 스트리밍 스토어 마운트
   const chatStreamStore = useChatStreamStore();
   const chatStore = useChatStore();
-  const systemSettingsStore = useSystemSettingsStore();
   const {NAVIGATION_LOCK_SCOPES, isChatHistoryLocked, releaseLock} =
     useNavigationLock();
 
@@ -117,7 +115,7 @@ export function useChatNavigationActions({
     if (chatStreamStore.isStreaming) return; // 답변 스트리밍 중에는 새 대화/Assistant 전환을 차단합니다.
 
     // 기존 대화방 렌더 lock이 남아 있어도 새 대화/Assistant 전환은 현재 방을 벗어나는 취소성 액션입니다.
-    // activeRoom까지 먼저 정리해야 hidden/visible 모드 모두에서 첫 클릭이 /chat 엔트리에 머물지 않습니다.
+    // activeRoom까지 먼저 정리해야 hidden-only 구조에서 첫 클릭이 /chat 엔트리에 머물지 않습니다.
     clearConversationNavigationState();
 
     // 메모리 누수 방지 가드: 대화방을 완전히 나가거나 초기화하므로 가비지 컬렉터 유도를 위해 첨부파일 인메모리 임시 URL 전원 소멸 폐기
@@ -164,7 +162,6 @@ export function useChatNavigationActions({
     await navigateToConversation({
       router,
       chatStore,
-      settings: systemSettingsStore.settings,
       chatId: historyId,
       replace: true,
     }).catch(() => {});

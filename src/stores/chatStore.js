@@ -8,29 +8,13 @@
  */
 
 import {defineStore} from "pinia";
+import {ACTIVE_ROOM_TYPES, normalizeActiveRoomType} from "@/constants/chatRoom";
+import {
+  DEFAULT_PROMPT_TOOL_SETTINGS,
+  DRAFT_PROMPT_TOOL_SETTINGS_KEY,
+} from "@/constants/promptComposer";
 
-// 대화방 세션이 완전히 생성되기 전, 인풋창 영역에서 세팅을 조작할 때 가상 바인딩할 임시 임시 버퍼 키 고정값
-const DRAFT_PROMPT_TOOL_SETTINGS_KEY = "__draft__";
-
-// 확장 도구 메뉴들의 표준 공장 초기화 설정 맵 구조체 (불변 보존을 위해 Object.freeze 하드락 동결)
-const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
-  knowledgeSearch: [], // 내부 사내 문서 지식 데이터베이스(RAG) 검색 필터 범위 타깃 어레이
-  webSearch: null, // 실시간 웹 브라우징 외부 검색 엔진 지정 상세 키 사양
-  webSearchEnabled: false, // 웹 서치 크롤러 허브 기능 동적 점등 활성화 플래그
-  promptTemplateId: null, // 결합 선택된 시스템 프롬프트 어시스턴트 템플릿의 ID 명세
-  promptTemplateOptions: {}, // 템플릿 내부에 동적 조립 변수로 인입될 라디오/체크 옵션 적치 버퍼 맵
-});
-
-// URL 노출/숨김 정책과 공유방 조회 모드를 모두 같은 채팅 화면에서 다룰 수 있도록
-// 현재 화면에 표시할 방의 출처를 단일 activeRoom 상태로 관리합니다.
-export const ACTIVE_ROOM_TYPES = Object.freeze({
-  chat: "chat",
-  shared: "shared",
-});
-
-function normalizeActiveRoomType(type) {
-  return Object.values(ACTIVE_ROOM_TYPES).includes(type) ? type : null;
-}
+export {ACTIVE_ROOM_TYPES};
 
 /**
  * 객체 참조 복사로 인한 버그를 완벽히 격리 방어하기 위해 도구 세팅 구조체를

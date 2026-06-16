@@ -21,10 +21,8 @@ function assert(condition, message) {
   "Scheduler cleanup and history render reset helpers",
   "Previous-history request flow",
   "Message identity and user-scroll intent helpers",
-  "History render readiness checks",
-  "Mermaid post-processing during history render",
-  "Layout stability checks after render/post-process",
-  "History render orchestration sequence",
+  "History post-processing and layout stability controller",
+  "History render lifecycle sequence",
   "Public scroll commands used by MessageList/ChatContainer",
   "Message rendered events and streaming scroll behavior",
   "Resize recalculation scheduling controller",
@@ -34,19 +32,81 @@ function assert(condition, message) {
   assert(source.includes(marker), `${file} must keep role marker: ${marker}`);
 });
 
+const postProcessFile =
+  "src/composables/chat/internal/message-list/useMessageHistoryPostProcess.js";
+const postProcessSource = fs.readFileSync(
+  path.join(root, postProcessFile),
+  "utf8"
+);
+const lifecycleFile =
+  "src/composables/chat/internal/message-list/useMessageHistoryRenderLifecycle.js";
+const lifecycleSource = fs.readFileSync(
+  path.join(root, lifecycleFile),
+  "utf8"
+);
+[
+  "export function createMessageHistoryPostProcessController",
+  "function renderHistoryRoomPendingMermaidSequentially",
+  "function waitForHistoryRenderLayoutStability",
+  "function finalizeHistoryRenderPostProcess",
+  "fallbackPendingMermaidToCode",
+  "renderMermaidInElement",
+].forEach((marker) => {
+  assert(
+    postProcessSource.includes(marker),
+    `${postProcessFile} must keep post-process member: ${marker}`
+  );
+});
+
+[
+  "export function createMessageHistoryRenderLifecycleController",
+  "function waitForHistoryRenderDomReady",
+  "function revealProgressiveHistoryMarkdownIfReady",
+  "function runHistoryRenderThenScrollSequence",
+  "function resetHistoryRenderLifecycleState",
+].forEach((marker) => {
+  assert(
+    lifecycleSource.includes(marker),
+    `${lifecycleFile} must keep lifecycle member: ${marker}`
+  );
+});
+
+[
+  "function waitForHistoryRenderDomReady",
+  "function revealProgressiveHistoryMarkdownIfReady",
+  "async function runHistoryRenderThenScrollSequence",
+].forEach((marker) => {
+  assert(
+    !source.includes(marker),
+    `${file} should delegate history render lifecycle helper: ${marker}`
+  );
+});
+
 const publicReturnMarker =
   "Public return contract. Keep these names stable for callers.";
 const publicReturnStart = source.indexOf(publicReturnMarker);
 assert(publicReturnStart >= 0, `${file} must keep the public return marker`);
 const publicReturnSource = source.slice(publicReturnStart);
-const returnBlockMatch = publicReturnSource.match(
-  /return \{([\s\S]*?)\n  \};\n\}/
+assert(
+  publicReturnSource.includes("return createMessageListScrollPublicContract({"),
+  `${file} must return through createMessageListScrollPublicContract`
 );
-assert(returnBlockMatch, `${file} must keep a plain public return object`);
 
-const returnNames = Array.from(
-  returnBlockMatch[1].matchAll(/\n\s*([A-Za-z0-9_]+),/g)
-).map((match) => match[1]);
+const publicContractFile =
+  "src/composables/chat/internal/message-list/useMessageListScrollPublicContract.js";
+const publicContractSource = fs.readFileSync(
+  path.join(root, publicContractFile),
+  "utf8"
+);
+assert(
+  publicContractSource.includes("MESSAGE_LIST_SCROLL_PUBLIC_CONTRACT_KEYS"),
+  `${publicContractFile} must expose public contract keys`
+);
+assert(
+  publicContractSource.includes("createMessageListScrollPublicContract"),
+  `${publicContractFile} must expose public contract factory`
+);
+
 const expectedReturnNames = [
   "scrollRef",
   "bottomRef",
@@ -64,11 +124,23 @@ const expectedReturnNames = [
   "getIsAtBottom",
   "getScrollElement",
 ];
-
-assert(
-  JSON.stringify(returnNames) === JSON.stringify(expectedReturnNames),
-  `${file} public return names changed:\nexpected ${expectedReturnNames.join(", ")}\nactual   ${returnNames.join(", ")}`
+const contractKeysMatch = publicContractSource.match(
+  /MESSAGE_LIST_SCROLL_PUBLIC_CONTRACT_KEYS = Object\.freeze\(\[([\s\S]*?)\]\);/
 );
+assert(contractKeysMatch, `${publicContractFile} must keep public keys as a frozen array`);
+const contractKeys = Array.from(
+  contractKeysMatch[1].matchAll(/"([A-Za-z0-9_]+)"/g)
+).map((match) => match[1]);
+assert(
+  JSON.stringify(contractKeys) === JSON.stringify(expectedReturnNames),
+  `${publicContractFile} public contract keys changed:\nexpected ${expectedReturnNames.join(", ")}\nactual   ${contractKeys.join(", ")}`
+);
+expectedReturnNames.forEach((name) => {
+  assert(
+    publicContractSource.includes(`${name}: contract.${name}`),
+    `${publicContractFile} must map ${name} explicitly`
+  );
+});
 
 const utilsFile =
   "src/composables/chat/internal/message-list/messageListScrollUtils.js";
@@ -131,6 +203,40 @@ const lazyPrependSource = fs.readFileSync(
     `${file} should keep step 3 lazy prepend controller outside orchestrator: ${marker}`
   );
 });
+
+const previousHistoryLazyFile =
+  "src/composables/chat/internal/message-list/usePreviousHistoryLazyLoad.js";
+const previousHistoryLazySource = fs.readFileSync(
+  path.join(root, previousHistoryLazyFile),
+  "utf8"
+);
+[
+  "export function createPreviousHistoryLazyLoadController",
+  "async function requestPreviousHistoryMessagesIfNeeded",
+  "function handleManualPreviousHistoryLoad",
+  "function blurHistoryLoadMoreTrigger",
+].forEach((marker) => {
+  assert(
+    previousHistoryLazySource.includes(marker),
+    `${previousHistoryLazyFile} must keep previous history lazy-load member: ${marker}`
+  );
+});
+
+[
+  "async function requestPreviousHistoryMessagesIfNeeded",
+  "function blurHistoryLoadMoreTrigger",
+  "function handleManualPreviousHistoryLoad",
+].forEach((marker) => {
+  assert(
+    !source.includes(marker),
+    `${file} should keep step 5-4 previous history lazy-load flow outside orchestrator: ${marker}`
+  );
+});
+
+assert(
+  source.includes("createPreviousHistoryLazyLoadController"),
+  `${file} must wire previous-history lazy-load controller`
+);
 
 const overlaySyncFile =
   "src/composables/chat/internal/message-list/useMessageOverlayScrollSync.js";

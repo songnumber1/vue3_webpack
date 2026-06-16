@@ -9,7 +9,7 @@
     style="display: flex"
   >
     <div
-      class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[820px] tw-flex-col tw-items-center tw-gap-4 tw-text-center"
+      class="empty-center main-empty-state__center tw-mx-auto tw-flex tw-w-full tw-max-w-[var(--layout-prompt-width,880px)] tw-flex-col tw-items-center tw-gap-4 tw-text-center"
     >
       <img
         class="empty-assistant-logo main-empty-state__logo tw-h-12 tw-w-12 tw-rounded-2xl tw-object-contain tw-shadow-control"
@@ -184,8 +184,8 @@ function handleSuggestionClick(item) {
     .desktop-center-prompt
 ) {
   order: 10 !important;
-  width: min(var(--layout-prompt-width, 820px), 100%) !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
 }
 
 :global(
@@ -203,8 +203,8 @@ function handleSuggestionClick(item) {
   flex-wrap: nowrap !important;
   align-items: stretch !important;
   justify-content: flex-start !important;
-  width: min(var(--layout-prompt-width, 820px), 100%) !important;
-  max-width: var(--layout-prompt-width, 820px) !important;
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
   margin-top: 4px !important;
 }
 
@@ -238,7 +238,6 @@ function handleSuggestionClick(item) {
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
 }
-
 
 /*
  * When the PC main composer is expanded, hide the surrounding empty-state
@@ -375,7 +374,7 @@ function handleSuggestionClick(item) {
   inset: auto !important;
   box-sizing: border-box;
   width: 100% !important;
-  max-width: min(100%, var(--layout-prompt-width, 820px)) !important;
+  max-width: min(100%, var(--layout-prompt-width, 880px)) !important;
   margin: 0 auto !important;
   padding: 0 !important;
   overflow: visible !important;

@@ -42,8 +42,8 @@ export function usePromptComposer(props, emit) {
   const {t, locale} = useI18n();
   // 2. 외부 Props의 변경 사항을 하위 서브 훅들이 안전하게 반응형 추적할 수 있도록 `toRef` 단방향 참조 처리를 수행합니다.
   const disabled = toRef(props, "disabled");
-  const attachmentDisabled = computed(
-    () => Boolean(disabled.value || props.submitDisabled || props.hideAttachActions)
+  const attachmentDisabled = computed(() =>
+    Boolean(disabled.value || props.submitDisabled || props.hideAttachActions)
   );
 
   // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 전역 채팅 Pinia 스토어를 로드합니다.

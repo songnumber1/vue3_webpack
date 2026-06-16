@@ -19,7 +19,7 @@
 
 .mobile-main-fixed-prompt .prompt-box,
 .desktop-center-prompt .prompt-box {
-  width: min(100%, var(--layout-prompt-width, 820px));
+  width: min(100%, var(--layout-prompt-width, 880px));
 }
 
 body.mobile-mode .mobile-main-fixed-prompt {
@@ -84,8 +84,8 @@ body.mobile-mode .mobile-bottom-prompt {
 
 .prompt-box,
 body.mobile-mode .prompt-box {
-  width: min(100%, 760px);
-  max-width: 760px;
+  width: min(100%, var(--layout-prompt-width, 880px));
+  max-width: var(--layout-prompt-width, 880px);
   min-width: 0;
   margin: 0 auto;
   display: flex !important;
@@ -182,8 +182,8 @@ body.mobile-mode .prompt-box textarea {
 
 .prompt-box--gemini,
 body.mobile-mode .prompt-box--gemini {
-  width: min(100%, 820px);
-  max-width: 820px;
+  width: min(100%, var(--layout-prompt-width, 880px));
+  max-width: var(--layout-prompt-width, 880px);
   display: flex !important;
   flex-direction: column;
   align-items: stretch;
@@ -425,7 +425,7 @@ body.mobile-mode .prompt-box--gemini .send-button {
 }
 
 body.desktop-mode .desktop-center-prompt {
-  width: min(820px, calc(100vw - 420px));
+  width: min(var(--layout-prompt-width, 880px), calc(100vw - 420px));
 }
 
 .prompt-box--gemini .voice-button,
@@ -887,9 +887,7 @@ body.desktop-mode
   align-self: stretch;
 }
 
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-desktop-top-row {
+body.desktop-mode .prompt-box--desktop-top-actions .prompt-desktop-top-row {
   order: 1;
 }
 

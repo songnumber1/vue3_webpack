@@ -70,7 +70,6 @@ export const useSystemSettingsStore = defineStore("systemSettings", {
     showMobileProgress: (state) => state.settings.showMobileProgress,
     // AI의 답변 토큰이 실시간 분출 타이핑 출력될 때 메인 대화 스크롤바 영역을 화면 하단 꼬리로 완전 자동 연속 동적 추적 다운시킬지 판별식
     autoScrollOnAnswer: (state) => state.settings.autoScrollOnAnswer,
-    conversationUrlMode: (state) => state.settings.conversationUrlMode,
     showMermaidHeader: (state) => state.settings.showMermaidHeader,
     enableMermaidRendering: (state) => state.settings.enableMermaidRendering,
     pcShowMermaidHeader: (state) => state.settings.pcShowMermaidHeader,

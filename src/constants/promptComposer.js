@@ -7,6 +7,16 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
+export const DRAFT_PROMPT_TOOL_SETTINGS_KEY = "__draft__";
+
+export const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
+  knowledgeSearch: [],
+  webSearch: null,
+  webSearchEnabled: false,
+  promptTemplateId: null,
+  promptTemplateOptions: {},
+});
+
 export const PROMPT_MENU_TYPE = Object.freeze({
   model: "model",
   tool: "tool",

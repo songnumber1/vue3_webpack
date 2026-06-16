@@ -30,7 +30,7 @@ import {useHistoryConversationLoader} from "@/composables/chat/history/useHistor
 import {useSharedConversationLoader} from "@/composables/chat/shared/useSharedConversationLoader";
 import {useConversationLazyHistory} from "@/composables/chat/conversation/useConversationLazyHistory";
 import {useConversationRenderLifecycle} from "@/composables/chat/conversation/useConversationRenderLifecycle";
-import {resolveConversationRouteReconciliation} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {resolveHiddenConversationRoute} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {
   resolveConversationTitle,
   resolveWorkspaceAssistantLabel,
@@ -88,7 +88,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
     props,
     route,
     chatStore,
-    systemSettingsStore,
   });
 
   const isReadOnly = computed(
@@ -128,11 +127,10 @@ export function useChatDataController({props, ui, runtime, messages}) {
     chatStore,
   });
 
-  async function reconcileConversationUrlModeRoute() {
-    const result = resolveConversationRouteReconciliation({
+  async function reconcileHiddenConversationRoute() {
+    const result = resolveHiddenConversationRoute({
       route,
       chatStore,
-      settings: systemSettingsStore.settings,
     });
 
     if (!result.shouldRedirect) return false;
@@ -235,7 +233,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
       t,
       router,
       chatStore,
-      systemSettingsStore,
       messages,
       activeHistoryId,
       getSharedEntryId,
@@ -340,7 +337,6 @@ export function useChatDataController({props, ui, runtime, messages}) {
         route.params.shareId,
         chatStore.activeRoomId,
         chatStore.activeRoomType,
-        systemSettingsStore.settings.conversationUrlMode,
         route.query?.messageId,
         currentMode.value,
       ],
@@ -350,7 +346,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
           invalidateRouteLoad();
           return;
         }
-        if (await reconcileConversationUrlModeRoute()) return;
+        if (await reconcileHiddenConversationRoute()) return;
         loadRouteConversation();
       }
     );
@@ -390,7 +386,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
         logWarn("[useChatDataController] runtime.initialize 오류:", error);
       }
       if (shouldLoadRouteConversation()) {
-        if (await reconcileConversationUrlModeRoute()) {
+        if (await reconcileHiddenConversationRoute()) {
           await nextTick();
         }
         await loadRouteConversation(); // 3단계: 현재 주소창에 박제되어 있는 대화 내역 원격 자동 동기화 복원

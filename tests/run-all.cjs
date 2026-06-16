@@ -22,9 +22,13 @@ require('./overlay-scroll-container-static.cjs');
 require('./studio-create-overlay-container-static.cjs');
 require('./runtime-mode-helpers-static.cjs');
 require('./layout-mode-helpers-static.cjs');
+require('./layout-width-static.cjs');
 require('./main-empty-state-desktop-order-static.cjs');
 require('./prompt-submit-disabled-static.cjs');
 require('./prompt-desktop-top-actions-static.cjs');
 require('./prompt-desktop-top-actions-placement-static.cjs');
+require('./prompt-scss-structure-static.cjs');
+require('./responsive-keyboard-scss-structure-static.cjs');
+require('./message-list-depth-static.cjs');
 
 console.log("all regression checks passed");
