@@ -16,6 +16,7 @@ import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
+import {useAppOverlayBackStore} from "@/stores/appOverlayBackStore";
 import {
   isSharedChat,
   resolveMessageRenderPolicy,
@@ -64,6 +65,7 @@ export function useChatDataController({props, ui, runtime, messages}) {
   const platformStore = usePlatformStore();
   const systemSettingsStore = useSystemSettingsStore();
   const chatStore = useChatStore();
+  const overlayBackStore = useAppOverlayBackStore();
   const navigationLock = useNavigationLock();
   const messageRenderPolicy = computed(() =>
     resolveMessageRenderPolicy({
@@ -329,6 +331,42 @@ export function useChatDataController({props, ui, runtime, messages}) {
    * @function bindDataEvents
    * @description 라우트 주소 변경 및 스토어 백그라운드 메시지 갱신 내역을 감시하는 반응형 리스너 버스를 개통합니다.
    */
+
+  function isRouteLoadSourceChanged(nextSource = [], previousSource = []) {
+    return JSON.stringify(nextSource || []) !== JSON.stringify(previousSource || []);
+  }
+
+  function isRealRouteLoadTargetChanged(nextSource = [], previousSource = []) {
+    return (
+      String(nextSource?.[0] || "") !== String(previousSource?.[0] || "") ||
+      String(nextSource?.[1] || "") !== String(previousSource?.[1] || "") ||
+      String(nextSource?.[2] || "") !== String(previousSource?.[2] || "") ||
+      String(nextSource?.[3] || "") !== String(previousSource?.[3] || "") ||
+      String(nextSource?.[4] || "") !== String(previousSource?.[4] || "") ||
+      String(nextSource?.[5] || "") !== String(previousSource?.[5] || "")
+    );
+  }
+
+  function shouldSkipRouteLoadForOverlayBack(nextSource, previousSource) {
+    if (!overlayBackStore.shouldSuppressChatRouteLoad(activeHistoryId.value)) {
+      return false;
+    }
+
+    const sourceChanged = isRouteLoadSourceChanged(nextSource, previousSource);
+    const realTargetChanged = isRealRouteLoadTargetChanged(
+      nextSource,
+      previousSource
+    );
+
+    if (sourceChanged && realTargetChanged) {
+      overlayBackStore.clearSuppressNextChatRouteLoad();
+      return false;
+    }
+
+    overlayBackStore.consumeSuppressNextChatRouteLoad(activeHistoryId.value);
+    return true;
+  }
+
   function bindDataEvents() {
     // 왓처 A: 사용자가 URL 주소를 바꾸거나 뒤로가기/앞으로가기 및 메인 전환 모션을 취할 시 감지하여 세션 복원 함수를 호출합니다.
     watch(
@@ -340,9 +378,13 @@ export function useChatDataController({props, ui, runtime, messages}) {
         route.query?.messageId,
         currentMode.value,
       ],
-      async () => {
+      async (nextSource, previousSource) => {
         if (!runtimeReady.value) return;
         if (!shouldLoadRouteConversation()) {
+          invalidateRouteLoad();
+          return;
+        }
+        if (shouldSkipRouteLoadForOverlayBack(nextSource, previousSource)) {
           invalidateRouteLoad();
           return;
         }

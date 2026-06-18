@@ -83,6 +83,9 @@ export function usePromptComposer(props, emit) {
   // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
   const {
     fileInputRef, // <input type="file" /> 실제 숨김 노드 접근용 Vue Ref
+    fileDropZoneRef, // 파일 드래그앤드롭 이벤트를 수신할 입력 박스 루트 DOM Ref
+    isFileDragging, // 현재 파일이 입력 박스 위로 드래그되고 있는지 여부
+    isFileDropDisabled, // 현재 모델/상태에서 파일 드롭이 차단되어 있는지 여부
     attachments, // 현재 업로드되어 프롬프트 전송을 대기 중인 파일 오브젝트들의 반응형 배열 (Ref)
     fileAccept, // 허용할 확장자 및 미디어 마임 타입 가이드 문자열 (예: "image/*,application/pdf")
     captureMode, // 모바일 카메라 촬영 연동 시 전면/후면 지시 속성값
@@ -375,6 +378,9 @@ export function usePromptComposer(props, emit) {
     handlePaste,
     // attachment 첨부 제어 파트
     fileInputRef,
+    fileDropZoneRef,
+    isFileDragging,
+    isFileDropDisabled,
     attachments,
     fileAccept,
     captureMode,

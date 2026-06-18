@@ -9,6 +9,7 @@
 
 import {computed, nextTick, onBeforeUnmount, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
+import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
 import {usePlatformStore} from "@/stores/platformStore";
 import {openNativeFilePicker} from "@/platform/bridge/platformBridge";
 import {
@@ -52,6 +53,8 @@ export function usePromptAttachment({
 
   // 숨겨진 원시 파일 업로드 마크업 돔 요소 레퍼런스 (<input type="file" ref="fileInputRef" />)
   const fileInputRef = ref(null);
+  // 파일 드래그앤드롭 이벤트를 수신할 입력 박스 루트 DOM 레퍼런스입니다.
+  const fileDropZoneRef = ref(null);
   // 현재 입력 대기 상태인 파일 객체들이 정형화되어 누적 적치되는 메인 배열
   const attachments = ref([]);
   const fileAccept = ref("");
@@ -226,6 +229,22 @@ export function usePromptAttachment({
     attachments.value = [];
   }
 
+  function handleDroppedFiles(files) {
+    if (disabled.value) return;
+    addFiles(files);
+  }
+
+  const {
+    isFileDragging,
+    isFileDropEnabled,
+    isFileDropDisabled,
+    resetFileDragState,
+  } = useFileDragDrop({
+    targetRef: fileDropZoneRef,
+    enabled: computed(() => !disabled.value),
+    onDropFiles: handleDroppedFiles,
+  });
+
   // 안드로이드 자바 및 코틀린 레이어에서 웹뷰 인프라를 향해 쏴주는 원격 커스텀 파일 선택 완결 이벤트 버스 리스너 개통
   useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
@@ -241,6 +260,11 @@ export function usePromptAttachment({
   // 하위 마크업 템플릿 바인딩 뷰 및 버튼 컴포넌트 주입용 자원 팩 허브 분출
   return {
     fileInputRef,
+    fileDropZoneRef,
+    isFileDragging,
+    isFileDropEnabled,
+    isFileDropDisabled,
+    resetFileDragState,
     attachments,
     fileAccept,
     captureMode,

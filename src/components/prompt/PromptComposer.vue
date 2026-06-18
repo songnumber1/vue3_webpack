@@ -7,10 +7,13 @@
     }"
   >
     <form
+      ref="fileDropZoneRef"
       class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt"
       :class="{
         'prompt-box--expanded': isPromptExpanded,
         'prompt-box--desktop-top-actions': usesDesktopTopActions,
+        'prompt-box--file-dragging': isFileDragging,
+        'prompt-box--file-drop-disabled': isFileDropDisabled,
       }"
       @submit.prevent="submit"
     >
@@ -307,6 +310,9 @@ const {
   textareaComponentRef,
   toolbarRef,
   fileInputRef,
+  fileDropZoneRef,
+  isFileDragging,
+  isFileDropDisabled,
   attachments,
   attachMenuOpen,
   modelMenuOpen,
@@ -447,5 +453,26 @@ defineExpose({
 :global(body.mobile-mode) .prompt-box,
 :global(body.mobile-mode) .prompt-box--gemini {
   border: 1px solid var(--prompt-border);
+}
+
+.prompt-box--file-dragging {
+  outline: 2px dashed var(--prompt-border);
+  outline-offset: 4px;
+}
+
+.prompt-box--file-dragging::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--app-prompt);
+  opacity: 0.72;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.prompt-box--file-dragging > * {
+  position: relative;
+  z-index: 3;
 }
 </style>

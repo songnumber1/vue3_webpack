@@ -26,6 +26,7 @@ import {useChatNavigationActions} from "@/composables/chat/internal/container/us
 import {useChatPromptActions} from "@/composables/chat/internal/container/useChatPromptActions";
 import {useChatScrollController} from "@/composables/chat/internal/container/useChatScrollController";
 import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
+import {useOverlayBackGuard} from "@/composables/app/useOverlayBackGuard";
 import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
 import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
 import {registerActiveConversationCleanup} from "@/composables/chat/conversation/useActiveConversationCleanup";
@@ -72,6 +73,16 @@ export function useChatUIController({
     systemOpen,
     languageSheetOpen,
     mobileSettingsOpen,
+    isAnyOverlayOpen,
+    activeOverlayType,
+    closeAppOverlay,
+    closeActiveOverlayOnly,
+    closeNotice: closeNoticeOnly,
+    closePrivacy: closePrivacyOnly,
+    closePersonalization: closePersonalizationOnly,
+    closeSystem: closeSystemOnly,
+    closeLanguageSheet: closeLanguageSheetOnly,
+    closeMobileSettings: closeMobileSettingsOnly,
     handleMobileSettingsDesktopOpen,
   } = useAppShellOverlays();
 
@@ -97,6 +108,52 @@ export function useChatUIController({
     isCompactScreen,
     platformInfo,
   });
+
+  function closeCurrentAppOverlayOnly() {
+    if (activeOverlayType.value) {
+      closeAppOverlay(activeOverlayType.value);
+      return;
+    }
+
+    closeActiveOverlayOnly();
+  }
+
+  const shouldSuppressChatRouteLoadOnOverlayBack = computed(() =>
+    Boolean(pageState.isChatPage?.value)
+  );
+
+  const {closeOverlayByBackOrDirect} = useOverlayBackGuard({
+    isMobile,
+    isAnyOverlayOpen,
+    activeOverlayType,
+    closeActiveOverlayOnly: closeCurrentAppOverlayOnly,
+    shouldSuppressChatRouteLoad: shouldSuppressChatRouteLoadOnOverlayBack,
+    suppressChatRouteLoadId: activeHistoryId,
+  });
+
+  function closeNotice() {
+    closeOverlayByBackOrDirect(closeNoticeOnly);
+  }
+
+  function closePrivacy() {
+    closeOverlayByBackOrDirect(closePrivacyOnly);
+  }
+
+  function closePersonalization() {
+    closeOverlayByBackOrDirect(closePersonalizationOnly);
+  }
+
+  function closeSystem() {
+    closeOverlayByBackOrDirect(closeSystemOnly);
+  }
+
+  function closeLanguageSheet() {
+    closeOverlayByBackOrDirect(closeLanguageSheetOnly);
+  }
+
+  function closeMobileSettings() {
+    closeOverlayByBackOrDirect(closeMobileSettingsOnly);
+  }
 
   // ── [4. 엘리먼트 가상 고속 스크롤 매니저 엔진] ──────────────────
   const {
@@ -250,6 +307,15 @@ export function useChatUIController({
     systemOpen,
     languageSheetOpen,
     mobileSettingsOpen,
+    isAnyOverlayOpen,
+    activeOverlayType,
+    closeActiveOverlayOnly,
+    closeNotice,
+    closePrivacy,
+    closePersonalization,
+    closeSystem,
+    closeLanguageSheet,
+    closeMobileSettings,
     previewImage,
     themeName,
     isMobile,

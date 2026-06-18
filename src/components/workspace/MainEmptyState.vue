@@ -36,7 +36,9 @@
       >
         {{ subtitle }}
       </p>
-      <slot v-if="!isMobile" name="composer"></slot>
+      <div class="main-empty-state__composer-dock" aria-label="Main prompt">
+        <slot name="composer"></slot>
+      </div>
       <div
         v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
@@ -57,13 +59,6 @@
           <span class="suggestion-chip-text">{{ item.text }}</span>
         </button>
       </div>
-    </div>
-    <div
-      v-if="isMobile"
-      class="main-empty-state__composer-dock"
-      aria-label="Mobile main prompt"
-    >
-      <slot name="composer"></slot>
     </div>
   </section>
 </template>
@@ -136,6 +131,11 @@ function handleSuggestionClick(item) {
   align-items: center;
   justify-content: center;
   gap: 10px;
+}
+
+.main-empty-state__composer-dock {
+  width: min(var(--layout-prompt-width, 880px), 100%);
+  max-width: var(--layout-prompt-width, 880px);
 }
 
 .studio-detail-trigger {

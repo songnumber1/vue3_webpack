@@ -32,9 +32,9 @@
       :privacy-subtitle="t('legal.privacy.description')"
       :personalization-title="t('personalization.title')"
       :personalization-subtitle="t('personalization.subtitle')"
-      @close-notice="noticeOpen = false"
-      @close-privacy="privacyOpen = false"
-      @close-personalization="personalizationOpen = false"
+      @close-notice="closeNotice"
+      @close-privacy="closePrivacy"
+      @close-personalization="closePersonalization"
     >
       <template #notice>
         <NoticeView />
@@ -52,22 +52,22 @@
       :title="t('common.system')"
       :subtitle="t('menu.systemSummary')"
       panel-class="responsive-panel--system-settings"
-      @close="systemOpen = false"
+      @close="closeSystem"
     >
       <SystemSettingsView
-        @close="systemOpen = false"
+        @close="closeSystem"
         @applied="handleSystemSettingsApplied"
       />
     </ResponsiveOverlay>
 
     <LanguageSelectSheet
       :open="languageSheetOpen"
-      @close="languageSheetOpen = false"
+      @close="closeLanguageSheet"
     />
 
     <MobileSettingsPanel
       :open="mobileSettingsOpen"
-      @close="mobileSettingsOpen = false"
+      @close="closeMobileSettings"
       @desktop-open="handleMobileSettingsDesktopOpen"
       @applied="handleSystemSettingsApplied"
     />
@@ -197,6 +197,12 @@ const {
   systemOpen,
   languageSheetOpen,
   mobileSettingsOpen,
+  closeNotice,
+  closePrivacy,
+  closePersonalization,
+  closeSystem,
+  closeLanguageSheet,
+  closeMobileSettings,
   historyDialogOpen,
   historyDialogMode,
   historyDialogTarget,
