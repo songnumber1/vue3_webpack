@@ -97,6 +97,7 @@ export function useOverlayBackGuard({
 
     if (shouldConsumeForOverlay) {
       stopRouterPopStateSideEffects(event);
+      markChatRouteLoadSuppressedIfNeeded();
     }
 
     if (overlayBackStore.restoringMobileHistory) {
@@ -110,8 +111,6 @@ export function useOverlayBackGuard({
       clearOverlayBackState();
       return;
     }
-
-    markChatRouteLoadSuppressedIfNeeded();
 
     if (typeof closeActiveOverlayOnly === "function") {
       closeActiveOverlayOnly();
