@@ -11,10 +11,6 @@ import {computed, ref, unref, watch} from "vue";
 import {useEventListener} from "@vueuse/core";
 
 const FILE_DATA_TRANSFER_TYPE = "Files";
-const WEB_CONTENT_DATA_TRANSFER_TYPES = Object.freeze([
-  "text/html",
-  "text/uri-list",
-]);
 
 /**
  * Ref, computed, boolean, getter 함수 형태로 전달되는 옵션 값을 안전하게 현재 값으로 해석합니다.
@@ -26,18 +22,10 @@ function resolveOptionValue(value) {
 /**
  * 브라우저 드래그 이벤트가 실제 파일 payload를 포함하는지 확인합니다.
  */
-function getDataTransferTypes(event) {
-  return Array.from(event?.dataTransfer?.types || []);
-}
-
 function hasFilePayload(event) {
-  return getDataTransferTypes(event).includes(FILE_DATA_TRANSFER_TYPE);
-}
-
-function hasWebContentPayload(event) {
-  const types = getDataTransferTypes(event);
-
-  return WEB_CONTENT_DATA_TRANSFER_TYPES.some((type) => types.includes(type));
+  return Array.from(event?.dataTransfer?.types || []).includes(
+    FILE_DATA_TRANSFER_TYPE
+  );
 }
 
 /**
@@ -131,21 +119,9 @@ export function useFileDragDrop({
     return true;
   }
 
-  function allowExternalFileEvent(event) {
-    if (!hasFilePayload(event)) return false;
-
-    if (hasWebContentPayload(event)) {
-      preventFileDropDefault(event);
-      resetFileDragState();
-      return false;
-    }
-
-    return true;
-  }
-
   function handleDragEnter(event) {
     if (guardDisabledFileEvent(event, "dragenter")) return;
-    if (!allowExternalFileEvent(event)) return;
+    if (!hasFilePayload(event)) return;
 
     preventFileDropDefault(event);
 
@@ -155,7 +131,7 @@ export function useFileDragDrop({
 
   function handleDragOver(event) {
     if (guardDisabledFileEvent(event, "dragover")) return;
-    if (!allowExternalFileEvent(event)) return;
+    if (!hasFilePayload(event)) return;
 
     preventFileDropDefault(event);
 
@@ -169,7 +145,7 @@ export function useFileDragDrop({
   function handleDragLeave(event) {
     if (guardDisabledFileEvent(event, "dragleave")) return;
 
-    if (!allowExternalFileEvent(event)) {
+    if (!hasFilePayload(event)) {
       if (isFileDragging.value) resetFileDragState();
       return;
     }
@@ -183,7 +159,7 @@ export function useFileDragDrop({
 
   function handleDrop(event) {
     if (guardDisabledFileEvent(event, "drop")) return;
-    if (!allowExternalFileEvent(event)) return;
+    if (!hasFilePayload(event)) return;
 
     preventFileDropDefault(event);
 

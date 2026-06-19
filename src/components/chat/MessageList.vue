@@ -281,22 +281,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.message-list-shell {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-}
-
-.message-list-shell > .message-list {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-}
-
 .message-list {
   min-width: 0;
   min-height: 0;
@@ -394,12 +378,6 @@ defineExpose({
 .message-list--manual-stream .stream-focus-spacer,
 .message-list--manual-stream .message-list-anchor {
   overflow-anchor: none;
-}
-
-.message-list-anchor {
-  width: 100%;
-  height: 1px;
-  pointer-events: none;
 }
 
 .typing-row {
