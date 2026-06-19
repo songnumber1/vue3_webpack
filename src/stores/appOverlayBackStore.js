@@ -15,10 +15,6 @@ export const useAppOverlayBackStore = defineStore("appOverlayBack", {
     suppressNextChatRouteLoadExpiresAt: 0,
   }),
 
-  getters: {
-    hasMobileHistoryEntry: (state) => Boolean(state.mobileHistoryPushed),
-  },
-
   actions: {
     setActiveOverlayType(type) {
       this.activeOverlayType = type || null;

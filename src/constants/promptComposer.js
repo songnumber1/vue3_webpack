@@ -42,9 +42,32 @@ export const FILE_PICKER_TYPE = Object.freeze({
   all: "all",
 });
 
+export const ALLOWED_ATTACHMENT_EXTENSIONS = Object.freeze([
+  "doc",
+  "docx",
+  "ppt",
+  "pptx",
+]);
+
+export const ALLOWED_ATTACHMENT_MIME_TYPES = Object.freeze([
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+]);
+
+export const ALLOWED_ATTACHMENT_ACCEPT = [
+  "image/*",
+  ".doc",
+  ".docx",
+  ".ppt",
+  ".pptx",
+  ...ALLOWED_ATTACHMENT_MIME_TYPES,
+].join(",");
+
 export const FILE_ACCEPT = Object.freeze({
   image: "image/*",
-  all: "",
+  all: ALLOWED_ATTACHMENT_ACCEPT,
 });
 
 export const CAMERA_CAPTURE_MODE = "environment";

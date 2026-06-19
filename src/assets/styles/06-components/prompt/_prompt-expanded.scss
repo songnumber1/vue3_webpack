@@ -30,8 +30,8 @@ body.mobile-mode.prompt-input-expanded {
 }
 
 /* Main screen: the expanded composer should replace the guide/suggestion area.
-   Hide, rather than reflow, the empty-state content so only the overlay prompt
-   owns touch and visual space while expanded. */
+   The composer dock is now inside .main-empty-state__center, so keep the
+   center visible and hide only non-composer guide content. */
 body.mobile-mode.prompt-input-expanded
   .chat-container-root--mode-main
   .empty-stage--mobile-main
@@ -40,6 +40,26 @@ body.mobile-mode.prompt-input-expanded
   .chat-container-root--mode-main
   .empty-stage--mobile-main
   .main-empty-state__center {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .main-empty-state__logo,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .main-empty-state__title,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .main-empty-state__subtitle,
+body.mobile-mode.prompt-input-expanded
+  .chat-container-root--mode-main
+  .empty-stage--mobile-main
+  .main-empty-state__suggestions {
   visibility: hidden !important;
   pointer-events: none !important;
 }

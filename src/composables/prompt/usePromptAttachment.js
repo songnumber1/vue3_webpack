@@ -16,10 +16,13 @@ import {
   createBrowserAttachment,
   createNativeAttachment,
   imageAttachment,
+  isImageFile,
   revokeAttachmentUrl,
 } from "@/utils/attachment";
 import {logWarn} from "@/utils/logger";
 import {
+  ALLOWED_ATTACHMENT_EXTENSIONS,
+  ALLOWED_ATTACHMENT_MIME_TYPES,
   ANDROID_TO_JS_EVENT,
   ATTACH_MENU_OPTIONS,
   FILE_PICKER_TYPE,
@@ -28,6 +31,40 @@ import {
   PROMPT_MENU_TYPE,
 } from "@/constants/promptComposer";
 import {useI18n} from "vue-i18n";
+
+
+const ALLOWED_ATTACHMENT_EXTENSION_SET = new Set(
+  ALLOWED_ATTACHMENT_EXTENSIONS.map((extension) => extension.toLowerCase())
+);
+const ALLOWED_ATTACHMENT_MIME_TYPE_SET = new Set(
+  ALLOWED_ATTACHMENT_MIME_TYPES.map((type) => type.toLowerCase())
+);
+
+function getFileExtension(name = "") {
+  const normalized = String(name).toLowerCase();
+  const extensionIndex = normalized.lastIndexOf(".");
+
+  if (extensionIndex < 0) return "";
+
+  return normalized.slice(extensionIndex + 1);
+}
+
+function isAllowedAttachmentFile(file) {
+  if (!file) return false;
+  if (isImageFile(file)) return true;
+
+  const extension = getFileExtension(file.name);
+  if (ALLOWED_ATTACHMENT_EXTENSION_SET.has(extension)) return true;
+
+  const mimeType = String(file.type || "").toLowerCase();
+  return ALLOWED_ATTACHMENT_MIME_TYPE_SET.has(mimeType);
+}
+
+function filterAllowedAttachmentFiles(fileList) {
+  const files = Array.from(fileList || []);
+
+  return files.filter(isAllowedAttachmentFile);
+}
 
 /**
  * @function usePromptAttachment
@@ -138,7 +175,7 @@ export function usePromptAttachment({
     const detail = event?.detail || {};
     if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
 
-    const nativeFiles = detail.payload?.files || [];
+    const nativeFiles = filterAllowedAttachmentFiles(detail.payload?.files || []);
     const mapped = nativeFiles.map(createNativeAttachment);
 
     if (mapped.length) attachments.value = [...attachments.value, ...mapped];
@@ -158,7 +195,8 @@ export function usePromptAttachment({
    * 프론트엔드 말풍선 첨부용 데이터 모델로 변환 빌드 및 이미지 하이드레이션(섬네일 추출)을 전개합니다.
    */
   function addFiles(fileList) {
-    const mapped = Array.from(fileList || []).map(createBrowserAttachment);
+    const allowedFiles = filterAllowedAttachmentFiles(fileList);
+    const mapped = allowedFiles.map(createBrowserAttachment);
     if (!mapped.length) return;
 
     // 반응형 배열의 불변성을 보존하며 신규 첨부 자원을 기존 배열 꼬리에 결합 주입합니다.

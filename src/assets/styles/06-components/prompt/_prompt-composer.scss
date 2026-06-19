@@ -711,6 +711,19 @@ body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .empty-center {
 
 body.desktop-mode
   .main-empty-state:has(.prompt-wrap--expanded)
+  .main-empty-state__composer-dock {
+  display: flex !important;
+  flex: 1 1 auto !important;
+  width: min(var(--layout-prompt-width, 880px), 100%) !important;
+  max-width: var(--layout-prompt-width, 880px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+}
+
+body.desktop-mode
+  .main-empty-state:has(.prompt-wrap--expanded)
   .empty-assistant-logo,
 body.desktop-mode
   .main-empty-state:has(.prompt-wrap--expanded)
@@ -769,6 +782,14 @@ body.desktop-mode
   overflow: hidden !important;
 }
 
+body.desktop-mode
+  .chat-container-root--mode-chat
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .message-list-shell,
+body.desktop-mode
+  .chat-container-root--mode-shared
+  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
+  .message-list-shell,
 body.desktop-mode
   .chat-container-root--mode-chat
   .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)

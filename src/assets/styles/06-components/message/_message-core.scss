@@ -1,6 +1,20 @@
 /* Message list, bubble, avatar and typing baseline extracted from 05-layout/_chat-core.scss.
    Preserve selectors, declarations and import order during Step 6 SCSS refactor. */
 @use "../../00-abstracts/mixins" as *;
+.message-list-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+.message-list-shell > .message-list {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
 .message-list {
   overflow: auto;
   padding: 22px min(8vw, 130px) 28px;
