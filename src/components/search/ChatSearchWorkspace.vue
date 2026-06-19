@@ -278,11 +278,9 @@ async function openChat(result) {
       router,
       chatStore,
       chatId,
+      replace: false,
+      query,
     });
-
-    if (query && Object.keys(query).length) {
-      await router.replace({query}).catch(() => {});
-    }
   } catch (_error) {
     if (String(chatStore.pendingSelectedChatId) === chatId) {
       chatStore.clearPendingSelectedChatId();

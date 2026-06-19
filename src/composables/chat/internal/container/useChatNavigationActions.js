@@ -1,4 +1,3 @@
-import {nextTick} from "vue";
 /**
  * @file composables/chat/internal/container/useChatNavigationActions.js
  * @description ChatContainer 전용 controller 계층입니다. route, UI 상태, scroll, modal, submit 흐름을 도메인별 composable로 조립합니다.
@@ -8,17 +7,11 @@ import {nextTick} from "vue";
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
-import {authApiLive} from "@/api/live/authApi.live";
-import {useAuthStore} from "@/stores/authStore";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {createAppShellActionHandlers} from "@/composables/app/createAppShellActionHandlers";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
-import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
-import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
-import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
@@ -163,52 +156,8 @@ export function useChatNavigationActions({
       router,
       chatStore,
       chatId: historyId,
-      replace: true,
     }).catch(() => {});
     return true;
-  }
-
-  /**
-   * @description 라이트 모드 <-> 다크 모드 스타일 레이어를 반전 토글하고, 이에 대응하여 메시지 리스트에 내장된 Mermaid.js 기반 순서도/다이어그램 그래프의 색상 스키마를 강제 리렌더링 보정합니다.
-   */
-  async function toggleTheme() {
-    if (isChatNavigationBlocked()) return;
-    try {
-      theme.toggle(); // 글로벌 하드웨어 테마 쿠키/로컬스토리지 스위칭 연동
-      themeName.value = theme.current; // 현재 모드 런타임 캐싱 업데이트
-
-      await nextTick(); // Vue DOM 트리 상에 다크/라이트 CSS 클래스명이 전격 주입 정착되는 프레임 대기
-
-      // [중요 인프라 가드]: 테마 백그라운드가 바뀌면 흰색/검은색 선이 가려지므로 돔 요소를 수색하여 인라인 SVG 머메이드 다이어그램 코드를 강제 강도 압착 재생성
-      if (
-        isMermaidRenderingEnabledForPlatform(
-          getRuntimeSystemSettings(),
-          Boolean(isMobile?.value)
-        )
-      ) {
-        await renderMermaidInElement(document.querySelector(".message-list"), {
-          force: true,
-        });
-      }
-
-      // 차트 재생성으로 인해 채팅창 총 길이가 변동될 수 있으므로 스테이블 모드로 하단 최적화 스크롤 복구 안착
-      scrollBottom({stable: true});
-    } catch (error) {
-      logWarn("[useChatNavigationActions] toggleTheme 오류:", error);
-    }
-  }
-
-  // 시스템 API 개발서 전용 주소창 다이렉트 점프
-  function openSwagger() {
-    if (isChatNavigationBlocked()) return;
-    router.push({name: ROUTE_NAMES.SWAGGER}).catch(() => {});
-  }
-
-  // 프롬프트 및 API 테스트 전용 실험실(Playground) 화면 이동 (이동 시 사이드 드로어는 눈을 가리기 위해 닫기 처리)
-  function openPlayground() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.PLAYGROUND}).catch(() => {});
   }
 
   // 모바일 환경에서 가상 키보드 튐이나 인풋 포커스 록을 깨부수고 부드럽게 좌측 사이드 메뉴 드로어를 슬라이딩 노출합니다.
@@ -227,88 +176,22 @@ export function useChatNavigationActions({
     window.setTimeout(refreshViewport, 180);
   }
 
-  // 해상도 조건에 의거하여 반응형으로 디바이스 맞춤형 환경설정 모달 또는 전용 페이지 창을 점등 제어합니다.
-  function openSettings() {
-    if (isChatNavigationBlocked()) return;
-    if (isMobile.value) {
-      navigationStore.setDrawerOpen(false); // 모바일은 드로어를 등 뒤로 끄고 전체화면 세팅 팝업 로드
-      mobileSettingsOpen.value = true;
-      return;
-    }
-    openPersonalization(); // 데스크톱은 개인화 관리 중앙 데시보드 모달 매핑 실행
-  }
-
-  // 이용 가이드라인 가이드북 라우팅 화면 점프
-  function openGuide() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.GUIDE}).catch(() => {});
-  }
-
-  // 시스템 전체 공지사항 모달 가시 노출 활성화
-  function openNotice() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    noticeOpen.value = true;
-  }
-
-  // 서비스 개인정보 처리방침 규약 모달 가시 노출 활성화
-  function openPrivacy() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    privacyOpen.value = true;
-  }
-
-  // 서비스 공식 이용약관 서면 페이지 라우팅 이동
-  function openTerms() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    router.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
-  }
-
-  // 시스템 커스텀 마이페이지 개인화 모달 팝업 개통
-  function openPersonalization() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    personalizationOpen.value = true;
-  }
-
-  // 인프라 운영 모니터링 및 코어 시스템 정보 가이드 모달 개통
-  function openSystem() {
-    if (isChatNavigationBlocked()) return;
-    navigationStore.setDrawerOpen(false);
-    systemOpen.value = true;
-  }
-
-  // 다국어 글로벌 번역 체인지 전용 바텀시트 활성화
-  function openLanguage() {
-    if (isChatNavigationBlocked()) return;
-    languageSheetOpen.value = true;
-  }
-
-  /**
-   * @description 백엔드 라이브 인증 세션 서버에 로그아웃 HTTP 요청을 무효화 집행하고, 통신 성공 여부와 상관없이 클라이언트 전역 인증 토큰/프로필 컨텍스트 스토어를 영구 리셋 포맷한 뒤 로그인 필수 화면으로 추방 라우트 전환합니다.
-   */
-  async function logout() {
-    if (isChatNavigationBlocked()) return;
-    try {
-      await authApiLive.logout(); // 1. 인증 가동 서버의 쿠키 및 단방향 세션 블록 날리기 요청
-    } catch (error) {
-      logWarn("[useChatNavigationActions] logout 오류:", error); // 서버 다운 등으로 실패하더라도 프론트엔드 탈거는 계속 마감 진행
-    } finally {
-      resetAppBootstrapState();
-      useAuthStore().resetAuth(); // 2. 피나(Pinia) 토큰, 유저 프로필 메모리 정보 전격 소멸
-      navigationStore.setDrawerOpen(false); // 3. 잔존해 있던 네비게이션 가시 오버레이 파괴 해제
-
-      // 4. 인증 상실 전용 가이드 뷰페이지로 리플레이스 강제 릴리즈 (뒤로가기 방어 처리 및 다국어 리즌 코드 쿼리 수치화 결합)
-      await router
-        .replace({
-          name: ROUTE_NAMES.LOGIN_REQUIRED,
-          query: {reason: "LOGIN_REQUIRED"},
-        })
-        .catch(() => {});
-    }
-  }
+  const appShellActions = createAppShellActionHandlers({
+    router,
+    theme,
+    themeName,
+    isMobile,
+    navigationStore,
+    noticeOpen,
+    privacyOpen,
+    personalizationOpen,
+    systemOpen,
+    languageSheetOpen,
+    mobileSettingsOpen,
+    scrollBottom,
+    isBlocked: isChatNavigationBlocked,
+    logScope: "useChatNavigationActions",
+  });
 
   // 상단 탑 헤더 영역의 모델명 버튼 명세 등을 클릭했을 때 하향식 어시스턴트 목록 변경 팝업 시트를 개통 조율
   function openAssistantFromHeader() {
@@ -320,19 +203,8 @@ export function useChatNavigationActions({
   return {
     startNewChat,
     openHistory,
-    toggleTheme,
-    openSwagger,
-    openPlayground,
+    ...appShellActions,
     openMobileDrawer,
-    openSettings,
-    openGuide,
-    openNotice,
-    openPrivacy,
-    openTerms,
-    openPersonalization,
-    openSystem,
-    openLanguage,
     openAssistantFromHeader,
-    logout,
   };
 }

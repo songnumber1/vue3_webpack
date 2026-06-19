@@ -1,66 +1,68 @@
 <template>
-  <section
-    ref="scrollRef"
-    class="message-list"
-    :class="{
-      'message-list--history-rendering':
-        historyRendering && !historyMarkdownVisible,
-      'message-list--manual-stream': loading && !autoScrollOnAnswer,
-    }"
-    :inert="historyRendering && !historyMarkdownVisible ? '' : null"
-    aria-live="polite"
-    :aria-busy="historyRendering ? 'true' : 'false'"
-    @scroll.passive="handleScroll"
-    @touchstart.passive="handleUserScrollIntent"
-    @wheel.passive="handleUserScrollIntent"
-    @pointerdown.passive="handleUserScrollIntent"
-  >
-    <div v-if="showAndroidHistoryLoadMore" class="history-load-more-row">
-      <button
-        class="history-load-more-button"
-        type="button"
-        :disabled="previousHistoryLoadInProgress"
-        @click="handleManualPreviousHistoryLoad($event)"
-      >
-        <span v-if="previousHistoryLoadInProgress"
-          >이전 대화 불러오는 중...</span
-        >
-        <span v-else>이전 대화 {{ historyLazyChunkSize }}개 더 보기</span>
-      </button>
-    </div>
-    <div
-      v-for="(sector, sectorIndex) in messageTurnSectors"
-      :key="sector.id"
-      class="message-turn-sector"
+  <div v-show="visible" class="message-list-shell">
+    <section
+      ref="scrollRef"
+      class="message-list"
       :class="{
-        'message-turn-sector--last':
-          shouldApplyLastTurnSectorMinHeight(sectorIndex),
+        'message-list--history-rendering':
+          historyRendering && !historyMarkdownVisible,
+        'message-list--manual-stream': loading && !autoScrollOnAnswer,
       }"
-      :style="getTurnSectorStyle(sectorIndex)"
+      :inert="historyRendering && !historyMarkdownVisible ? '' : null"
+      aria-live="polite"
+      :aria-busy="historyRendering ? 'true' : 'false'"
+      @scroll.passive="handleScroll"
+      @touchstart.passive="handleUserScrollIntent"
+      @wheel.passive="handleUserScrollIntent"
+      @pointerdown.passive="handleUserScrollIntent"
     >
-      <ChatMessageRouter
-        v-for="message in sector.messages"
-        :key="message.id"
-        :message="message"
-        :show-regenerate="!readonly && isLastAssistantMessage(message)"
-        :message-dom-id="String(message.id || '')"
-        :message-dom-role="message.role"
-        :defer-mermaid-enhancement="historyRendering"
-        @rendered="handleMessageRendered(message.id, $event)"
-        @regenerate="$emit('regenerate', $event)"
-      />
-    </div>
-    <div v-if="loading" class="typing-row">
-      <span></span><span></span><span></span>
-    </div>
-    <div
-      v-if="streamFocusSpacerHeight > 0"
-      class="stream-focus-spacer"
-      :style="{height: `${streamFocusSpacerHeight}px`}"
-      aria-hidden="true"
-    ></div>
-    <div ref="bottomRef" class="message-list-anchor" aria-hidden="true"></div>
-  </section>
+      <div v-if="showAndroidHistoryLoadMore" class="history-load-more-row">
+        <button
+          class="history-load-more-button"
+          type="button"
+          :disabled="previousHistoryLoadInProgress"
+          @click="handleManualPreviousHistoryLoad($event)"
+        >
+          <span v-if="previousHistoryLoadInProgress"
+            >이전 대화 불러오는 중...</span
+          >
+          <span v-else>이전 대화 {{ historyLazyChunkSize }}개 더 보기</span>
+        </button>
+      </div>
+      <div
+        v-for="(sector, sectorIndex) in messageTurnSectors"
+        :key="sector.id"
+        class="message-turn-sector"
+        :class="{
+          'message-turn-sector--last':
+            shouldApplyLastTurnSectorMinHeight(sectorIndex),
+        }"
+        :style="getTurnSectorStyle(sectorIndex)"
+      >
+        <ChatMessageRouter
+          v-for="message in sector.messages"
+          :key="message.id"
+          :message="message"
+          :show-regenerate="!readonly && isLastAssistantMessage(message)"
+          :message-dom-id="String(message.id || '')"
+          :message-dom-role="message.role"
+          :defer-mermaid-enhancement="historyRendering"
+          @rendered="handleMessageRendered(message.id, $event)"
+          @regenerate="$emit('regenerate', $event)"
+        />
+      </div>
+      <div v-if="loading" class="typing-row">
+        <span></span><span></span><span></span>
+      </div>
+      <div
+        v-if="streamFocusSpacerHeight > 0"
+        class="stream-focus-spacer"
+        :style="{height: `${streamFocusSpacerHeight}px`}"
+        aria-hidden="true"
+      ></div>
+      <div ref="bottomRef" class="message-list-anchor" aria-hidden="true"></div>
+    </section>
+  </div>
 </template>
 
 <script setup>
@@ -69,6 +71,7 @@ import ChatMessageRouter from "./ChatMessageRouter.vue";
 import {useMessageListScroll} from "@/composables/chat/useChatScroll";
 
 const props = defineProps({
+  visible: {type: Boolean, default: true},
   messages: {type: Array, required: true},
   loading: {type: Boolean, default: false},
   autoScrollOnAnswer: {type: Boolean, default: false},
@@ -250,6 +253,15 @@ watch(
   }
 );
 
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      nextTick(updateLastTurnSectorMinHeight);
+    }
+  }
+);
+
 const showAndroidHistoryLoadMore = computed(
   () =>
     androidManualHistoryLoadMode.value &&
@@ -269,6 +281,22 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
+.message-list-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.message-list-shell > .message-list {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
 .message-list {
   min-width: 0;
   min-height: 0;

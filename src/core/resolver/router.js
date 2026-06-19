@@ -190,6 +190,7 @@ function isAllowedHistoryLockNavigation({to, from, chatStore}) {
   // 늦게 들어온 history render lock이 남아 있어도 명시적인 포털 이동은 허용합니다.
   if (
     to.name === ROUTE_NAMES.MAIN ||
+    to.name === ROUTE_NAMES.CHAT_SEARCH ||
     to.name === ROUTE_NAMES.STUDIO ||
     to.name === ROUTE_NAMES.CONNECTOR_STORE
   ) {

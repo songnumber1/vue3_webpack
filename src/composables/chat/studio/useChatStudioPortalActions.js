@@ -5,21 +5,16 @@
  */
 
 import {computed, ref, watch} from "vue";
-import {
-  ASSISTANT_PORTAL_IDS,
-  isPortalAssistantId,
-} from "@/constants/assistantPortal";
+import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {navigateToPortalAssistant} from "@/composables/chat/internal/navigation/portalAssistantNavigation";
+import {getPortalAssistantIdByRouteName} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
-import {
-  cleanupAfterPortalConversationNavigation,
-  preparePortalConversationNavigation,
-} from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {deleteStudio} from "@/services/studioDetailService";
 import {
@@ -27,8 +22,6 @@ import {
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
 
-const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
-const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 
 export function useChatStudioPortalActions({
   route,
@@ -164,29 +157,16 @@ export function useChatStudioPortalActions({
     };
   }
 
-  function preparePortalNavigation() {
-    preparePortalConversationNavigation(createPortalNavigationResetContext());
-  }
-
-  function cleanupAfterPortalNavigation() {
-    cleanupAfterPortalConversationNavigation(
-      createPortalNavigationResetContext()
-    );
-  }
-
   async function openPortalAssistant(assistantId) {
-    const targetRoute = {
-      name:
-        assistantId === CONNECTOR_STORE_PORTAL_ID
-          ? ROUTE_NAMES.CONNECTOR_STORE
-          : ROUTE_NAMES.STUDIO,
-    };
-
-    preparePortalNavigation();
-    assistantStore.selectAssistant(assistantId);
-    if (assistantSheetOpen) assistantSheetOpen.value = false;
-    await router?.push(targetRoute).catch(() => {});
-    cleanupAfterPortalNavigation();
+    await navigateToPortalAssistant({
+      router,
+      assistantStore,
+      assistantId,
+      resetContext: createPortalNavigationResetContext(),
+      afterSelect: () => {
+        if (assistantSheetOpen) assistantSheetOpen.value = false;
+      },
+    });
   }
 
   async function handleAssistantNewChat(assistantId) {
@@ -209,27 +189,15 @@ export function useChatStudioPortalActions({
   }
 
   function syncAssistantSelectionWithRoute() {
-    const studioAssistant =
-      assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID];
-    const connectorAssistant =
-      assistantStore.assistantMap[CONNECTOR_STORE_PORTAL_ID];
+    const routePortalAssistantId = getPortalAssistantIdByRouteName(route?.name);
 
-    if (route?.name === ROUTE_NAMES.STUDIO) {
+    if (routePortalAssistantId) {
+      const portalAssistant = assistantStore.assistantMap[routePortalAssistantId];
       if (
-        studioAssistant &&
-        assistantStore.selectedAssistantId !== ASSISTANT_STUDIO_PORTAL_ID
+        portalAssistant &&
+        assistantStore.selectedAssistantId !== routePortalAssistantId
       ) {
-        assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
-      }
-      return;
-    }
-
-    if (route?.name === ROUTE_NAMES.CONNECTOR_STORE) {
-      if (
-        connectorAssistant &&
-        assistantStore.selectedAssistantId !== CONNECTOR_STORE_PORTAL_ID
-      ) {
-        assistantStore.selectAssistant(CONNECTOR_STORE_PORTAL_ID);
+        assistantStore.selectAssistant(routePortalAssistantId);
       }
       return;
     }

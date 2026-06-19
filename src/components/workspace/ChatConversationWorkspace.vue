@@ -11,8 +11,8 @@
   />
 
   <MessageList
-    v-show="!isPromptExpandedInChat"
     ref="listRef"
+    :visible="!isPromptExpandedInChat"
     :messages="messages"
     :loading="isGenerating"
     :auto-scroll-on-answer="autoScrollOnAnswer"

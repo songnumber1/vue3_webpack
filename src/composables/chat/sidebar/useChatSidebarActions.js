@@ -5,7 +5,7 @@
  */
 
 import {nextTick} from "vue";
-import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
+import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -13,19 +13,16 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
+import {navigateToPortalAssistant} from "@/composables/chat/internal/navigation/portalAssistantNavigation";
 import {useChatActionsContext} from "@/composables/chat/context/useChatInject";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
-  cleanupAfterPortalConversationNavigation,
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   navigateToMainAfterConversationReset,
-  preparePortalConversationNavigation,
   resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
 } from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {logWarn} from "@/utils/logger";
 
-const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
-const CONNECTOR_STORE_PORTAL_ID = ASSISTANT_PORTAL_IDS.CONNECTOR_STORE;
 
 function getHistoryId(item) {
   return String(item?.id || "").trim();
@@ -95,14 +92,6 @@ export function useChatSidebarActions({
     );
   }
 
-  function preparePortalNavigation() {
-    preparePortalConversationNavigation(createNavigationResetContext());
-  }
-
-  function cleanupAfterPortalNavigation() {
-    cleanupAfterPortalConversationNavigation(createNavigationResetContext());
-  }
-
   async function resetChatState({assistantId = null} = {}) {
     resetConversationStateForRouteChange();
 
@@ -124,21 +113,14 @@ export function useChatSidebarActions({
   }
 
   async function selectAssistant(id) {
-    const isStudioPortal = id === ASSISTANT_STUDIO_PORTAL_ID;
-    const isConnectorPortal = id === CONNECTOR_STORE_PORTAL_ID;
-
-    if (isStudioPortal || isConnectorPortal) {
+    if (isPortalAssistantId(id)) {
       if (isGlobalLocked.value || isStreamingLocked.value) return false;
-      const targetRoute = {
-        name: isConnectorPortal
-          ? ROUTE_NAMES.CONNECTOR_STORE
-          : ROUTE_NAMES.STUDIO,
-      };
-
-      preparePortalNavigation();
-      assistantStore.selectAssistant(id);
-      await router?.push(targetRoute).catch(() => {});
-      cleanupAfterPortalNavigation();
+      await navigateToPortalAssistant({
+        router,
+        assistantStore,
+        assistantId: id,
+        resetContext: createNavigationResetContext(),
+      });
       return true;
     }
 
@@ -202,7 +184,6 @@ export function useChatSidebarActions({
         router,
         chatStore,
         chatId: historyId,
-        replace: true,
       }).catch(() => {});
 
       if (options.closeCollapsedRecent) {
