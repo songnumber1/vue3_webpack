@@ -133,16 +133,9 @@
         @paste="handlePaste"
       />
 
-      <PromptToolbarDesktop
+      <PromptSubmitActions
         v-if="usesDesktopTopActions"
-        layout-mode="submit-only"
         class="prompt-toolbar-desktop-submit"
-        @open-model="openModelSelector"
-        @open-tool="openToolSelector"
-        @open-attach="openAttachSelector"
-        @select-model="selectModel"
-        @apply-tool="applyTool"
-        @open-file-picker="openFilePicker"
         @start-voice="startVoiceInput"
         @stop-voice="stopVoiceInput"
       />
@@ -209,6 +202,7 @@ import {computed, nextTick, onBeforeUnmount, reactive, watch} from "vue";
 import {usePromptComposer} from "@/composables/prompt/usePromptComposer";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
+import PromptSubmitActions from "@/components/prompt/controls/PromptSubmitActions.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
 import PromptMobileBottomSheets from "@/components/prompt/controls/PromptMobileBottomSheets.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
