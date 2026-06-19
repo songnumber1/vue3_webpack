@@ -42,7 +42,6 @@
       >
         <PromptToolbarDesktop
           ref="toolbarRef"
-          layout-mode="top-actions"
           class="prompt-toolbar-desktop-top"
           @open-model="openModelSelector"
           @open-tool="openToolSelector"
@@ -50,8 +49,6 @@
           @select-model="selectModel"
           @apply-tool="applyTool"
           @open-file-picker="openFilePicker"
-          @start-voice="startVoiceInput"
-          @stop-voice="stopVoiceInput"
         />
         <button
           class="prompt-expand-toggle prompt-expand-toggle--desktop-row"
@@ -140,8 +137,7 @@
         @stop-voice="stopVoiceInput"
       />
 
-      <component
-        :is="resolvedToolbarComponent"
+      <PromptToolbarMobile
         v-else
         ref="toolbarRef"
         @open-model="openModelSelector"
@@ -384,9 +380,6 @@ onBeforeUnmount(() => {
   emit("expanded-change", false);
 });
 
-const resolvedToolbarComponent = computed(() =>
-  isMobileSheet.value ? PromptToolbarMobile : PromptToolbarDesktop
-);
 const usesDesktopTopActions = computed(() => !isMobileSheet.value);
 
 providePromptTextareaState({

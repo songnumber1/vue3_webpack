@@ -1,15 +1,8 @@
 <template>
   <div
-    class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
-    :class="{
-      'prompt-action-row--top-actions': isTopActionsOnly,
-      'prompt-action-row--submit-only': isSubmitOnly,
-    }"
+    class="prompt-action-row prompt-action-row--top-actions tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
   >
-    <div
-      v-if="!isSubmitOnly"
-      class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2"
-    >
+    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
       <PromptModelSelector
         ref="modelSelectorRef"
         :disabled="disabled"
@@ -174,69 +167,6 @@
         @open-file-picker="$emit('open-file-picker', $event)"
       />
     </div>
-
-    <div
-      v-if="!isTopActionsOnly"
-      class="prompt-submit-actions tw-flex tw-min-w-0 tw-items-center tw-justify-end"
-    >
-      <button
-        v-if="showVoiceStartButton"
-        class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
-        type="button"
-        :disabled="disabled || !isSpeechSupported"
-        :title="voiceStartLabel"
-        :aria-label="voiceStartLabel"
-        @click="$emit('start-voice')"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M5 11a7 7 0 0 0 14 0M12 18v3M8.5 21h7"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-
-      <button
-        v-else-if="showVoiceStopButton"
-        class="voice-button voice-button--stop tw-inline-flex tw-items-center tw-justify-center"
-        type="button"
-        :disabled="disabled"
-        :title="voiceStopLabel"
-        :aria-label="voiceStopLabel"
-        @click="$emit('stop-voice')"
-      >
-        <span aria-hidden="true"></span>
-      </button>
-
-      <button
-        v-else
-        class="send-button tw-inline-flex tw-items-center tw-justify-center"
-        :class="{'send-button--loading': generating}"
-        type="submit"
-        :disabled="disabled || generating || !canSubmit"
-        :title="sendLabel"
-        :aria-label="sendLabel"
-      >
-        <span
-          v-if="generating"
-          class="send-button-spinner"
-          aria-hidden="true"
-        ></span>
-        <span v-else aria-hidden="true">↗</span>
-      </button>
-    </div>
   </div>
 </template>
 
@@ -258,12 +188,6 @@ import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
 import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
-const LAYOUT_MODES = Object.freeze({
-  DEFAULT: "default",
-  TOP_ACTIONS: "top-actions",
-  SUBMIT_ONLY: "submit-only",
-});
-
 const TOOL_MENU_FLOATING_OFFSET = 10;
 const TOOL_MENU_FLOATING_PADDING = 12;
 const TOOL_SUBMENU_WIDTH = 248;
@@ -273,17 +197,8 @@ const TOOL_SUBMENU_PLACEMENT = Object.freeze({
 });
 
 // -----------------------------------------------------------------------------
-// Props and emits
+// Emits
 // -----------------------------------------------------------------------------
-const componentProps = defineProps({
-  layoutMode: {
-    type: String,
-    default: "default",
-    validator: (value) =>
-      ["default", "top-actions", "submit-only"].includes(value),
-  },
-});
-
 const emit = defineEmits([
   "open-model",
   "open-tool",
@@ -291,8 +206,6 @@ const emit = defineEmits([
   "select-model",
   "apply-tool",
   "open-file-picker",
-  "start-voice",
-  "stop-voice",
 ]);
 
 const {t} = useI18n();
@@ -377,41 +290,8 @@ const props = reactive({
   get hideAttachActions() {
     return toolbarState.value.hideAttachActions;
   },
-  get hideVoiceAction() {
-    return toolbarState.value.hideVoiceAction;
-  },
-  get canSubmit() {
-    return toolbarState.value.canSubmit;
-  },
-  get hasPromptText() {
-    return toolbarState.value.hasPromptText;
-  },
-  get isMicEnabled() {
-    return toolbarState.value.isMicEnabled;
-  },
-  get isVoiceListening() {
-    return toolbarState.value.isVoiceListening;
-  },
-  get hasVoiceStopped() {
-    return toolbarState.value.hasVoiceStopped;
-  },
-  get generating() {
-    return toolbarState.value.generating;
-  },
-  get isSpeechSupported() {
-    return toolbarState.value.isSpeechSupported;
-  },
-  get voiceStartLabel() {
-    return toolbarState.value.voiceStartLabel;
-  },
-  get voiceStopLabel() {
-    return toolbarState.value.voiceStopLabel;
-  },
   get attachLabel() {
     return toolbarState.value.attachLabel;
-  },
-  get sendLabel() {
-    return toolbarState.value.sendLabel;
   },
   get modelSelectLabel() {
     return toolbarState.value.modelSelectLabel;
@@ -435,46 +315,17 @@ const {
   selectedTemplateTool,
   hideToolActions,
   hideAttachActions,
-  canSubmit,
-  generating,
-  isSpeechSupported,
-  voiceStartLabel,
-  voiceStopLabel,
   attachLabel,
-  sendLabel,
   modelSelectLabel,
 } = toRefs(props);
 
 // -----------------------------------------------------------------------------
 // Computed state
 // -----------------------------------------------------------------------------
-const isTopActionsOnly = computed(
-  () => componentProps.layoutMode === LAYOUT_MODES.TOP_ACTIONS
-);
-const isSubmitOnly = computed(
-  () => componentProps.layoutMode === LAYOUT_MODES.SUBMIT_ONLY
-);
-
 const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );
 
-const showVoiceStartButton = computed(
-  () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isSpeechSupported &&
-    !props.hasPromptText &&
-    !props.isVoiceListening
-);
-const showVoiceStopButton = computed(
-  () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isVoiceListening
-);
 
 // -----------------------------------------------------------------------------
 // Tool menu handlers
@@ -574,13 +425,6 @@ defineExpose({modelRoot, toolRoot, attachRoot});
   justify-content: flex-start;
 }
 
-.prompt-action-row--submit-only {
-  justify-content: flex-end;
-}
-
-.prompt-submit-actions {
-  margin-left: auto;
-}
 
 .prompt-left-actions {
   min-width: 0;

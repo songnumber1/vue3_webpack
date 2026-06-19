@@ -43,6 +43,11 @@ function resolveBaseURL() {
  * @param {object} policy - `resolveApiPolicy` 파이프라인에서 추출된 해당 API의 정책 규격 객체
  * @returns {boolean} 전역 ProgressBar 가동 여부 플래그
  */
+
+function getApiRequestStore() {
+  return useApiRequestStore();
+}
+
 function shouldShowOverlay(policy) {
   try {
     if (!policy.overlay) return false;
@@ -92,7 +97,7 @@ export function createHttpClient() {
   client.interceptors.request.use((config) => {
     config = applyAuthRequestConfig(config);
     const apiPolicy = resolveApiPolicy(config.apiKey);
-    const apiRequestStore = useApiRequestStore();
+    const apiRequestStore = getApiRequestStore();
 
     // 요청 고유 식별자(Request Key) 난수 조합 생성: 동시 다발적 중복 요청 트래킹 및 특정 요청 타깃 중도 abort 저격을 위함
     const requestKey = createId();
@@ -120,7 +125,7 @@ export function createHttpClient() {
   // 3. [Response Interceptor] 서버로부터 HTTP 응답 패킷이 인입된 직후 혹은 네트워크 크래시 발생 시 거치는 후처리 관문 개통
   client.interceptors.response.use(
     (response) => {
-      const apiRequestStore = useApiRequestStore();
+      const apiRequestStore = getApiRequestStore();
 
       // 통신 정상 완수 시 등록해 두었던 컨트롤러를 메모리 누수 방지 차원에서 레지스트리 목록에서 즉각 소멸 격리
       apiRequestStore.unregisterController(response.config?.__apiRequestKey);
@@ -131,7 +136,7 @@ export function createHttpClient() {
       return response;
     },
     (error) => {
-      const apiRequestStore = useApiRequestStore();
+      const apiRequestStore = getApiRequestStore();
 
       // 404, 500 에러 혹은 하드웨어 타임아웃, Abort 중도 차단 등으로 인해 통신이 파손되더라도 동일하게 메모리 클린업 파이프라인 수행
       apiRequestStore.unregisterController(error.config?.__apiRequestKey);

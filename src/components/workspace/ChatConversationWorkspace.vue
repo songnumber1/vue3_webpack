@@ -58,10 +58,9 @@
     class="chat-composer-slot"
     :aria-hidden="isComposerVisible ? null : 'true'"
   >
-    <ChatReadonlyInput v-if="readonly" />
     <ChatReadonlyInput
-      v-else-if="isActiveModelUnavailable"
-      :variant="isActiveModelDeleted ? 'deleted-model' : 'unavailable-model'"
+      v-if="readonly || isActiveModelUnavailable"
+      :variant="readonlyInputVariant"
     />
     <PromptComposer
       v-else
@@ -161,6 +160,10 @@ const isActiveModelDeleted = computed(
 const isActiveModelUnavailable = computed(
   () => workspaceState.value.isActiveModelUnavailable
 );
+const readonlyInputVariant = computed(() => {
+  if (readonly.value) return "shared";
+  return isActiveModelDeleted.value ? "deleted-model" : "unavailable-model";
+});
 const isGenerating = computed(() => workspaceState.value.isGenerating);
 const messages = computed(() => workspaceState.value.messages || []);
 const showScrollBottom = computed(() => workspaceState.value.showScrollBottom);
