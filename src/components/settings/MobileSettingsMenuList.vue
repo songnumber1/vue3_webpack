@@ -90,7 +90,11 @@
       </span>
     </button>
 
-    <button class="mobile-settings-item" type="button" @click="$emit('select', 'system')">
+    <button
+      class="mobile-settings-item"
+      type="button"
+      @click="$emit('select', 'system')"
+    >
       <span class="mobile-settings-item-icon" aria-hidden="true">
         <img :src="systemIcon" alt="" />
       </span>
@@ -138,7 +142,11 @@
       </span>
     </button>
 
-    <button class="mobile-settings-item" type="button" @click="$emit('select', 'language')">
+    <button
+      class="mobile-settings-item"
+      type="button"
+      @click="$emit('select', 'language')"
+    >
       <span class="mobile-settings-item-icon" aria-hidden="true">
         <img :src="languageIcon" alt="" />
       </span>

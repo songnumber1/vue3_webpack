@@ -19,7 +19,11 @@
         <span>{{ option }}</span>
       </label>
     </div>
-    <button class="studio-button studio-button--primary" type="button" @click="$emit('close')">
+    <button
+      class="studio-button studio-button--primary"
+      type="button"
+      @click="$emit('close')"
+    >
       {{ t("studio.createPage.apply") }}
     </button>
   </div>

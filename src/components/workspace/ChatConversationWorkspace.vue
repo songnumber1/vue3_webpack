@@ -29,7 +29,9 @@
     :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     :readonly="readonly"
-    :continue-progressive-initial-history-render="continueProgressiveInitialHistoryRender"
+    :continue-progressive-initial-history-render="
+      continueProgressiveInitialHistoryRender
+    "
     @content-rendered="handleMessageContentRendered"
     @history-markdown-rendered="handleHistoryMarkdownRendered"
     @history-rendered="handleHistoryRendered"
@@ -106,7 +108,15 @@
  * @file components/workspace/ChatConversationWorkspace.vue
  * @description 기존 통합 채팅 workspace의 대화방 렌더링만 분리한 라우트 전용 workspace입니다.
  */
-import {computed, inject, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {
+  computed,
+  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
@@ -143,7 +153,10 @@ const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const workspaceActions = inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
+const workspaceActions = inject(
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions()
+);
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
@@ -521,9 +534,7 @@ function openCodeInterpreterPanel(event) {
   if (!canUseDesktopCodeInterpreter.value) return;
   updateCodeInterpreterChatWidth();
   selectedInterpreterCode.value = String(event?.detail?.code || "");
-  selectedInterpreterLanguage.value = String(
-    event?.detail?.language || "text"
-  );
+  selectedInterpreterLanguage.value = String(event?.detail?.language || "text");
   previewHtml.value = buildCodeInterpreterPreviewHtml();
   codeInterpreterOpen.value = true;
   nextTick(() => {

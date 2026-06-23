@@ -488,5 +488,4 @@ function confirmDelete() {
   gap: 8px;
   margin-top: 18px;
 }
-
 </style>

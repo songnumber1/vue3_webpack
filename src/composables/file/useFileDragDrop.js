@@ -45,7 +45,8 @@ function isLeavingViewport(event) {
   const x = event.clientX;
   const y = event.clientY;
   const width = window.innerWidth || document.documentElement?.clientWidth || 0;
-  const height = window.innerHeight || document.documentElement?.clientHeight || 0;
+  const height =
+    window.innerHeight || document.documentElement?.clientHeight || 0;
 
   return x <= 0 || y <= 0 || x >= width || y >= height;
 }
@@ -83,7 +84,9 @@ export function useFileDragDrop({
   const dragDepth = ref(0);
   const isFileDragging = ref(false);
 
-  const isFileDropEnabled = computed(() => resolveOptionValue(enabled) === true);
+  const isFileDropEnabled = computed(
+    () => resolveOptionValue(enabled) === true
+  );
   const shouldPreventOnDisabled = computed(
     () => resolveOptionValue(preventOnDisabled) !== false
   );

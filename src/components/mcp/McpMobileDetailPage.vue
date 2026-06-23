@@ -42,9 +42,13 @@ import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 const {t} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const contentRef = ref(null);
-useOverlayScrollbar(contentRef, {overflow: {x: "hidden", y: "scroll"}}, {
-  enabled: () => shouldUseOverlayScrollbar.value,
-});
+useOverlayScrollbar(
+  contentRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {
+    enabled: () => shouldUseOverlayScrollbar.value,
+  }
+);
 defineProps({mcp: {type: Object, required: true}});
 defineEmits(["close"]);
 </script>

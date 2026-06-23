@@ -7,7 +7,10 @@
     :aria-checked="paperActive"
     @click="$emit('toggle-option', 'knowledge-paper')"
   >
-    <span class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder" aria-hidden="true">
+    <span
+      class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+      aria-hidden="true"
+    >
       <span v-if="paperActive">✓</span>
     </span>
     <p>{{ paperLabel }}</p>
@@ -20,7 +23,10 @@
     :aria-checked="confluenceActive"
     @click="$emit('toggle-option', 'knowledge-confluence')"
   >
-    <span class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder" aria-hidden="true">
+    <span
+      class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+      aria-hidden="true"
+    >
       <span v-if="confluenceActive">✓</span>
     </span>
     <p>{{ confluenceLabel }}</p>
@@ -33,7 +39,10 @@
     :aria-checked="jiraActive"
     @click="$emit('toggle-option', 'knowledge-jira')"
   >
-    <span class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder" aria-hidden="true">
+    <span
+      class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+      aria-hidden="true"
+    >
       <span v-if="jiraActive">✓</span>
     </span>
     <p>{{ jiraLabel }}</p>

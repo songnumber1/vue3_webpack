@@ -1,5 +1,7 @@
 <template>
-  <div class="prompt-submit-actions tw-flex tw-min-w-0 tw-items-center tw-justify-end">
+  <div
+    class="prompt-submit-actions tw-flex tw-min-w-0 tw-items-center tw-justify-end"
+  >
     <button
       v-if="showVoiceStartButton"
       class="voice-button voice-button--start tw-inline-flex tw-items-center tw-justify-center"
@@ -50,7 +52,11 @@
       :title="sendLabel"
       :aria-label="sendLabel"
     >
-      <span v-if="generating" class="send-button-spinner" aria-hidden="true"></span>
+      <span
+        v-if="generating"
+        class="send-button-spinner"
+        aria-hidden="true"
+      ></span>
       <span v-else aria-hidden="true">↗</span>
     </button>
   </div>

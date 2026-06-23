@@ -138,8 +138,8 @@ const knowledgeValues = computed(() =>
     : []
 );
 const knowledgeActiveCount = computed(() => knowledgeValues.value.length);
-const webSearchEnabled = computed(
-  () => Boolean(activePromptToolSettings.value.webSearchEnabled)
+const webSearchEnabled = computed(() =>
+  Boolean(activePromptToolSettings.value.webSearchEnabled)
 );
 const selectedWebSearchEngine = computed(
   () => activePromptToolSettings.value.webSearch || ""
@@ -629,5 +629,4 @@ watch(
   flex: 0 0 18px;
   object-fit: contain;
 }
-
 </style>

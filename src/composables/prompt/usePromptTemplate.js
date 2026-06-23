@@ -61,7 +61,9 @@ export function usePromptTemplate({modelId} = {}) {
   const activeMobileGroupId = ref("");
 
   // Pinia 전역 채팅 저장소 내부에 적치 보존되고 있는 '현재 활성화된 프롬프트 도구 확장 세팅' 스냅샷 스토어 구독
-  const activeSettings = computed(() => promptControlStore.activePromptToolSettings);
+  const activeSettings = computed(
+    () => promptControlStore.activePromptToolSettings
+  );
 
   // ── 📊 [1. 현재 LLM 사양에 일치하는 템플릿 목록 동적 정렬] ──────────────────
   const currentModelTemplates = computed(() => {

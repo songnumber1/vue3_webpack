@@ -230,18 +230,18 @@ function shouldUseMobilePlatformLayout(platformInfo = {}) {
   if (platformInfo.isPlatformForced) {
     return Boolean(
       platformInfo.isAndroidApp ||
-        platformInfo.isNativeApp ||
-        platformInfo.isNativeRuntime ||
-        (platformInfo.actualEnv === "android" &&
-          platformInfo.actualRuntime !== "native")
+      platformInfo.isNativeApp ||
+      platformInfo.isNativeRuntime ||
+      (platformInfo.actualEnv === "android" &&
+        platformInfo.actualRuntime !== "native")
     );
   }
 
   return Boolean(
     platformInfo.isMobileBrowser ||
-      platformInfo.isAndroidApp ||
-      platformInfo.isNativeApp ||
-      platformInfo.isNativeRuntime
+    platformInfo.isAndroidApp ||
+    platformInfo.isNativeApp ||
+    platformInfo.isNativeRuntime
   );
 }
 
@@ -542,7 +542,11 @@ function createFallbackHistoryForNewSubmit({
   );
 }
 
-async function createRemoteRuntimeConversation({text, assistantId, modelId} = {}) {
+async function createRemoteRuntimeConversation({
+  text,
+  assistantId,
+  modelId,
+} = {}) {
   const chatId = createId();
   const chatTitle = String(text || "")
     .trim()
@@ -646,12 +650,8 @@ const autoScrollOnAnswer = computed(
   () => systemSettingsStore.autoScrollOnAnswer
 );
 
-const {
-  previewImage,
-  closeImagePreview,
-  handlePreviewLoad,
-  handlePreviewError,
-} = useImagePreview();
+const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
+  useImagePreview();
 
 const isCompactScreen = computed(() => viewportStore.isCompact);
 const platformInfo = computed(() => platformStore.info || {});
@@ -978,7 +978,6 @@ function refreshPromptViewport() {
   refreshViewport();
 }
 
-
 function clearConversationNavigationState() {
   clearConversationNavigationStateByPolicy({
     chatStore,
@@ -1163,9 +1162,7 @@ let historyRenderFinishSeq = 0;
 let progressiveInitialHistoryToken = 0;
 let progressiveInitialHistoryRunning = false;
 
-async function flushConversationSwitchPaint({
-  clearMessages = true,
-} = {}) {
+async function flushConversationSwitchPaint({clearMessages = true} = {}) {
   if (clearMessages) {
     messages.value = [];
   }
@@ -1562,9 +1559,7 @@ function mergeVisibleMessagesIntoFullHistory(nextVisibleMessages = []) {
     ? fullHistoryMessages.value
     : [];
   const start = Math.max(0, historyVisibleStartIndex.value);
-  const visible = Array.isArray(nextVisibleMessages)
-    ? nextVisibleMessages
-    : [];
+  const visible = Array.isArray(nextVisibleMessages) ? nextVisibleMessages : [];
 
   const merged = [...existing.slice(0, start), ...visible];
   fullHistoryMessages.value = merged;
@@ -1627,10 +1622,7 @@ function expandProgressiveStateForward(state) {
 
 function expandProgressiveStateBackward(state) {
   if (state.nextBefore <= state.finalStart) return false;
-  state.start = Math.max(
-    state.nextBefore - state.chunkSize,
-    state.finalStart
-  );
+  state.start = Math.max(state.nextBefore - state.chunkSize, state.finalStart);
   state.nextBefore = state.start;
   return true;
 }
@@ -2082,7 +2074,6 @@ onBeforeUnmount(() => {
   cleanupHistoryRender();
 });
 
-
 const shellReady = computed(
   () => runtimeReady.value || appRuntimeStore.initialized
 );
@@ -2131,9 +2122,7 @@ const studioDetailOpen = computed(() => Boolean(studioDetailStudio.value));
 function isDeletedRuntimeStudioAssistant(assistant = null) {
   const id = String(assistant?.id || "").trim();
   return Boolean(
-    id &&
-      isStudioAssistant(assistant) &&
-      studioRuntimeStore.isStudioDeleted(id)
+    id && isStudioAssistant(assistant) && studioRuntimeStore.isStudioDeleted(id)
   );
 }
 
@@ -2249,7 +2238,9 @@ function preparePortalNavigation() {
 }
 
 function cleanupAfterPortalNavigation() {
-  cleanupAfterPortalConversationNavigation(createPortalNavigationResetContext());
+  cleanupAfterPortalConversationNavigation(
+    createPortalNavigationResetContext()
+  );
 }
 
 async function openPortalAssistant(assistantId) {

@@ -231,7 +231,6 @@ const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );
 
-
 const modelRoot = computed(
   () =>
     modelSelectorRef.value?.modelRoot?.value ||
@@ -259,7 +258,6 @@ defineExpose({modelRoot, toolRoot, attachRoot});
 .prompt-action-row--top-actions {
   justify-content: flex-start;
 }
-
 
 .prompt-left-actions {
   min-width: 0;

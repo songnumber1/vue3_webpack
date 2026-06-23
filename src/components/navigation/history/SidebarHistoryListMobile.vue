@@ -10,7 +10,6 @@
       :key="item.id"
       class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
       :class="{selected: String(item.id) === String(selectedChatId)}"
-      
     >
       <button
         :class="[
@@ -54,7 +53,6 @@
       :key="item.id"
       class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
       :class="{selected: String(item.id) === String(selectedChatId)}"
-      
     >
       <button
         :class="[

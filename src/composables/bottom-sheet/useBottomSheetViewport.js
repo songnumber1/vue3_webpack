@@ -143,8 +143,7 @@ export function createBottomSheetViewport(options) {
 
     // [최대 상한선 공식]: '전체 뷰포트 * 허용 최대 배율' 공식에서 노치 디바이스 및 아이폰 하단 홈 바 영역(`SafeAreaBottom`) 픽셀을 추가로 차감하여 안전 상한선 도출
     const ratioMaxHeight =
-      Math.floor(viewportHeight * props.maxRatio) -
-      getSafeAreaBottom();
+      Math.floor(viewportHeight * props.maxRatio) - getSafeAreaBottom();
 
     // 시스템 관리자 설정 상한선 규격이 존재하는 경우, 비율 상한선과 비교하여 더 타이트한(작은) 상한선 수치를 최종 타깃으로 확정
     const configuredMaxHeight = systemBounds.maxHeight

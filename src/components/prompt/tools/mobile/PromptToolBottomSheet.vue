@@ -106,8 +106,8 @@ const knowledgeValues = computed(() =>
     : []
 );
 const knowledgeActiveCount = computed(() => knowledgeValues.value.length);
-const webSearchEnabled = computed(
-  () => Boolean(activePromptToolSettings.value.webSearchEnabled)
+const webSearchEnabled = computed(() =>
+  Boolean(activePromptToolSettings.value.webSearchEnabled)
 );
 const selectedWebSearchEngine = computed(
   () => activePromptToolSettings.value.webSearch || ""
@@ -458,7 +458,8 @@ watch(
   line-height: 1.2;
 }
 
-:global(body.mobile-mode) :deep(.bottom-sheet-option--template > .bottom-sheet-option-main) {
+:global(body.mobile-mode)
+  :deep(.bottom-sheet-option--template > .bottom-sheet-option-main) {
   width: auto !important;
   min-width: 0 !important;
   flex: 1 1 auto !important;
@@ -472,5 +473,4 @@ watch(
   flex: 0 0 22px !important;
   object-fit: contain;
 }
-
 </style>

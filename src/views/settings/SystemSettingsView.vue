@@ -126,9 +126,13 @@ function settingItem(key, extra = {}) {
   };
 }
 
-useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}}, {
-  enabled: () => shouldUseOverlayScrollbar.value,
-});
+useOverlayScrollbar(
+  settingsScrollRef,
+  {overflow: {x: "hidden", y: "scroll"}},
+  {
+    enabled: () => shouldUseOverlayScrollbar.value,
+  }
+);
 
 const commonGroups = computed(() => [
   {

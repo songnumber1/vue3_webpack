@@ -12,7 +12,10 @@
       :class="{'is-selected': selectedEngine === 'web-perplexity'}"
       aria-hidden="true"
     >
-      <span v-if="selectedEngine === 'web-perplexity'" class="bottom-sheet-radio-dot"></span>
+      <span
+        v-if="selectedEngine === 'web-perplexity'"
+        class="bottom-sheet-radio-dot"
+      ></span>
     </span>
     <strong>{{ perplexityLabel }}</strong>
   </button>
@@ -29,7 +32,10 @@
       :class="{'is-selected': selectedEngine === 'web-google-ai-overviews'}"
       aria-hidden="true"
     >
-      <span v-if="selectedEngine === 'web-google-ai-overviews'" class="bottom-sheet-radio-dot"></span>
+      <span
+        v-if="selectedEngine === 'web-google-ai-overviews'"
+        class="bottom-sheet-radio-dot"
+      ></span>
     </span>
     <strong>{{ googleAiOverviewsLabel }}</strong>
   </button>
@@ -46,7 +52,10 @@
       :class="{'is-selected': selectedEngine === 'web-chatgpt-search'}"
       aria-hidden="true"
     >
-      <span v-if="selectedEngine === 'web-chatgpt-search'" class="bottom-sheet-radio-dot"></span>
+      <span
+        v-if="selectedEngine === 'web-chatgpt-search'"
+        class="bottom-sheet-radio-dot"
+      ></span>
     </span>
     <strong>{{ chatgptSearchLabel }}</strong>
   </button>
@@ -63,7 +72,10 @@
       :class="{'is-selected': selectedEngine === 'web-microsoft-copilot'}"
       aria-hidden="true"
     >
-      <span v-if="selectedEngine === 'web-microsoft-copilot'" class="bottom-sheet-radio-dot"></span>
+      <span
+        v-if="selectedEngine === 'web-microsoft-copilot'"
+        class="bottom-sheet-radio-dot"
+      ></span>
     </span>
     <strong>{{ microsoftCopilotLabel }}</strong>
   </button>

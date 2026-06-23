@@ -68,10 +68,7 @@ function shouldCreateConversation(options, targetHistoryId, currentRoute = {}) {
 
   const routeName = options.route?.name || currentRoute?.name;
 
-  return (
-    routeName === ROUTE_NAMES.MAIN ||
-    routeName === ROUTE_NAMES.CHAT_ENTRY
-  );
+  return routeName === ROUTE_NAMES.MAIN || routeName === ROUTE_NAMES.CHAT_ENTRY;
 }
 
 async function ensureConversationForSubmit(
@@ -184,7 +181,9 @@ export function useChatSubmit(options) {
       );
 
       if (isNewConversationSubmit) {
-        usePromptControlStore().promoteDraftPromptToolSettingsToChat(targetHistoryId);
+        usePromptControlStore().promoteDraftPromptToolSettingsToChat(
+          targetHistoryId
+        );
       }
 
       const {messages, assistantMessage} =

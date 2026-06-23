@@ -106,7 +106,9 @@ function handlePopState(event) {
   if (overlayBackStore.restoringMobileHistory) {
     overlayBackStore.clearRestoringMobileHistory();
     overlayBackStore.clearMobileHistoryPushed();
-    overlayBackStore.setActiveOverlayType(responseOverlayActiveType.value || null);
+    overlayBackStore.setActiveOverlayType(
+      responseOverlayActiveType.value || null
+    );
     return;
   }
 
@@ -168,10 +170,14 @@ export function configureResponseOverlay(options = {}) {
   if (Object.prototype.hasOwnProperty.call(options, "isMobile")) {
     configuredIsMobile.value = options.isMobile;
   }
-  if (Object.prototype.hasOwnProperty.call(options, "shouldSuppressChatRouteLoad")) {
+  if (
+    Object.prototype.hasOwnProperty.call(options, "shouldSuppressChatRouteLoad")
+  ) {
     suppressChatRouteLoad.value = options.shouldSuppressChatRouteLoad;
   }
-  if (Object.prototype.hasOwnProperty.call(options, "suppressChatRouteLoadId")) {
+  if (
+    Object.prototype.hasOwnProperty.call(options, "suppressChatRouteLoadId")
+  ) {
     suppressChatRouteLoadId.value = options.suppressChatRouteLoadId;
   }
 }

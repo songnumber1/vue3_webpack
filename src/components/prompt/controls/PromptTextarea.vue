@@ -31,9 +31,7 @@
  */
 
 import {computed, nextTick, ref, inject} from "vue";
-import {
-  PROMPT_TEXTAREA_STATE_KEY,
-} from "@/composables/chat/chatActionContext";
+import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatActionContext";
 
 const textareaRef = ref(null);
 const localText = ref("");

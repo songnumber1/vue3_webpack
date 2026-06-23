@@ -30,7 +30,10 @@
         type="button"
         @click="$emit('close')"
       >
-        <span class="studio-icon studio-icon--register" aria-hidden="true"></span>
+        <span
+          class="studio-icon studio-icon--register"
+          aria-hidden="true"
+        ></span>
         <strong>{{ t("studio.createPage.register") }}</strong>
       </button>
       <button

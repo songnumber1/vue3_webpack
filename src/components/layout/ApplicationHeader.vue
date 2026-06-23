@@ -159,7 +159,8 @@ const shellActions = {
       isBlocked: isShellActionBlocked,
       logScope: "ApplicationHeader",
     }),
-  openSwagger: () => openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
+  openSwagger: () =>
+    openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
   openPlayground: () =>
     openPlaygroundRoute({
       router,

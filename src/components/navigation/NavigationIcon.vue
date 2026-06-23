@@ -1,11 +1,5 @@
 <template>
-  <img
-    v-if="bare"
-    class="nav-icon"
-    :src="iconSrc"
-    alt=""
-    aria-hidden="true"
-  />
+  <img v-if="bare" class="nav-icon" :src="iconSrc" alt="" aria-hidden="true" />
   <span v-else class="icon-wrap">
     <img class="nav-icon" :src="iconSrc" alt="" aria-hidden="true" />
   </span>

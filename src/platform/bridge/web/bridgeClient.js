@@ -12,7 +12,6 @@ import {executeWebApi} from "./bridgeWebApiRuntime";
 import {rejectAndroidToJsSwaggerExecution} from "../native/bridgeAndroidToJsRuntime";
 import {registerBridgeRuntimeGlobals} from "../runtime/bridgeRuntime";
 
-
 export function executeContract(category, type, payload = {}) {
   if (category === "web-api") return executeWebApi(type, payload);
   if (category === "js-to-android") return callNative(type, payload);

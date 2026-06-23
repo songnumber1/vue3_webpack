@@ -1,6 +1,11 @@
 <template>
   <div v-if="open" class="studio-detail-viewer__menu" role="menu">
-    <button type="button" role="menuitem" :disabled="disabled" @click="$emit('edit')">
+    <button
+      type="button"
+      role="menuitem"
+      :disabled="disabled"
+      @click="$emit('edit')"
+    >
       <span aria-hidden="true">✎</span>
       <span>{{ t("studio.detail.edit") }}</span>
     </button>

@@ -61,7 +61,10 @@ const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const workspaceActions = inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
+const workspaceActions = inject(
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions()
+);
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
 const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);

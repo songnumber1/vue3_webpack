@@ -7,7 +7,8 @@
     :aria-checked="paperActive"
     @click="$emit('toggle-option', 'knowledge-paper')"
   >
-    <span class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+    <span
+      class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
       :class="{'is-checked': paperActive}"
       aria-hidden="true"
     >
@@ -23,7 +24,8 @@
     :aria-checked="confluenceActive"
     @click="$emit('toggle-option', 'knowledge-confluence')"
   >
-    <span class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+    <span
+      class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
       :class="{'is-checked': confluenceActive}"
       aria-hidden="true"
     >
@@ -39,7 +41,8 @@
     :aria-checked="jiraActive"
     @click="$emit('toggle-option', 'knowledge-jira')"
   >
-    <span class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
+    <span
+      class="bottom-sheet-checkbox tw-inline-flex tw-h-[22px] tw-w-[22px] tw-min-w-[22px] tw-flex-[0_0_22px] tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
       :class="{'is-checked': jiraActive}"
       aria-hidden="true"
     >

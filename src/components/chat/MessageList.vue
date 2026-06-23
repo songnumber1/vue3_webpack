@@ -561,9 +561,7 @@ function handleMessageRendered(messageId, renderPart = "") {
     return;
   }
 
-  const shouldRecalculateSpacer = !(
-    props.loading && !props.autoScrollOnAnswer
-  );
+  const shouldRecalculateSpacer = !(props.loading && !props.autoScrollOnAnswer);
   scheduleRenderedFrameUpdate({spacer: shouldRecalculateSpacer});
 
   if (
@@ -646,11 +644,9 @@ onMounted(() => {
   window.addEventListener("resize", scheduleResizeRecalculate, {
     passive: true,
   });
-  window.visualViewport?.addEventListener(
-    "resize",
-    scheduleResizeRecalculate,
-    {passive: true}
-  );
+  window.visualViewport?.addEventListener("resize", scheduleResizeRecalculate, {
+    passive: true,
+  });
   addUserScrollIntentListeners(window);
 });
 

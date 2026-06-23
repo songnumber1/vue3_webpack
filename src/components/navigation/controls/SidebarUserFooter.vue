@@ -135,7 +135,8 @@ const actions = {
       navigationStore,
       isBlocked: isShellActionBlocked,
     }),
-  openSwagger: () => openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
+  openSwagger: () =>
+    openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
   logout: () =>
     logoutApp({
       router,

@@ -20,7 +20,6 @@ import {
   useNavigationLockStore,
 } from "@/stores/navigationLockStore";
 
-
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
 const SwaggerPage = () =>

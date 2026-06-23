@@ -206,7 +206,18 @@
  * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
-import {computed, nextTick, onBeforeUnmount, onMounted, provide, reactive, ref, toRef, watch, inject} from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  reactive,
+  ref,
+  toRef,
+  watch,
+  inject,
+} from "vue";
 import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
 import PromptSubmitActions from "@/components/prompt/controls/PromptSubmitActions.vue";
@@ -244,7 +255,10 @@ const componentProps = defineProps({
 });
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
-const workspaceActions = inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
+const workspaceActions = inject(
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceActions()
+);
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -318,7 +332,6 @@ function handleComposerEvent(eventName, payload) {
   }
 }
 
-
 // 1. 다국어 메시지 처리를 위한 i18n 인스턴스로부터 t 번역 메서드를 확보합니다.
 const {t, locale} = useI18n();
 // 2. 외부 Props의 변경 사항을 하위 서브 훅들이 안전하게 반응형 추적할 수 있도록 `toRef` 단방향 참조 처리를 수행합니다.
@@ -358,7 +371,11 @@ const {
   focusTextarea, // 텍스트 입력창으로 포커스 커서를 강제 이동(주입)시키는 제어 함수
   restoreTextareaAutoGrow, // 최대화 해제 후 textarea inline style을 기존 auto-grow 상태로 복원하는 함수
   clearText, // 전송 직후 반응형 값과 실제 textarea DOM 값을 함께 비우는 함수
-} = usePromptText({isMobileSheet, emit: handleComposerEvent, isExpanded: isPromptExpanded});
+} = usePromptText({
+  isMobileSheet,
+  emit: handleComposerEvent,
+  isExpanded: isPromptExpanded,
+});
 
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
 // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
@@ -490,10 +507,7 @@ function setText(value, {focus = true} = {}) {
 function getTextareaElement() {
   const exposed = textareaComponentRef.value;
   return (
-    exposed?.textareaRef?.value ||
-    exposed?.textareaRef ||
-    exposed?.$el ||
-    null
+    exposed?.textareaRef?.value || exposed?.textareaRef || exposed?.$el || null
   );
 }
 

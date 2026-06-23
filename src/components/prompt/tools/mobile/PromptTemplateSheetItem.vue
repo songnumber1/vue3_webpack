@@ -12,7 +12,9 @@
       alt=""
       aria-hidden="true"
     />
-    <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
+    <span
+      class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left"
+    >
       <strong>{{ label }}</strong>
       <small v-if="description">{{ description }}</small>
     </span>

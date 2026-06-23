@@ -8,7 +8,9 @@
     @click="$emit('toggle-group')"
   >
     <span class="prompt-tool-icon tw-shrink-0" aria-hidden="true">◉</span>
-    <span class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left">
+    <span
+      class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left"
+    >
       <strong>{{ label }}</strong>
     </span>
     <span
@@ -24,7 +26,9 @@
     >
       <span aria-hidden="true"></span>
     </span>
-    <span class="prompt-submenu-arrow tw-ml-auto tw-shrink-0" aria-hidden="true">›</span>
+    <span class="prompt-submenu-arrow tw-ml-auto tw-shrink-0" aria-hidden="true"
+      >›</span
+    >
   </button>
 </template>
 

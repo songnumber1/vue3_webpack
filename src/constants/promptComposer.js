@@ -59,7 +59,6 @@ export const PROMPT_TEMPLATE_MODEL_IDS = Object.freeze([
   "model-ds-rag",
 ]);
 
-
 export const ATTACH_MENU_OPTIONS = Object.freeze([
   {
     id: FILE_PICKER_TYPE.camera,

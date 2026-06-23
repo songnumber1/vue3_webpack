@@ -176,11 +176,9 @@ export function usePromptMenu() {
   );
 
   // 메뉴 상태가 바뀔 때마다 즉각 도큐먼트 바디 스타일 클래스를 동기화 수립합니다.
-  watch(
-    () => promptControlStore.hasAnyPromptMenuOpen,
-    syncPromptMenuClass,
-    {immediate: true}
-  );
+  watch(() => promptControlStore.hasAnyPromptMenuOpen, syncPromptMenuClass, {
+    immediate: true,
+  });
 
   // ── 🧹 [컴포넌트 생명주기 마감: 좀비 스타일 클래스 박멸 청소] ──────────────────
   // 유저가 질문 입력을 중단하고 뒤로가기나 메인 대화방 이탈 등으로 컴포넌트가 파괴될 때,

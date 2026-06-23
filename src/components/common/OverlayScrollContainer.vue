@@ -41,7 +41,8 @@ const props = defineProps({
 });
 
 const rootRef = ref(null);
-const {isActualAndroidRuntime, shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
+const {isActualAndroidRuntime, shouldUseOverlayScrollbar} =
+  useOverlayScrollPolicy();
 
 function resolveMaybeRef(value) {
   if (typeof value === "function") return value();
@@ -56,12 +57,15 @@ function resolveBoolean(value, fallback = false) {
 }
 
 const overlayEnabled = computed(() => resolveBoolean(props.enabled, true));
-const keyboardAware = computed(() => resolveBoolean(props.keyboardAware, false));
+const keyboardAware = computed(() =>
+  resolveBoolean(props.keyboardAware, false)
+);
 const overlayScrollbarEnabled = computed(
   () => overlayEnabled.value && shouldUseOverlayScrollbar.value
 );
 const keyboardControllerEnabled = computed(
-  () => overlayEnabled.value && keyboardAware.value && isActualAndroidRuntime.value
+  () =>
+    overlayEnabled.value && keyboardAware.value && isActualAndroidRuntime.value
 );
 
 const overlay = useOverlayScrollbar(rootRef, props.overlayOptions || {}, {

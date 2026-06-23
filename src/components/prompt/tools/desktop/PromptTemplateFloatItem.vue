@@ -14,7 +14,9 @@
       alt=""
       aria-hidden="true"
     />
-    <span class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left">
+    <span
+      class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left"
+    >
       <strong>{{ label }}</strong>
     </span>
   </button>

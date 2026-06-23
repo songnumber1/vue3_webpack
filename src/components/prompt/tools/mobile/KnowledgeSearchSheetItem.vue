@@ -6,7 +6,9 @@
     @click="$emit('open-group')"
   >
     <span aria-hidden="true">⌕</span>
-    <span class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left">
+    <span
+      class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-items-start tw-text-left"
+    >
       <strong>{{ label }}</strong>
     </span>
     <span
@@ -16,7 +18,11 @@
     >
       {{ activeCount }}
     </span>
-    <span class="bottom-sheet-submenu-arrow tw-ml-auto tw-shrink-0" aria-hidden="true">›</span>
+    <span
+      class="bottom-sheet-submenu-arrow tw-ml-auto tw-shrink-0"
+      aria-hidden="true"
+      >›</span
+    >
   </button>
 </template>
 

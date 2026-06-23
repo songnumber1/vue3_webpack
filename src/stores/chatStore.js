@@ -126,7 +126,9 @@ export const useChatStore = defineStore("chat", {
       } else if (this.activeRoomType !== ACTIVE_ROOM_TYPES.shared) {
         this.clearActiveRoom();
       }
-      usePromptControlStore().setActivePromptToolSettingsKey(this.selectedChatId);
+      usePromptControlStore().setActivePromptToolSettingsKey(
+        this.selectedChatId
+      );
       this.clearPendingSelectedChatId(); // 실제 활성 방 포인터가 확정되었으므로 클릭 선반영 상태를 해제
       usePromptControlStore().resetActivePromptToolSettings(); // 방이 체인지되었으므로 툴바 세팅 캐시 구조체도 타깃에 맞게 세로정렬 리셋 트리거
     },
@@ -194,7 +196,5 @@ export const useChatStore = defineStore("chat", {
         ...this.histories.filter((item) => item.id !== history.id), // 중복 제거 매칭 스크리닝 동시 집행
       ];
     },
-
-
   },
 });

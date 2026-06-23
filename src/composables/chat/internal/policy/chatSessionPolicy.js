@@ -64,7 +64,9 @@ export function resolveDeletedStudioSessionState({
     assistantId,
     isStudioSession,
     isDeleted,
-    displayLabel: isDeleted ? resolveHistoryAssistantLabel(history, session) : "",
+    displayLabel: isDeleted
+      ? resolveHistoryAssistantLabel(history, session)
+      : "",
   };
 }
 
@@ -88,7 +90,8 @@ export function markSessionAsMissingAssistant({
     assistantType: session?.assistantType || assistantType,
     assistantLabel: session?.assistantLabel || deletedAssistantLabel,
     displayAssistantId: session?.displayAssistantId || deletedAssistantId,
-    displayAssistantLabel: session?.displayAssistantLabel || deletedAssistantLabel,
+    displayAssistantLabel:
+      session?.displayAssistantLabel || deletedAssistantLabel,
     isAssistantMissing: true,
     isModelUnavailable: true,
     modelUnavailableReason: "missing-assistant",

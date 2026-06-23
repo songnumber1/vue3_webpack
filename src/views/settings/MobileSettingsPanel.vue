@@ -75,7 +75,9 @@
               </ul>
             </section>
 
-            <MobileSettingsLanguageOptions v-else-if="activeMenu === 'language'" />
+            <MobileSettingsLanguageOptions
+              v-else-if="activeMenu === 'language'"
+            />
           </section>
         </main>
       </section>

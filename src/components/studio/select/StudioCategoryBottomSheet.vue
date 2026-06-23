@@ -20,7 +20,10 @@
         <strong>{{ category.label }}</strong>
         <small>{{ category.description }}</small>
       </span>
-      <CheckIcon v-if="selectedValue === category.value" class="bottom-sheet-check" />
+      <CheckIcon
+        v-if="selectedValue === category.value"
+        class="bottom-sheet-check"
+      />
     </button>
   </BaseBottomSheet>
 </template>
