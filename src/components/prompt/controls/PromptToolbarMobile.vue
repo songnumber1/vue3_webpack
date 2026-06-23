@@ -156,9 +156,12 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, reactive, ref, toRefs} from "vue";
+import {computed, reactive, ref, toRefs, inject} from "vue";
 import {useI18n} from "vue-i18n";
-import {usePromptToolbarStateContext} from "@/composables/chat/context/useChatInject";
+import {
+  PROMPT_TOOLBAR_STATE_KEY,
+  createEmptyPromptToolbarState,
+} from "@/composables/chat/chatActionContext";
 
 const {t} = useI18n();
 const modelRoot = ref(null);
@@ -168,7 +171,10 @@ const attachRoot = ref(null);
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
-const toolbarState = usePromptToolbarStateContext();
+const toolbarState = inject(
+  PROMPT_TOOLBAR_STATE_KEY,
+  computed(createEmptyPromptToolbarState)
+);
 const props = reactive({
   get disabled() {
     return toolbarState.value.disabled;

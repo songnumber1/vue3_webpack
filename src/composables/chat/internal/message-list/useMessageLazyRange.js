@@ -3,7 +3,7 @@
  * @description PC/모바일별 이력 메시지 lazy 렌더링 개수와 visible range 계산을 담당합니다.
  */
 
-import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
+import {isForcedMobilePlatformOverride} from "./messageRenderPolicyTypes";
 
 const DEFAULT_PC_INITIAL_COUNT = 100;
 const DEFAULT_PC_APPEND_COUNT = 50;
@@ -28,13 +28,6 @@ function normalizeNonNegativeInteger(value, fallback) {
   return Number.isFinite(numeric) && numeric >= 0
     ? Math.round(numeric)
     : fallback;
-}
-
-export function isForcedMobilePlatformOverride(platformOverride) {
-  return (
-    platformOverride === PLATFORM_OVERRIDE_MODES.androidChrome ||
-    platformOverride === PLATFORM_OVERRIDE_MODES.androidWebView
-  );
 }
 
 export function resolveMessageLazyDeviceMode(settings = {}, isMobile = false) {

@@ -240,9 +240,11 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const listAreaRef = ref(null);
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => Boolean(responsiveContext.value?.isMobile));
@@ -263,6 +265,7 @@ useOverlayScrollbar(
   listAreaRef,
   {overflow: {x: "hidden", y: "scroll"}},
   {
+    enabled: () => shouldUseOverlayScrollbar.value,
     disableOnMobile: false,
     watchSource: () => [
       props.activeTab,

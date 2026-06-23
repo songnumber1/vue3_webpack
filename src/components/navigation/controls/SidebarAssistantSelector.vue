@@ -56,6 +56,7 @@
 
 import {computed, ref} from "vue";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useI18n} from "vue-i18n";
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
@@ -73,6 +74,7 @@ const props = defineProps({
 defineEmits(["toggle", "select"]);
 
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const rootRef = ref(null);
 const menuRef = ref(null);
 const currentAssistant = computed(
@@ -86,7 +88,8 @@ useOverlayScrollbar(
   {overflow: {x: "hidden", y: "scroll"}},
   {
     watchSource: () => [props.open, props.mobile, props.assistants.length],
-    enabled: () => props.open && !props.mobile,
+    enabled: () =>
+      shouldUseOverlayScrollbar.value && props.open && !props.mobile,
   }
 );
 

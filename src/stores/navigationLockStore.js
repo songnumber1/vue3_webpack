@@ -3,8 +3,7 @@
  * @description 앱 전역 navigation/action lock 상태를 scope 단위로 관리합니다.
  *
  * 이 store는 UI/UX 정책을 판단하지 않고 lock의 원본 상태만 보관합니다.
- * 화면별 차단 정책은 useChatSidebarLock, useMainPageLock, useChatPageLock 같은
- * 영역별 composable에서 scope 조합으로 해석합니다.
+ * 화면별 차단 정책은 각 Vue에서 useNavigationLock과 관련 store를 직접 조합합니다.
  */
 
 import {defineStore} from "pinia";

@@ -31,10 +31,20 @@
  * @description responseOverlay 계열 화면을 하나의 host에서 렌더링합니다.
  */
 
+import {useI18n} from "vue-i18n";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
-import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
+import {useViewportStore} from "@/stores/viewportStore";
+import {
+  closeResponseOverlayByBackOrDirect,
+  createResponseOverlayViewState,
+  handleMobileSettingsDesktopOpen,
+  setupResponseOverlayBackGuard,
+} from "@/composables/overlay/responseOverlayActions";
 
 const emit = defineEmits(["applied"]);
+const {t} = useI18n();
+const viewportStore = useViewportStore();
+setupResponseOverlayBackGuard(viewportStore);
 
 const {
   isOpen,
@@ -44,8 +54,6 @@ const {
   overlayPanelClass,
   usesResponsiveOverlay,
   usesStandaloneOverlay,
-  closeResponseOverlayByBackOrDirect,
-  handleMobileSettingsDesktopOpen,
-} = useResponseOverlay({enableBackGuard: true});
+} = createResponseOverlayViewState(t, viewportStore);
 
 </script>

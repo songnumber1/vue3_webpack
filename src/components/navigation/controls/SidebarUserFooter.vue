@@ -66,22 +66,85 @@
  */
 
 import {computed} from "vue";
+import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
-import {useAppShellActions} from "@/composables/app/useAppShellActions";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useViewportStore} from "@/stores/viewportStore";
+import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
+import {useAppContext} from "@/composables/app/useAppContext";
+import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  logoutApp,
+  openPlaygroundRoute,
+  openSwaggerRoute,
+  toggleThemeAction,
+} from "@/composables/app/appShellActions";
 
 const {t} = useI18n();
+const router = useRouter();
 const authStore = useAuthStore();
+const navigationStore = useNavigationStore();
+const viewportStore = useViewportStore();
+const chatStreamStore = useChatStreamStore();
+const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
+  useNavigationLock();
 const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
-const actions = useAppShellActions();
-const responseOverlay = useResponseOverlay();
+const {theme} = useAppContext();
+const {themeName} = useAppShellThemeState(theme?.current);
+const {shouldUseMobileLayout} = useRuntimeModeFlags();
+const isAppShellActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingLocked.value ||
+    isChatHistoryLocked.value ||
+    chatStreamStore.isStreaming
+);
+const isShellActionBlocked = () => isAppShellActionBlocked.value;
+const responseOverlay = {
+  openSettings: () =>
+    openSettingsOverlay({
+      isMobile: shouldUseMobileLayout,
+      isBlocked: isShellActionBlocked,
+      viewportStore,
+      navigationStore,
+    }),
+};
+
+const actions = {
+  toggleTheme: () =>
+    toggleThemeAction({
+      theme,
+      themeName,
+      isMobile: shouldUseMobileLayout,
+      isBlocked: isShellActionBlocked,
+      logScope: "SidebarUserFooter",
+    }),
+  openPlayground: () =>
+    openPlaygroundRoute({
+      router,
+      navigationStore,
+      isBlocked: isShellActionBlocked,
+    }),
+  openSwagger: () => openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
+  logout: () =>
+    logoutApp({
+      router,
+      navigationStore,
+      authStore,
+      isBlocked: isShellActionBlocked,
+      logScope: "SidebarUserFooter",
+    }),
+};
 
 const displayName = computed(() => userName.value || t("common.user"));
 const userInitial = computed(() => {

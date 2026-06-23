@@ -3,21 +3,11 @@
  * @description 채팅방 진입 시점의 메시지 lazy 렌더링 사용 여부와 최초 스크롤 대상을 계산합니다.
  */
 
-import {isForcedMobilePlatformOverride} from "@/composables/chat/internal/message-list/useMessageLazyRange";
-
-export const MESSAGE_SCROLL_TARGET_TYPES = Object.freeze({
-  bottom: "bottom",
-  first: "first",
-  message: "message",
-});
-
-export const HISTORY_RENDER_STRATEGIES = Object.freeze({
-  mobileCurrent: "mobile-current",
-  pcBlockingCurrent: "pc-blocking-current",
-  pcProgressiveShared: "pc-progressive-shared",
-  pcProgressiveNormal: "pc-progressive-normal",
-  pcProgressiveSearch: "pc-progressive-search",
-});
+import {
+  HISTORY_RENDER_STRATEGIES,
+  isForcedMobilePlatformOverride,
+  MESSAGE_SCROLL_TARGET_TYPES,
+} from "./messageRenderPolicyTypes";
 
 function hasSharedId(chat) {
   return String(chat?.sharedId || "").trim().length > 0;

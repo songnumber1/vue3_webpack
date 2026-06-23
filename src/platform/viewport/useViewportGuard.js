@@ -12,11 +12,9 @@ import {useEventListener} from "@vueuse/core";
 import {
   KEYBOARD_THRESHOLD_PX,
   MIN_VIEWPORT_HEIGHT_PX,
-  VIEWPORT_GUARD_DELAY_MS,
-} from "@/platform/viewport/viewportConstants";
-import {
   VIEWPORT_BROWSER_CLASSES,
   VIEWPORT_GUARD_CUSTOM_EVENT,
+  VIEWPORT_GUARD_DELAY_MS,
   VIEWPORT_GUARD_EVENTS,
 } from "@/platform/viewport/viewportConstants";
 import {KEYBOARD_MODES} from "@/constants/systemSettings";

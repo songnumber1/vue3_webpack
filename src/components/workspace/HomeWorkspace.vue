@@ -35,25 +35,33 @@
  * @description 실제 메인 라우트 전용 workspace입니다. 메인 빈 화면 UI는 MainEmptyState를 공유하고,
  * 실제 PromptComposer만 slot으로 주입하여 Studio 미리보기와 UI를 함께 관리합니다.
  */
-import {computed, ref} from "vue";
+import {computed, ref, inject} from "vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
-import {
-  useChatWorkspaceStateContext,
-  useWorkspaceActionsContext,
-} from "@/composables/chat/context/useChatInject";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
-import {useMainPageActions} from "@/composables/main/useMainPageActions";
-import {useMainPageLock} from "@/composables/main/useMainPageLock";
 import {useMainPromptState} from "@/composables/main/useMainPromptState";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  CHAT_WORKSPACE_STATE_KEY,
+  WORKSPACE_ACTIONS_KEY,
+  createEmptyWorkspaceState,
+  createEmptyWorkspaceActions,
+} from "@/composables/chat/chatActionContext";
 
+const chatStreamStore = useChatStreamStore();
+const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
+  useNavigationLock();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
-const workspaceState = useChatWorkspaceStateContext();
-const workspaceActions = useWorkspaceActionsContext();
+const workspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
+const workspaceActions = inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
 const isMobile = useResolvedMobileMode(injectedIsMobile);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
@@ -73,15 +81,20 @@ const studioDetailDisabled = computed(
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );
-const mainPageLock = useMainPageLock();
+const isMainPageActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingLocked.value ||
+    chatStreamStore.isStreaming ||
+    isChatHistoryLocked.value
+);
+const isPromptExampleBlocked = computed(() => isMainPageActionBlocked.value);
 const {mainPromptClass} = useMainPromptState({isMobile});
-const mainPageActions = useMainPageActions({
-  promptInputRef: mainPromptInputRef,
-  lock: mainPageLock,
-});
-
 function handleSuggestionClick(item) {
-  mainPageActions.applySuggestionToPrompt(item);
+  if (isPromptExampleBlocked.value) return;
+
+  const prompt = item?.prompt || item?.title || item?.text || "";
+  mainPromptInputRef.value?.setText?.(prompt, {focus: true});
 }
 
 function handleMainPromptExpandedChange(expanded) {

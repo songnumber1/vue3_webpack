@@ -3,7 +3,7 @@
  * @description 채팅방 진입 준비 흐름에서 최초 스크롤 위치(bottom/first/message)를 계산하고 적용합니다.
  */
 
-import {MESSAGE_SCROLL_TARGET_TYPES} from "./useMessageRenderPolicy";
+import {MESSAGE_SCROLL_TARGET_TYPES} from "./messageRenderPolicyTypes";
 
 function getSafeScrollTop(container, top) {
   if (!container) return 0;

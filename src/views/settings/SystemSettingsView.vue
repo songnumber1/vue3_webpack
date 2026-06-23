@@ -122,13 +122,14 @@
 
 import {computed, reactive, ref, watch} from "vue";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useAuthStore} from "@/stores/authStore";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {authApiLive} from "@/api/live/authApi.live";
@@ -160,6 +161,7 @@ import {ROUTE_NAMES} from "@/constants/routeNames";
 
 const emit = defineEmits(["close", "applied"]);
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
@@ -198,7 +200,9 @@ function settingItem(key, extra = {}) {
   };
 }
 
-useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}});
+useOverlayScrollbar(settingsScrollRef, {overflow: {x: "hidden", y: "scroll"}}, {
+  enabled: () => shouldUseOverlayScrollbar.value,
+});
 
 const commonGroups = computed(() => [
   {

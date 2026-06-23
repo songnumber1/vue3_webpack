@@ -74,22 +74,109 @@
  * ChatHeader는 대화방/워크스페이스 헤더 역할만 유지합니다.
  */
 
-import {computed} from "vue";
+import {computed, inject} from "vue";
+import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
-import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
-import {useAppShellActions} from "@/composables/app/useAppShellActions";
+import {useAuthStore} from "@/stores/authStore";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useViewportStore} from "@/stores/viewportStore";
+import {
+  openLanguageOverlay,
+  openNoticeOverlay,
+  openPersonalizationOverlay,
+  openPrivacyOverlay,
+  openSystemOverlay,
+} from "@/composables/overlay/responseOverlayActions";
+import {useAppContext} from "@/composables/app/useAppContext";
+import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  logoutApp,
+  openGuideRoute,
+  openPlaygroundRoute,
+  openSwaggerRoute,
+  openTermsRoute,
+  toggleThemeAction,
+} from "@/composables/app/appShellActions";
+import {
+  CHAT_WORKSPACE_STATE_KEY,
+  createEmptyWorkspaceState,
+} from "@/composables/chat/chatActionContext";
 
 const {t} = useI18n();
-const shellActions = useAppShellActions();
-const responseOverlay = useResponseOverlay();
-const workspaceState = useChatWorkspaceStateContext();
+const router = useRouter();
+const authStore = useAuthStore();
+const navigationStore = useNavigationStore();
+const viewportStore = useViewportStore();
+const chatStreamStore = useChatStreamStore();
+const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
+  useNavigationLock();
+const {theme} = useAppContext();
+const {themeName: shellThemeName} = useAppShellThemeState(theme?.current);
+const {shouldUseMobileLayout} = useRuntimeModeFlags();
+const isAppShellActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingLocked.value ||
+    isChatHistoryLocked.value ||
+    chatStreamStore.isStreaming
+);
+const isShellActionBlocked = () => isAppShellActionBlocked.value;
+const overlayActionOptions = {
+  isBlocked: isShellActionBlocked,
+  viewportStore,
+  navigationStore,
+};
+const responseOverlay = {
+  openNotice: () => openNoticeOverlay(overlayActionOptions),
+  openPrivacy: () => openPrivacyOverlay(overlayActionOptions),
+  openPersonalization: () => openPersonalizationOverlay(overlayActionOptions),
+  openSystem: () => openSystemOverlay(overlayActionOptions),
+  openLanguage: () => openLanguageOverlay(overlayActionOptions),
+};
+const workspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
-const themeName = computed(() => workspaceState.value.themeName || "light");
+const themeName = computed(
+  () => workspaceState.value.themeName || shellThemeName.value || "light"
+);
+const shellActions = {
+  toggleTheme: () =>
+    toggleThemeAction({
+      theme,
+      themeName: shellThemeName,
+      isMobile: shouldUseMobileLayout,
+      isBlocked: isShellActionBlocked,
+      logScope: "ApplicationHeader",
+    }),
+  openSwagger: () => openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
+  openPlayground: () =>
+    openPlaygroundRoute({
+      router,
+      navigationStore,
+      isBlocked: isShellActionBlocked,
+    }),
+  openGuide: () =>
+    openGuideRoute({router, navigationStore, isBlocked: isShellActionBlocked}),
+  openTerms: () =>
+    openTermsRoute({router, navigationStore, isBlocked: isShellActionBlocked}),
+  logout: () =>
+    logoutApp({
+      router,
+      navigationStore,
+      authStore,
+      isBlocked: isShellActionBlocked,
+      logScope: "ApplicationHeader",
+    }),
+};
 </script>

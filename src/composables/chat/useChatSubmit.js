@@ -1,4 +1,5 @@
 import {computed, nextTick} from "vue";
+import {useRoute, useRouter} from "vue-router";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -136,6 +137,8 @@ export function useChatSubmit(options) {
   const isGenerating = computed(() => chatStreamStore.isStreaming);
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
+  const route = useRoute();
+  const router = useRouter();
 
   async function submitPrompt(payload) {
     const normalized = normalizePromptPayload(payload);
@@ -152,7 +155,7 @@ export function useChatSubmit(options) {
 
     const initialHistoryId = normalizeChatId(
       resolveActiveChatId({
-        route: options.route,
+        route,
         chatStore,
       })
     );
@@ -199,7 +202,7 @@ export function useChatSubmit(options) {
         // hidden-only 정책에 따라 /chat 라우팅만 1회 허용합니다.
         // 사용자가 클릭한 다른 대화방/Studio/MCP 이동은 router guard에서 계속 차단됩니다.
         chatStreamStore.allowNavigationTo(nextRoute);
-        await options.router.push(nextRoute).catch(() => {
+        await router.push(nextRoute).catch(() => {
           chatStreamStore.clearAllowedNavigation();
         });
         applyConversationActiveRoom({
@@ -243,7 +246,7 @@ export function useChatSubmit(options) {
 
     const targetHistoryId = normalizeChatId(
       resolveActiveChatId({
-        route: options.route,
+        route,
         chatStore,
       })
     );

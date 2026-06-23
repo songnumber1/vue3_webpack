@@ -138,7 +138,7 @@
  * @file components/search/ChatSearchWorkspace.vue
  * @description Studio 목록 레이아웃 리듬을 사용하는 채팅 검색 화면입니다.
  */
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
@@ -146,12 +146,16 @@ import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useChatSearch} from "@/composables/search/useChatSearch";
 import {createHistoryFromSearchResult} from "@/adapters/chatResponseAdapter";
-import {createEmptyWorkspaceState} from "@/composables/chat/chatActionContext";
-import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatActionContext";
 
 const {t, locale} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const chatSearch = useChatSearch({
   fallbackTitle: t("chatSearch.untitled"),
   limit: 200,
@@ -160,7 +164,10 @@ const router = useRouter();
 const chatStore = useChatStore();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
-const injectedWorkspaceState = useChatWorkspaceStateContext();
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
 const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );
@@ -194,6 +201,7 @@ useOverlayScrollbar(
   listAreaRef,
   {overflow: {x: "hidden", y: "scroll"}},
   {
+    enabled: () => shouldUseOverlayScrollbar.value,
     watchSource: () => [
       pagedResults.value.length,
       loading.value,

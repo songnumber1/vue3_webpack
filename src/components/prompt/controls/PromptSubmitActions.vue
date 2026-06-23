@@ -62,12 +62,18 @@
  * @description 데스크톱 PromptComposer의 전송/음성 버튼만 담당하는 경량 컴포넌트입니다.
  */
 
-import {computed} from "vue";
-import {usePromptToolbarStateContext} from "@/composables/chat/context/useChatInject";
+import {computed, inject} from "vue";
+import {
+  PROMPT_TOOLBAR_STATE_KEY,
+  createEmptyPromptToolbarState,
+} from "@/composables/chat/chatActionContext";
 
 defineEmits(["start-voice", "stop-voice"]);
 
-const toolbarState = usePromptToolbarStateContext();
+const toolbarState = inject(
+  PROMPT_TOOLBAR_STATE_KEY,
+  computed(createEmptyPromptToolbarState)
+);
 
 const disabled = computed(() => toolbarState.value.disabled);
 const canSubmit = computed(() => toolbarState.value.canSubmit);

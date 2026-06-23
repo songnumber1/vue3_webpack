@@ -8,7 +8,7 @@
         class="round-icon menu-toggle"
         type="button"
         :aria-label="t('chat.openSidebar')"
-        @click="chatActions.openDrawer()"
+        @click="openDrawer"
       >
         <span class="icon-lines"></span>
       </button>
@@ -18,7 +18,7 @@
           class="model-trigger model-trigger--assistant"
           type="button"
           :aria-label="t('chat.assistantSelect')"
-          @click="chatActions.openAssistant()"
+          @click="openAssistant"
         >
           <img
             class="assistant-brand-logo assistant-brand-logo--mobile"
@@ -91,7 +91,7 @@
         type="button"
         :aria-label="t('common.settings')"
         :title="t('common.settings')"
-        @click="chatActions.openSettings()"
+        @click="openSettings"
       >
         <span aria-hidden="true">⋯</span>
       </button>
@@ -119,7 +119,12 @@ import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
-import {useChatHeaderActions} from "@/composables/chat/header/useChatHeaderActions";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useViewportStore} from "@/stores/viewportStore";
+import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
+import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -137,7 +142,19 @@ const props = defineProps({
 defineEmits(["studio-detail"]);
 
 const {t} = useI18n();
-const chatActions = useChatHeaderActions();
+const navigationStore = useNavigationStore();
+const chatStreamStore = useChatStreamStore();
+const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
+  useNavigationLock();
+const viewportStore = useViewportStore();
+const isAppShellActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingLocked.value ||
+    isChatHistoryLocked.value ||
+    chatStreamStore.isStreaming
+);
+const {openAssistantSheet} = useChatAssistantSheetState();
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 const desktopAssistantIcon = computed(() =>
@@ -159,6 +176,35 @@ const showDesktopConversationTitle = computed(
 const showDesktopMainTitle = computed(
   () => props.mode === "main" && !isMobile.value
 );
+
+function refreshViewportSoon() {
+  if (typeof window === "undefined") return;
+  window.setTimeout(() => viewportStore.refresh(), 50);
+  window.setTimeout(() => viewportStore.refresh(), 180);
+}
+
+function openDrawer() {
+  if (isAppShellActionBlocked.value) return;
+  const activeElement =
+    typeof document !== "undefined" ? document.activeElement : null;
+  if (activeElement?.blur) activeElement.blur();
+  navigationStore.setDrawerOpen(true);
+  refreshViewportSoon();
+}
+
+function openAssistant() {
+  if (isAppShellActionBlocked.value) return;
+  openAssistantSheet();
+}
+
+function openSettings() {
+  openSettingsOverlay({
+    isMobile,
+    isBlocked: () => isAppShellActionBlocked.value,
+    viewportStore,
+    navigationStore,
+  });
+}
 </script>
 
 <style scoped lang="scss">

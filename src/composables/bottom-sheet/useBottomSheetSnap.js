@@ -59,7 +59,7 @@ export function createBottomSheetSnap(options) {
     setHeight(props.minHeight, "min");
   }
 
-  // 상위 useBottomSheetSizing 오케스트레이터 및 드래그 핸들러에서 탈취 조작할 타깃 인터페이스 레버 리턴
+  // 상위 BottomSheet 컴포넌트 및 드래그 핸들러에서 탈취 조작할 타깃 인터페이스 레버 리턴
   return {
     collapse,
     expand,

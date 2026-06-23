@@ -180,7 +180,9 @@ import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -248,7 +250,10 @@ const paginationButtonClass =
 useOverlayScrollbar(
   gridShellRef,
   {overflow: {x: "scroll", y: "scroll"}},
-  {watchSource: () => [props.open, pagedAuthorities.value.length, page.value]}
+  {
+    enabled: () => shouldUseOverlayScrollbar.value,
+    watchSource: () => [props.open, pagedAuthorities.value.length, page.value],
+  }
 );
 watch(
   () => props.open,

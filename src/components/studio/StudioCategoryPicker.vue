@@ -73,8 +73,10 @@ import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vu
 import CheckIcon from "@/components/icons/CheckIcon.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const pickerBodyRef = ref(null);
 defineProps({
   open: {type: Boolean, default: false},
@@ -87,6 +89,9 @@ const isMobile = computed(() => responsiveContext.value.isMobile);
 useOverlayScrollbar(
   pickerBodyRef,
   {overflow: {x: "hidden", y: "scroll"}},
-  {watchSource: () => [isMobile.value]}
+  {
+    enabled: () => shouldUseOverlayScrollbar.value,
+    watchSource: () => [isMobile.value],
+  }
 );
 </script>

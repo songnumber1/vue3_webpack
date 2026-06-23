@@ -8,27 +8,20 @@
 
 import {bootstrapAppRuntime} from "@/composables/app/appRuntimeBootstrap";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
+import {
+  clearAppBootstrapPromise,
+  getAppBootstrapGeneration,
+  getAppBootstrapPromise,
+  setAppBootstrapPromise,
+} from "@/composables/app/appBootstrapState";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
-
-let initializePromise = null;
-let initializeGeneration = 0;
 
 /**
  * App 공통 bootstrap을 시작하거나 이미 진행 중인 동일 promise를 재사용합니다.
  * AppContainer와 ChatContainer가 동시에 호출해도 실제 API bundle은 한 번만 실행됩니다.
  */
-export function resetAppBootstrapState() {
-  initializeGeneration += 1;
-  initializePromise = null;
-
-  try {
-    useAppRuntimeStore().resetRuntime();
-  } catch (_storeError) {
-    // Pinia 초기화 전 또는 테스트 환경에서는 reset 요청을 무시합니다.
-  }
-}
 
 export function useAppBootstrap() {
   const appRuntimeStore = useAppRuntimeStore();
@@ -38,19 +31,20 @@ export function useAppBootstrap() {
 
   async function initialize() {
     if (appRuntimeStore.initialized) return true;
-    if (initializePromise) return initializePromise;
+    const activePromise = getAppBootstrapPromise();
+    if (activePromise) return activePromise;
 
-    const requestGeneration = initializeGeneration;
+    const requestGeneration = getAppBootstrapGeneration();
 
     appRuntimeStore.startLoading();
 
-    initializePromise = bootstrapAppRuntime({
+    const initializePromise = bootstrapAppRuntime({
       accessInfoOverride: authStore.isAuthenticated
         ? authStore.accessInfo || null
         : null,
     })
       .then((data) => {
-        if (requestGeneration !== initializeGeneration) return data;
+        if (requestGeneration !== getAppBootstrapGeneration()) return data;
         if (data.accessInfo?.user) {
           authStore.setAuthenticatedAccessInfo(data.accessInfo);
         } else {
@@ -64,17 +58,16 @@ export function useAppBootstrap() {
         return data;
       })
       .catch((error) => {
-        if (requestGeneration === initializeGeneration) {
+        if (requestGeneration === getAppBootstrapGeneration()) {
           appRuntimeStore.fail(error);
         }
         throw error;
       })
       .finally(() => {
-        if (requestGeneration === initializeGeneration) {
-          initializePromise = null;
-        }
+        clearAppBootstrapPromise(requestGeneration);
       });
 
+    setAppBootstrapPromise(initializePromise);
     return initializePromise;
   }
 

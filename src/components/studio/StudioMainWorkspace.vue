@@ -49,14 +49,16 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from "vue";
+import {computed, ref, watch, inject} from "vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import StudioMainPage from "@/components/studio/StudioMainPage.vue";
 import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
-import {createEmptyWorkspaceState} from "@/composables/chat/chatActionContext";
-import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatActionContext";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
 
 const props = defineProps({
@@ -83,7 +85,10 @@ const emit = defineEmits([
 
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
-const injectedWorkspaceState = useChatWorkspaceStateContext();
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
 const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );

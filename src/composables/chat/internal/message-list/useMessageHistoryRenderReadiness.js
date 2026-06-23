@@ -1,4 +1,4 @@
-import {MESSAGE_SCROLL_TARGET_TYPES} from "./useMessageRenderPolicy";
+import {MESSAGE_SCROLL_TARGET_TYPES} from "./messageRenderPolicyTypes";
 import {
   countMermaidBlocksInText,
   isAssistantErrorMessage,

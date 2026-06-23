@@ -3,7 +3,7 @@
  *
  * This module owns only viewport anchor capture/restore and the temporary
  * manual lock used after Android/manual previous-history loading. It preserves
- * the exact behavior previously implemented inside useMessageListScroll.
+ * the exact behavior previously implemented inside the MessageList scroll orchestrator.
  */
 export function createMessageLazyPrependScrollController({
   suppressHistoryLazyScrollRestore,

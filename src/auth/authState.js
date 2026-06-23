@@ -1,6 +1,6 @@
 import {clearTokens} from "@/auth/tokenStore";
 import {useAuthStore} from "@/stores/authStore";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 
 export function resetAuthStateSafely() {
   clearTokens();

@@ -1,9 +1,8 @@
 /**
  * @file composables/ui/useOverlayScrollbar.js
- * @description Vue ref 대상에 OverlayScrollbars를 안전하게 연결합니다.
+ * @description Vue ref 대상에 OverlayScrollbars lifecycle만 안전하게 연결합니다.
  */
 import {nextTick, onBeforeUnmount, onMounted, watch} from "vue";
-import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {
   destroyOverlayScrollbar,
   getOverlayScrollbarViewport,
@@ -18,14 +17,12 @@ export function useOverlayScrollbar(targetRef, options = {}, config = {}) {
   let removeWindowResizeListener = null;
   const enabled = config.enabled ?? true;
   const reserveScrollbarGap = config.reserveScrollbarGap ?? true;
-  const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
-
   function resolveLocalEnabled() {
     return typeof enabled === "function" ? enabled() : Boolean(enabled);
   }
 
   function resolveEnabled() {
-    return resolveLocalEnabled() && shouldUseOverlayScrollbar.value;
+    return resolveLocalEnabled();
   }
 
   async function setup() {

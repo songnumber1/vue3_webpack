@@ -1,4 +1,5 @@
 import {computed} from "vue";
+import {useRoute} from "vue-router";
 import {
   ROUTE_NAMES,
   CHAT_ROUTE_NAMES,
@@ -25,6 +26,7 @@ export function resolveRouteMode(routeName) {
   return ROUTE_MODES.MAIN;
 }
 
-export function useRouteMode(route) {
+export function useRouteMode() {
+  const route = useRoute();
   return computed(() => resolveRouteMode(route?.name));
 }

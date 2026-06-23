@@ -204,7 +204,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, ref, watch} from "vue";
+import {computed, inject, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
@@ -220,20 +220,47 @@ import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFoote
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useChatStore} from "@/stores/chatStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
-import {useChatSidebarLock} from "@/composables/chat/sidebar/useChatSidebarLock";
-import {useChatSidebarActions} from "@/composables/chat/sidebar/useChatSidebarActions";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {isPortalAssistantId} from "@/constants/assistantPortal";
+import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
+import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
+import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
+import {
+  clearConversationNavigationState as clearConversationNavigationStateByPolicy,
+  navigateToMainAfterConversationReset,
+  resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
+  preparePortalConversationNavigation,
+  cleanupAfterPortalConversationNavigation,
+} from "@/composables/chat/internal/navigation/chatNavigationReset";
+import {createPortalAssistantRoute} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
+import {logWarn} from "@/utils/logger";
+import {
+  CHAT_ACTIONS_KEY,
+  createEmptyChatActions,
+} from "@/composables/chat/chatActionContext";
 import {ROUTE_NAMES} from "@/constants/routeNames";
-const router = useRouter();
 const route = useRoute();
+const router = useRouter();
 const {t} = useI18n();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
+const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
+const historyDialogActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
+const {
+  NAVIGATION_LOCK_SCOPES,
+  acquireLockIfFree,
+  releaseLock,
+  isGlobalLocked,
+  isStreamingLocked,
+  isChatHistoryLocked,
+} = useNavigationLock();
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
@@ -251,6 +278,32 @@ function isDeletedRuntimeStudio(assistant = null) {
   return Boolean(isStudio && studioRuntimeStore.isStudioDeleted(id));
 }
 
+async function preloadRuntimeExamplePrompts(assistantId) {
+  if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
+  try {
+    const assistant = assistantStore.assistantMap[assistantId];
+    const prompts = await loadExamplePrompts({
+      assistantId,
+      studioYN: assistant?.type === "studio",
+    });
+    assistantStore.setExamplePrompts(assistantId, prompts);
+  } catch (error) {
+    logWarn("[AppSidebar] preloadExamplePrompts 오류:", error);
+  }
+}
+
+async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
+  if (!forNewChat && chatStore.isModelLocked) return;
+  if (!assistantStore.assistantMap[id]) return;
+  try {
+    await preloadRuntimeExamplePrompts(id);
+    assistantStore.selectAssistant(id);
+    if (forNewChat) chatStore.clearActiveSession();
+  } catch (error) {
+    logWarn("[AppSidebar] selectAssistant 오류:", error);
+  }
+}
+
 const visibleAssistants = computed(() =>
   assistants.value.filter((assistant) => !isDeletedRuntimeStudio(assistant))
 );
@@ -264,7 +317,24 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
-const sidebarLock = useChatSidebarLock();
+const isStreamingBlocked = computed(
+  () => chatStreamStore.isStreaming || isStreamingLocked.value
+);
+const isChatHistoryBlocked = computed(() => isChatHistoryLocked.value);
+const isSidebarActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingBlocked.value ||
+    isChatHistoryBlocked.value
+);
+const sidebarLock = {
+  isSidebarActionBlocked,
+  isHistorySelectBlocked: computed(() => isSidebarActionBlocked.value),
+  isHistoryMenuBlocked: computed(() => isSidebarActionBlocked.value),
+  isNewChatBlocked: computed(() => isSidebarActionBlocked.value),
+  isAssistantSelectBlocked: computed(() => isSidebarActionBlocked.value),
+  isChatSearchBlocked: computed(() => isSidebarActionBlocked.value),
+};
 const {
   isChatSearchBlocked,
   isHistoryMenuBlocked,
@@ -278,18 +348,107 @@ function syncViewportMode() {
   isMobileSheet.value = shouldUseMobileLayout.value;
 }
 
+function getHistoryId(item) {
+  return String(item?.id || "").trim();
+}
+
+function closeSidebarNavigationPanels() {
+  navigationStore.setDrawerOpen(false);
+  navigationStore.setCollapsedRecentOpen(false);
+}
+
+function closeAssistantSelector() {
+  assistantMenuOpen.value = false;
+}
+
+function isBlocked(blockedRef) {
+  return Boolean(blockedRef?.value);
+}
+
+function createNavigationResetContext() {
+  return {
+    chatStore,
+    releaseLock,
+    chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
+    clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
+    cleanupActiveConversation: cleanupActiveConversationForNavigation,
+    navigationStore,
+    closeAssistantSelector,
+  };
+}
+
+function clearConversationNavigationState() {
+  clearConversationNavigationStateByPolicy(createNavigationResetContext());
+}
+
+function preparePortalNavigation() {
+  preparePortalConversationNavigation(createNavigationResetContext());
+}
+
+function cleanupAfterPortalNavigation() {
+  cleanupAfterPortalConversationNavigation(createNavigationResetContext());
+}
+
+async function navigatePortalAssistant(assistantId) {
+  const targetRoute = createPortalAssistantRoute(assistantId);
+
+  preparePortalNavigation();
+  assistantStore.selectAssistant(assistantId);
+  await router.push(targetRoute).catch(() => {});
+  cleanupAfterPortalNavigation();
+}
+
+async function navigateMainAfterReset() {
+  await navigateToMainAfterConversationReset({
+    router,
+    clearBeforeNavigate: clearConversationNavigationState,
+  });
+}
+
+function resetConversationStateForRouteChange() {
+  resetConversationStateForRouteChangeByPolicy(createNavigationResetContext());
+}
+
+async function resetChatState({assistantId = null} = {}) {
+  resetConversationStateForRouteChange();
+
+  if (assistantId) {
+    try {
+      await selectRuntimeAssistant(assistantId, {forNewChat: true});
+    } catch (error) {
+      logWarn("[AppSidebar] selectAssistant 오류:", error);
+    }
+  }
+
+  await navigateMainAfterReset();
+}
+
 /**
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openAssistantSelector() {
-  sidebarActions.openAssistantSelector();
+  if (isBlocked(sidebarLock.isAssistantSelectBlocked)) return;
+  syncViewportMode();
+  assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function selectAssistant(id) {
-  await sidebarActions.selectAssistant(id);
+  if (isPortalAssistantId(id)) {
+    if (isGlobalLocked.value || isStreamingLocked.value) return;
+    await navigatePortalAssistant(id);
+    return;
+  }
+
+  if (isBlocked(sidebarLock.isAssistantSelectBlocked)) return;
+
+  await resetChatState({assistantId: id});
+
+  if ([ROUTE_NAMES.STUDIO, ROUTE_NAMES.CONNECTOR_STORE].includes(route.name)) {
+    await router.push({name: ROUTE_NAMES.MAIN}).catch(() => {});
+  }
 }
 
 /**
@@ -297,12 +456,13 @@ async function selectAssistant(id) {
  */
 async function handleNewChat() {
   if (isNewChatBlocked.value) return;
-  await sidebarActions.newChat();
+  await resetChatState();
 }
 
 function handleChatSearch() {
   if (isChatSearchBlocked.value) return;
-  sidebarActions.openChatSearch();
+  closeSidebarNavigationPanels();
+  router.push({name: ROUTE_NAMES.CHAT_SEARCH}).catch(() => {});
 }
 
 /**
@@ -310,7 +470,7 @@ function handleChatSearch() {
  */
 function openHistoryMenu(payload = {}) {
   if (isHistoryMenuBlocked.value) return;
-  if (sidebarActions.openHistoryMenu(payload) === false) return;
+  syncViewportMode();
   const {item, event} = payload;
   historyMenuTarget.value = item || null;
   historyMenuReferenceEl.value = event?.currentTarget || null;
@@ -326,15 +486,6 @@ function closeHistoryMenu() {
   historyMenuReferenceEl.value = null;
 }
 
-const sidebarActions = useChatSidebarActions({
-  router,
-  route,
-  lock: sidebarLock,
-  assistantMenuOpen,
-  syncViewportMode,
-  closeHistoryMenu,
-});
-
 /**
  * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
@@ -342,7 +493,8 @@ function selectHistoryMenuAction(action) {
   if (isHistoryMenuBlocked.value) return;
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
-  sidebarActions.historyMenuAction({action, history});
+  if (!history || !action) return;
+  historyDialogActions?.historyMenuAction?.({action, history});
 }
 
 /**
@@ -350,7 +502,7 @@ function selectHistoryMenuAction(action) {
  */
 async function handleSelectHistory(item) {
   if (isHistorySelectBlocked.value) return;
-  await sidebarActions.selectHistory(item);
+  await selectHistory(item);
 }
 
 /**
@@ -358,10 +510,61 @@ async function handleSelectHistory(item) {
  */
 async function handleSelectHistoryCollapsed(item) {
   if (isHistorySelectBlocked.value) return;
-  await sidebarActions.selectHistory(item, {
+  await selectHistory(item, {
     source: "collapsed-sidebar",
     closeCollapsedRecent: true,
   });
+}
+
+async function selectHistory(item, options = {}) {
+  if (isBlocked(sidebarLock.isHistorySelectBlocked)) return false;
+
+  const historyId = getHistoryId(item);
+  if (!historyId) return false;
+
+  const currentHistoryId = String(
+    chatStore.pendingSelectedChatId ||
+      chatStore.activeRoomId ||
+      chatStore.selectedChatId ||
+      ""
+  ).trim();
+  if (currentHistoryId && currentHistoryId === historyId) {
+    return false;
+  }
+
+  const lockEntry = acquireLockIfFree(NAVIGATION_LOCK_SCOPES.chatHistory, {
+    owner: historyId,
+    reason: "sidebar-history-select",
+    meta: {source: options.source || "sidebar"},
+  });
+
+  if (!lockEntry) return false;
+
+  try {
+    chatStore.setPendingSelectedChatId(historyId);
+    navigationStore.closeTransientPanels();
+    navigationStore.setDrawerOpen(false);
+    navigationStore.setCollapsedRecentOpen(false);
+
+    await navigateToConversation({
+      router,
+      chatStore,
+      chatId: historyId,
+    }).catch(() => {});
+
+    if (options.closeCollapsedRecent) {
+      navigationStore.setCollapsedRecentOpen(false);
+    } else {
+      navigationStore.setDrawerOpen(false);
+    }
+
+    await nextTick();
+    return true;
+  } catch (_error) {
+    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory, historyId);
+    chatStore.clearPendingSelectedChatId();
+    return false;
+  }
 }
 
 useOutsideClick(

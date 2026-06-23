@@ -295,9 +295,21 @@ import {
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
-import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useViewportStore} from "@/stores/viewportStore";
+import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  openNoticeOverlay,
+  openPersonalizationOverlay,
+} from "@/composables/overlay/responseOverlayActions";
 
 const {t} = useI18n();
+const navigationStore = useNavigationStore();
+const viewportStore = useViewportStore();
+const chatStreamStore = useChatStreamStore();
+const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
+  useNavigationLock();
 const {appInfo} = useAppContext();
 const {
   isCompactViewport,
@@ -305,7 +317,22 @@ const {
   isAndroidApp: isAndroidRuntime,
   isMobileBrowser,
 } = useRuntimeModeFlags();
-const responseOverlay = useResponseOverlay();
+const isAppShellActionBlocked = computed(
+  () =>
+    isGlobalLocked.value ||
+    isStreamingLocked.value ||
+    isChatHistoryLocked.value ||
+    chatStreamStore.isStreaming
+);
+const overlayActionOptions = {
+  isBlocked: () => isAppShellActionBlocked.value,
+  viewportStore,
+  navigationStore,
+};
+const responseOverlay = {
+  openNotice: () => openNoticeOverlay(overlayActionOptions),
+  openPersonalization: () => openPersonalizationOverlay(overlayActionOptions),
+};
 const sheetOpen = ref(false);
 const popupOpen = ref(false);
 const activePopupType = ref("alert");

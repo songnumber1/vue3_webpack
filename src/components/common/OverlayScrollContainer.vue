@@ -23,8 +23,10 @@
  * useOverlayKeyboardScrollController를 통해 동작합니다.
  */
 
-import {ref} from "vue";
-import {useOverlayScrollContainer} from "@/composables/ui/useOverlayScrollContainer";
+import {computed, ref, unref} from "vue";
+import {useOverlayKeyboardScrollController} from "@/composables/ui/useOverlayKeyboardScrollController";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
+import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 
 defineOptions({inheritAttrs: false});
 
@@ -39,28 +41,51 @@ const props = defineProps({
 });
 
 const rootRef = ref(null);
+const {isActualAndroidRuntime, shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 
-function resolveEnabledProp() {
-  return typeof props.enabled === "function" ? props.enabled() : props.enabled;
+function resolveMaybeRef(value) {
+  if (typeof value === "function") return value();
+  return unref(value);
 }
 
-const scrollContainer = useOverlayScrollContainer(rootRef, {
-  enabled: resolveEnabledProp,
-  keyboardAware: () => props.keyboardAware,
-  overlayOptions: props.overlayOptions,
-  keyboardOptions: props.keyboardOptions,
-  reserveScrollbarGap: props.reserveScrollbarGap,
+function resolveBoolean(value, fallback = false) {
+  const resolved = resolveMaybeRef(value);
+  return resolved === undefined || resolved === null
+    ? fallback
+    : Boolean(resolved);
+}
+
+const overlayEnabled = computed(() => resolveBoolean(props.enabled, true));
+const keyboardAware = computed(() => resolveBoolean(props.keyboardAware, false));
+const overlayScrollbarEnabled = computed(
+  () => overlayEnabled.value && shouldUseOverlayScrollbar.value
+);
+const keyboardControllerEnabled = computed(
+  () => overlayEnabled.value && keyboardAware.value && isActualAndroidRuntime.value
+);
+
+const overlay = useOverlayScrollbar(rootRef, props.overlayOptions || {}, {
+  enabled: () => overlayScrollbarEnabled.value,
+  reserveScrollbarGap: props.reserveScrollbarGap ?? true,
 });
 
-const {
-  handleFocusIn,
-  handleFocusOut,
-  handlePointerDown,
-  setup,
-  update,
-  destroy,
-  getViewport,
-} = scrollContainer;
+const keyboardController = useOverlayKeyboardScrollController({
+  ...(props.keyboardOptions || {}),
+  enabled: () => keyboardControllerEnabled.value,
+  viewport: overlay,
+  updateOverlay: overlay.update,
+});
+
+function getViewport() {
+  return overlay.getViewport();
+}
+
+const handleFocusIn = keyboardController.handleFocusIn;
+const handleFocusOut = keyboardController.handleFocusOut;
+const handlePointerDown = keyboardController.handlePointerDown;
+const setup = overlay.setup;
+const update = overlay.update;
+const destroy = overlay.destroy;
 
 defineExpose({
   setup,

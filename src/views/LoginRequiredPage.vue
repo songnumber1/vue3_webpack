@@ -53,7 +53,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {authApiLive} from "@/api/live/authApi.live";
 import {useAuthStore} from "@/stores/authStore";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 
 const route = useRoute();
 const router = useRouter();

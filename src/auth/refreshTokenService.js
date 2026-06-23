@@ -10,7 +10,7 @@ import {AUTH_HEADER_NAMES, AUTH_MODES} from "@/auth/authConstants";
 import {AUTH_API_KEYS as A} from "@/constants/api/authApiKeys";
 import {adaptAuthTokens} from "@/adapters/authResponseAdapter";
 import {useAuthStore} from "@/stores/authStore";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 
 let refreshPromise = null;
 

@@ -112,7 +112,7 @@ export function createEmptyPromptToolbarState() {
 }
 
 /**
- * @description [Null Object 패턴] 글로벌 네비게이션 제어기(`useChatNavigationActions`) 레이어가 아직 Provide되기 전이거나, 독립형 단위 테스트(Vitest/Jest) 런타임 환경에서 예외 크래시를 방지하기 위해 아무 동작도 수행하지 않는 안전 우회용 빈 더미 함수 객체를 빌드합니다.
+ * @description [Null Object 패턴] 글로벌 네비게이션 액션 provide 레이어가 아직 Provide되기 전이거나, 독립형 단위 테스트(Vitest/Jest) 런타임 환경에서 예외 크래시를 방지하기 위해 아무 동작도 수행하지 않는 안전 우회용 빈 더미 함수 객체를 빌드합니다.
  * @returns {{
  * openDrawer: () => void,
  * toggleTheme: () => void,

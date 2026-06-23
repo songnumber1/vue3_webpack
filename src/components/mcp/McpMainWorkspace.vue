@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import {computed, ref, watch} from "vue";
+import {computed, ref, watch, inject} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import McpMainPage from "@/components/mcp/McpMainPage.vue";
@@ -90,10 +90,14 @@ import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import {createEmptyWorkspaceState} from "@/composables/chat/chatActionContext";
-import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
+import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatActionContext";
 
 const {t} = useI18n();
+const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const props = defineProps({
   searchText: {type: String, default: ""},
   activeTab: {type: String, default: "all"},
@@ -118,7 +122,10 @@ const emit = defineEmits([
 
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => responsiveContext.value.isMobile);
-const injectedWorkspaceState = useChatWorkspaceStateContext();
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
 const workspaceState = computed(
   () => injectedWorkspaceState.value || createEmptyWorkspaceState()
 );
@@ -129,7 +136,10 @@ const categorySelectorOpen = ref(false);
 useOverlayScrollbar(
   detailDialogRef,
   {overflow: {x: "hidden", y: "scroll"}},
-  {watchSource: () => [Boolean(selectedMcp.value)]}
+  {
+    enabled: () => shouldUseOverlayScrollbar.value,
+    watchSource: () => [Boolean(selectedMcp.value)],
+  }
 );
 
 watch(isMobile, (mobile) => {

@@ -21,7 +21,7 @@ import {
 } from "@/adapters/authResponseAdapter";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {API_REQUEST_KEYS as Q} from "@/constants/api/apiRequestKeys";
-import {resetAppBootstrapState} from "@/composables/app/useAppBootstrap";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 /**
