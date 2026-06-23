@@ -301,10 +301,34 @@ watch(
 }
 
 :deep(.bottom-sheet-option--selectedRow.is-active) {
-  border-color: color-mix(in srgb, var(--accent) 54%, var(--control-border));
-  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-  color: var(--text);
-  box-shadow: inset 3px 0 0 var(--accent);
+  border-color: var(--accent) !important;
+  background: color-mix(in srgb, var(--accent) 24%, var(--surface)) !important;
+  color: var(--text) !important;
+  box-shadow:
+    inset 4px 0 0 var(--accent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+
+:deep(.bottom-sheet-option--selectedRow.is-active strong) {
+  color: var(--text) !important;
+  font-weight: 900;
+}
+
+:deep(.bottom-sheet-selected-check) {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  flex: 0 0 24px !important;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: var(--font-size-fixed-14);
+  font-weight: 900;
+  line-height: 1;
 }
 
 :deep(.bottom-sheet-checkbox) {

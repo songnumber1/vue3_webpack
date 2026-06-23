@@ -18,6 +18,12 @@
       ></span>
     </span>
     <strong>{{ perplexityLabel }}</strong>
+    <span
+      v-if="selectedEngine === 'web-perplexity'"
+      class="bottom-sheet-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice bottom-sheet-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-text-left"
@@ -38,6 +44,12 @@
       ></span>
     </span>
     <strong>{{ googleAiOverviewsLabel }}</strong>
+    <span
+      v-if="selectedEngine === 'web-google-ai-overviews'"
+      class="bottom-sheet-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice bottom-sheet-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-text-left"
@@ -58,6 +70,12 @@
       ></span>
     </span>
     <strong>{{ chatgptSearchLabel }}</strong>
+    <span
+      v-if="selectedEngine === 'web-chatgpt-search'"
+      class="bottom-sheet-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="bottom-sheet-option bottom-sheet-option--row bottom-sheet-option--choice bottom-sheet-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-text-left"
@@ -78,6 +96,12 @@
       ></span>
     </span>
     <strong>{{ microsoftCopilotLabel }}</strong>
+    <span
+      v-if="selectedEngine === 'web-microsoft-copilot'"
+      class="bottom-sheet-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
 </template>
 

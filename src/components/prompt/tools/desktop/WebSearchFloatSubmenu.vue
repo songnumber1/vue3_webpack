@@ -15,6 +15,12 @@
       <span v-if="selectedEngine === 'web-perplexity'"></span>
     </span>
     <p>{{ perplexityLabel }}</p>
+    <span
+      v-if="selectedEngine === 'web-perplexity'"
+      class="prompt-tool-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="prompt-tool-child-option prompt-tool-child-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-rounded-control tw-px-2.5 tw-text-left"
@@ -32,6 +38,12 @@
       <span v-if="selectedEngine === 'web-google-ai-overviews'"></span>
     </span>
     <p>{{ googleAiOverviewsLabel }}</p>
+    <span
+      v-if="selectedEngine === 'web-google-ai-overviews'"
+      class="prompt-tool-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="prompt-tool-child-option prompt-tool-child-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-rounded-control tw-px-2.5 tw-text-left"
@@ -49,6 +61,12 @@
       <span v-if="selectedEngine === 'web-chatgpt-search'"></span>
     </span>
     <p>{{ chatgptSearchLabel }}</p>
+    <span
+      v-if="selectedEngine === 'web-chatgpt-search'"
+      class="prompt-tool-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
   <button
     class="prompt-tool-child-option prompt-tool-child-option--selectedRow tw-flex tw-w-full tw-items-center tw-gap-3 tw-rounded-control tw-px-2.5 tw-text-left"
@@ -66,6 +84,12 @@
       <span v-if="selectedEngine === 'web-microsoft-copilot'"></span>
     </span>
     <p>{{ microsoftCopilotLabel }}</p>
+    <span
+      v-if="selectedEngine === 'web-microsoft-copilot'"
+      class="prompt-tool-selected-check"
+      aria-hidden="true"
+      >✓</span
+    >
   </button>
 </template>
 

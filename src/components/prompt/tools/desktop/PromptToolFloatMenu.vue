@@ -377,10 +377,34 @@ watch(
 }
 
 .prompt-tool-child-option--selectedRow.is-active {
-  border-color: color-mix(in srgb, var(--accent) 54%, var(--control-border));
-  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
-  color: var(--text);
-  box-shadow: inset 3px 0 0 var(--accent);
+  border-color: var(--accent) !important;
+  background: color-mix(in srgb, var(--accent) 24%, var(--surface)) !important;
+  color: var(--text) !important;
+  box-shadow:
+    inset 4px 0 0 var(--accent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+
+.prompt-tool-child-option--selectedRow.is-active p {
+  color: var(--text) !important;
+  font-weight: 900;
+}
+
+.prompt-tool-selected-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  flex: 0 0 22px;
+  margin-left: auto;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--surface);
+  font-size: var(--font-size-fixed-14);
+  font-weight: 900;
+  line-height: 1;
 }
 
 .prompt-tool-radio {
