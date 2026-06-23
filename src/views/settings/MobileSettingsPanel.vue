@@ -27,30 +27,11 @@
           class="mobile-settings-body"
           :class="{'mobile-settings-body--system': activeMenu === 'system'}"
         >
-          <nav
+          <MobileSettingsMenuList
             v-if="!activeMenu"
-            class="mobile-settings-list"
-            :aria-label="t('common.settings')"
-          >
-            <button
-              v-for="item in menuItems"
-              :key="item.key"
-              class="mobile-settings-item"
-              type="button"
-              @click="selectMenuItem(item.key)"
-            >
-              <span class="mobile-settings-item-icon" aria-hidden="true">
-                <img :src="item.icon" alt="" />
-              </span>
-              <span>
-                <strong>{{ item.label }}</strong>
-                <small>{{ item.description }}</small>
-              </span>
-              <span class="mobile-settings-item-arrow" aria-hidden="true"
-                ><ChevronRightIcon
-              /></span>
-            </button>
-          </nav>
+            :system-settings="systemSettings"
+            @select="selectMenuItem"
+          />
 
           <section
             v-else
@@ -94,22 +75,7 @@
               </ul>
             </section>
 
-            <section
-              v-else-if="activeMenu === 'language'"
-              class="settings-language-card"
-            >
-              <button
-                v-for="option in languageOptions"
-                :key="option.value"
-                class="settings-language-option"
-                :class="{active: locale === option.value}"
-                type="button"
-                @click="setAppLocale(option.value)"
-              >
-                <span>{{ option.label }}</span>
-                <span v-if="locale === option.value" aria-hidden="true">✓</span>
-              </button>
-            </section>
+            <MobileSettingsLanguageOptions v-else-if="activeMenu === 'language'" />
           </section>
         </main>
       </section>
@@ -120,45 +86,29 @@
 <script setup>
 /**
  * @file views/settings/MobileSettingsPanel.vue
- * @description 라우터가 직접 렌더하는 페이지 진입 컴포넌트입니다. 대부분 실제 로직은 container에 위임합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 모바일 설정 패널의 페이지 전환 상태만 관리합니다. 메뉴 목록과 언어 옵션은 전용 컴포넌트가 직접 렌더링합니다.
  */
 
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
-import {setAppLocale} from "@/i18n/appI18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
+import MobileSettingsLanguageOptions from "@/components/settings/MobileSettingsLanguageOptions.vue";
+import MobileSettingsMenuList from "@/components/settings/MobileSettingsMenuList.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
-import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
-import guideIcon from "@/assets/img/settings/guide.svg";
-import noticeIcon from "@/assets/img/settings/notice.svg";
-import privacyIcon from "@/assets/img/settings/privacy.svg";
-import termsIcon from "@/assets/img/settings/terms.svg";
-import personalizationIcon from "@/assets/img/settings/personalization.svg";
-import systemIcon from "@/assets/img/settings/system.svg";
-import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
-import languageIcon from "@/assets/img/settings/language.svg";
-import playgroundIcon from "@/assets/img/settings/playground.svg";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
 const props = defineProps({
   open: {type: Boolean, default: false},
 });
 const emit = defineEmits(["close", "desktop-open", "applied"]);
-const {t, tm, locale} = useI18n();
+const {t, tm} = useI18n();
 const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
@@ -166,89 +116,21 @@ const activeMenu = ref("");
 const responsiveContext = useResponsiveContext();
 const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
 
-const menuItems = computed(() =>
-  [
-    {
-      key: "guide",
-      icon: guideIcon,
-      label: t("common.guide"),
-      description: t("guide.subtitle"),
-      visible: systemSettings.value.showGuideButton,
-    },
-    {
-      key: "notice",
-      icon: noticeIcon,
-      label: t("common.notice"),
-      description: t("menu.noticeSummary"),
-      visible: systemSettings.value.showNoticeMenu,
-    },
-    {
-      key: "privacy",
-      icon: privacyIcon,
-      label: t("common.privacy"),
-      description: t("menu.privacySummary"),
-      visible: systemSettings.value.showPrivacyMenu,
-    },
-    {
-      key: "terms",
-      icon: termsIcon,
-      label: t("common.terms"),
-      description: t("menu.termsSummary"),
-      visible: systemSettings.value.showTermsMenu,
-    },
-    {
-      key: "personalization",
-      icon: personalizationIcon,
-      label: t("common.personalization"),
-      description: t("menu.personalizationSummary"),
-      visible: systemSettings.value.showPersonalizationMenu,
-    },
-    {
-      key: "system",
-      icon: systemIcon,
-      label: t("common.system"),
-      description: t("menu.systemSummary"),
-      visible: true,
-    },
-    {
-      key: "playground",
-      icon: playgroundIcon,
-      label: t("common.playground"),
-      description: t("menu.playgroundSummary"),
-      visible: systemSettings.value.showPlaygroundMenu,
-    },
-    {
-      key: "chatManagement",
-      icon: chatManagementIcon,
-      label: t("settings.chatManagement"),
-      description: t("settings.chatManagementSummary"),
-      visible: true,
-    },
-    {
-      key: "language",
-      icon: languageIcon,
-      label: t("common.language"),
-      description: t("menu.languageSummary"),
-      visible: true,
-    },
-  ].filter((item) => item.visible)
-);
-const currentMenu = computed(() =>
-  menuItems.value.find((item) => item.key === activeMenu.value)
-);
-const headerTitle = computed(() =>
-  activeMenu.value
-    ? currentMenu.value?.label || t("common.settings")
-    : t("common.settings")
-);
+const headerTitle = computed(() => resolveMenuTitle(activeMenu.value));
 const guideSections = computed(() => tm("guide.sections"));
-const languageOptions = computed(() => [
-  {value: "ko", label: t("common.korean")},
-  {value: "en", label: t("common.english")},
-]);
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
+
+function resolveMenuTitle(key) {
+  if (!key) return t("common.settings");
+  if (key === "guide") return t("common.guide");
+  if (key === "notice") return t("common.notice");
+  if (key === "privacy") return t("common.privacy");
+  if (key === "personalization") return t("common.personalization");
+  if (key === "system") return t("common.system");
+  if (key === "chatManagement") return t("settings.chatManagement");
+  if (key === "language") return t("common.language");
+  return t("common.settings");
+}
+
 function selectMenuItem(key) {
   if (key === "terms" || key === "playground") {
     closePanel();
@@ -264,9 +146,6 @@ function selectMenuItem(key) {
   activeMenu.value = key;
 }
 
-/**
- * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
- */
 function handleBack() {
   if (activeMenu.value) {
     activeMenu.value = "";
@@ -274,13 +153,12 @@ function handleBack() {
   }
   closePanel();
 }
-/**
- * 관련 modal, sheet, menu, overlay 상태를 닫힘 상태로 전환합니다.
- */
+
 function closePanel() {
   activeMenu.value = "";
   emit("close");
 }
+
 watch(
   () => props.open,
   (value) => {

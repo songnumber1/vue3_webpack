@@ -14,7 +14,7 @@
       @error="handlePreviewError"
     />
 
-    <AssistantSelectSheet
+    <AssistantBottomSheet
       :open="assistantSheetOpen"
       :assistants="visibleAssistants"
       :selected-assistant-id="selectedAssistantId"
@@ -37,7 +37,7 @@
 
     <VirtualKeyboardDebug :visible="showVirtualKeyboardDebugButton" />
 
-    <ChatHistoryActionDialog
+    <ChatHistoryConfirmDialog
       :open="historyDialogOpen"
       :mode="historyDialogMode"
       :title="historyDialogTitle"
@@ -108,11 +108,11 @@ import {
   PROMPT_STATE_KEY,
   WORKSPACE_ACTIONS_KEY,
 } from "@/composables/chat/chatActionContext";
-import AssistantSelectSheet from "@/components/assistant/AssistantSelectSheet.vue";
+import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
 import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
-import ChatHistoryActionDialog from "@/components/navigation/controls/ChatHistoryActionDialog.vue";
+import ChatHistoryConfirmDialog from "@/components/navigation/history/ChatHistoryConfirmDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
@@ -519,6 +519,29 @@ async function ensureRuntimeConversation(historyId) {
   return chatStore.messageMap[history.id] || [];
 }
 
+function createFallbackHistoryForNewSubmit({
+  chatId,
+  chatTitle,
+  assistantId,
+  modelId,
+} = {}) {
+  return adaptChatHistory(
+    {
+      chatId,
+      chatTitle: chatTitle || "새 대화",
+      assistId: assistantId,
+      modelId,
+      modeId: modelId,
+      bookmarkYN: false,
+      chatEndDt: new Date().toISOString(),
+    },
+    {
+      assistantMap: assistantStore.assistantMap,
+      modelMap: assistantStore.modelMap,
+    }
+  );
+}
+
 async function createRemoteRuntimeConversation({text, assistantId, modelId} = {}) {
   const chatId = createId();
   const chatTitle = String(text || "")
@@ -532,13 +555,22 @@ async function createRemoteRuntimeConversation({text, assistantId, modelId} = {}
     ChatTilte: chatTitle || String(text || "").trim(),
     studio: assistant?.type === "studio",
   });
-  const history = adaptChatHistory(rawHistory, {
+  let history = adaptChatHistory(rawHistory, {
     assistantMap: assistantStore.assistantMap,
     modelMap: assistantStore.modelMap,
   });
 
   if (!history?.id) {
-    throw new Error("new.do response does not contain chatId.");
+    logWarn(
+      "[ChatContainer] new.do 응답에 chatId가 없어 요청 chatId로 대체합니다.",
+      rawHistory
+    );
+    history = createFallbackHistoryForNewSubmit({
+      chatId,
+      chatTitle: chatTitle || String(text || "").trim(),
+      assistantId,
+      modelId,
+    });
   }
 
   chatStore.addHistory(history);

@@ -13,6 +13,7 @@ import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {PROMPT_MENU_TYPE} from "@/constants/promptComposer";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 
 /**
  * @function createMenuOpenRef
@@ -25,15 +26,15 @@ import {usePlatformStore} from "@/stores/platformStore";
 /**
  * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
-function createMenuOpenRef(activeMenu, menuType) {
+function createMenuOpenRef(promptControlStore, scopeId, menuType) {
   return computed({
-    get: () => activeMenu.value === menuType,
+    get: () => promptControlStore.isPromptMenuOpen(scopeId, menuType),
     set: (open) => {
       if (open) {
-        activeMenu.value = menuType; // 특정 메뉴를 열면 기존 활성화되어 있던 다른 메뉴는 자동으로 null 처리되며 닫힙니다.
+        promptControlStore.openPromptMenu(scopeId, menuType); // 특정 메뉴를 열면 기존 활성화되어 있던 다른 메뉴는 자동으로 null 처리되며 닫힙니다.
         return;
       }
-      if (activeMenu.value === menuType) activeMenu.value = null;
+      promptControlStore.closePromptMenu(scopeId, menuType);
     },
   });
 }
@@ -46,17 +47,33 @@ function createMenuOpenRef(activeMenu, menuType) {
 export function usePromptMenu() {
   const systemSettingsStore = useSystemSettingsStore();
   const platformStore = usePlatformStore();
+  const promptControlStore = usePromptControlStore();
+  const promptMenuScopeId = `prompt-menu-${Math.random().toString(36).slice(2)}`;
   const {width} = useWindowSize();
 
   // 툴바 하위 컴포넌트들의 마스터 DOM 참조점들이 맵 구조로 주입될 앵커 포인터
   const toolbarRef = ref(null);
   // 현재 활성화되어 화면을 점유 중인 메뉴의 실시간 단일 밸류 상태
-  const activeMenu = ref(null);
+  const activeMenu = computed(() =>
+    promptControlStore.getActivePromptMenu(promptMenuScopeId)
+  );
 
   // 상호 배제형 인스턴스 팩토리 주입 바인딩 개통
-  const modelMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.model); // AI 모델 서랍
-  const toolMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.tool); // 확장 기능 플러그인 서랍
-  const attachMenuOpen = createMenuOpenRef(activeMenu, PROMPT_MENU_TYPE.attach); // 클립 파일 첨부 서랍
+  const modelMenuOpen = createMenuOpenRef(
+    promptControlStore,
+    promptMenuScopeId,
+    PROMPT_MENU_TYPE.model
+  ); // AI 모델 서랍
+  const toolMenuOpen = createMenuOpenRef(
+    promptControlStore,
+    promptMenuScopeId,
+    PROMPT_MENU_TYPE.tool
+  ); // 확장 기능 플러그인 서랍
+  const attachMenuOpen = createMenuOpenRef(
+    promptControlStore,
+    promptMenuScopeId,
+    PROMPT_MENU_TYPE.attach
+  ); // 클립 파일 첨부 서랍
 
   // 현재 브라우저의 너비 사양이 시스템 모바일 중단점(Breakpoint) 이하로 압축되었는지 감지하는 플래그
   const isPromptCompactViewport = computed(() => {
@@ -86,7 +103,9 @@ export function usePromptMenu() {
     );
   });
   // 모바일 뷰포트 사양 가이드와 가상 키보드 충돌 요소를 계산하여 최종 '모바일 바텀시트' 형태로 서랍을 분출할지 판별하는 플래그
-  const isMobileSheet = ref(false);
+  const isMobileSheet = computed(() =>
+    promptControlStore.isPromptMobileSheet(promptMenuScopeId)
+  );
 
   /**
    * @function syncPromptMenuClass
@@ -97,7 +116,7 @@ export function usePromptMenu() {
     if (typeof document === "undefined") return;
     document.documentElement.classList.toggle(
       "is-prompt-menu-open",
-      Boolean(activeMenu.value)
+      promptControlStore.hasAnyPromptMenuOpen
     );
   }
 
@@ -105,8 +124,9 @@ export function usePromptMenu() {
    * 데스크톱 웹 해상도와 모바일 뷰포트 사양 간의 인터페이스 마운트 모드를 동적 최신화합니다.
    */
   function syncViewportMode() {
-    isMobileSheet.value = Boolean(
-      isPromptCompactViewport.value || isForcedMobilePlatform.value
+    promptControlStore.setPromptMobileSheet(
+      promptMenuScopeId,
+      Boolean(isPromptCompactViewport.value || isForcedMobilePlatform.value)
     );
   }
 
@@ -115,22 +135,22 @@ export function usePromptMenu() {
    */
   function closeMenus(except = "") {
     if (except && activeMenu.value === except) return;
-    activeMenu.value = null;
+    promptControlStore.closePromptMenu(promptMenuScopeId);
   }
 
   function openMenu(menuType) {
-    activeMenu.value = menuType;
+    promptControlStore.openPromptMenu(promptMenuScopeId, menuType);
   }
 
   function closeMenu(menuType) {
-    if (!menuType || activeMenu.value === menuType) activeMenu.value = null;
+    promptControlStore.closePromptMenu(promptMenuScopeId, menuType);
   }
 
   /**
    * 특정 메뉴 버튼을 반복 연타 클릭했을 때 팝업을 스위칭 개폐하는 범용 토글 허브 메서드입니다.
    */
   function toggleMenu(menuType) {
-    activeMenu.value = activeMenu.value === menuType ? null : menuType;
+    promptControlStore.togglePromptMenu(promptMenuScopeId, menuType);
   }
 
   /**
@@ -156,15 +176,18 @@ export function usePromptMenu() {
   );
 
   // 메뉴 상태가 바뀔 때마다 즉각 도큐먼트 바디 스타일 클래스를 동기화 수립합니다.
-  watch(activeMenu, syncPromptMenuClass, {immediate: true});
+  watch(
+    () => promptControlStore.hasAnyPromptMenuOpen,
+    syncPromptMenuClass,
+    {immediate: true}
+  );
 
   // ── 🧹 [컴포넌트 생명주기 마감: 좀비 스타일 클래스 박멸 청소] ──────────────────
   // 유저가 질문 입력을 중단하고 뒤로가기나 메인 대화방 이탈 등으로 컴포넌트가 파괴될 때,
   // document 최외각 돔에 잔존마킹된 `is-prompt-menu-open` 흔적 클래스를 완전히 강제 제거하여 서비스 전체 화면이 먹통 잠금되는 치명적 UI 결함을 차단합니다.
   onBeforeUnmount(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.classList.remove("is-prompt-menu-open");
-    }
+    promptControlStore.clearPromptScope(promptMenuScopeId);
+    syncPromptMenuClass();
   });
 
   watch([isPromptCompactViewport, isForcedMobilePlatform], syncViewportMode);

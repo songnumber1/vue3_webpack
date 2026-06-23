@@ -1,95 +1,19 @@
 <template>
   <form class="system-settings-view" @submit.prevent="apply">
     <div ref="settingsScrollRef" class="system-settings-scroll">
-      <div class="system-settings-tabs-row">
-        <div
-          class="studio-tabs system-settings-tabs"
-          role="tablist"
-          :aria-label="t('systemSettings.tabsLabel')"
-        >
-          <button
-            v-for="tab in settingTabs"
-            :key="tab.key"
-            class="studio-tab system-settings-tab"
-            type="button"
-            role="tab"
-            :aria-selected="activeSettingTab === tab.key"
-            :class="{'is-active': activeSettingTab === tab.key}"
-            @click="activeSettingTab = tab.key"
-          >
-            {{ tab.label }}
-          </button>
-        </div>
-      </div>
+      <SystemSettingsTabs
+        :tabs="settingTabs"
+        :active-tab="activeSettingTab"
+        @change="activeSettingTab = $event"
+      />
 
-      <section
+      <SystemSettingsGroup
         v-for="group in activeGroups"
         :key="group.title"
-        class="system-settings-group"
-      >
-        <header>
-          <span>{{ group.kicker }}</span>
-          <h4>{{ group.title }}</h4>
-        </header>
-
-        <label
-          v-for="item in group.items"
-          :key="item.key"
-          class="system-settings-row"
-          :class="{'is-disabled': item.disabled}"
-          :for="`system-setting-${item.key}`"
-          :aria-disabled="item.disabled ? 'true' : undefined"
-        >
-          <span class="system-settings-copy">
-            <strong>{{ item.label }}</strong>
-            <small>{{ item.description }}</small>
-          </span>
-
-          <input
-            v-if="item.type === 'number'"
-            :id="`system-setting-${item.key}`"
-            v-model.number="draft[item.key]"
-            class="system-settings-number"
-            type="number"
-            :min="item.min || 0"
-            :max="item.max || 9999"
-            :step="item.step || 1"
-            :disabled="item.disabled"
-          />
-          <input
-            v-else-if="item.type === 'text'"
-            :id="`system-setting-${item.key}`"
-            v-model="draft[item.key]"
-            class="system-settings-text"
-            type="text"
-            :disabled="item.disabled"
-          />
-          <select
-            v-else-if="item.type === 'select'"
-            :id="`system-setting-${item.key}`"
-            v-model="draft[item.key]"
-            class="system-settings-select"
-            :disabled="item.disabled"
-          >
-            <option
-              v-for="option in item.options"
-              :key="option.value"
-              :value="option.value"
-            >
-              {{ option.label }}
-            </option>
-          </select>
-          <span v-else class="system-settings-switch">
-            <input
-              :id="`system-setting-${item.key}`"
-              v-model="draft[item.key]"
-              type="checkbox"
-              :disabled="item.disabled"
-            />
-            <span aria-hidden="true"></span>
-          </span>
-        </label>
-      </section>
+        :group="group"
+        :draft="draft"
+        @update-setting="updateDraftSetting"
+      />
     </div>
 
     <footer class="system-settings-footer">
@@ -158,6 +82,8 @@ import {
   AUTH_MODE_OPTIONS,
 } from "@/constants/systemSettings";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import SystemSettingsGroup from "@/components/settings/SystemSettingsGroup.vue";
+import SystemSettingsTabs from "@/components/settings/SystemSettingsTabs.vue";
 
 const emit = defineEmits(["close", "applied"]);
 const {t} = useI18n();
@@ -393,6 +319,10 @@ const activeGroups = computed(() => {
  */
 function syncDraft() {
   Object.assign(draft, settings.value);
+}
+
+function updateDraftSetting(key, value) {
+  draft[key] = value;
 }
 
 /**

@@ -164,60 +164,13 @@
       />
     </div>
 
-    <BaseBottomSheet
+    <StudioCreateActionBottomSheet
       v-if="isMobile"
       :open="actionSheetOpen"
-      :title="t('studio.createPage.actionMenu')"
-      overlay-class="studio-create-action-bottom-sheet"
-      initial-snap="content"
-      :min-height="300"
-      :max-ratio="0.75"
       @close="actionSheetOpen = false"
-    >
-      <div class="studio-create-action-sheet__list">
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
-          type="button"
-          @click="handleMobileApply"
-        >
-          <span
-            class="studio-icon studio-icon--apply"
-            aria-hidden="true"
-          ></span>
-          <strong>{{ t("studio.createPage.apply") }}</strong>
-        </button>
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
-          type="button"
-          @click="actionSheetOpen = false"
-        >
-          <span class="studio-icon studio-icon--save" aria-hidden="true"></span>
-          <strong>{{ t("studio.createPage.save") }}</strong>
-        </button>
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
-          type="button"
-          @click="actionSheetOpen = false"
-        >
-          <span
-            class="studio-icon studio-icon--register"
-            aria-hidden="true"
-          ></span>
-          <strong>{{ t("studio.createPage.register") }}</strong>
-        </button>
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-create-action-sheet__option"
-          type="button"
-          @click="handleMobileClose"
-        >
-          <span
-            class="studio-icon studio-icon--close"
-            aria-hidden="true"
-          ></span>
-          <strong>{{ t("studio.createPage.close") }}</strong>
-        </button>
-      </div>
-    </BaseBottomSheet>
+      @apply="handleMobileApply"
+      @request-close="handleMobileClose"
+    />
   </section>
 </template>
 
@@ -229,8 +182,8 @@ import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
-import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
+import StudioCreateActionBottomSheet from "@/components/studio/create/StudioCreateActionBottomSheet.vue";
 
 const {t} = useI18n();
 

@@ -10,7 +10,7 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {PROMPT_TEMPLATE_MODEL_IDS} from "@/constants/promptComposer";
 
 /**
@@ -55,13 +55,13 @@ function isSelectableTemplate(template = {}) {
 export function usePromptTemplate({modelId} = {}) {
   const {locale} = useI18n();
   const assistantStore = useAssistantStore();
-  const chatStore = useChatStore();
+  const promptControlStore = usePromptControlStore();
 
   // 모바일 뷰포트 상태에서 옵션 변경 바텀시트를 전개할 때, 현재 터치하여 진입한 대상 그룹의 고유 ID를 마킹하는 버퍼 고리
   const activeMobileGroupId = ref("");
 
   // Pinia 전역 채팅 저장소 내부에 적치 보존되고 있는 '현재 활성화된 프롬프트 도구 확장 세팅' 스냅샷 스토어 구독
-  const activeSettings = computed(() => chatStore.activePromptToolSettings);
+  const activeSettings = computed(() => promptControlStore.activePromptToolSettings);
 
   // ── 📊 [1. 현재 LLM 사양에 일치하는 템플릿 목록 동적 정렬] ──────────────────
   const currentModelTemplates = computed(() => {
@@ -168,7 +168,7 @@ export function usePromptTemplate({modelId} = {}) {
    * 최종 확정 값을 글로벌 Pinia 캐시 영역에 적치 동기화하고 모바일 시트를 폐쇄 조치합니다.
    */
   function selectTemplateOption(groupId, optionTag) {
-    chatStore.setPromptTemplateOption(groupId, optionTag);
+    promptControlStore.setPromptTemplateOption(groupId, optionTag);
     activeMobileGroupId.value = ""; // 모바일 바텀시트 가동 상태 리셋
   }
 

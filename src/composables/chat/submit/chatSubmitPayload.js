@@ -1,4 +1,4 @@
-import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {createId} from "@/utils/id";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 
@@ -29,8 +29,8 @@ function normalizeChatId(chatId) {
 }
 
 function resolvePromptToolSettings() {
-  const chatStore = useChatStore();
-  return chatStore.activePromptToolSettings || {};
+  const promptControlStore = usePromptControlStore();
+  return promptControlStore.activePromptToolSettings || {};
 }
 
 function resolveStyleOptions(settings = {}) {

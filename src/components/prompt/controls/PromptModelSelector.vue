@@ -20,25 +20,12 @@
         />
       </svg>
     </button>
-    <div
-      v-if="modelMenuOpen && !isMobileSheet"
-      class="prompt-popover model-menu prompt-model-menu tw-box-border"
-    >
-      <button
-        v-for="model in models"
-        :key="model.id"
-        class="model-option"
-        :class="{active: model.id === modelValue}"
-        type="button"
-        @click="$emit('select-model', model.id)"
-      >
-        <span class="model-option-main tw-min-w-0">
-          <strong>{{ model.label }}</strong>
-          <small>{{ model.description }}</small>
-        </span>
-        <CheckIcon v-if="model.id === modelValue" class="option-check" />
-      </button>
-    </div>
+    <PromptModelFloatMenu
+      :open="modelMenuOpen && !isMobileSheet"
+      :model-value="modelValue"
+      :models="models"
+      @select-model="$emit('select-model', $event)"
+    />
   </div>
 </template>
 
@@ -53,7 +40,7 @@
  */
 
 import {ref} from "vue";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
+import PromptModelFloatMenu from "@/components/prompt/model/desktop/PromptModelFloatMenu.vue";
 
 const modelRoot = ref(null);
 

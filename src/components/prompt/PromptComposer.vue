@@ -25,9 +25,15 @@
         @preview-error="markPreviewError"
       />
 
-      <PromptTemplatePanel
-        :visible="hasSelectedTemplatePanel"
-        :is-mobile-sheet="isMobileSheet"
+      <PromptTemplatePanelDesktop
+        v-if="hasSelectedTemplatePanel && !isMobileSheet"
+        :groups="selectedTemplateGroups"
+        :is-option-active="isTemplateOptionActive"
+        @select-option="selectTemplateOption"
+      />
+
+      <PromptTemplatePanelMobile
+        v-if="hasSelectedTemplatePanel && isMobileSheet"
         :groups="selectedTemplateGroups"
         :active-mobile-group="activeMobileGroup"
         :is-option-active="isTemplateOptionActive"
@@ -46,9 +52,9 @@
           class="prompt-toolbar-desktop-top"
           @open-model="openModelSelector"
           @open-tool="openToolSelector"
+          @close-tool="toolMenuOpen = false"
           @open-attach="openAttachSelector"
           @select-model="selectModel"
-          @apply-tool="applyTool"
           @open-file-picker="openFilePicker"
         />
         <button
@@ -139,15 +145,13 @@
         @stop-voice="stopVoiceInput"
       />
 
-      <component
-        :is="resolvedToolbarComponent"
+      <PromptToolbarMobile
         v-else
         ref="toolbarRef"
         @open-model="openModelSelector"
         @open-tool="openToolSelector"
         @open-attach="openAttachSelector"
         @select-model="selectModel"
-        @apply-tool="applyTool"
         @open-file-picker="openFilePicker"
         @start-voice="startVoiceInput"
         @stop-voice="stopVoiceInput"
@@ -170,22 +174,27 @@
       UI demo. Extend resolver/api.js for production integration.
     </p>
 
-    <PromptMobileBottomSheets
-      :model-open="modelMenuOpen && isMobileSheet"
-      :tool-open="toolMenuOpen && isMobileSheet"
-      :attach-open="attachMenuOpen && isMobileSheet"
-      :models="currentModels"
-      :tools="tools"
+    <PromptModelBottomSheet
+      :open="modelMenuOpen && isMobileSheet"
+      :title="t('chat.modelSelect')"
       :model-value="modelValue"
-      :attach-options="attachOptions"
-      :tool-title="t('chat.tools')"
-      :model-title="t('chat.modelSelect')"
-      :attach-title="t('chat.attach')"
-      @close-model="modelMenuOpen = false"
-      @close-tool="toolMenuOpen = false"
-      @close-attach="attachMenuOpen = false"
+      :models="currentModels"
+      @close="modelMenuOpen = false"
       @select-model="selectModel"
-      @apply-tool="applyTool"
+    />
+
+    <PromptToolBottomSheet
+      :open="toolMenuOpen && isMobileSheet"
+      :title="t('chat.tools')"
+      :model-value="modelValue"
+      @close="toolMenuOpen = false"
+    />
+
+    <PromptAttachBottomSheet
+      :open="attachMenuOpen && isMobileSheet"
+      :title="t('chat.attach')"
+      :attach-options="attachOptions"
+      @close="attachMenuOpen = false"
       @open-file-picker="openFilePicker"
     />
   </footer>
@@ -202,9 +211,12 @@ import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesk
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
 import PromptSubmitActions from "@/components/prompt/controls/PromptSubmitActions.vue";
 import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
-import PromptMobileBottomSheets from "@/components/prompt/controls/PromptMobileBottomSheets.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
-import PromptTemplatePanel from "@/components/prompt/controls/PromptTemplatePanel.vue";
+import PromptTemplatePanelDesktop from "@/components/prompt/controls/PromptTemplatePanelDesktop.vue";
+import PromptTemplatePanelMobile from "@/components/prompt/controls/PromptTemplatePanelMobile.vue";
+import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
+import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
+import PromptToolBottomSheet from "@/components/prompt/tools/mobile/PromptToolBottomSheet.vue";
 import {useI18n} from "vue-i18n";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
@@ -213,7 +225,7 @@ import {usePromptSpeech} from "@/composables/prompt/usePromptSpeech";
 import {usePromptModel} from "@/composables/prompt/usePromptModel";
 import {usePromptTool} from "@/composables/prompt/usePromptTool";
 import {usePromptTemplate} from "@/composables/prompt/usePromptTemplate";
-import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
@@ -233,7 +245,6 @@ const componentProps = defineProps({
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
 const workspaceActions = inject(WORKSPACE_ACTIONS_KEY, createEmptyWorkspaceActions());
-const resolvedToolbarComponent = computed(() => PromptToolbarMobile);
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -281,7 +292,7 @@ function handleComposerEvent(eventName, payload) {
     workspaceActions.submit(payload);
     return;
   }
-  if (eventName === "open-tool" || eventName === "apply-tool") {
+  if (eventName === "open-tool") {
     if (componentProps.hideToolActions) return;
   }
   if (eventName === "open-attach" || eventName === "open-file-picker") {
@@ -316,8 +327,8 @@ const attachmentDisabled = computed(() =>
   Boolean(disabled.value || props.submitDisabled || props.hideAttachActions)
 );
 
-// 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 전역 채팅 Pinia 스토어를 로드합니다.
-const chatStore = useChatStore();
+// 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 프롬프트 제어 Pinia 스토어를 로드합니다.
+const promptControlStore = usePromptControlStore();
 
 // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
 // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
@@ -413,7 +424,7 @@ const {
   closeTemplateOptionSheet, // 모바일 서식 템플릿 바텀시트를 패쇄하는 함수
 } = usePromptTemplate({modelId: toRef(props, "modelValue")});
 
-const {tools, openToolSelector, applyTool} = usePromptTool({
+const {openToolSelector} = usePromptTool({
   props,
   toolMenuOpen,
   syncViewportMode,
@@ -445,7 +456,7 @@ watch(
   (nextModelId, prevModelId) => {
     // 기존 모델 정보가 확실히 실재했고, 바뀐 신규 모델 ID가 이전과 엄연히 다르다면, 기존에 적용되어 돌고 있던 프롬프트 템플릿과의 정합성이 깨지므로 서식을 즉시 초기화해 줍니다.
     if (prevModelId && nextModelId !== prevModelId) {
-      chatStore.resetActivePromptTemplate();
+      promptControlStore.resetActivePromptTemplate();
     }
   }
 );
@@ -692,7 +703,6 @@ provide(
     modelValue: props.modelValue,
     currentModel: currentModel.value,
     models: currentModels.value,
-    tools: tools.value,
     selectedTemplateTool: selectedTemplateTool.value,
     attachOptions: attachOptions.value,
     modelMenuOpen: modelMenuOpen.value,

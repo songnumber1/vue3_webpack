@@ -191,9 +191,6 @@ const props = reactive({
   get models() {
     return toolbarState.value.models;
   },
-  get tools() {
-    return toolbarState.value.tools;
-  },
   get attachOptions() {
     return toolbarState.value.attachOptions;
   },
@@ -285,7 +282,6 @@ defineEmits([
   "open-tool",
   "open-attach",
   "select-model",
-  "apply-tool",
   "open-file-picker",
   "start-voice",
   "stop-voice",

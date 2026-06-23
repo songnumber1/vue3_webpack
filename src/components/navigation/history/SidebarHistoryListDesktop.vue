@@ -1,8 +1,10 @@
 <template>
-  <component
-    :is="scrollContainerComponent"
+  <OverlayScrollbarsComponent
+    v-if="shouldUseOverlayScrollbar"
     :class="[containerClass, 'tw-min-w-0']"
-    v-bind="scrollContainerAttrs"
+    defer
+    :options="overlayScrollbarOptions"
+    :events="overlayScrollbarEvents"
     @scroll.passive.capture="hideTooltip"
     @wheel.passive.capture="hideTooltip"
     @pointerdown.capture="hideTooltip"
@@ -54,7 +56,63 @@
         </button>
       </div>
     </div>
-  </component>
+  </OverlayScrollbarsComponent>
+
+  <div
+    v-else
+    :class="[containerClass, 'tw-min-w-0']"
+    @scroll.passive.capture="hideTooltip"
+    @wheel.passive.capture="hideTooltip"
+    @pointerdown.capture="hideTooltip"
+    @mouseleave="hideTooltip"
+  >
+    <div
+      v-for="item in histories"
+      :key="item.id"
+      class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
+      :class="{selected: String(item.id) === String(selectedChatId)}"
+      @mouseleave="hideTooltip"
+    >
+      <button
+        :class="[
+          itemClass,
+          'sidebar-history-title-button tw-min-w-0 tw-flex-1 tw-rounded-control tw-text-left tw-transition',
+        ]"
+        type="button"
+        :aria-label="item.title"
+        @mouseenter="showTooltip($event, item)"
+        @focus="showTooltip($event, item)"
+        @blur="hideTooltip"
+        @click="handleSelect(item)"
+      >
+        <span>{{ item.title }}</span>
+      </button>
+
+      <div
+        v-if="showActions"
+        class="sidebar-history-actions tw-flex tw-shrink-0 tw-items-center tw-gap-1"
+      >
+        <span
+          v-if="item.isPinned"
+          class="sidebar-history-pin tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm"
+          :aria-label="t('chat.historyMenu.pin')"
+        >
+          📌
+        </span>
+        <button
+          v-if="showMenu"
+          class="sidebar-history-menu-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-controlSm"
+          type="button"
+          :aria-label="t('chat.historyMenu.title')"
+          @mouseenter="hideTooltip"
+          @focus="hideTooltip"
+          @click.stop="handleOpenMenu(item, $event)"
+        >
+          ⋯
+        </button>
+      </div>
+    </div>
+  </div>
 
   <teleport to="body">
     <div
@@ -71,12 +129,8 @@
 
 <script setup>
 /**
- * @file components/navigation/controls/SidebarHistoryList.vue
- * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @file components/navigation/history/SidebarHistoryListDesktop.vue
+ * @description PC 좌측 이력 리스트입니다. OverlayScrollbars와 hover tooltip을 직접 관리합니다.
  */
 
 import {computed, nextTick, ref, watch} from "vue";
@@ -206,20 +260,6 @@ const overlayScrollbarEvents = {
 
 const shouldUseOverlayScrollbar = computed(
   () => props.useOverlayScrollbar && shouldUseOverlayScrollbarByPolicy.value
-);
-
-const scrollContainerComponent = computed(() =>
-  shouldUseOverlayScrollbar.value ? OverlayScrollbarsComponent : "div"
-);
-
-const scrollContainerAttrs = computed(() =>
-  shouldUseOverlayScrollbar.value
-    ? {
-        defer: true,
-        options: overlayScrollbarOptions,
-        events: overlayScrollbarEvents,
-      }
-    : {}
 );
 
 watch(isTooltipEnabled, (enabled) => {

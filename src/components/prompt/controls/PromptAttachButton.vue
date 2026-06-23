@@ -23,44 +23,33 @@
         />
       </svg>
     </button>
-    <div
-      v-if="attachMenuOpen && !isMobileSheet"
-      ref="attachMenuRef"
-      class="prompt-popover attach-menu prompt-floating-menu tw-absolute tw-z-popover tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
-      :style="attachMenuStyle"
-      role="menu"
-    >
-      <button
-        v-for="option in attachOptions"
-        :key="option.id"
-        type="button"
-        role="menuitem"
-        @click="$emit('open-file-picker', option.id)"
-      >
-        <span aria-hidden="true">{{ option.icon }}</span>
-        <p>{{ option.label }}</p>
-      </button>
-    </div>
+
+    <PromptAttachFloatMenu
+      :open="attachMenuOpen && !isMobileSheet"
+      :reference-element="attachRoot"
+      :attach-options="attachOptions"
+      @open-file-picker="$emit('open-file-picker', $event)"
+    />
   </div>
 </template>
 
 <script setup>
 /**
  * @file components/prompt/controls/PromptAttachButton.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
+ * @description 프롬프트 첨부 버튼입니다. PC 첨부 메뉴는 별도 FloatMenu 컴포넌트로 직접 import합니다.
  *
  * 프리징 코드 주석 기준:
  * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, ref, watch} from "vue";
-import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
+import {ref} from "vue";
+import PromptAttachFloatMenu from "@/components/prompt/attach/desktop/PromptAttachFloatMenu.vue";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
-const props = defineProps({
+defineProps({
   disabled: {type: Boolean, default: false},
   attachOptions: {type: Array, default: () => []},
   attachMenuOpen: {type: Boolean, default: false},
@@ -71,40 +60,6 @@ const props = defineProps({
 defineEmits(["open-attach", "open-file-picker"]);
 
 const attachRoot = ref(null);
-const attachMenuRef = ref(null);
-const attachPositionReady = ref(false);
-const attachReferenceRef = computed(() => attachRoot.value || null);
-
-const {floatingStyles: attachFloatingStyles, update: updateAttachFloating} =
-  useFloating(attachReferenceRef, attachMenuRef, {
-    placement: "top-start",
-    strategy: "absolute",
-    transform: false,
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(10),
-      flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-      shift({padding: 12}),
-    ],
-  });
-
-const attachMenuStyle = computed(() => ({
-  ...attachFloatingStyles.value,
-  visibility: attachPositionReady.value ? "visible" : "hidden",
-}));
-
-watch(
-  () => props.attachMenuOpen,
-  async (open) => {
-    attachPositionReady.value = false;
-    if (!open) return;
-
-    await nextTick();
-    await updateAttachFloating?.();
-    attachPositionReady.value = true;
-  },
-  {flush: "post"}
-);
 
 defineExpose({attachRoot});
 </script>
@@ -112,17 +67,5 @@ defineExpose({attachRoot});
 <style scoped lang="scss">
 .prompt-selector-wrap {
   min-width: 0;
-}
-
-.prompt-popover {
-  box-sizing: border-box;
-}
-
-.prompt-floating-menu {
-  top: auto;
-  right: auto;
-  bottom: auto;
-  left: auto;
-  z-index: var(--z-popover);
 }
 </style>

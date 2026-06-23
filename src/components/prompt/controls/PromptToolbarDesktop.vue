@@ -61,107 +61,13 @@
           />
           <span>{{ selectedTemplateTool.label }}</span>
         </button>
-        <div
-          v-if="toolMenuOpen && !isMobileSheet"
-          ref="toolMenuRef"
-          class="prompt-popover prompt-tool-menu prompt-floating-menu tw-box-border tw-rounded-control tw-border tw-border-solid tw-border-app-border tw-bg-app-menu tw-shadow-menu"
-          :style="toolMenuStyle"
-        >
-          <button
-            v-for="tool in tools"
-            :key="tool.id"
-            type="button"
-            :class="{
-              'prompt-tool-menu-parent tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-control tw-px-2.5 tw-text-left':
-                hasChildren(tool),
-              active: activeToolGroupId === tool.id || tool.active,
-              'is-template-tool tw-flex tw-w-full tw-items-center tw-gap-2.5 tw-rounded-controlSm tw-px-2.5 tw-text-left':
-                Boolean(tool.promptTemplateKey),
-            }"
-            :aria-haspopup="hasChildren(tool) ? 'menu' : undefined"
-            :aria-expanded="
-              hasChildren(tool) ? activeToolGroupId === tool.id : undefined
-            "
-            @click="handleToolClick(tool)"
-          >
-            <img
-              v-if="tool.iconSrc"
-              class="prompt-tool-icon-img tw-h-[18px] tw-w-[18px] tw-shrink-0 tw-object-contain"
-              :src="tool.iconSrc"
-              alt=""
-              aria-hidden="true"
-            />
-            <span
-              v-else-if="!tool.promptTemplateKey"
-              class="prompt-tool-icon tw-shrink-0"
-              aria-hidden="true"
-              >{{ tool.icon }}</span
-            >
-            <span
-              class="prompt-tool-text tw-flex tw-min-w-0 tw-flex-1 tw-flex-col tw-text-left"
-            >
-              <strong>{{ tool.label }}</strong>
-            </span>
-            <span
-              v-if="hasChildren(tool) && tool.active && !isSwitchParent(tool)"
-              class="prompt-menu-active-badge tw-ml-auto tw-inline-flex tw-items-center tw-justify-center tw-rounded-full"
-              aria-hidden="true"
-            >
-              {{ tool.activeCount }}
-            </span>
-            <span
-              v-if="hasChildren(tool) && isSwitchParent(tool)"
-              class="prompt-tool-parent-switch tw-ml-auto tw-shrink-0 tw-rounded-full"
-              :class="{'is-active': tool.active}"
-              role="switch"
-              tabindex="0"
-              :aria-pressed="tool.active"
-              :aria-label="tool.label"
-              @click.stop="handleToolSwitchClick(tool)"
-              @keydown.enter.stop.prevent="handleToolSwitchClick(tool)"
-              @keydown.space.stop.prevent="handleToolSwitchClick(tool)"
-            >
-              <span aria-hidden="true"></span>
-            </span>
-            <span
-              v-if="hasChildren(tool)"
-              class="prompt-submenu-arrow tw-ml-auto tw-shrink-0"
-              aria-hidden="true"
-            >
-              ›
-            </span>
-          </button>
-
-          <div
-            v-if="activeToolGroup"
-            class="prompt-popover prompt-tool-submenu tw-box-border tw-rounded-control tw-border tw-border-solid tw-border-app-border tw-bg-app-menu tw-shadow-menu"
-            :class="`prompt-tool-submenu--${submenuPlacement}`"
-            role="menu"
-          >
-            <button
-              v-for="child in activeToolGroup.children"
-              :key="child.id"
-              class="prompt-tool-child-option tw-flex tw-w-full tw-items-center tw-gap-3 tw-rounded-control tw-px-2.5 tw-text-left"
-              :class="[
-                `prompt-tool-child-option--${child.controlType || activeToolGroup.childControlType || 'default'}`,
-                {'is-active': child.active},
-              ]"
-              type="button"
-              :role="getChildRole(child)"
-              :aria-checked="child.active"
-              @click="$emit('apply-tool', child)"
-            >
-              <span
-                v-if="isCheckboxChild(child)"
-                class="prompt-tool-checkbox tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder"
-                aria-hidden="true"
-              >
-                <span v-if="child.active">✓</span>
-              </span>
-              <p>{{ child.label }}</p>
-            </button>
-          </div>
-        </div>
+        <PromptToolFloatMenu
+          :open="toolMenuOpen && !isMobileSheet"
+          :reference-element="toolRoot"
+          :model-value="modelValue"
+          :is-mobile-sheet="isMobileSheet"
+          @close="$emit('close-tool')"
+        />
       </div>
 
       <PromptAttachButton
@@ -190,12 +96,11 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, nextTick, reactive, ref, toRefs, watch, inject} from "vue";
-import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
+import {computed, reactive, ref, toRefs, inject} from "vue";
 import {useI18n} from "vue-i18n";
 import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.vue";
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
-import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
+import PromptToolFloatMenu from "@/components/prompt/tools/desktop/PromptToolFloatMenu.vue";
 import {
   PROMPT_TOOLBAR_STATE_KEY,
   createEmptyPromptToolbarState,
@@ -205,13 +110,6 @@ const LAYOUT_MODES = Object.freeze({
   TOP_ACTIONS: "top-actions",
   SUBMIT_ONLY: "submit-only",
 });
-const TOOL_MENU_FLOATING_OFFSET = 10;
-const TOOL_MENU_FLOATING_PADDING = 12;
-const TOOL_SUBMENU_WIDTH = 248;
-const TOOL_SUBMENU_PLACEMENT = Object.freeze({
-  LEFT: "left",
-  RIGHT: "right",
-});
 
 // -----------------------------------------------------------------------------
 // Props and emits
@@ -220,12 +118,12 @@ const componentProps = defineProps({
   layoutMode: {type: String, default: "top-actions"},
 });
 
-const emit = defineEmits([
+defineEmits([
   "open-model",
   "open-tool",
+  "close-tool",
   "open-attach",
   "select-model",
-  "apply-tool",
   "open-file-picker",
 ]);
 
@@ -237,29 +135,6 @@ const {t} = useI18n();
 const modelSelectorRef = ref(null);
 const toolRoot = ref(null);
 const attachButtonRef = ref(null);
-const toolMenuRef = ref(null);
-const toolPositionReady = ref(false);
-const submenuPlacement = ref(TOOL_SUBMENU_PLACEMENT.RIGHT);
-
-const toolReferenceRef = computed(() => toolRoot.value || null);
-
-const {floatingStyles: toolFloatingStyles, update: updateToolFloating} =
-  useFloating(toolReferenceRef, toolMenuRef, {
-    placement: "top-start",
-    strategy: "absolute",
-    transform: false,
-    whileElementsMounted: autoUpdate,
-    middleware: [
-      offset(TOOL_MENU_FLOATING_OFFSET),
-      flip({fallbackPlacements: ["top-end", "bottom-start", "bottom-end"]}),
-      shift({padding: TOOL_MENU_FLOATING_PADDING}),
-    ],
-  });
-
-const toolMenuStyle = computed(() => ({
-  ...toolFloatingStyles.value,
-  visibility: toolPositionReady.value ? "visible" : "hidden",
-}));
 
 // -----------------------------------------------------------------------------
 // Context-backed toolbar state
@@ -286,9 +161,6 @@ const props = reactive({
   },
   get models() {
     return toolbarState.value.models;
-  },
-  get tools() {
-    return toolbarState.value.tools;
   },
   get attachOptions() {
     return toolbarState.value.attachOptions;
@@ -333,7 +205,6 @@ const {
   modelValue,
   currentModel,
   models,
-  tools,
   attachOptions,
   modelMenuOpen,
   toolMenuOpen,
@@ -360,76 +231,6 @@ const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );
 
-
-// -----------------------------------------------------------------------------
-// Tool menu handlers
-// -----------------------------------------------------------------------------
-const {
-  activeToolGroupId,
-  activeToolGroup,
-  hasChildren,
-  isSwitchParent,
-  isCheckboxChild,
-  getChildRole,
-  handleToolClick,
-  handleToolSwitchClick,
-  closeActiveToolGroup,
-} = usePromptToolMenuActions({
-  tools: () => props.tools,
-  emit,
-  onGroupOpen: async () => {
-    await nextTick();
-    await updateToolFloating?.();
-    resolveSubmenuPlacement();
-  },
-});
-
-// -----------------------------------------------------------------------------
-// Floating submenu placement handlers
-// -----------------------------------------------------------------------------
-function resolveSubmenuPlacement() {
-  const menuRect = toolMenuRef.value?.getBoundingClientRect?.();
-  if (!menuRect) {
-    submenuPlacement.value = TOOL_SUBMENU_PLACEMENT.RIGHT;
-    return;
-  }
-
-  const submenuWidth = TOOL_SUBMENU_WIDTH;
-  const viewportWidth =
-    window.innerWidth || document.documentElement.clientWidth;
-  const rightSpace = viewportWidth - menuRect.right;
-  const leftSpace = menuRect.left;
-  submenuPlacement.value =
-    rightSpace >= submenuWidth || rightSpace >= leftSpace
-      ? TOOL_SUBMENU_PLACEMENT.RIGHT
-      : TOOL_SUBMENU_PLACEMENT.LEFT;
-}
-
-// -----------------------------------------------------------------------------
-// Watchers
-// -----------------------------------------------------------------------------
-watch(
-  () => props.toolMenuOpen,
-  async (open) => {
-    toolPositionReady.value = false;
-    if (!open) {
-      closeActiveToolGroup();
-      return;
-    }
-
-    await nextTick();
-    await updateToolFloating?.();
-    toolPositionReady.value = true;
-  },
-  {flush: "post"}
-);
-
-watch(
-  () => props.isMobileSheet,
-  () => {
-    closeActiveToolGroup();
-  }
-);
 
 const modelRoot = computed(
   () =>

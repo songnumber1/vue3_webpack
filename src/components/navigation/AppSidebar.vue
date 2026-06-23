@@ -56,7 +56,7 @@
       >
         {{ t("chat.conversations") }}
       </div>
-      <SidebarHistoryList
+      <SidebarHistoryListDesktop
         :histories="histories"
         :selected-chat-id="effectiveSelectedChatId"
         use-overlay-scrollbar
@@ -141,7 +141,7 @@
         >
           {{ t("chat.conversations") }}
         </div>
-        <SidebarHistoryList
+        <SidebarHistoryListMobile
           :histories="histories"
           :selected-chat-id="effectiveSelectedChatId"
           use-overlay-scrollbar
@@ -154,42 +154,26 @@
     </aside>
   </transition>
 
-  <BaseBottomSheet
+  <AssistantBottomSheet
     :open="assistantMenuOpen && isMobileSheet"
-    :title="t('chat.assistantSelect')"
+    :assistants="visibleAssistants"
+    :selected-assistant-id="selectedAssistantId"
     @close="assistantMenuOpen = false"
-  >
-    <button
-      v-for="assistant in visibleAssistants"
-      :key="assistant.id"
-      class="bottom-sheet-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left"
-      :class="{active: assistant.id === selectedAssistantId}"
-      type="button"
-      @click="selectAssistant(assistant.id)"
-    >
-      <span
-        class="bottom-sheet-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1"
-      >
-        <strong>{{ assistant.label }}</strong>
-        <small>{{ assistant.description }}</small>
-      </span>
-      <span
-        v-if="assistant.id === selectedAssistantId"
-        class="bottom-sheet-selected-indicator tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
-        :aria-label="t('chat.assistantSelected')"
-      >
-        <CheckIcon class="bottom-sheet-check" />
-        <span class="sr-only">{{ t("chat.assistantSelected") }}</span>
-      </span>
-    </button>
-  </BaseBottomSheet>
+    @select="selectAssistant"
+  />
 
-  <ChatHistoryContextMenu
+  <ChatHistoryActionBottomSheet
+    :open="historyMenuOpen && isMobileSheet"
+    :target="historyMenuTarget"
+    @close="closeHistoryMenu"
+    @select="selectHistoryMenuAction"
+  />
+
+  <ChatHistoryActionFloatMenu
     ref="historyMenuRef"
-    :open="historyMenuOpen"
+    :open="historyMenuOpen && !isMobileSheet"
     :target="historyMenuTarget"
     :reference-el="historyMenuReferenceEl"
-    @close="closeHistoryMenu"
     @select="selectHistoryMenuAction"
   />
 </template>
@@ -209,13 +193,14 @@ import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {useEventListener} from "@vueuse/core";
-import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
 import Icon from "@/components/navigation/NavigationIcon.vue";
 import CollapsedSidebar from "@/components/navigation/controls/CollapsedSidebar.vue";
 import SidebarAssistantSelector from "@/components/navigation/controls/SidebarAssistantSelector.vue";
-import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
-import ChatHistoryContextMenu from "@/components/navigation/controls/ChatHistoryContextMenu.vue";
+import SidebarHistoryListDesktop from "@/components/navigation/history/SidebarHistoryListDesktop.vue";
+import SidebarHistoryListMobile from "@/components/navigation/history/SidebarHistoryListMobile.vue";
+import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
+import ChatHistoryActionBottomSheet from "@/components/navigation/history/ChatHistoryActionBottomSheet.vue";
+import ChatHistoryActionFloatMenu from "@/components/navigation/history/ChatHistoryActionFloatMenu.vue";
 import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFooter.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";

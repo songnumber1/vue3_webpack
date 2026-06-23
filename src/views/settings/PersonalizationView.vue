@@ -17,14 +17,28 @@
       <p>{{ t("personalization.styleBody") }}</p>
       <div class="style-chip-group">
         <button
-          v-for="option in styleOptions"
-          :key="option.value"
           class="style-chip"
-          :class="{active: selectedStyle === option.value}"
+          :class="{active: selectedStyle === 'compact'}"
           type="button"
-          @click="selectedStyle = option.value"
+          @click="selectedStyle = 'compact'"
         >
-          {{ option.label }}
+          {{ t("personalization.compact") }}
+        </button>
+        <button
+          class="style-chip"
+          :class="{active: selectedStyle === 'detailed'}"
+          type="button"
+          @click="selectedStyle = 'detailed'"
+        >
+          {{ t("personalization.detailed") }}
+        </button>
+        <button
+          class="style-chip"
+          :class="{active: selectedStyle === 'technical'}"
+          type="button"
+          @click="selectedStyle = 'technical'"
+        >
+          {{ t("personalization.technical") }}
         </button>
       </div>
     </section>
@@ -42,22 +56,13 @@
 <script setup>
 /**
  * @file views/settings/PersonalizationView.vue
- * @description 라우터가 직접 렌더하는 페이지 진입 컴포넌트입니다. 대부분 실제 로직은 container에 위임합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 개인화 설정 화면입니다. 고정 스타일 옵션은 template에서 직접 렌더링합니다.
  */
 
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
 const memoryEnabled = ref(true);
 const selectedStyle = ref("detailed");
-const styleOptions = computed(() => [
-  {value: "compact", label: t("personalization.compact")},
-  {value: "detailed", label: t("personalization.detailed")},
-  {value: "technical", label: t("personalization.technical")},
-]);
 </script>

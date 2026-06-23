@@ -82,63 +82,21 @@
         </button>
       </footer>
 
-      <div
-        v-if="actionsOpen && canManageStudio && !isMobile"
-        class="studio-detail-viewer__menu"
-        role="menu"
-      >
-        <button
-          type="button"
-          role="menuitem"
-          :disabled="actionsDisabled"
-          @click="edit"
-        >
-          <span aria-hidden="true">✎</span>
-          <span>{{ t("studio.detail.edit") }}</span>
-        </button>
-        <button
-          class="studio-detail-viewer__menu-danger"
-          type="button"
-          role="menuitem"
-          :disabled="actionsDisabled"
-          @click="requestDelete"
-        >
-          <span aria-hidden="true">🗑</span>
-          <span>{{ t("studio.detail.delete") }}</span>
-        </button>
-      </div>
+      <StudioDetailActionFloatMenu
+        :open="actionsOpen && canManageStudio && !isMobile"
+        :disabled="actionsDisabled"
+        @edit="edit"
+        @delete="requestDelete"
+      />
     </article>
 
-    <BaseBottomSheet
+    <StudioDetailActionBottomSheet
       :open="actionsOpen && canManageStudio && isMobile"
-      :title="t('studio.detail.settings')"
-      overlay-class="studio-detail-action-bottom-sheet"
-      initial-snap="content"
-      :min-height="220"
-      :max-ratio="0.65"
+      :disabled="actionsDisabled"
       @close="actionsOpen = false"
-    >
-      <div class="studio-detail-action-sheet__list">
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-detail-action-sheet__option"
-          type="button"
-          :disabled="actionsDisabled"
-          @click="edit"
-        >
-          <span aria-hidden="true">✎</span>
-          <strong>{{ t("studio.detail.edit") }}</strong>
-        </button>
-        <button
-          class="bottom-sheet-option bottom-sheet-option--row studio-detail-action-sheet__option studio-detail-action-sheet__option--danger"
-          type="button"
-          :disabled="actionsDisabled"
-          @click="requestDelete"
-        >
-          <span aria-hidden="true">🗑</span>
-          <strong>{{ t("studio.detail.delete") }}</strong>
-        </button>
-      </div>
-    </BaseBottomSheet>
+      @edit="edit"
+      @delete="requestDelete"
+    />
 
     <div
       v-if="deleteConfirmOpen"
@@ -186,7 +144,8 @@
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioInfoPanel from "@/components/studio/StudioInfoPanel.vue";
-import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import StudioDetailActionBottomSheet from "@/components/studio/detail/StudioDetailActionBottomSheet.vue";
+import StudioDetailActionFloatMenu from "@/components/studio/detail/StudioDetailActionFloatMenu.vue";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -450,47 +409,6 @@ function confirmDelete() {
   color: #b91c1c;
 }
 
-.studio-detail-viewer__menu {
-  position: absolute;
-  top: 42px;
-  right: 48px;
-  z-index: 4;
-  min-width: 148px;
-  overflow: hidden;
-  border: 1px solid var(--studio-border, #e5e7eb);
-  border-radius: 10px;
-  background: var(--studio-surface, #fff);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18);
-}
-
-.studio-detail-viewer__menu button,
-.studio-detail-viewer__sheet-option {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  gap: 10px;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  cursor: pointer;
-  font: inherit;
-  text-align: left;
-}
-
-.studio-detail-viewer__menu button {
-  padding: 11px 14px;
-}
-
-.studio-detail-viewer__menu button:hover,
-.studio-detail-viewer__sheet-option:hover {
-  background: var(--studio-controlHover, #f3f4f6);
-}
-
-.studio-detail-viewer__menu-danger,
-.studio-detail-viewer__sheet-option--danger {
-  color: #dc2626 !important;
-}
-
 .studio-detail-viewer__sheet-backdrop,
 .studio-detail-viewer__confirm-backdrop {
   position: absolute;
@@ -529,8 +447,26 @@ function confirmDelete() {
 }
 
 .studio-detail-viewer__sheet-option {
+  display: flex;
+  width: 100%;
   min-height: 48px;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
   padding: 12px 4px;
+  text-align: left;
+}
+
+.studio-detail-viewer__sheet-option:hover {
+  background: var(--studio-controlHover, #f3f4f6);
+}
+
+.studio-detail-viewer__sheet-option--danger {
+  color: #dc2626 !important;
 }
 
 .studio-detail-viewer__confirm {
@@ -553,26 +489,4 @@ function confirmDelete() {
   margin-top: 18px;
 }
 
-:global(.studio-detail-action-bottom-sheet.bottom-sheet-backdrop) {
-  z-index: 100010 !important;
-}
-
-:global(.studio-detail-action-bottom-sheet.bottom-sheet) {
-  z-index: 100020 !important;
-}
-
-.studio-detail-action-sheet__list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 2px 0 6px;
-}
-
-.studio-detail-action-sheet__option {
-  min-height: 52px;
-}
-
-.studio-detail-action-sheet__option--danger {
-  color: #dc2626 !important;
-}
 </style>

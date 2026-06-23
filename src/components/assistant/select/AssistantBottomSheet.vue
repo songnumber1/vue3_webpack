@@ -7,7 +7,7 @@
     <button
       v-for="assistant in assistants"
       :key="assistant.id"
-      class="bottom-sheet-option"
+      class="bottom-sheet-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left"
       :class="{active: assistant.id === selectedAssistantId}"
       type="button"
       @click="$emit('select', assistant.id)"
@@ -19,14 +19,16 @@
           alt=""
           aria-hidden="true"
         />
-        <span class="bottom-sheet-option-main assistant-sheet-option-main">
+        <span
+          class="bottom-sheet-option-main assistant-sheet-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1"
+        >
           <strong>{{ assistant.label }}</strong>
           <small>{{ assistant.description }}</small>
         </span>
       </span>
       <span
         v-if="assistant.id === selectedAssistantId"
-        class="bottom-sheet-selected-indicator"
+        class="bottom-sheet-selected-indicator tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         :aria-label="t('chat.assistantSelected')"
       >
         <CheckIcon class="bottom-sheet-check" />
@@ -38,12 +40,8 @@
 
 <script setup>
 /**
- * @file components/assistant/AssistantSelectSheet.vue
- * @description 재사용 UI 컴포넌트입니다. 화면 상태는 상위 props/action에서 받고 내부에서는 렌더와 사용자 이벤트만 처리합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @file components/assistant/select/AssistantBottomSheet.vue
+ * @description 모바일 사이드바 Assistant 선택 BottomSheet 전용 컴포넌트입니다.
  */
 
 import {useI18n} from "vue-i18n";
@@ -80,7 +78,8 @@ defineEmits(["close", "select"]);
   object-fit: cover;
 }
 
-.assistant-sheet-option-main {
+.assistant-sheet-option-main,
+.bottom-sheet-option-main {
   min-width: 0;
 }
 </style>

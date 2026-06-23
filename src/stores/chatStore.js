@@ -8,29 +8,9 @@
  */
 
 import {defineStore} from "pinia";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {ACTIVE_ROOM_TYPES, normalizeActiveRoomType} from "@/constants/chatRoom";
-import {
-  DEFAULT_PROMPT_TOOL_SETTINGS,
-  DRAFT_PROMPT_TOOL_SETTINGS_KEY,
-} from "@/constants/promptComposer";
-
 export {ACTIVE_ROOM_TYPES};
-
-/**
- * 객체 참조 복사로 인한 버그를 완벽히 격리 방어하기 위해 도구 세팅 구조체를
- * 딥 카피 수준으로 완벽하게 분리 복제 빌드해 주는 순수 헬퍼 가공식입니다.
- */
-function clonePromptToolSettings(settings = {}) {
-  return {
-    knowledgeSearch: Array.isArray(settings.knowledgeSearch)
-      ? [...settings.knowledgeSearch]
-      : [],
-    webSearch: settings.webSearch || null,
-    webSearchEnabled: Boolean(settings.webSearchEnabled),
-    promptTemplateId: settings.promptTemplateId || null,
-    promptTemplateOptions: {...(settings.promptTemplateOptions || {})},
-  };
-}
 
 /**
  * @description 활성 대화방 리스트, 메시지 버퍼, 그리고 입력창 툴바 옵션 세팅 맵을 통합 중계 보존하는 챗 비즈니스 코어 스토어입니다.
@@ -45,7 +25,6 @@ export const useChatStore = defineStore("chat", {
     pendingSelectedChatId: null, // 대화방 전환 클릭 직후 실제 session 세팅 전까지 좌측 메뉴 선택 색상을 먼저 반영하기 위한 임시 Chat ID
     activeSession: null, // 백엔드 세션 소켓 커넥션 정보 및 읽기 전용 가드 상태 믹스드 객체
     messageMap: {}, // 챗방 ID를 최상위 키로 삼아 대화 말풍선 어레이 목록을 캐시 보존하는 거대 레포지토리
-    promptToolSettingsMap: {}, // 챗방 ID별로 유저가 커스텀 커스터마이징해 둔 툴바 확장 옵션 정보 보관함
     pendingNewSubmitChatIds: {}, // 메인 새 대화 submit 직후 라우트 전환 시 기존 대화방 historyRender overlay/scroll을 건너뛰기 위한 일회성 플래그 맵
   }),
   getters: {
@@ -70,15 +49,6 @@ export const useChatStore = defineStore("chat", {
      * 특정 챗방이 히스토리 박제 형태 또는 이미 완료 처리되어 AI 모델 사양을 유저가 도중에 함부로 가로채 교체할 수 없도록 강제 락을 걸었는지 확인하는 판별식입니다.
      */
     isModelLocked: (state) => Boolean(state.activeSession?.readonlyModel),
-    /**
-     * 현재 화면 하단 입력창 영역에 도식화되어 투영되어야 할 활성 툴바 세팅 정보를 추출 게팅합니다.
-     */
-    activePromptToolSettings: (state) => {
-      const chatId = state.selectedChatId || DRAFT_PROMPT_TOOL_SETTINGS_KEY; // 방이 아직 없다면 초동 임시 가상 키로 바이패스 유도
-      return clonePromptToolSettings(
-        state.promptToolSettingsMap[chatId] || DEFAULT_PROMPT_TOOL_SETTINGS
-      );
-    },
   },
   actions: {
     /**
@@ -156,8 +126,9 @@ export const useChatStore = defineStore("chat", {
       } else if (this.activeRoomType !== ACTIVE_ROOM_TYPES.shared) {
         this.clearActiveRoom();
       }
+      usePromptControlStore().setActivePromptToolSettingsKey(this.selectedChatId);
       this.clearPendingSelectedChatId(); // 실제 활성 방 포인터가 확정되었으므로 클릭 선반영 상태를 해제
-      this.resetActivePromptToolSettings(); // 방이 체인지되었으므로 툴바 세팅 캐시 구조체도 타깃에 맞게 세로정렬 리셋 트리거
+      usePromptControlStore().resetActivePromptToolSettings(); // 방이 체인지되었으므로 툴바 세팅 캐시 구조체도 타깃에 맞게 세로정렬 리셋 트리거
     },
     /**
      * 현재 활성화된 방을 폭파 해제하고 공백 상태로 뷰포트를 전면 언마운트 리셋 클리어합니다.
@@ -166,8 +137,9 @@ export const useChatStore = defineStore("chat", {
       this.activeSession = null;
       this.selectedChatId = null;
       this.clearActiveRoom();
+      usePromptControlStore().setActivePromptToolSettingsKey(null);
       this.clearPendingSelectedChatId();
-      this.resetActivePromptToolSettings();
+      usePromptControlStore().resetActivePromptToolSettings();
     },
 
     /**
@@ -202,11 +174,7 @@ export const useChatStore = defineStore("chat", {
      */
     pruneInactiveMessageCache(keepChatId) {
       const keepId = String(keepChatId || "");
-      const shouldKeepChatScopedCache = (chatId) =>
-        String(chatId) === keepId ||
-        String(chatId) === DRAFT_PROMPT_TOOL_SETTINGS_KEY;
       const nextMessageMap = {};
-      const nextPromptToolSettingsMap = {};
 
       Object.entries(this.messageMap || {}).forEach(([chatId, list]) => {
         if (String(chatId) === keepId) {
@@ -214,17 +182,8 @@ export const useChatStore = defineStore("chat", {
         }
       });
 
-      Object.entries(this.promptToolSettingsMap || {}).forEach(
-        ([chatId, settings]) => {
-          if (shouldKeepChatScopedCache(chatId)) {
-            nextPromptToolSettingsMap[chatId] =
-              clonePromptToolSettings(settings);
-          }
-        }
-      );
-
       this.messageMap = nextMessageMap;
-      this.promptToolSettingsMap = nextPromptToolSettingsMap;
+      usePromptControlStore().prunePromptToolSettingsCache(keepChatId);
     },
     /**
      * 새로운 대화 이력이 생성되었거나 변경 사항이 발생했을 때 리스트 최선두에 아이템을 새치기 배치하고 구방을 뒤로 밀어 정렬합니다.
@@ -235,181 +194,7 @@ export const useChatStore = defineStore("chat", {
         ...this.histories.filter((item) => item.id !== history.id), // 중복 제거 매칭 스크리닝 동시 집행
       ];
     },
-    /**
-     * 스토어 내부 탐색 게터들이 참조할 적합성 타깃 룸 ID 식별 문자열 키를 리턴합니다.
-     */
-    getPromptToolSettingsKey() {
-      return this.selectedChatId || DRAFT_PROMPT_TOOL_SETTINGS_KEY;
-    },
-    /**
-     * 현재 스코프 활성 영역의 입력창 툴바 옵션을 공장 출고 규격 사양 사양으로 전면 포맷 리셋시킵니다.
-     */
-    resetActivePromptToolSettings() {
-      const chatId = this.getPromptToolSettingsKey();
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: clonePromptToolSettings(DEFAULT_PROMPT_TOOL_SETTINGS), // 불변 객체 딥 카피 주입 완료
-      };
-    },
 
-    /**
-     * 메인 화면(아직 chatId가 없는 새 대화)에서 선택한 툴 설정을
-     * 실제 생성된 채팅방 ID로 1회 승격합니다.
-     *
-     * 새 대화 첫 submit 흐름에서는 new.do 이후 setActiveSession()이 호출되면서
-     * 활성 chatId가 새 방으로 바뀌고 기본값 초기화가 수행됩니다. 이때 draft 키에
-     * 있던 지식 검색/웹 검색/템플릿 선택값이 사라지지 않도록 생성된 chatId 슬롯에
-     * 복사하고, 이후 다른 새 대화에 누수되지 않게 draft 슬롯은 즉시 초기화합니다.
-     */
-    promoteDraftPromptToolSettingsToChat(chatId) {
-      const id = String(chatId || "").trim();
-      if (!id) return;
 
-      const draftSettings = clonePromptToolSettings(
-        this.promptToolSettingsMap[DRAFT_PROMPT_TOOL_SETTINGS_KEY] ||
-          DEFAULT_PROMPT_TOOL_SETTINGS
-      );
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [id]: draftSettings,
-        [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: clonePromptToolSettings(
-          DEFAULT_PROMPT_TOOL_SETTINGS
-        ),
-      };
-    },
-    /**
-     * @function ensurePromptToolSettings
-     * @description 특정 챗방 전용 툴바 옵션 적치 공간이 맵 내부에 부재하여 에러가 나는 현상을 차단하기 위해 고안된 안전 가드 초기화 보장식입니다.
-     * @returns {string} 확보가 보장 완료된 대상 챗방의 마스터 조회 키 스트링
-     */
-    ensurePromptToolSettings() {
-      const chatId = this.getPromptToolSettingsKey();
-      if (!this.promptToolSettingsMap[chatId]) {
-        this.promptToolSettingsMap = {
-          ...this.promptToolSettingsMap,
-          [chatId]: clonePromptToolSettings(DEFAULT_PROMPT_TOOL_SETTINGS),
-        };
-      }
-      return chatId; // 앵커 키 반환
-    },
-
-    /**
-     * 유저가 모델 종류를 도중에 스위칭 체인지했을 때, 다른 기종 LLM 프롬프트 토큰과 매핑 구조가 충돌을 방지하기 위해
-     * 마운트되어 있던 프롬프트 템플릿 서랍 세팅을 무효화 청소 초기화합니다.
-     */
-    resetActivePromptTemplate() {
-      const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(
-        this.promptToolSettingsMap[chatId]
-      );
-      current.promptTemplateId = null; // 템플릿 결합 해제
-      current.promptTemplateOptions = {}; // 하위 라디오 세부 설정값 흔적 소거
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: current,
-      };
-    },
-    /**
-     * @function setActivePromptTemplate
-     * @description 유저가 프롬프트 서랍 툴바에서 특정 목적지 프리셋 카드(번역기 등)를 선택 클릭했을 때 온/오프 세팅을 바인딩 토글 갱신합니다.
-     * @param {string} templateId - 타깃 시스템 프롬프트 템플릿의 고유 Key
-     */
-    setActivePromptTemplate(templateId) {
-      const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(
-        this.promptToolSettingsMap[chatId]
-      );
-      // 이미 연타 선택된 동일 템플릿 ID 인입 시 해제(Toggle Off)하고, 새로운 사양 구동 시 교체 마운트합니다.
-      const nextTemplateId =
-        current.promptTemplateId === templateId ? null : templateId;
-      current.promptTemplateId = nextTemplateId;
-      current.promptTemplateOptions = {}; // 교체 시점에는 하위 세부 옵션값들을 깔끔하게 리셋 포맷 처리
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: current,
-      };
-    },
-    /**
-     * @function setPromptTemplateOption
-     * @description 프롬프트 템플릿 조립 가이드 패널 내에서 동적 파라미터 변수(말투 톤앤매너 -> 격식체 등)를 매칭 세팅합니다.
-     * @param {string} groupId - 대상 하위 옵션 가이드 카테고리 고유 명칭 (예: 'tone')
-     * @param {string} optionTag - 유저가 라디오 버튼으로 최종 클릭한 대상 식별 태그명 (예: 'formal')
-     */
-    setPromptTemplateOption(groupId, optionTag) {
-      const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(
-        this.promptToolSettingsMap[chatId]
-      );
-      current.promptTemplateOptions = {
-        ...current.promptTemplateOptions,
-        [groupId]: optionTag, // 특정 그룹 슬롯에 밸류값 저격 수립 매핑
-      };
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: current,
-      };
-    },
-    /**
-     * @function setPromptToolGroupEnabled
-     * @description 대도구 범주(예: 웹 실시간 검색 기능)의 마스터 스위치를 글로벌 파워 온/오프 토글 동기화합니다.
-     * @param {string} groupId - 타깃 제어 대상 도구의 세팅 그룹 명칭
-     * @param {boolean} enabled - 점등(true) 혹은 강제 비활성화 차단 소등(false) 상태 값
-     */
-    setPromptToolGroupEnabled(groupId, enabled) {
-      const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(
-        this.promptToolSettingsMap[chatId]
-      );
-
-      if (groupId === "webSearch") {
-        current.webSearchEnabled = Boolean(enabled); // 마스터 전원 토글
-        if (!enabled) {
-          current.webSearch = null; // 대도구 자체가 소등 전원 차단되었다면 하위 세부 스펙(엔진 세팅 등)도 숏서킷 클리어 소거합니다.
-        }
-      }
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: current,
-      };
-    },
-    /**
-     * @function togglePromptToolOption
-     * @description 하위 세부 칩들(검색 기간 필터, 지식 소스 타깃 범위 칩 등)을 클릭했을 때 단일 선택 / 다중 체크박스 룰에 입각하여 배열을 가공 가도합니다.
-     * @param {string} groupId - 타깃 세팅 그룹의 고유 데이터 명칭
-     * @param {string} optionId - 유저가 활성화 토글을 지시한 대상 유닛 아이템 코드 ID
-     * @param {string} [selectionMode="multiple"] - 'single' (라디오 전용 스위칭) 또는 'multiple' (다중 체크박스 온오프 연산) 규칙 모드 가이드
-     */
-    togglePromptToolOption(groupId, optionId, selectionMode = "multiple") {
-      const chatId = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(
-        this.promptToolSettingsMap[chatId]
-      );
-
-      if (selectionMode === "single") {
-        // 단일 선택 라디오 룰: 동일 칩 연타 시 null 해제 처리하고, 타 칩 선택 시 기존 값을 덮어써서 단일 밸류 치환합니다.
-        current[groupId] = current[groupId] === optionId ? null : optionId;
-
-        // 하위 엔진 설정값이 수립되었다면, 연동성 보정을 위해 상위 마스터 웹 서치 전원 스위치 상태를 완벽하게 연쇄 자동 활성화 켬 처리해 줍니다.
-        if (groupId === "webSearch") {
-          current.webSearchEnabled = Boolean(current.webSearch);
-        }
-      } else {
-        // 다중 선택 체크박스 룰: 배열에 이미 실재하는 식별자면 필터 제거 스크리닝하고, 신규 인입이면 불변 어레이 구조로 요소를 Push 병합 적치합니다.
-        const values = Array.isArray(current[groupId]) ? current[groupId] : [];
-        current[groupId] = values.includes(optionId)
-          ? values.filter((value) => value !== optionId)
-          : [...values, optionId];
-      }
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [chatId]: current,
-      };
-    },
   },
 });

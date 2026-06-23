@@ -52,7 +52,7 @@
         :aria-label="t('chat.recentChats')"
       >
         <h2>{{ t("chat.recentChats") }}</h2>
-        <SidebarHistoryList
+        <SidebarHistoryListDesktop
           :histories="histories"
           :selected-chat-id="selectedChatId"
           container-class="collapsed-recent-list"
@@ -80,7 +80,7 @@
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import Icon from "@/components/navigation/NavigationIcon.vue";
-import SidebarHistoryList from "@/components/navigation/controls/SidebarHistoryList.vue";
+import SidebarHistoryListDesktop from "@/components/navigation/history/SidebarHistoryListDesktop.vue";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 
 const {t} = useI18n();

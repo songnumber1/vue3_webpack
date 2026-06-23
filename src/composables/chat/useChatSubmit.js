@@ -3,6 +3,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -59,26 +60,29 @@ async function createConversationForSubmit(options, normalized) {
   }
 }
 
-function shouldCreateConversation(options, targetHistoryId) {
+function shouldCreateConversation(options, targetHistoryId, currentRoute = {}) {
   // URL 숨김 모드에서는 기존 대화방도 /chat(chat-entry) 라우트를 사용합니다.
   // 따라서 라우트 이름만으로 새 대화 여부를 판단하면 기존 대화방 추가 질문이
   // new.do로 잘못 분기될 수 있습니다. active chat id가 있으면 항상 기존 대화방으로 처리합니다.
   if (targetHistoryId) return false;
 
+  const routeName = options.route?.name || currentRoute?.name;
+
   return (
-    options.route.name === ROUTE_NAMES.MAIN ||
-    options.route.name === ROUTE_NAMES.CHAT_ENTRY
+    routeName === ROUTE_NAMES.MAIN ||
+    routeName === ROUTE_NAMES.CHAT_ENTRY
   );
 }
 
 async function ensureConversationForSubmit(
   options,
   normalized,
-  currentHistoryId
+  currentHistoryId,
+  currentRoute = {}
 ) {
   let targetHistoryId = normalizeChatId(currentHistoryId);
 
-  if (!shouldCreateConversation(options, targetHistoryId)) {
+  if (!shouldCreateConversation(options, targetHistoryId, currentRoute)) {
     return targetHistoryId;
   }
 
@@ -161,7 +165,8 @@ export function useChatSubmit(options) {
     );
     const isNewConversationSubmit = shouldCreateConversation(
       options,
-      initialHistoryId
+      initialHistoryId,
+      route
     );
     let overlaySuppressed = false;
 
@@ -174,11 +179,12 @@ export function useChatSubmit(options) {
       const targetHistoryId = await ensureConversationForSubmit(
         options,
         normalized,
-        initialHistoryId
+        initialHistoryId,
+        route
       );
 
       if (isNewConversationSubmit) {
-        chatStore.promoteDraftPromptToolSettingsToChat(targetHistoryId);
+        usePromptControlStore().promoteDraftPromptToolSettingsToChat(targetHistoryId);
       }
 
       const {messages, assistantMessage} =

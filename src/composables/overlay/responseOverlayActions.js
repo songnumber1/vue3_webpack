@@ -3,14 +3,8 @@
  * @description responseOverlay 상태, open/close action, 모바일 back 정책을 named function으로 제공합니다.
  */
 
-import {computed, markRaw, ref, unref, watch} from "vue";
+import {computed, ref, unref, watch} from "vue";
 import {useAppOverlayBackStore} from "@/stores/appOverlayBackStore";
-import LanguageSelectSheet from "@/components/menu/LanguageSelectSheet.vue";
-import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
-import NoticeView from "@/views/settings/NoticeView.vue";
-import PersonalizationView from "@/views/settings/PersonalizationView.vue";
-import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
-import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 
 const RESPONSE_OVERLAY_HISTORY_KEY = "__responseOverlayBack";
 
@@ -43,15 +37,6 @@ const STANDALONE_OVERLAY_TYPES = Object.freeze([
   APP_OVERLAY_TYPES.LANGUAGE,
   APP_OVERLAY_TYPES.MOBILE_SETTINGS,
 ]);
-
-const RESPONSE_OVERLAY_COMPONENTS = Object.freeze({
-  [APP_OVERLAY_TYPES.NOTICE]: markRaw(NoticeView),
-  [APP_OVERLAY_TYPES.PRIVACY]: markRaw(PrivacyPolicyView),
-  [APP_OVERLAY_TYPES.PERSONALIZATION]: markRaw(PersonalizationView),
-  [APP_OVERLAY_TYPES.SYSTEM]: markRaw(SystemSettingsView),
-  [APP_OVERLAY_TYPES.LANGUAGE]: markRaw(LanguageSelectSheet),
-  [APP_OVERLAY_TYPES.MOBILE_SETTINGS]: markRaw(MobileSettingsPanel),
-});
 
 export const responseOverlayActiveType = ref(null);
 const configuredIsMobile = ref(null);
@@ -238,9 +223,6 @@ export function createResponseOverlayViewState(t, viewportStore) {
   const isOpen = computed(() => Boolean(responseOverlayActiveType.value));
   const isMobile = computed(() => shouldUseMobileBack(viewportStore));
   const activeOverlayType = computed(() => responseOverlayActiveType.value);
-  const overlayComponent = computed(
-    () => RESPONSE_OVERLAY_COMPONENTS[responseOverlayActiveType.value] || null
-  );
   const overlayTitle = computed(() => {
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.NOTICE) {
       return t("notice.title");
@@ -302,7 +284,6 @@ export function createResponseOverlayViewState(t, viewportStore) {
     activeOverlayType,
     isOpen,
     isMobile,
-    overlayComponent,
     overlayTitle,
     overlaySubtitle,
     overlayRenderMode,

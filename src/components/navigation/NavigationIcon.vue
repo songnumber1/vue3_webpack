@@ -1,13 +1,14 @@
 <template>
-  <component :is="bare ? 'img' : 'span'" v-bind="rootAttrs">
-    <img
-      v-if="!bare"
-      class="nav-icon"
-      :src="iconSrc"
-      alt=""
-      aria-hidden="true"
-    />
-  </component>
+  <img
+    v-if="bare"
+    class="nav-icon"
+    :src="iconSrc"
+    alt=""
+    aria-hidden="true"
+  />
+  <span v-else class="icon-wrap">
+    <img class="nav-icon" :src="iconSrc" alt="" aria-hidden="true" />
+  </span>
 </template>
 
 <script setup>
@@ -42,14 +43,4 @@ const props = defineProps({
 });
 
 const iconSrc = computed(() => ICONS[props.name] || ICONS.chat);
-const rootAttrs = computed(() =>
-  props.bare
-    ? {
-        class: "nav-icon",
-        src: iconSrc.value,
-        alt: "",
-        "aria-hidden": "true",
-      }
-    : {class: "icon-wrap"}
-);
 </script>

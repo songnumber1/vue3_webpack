@@ -12,7 +12,7 @@ import {
   DEFAULT_FALLBACK_MODEL,
   PROMPT_MENU_TYPE,
 } from "@/constants/promptComposer";
-import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 
 /**
  * @function usePromptModel
@@ -33,8 +33,8 @@ export function usePromptModel({
   toggleMenu,
   emit,
 }) {
-  // 전역 대화방 컨텍스트 및 설정 템플릿을 동기화하기 위한 Pinia 마스터 스토어 인입
-  const chatStore = useChatStore();
+  // 프롬프트 템플릿 선택 상태를 동기화하기 위한 Pinia 마스터 스토어 인입
+  const promptControlStore = usePromptControlStore();
 
   // ── [장애 방어 가드: 시스템 폴백 모델 세팅] ──────────────────
   // 네트워크 장애, API 응답 유실, 혹은 가용 모델이 전무한 초동 진입 단계에서
@@ -80,7 +80,7 @@ export function usePromptModel({
     // [중요 비즈니스 로직] 기존 모델과 상이한 전혀 새로운 성격의 LLM 모델로 체인지하는 시점인 경우,
     // 이전 모델의 토큰 구조나 전용 파라미터 규격에 맞춰 임시 조립되어 있던 프롬프트 템플릿 캐시 버퍼를 깔끔하게 청소 초기화합니다.
     if (id !== props.modelValue) {
-      chatStore.resetActivePromptTemplate();
+      promptControlStore.resetActivePromptTemplate();
     }
 
     // Vue 3의 표준 v-model 규격에 입각하여 부모 컴포넌트의 프리셋 가치를 업데이트 단번에 칩니다.

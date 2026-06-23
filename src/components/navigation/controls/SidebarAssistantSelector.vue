@@ -12,35 +12,12 @@
       <span>{{ currentAssistant.label }}</span>
       <ChevronDownIcon class="chevron chevron--selector" />
     </button>
-    <div
-      v-if="open && !mobile"
-      ref="menuRef"
-      class="assistant-menu tw-absolute tw-z-popover tw-mt-2 tw-w-full tw-rounded-control tw-border tw-border-app-border tw-bg-app-menu tw-shadow-menu"
-    >
-      <button
-        v-for="assistant in assistants"
-        :key="assistant.id"
-        class="assistant-option tw-flex tw-w-full tw-items-center tw-justify-between tw-gap-3 tw-text-left tw-transition"
-        :class="{active: assistant.id === selectedAssistantId}"
-        type="button"
-        @click="$emit('select', assistant.id)"
-      >
-        <span
-          class="assistant-option-main tw-flex tw-min-w-0 tw-flex-col tw-gap-1"
-        >
-          <strong>{{ assistant.label }}</strong>
-          <small>{{ assistant.description }}</small>
-        </span>
-        <span
-          v-if="assistant.id === selectedAssistantId"
-          class="option-selected-indicator tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
-          :aria-label="t('chat.assistantSelected')"
-        >
-          <CheckIcon class="option-check" />
-          <span class="sr-only">{{ t("chat.assistantSelected") }}</span>
-        </span>
-      </button>
-    </div>
+    <AssistantFloatMenu
+      :open="open && !mobile"
+      :assistants="assistants"
+      :selected-assistant-id="selectedAssistantId"
+      @select="$emit('select', $event)"
+    />
   </div>
 </template>
 
@@ -55,11 +32,9 @@
  */
 
 import {computed, ref} from "vue";
-import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
-import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useI18n} from "vue-i18n";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
+import AssistantFloatMenu from "@/components/assistant/select/AssistantFloatMenu.vue";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -74,23 +49,11 @@ const props = defineProps({
 defineEmits(["toggle", "select"]);
 
 const {t} = useI18n();
-const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const rootRef = ref(null);
-const menuRef = ref(null);
 const currentAssistant = computed(
   () =>
     props.assistants.find((item) => item.id === props.selectedAssistantId) ||
     props.assistants[0] || {label: "Assistant"}
-);
-
-useOverlayScrollbar(
-  menuRef,
-  {overflow: {x: "hidden", y: "scroll"}},
-  {
-    watchSource: () => [props.open, props.mobile, props.assistants.length],
-    enabled: () =>
-      shouldUseOverlayScrollbar.value && props.open && !props.mobile,
-  }
 );
 
 defineExpose({rootRef});
