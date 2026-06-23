@@ -22,55 +22,7 @@
       @select="handleAssistantNewChat"
     />
 
-    <OverlayPortalProvider
-      :notice-open="noticeOpen"
-      :privacy-open="privacyOpen"
-      :personalization-open="personalizationOpen"
-      :notice-title="t('notice.title')"
-      :notice-subtitle="t('notice.subtitle')"
-      :privacy-title="t('legal.privacy.title')"
-      :privacy-subtitle="t('legal.privacy.description')"
-      :personalization-title="t('personalization.title')"
-      :personalization-subtitle="t('personalization.subtitle')"
-      @close-notice="closeNotice"
-      @close-privacy="closePrivacy"
-      @close-personalization="closePersonalization"
-    >
-      <template #notice>
-        <NoticeView />
-      </template>
-      <template #privacy>
-        <PrivacyPolicyView />
-      </template>
-      <template #personalization>
-        <PersonalizationView />
-      </template>
-    </OverlayPortalProvider>
-
-    <ResponsiveOverlay
-      :open="systemOpen"
-      :title="t('common.system')"
-      :subtitle="t('menu.systemSummary')"
-      panel-class="responsive-panel--system-settings"
-      @close="closeSystem"
-    >
-      <SystemSettingsView
-        @close="closeSystem"
-        @applied="handleSystemSettingsApplied"
-      />
-    </ResponsiveOverlay>
-
-    <LanguageSelectSheet
-      :open="languageSheetOpen"
-      @close="closeLanguageSheet"
-    />
-
-    <MobileSettingsPanel
-      :open="mobileSettingsOpen"
-      @close="closeMobileSettings"
-      @desktop-open="handleMobileSettingsDesktopOpen"
-      @applied="handleSystemSettingsApplied"
-    />
+    <ResponseOverlayHost @applied="handleSystemSettingsApplied" />
 
     <StudioDetailViewer
       :open="studioDetailOpen"
@@ -136,21 +88,13 @@ import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useChatContainerController} from "@/composables/chat/useChatContainerController";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
-import {
-  useChatContainerInteractionLocks,
-  useChatContainerProviders,
-  useChatStudioPortalActions,
-} from "@/composables/chat/useChatUi";
+import {useChatContainerInteractionLocks} from "@/composables/chat/internal/container/useChatContainerInteractionLocks";
+import {useChatContainerProviders} from "@/composables/chat/internal/container/useChatContainerProviders";
+import {useChatStudioPortalActions} from "@/composables/chat/studio/useChatStudioPortalActions";
 import AssistantSelectSheet from "@/components/assistant/AssistantSelectSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
-import LanguageSelectSheet from "@/components/menu/LanguageSelectSheet.vue";
-import OverlayPortalProvider from "@/components/overlay/OverlayPortalProvider.vue";
-import NoticeView from "@/views/settings/NoticeView.vue";
-import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
-import PersonalizationView from "@/views/settings/PersonalizationView.vue";
-import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
-import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
+import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
 import ChatHistoryActionDialog from "@/components/navigation/controls/ChatHistoryActionDialog.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
@@ -191,18 +135,6 @@ const {
   messages,
   showScrollBottom,
   assistantSheetOpen,
-  noticeOpen,
-  privacyOpen,
-  personalizationOpen,
-  systemOpen,
-  languageSheetOpen,
-  mobileSettingsOpen,
-  closeNotice,
-  closePrivacy,
-  closePersonalization,
-  closeSystem,
-  closeLanguageSheet,
-  closeMobileSettings,
   historyDialogOpen,
   historyDialogMode,
   historyDialogTarget,
@@ -249,7 +181,6 @@ const {
   handleMessageContentRendered,
   scrollBottom,
   handleSystemSettingsApplied,
-  handleMobileSettingsDesktopOpen,
 } = useChatContainerController(controllerProps);
 
 const shellReady = computed(

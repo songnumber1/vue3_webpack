@@ -4,7 +4,7 @@
       class="sidebar-user-profile"
       type="button"
       :aria-label="t('common.settings')"
-      @click="actions.openSettings()"
+      @click="responseOverlay.openSettings()"
     >
       <div class="user-avatar">{{ userInitial }}</div>
       <div class="sidebar-user-main">
@@ -65,16 +65,14 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject} from "vue";
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {
-  APP_SHELL_ACTIONS_KEY,
-  createEmptyAppShellActions,
-} from "@/composables/app/appShellActionContext";
+import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
+import {useAppShellActions} from "@/composables/app/useAppShellActions";
 
 const {t} = useI18n();
 const authStore = useAuthStore();
@@ -82,7 +80,8 @@ const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
-const actions = inject(APP_SHELL_ACTIONS_KEY, createEmptyAppShellActions());
+const actions = useAppShellActions();
+const responseOverlay = useResponseOverlay();
 
 const displayName = computed(() => userName.value || t("common.user"));
 const userInitial = computed(() => {

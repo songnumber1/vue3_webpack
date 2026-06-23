@@ -11,7 +11,7 @@
  * - .mobile-keyboard-dock--fixed applies that bottom value to fixed docks.
  *   Do not add it to relative wrappers such as the chat composer slot.
  * - .mobile-keyboard-scroll-page / .mobile-keyboard-form reserve scroll space
- *   for long form screens that also use useKeyboardFocusGuard.
+ *   for keyboard-aware long form screens.
  * - .mobile-keyboard-overlay-form is for non-BottomSheet overlay forms.
  */
 

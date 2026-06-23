@@ -42,6 +42,7 @@
       >
         <PromptToolbarDesktop
           ref="toolbarRef"
+          layout-mode="top-actions"
           class="prompt-toolbar-desktop-top"
           @open-model="openModelSelector"
           @open-tool="openToolSelector"
@@ -132,12 +133,14 @@
 
       <PromptSubmitActions
         v-if="usesDesktopTopActions"
+        layout-mode="submit-only"
         class="prompt-toolbar-desktop-submit"
         @start-voice="startVoiceInput"
         @stop-voice="stopVoiceInput"
       />
 
-      <PromptToolbarMobile
+      <component
+        :is="resolvedToolbarComponent"
         v-else
         ref="toolbarRef"
         @open-model="openModelSelector"
@@ -221,6 +224,7 @@ const componentProps = defineProps({
 
 const promptState = usePromptStateContext();
 const workspaceActions = useWorkspaceActionsContext();
+const resolvedToolbarComponent = computed(() => PromptToolbarMobile);
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;

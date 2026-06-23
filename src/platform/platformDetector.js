@@ -3,7 +3,7 @@ import {
   PLATFORM,
   hasAndroidBridge,
   hasExtensionRuntime,
-} from "@/core/config";
+} from "@/core/config/appConfig";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {
   createActualPlatformInfo,

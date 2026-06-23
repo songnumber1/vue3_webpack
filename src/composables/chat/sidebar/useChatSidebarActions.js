@@ -13,16 +13,17 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
-import {navigateToPortalAssistant} from "@/composables/chat/internal/navigation/portalAssistantNavigation";
 import {useChatActionsContext} from "@/composables/chat/context/useChatInject";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   navigateToMainAfterConversationReset,
   resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
+  preparePortalConversationNavigation,
+  cleanupAfterPortalConversationNavigation,
 } from "@/composables/chat/internal/navigation/chatNavigationReset";
+import {createPortalAssistantRoute} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
 import {logWarn} from "@/utils/logger";
-
 
 function getHistoryId(item) {
   return String(item?.id || "").trim();
@@ -79,6 +80,23 @@ export function useChatSidebarActions({
     clearConversationNavigationStateByPolicy(createNavigationResetContext());
   }
 
+  function preparePortalNavigation() {
+    preparePortalConversationNavigation(createNavigationResetContext());
+  }
+
+  function cleanupAfterPortalNavigation() {
+    cleanupAfterPortalConversationNavigation(createNavigationResetContext());
+  }
+
+  async function navigatePortalAssistant(assistantId) {
+    const targetRoute = createPortalAssistantRoute(assistantId);
+
+    preparePortalNavigation();
+    assistantStore.selectAssistant(assistantId);
+    await router?.push(targetRoute).catch(() => {});
+    cleanupAfterPortalNavigation();
+  }
+
   async function navigateMainAfterReset() {
     await navigateToMainAfterConversationReset({
       router,
@@ -115,12 +133,7 @@ export function useChatSidebarActions({
   async function selectAssistant(id) {
     if (isPortalAssistantId(id)) {
       if (isGlobalLocked.value || isStreamingLocked.value) return false;
-      await navigateToPortalAssistant({
-        router,
-        assistantStore,
-        assistantId: id,
-        resetContext: createNavigationResetContext(),
-      });
+      await navigatePortalAssistant(id);
       return true;
     }
 

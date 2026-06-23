@@ -44,7 +44,7 @@
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
-import {setAppLocale} from "@/i18n";
+import {setAppLocale} from "@/i18n/appI18n";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.

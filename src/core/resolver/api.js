@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {isAndroidApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config/appConfig";
 
 /**
  * @description 모든 플랫폼(일반 PC 웹, 모바일 브라우저, 확장 프로그램 등)에서 공통으로 사용하는 표준 베이스 API 엔드포인트 매핑 명세 매트릭스입니다.

@@ -1,7 +1,7 @@
 import {createRouter, createWebHistory} from "vue-router";
 import AssistantRouterView from "@/views/AssistantRouterView.vue";
 import MainPage from "@/views/MainPage.vue";
-import {isAndroidApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config/appConfig";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
@@ -9,17 +9,50 @@ import {useChatStore} from "@/stores/chatStore";
 import {
   getPendingSelectedChatId,
   resolveConversationEntryGuard,
-} from "@/composables/chat/useChatRoute";
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {ROUTE_NAMES} from "@/constants/routeNames";
-import {ROUTE_COMPONENTS} from "@/core/resolver/routeComponents";
 import {logInfo} from "@/utils/logger";
 import {
   NAVIGATION_LOCK_SCOPES,
   useNavigationLockStore,
 } from "@/stores/navigationLockStore";
+
+
+const ChatPage = () =>
+  import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
+const SwaggerPage = () =>
+  import(/* webpackChunkName: "swagger" */ "@/views/SwaggerPage.vue");
+const GuidePage = () =>
+  import(/* webpackChunkName: "guide" */ "@/views/GuidePage.vue");
+const SharedPage = () =>
+  import(/* webpackChunkName: "shared" */ "@/views/SharedPage.vue");
+const PlaygroundPage = () =>
+  import(
+    /* webpackChunkName: "playground" */ "@/views/playground/PlaygroundPage.vue"
+  );
+const StudioPage = () =>
+  import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
+const McpConnectorListPage = () =>
+  import(
+    /* webpackChunkName: "connector-store" */ "@/views/mcp/McpConnectorListPage.vue"
+  );
+const ChatSearchPage = () =>
+  import(
+    /* webpackChunkName: "chat-search" */ "@/views/search/ChatSearchPage.vue"
+  );
+const LoginRequiredPage = () =>
+  import(
+    /* webpackChunkName: "login-required" */ "@/views/LoginRequiredPage.vue"
+  );
+const AndroidUpdate = () =>
+  import(
+    /* webpackChunkName: "android-update" */ "@/views/android/AndroidUpdate.vue"
+  );
+const TermsPage = () =>
+  import(/* webpackChunkName: "terms" */ "@/views/TermsPage.vue");
 
 const baseRoutes = [
   {
@@ -37,63 +70,63 @@ const baseRoutes = [
       {
         path: "chat",
         name: ROUTE_NAMES.CHAT_ENTRY,
-        component: ROUTE_COMPONENTS.ChatPage,
+        component: ChatPage,
         meta: {title: "Chat"},
       },
       {
         path: "chat/:id",
         name: ROUTE_NAMES.CHAT_DETAIL,
-        component: ROUTE_COMPONENTS.ChatPage,
+        component: ChatPage,
         props: true,
         meta: {title: "Chat"},
       },
       {
         path: "chat-search",
         name: ROUTE_NAMES.CHAT_SEARCH,
-        component: ROUTE_COMPONENTS.ChatSearchPage,
+        component: ChatSearchPage,
         meta: {title: "Chat Search"},
       },
       {
         path: "studio",
         name: ROUTE_NAMES.STUDIO,
-        component: ROUTE_COMPONENTS.StudioPage,
+        component: StudioPage,
         meta: {title: "Assistant Studio"},
       },
       {
         path: "connector-store",
         name: ROUTE_NAMES.CONNECTOR_STORE,
-        component: ROUTE_COMPONENTS.McpConnectorListPage,
+        component: McpConnectorListPage,
         meta: {title: "Connector Store"},
       },
       {
         path: "swagger",
         name: ROUTE_NAMES.SWAGGER,
-        component: ROUTE_COMPONENTS.SwaggerPage,
+        component: SwaggerPage,
         meta: {title: "Swagger"},
       },
       {
         path: "guide",
         name: ROUTE_NAMES.GUIDE,
-        component: ROUTE_COMPONENTS.GuidePage,
+        component: GuidePage,
         meta: {title: "Guide"},
       },
       {
         path: "shared",
         name: ROUTE_NAMES.SHARED,
-        component: ROUTE_COMPONENTS.SharedPage,
+        component: SharedPage,
         meta: {title: "Shared Chat", skipAuthCheck: true},
       },
       {
         path: "shared/:id",
         name: ROUTE_NAMES.SHARED_ENTRY,
-        component: ROUTE_COMPONENTS.SharedPage,
+        component: SharedPage,
         props: true,
         meta: {title: "Shared Chat", skipAuthCheck: true},
       },
       {
         path: "playground",
         name: ROUTE_NAMES.PLAYGROUND,
-        component: ROUTE_COMPONENTS.PlaygroundPage,
+        component: PlaygroundPage,
         meta: {title: "Playground"},
       },
     ],
@@ -104,7 +137,7 @@ const legalRoutes = [
   {
     path: "/terms",
     name: ROUTE_NAMES.TERMS,
-    component: ROUTE_COMPONENTS.TermsPage,
+    component: TermsPage,
     meta: {
       title: "Terms of Service",
       requireAuth: true,
@@ -118,7 +151,7 @@ const authRoutes = [
     path: "/login",
     alias: "/login-required",
     name: ROUTE_NAMES.LOGIN_REQUIRED,
-    component: ROUTE_COMPONENTS.LoginRequiredPage,
+    component: LoginRequiredPage,
     meta: {
       title: "Login Required",
       skipAuthCheck: true,
@@ -131,7 +164,7 @@ const androidRoutes = [
   {
     path: "/android/update",
     name: ROUTE_NAMES.ANDROID_UPDATE,
-    component: ROUTE_COMPONENTS.AndroidUpdate,
+    component: AndroidUpdate,
     meta: {
       title: "Android Update",
       skipAuthCheck: true,

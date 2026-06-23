@@ -65,14 +65,14 @@
           <button
             class="playground-button"
             type="button"
-            @click="noticeOpen = true"
+            @click="responseOverlay.openNotice()"
           >
             {{ t("playground.overlay.openNotice") }}
           </button>
           <button
             class="playground-button playground-button--secondary"
             type="button"
-            @click="personalizationOpen = true"
+            @click="responseOverlay.openPersonalization()"
           >
             {{ t("playground.overlay.openPersonalization") }}
           </button>
@@ -203,23 +203,7 @@
       </article>
     </section>
 
-    <OverlayPortalProvider
-      :notice-open="noticeOpen"
-      :personalization-open="personalizationOpen"
-      :notice-title="t('notice.title')"
-      :notice-subtitle="t('notice.subtitle')"
-      :personalization-title="t('personalization.title')"
-      :personalization-subtitle="t('personalization.subtitle')"
-      @close-notice="noticeOpen = false"
-      @close-personalization="personalizationOpen = false"
-    >
-      <template #notice>
-        <NoticeView />
-      </template>
-      <template #personalization>
-        <PersonalizationView />
-      </template>
-    </OverlayPortalProvider>
+    <ResponseOverlayHost />
 
     <ResponsiveOverlay
       :open="popupOpen"
@@ -308,11 +292,10 @@ import {
   copyClipboardByPlatform,
   showToastByPlatform,
 } from "@/platform/bridge/platformBridge";
-import OverlayPortalProvider from "@/components/overlay/OverlayPortalProvider.vue";
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
-import NoticeView from "@/views/settings/NoticeView.vue";
-import PersonalizationView from "@/views/settings/PersonalizationView.vue";
+import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
+import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
 
 const {t} = useI18n();
 const {appInfo} = useAppContext();
@@ -322,8 +305,7 @@ const {
   isAndroidApp: isAndroidRuntime,
   isMobileBrowser,
 } = useRuntimeModeFlags();
-const noticeOpen = ref(false);
-const personalizationOpen = ref(false);
+const responseOverlay = useResponseOverlay();
 const sheetOpen = ref(false);
 const popupOpen = ref(false);
 const activePopupType = ref("alert");

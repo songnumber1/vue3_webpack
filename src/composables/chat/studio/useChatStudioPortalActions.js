@@ -12,16 +12,21 @@ import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
-import {navigateToPortalAssistant} from "@/composables/chat/internal/navigation/portalAssistantNavigation";
-import {getPortalAssistantIdByRouteName} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
+import {
+  createPortalAssistantRoute,
+  getPortalAssistantIdByRouteName,
+} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
+import {
+  cleanupAfterPortalConversationNavigation,
+  preparePortalConversationNavigation,
+} from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {deleteStudio} from "@/services/studioDetailService";
 import {
   isStudioAssistant,
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
-
 
 export function useChatStudioPortalActions({
   route,
@@ -157,16 +162,22 @@ export function useChatStudioPortalActions({
     };
   }
 
+  function preparePortalNavigation() {
+    preparePortalConversationNavigation(createPortalNavigationResetContext());
+  }
+
+  function cleanupAfterPortalNavigation() {
+    cleanupAfterPortalConversationNavigation(createPortalNavigationResetContext());
+  }
+
   async function openPortalAssistant(assistantId) {
-    await navigateToPortalAssistant({
-      router,
-      assistantStore,
-      assistantId,
-      resetContext: createPortalNavigationResetContext(),
-      afterSelect: () => {
-        if (assistantSheetOpen) assistantSheetOpen.value = false;
-      },
-    });
+    const targetRoute = createPortalAssistantRoute(assistantId);
+
+    preparePortalNavigation();
+    assistantStore.selectAssistant(assistantId);
+    if (assistantSheetOpen) assistantSheetOpen.value = false;
+    await router?.push(targetRoute).catch(() => {});
+    cleanupAfterPortalNavigation();
   }
 
   async function handleAssistantNewChat(assistantId) {

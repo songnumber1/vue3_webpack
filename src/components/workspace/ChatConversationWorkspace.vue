@@ -58,8 +58,9 @@
     class="chat-composer-slot"
     :aria-hidden="isComposerVisible ? null : 'true'"
   >
+    <ChatReadonlyInput v-if="readonly" :variant="readonlyInputVariant" />
     <ChatReadonlyInput
-      v-if="readonly || isActiveModelUnavailable"
+      v-else-if="isActiveModelUnavailable"
       :variant="readonlyInputVariant"
     />
     <PromptComposer
@@ -120,8 +121,8 @@ import {
 import {useChatStore} from "@/stores/chatStore";
 import {useChatPageLock} from "@/composables/chat/conversation/useChatPageLock";
 import {useChatConversationActions} from "@/composables/chat/conversation/useChatConversationActions";
-import {useCodeInterpreterPanel} from "@/composables/chat/useChatUi";
-import {useConversationComposerHeight} from "@/composables/chat/useChatUi";
+import {useCodeInterpreterPanel} from "@/composables/chat/conversation/useCodeInterpreterPanel";
+import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 
 const {locale, t} = useI18n();

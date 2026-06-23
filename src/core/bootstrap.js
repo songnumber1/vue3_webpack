@@ -12,8 +12,8 @@ import {createPinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import App from "@/App.vue";
-import {resolveAppConfig} from "@/core/config";
-import {resolveLayout} from "@/core/resolver/layout";
+import {resolveAppConfig} from "@/core/config/appConfig";
+import AppContainer from "@/containers/AppContainer.vue";
 import {resolveAxios} from "@/core/resolver/axios";
 import {resolveAuthAxios} from "@/core/resolver/authAxios";
 import {applyInterceptors} from "@/core/resolver/interceptor";
@@ -24,7 +24,7 @@ import {resolveStorage} from "@/core/resolver/storage";
 import {resolveTheme} from "@/core/resolver/theme";
 import {resolveErrorUI} from "@/core/resolver/errorUi";
 import {resolveUploadStrategy} from "@/core/resolver/upload";
-import {i18n} from "@/i18n";
+import {i18n} from "@/i18n/appI18n";
 import {installViewportModeClass} from "@/platform/viewport/viewportMode";
 import {logWarn} from "@/utils/logger";
 
@@ -33,7 +33,7 @@ import {logWarn} from "@/utils/logger";
  * 순차적으로 조율(Orchestration)하여 앱을 최종 구동하는 비동기 진입점 함수입니다.
  * @returns {Promise<void>}
  * @see {@link resolveAppConfig} 플랫폼 전역 초기화 설정을 파싱하는 함수
- * @see {@link createAndroidConfig} 내부의 resolveBridge를 통해 안드로이드인 경우 네이티브 설정을 연동합니다.
+ * @see {@link resolveBridge} 안드로이드인 경우 네이티브 설정을 연동합니다.
  */
 export async function bootstrap() {
   // 1. 현재 화면 크기를 추적하여 HTML/Body 태그에 모바일/데스크톱 대응용 CSS 클래스(예: .is-mobile)를 동적으로 삽입합니다.
@@ -73,7 +73,7 @@ export async function bootstrap() {
   const router = resolveRouter(appInfo, {authAxios});
 
   // 13. 현재 앱의 단일 글로벌 레이아웃 컴포넌트(Layout)를 가동합니다.
-  const Layout = resolveLayout();
+  const Layout = AppContainer;
 
   // 14. Vue.js 프레임워크의 루트 인스턴스(App.vue)를 인스턴스화합니다.
   const app = createApp(App);

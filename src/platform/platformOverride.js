@@ -1,4 +1,4 @@
-import {RUN_ENV, PLATFORM} from "@/core/config";
+import {RUN_ENV, PLATFORM} from "@/core/config/appConfig";
 import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
 
 export function getForcedPlatformOverride(value) {

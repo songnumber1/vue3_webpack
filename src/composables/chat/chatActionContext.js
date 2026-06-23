@@ -117,15 +117,9 @@ export function createEmptyPromptToolbarState() {
  * openDrawer: () => void,
  * toggleTheme: () => void,
  * openSwagger: () => void,
- * openSettings: () => void,
  * openAssistant: () => void,
  * openGuide: () => void,
- * openNotice: () => void,
- * openPrivacy: () => void,
  * openTerms: () => void,
- * openPersonalization: () => void,
- * openSystem: () => void,
- * openLanguage: () => void,
  * openPlayground: () => void,
  * logout: () => void
  * }} 런타임 세이프 아웃라인 액션 패키지 스텁
@@ -135,15 +129,9 @@ export function createEmptyChatActions() {
     openDrawer: () => {}, // 모바일 사이드 메뉴 드로어 개통 무동작 스텁
     toggleTheme: () => {}, // 다크/라이트 테마 반전 무동작 스텁
     openSwagger: () => {}, // API 명세서 이동 무동작 스텁
-    openSettings: () => {}, // 환경설정 진입 무동작 스텁
     openAssistant: () => {}, // AI 모델 바텀시트 개통 무동작 스텁
     openGuide: () => {}, // 가이드북 라우팅 무동작 스텁
-    openNotice: () => {}, // 공지사항 팝업 무동작 스텁
-    openPrivacy: () => {}, // 개인정보 처리방침 무동작 스텁
     openTerms: () => {}, // 이용약관 팝업 무동작 스텁
-    openPersonalization: () => {}, // 개인화 마이페이지 모달 무동작 스텁
-    openSystem: () => {}, // 인프라 운영 모달 무동작 스텁
-    openLanguage: () => {}, // 언어 스위칭 바텀시트 무동작 스텁
     openPlayground: () => {}, // 실험실 플레이그라운드 무동작 스텁
     logout: () => {}, // 인증 토큰 소멸 추방 무동작 스텁
     newChat: () => {}, // 새 대화 시작 무동작 스텁

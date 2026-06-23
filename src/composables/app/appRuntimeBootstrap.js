@@ -10,7 +10,7 @@
 import {resolveChatApis} from "@/api/runtime/chatApis";
 import {adaptAssistantList} from "@/adapters/assistantAdapter";
 import {adaptModelList, filterAvailableModels} from "@/adapters/modelAdapter";
-import {adaptChatHistoryList} from "@/adapters/chatAdapter";
+import {adaptChatHistoryList} from "@/adapters/chatResponseAdapter";
 import {
   adaptExamplePromptList,
   adaptPromptTemplateList,

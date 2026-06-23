@@ -1,8 +1,17 @@
 <template>
   <div
-    class="prompt-action-row prompt-action-row--top-actions tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+    v-if="!isSubmitOnly"
+    class="prompt-action-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
+    :class="{
+      'prompt-action-row--top-actions': isTopActionsOnly,
+      'prompt-action-row--submit-only': isSubmitOnly,
+    }"
+    :data-can-submit="!canSubmit ? 'false' : 'true'"
   >
-    <div class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2">
+    <div
+      v-if="!isSubmitOnly"
+      class="prompt-left-actions tw-flex tw-min-w-0 tw-items-center tw-gap-2"
+    >
       <PromptModelSelector
         ref="modelSelectorRef"
         :disabled="disabled"
@@ -167,6 +176,7 @@
         @open-file-picker="$emit('open-file-picker', $event)"
       />
     </div>
+    <slot v-if="!isTopActionsOnly" name="submit-actions" />
   </div>
 </template>
 
@@ -188,6 +198,10 @@ import PromptAttachButton from "@/components/prompt/controls/PromptAttachButton.
 import PromptModelSelector from "@/components/prompt/controls/PromptModelSelector.vue";
 import {usePromptToolMenuActions} from "@/composables/prompt/usePromptToolMenuActions";
 
+const LAYOUT_MODES = Object.freeze({
+  TOP_ACTIONS: "top-actions",
+  SUBMIT_ONLY: "submit-only",
+});
 const TOOL_MENU_FLOATING_OFFSET = 10;
 const TOOL_MENU_FLOATING_PADDING = 12;
 const TOOL_SUBMENU_WIDTH = 248;
@@ -197,8 +211,12 @@ const TOOL_SUBMENU_PLACEMENT = Object.freeze({
 });
 
 // -----------------------------------------------------------------------------
-// Emits
+// Props and emits
 // -----------------------------------------------------------------------------
+const componentProps = defineProps({
+  layoutMode: {type: String, default: "top-actions"},
+});
+
 const emit = defineEmits([
   "open-model",
   "open-tool",
@@ -299,6 +317,9 @@ const props = reactive({
   get readonlyTitle() {
     return toolbarState.value.readonlyTitle;
   },
+  get canSubmit() {
+    return toolbarState.value.canSubmit;
+  },
 });
 const {
   disabled,
@@ -317,11 +338,18 @@ const {
   hideAttachActions,
   attachLabel,
   modelSelectLabel,
+  canSubmit,
 } = toRefs(props);
 
 // -----------------------------------------------------------------------------
 // Computed state
 // -----------------------------------------------------------------------------
+const isSubmitOnly = computed(
+  () => componentProps.layoutMode === LAYOUT_MODES.SUBMIT_ONLY
+);
+const isTopActionsOnly = computed(
+  () => componentProps.layoutMode === LAYOUT_MODES.TOP_ACTIONS
+);
 const resolvedReadonlyTitle = computed(
   () => props.readonlyTitle || t("prompt.modelReadonly")
 );

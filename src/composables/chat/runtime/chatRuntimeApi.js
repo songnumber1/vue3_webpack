@@ -5,7 +5,8 @@
  */
 
 import {resolveChatApis} from "@/api/runtime/chatApis";
-import {adaptChatHistoryList, adaptMessageList} from "@/adapters/chatAdapter";
+import {adaptChatHistoryList} from "@/adapters/chatResponseAdapter";
+import {adaptMessageList} from "@/adapters/messageResponseAdapter";
 import {adaptExamplePromptList} from "@/adapters/promptAdapter";
 
 /**

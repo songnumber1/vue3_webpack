@@ -7,11 +7,11 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {callNative} from "@/platform/bridge/web/bridgeClient";
+import {callNative} from "@/platform/bridge/native/bridgeNativeRuntime";
 import {usePlatformStore} from "@/stores/platformStore";
 import {logInfo, logWarn} from "@/utils/logger";
 import {copyText as copyWebText} from "@/platform/system/clipboard";
-import {i18n} from "@/i18n";
+import {i18n} from "@/i18n/appI18n";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {createId} from "@/utils/id";
 import {

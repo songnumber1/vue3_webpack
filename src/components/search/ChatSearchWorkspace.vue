@@ -141,7 +141,7 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {navigateToConversation} from "@/composables/chat/useChatRoute";
+import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
@@ -279,8 +279,11 @@ async function openChat(result) {
       chatStore,
       chatId,
       replace: false,
-      query,
     });
+
+    if (query) {
+      await router.replace({query}).catch(() => {});
+    }
   } catch (_error) {
     if (String(chatStore.pendingSelectedChatId) === chatId) {
       chatStore.clearPendingSelectedChatId();

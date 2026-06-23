@@ -1,5 +1,5 @@
 /**
- * @file core/config/index.js
+ * @file core/config/appConfig.js
  * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
  *
  * 프리징 코드 주석 기준:

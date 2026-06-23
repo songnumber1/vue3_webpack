@@ -8,7 +8,7 @@
  */
 
 import axios from "axios";
-import {isAndroidApp} from "@/core/config";
+import {isAndroidApp} from "@/core/config/appConfig";
 import {SERVER_API_BASE_URL} from "@/constants/apiMode";
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {attachAuthInterceptors} from "@/auth/httpAuthInterceptor";

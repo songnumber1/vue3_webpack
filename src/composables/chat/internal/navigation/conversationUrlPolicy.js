@@ -40,14 +40,12 @@ export async function navigateToConversation({
   // 정상적인 사용자 이동과 새로고침/직접 접근을 구분하려면 pending ID가 먼저 필요합니다.
   // 기존 호출부가 pending을 세팅하더라도 이 helper에서 한 번 더 보장해
   // sidebar/search/history 등 모든 일반 대화방 이동 경로의 첫 진입 race를 차단합니다.
-  chatStore.setPendingSelectedChatId(chatId);
+  chatStore?.setPendingSelectedChatId?.(chatId);
+
+  const navigate = replace ? router.replace : router.push;
 
   try {
-    if (replace) {
-      return await router.replace(route);
-    }
-
-    return await router.push(route);
+    return await navigate.call(router, route);
   } finally {
     // /chat 라우트 하나가 모든 일반 대화방을 공유하므로, 라우터 이동 시도 후
     // activeRoom을 갱신해 route watcher가 현재 방을 다시 로드하도록 보장합니다.

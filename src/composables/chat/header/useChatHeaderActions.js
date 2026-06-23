@@ -8,19 +8,12 @@ import {useNavigationStore} from "@/stores/navigationStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellLock} from "@/composables/app/useAppShellLock";
 import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
-import {
-  APP_SHELL_ACTIONS_KEY,
-  createEmptyAppShellActions,
-} from "@/composables/app/appShellActionContext";
-import {inject} from "vue";
+import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
 
 export function useChatHeaderActions() {
   const navigationStore = useNavigationStore();
   const viewportStore = useViewportStore();
-  const appShellActions = inject(
-    APP_SHELL_ACTIONS_KEY,
-    createEmptyAppShellActions()
-  );
+  const responseOverlay = useResponseOverlay();
   const {isAppShellActionBlocked} = useAppShellLock();
   const {openAssistantSheet} = useChatAssistantSheetState();
 
@@ -45,7 +38,7 @@ export function useChatHeaderActions() {
   }
 
   function openSettings() {
-    appShellActions.openSettings?.();
+    responseOverlay.openSettings();
   }
 
   return {

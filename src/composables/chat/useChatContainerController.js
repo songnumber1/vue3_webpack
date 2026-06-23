@@ -10,11 +10,11 @@
 import {computed, onBeforeUnmount, ref, watch} from "vue";
 import {useRoute} from "vue-router";
 import {useChatRuntime} from "@/composables/chat/useChatRuntime";
-import {useChatDataController} from "@/composables/chat/useChatData";
+import {useChatDataController} from "@/composables/chat/internal/container/useChatDataController";
 import {useChatStore} from "@/stores/chatStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {resolveActiveChatId} from "@/composables/chat/useChatRoute";
-import {useChatUIController} from "@/composables/chat/useChatUi";
+import {resolveActiveChatId} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {useChatUIController} from "@/composables/chat/internal/container/useChatUIController";
 
 /**
  * [ChatContainer 최상위 controller]

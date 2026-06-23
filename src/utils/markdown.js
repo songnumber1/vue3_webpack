@@ -19,7 +19,7 @@ import rehypeStringify from "rehype-stringify";
 import rehypeExternalLinks from "rehype-external-links";
 import rehypeHighlight from "rehype-highlight";
 import {visit} from "unist-util-visit";
-import {i18n} from "@/i18n";
+import {i18n} from "@/i18n/appI18n";
 
 // -----------------------------------------------------------------------------
 // Sanitizer schema

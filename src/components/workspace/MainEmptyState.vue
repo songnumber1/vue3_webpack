@@ -37,7 +37,8 @@
         {{ subtitle }}
       </p>
       <div class="main-empty-state__composer-dock" aria-label="Main prompt">
-        <slot name="composer"></slot>
+        <slot v-if="!isMobile" name="composer"></slot>
+        <slot v-else name="composer"></slot>
       </div>
       <div
         v-if="normalizedSuggestions.length"

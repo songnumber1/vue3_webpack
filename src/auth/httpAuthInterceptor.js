@@ -1,7 +1,7 @@
 import {resolveAuthPolicy} from "@/auth/authPolicy";
 import {AUTH_HEADER_NAMES} from "@/auth/authConstants";
 import {resetAuthStateSafely} from "@/auth/authState";
-import {resolveAuthStrategy} from "@/auth/strategies";
+import {resolveAuthStrategy} from "@/auth/resolveAuthStrategy";
 
 function ensureHeaders(config) {
   config.headers = config.headers || {};

@@ -7,7 +7,7 @@
  * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {i18n} from "@/i18n";
+import {i18n} from "@/i18n/appI18n";
 import {showToastByPlatform} from "@/platform/bridge/platformBridge";
 import {usePlatformStore} from "@/stores/platformStore";
 import {shouldUseMobileFeedbackChannel} from "@/utils/appFeedback";

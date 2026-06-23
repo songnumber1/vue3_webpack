@@ -1,4 +1,4 @@
-import {PLATFORM, hasAndroidBridge} from "@/core/config";
+import {PLATFORM, hasAndroidBridge} from "@/core/config/appConfig";
 
 export function getNavigator() {
   return typeof window === "undefined" ? {} : window.navigator || {};

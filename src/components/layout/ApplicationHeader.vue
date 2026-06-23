@@ -26,7 +26,7 @@
         type="button"
         :aria-label="t('common.guide')"
         :title="t('common.guide')"
-        @click="chatActions.openGuide()"
+        @click="shellActions.openGuide()"
       >
         <GuideIcon />
       </button>
@@ -36,7 +36,7 @@
         type="button"
         :aria-label="t('common.theme')"
         :title="t('common.theme')"
-        @click="chatActions.toggleTheme()"
+        @click="shellActions.toggleTheme()"
       >
         <span
           class="theme-glyph"
@@ -49,19 +49,19 @@
         type="button"
         :aria-label="t('common.swagger')"
         :title="t('common.swagger')"
-        @click="chatActions.openSwagger()"
+        @click="shellActions.openSwagger()"
       >
         <SwaggerDocIcon />
       </button>
       <UserMenu
-        @notice="chatActions.openNotice()"
-        @privacy="chatActions.openPrivacy()"
-        @terms="chatActions.openTerms()"
-        @personalization="chatActions.openPersonalization()"
-        @system="chatActions.openSystem()"
-        @language="chatActions.openLanguage()"
-        @playground="chatActions.openPlayground()"
-        @logout="chatActions.logout()"
+        @notice="responseOverlay.openNotice()"
+        @privacy="responseOverlay.openPrivacy()"
+        @terms="shellActions.openTerms()"
+        @personalization="responseOverlay.openPersonalization()"
+        @system="responseOverlay.openSystem()"
+        @language="responseOverlay.openLanguage()"
+        @playground="shellActions.openPlayground()"
+        @logout="shellActions.logout()"
       />
     </nav>
   </header>
@@ -74,7 +74,7 @@
  * ChatHeader는 대화방/워크스페이스 헤더 역할만 유지합니다.
  */
 
-import {computed, inject} from "vue";
+import {computed} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import UserMenu from "@/components/menu/UserMenu.vue";
@@ -82,13 +82,12 @@ import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatWorkspaceStateContext} from "@/composables/chat/context/useChatInject";
-import {
-  APP_SHELL_ACTIONS_KEY,
-  createEmptyAppShellActions,
-} from "@/composables/app/appShellActionContext";
+import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
+import {useAppShellActions} from "@/composables/app/useAppShellActions";
 
 const {t} = useI18n();
-const chatActions = inject(APP_SHELL_ACTIONS_KEY, createEmptyAppShellActions());
+const shellActions = useAppShellActions();
+const responseOverlay = useResponseOverlay();
 const workspaceState = useChatWorkspaceStateContext();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);

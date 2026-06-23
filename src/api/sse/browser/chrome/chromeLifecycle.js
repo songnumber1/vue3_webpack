@@ -1,6 +1,6 @@
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {abortGenerationController} from "@/api/sse/common/sseErrors";
-import {i18n} from "@/i18n";
+import {i18n} from "@/i18n/appI18n";
 
 const MOBILE_BACKGROUND_ABORT_RESUME_ALERT_KEY =
   "chat.lifecycle.mobileBackgroundAbortResumeAlert";

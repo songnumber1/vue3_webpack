@@ -8,7 +8,7 @@
  */
 
 import {logWarn} from "@/utils/logger";
-import {createAppShellActionHandlers} from "@/composables/app/createAppShellActionHandlers";
+import {useAppShellActions} from "@/composables/app/useAppShellActions";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
@@ -26,12 +26,6 @@ import {
  * @property {import('vue').Ref<Array>} messages - 현재 화면 타임라인에 렌더링 중인 실시간 대화 메시지 배열 모델
  * @property {import('vue').Ref<boolean>} isMobile - 모바일 해상도 및 모바일 플랫폼 작동 여부 통합 식별 플래그
  * @property {import('vue').Ref<boolean>} assistantSheetOpen - 어시스턴트 선택 바텀시트 활성화 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} noticeOpen - 공지사항 팝업 모달 노출 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} privacyOpen - 개인정보 처리방침 팝업 모달 노출 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} personalizationOpen - 개인화/맞춤 설정 모달 노출 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} systemOpen - 시스템 운영 어드민 설정 모달 노출 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} languageSheetOpen - 다국어 설정 바텀시트 노출 여부 제어 플래그
- * @property {import('vue').Ref<boolean>} mobileSettingsOpen - 모바일 전용 환경설정 전체 패널 노출 여부 제어 플래그
  * @property {object} navigationStore - 네비게이션 드로어 및 모달 토글 통합 상태 전역 스토어
  * @property {function(Array): void} revokeMessageAttachments - 업로드 대기/완료된 기존 첨부파일의 임시 Blob URL 리소스를 해제하여 메모리 누수를 막는 유틸
  * @property {function(): void} clearActiveSession - 현재 진행 중이던 로컬 세션의 채팅방 ID 포인터를 클리어하는 초기화 함수
@@ -53,12 +47,6 @@ export function useChatNavigationActions({
   messages,
   isMobile,
   assistantSheetOpen,
-  noticeOpen,
-  privacyOpen,
-  personalizationOpen,
-  systemOpen,
-  languageSheetOpen,
-  mobileSettingsOpen,
   navigationStore,
   revokeMessageAttachments,
   clearActiveSession,
@@ -176,18 +164,12 @@ export function useChatNavigationActions({
     window.setTimeout(refreshViewport, 180);
   }
 
-  const appShellActions = createAppShellActionHandlers({
+  const appShellActions = useAppShellActions({
     router,
     theme,
     themeName,
     isMobile,
     navigationStore,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
     scrollBottom,
     isBlocked: isChatNavigationBlocked,
     logScope: "useChatNavigationActions",

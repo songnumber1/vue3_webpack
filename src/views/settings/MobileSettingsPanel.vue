@@ -130,7 +130,7 @@
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
-import {setAppLocale} from "@/i18n";
+import {setAppLocale} from "@/i18n/appI18n";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";

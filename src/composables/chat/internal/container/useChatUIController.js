@@ -25,8 +25,7 @@ import {useChatMobileState} from "@/composables/chat/internal/container/useChatM
 import {useChatNavigationActions} from "@/composables/chat/internal/container/useChatNavigationActions";
 import {useChatPromptActions} from "@/composables/chat/internal/container/useChatPromptActions";
 import {useChatScrollController} from "@/composables/chat/internal/container/useChatScrollController";
-import {useAppShellOverlays} from "@/composables/app/useAppShellOverlays";
-import {useOverlayBackGuard} from "@/composables/app/useOverlayBackGuard";
+import {useResponseOverlay} from "@/composables/overlay/useResponseOverlay";
 import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
 import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
 import {registerActiveConversationCleanup} from "@/composables/chat/conversation/useActiveConversationCleanup";
@@ -64,27 +63,8 @@ export function useChatUIController({
   const workspaceRef = ref(null); // 스크롤 연산 타깃이 될 메인 워크스페이스 컨테이너 DOM 가리킴 고리
   const {themeName} = useAppShellThemeState(theme.current); // 현재 브라우저에 마운트된 UI 테마 식별 명칭
 
-  // 각종 바텀시트 및 오버레이 설정 레이어 모달들의 마운트 플래그 세트
-  const {assistantSheetOpen} = useChatAssistantSheetState(); // 모바일 전용 AI 어시스턴트 변경 시트
-  const {
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    isAnyOverlayOpen,
-    activeOverlayType,
-    closeAppOverlay,
-    closeActiveOverlayOnly,
-    closeNotice: closeNoticeOnly,
-    closePrivacy: closePrivacyOnly,
-    closePersonalization: closePersonalizationOnly,
-    closeSystem: closeSystemOnly,
-    closeLanguageSheet: closeLanguageSheetOnly,
-    closeMobileSettings: closeMobileSettingsOnly,
-    handleMobileSettingsDesktopOpen,
-  } = useAppShellOverlays();
+  // 모바일 전용 AI 어시스턴트 변경 시트
+  const {assistantSheetOpen} = useChatAssistantSheetState();
 
   // AI가 문장을 완성해 나갈 때 스크롤을 자동으로 하향 추적할지 여부를 판별하는 사용자 커스텀 옵션값
   const autoScrollOnAnswer = computed(
@@ -109,51 +89,15 @@ export function useChatUIController({
     platformInfo,
   });
 
-  function closeCurrentAppOverlayOnly() {
-    if (activeOverlayType.value) {
-      closeAppOverlay(activeOverlayType.value);
-      return;
-    }
-
-    closeActiveOverlayOnly();
-  }
-
-  const shouldSuppressChatRouteLoadOnOverlayBack = computed(() =>
-    Boolean(pageState.isChatPage?.value)
-  );
-
-  const {closeOverlayByBackOrDirect} = useOverlayBackGuard({
+  // responseOverlay 계열은 useResponseOverlay 단일 컨트롤러에서 open/close/back 처리를 관리합니다.
+  useResponseOverlay({
+    enableBackGuard: true,
     isMobile,
-    isAnyOverlayOpen,
-    activeOverlayType,
-    closeActiveOverlayOnly: closeCurrentAppOverlayOnly,
-    shouldSuppressChatRouteLoad: shouldSuppressChatRouteLoadOnOverlayBack,
+    shouldSuppressChatRouteLoad: computed(() =>
+      Boolean(pageState.isChatPage?.value)
+    ),
     suppressChatRouteLoadId: activeHistoryId,
   });
-
-  function closeNotice() {
-    closeOverlayByBackOrDirect(closeNoticeOnly);
-  }
-
-  function closePrivacy() {
-    closeOverlayByBackOrDirect(closePrivacyOnly);
-  }
-
-  function closePersonalization() {
-    closeOverlayByBackOrDirect(closePersonalizationOnly);
-  }
-
-  function closeSystem() {
-    closeOverlayByBackOrDirect(closeSystemOnly);
-  }
-
-  function closeLanguageSheet() {
-    closeOverlayByBackOrDirect(closeLanguageSheetOnly);
-  }
-
-  function closeMobileSettings() {
-    closeOverlayByBackOrDirect(closeMobileSettingsOnly);
-  }
 
   // ── [4. 엘리먼트 가상 고속 스크롤 매니저 엔진] ──────────────────
   const {
@@ -226,12 +170,6 @@ export function useChatUIController({
     messages,
     isMobile,
     assistantSheetOpen,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
     navigationStore,
     revokeMessageAttachments: runtime.revokeMessageAttachments,
     clearActiveSession: runtime.clearActiveSession,
@@ -301,21 +239,6 @@ export function useChatUIController({
     t,
     workspaceRef,
     assistantSheetOpen,
-    noticeOpen,
-    privacyOpen,
-    personalizationOpen,
-    systemOpen,
-    languageSheetOpen,
-    mobileSettingsOpen,
-    isAnyOverlayOpen,
-    activeOverlayType,
-    closeActiveOverlayOnly,
-    closeNotice,
-    closePrivacy,
-    closePersonalization,
-    closeSystem,
-    closeLanguageSheet,
-    closeMobileSettings,
     previewImage,
     themeName,
     isMobile,
@@ -346,7 +269,6 @@ export function useChatUIController({
     updateMobileState,
     bindUiEvents,
     handleSystemSettingsApplied,
-    handleMobileSettingsDesktopOpen,
     cleanupUiController,
     ...navigationActions, // 네비게이션 액션 분출 팩 전개 주입
   };

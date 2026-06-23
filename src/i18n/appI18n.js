@@ -1,5 +1,5 @@
 /**
- * @file i18n/index.js
+ * @file i18n/appI18n.js
  * @description 다국어 메시지와 locale 관리 모듈입니다.
  *
  * 프리징 코드 주석 기준:

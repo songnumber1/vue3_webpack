@@ -20,7 +20,7 @@ import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
-import {adaptChatHistory} from "@/adapters/chatAdapter";
+import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
 import {
   createLocalHistory,
   createSessionFromHistory,

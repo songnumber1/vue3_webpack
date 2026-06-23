@@ -68,7 +68,7 @@
 <script setup>
 import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import ChatMessageRouter from "./ChatMessageRouter.vue";
-import {useMessageListScroll} from "@/composables/chat/useChatScroll";
+import {useMessageListScroll} from "@/composables/chat/internal/message-list/useMessageListScroll";
 
 const props = defineProps({
   visible: {type: Boolean, default: true},
