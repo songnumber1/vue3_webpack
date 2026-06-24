@@ -350,6 +350,16 @@ const {
 } = storeToRefs(assistantStore);
 const {histories: historyListRef} = storeToRefs(chatStore);
 const {showVirtualKeyboardDebug} = storeToRefs(systemSettingsStore);
+
+function getRuntimeAssistantList() {
+  return Array.isArray(assistantStore.assistants)
+    ? assistantStore.assistants
+    : [];
+}
+
+function getRuntimeAssistantCount() {
+  return getRuntimeAssistantList().length;
+}
 async function refreshHistories({notifyOnError = false} = {}) {
   try {
     const chatHistories = await loadChatHistoryList({
@@ -546,7 +556,7 @@ async function ensureRuntimeConversation(historyId) {
     history,
     session,
     assistantMap: assistantStore.assistantMap,
-    assistants: assistantStore.assistants,
+    assistants: getRuntimeAssistantList(),
     studioRuntimeStore,
     preserveSidebarAssistant: shouldPreserveSidebarAssistantOnHistoryOpen(),
   });
@@ -2192,7 +2202,7 @@ function openStudioDetail() {
 }
 
 function findFirstFallbackAssistant() {
-  return assistantStore.assistants.find(
+  return getRuntimeAssistantList().find(
     (assistant) =>
       assistant?.id &&
       !isPortalAssistantId(assistant.id) &&
@@ -2294,7 +2304,7 @@ async function handleAssistantNewChat(assistantId) {
 }
 
 function findFirstNormalAssistant() {
-  return assistantStore.assistants.find(
+  return getRuntimeAssistantList().find(
     (assistant) =>
       assistant?.id &&
       !isPortalAssistantId(assistant.id) &&
@@ -2325,7 +2335,7 @@ function syncAssistantSelectionWithRoute() {
 }
 
 watch(
-  [() => route.name, () => assistantStore.assistants.length],
+  [() => route.name, getRuntimeAssistantCount],
   syncAssistantSelectionWithRoute,
   {immediate: true}
 );
