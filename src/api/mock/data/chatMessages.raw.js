@@ -3052,7 +3052,7 @@ export const CHAT_MESSAGES_RAW = {
     {
       role: "assistant",
       content:
-        "# ragimage 연관 이미지 테스트\n\n이 답변은 본문 아래, 피드백 버튼 위에 **ragimage 연관 이미지 컴포넌트**가 출력되는지 확인하기 위한 mock 데이터입니다.\n\n- duo는 비어 있어야 합니다.\n- 이미지 그리드만 표시되어야 합니다.\n- 모바일에서는 2열 이미지 목록으로 확인할 수 있습니다.",
+        "# ragimage 연관 이미지 테스트\n\n이 답변은 본문 아래, 피드백 버튼 위에 **ragimage 연관 이미지 컴포넌트**가 출력되는지 확인하기 위한 mock 데이터입니다.\n\n- duo는 비어 있어야 합니다.\n- 이미지는 한 줄 가로 목록으로 표시되어야 합니다.\n- 이미지가 10개라 화면 너비를 초과하고, 좌우 화살표와 가로 스크롤을 확인할 수 있어야 합니다.",
       id: "chat-mock-ragimage-only-assistant-1",
       isSend: true,
       isRAG: true,
@@ -3124,6 +3124,46 @@ export const CHAT_MESSAGES_RAW = {
         {
           title: "동시 출력 이미지 2",
           url: "https://picsum.photos/seed/duo-ragimage-2/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 3",
+          url: "https://picsum.photos/seed/duo-ragimage-3/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 4",
+          url: "https://picsum.photos/seed/duo-ragimage-4/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 5",
+          url: "https://picsum.photos/seed/duo-ragimage-5/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 6",
+          url: "https://picsum.photos/seed/duo-ragimage-6/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 7",
+          url: "https://picsum.photos/seed/duo-ragimage-7/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 8",
+          url: "https://picsum.photos/seed/duo-ragimage-8/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 9",
+          url: "https://picsum.photos/seed/duo-ragimage-9/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 10",
+          url: "https://picsum.photos/seed/duo-ragimage-10/640/420",
           sourceUrl: "https://picsum.photos/",
         },
       ],
