@@ -53,6 +53,8 @@
         @click.capture="handleMarkdownClick"
         v-html="html"
       ></div>
+      <AssistantDuoLinks v-if="hasDuoLinks" :items="message.duo" />
+      <AssistantRagImages v-if="hasRagImages" :items="message.ragimage" />
       <MessageActions
         v-if="showMessageActions"
         role="assistant"
@@ -85,6 +87,8 @@ import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
+import AssistantDuoLinks from "./AssistantDuoLinks.vue";
+import AssistantRagImages from "./AssistantRagImages.vue";
 import MessageActions from "./MessageActions.vue";
 
 /**
@@ -117,6 +121,13 @@ let reasoningRenderVersion = 0;
 let componentAlive = true;
 
 const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
+const hasDuoLinks = computed(
+  () => Array.isArray(props.message.duo) && props.message.duo.length > 0
+);
+const hasRagImages = computed(
+  () =>
+    Array.isArray(props.message.ragimage) && props.message.ragimage.length > 0
+);
 const showMessageActions = computed(
   () =>
     !isInteractionBlocked.value &&

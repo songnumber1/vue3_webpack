@@ -75,6 +75,13 @@ export function adaptMessageItem(raw = {}) {
     intention: raw.intention || null,
     tags: Array.isArray(raw.tags) ? raw.tags : [],
     references: readArray(raw[M.REFERENCES], raw[M.REFERENCES_LEGACY_TYPO]),
+    duo: readArray(raw[M.DUO]),
+    ragimage: readArray(
+      raw[M.RAG_IMAGE],
+      raw[M.RAG_IMAGE_CAMEL],
+      raw[M.RAG_IMAGES],
+      raw[M.RAG_IMAGES_SNAKE]
+    ),
     raw,
   };
 }

@@ -2994,5 +2994,140 @@ export const CHAT_MESSAGES_RAW = {
       refreences: [],
     },
   ],
+  "chat-mock-duo-only": [
+    {
+      role: "user",
+      content: "duo 연관 링크만 답변과 피드백 사이에 출력되는지 확인해줘",
+      id: "chat-mock-duo-only-user-1",
+      isSend: true,
+      isRAG: false,
+      isRagCot: false,
+      intention: "직접입력",
+      sendTime: "2026-05-05T15:00:00Z",
+      tags: [],
+      refreences: [],
+    },
+    {
+      role: "assistant",
+      content:
+        "# duo 연관 링크 테스트\n\n이 답변은 본문 아래, 피드백 버튼 위에 **duo 연관 링크 컴포넌트**가 출력되는지 확인하기 위한 mock 데이터입니다.\n\n- ragimage는 비어 있어야 합니다.\n- 연관 링크 카드만 표시되어야 합니다.\n- PC와 모바일 모두 같은 위치에 표시되어야 합니다.",
+      id: "chat-mock-duo-only-assistant-1",
+      isSend: true,
+      isRAG: true,
+      isRagCot: false,
+      intention: null,
+      sendTime: "2026-05-05T15:00:08Z",
+      tags: ["mock", "duo"],
+      refreences: [],
+      duo: [
+        {
+          title: "Vue 공식 문서",
+          description: "Vue 컴포넌트와 Composition API 구조 확인용 링크입니다.",
+          url: "https://vuejs.org/guide/introduction.html",
+        },
+        {
+          title: "Vue Router 공식 문서",
+          description: "채팅방 mock 이동과 라우팅 확인용 링크입니다.",
+          url: "https://router.vuejs.org/",
+        },
+        "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
+      ],
+      ragimage: [],
+    },
+  ],
+  "chat-mock-ragimage-only": [
+    {
+      role: "user",
+      content:
+        "ragimage 연관 이미지만 답변과 피드백 사이에 출력되는지 확인해줘",
+      id: "chat-mock-ragimage-only-user-1",
+      isSend: true,
+      isRAG: false,
+      isRagCot: false,
+      intention: "직접입력",
+      sendTime: "2026-05-05T15:10:00Z",
+      tags: [],
+      refreences: [],
+    },
+    {
+      role: "assistant",
+      content:
+        "# ragimage 연관 이미지 테스트\n\n이 답변은 본문 아래, 피드백 버튼 위에 **ragimage 연관 이미지 컴포넌트**가 출력되는지 확인하기 위한 mock 데이터입니다.\n\n- duo는 비어 있어야 합니다.\n- 이미지 그리드만 표시되어야 합니다.\n- 모바일에서는 2열 이미지 목록으로 확인할 수 있습니다.",
+      id: "chat-mock-ragimage-only-assistant-1",
+      isSend: true,
+      isRAG: true,
+      isRagCot: false,
+      intention: null,
+      sendTime: "2026-05-05T15:10:08Z",
+      tags: ["mock", "ragimage"],
+      refreences: [],
+      duo: [],
+      ragimage: [
+        {
+          title: "연관 이미지 1",
+          url: "https://picsum.photos/seed/ragimage-only-1/640/420",
+          link: "https://picsum.photos/",
+        },
+        {
+          title: "연관 이미지 2",
+          url: "https://picsum.photos/seed/ragimage-only-2/640/420",
+          link: "https://picsum.photos/",
+        },
+        "https://picsum.photos/seed/ragimage-only-3/640/420",
+      ],
+    },
+  ],
+  "chat-mock-duo-ragimage": [
+    {
+      role: "user",
+      content:
+        "duo와 ragimage가 둘 다 있을 때 답변과 피드백 사이에 같이 출력되는지 확인해줘",
+      id: "chat-mock-duo-ragimage-user-1",
+      isSend: true,
+      isRAG: false,
+      isRagCot: false,
+      intention: "직접입력",
+      sendTime: "2026-05-05T15:20:00Z",
+      tags: [],
+      refreences: [],
+    },
+    {
+      role: "assistant",
+      content:
+        "# duo + ragimage 동시 출력 테스트\n\n이 답변은 API 마지막 payload에 `duo`와 `ragimage`가 모두 존재하는 상황을 가정한 mock 데이터입니다.\n\n출력 순서는 다음과 같아야 합니다.\n\n1. 답변 본문\n2. duo 연관 링크\n3. ragimage 연관 이미지\n4. 피드백/복사/재생성 버튼",
+      id: "chat-mock-duo-ragimage-assistant-1",
+      isSend: true,
+      isRAG: true,
+      isRagCot: false,
+      intention: null,
+      sendTime: "2026-05-05T15:20:08Z",
+      tags: ["mock", "duo", "ragimage"],
+      refreences: [],
+      duo: [
+        {
+          title: "Tailwind CSS 문서",
+          description: "카드/그리드 레이아웃 확인용 링크입니다.",
+          url: "https://tailwindcss.com/docs",
+        },
+        {
+          title: "MDN 이미지 loading 속성",
+          description: "연관 이미지 lazy loading 확인용 링크입니다.",
+          url: "https://developer.mozilla.org/en-US/docs/Web/HTML/Element/img",
+        },
+      ],
+      ragimage: [
+        {
+          title: "동시 출력 이미지 1",
+          url: "https://picsum.photos/seed/duo-ragimage-1/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+        {
+          title: "동시 출력 이미지 2",
+          url: "https://picsum.photos/seed/duo-ragimage-2/640/420",
+          sourceUrl: "https://picsum.photos/",
+        },
+      ],
+    },
+  ],
   ...PERFORMANCE_CHAT_MESSAGES_RAW,
 };
