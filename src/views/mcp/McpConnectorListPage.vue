@@ -1,9 +1,5 @@
 <template>
-  <ChatContainer>
-    <template #default="{setWorkspaceRef}">
-      <McpWorkspace :ref="setWorkspaceRef" />
-    </template>
-  </ChatContainer>
+  <ChatContainer workspace="mcp" />
 </template>
 
 <script setup>
@@ -14,7 +10,6 @@
 import {watch} from "vue";
 import {storeToRefs} from "pinia";
 import ChatContainer from "@/containers/chat/ChatContainer.vue";
-import McpWorkspace from "@/components/workspace/McpWorkspace.vue";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 

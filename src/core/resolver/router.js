@@ -215,8 +215,9 @@ function isRouteGuardBypassRoute(to = {}) {
   );
 }
 
-function isAllowedHistoryLockNavigation({to, from, chatStore}) {
-  const pendingHistoryId = getPendingSelectedChatId(chatStore);
+function isAllowedHistoryLockNavigation({to, from}) {
+  const chatStore = useChatStore();
+  const pendingHistoryId = getPendingSelectedChatId();
 
   // 새대화/Assistant/Studio/MCP 선택은 현재 대화방 로딩을 취소하고 이탈하는 동작입니다.
   // 늦게 들어온 history render lock이 남아 있어도 명시적인 포털 이동은 허용합니다.
@@ -280,19 +281,22 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
   });
 }
 
-function guardStreamingNavigation(to, chatStreamStore) {
+function guardStreamingNavigation(to) {
+  const chatStreamStore = useChatStreamStore();
   if (!chatStreamStore.isStreaming) return true;
   return chatStreamStore.consumeAllowedNavigation(to) ? true : false;
 }
 
-function guardHistoryNavigation({to, from, chatStore, navigationLockStore}) {
+function guardHistoryNavigation({to, from}) {
+  const navigationLockStore = useNavigationLockStore();
   if (!navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)) {
     return true;
   }
-  return isAllowedHistoryLockNavigation({to, from, chatStore}) ? true : false;
+  return isAllowedHistoryLockNavigation({to, from}) ? true : false;
 }
 
-function guardSharedRoute(to, chatStore) {
+function guardSharedRoute(to) {
+  const chatStore = useChatStore();
   // /shared is valid only after /shared/:id has confirmed an active shared room.
   if (to.name === ROUTE_NAMES.SHARED && !chatStore.isActiveSharedRoom) {
     return {name: ROUTE_NAMES.MAIN, replace: true};
@@ -300,12 +304,8 @@ function guardSharedRoute(to, chatStore) {
   return true;
 }
 
-function guardHiddenConversationEntry({to, chatStore, chatStreamStore}) {
-  return resolveConversationEntryGuard({
-    to,
-    chatStore,
-    chatStreamStore,
-  });
+function guardHiddenConversationEntry(to) {
+  return resolveConversationEntryGuard({to});
 }
 
 async function guardAuth({to, authAxios}) {
@@ -331,7 +331,8 @@ async function guardAuth({to, authAxios}) {
   return createLoginRequiredRedirect(to, authResult.reason);
 }
 
-function guardVersion({to, platformStore, appInfo}) {
+function guardVersion({to, appInfo}) {
+  const platformStore = usePlatformStore();
   if (!platformStore.isAccess) return true;
   if (to.meta?.skipVersionCheck) return true;
   if (to.name === ROUTE_NAMES.ANDROID_UPDATE) return true;
@@ -352,9 +353,6 @@ function registerRouteGuard(router, appInfo, context = {}) {
 
   router.beforeEach(async (to, from) => {
     const platformStore = usePlatformStore();
-    const chatStreamStore = useChatStreamStore();
-    const chatStore = useChatStore();
-    const navigationLockStore = useNavigationLockStore();
 
     platformStore.refresh(appInfo);
 
@@ -362,21 +360,12 @@ function registerRouteGuard(router, appInfo, context = {}) {
     if (isRouteGuardBypassRoute(to)) return true;
 
     const guardResults = [
-      guardStreamingNavigation(to, chatStreamStore),
-      guardHistoryNavigation({
-        to,
-        from,
-        chatStore,
-        navigationLockStore,
-      }),
-      guardSharedRoute(to, chatStore),
-      guardHiddenConversationEntry({
-        to,
-        chatStore,
-        chatStreamStore,
-      }),
+      guardStreamingNavigation(to),
+      guardHistoryNavigation({to, from}),
+      guardSharedRoute(to),
+      guardHiddenConversationEntry(to),
       await guardAuth({to, authAxios}),
-      guardVersion({to, platformStore, appInfo}),
+      guardVersion({to, appInfo}),
     ];
 
     for (const result of guardResults) {

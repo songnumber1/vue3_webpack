@@ -1,10 +1,6 @@
 /**
  * @file core/resolver/storage.js
  * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {isNativeApp} from "@/core/config/appConfig";
@@ -49,9 +45,6 @@ function setFallback(key, value) {
   // 데이터 정합성 통일을 위해 어떤 원시 타입이 인입되든 무조건 문자열(String) 포맷으로 형변환하여 맵에 보관
   memoryStorage.set(key, String(value));
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function removeFallback(key) {
   memoryStorage.delete(key); // 인메모리 맵에 적재된 특정 캐시 키 삭제 소멸
 }
@@ -81,9 +74,6 @@ function parseEnvelope(raw) {
     return null;
   }
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function callDirectStorage(bridge, methodName, payload) {
   const method = bridge?.[methodName];
   if (typeof method !== "function") return null; // 실행할 브릿지 내부의 네이티브 메서드가 인터페이스 상에 없으면 조기 차단

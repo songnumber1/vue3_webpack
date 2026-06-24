@@ -1,4 +1,5 @@
 import {createId} from "@/utils/id";
+import {useChatStore} from "@/stores/chatStore";
 
 export function revokeMessageAttachments(items = []) {
   items.forEach((message) => {
@@ -9,11 +10,8 @@ export function revokeMessageAttachments(items = []) {
   });
 }
 
-export function appendUserAndAssistantMessages({
-  chatStore,
-  chatId,
-  normalized,
-}) {
+export function appendUserAndAssistantMessages({chatId, normalized}) {
+  const chatStore = useChatStore();
   const currentMessages = chatStore.messageMap[chatId] || [];
   const userMessage = {
     id: createId("message"),

@@ -58,7 +58,7 @@ import {useResponsiveContext} from "@/composables/app/responsiveContext";
 import {
   createEmptyWorkspaceState,
   CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
 
 const props = defineProps({

@@ -1,9 +1,5 @@
 <template>
-  <ChatContainer>
-    <template #default="{setWorkspaceRef}">
-      <StudioWorkspace :ref="setWorkspaceRef" />
-    </template>
-  </ChatContainer>
+  <ChatContainer workspace="studio" />
 </template>
 
 <script setup>
@@ -13,7 +9,6 @@
  */
 import {watch} from "vue";
 import ChatContainer from "@/containers/chat/ChatContainer.vue";
-import StudioWorkspace from "@/components/workspace/StudioWorkspace.vue";
 import {storeToRefs} from "pinia";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";

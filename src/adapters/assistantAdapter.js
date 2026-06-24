@@ -1,10 +1,6 @@
 /**
  * @file adapters/assistantAdapter.js
  * @description 백엔드 API API 또는 Mock 레이어의 원본 응답 구조를 프론트엔드 뷰(View) 및 스토어(Store) 레이어에서 일관되게 소비할 수 있도록 정규화(Normalization)하는 어댑터 가공 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {ASSISTANT_API_KEYS as ASSISTANT_KEYS} from "@/constants/api/assistantApiKeys";

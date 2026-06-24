@@ -1,10 +1,6 @@
 /**
  * @file composables/prompt/usePromptMenu.js
  * @description 프롬프트 입력 도메인 composable입니다. 텍스트/첨부/도구/모델 선택 상태와 submit emit을 관리합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {computed, onBeforeUnmount, ref, watch} from "vue";
@@ -26,7 +22,8 @@ import {usePromptControlStore} from "@/stores/promptControlStore";
 /**
  * 호출 흐름에서 재사용할 객체, 상태, context 또는 handler를 생성합니다.
  */
-function createMenuOpenRef(promptControlStore, scopeId, menuType) {
+function createMenuOpenRef(scopeId, menuType) {
+  const promptControlStore = usePromptControlStore();
   return computed({
     get: () => promptControlStore.isPromptMenuOpen(scopeId, menuType),
     set: (open) => {
@@ -60,17 +57,14 @@ export function usePromptMenu() {
 
   // 상호 배제형 인스턴스 팩토리 주입 바인딩 개통
   const modelMenuOpen = createMenuOpenRef(
-    promptControlStore,
     promptMenuScopeId,
     PROMPT_MENU_TYPE.model
   ); // AI 모델 서랍
   const toolMenuOpen = createMenuOpenRef(
-    promptControlStore,
     promptMenuScopeId,
     PROMPT_MENU_TYPE.tool
   ); // 확장 기능 플러그인 서랍
   const attachMenuOpen = createMenuOpenRef(
-    promptControlStore,
     promptMenuScopeId,
     PROMPT_MENU_TYPE.attach
   ); // 클립 파일 첨부 서랍

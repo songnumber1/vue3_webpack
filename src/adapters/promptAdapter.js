@@ -1,10 +1,6 @@
 /**
  * @file adapters/promptAdapter.js
  * @description 백엔드 API 또는 Mock 시스템으로부터 수신된 추천 질문 데이터(Example Prompt) 및 프롬프트 서식(Prompt Template) 원시 응답을 프론트엔드의 작곡기(Composer), 스토어, 화면 컴포넌트 레이어에서 안전하게 소비할 수 있도록 정규화(Normalization)하는 어댑터 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {PROMPT_TEMPLATE_MODEL_IDS} from "@/constants/promptComposer";

@@ -11,10 +11,9 @@ import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
-
-function isActionBlocked(isBlocked) {
-  return Boolean(isBlocked?.());
-}
+import {closeNavigationDrawer} from "@/actions/navigation/navigationUiActions";
+import {useAuthStore} from "@/stores/authStore";
+import {resolveBlocked} from "@/utils/interactionGuard";
 
 export async function toggleThemeAction({
   theme,
@@ -24,7 +23,7 @@ export async function toggleThemeAction({
   isBlocked,
   logScope = "appShellActions",
 } = {}) {
-  if (isActionBlocked(isBlocked)) return;
+  if (resolveBlocked(isBlocked)) return;
   try {
     if (!theme?.toggle) return;
     theme.toggle();
@@ -47,44 +46,42 @@ export async function toggleThemeAction({
 }
 
 export function openSwaggerRoute({router, isBlocked} = {}) {
-  if (isActionBlocked(isBlocked)) return;
+  if (resolveBlocked(isBlocked)) return;
   router?.push({name: ROUTE_NAMES.SWAGGER}).catch(() => {});
 }
 
-export function openPlaygroundRoute({router, navigationStore, isBlocked} = {}) {
-  if (isActionBlocked(isBlocked)) return;
-  navigationStore?.setDrawerOpen(false);
+export function openPlaygroundRoute({router, isBlocked} = {}) {
+  if (resolveBlocked(isBlocked)) return;
+  closeNavigationDrawer();
   router?.push({name: ROUTE_NAMES.PLAYGROUND}).catch(() => {});
 }
 
-export function openGuideRoute({router, navigationStore, isBlocked} = {}) {
-  if (isActionBlocked(isBlocked)) return;
-  navigationStore?.setDrawerOpen(false);
+export function openGuideRoute({router, isBlocked} = {}) {
+  if (resolveBlocked(isBlocked)) return;
+  closeNavigationDrawer();
   router?.push({name: ROUTE_NAMES.GUIDE}).catch(() => {});
 }
 
-export function openTermsRoute({router, navigationStore, isBlocked} = {}) {
-  if (isActionBlocked(isBlocked)) return;
-  navigationStore?.setDrawerOpen(false);
+export function openTermsRoute({router, isBlocked} = {}) {
+  if (resolveBlocked(isBlocked)) return;
+  closeNavigationDrawer();
   router?.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
 }
 
 export async function logoutApp({
   router,
-  navigationStore,
-  authStore,
   isBlocked,
   logScope = "appShellActions",
 } = {}) {
-  if (isActionBlocked(isBlocked)) return;
+  if (resolveBlocked(isBlocked)) return;
   try {
     await authApiLive.logout();
   } catch (error) {
     logWarn(`[${logScope}] logout 오류:`, error);
   } finally {
     resetAppBootstrapState();
-    authStore?.resetAuth?.();
-    navigationStore?.setDrawerOpen(false);
+    useAuthStore().resetAuth?.();
+    closeNavigationDrawer();
     await router
       ?.replace({
         name: ROUTE_NAMES.LOGIN_REQUIRED,

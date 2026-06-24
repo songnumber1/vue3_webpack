@@ -1,10 +1,6 @@
 /**
  * @file constants/auth/authEnvConfig.js
  * @description 시스템 환경 변수(.env) 파일을 해독하여 인증 가드 캐시와 디버깅 옵션을 정적 수립하는 인증 인프라 설정 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 /**

@@ -8,6 +8,7 @@ import {
   isForcedMobilePlatformOverride,
   MESSAGE_SCROLL_TARGET_TYPES,
 } from "./messageRenderPolicyTypes";
+import {normalizeNullableMessageId} from "@/utils/normalize";
 
 function hasSharedId(chat) {
   return String(chat?.sharedId || "").trim().length > 0;
@@ -17,11 +18,6 @@ export function isSharedChat(chat) {
   // 사용자가 제목에 "공유 -"를 직접 입력할 수 있으므로, 제목/문구가 아니라
   // 백엔드가 내려준 sharedId 존재 여부만 공유방 렌더 정책 기준으로 사용합니다.
   return hasSharedId(chat);
-}
-
-function normalizeMessageId(value) {
-  const id = String(value || "").trim();
-  return id || null;
 }
 
 /**
@@ -35,7 +31,7 @@ export function resolveMessageRenderPolicy({
   showPcProgress = true,
   settings = {},
 } = {}) {
-  const targetMessageId = normalizeMessageId(searchTargetMessageId);
+  const targetMessageId = normalizeNullableMessageId(searchTargetMessageId);
   const isPcHistoryRenderPlatform =
     !isMobile && !isForcedMobilePlatformOverride(settings?.platformOverride);
   const usePcProgressiveRender =

@@ -1,10 +1,6 @@
 /**
  * @file composables/app/appRuntimeBootstrap.js
  * @description Vue Composition API 기반 상태/행동 분리 모듈입니다. UI 컴포넌트의 복잡도를 낮추기 위해 사용됩니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {resolveChatApis} from "@/api/runtime/chatApis";
@@ -78,9 +74,6 @@ function appendAssistantStudioPortal(assistants = []) {
  * @param {Array} [items=[]] - 변환할 엔티티 객체 배열
  * @returns {Object} ID 기반 고속 조회가 가능한 해시 맵 구조체
  */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function toMap(items = []) {
   return items.reduce((acc, item) => {
     if (item?.id) acc[item.id] = item;
@@ -93,9 +86,6 @@ function toMap(items = []) {
  * 그룹 내에서는 관리자가 수립한 정렬 순서(`order`) 기준 정방향 오름차순으로 정렬합니다.
  * @param {Array} [models=[]] - 정형화 완료된 전체 모델 배열 목록
  * @returns {Object} 어시스턴트 ID를 Key로 하고 소속 모델 배열을 Value로 갖는 바인딩 그룹 맵
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function groupModelsByAssistant(models = []) {
   return models.reduce((acc, model) => {
@@ -114,9 +104,6 @@ function groupModelsByAssistant(models = []) {
  * @param {Array} [assistants=[]] - 검증 인가 완료된 전체 어시스턴트 배열
  * @param {Object} [accessInfo={}] - 부트스트랩을 통해 도달한 현재 로그인 유저 메타 정보 세션
  * @returns {Object|null} 최초 홈 화면 렌더링에 매운맛 인젝션될 초기 타깃 어시스턴트 인스턴스
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function pickInitialAssistant(assistants = [], accessInfo = {}) {
   const preferredIds = Object.keys(accessInfo?.user?.presetInfo?.assist || {});
@@ -138,9 +125,6 @@ function pickInitialAssistant(assistants = [], accessInfo = {}) {
  * @param {Object} [modelMapByAssistant={}] - 어시스턴트 그룹별 모델 매핑 딕셔너리
  * @param {Object} [accessInfo={}] - 유저 계정 프리셋 메타 세션
  * @returns {Object|null} 최종 초기화에 탑재될 LLM 모델 인스턴스
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function pickInitialModel(
   assistant,

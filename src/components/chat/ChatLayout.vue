@@ -13,7 +13,7 @@
       class="application-body tw-min-h-0 tw-min-w-0 tw-overflow-hidden tw-bg-app-chat"
       aria-label="Application body"
     >
-      <AppSidebar />
+      <AppSidebar @history-menu-action="emit('history-menu-action', $event)" />
       <main class="chat-workspace tw-min-h-0 tw-min-w-0 tw-overflow-hidden">
         <slot />
       </main>
@@ -36,6 +36,8 @@ import AppSidebar from "@/components/navigation/AppSidebar.vue";
 import ApplicationHeader from "@/components/layout/ApplicationHeader.vue";
 import ApplicationFooter from "@/components/layout/ApplicationFooter.vue";
 import {useNavigationStore} from "@/stores/navigationStore";
+
+const emit = defineEmits(["history-menu-action"]);
 
 const navigationStore = useNavigationStore();
 const {sidebarCollapsed} = storeToRefs(navigationStore);

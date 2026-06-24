@@ -28,7 +28,6 @@
       <PromptTemplatePanelDesktop
         v-if="hasSelectedTemplatePanel && !isMobileSheet"
         :groups="selectedTemplateGroups"
-        :is-option-active="isTemplateOptionActive"
         @select-option="selectTemplateOption"
       />
 
@@ -36,7 +35,6 @@
         v-if="hasSelectedTemplatePanel && isMobileSheet"
         :groups="selectedTemplateGroups"
         :active-mobile-group="activeMobileGroup"
-        :is-option-active="isTemplateOptionActive"
         @select-option="selectTemplateOption"
         @open-mobile-group="openTemplateOptionSheet"
         @close-mobile-group="closeTemplateOptionSheet"
@@ -242,10 +240,8 @@ import {
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
   PROMPT_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
   createEmptyPromptState,
-  createEmptyWorkspaceActions,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 const componentProps = defineProps({
   submitDisabled: {type: Boolean, default: false},
@@ -255,10 +251,6 @@ const componentProps = defineProps({
 });
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
-const workspaceActions = inject(
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions()
-);
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -298,12 +290,19 @@ const props = reactive({
   },
 });
 
-const emit = defineEmits(["blur", "expanded-change"]);
+const emit = defineEmits([
+  "blur",
+  "expanded-change",
+  "submit",
+  "update:modelValue",
+  "focus",
+  "height-change",
+]);
 
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    workspaceActions.submit(payload);
+    emit("submit", payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -316,15 +315,15 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    workspaceActions.updateSelectedModel(payload);
+    emit("update:modelValue", payload);
     return;
   }
   if (eventName === "focus") {
-    workspaceActions.handlePromptFocus();
+    emit("focus", payload);
     return;
   }
   if (eventName === "height-change") {
-    workspaceActions.handlePromptResize();
+    emit("height-change", payload);
     return;
   }
   if (eventName === "blur") {
@@ -435,7 +434,6 @@ const {
   selectedTemplateGroups, // 카테고리(그룹)별로 분류된 선택 가능한 전체 템플릿 라인업 목록
   hasSelectedTemplatePanel, // 현재 특정 서식 서랍 컴포넌트 창이 화면에 노출되고 있는지 여부
   activeMobileGroup, // 모바일 화면에서 선택된 특정 카테고리 그룹 식별자
-  isTemplateOptionActive, // 특정 개별 서식 옵션이 활성화되었는지 판별하는 뷰어 가이드 함수
   selectTemplateOption, // 특정 프롬프트 서식을 최종 선택하여 폼 지침으로 주입하는 함수
   openTemplateOptionSheet, // 모바일 환경 서식 템플릿 바텀시트를 개방하는 함수
   closeTemplateOptionSheet, // 모바일 서식 템플릿 바텀시트를 패쇄하는 함수
@@ -686,7 +684,7 @@ watch(
     emit("expanded-change", expanded);
 
     await nextTick();
-    workspaceActions.handlePromptResize();
+    emit("height-change", getLastHeight());
   },
   {flush: "post"}
 );

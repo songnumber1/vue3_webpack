@@ -1,6 +1,7 @@
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {createId} from "@/utils/id";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
+import {normalizeChatId} from "@/utils/normalize";
 
 export function normalizePromptPayload(payload) {
   if (typeof payload === "string") {
@@ -22,10 +23,6 @@ function createRequestPayload(base = {}) {
     [G.RESPONSE_MESSAGE_ID]: respMsgId,
     ...base,
   };
-}
-
-function normalizeChatId(chatId) {
-  return String(chatId || "").trim();
 }
 
 function resolvePromptToolSettings() {

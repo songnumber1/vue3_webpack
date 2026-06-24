@@ -3,8 +3,51 @@
     v-if="shellReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
+    @history-menu-action="handleHistoryMenuAction"
   >
-    <slot :set-workspace-ref="setWorkspaceRef" />
+    <HomeWorkspace
+      v-if="activeWorkspaceType === 'main'"
+      :ref="setWorkspaceRef"
+      @submit="handleWorkspaceSubmit"
+      @update-selected-model="handleWorkspaceSelectedModelUpdate"
+      @prompt-focus="refreshPromptViewport"
+      @prompt-resize="refreshPromptViewport"
+      @studio-detail="openStudioDetail"
+    />
+
+    <ChatConversationWorkspace
+      v-else-if="activeWorkspaceType === 'conversation'"
+      :ref="setWorkspaceRef"
+      @continue-progressive-initial-history-render="
+        handleContinueProgressiveInitialHistoryRenderRequest
+      "
+      @load-previous-history="loadPreviousHistoryMessages"
+      @submit="handleWorkspaceSubmit"
+      @regenerate="handleWorkspaceRegenerate"
+      @update-selected-model="handleWorkspaceSelectedModelUpdate"
+      @prompt-focus="refreshPromptViewport"
+      @prompt-resize="refreshPromptViewport"
+      @message-content-rendered="handleMessageContentRendered"
+      @scroll-bottom="handleWorkspaceScrollBottom"
+      @history-rendered="finishHistoryRender"
+      @history-markdown-rendered="revealHistoryMarkdown"
+      @studio-detail="openStudioDetail"
+    />
+
+    <StudioWorkspace
+      v-else-if="activeWorkspaceType === 'studio'"
+      :ref="setWorkspaceRef"
+    />
+
+    <McpWorkspace
+      v-else-if="activeWorkspaceType === 'mcp'"
+      :ref="setWorkspaceRef"
+    />
+
+    <ChatSearchWorkspace
+      v-else-if="activeWorkspaceType === 'chat-search'"
+      :ref="setWorkspaceRef"
+    />
 
     <!-- 이미지 크게 보기 -->
     <ChatImagePreview
@@ -77,10 +120,6 @@
 /**
  * @file containers/chat/ChatContainer.vue
  * @description 채팅 화면의 최상위 조립 계층입니다. 주요 상태와 action을 직접 import로 하위 Vue 컴포넌트에 연결합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {
@@ -103,11 +142,9 @@ import {useAssistantStore} from "@/stores/assistantStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {
-  CHAT_ACTIONS_KEY,
   CHAT_WORKSPACE_STATE_KEY,
   PROMPT_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -116,6 +153,11 @@ import ChatHistoryConfirmDialog from "@/components/navigation/history/ChatHistor
 import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import VirtualKeyboardDebug from "@/components/debug/VirtualKeyboardDebug.vue";
 import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
+import HomeWorkspace from "@/components/workspace/HomeWorkspace.vue";
+import ChatConversationWorkspace from "@/components/workspace/ChatConversationWorkspace.vue";
+import StudioWorkspace from "@/components/workspace/StudioWorkspace.vue";
+import McpWorkspace from "@/components/workspace/McpWorkspace.vue";
+import ChatSearchWorkspace from "@/components/search/ChatSearchWorkspace.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
@@ -172,10 +214,7 @@ import {
 } from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {useRouteMode} from "@/composables/route/useRouteMode";
 import {deleteStudio} from "@/services/studioDetailService";
-import {
-  cleanupActiveConversationForNavigation,
-  registerActiveConversationCleanup,
-} from "@/composables/chat/conversation/useActiveConversationCleanup";
+import {registerActiveConversationCleanup} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
   cleanupAfterPortalConversationNavigation,
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
@@ -191,6 +230,13 @@ import {
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
+import {
+  normalizeHistoryId,
+  normalizeNullableMessageId,
+} from "@/utils/normalize";
+import {resolveBooleanSource} from "@/utils/interactionGuard";
+import {closeNavigationDrawerAndCollapsedRecent} from "@/actions/navigation/navigationUiActions";
+import {waitAnimationFrame} from "@/utils/frameScheduler";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
 import {
   isSharedChat,
@@ -220,11 +266,19 @@ import {getSharedConversation} from "@/composables/chat/useSharedChat";
  * 따라서 문제 추적 시 ChatContainer에서 직접 import한 store/function 흐름을 우선 확인합니다.
  */
 
-const LIST_READY_SCROLL_MAX_FRAMES = 60;
+const WORKSPACE_TYPES = Object.freeze({
+  MAIN: "main",
+  CONVERSATION: "conversation",
+  STUDIO: "studio",
+  MCP: "mcp",
+  CHAT_SEARCH: "chat-search",
+});
 
-function toLockValue(source) {
-  return Boolean(source?.value ?? source);
-}
+const props = defineProps({
+  workspace: {type: String, default: ""},
+});
+
+const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 function shouldUseMobilePlatformLayout(platformInfo = {}) {
   if (platformInfo.isPlatformForced) {
@@ -254,18 +308,8 @@ function waitForNextPaint() {
   });
 }
 
-function waitAnimationFrame() {
-  if (typeof window === "undefined") return Promise.resolve();
-  return new Promise((resolve) => window.requestAnimationFrame(resolve));
-}
-
-function normalizeMessageId(value) {
-  const id = String(value || "").trim();
-  return id || null;
-}
-
 function findMessageIndexById(messages = [], messageId) {
-  const targetId = normalizeMessageId(messageId);
+  const targetId = normalizeNullableMessageId(messageId);
   if (!targetId) return -1;
 
   return messages.findIndex(
@@ -388,13 +432,21 @@ const pageState = {
   isReadOnly: computed(() => currentMode.value === "shared"),
 };
 
+const activeWorkspaceType = computed(() => {
+  const requestedWorkspace = String(props.workspace || "").trim();
+  if (requestedWorkspace) return requestedWorkspace;
+
+  if (pageState.isConversationPage.value) return WORKSPACE_TYPES.CONVERSATION;
+  if (route.name === ROUTE_NAMES.CHAT_SEARCH)
+    return WORKSPACE_TYPES.CHAT_SEARCH;
+  if (route.name === ROUTE_NAMES.CONNECTOR_STORE) return WORKSPACE_TYPES.MCP;
+  if (route.name === ROUTE_NAMES.STUDIO) return WORKSPACE_TYPES.STUDIO;
+  return WORKSPACE_TYPES.MAIN;
+});
+
 const activeHistoryId = computed(() => {
   if (pageState.isChatPage.value) {
-    return resolveActiveChatId({
-      route,
-      chatStore,
-      settings: systemSettingsStore.settings,
-    });
+    return resolveActiveChatId();
   }
   if (pageState.isSharedPage.value) {
     return chatStore.activeRoomType === "shared"
@@ -610,7 +662,7 @@ function createLocalRuntimeConversation({text} = {}) {
 }
 
 function appendRuntimeUserAndAssistantMessages(chatId, normalized) {
-  return appendMessagesToChat({chatStore, chatId, normalized});
+  return appendMessagesToChat({chatId, normalized});
 }
 
 const runtime = {
@@ -672,7 +724,7 @@ configureResponseOverlay({
   ),
   suppressChatRouteLoadId: activeHistoryId,
 });
-setupResponseOverlayBackGuard(viewportStore);
+setupResponseOverlayBackGuard();
 
 const showScrollBottom = ref(false);
 let bottomStateTimer = 0;
@@ -979,12 +1031,7 @@ function refreshPromptViewport() {
 }
 
 function clearConversationNavigationState() {
-  clearConversationNavigationStateByPolicy({
-    chatStore,
-    releaseLock,
-    chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
-    clearActiveSession: runtime.clearActiveSession,
-  });
+  clearConversationNavigationStateByPolicy();
 }
 
 async function navigateToMainAfterReset() {
@@ -1011,8 +1058,7 @@ async function resetChatState({assistantId = null} = {}) {
   }
 
   navigationStore.closeTransientPanels();
-  navigationStore.setDrawerOpen(false);
-  navigationStore.setCollapsedRecentOpen(false);
+  closeNavigationDrawerAndCollapsedRecent();
   clearForceBottom();
   await navigateToMainAfterReset();
 }
@@ -1056,10 +1102,6 @@ function cleanupUiResources() {
   unregisterActiveConversationCleanup();
   cleanupScrollResources();
   runtime.revokeMessageAttachments(conversationMessages.value);
-}
-
-function normalizeHistoryId(value) {
-  return String(value || "").trim();
 }
 
 const runtimeReady = ref(false);
@@ -1119,10 +1161,7 @@ function clearPendingSelectedChatId(chatId) {
 }
 
 async function reconcileHiddenConversationRoute() {
-  const result = resolveHiddenConversationRoute({
-    route,
-    chatStore,
-  });
+  const result = resolveHiddenConversationRoute({route});
 
   if (!result.shouldRedirect) return false;
 
@@ -1685,6 +1724,13 @@ async function continueProgressiveInitialHistoryRender() {
   }
 }
 
+function handleContinueProgressiveInitialHistoryRenderRequest(complete) {
+  const result = continueProgressiveInitialHistoryRender();
+  if (typeof complete === "function") {
+    complete(result);
+  }
+}
+
 const activeConversationTitle = computed(() =>
   resolveConversationTitle({
     isSharedPage: pageState.isSharedPage.value,
@@ -1738,9 +1784,7 @@ function resetMainRouteConversation() {
 }
 
 async function handleMissingHistoryId({isCurrentLoad}) {
-  const hasPendingChatEntryNavigation = hasPendingChatNavigation({
-    chatStore,
-  });
+  const hasPendingChatEntryNavigation = hasPendingChatNavigation();
 
   beginHistoryRender();
   await flushConversationSwitchPaint();
@@ -2083,7 +2127,7 @@ const showVirtualKeyboardDebugButton = computed(
 );
 
 const isChatContainerHistoryBusy = computed(
-  () => isChatHistoryLocked.value || toLockValue(isHistoryRendering)
+  () => isChatHistoryLocked.value || resolveBooleanSource(isHistoryRendering)
 );
 const isConversationActionBlocked = computed(
   () =>
@@ -2097,15 +2141,15 @@ const chatPageLock = {
     () =>
       isConversationActionBlocked.value ||
       chatStreamStore.isStreaming ||
-      toLockValue(isReadOnly) ||
-      toLockValue(isGenerating) ||
-      toLockValue(isActiveModelUnavailable)
+      resolveBooleanSource(isReadOnly) ||
+      resolveBooleanSource(isGenerating) ||
+      resolveBooleanSource(isActiveModelUnavailable)
   ),
   isRegenerateBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
-      toLockValue(isReadOnly) ||
-      toLockValue(isGenerating)
+      resolveBooleanSource(isReadOnly) ||
+      resolveBooleanSource(isGenerating)
   ),
 };
 
@@ -2223,24 +2267,12 @@ async function handleStudioDetailDelete(studio) {
   }
 }
 
-function createPortalNavigationResetContext() {
-  return {
-    chatStore,
-    releaseLock,
-    chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
-    cleanupActiveConversation: cleanupActiveConversationForNavigation,
-    navigationStore,
-  };
-}
-
 function preparePortalNavigation() {
-  preparePortalConversationNavigation(createPortalNavigationResetContext());
+  preparePortalConversationNavigation();
 }
 
 function cleanupAfterPortalNavigation() {
-  cleanupAfterPortalConversationNavigation(
-    createPortalNavigationResetContext()
-  );
+  cleanupAfterPortalConversationNavigation();
 }
 
 async function openPortalAssistant(assistantId) {
@@ -2305,10 +2337,6 @@ function setWorkspaceRef(el) {
   workspaceRef.value = el;
 }
 
-provide(CHAT_ACTIONS_KEY, {
-  historyMenuAction: handleHistoryMenuAction,
-});
-
 provide(
   CHAT_WORKSPACE_STATE_KEY,
   computed(() => ({
@@ -2356,30 +2384,23 @@ provide(
   }))
 );
 
-provide(WORKSPACE_ACTIONS_KEY, {
-  submit: (payload) => {
-    if (chatPageLock.isSubmitBlocked.value) return;
-    submit(payload);
-  },
-  regenerate: (message) => {
-    if (chatPageLock.isRegenerateBlocked.value) return;
-    regenerate(message);
-  },
-  updateSelectedModel: (val) => {
-    selectedModel.value = val;
-  },
-  handlePromptFocus: refreshPromptViewport,
-  handlePromptResize: refreshPromptViewport,
-  handleMessageContentRendered,
-  scrollBottom: () => {
-    scrollBottom({force: true, behavior: "smooth", stable: true});
-  },
-  handleHistoryRendered: finishHistoryRender,
-  handleHistoryMarkdownRendered: revealHistoryMarkdown,
-  continueProgressiveInitialHistoryRender,
-  loadPreviousHistoryMessages,
-  openStudioDetail,
-});
+function handleWorkspaceSubmit(payload) {
+  if (chatPageLock.isSubmitBlocked.value) return;
+  submit(payload);
+}
+
+function handleWorkspaceRegenerate(message) {
+  if (chatPageLock.isRegenerateBlocked.value) return;
+  regenerate(message);
+}
+
+function handleWorkspaceSelectedModelUpdate(value) {
+  selectedModel.value = value;
+}
+
+function handleWorkspaceScrollBottom() {
+  scrollBottom({force: true, behavior: "smooth", stable: true});
+}
 </script>
 
 <style scoped lang="scss">

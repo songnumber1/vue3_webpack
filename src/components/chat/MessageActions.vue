@@ -157,10 +157,6 @@
 /**
  * @file components/chat/MessageActions.vue
  * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {computed, ref} from "vue";
@@ -229,23 +225,14 @@ function submitFeedback() {
   feedbackText.value = "";
   closeFeedbackDialog();
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function reasonLabel(reason) {
   return locale.value === "ko" ? reason.ko : reason.en;
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function toggleReason(id) {
   selectedReasons.value = selectedReasons.value.includes(id)
     ? selectedReasons.value.filter((item) => item !== id)
     : [...selectedReasons.value, id];
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 async function copy() {
   try {
     await copyClipboardByPlatform(props.content || "");

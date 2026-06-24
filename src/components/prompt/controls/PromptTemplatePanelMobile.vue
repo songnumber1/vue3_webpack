@@ -28,7 +28,6 @@
 
     <PromptTemplateOptionBottomSheet
       :group="activeMobileGroup"
-      :is-option-active="isOptionActive"
       @select-option="(...args) => $emit('select-option', ...args)"
       @close="$emit('close-mobile-group')"
     />
@@ -41,7 +40,6 @@ import PromptTemplateOptionBottomSheet from "@/components/prompt/controls/Prompt
 defineProps({
   groups: {type: Array, default: () => []},
   activeMobileGroup: {type: Object, default: null},
-  isOptionActive: {type: Function, required: true},
 });
 
 defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);

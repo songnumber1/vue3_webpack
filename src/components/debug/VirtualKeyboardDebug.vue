@@ -29,10 +29,6 @@
 /**
  * @file components/debug/VirtualKeyboardDebug.vue
  * @description 개발/디버그 전용 UI입니다. 운영 기능보다 런타임 상태 확인과 모바일 키보드 검증을 돕습니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
@@ -79,9 +75,6 @@ const modeDescription = computed(() =>
   )
 );
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function clearVirtualKeyboardVars({refresh = true} = {}) {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
@@ -141,9 +134,6 @@ function closePanel() {
   clearVirtualKeyboardVars();
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function togglePanel() {
   panelOpen.value = !panelOpen.value;
 }

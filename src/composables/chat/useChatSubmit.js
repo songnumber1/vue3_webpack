@@ -19,16 +19,13 @@ import {
 } from "./submit/chatSubmitScroll";
 import {runAssistantStream} from "./submit/chatSubmitStreamRunner";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import {normalizeChatId} from "@/utils/normalize";
 import {
   applyConversationActiveRoom,
   createConversationRoute,
   resolveActiveChatId,
-} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 // chatStreamStore.isStreaming을 생성 중 상태의 단일 기준으로 사용합니다.
-
-function normalizeChatId(chatId) {
-  return String(chatId || "").trim();
-}
 
 async function createConversationForSubmit(options, normalized) {
   const context = {
@@ -154,12 +151,7 @@ export function useChatSubmit(options) {
 
     chatStreamStore.start();
 
-    const initialHistoryId = normalizeChatId(
-      resolveActiveChatId({
-        route,
-        chatStore,
-      })
-    );
+    const initialHistoryId = normalizeChatId(resolveActiveChatId());
     const isNewConversationSubmit = shouldCreateConversation(
       options,
       initialHistoryId,
@@ -210,10 +202,7 @@ export function useChatSubmit(options) {
         await router.push(nextRoute).catch(() => {
           chatStreamStore.clearAllowedNavigation();
         });
-        applyConversationActiveRoom({
-          chatId: targetHistoryId,
-          chatStore,
-        });
+        applyConversationActiveRoom({chatId: targetHistoryId});
       }
 
       await nextTick();
@@ -249,12 +238,7 @@ export function useChatSubmit(options) {
       return;
     }
 
-    const targetHistoryId = normalizeChatId(
-      resolveActiveChatId({
-        route,
-        chatStore,
-      })
-    );
+    const targetHistoryId = normalizeChatId(resolveActiveChatId());
     if (!targetHistoryId) return;
 
     const currentMessages = Array.isArray(options.messages.value)

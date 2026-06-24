@@ -1,10 +1,6 @@
 /**
  * @file core/config/android.js
  * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {RUN_ENV, PLATFORM} from "./constants";
@@ -30,9 +26,6 @@ export const LAST_VERSION_INFO = Object.freeze({
  * @param {string} methodName - 브릿지 객체에서 호출하거나 조회할 타깃 멤버 이름
  * @param {*} [fallback=null] - 에러가 발생하거나 값이 유효하지 않을 때 반환할 기본 대입값
  * @returns {string|null} 조회된 데이터의 문자열 형태 결과 또는 대체(Fallback) 값
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function readAndroidValue(bridge, methodName, fallback = null) {
   try {

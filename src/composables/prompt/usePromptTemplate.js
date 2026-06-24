@@ -1,10 +1,6 @@
 /**
  * @file composables/prompt/usePromptTemplate.js
  * @description 프롬프트 입력 도메인 composable입니다. 텍스트/첨부/도구/모델 선택 상태와 submit emit을 관리합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {computed, ref} from "vue";
@@ -110,7 +106,7 @@ export function usePromptTemplate({modelId} = {}) {
       Object.entries(template)
         .map(([groupId, group]) => {
           // 해당 템플릿 그룹 하위에 속한 세부 버튼 아이템 목록 추출 가공
-          const options = Array.isArray(group.content)
+          const baseOptions = Array.isArray(group.content)
             ? group.content.map((option) => ({
                 tag: option.tag || option.ko || option.en || "",
                 label: resolveLocaleValue(option, locale.value),
@@ -119,11 +115,13 @@ export function usePromptTemplate({modelId} = {}) {
 
           // 사용자가 이미 영구 선택해 둔 태그값 혹은 사양 명세에 지정된 최초 기본 원소 아이템을 기본값으로 상속 처리
           const selectedTag =
-            selectedTemplateOptions.value[groupId] || options[0]?.tag || "";
+            selectedTemplateOptions.value[groupId] || baseOptions[0]?.tag || "";
+          const options = baseOptions.map((option) => ({
+            ...option,
+            active: option.tag === selectedTag,
+          }));
           const selectedOption =
-            options.find((option) => option.tag === selectedTag) ||
-            options[0] ||
-            null;
+            options.find((option) => option.active) || options[0] || null;
 
           return {
             id: groupId, // 파라미터 식별 고유 명칭 (예: 'tone')
@@ -158,13 +156,6 @@ export function usePromptTemplate({modelId} = {}) {
   });
 
   /**
-   * [단순 뷰 헬퍼 인터페이스] 특정 라디오 UI 칩 아이템 버튼이 활성화 점등(Active CSS) 상태를 부여받아야 하는지 체크합니다.
-   */
-  function isTemplateOptionActive(group, option) {
-    return (group.selectedTag || group.options[0]?.tag) === option.tag;
-  }
-
-  /**
    * @function selectTemplateOption
    * @description 사용자가 특정 옵션 아이템(예: 말투 -> '격식있게')을 마우스로 클릭하거나 터치했을 때
    * 최종 확정 값을 글로벌 Pinia 캐시 영역에 적치 동기화하고 모바일 시트를 폐쇄 조치합니다.
@@ -188,7 +179,6 @@ export function usePromptTemplate({modelId} = {}) {
     selectedTemplateGroups,
     hasSelectedTemplatePanel,
     activeMobileGroup,
-    isTemplateOptionActive,
     selectTemplateOption,
     openTemplateOptionSheet,
     closeTemplateOptionSheet,

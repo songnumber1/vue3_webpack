@@ -1,10 +1,6 @@
 /**
  * @file core/resolver/authGuard.js
  * @description 앱 초기화와 resolver 연결을 담당하는 core 계층입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
@@ -59,9 +55,6 @@ function debugAuthGuard(...args) {
  * @param {import("axios").AxiosInstance} authAxios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
  * @param {Object} payload - {@link createAccessPayload} 유틸로 가공된 파라미터 본문
  * @returns {Promise<Object>} 서버로부터 전달받은 가공되지 않은 순수 인증 결과 객체
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 async function requestAccessInfo(authAxios, payload) {
   // 디버그 활성화 상태 시 현재 실서버 인증 API 요청 상태를 로깅합니다.

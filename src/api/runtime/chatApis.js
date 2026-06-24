@@ -1,10 +1,6 @@
 /**
  * @file api/runtime/chatApis.js
  * @description 현재 애플리케이션의 런타임 설정 상태(디버그, 로컬 개발, 서버리스 모크 모드 등)를 동적 감지하여, 백엔드와 직접 연동되는 실서버(Live) API 구현체 그룹과 로컬 시뮬레이션용 가상 데이터(Mock) API 구현체 그룹을 단일 통로에서 스위칭하여 내보내는 동적 전략(Strategy) 라우팅 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {accessApiMock} from "@/api/mock/accessApi.mock";

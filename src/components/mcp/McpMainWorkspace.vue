@@ -94,7 +94,7 @@ import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {
   createEmptyWorkspaceState,
   CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 const {t} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();

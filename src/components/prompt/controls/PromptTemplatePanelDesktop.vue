@@ -23,7 +23,7 @@
             :key="option.tag"
             class="prompt-template-chip tw-inline-flex tw-min-h-[30px] tw-cursor-pointer tw-items-center tw-justify-center tw-gap-[6px] tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-px-[9px] tw-py-[5px] tw-font-app tw-text-fixed12 tw-font-extrabold tw-transition-colors tw-duration-fast"
             :class="
-              isOptionActive(group, option)
+              option.active
                 ? 'is-active tw-border-[color-mix(in_srgb,var(--accent)_54%,var(--control-border))] tw-bg-[color-mix(in_srgb,var(--accent)_9%,var(--surface))] tw-text-app-accent'
                 : 'tw-border-app-controlBorder tw-bg-app-surface tw-text-app-text hover:tw-bg-app-controlHover'
             "
@@ -41,7 +41,6 @@
 <script setup>
 defineProps({
   groups: {type: Array, default: () => []},
-  isOptionActive: {type: Function, required: true},
 });
 
 defineEmits(["select-option"]);

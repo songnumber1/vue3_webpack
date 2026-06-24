@@ -82,10 +82,7 @@ import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useAuthStore} from "@/stores/authStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useViewportStore} from "@/stores/viewportStore";
 import {
   openLanguageOverlay,
   openNoticeOverlay,
@@ -108,13 +105,10 @@ import {
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 const {t} = useI18n();
 const router = useRouter();
-const authStore = useAuthStore();
-const navigationStore = useNavigationStore();
-const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
 const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
   useNavigationLock();
@@ -131,8 +125,6 @@ const isAppShellActionBlocked = computed(
 const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const overlayActionOptions = {
   isBlocked: isShellActionBlocked,
-  viewportStore,
-  navigationStore,
 };
 const responseOverlay = {
   openNotice: () => openNoticeOverlay(overlayActionOptions),
@@ -164,18 +156,13 @@ const shellActions = {
   openPlayground: () =>
     openPlaygroundRoute({
       router,
-      navigationStore,
       isBlocked: isShellActionBlocked,
     }),
-  openGuide: () =>
-    openGuideRoute({router, navigationStore, isBlocked: isShellActionBlocked}),
-  openTerms: () =>
-    openTermsRoute({router, navigationStore, isBlocked: isShellActionBlocked}),
+  openGuide: () => openGuideRoute({router, isBlocked: isShellActionBlocked}),
+  openTerms: () => openTermsRoute({router, isBlocked: isShellActionBlocked}),
   logout: () =>
     logoutApp({
       router,
-      navigationStore,
-      authStore,
       isBlocked: isShellActionBlocked,
       logScope: "ApplicationHeader",
     }),

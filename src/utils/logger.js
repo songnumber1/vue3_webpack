@@ -1,10 +1,6 @@
 /**
  * @file utils/logger.js
  * @description 여러 영역에서 공유하는 유틸리티입니다. DOM/Markdown/feedback/viewport 보정 등 공통 처리를 담당합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 /** * 현재 실행 환경이 빌드 기준 배포/운영 프로덕션(production) 단계인지 판별하는 플래그 상수입니다.
@@ -28,9 +24,6 @@ const isDebugEnabled =
  * 인자로 전달된 로그 레벨(level)과 현재 런타임 환경 조건을 비교하여 실제 콘솔에 출력해야 하는지 여부를 판단합니다.
  * @param {string} level - 로그의 위험도 등급 명칭 (`"info"`, `"warn"`, `"error"`, `"debug"`)
  * @returns {boolean} 콘솔에 로그를 출력해야 하면 true, 숨겨야 하면 false
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function shouldLog(level) {
   // 개발(Development) 또는 로컬 환경일 경우 모든 시스템 로그를 무조건 투명하게 노출(true)합니다.

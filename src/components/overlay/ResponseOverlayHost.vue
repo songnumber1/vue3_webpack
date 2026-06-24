@@ -59,7 +59,6 @@ import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
-import {useViewportStore} from "@/stores/viewportStore";
 import {
   APP_OVERLAY_TYPES,
   closeResponseOverlayByBackOrDirect,
@@ -70,8 +69,7 @@ import {
 
 const emit = defineEmits(["applied"]);
 const {t} = useI18n();
-const viewportStore = useViewportStore();
-setupResponseOverlayBackGuard(viewportStore);
+setupResponseOverlayBackGuard();
 
 const {
   activeOverlayType,
@@ -80,5 +78,5 @@ const {
   overlaySubtitle,
   overlayPanelClass,
   usesResponsiveOverlay,
-} = createResponseOverlayViewState(t, viewportStore);
+} = createResponseOverlayViewState(t);
 </script>

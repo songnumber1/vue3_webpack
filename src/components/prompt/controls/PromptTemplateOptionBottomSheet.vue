@@ -8,13 +8,13 @@
       v-for="option in group?.options || []"
       :key="option.tag"
       class="bottom-sheet-option bottom-sheet-option--row prompt-template-sheet-option"
-      :class="{'is-active': isOptionActive(group, option)}"
+      :class="{'is-active': option.active}"
       type="button"
       @click="$emit('select-option', group.id, option.tag)"
     >
       <strong>{{ option.label }}</strong>
       <span
-        v-if="isOptionActive(group, option)"
+        v-if="option.active"
         class="prompt-template-sheet-check"
         aria-hidden="true"
         >✓</span
@@ -28,7 +28,6 @@ import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vu
 
 defineProps({
   group: {type: Object, default: null},
-  isOptionActive: {type: Function, required: true},
 });
 
 defineEmits(["select-option", "close"]);

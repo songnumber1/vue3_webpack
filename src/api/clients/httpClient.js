@@ -1,10 +1,6 @@
 /**
  * @file api/clients/httpClient.js
  * @description Axios 인스턴스를 커스텀 래핑하여 전역 API 통신의 공통 Base URL 설정, 타임아웃, 자격 증명(Credentials), 인터셉터를 통한 비동기 요청 취소(AbortController) 관리 및 모바일 progress 오버레이 연동을 일괄 제어하는 비동기 통신 코어 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import axios from "axios";

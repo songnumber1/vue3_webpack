@@ -3,9 +3,7 @@
  * @description Chat Header와 workspace에 표시할 Assistant 라벨/대화방 제목 우선순위를 한 곳에서 결정합니다.
  */
 
-function normalizeText(value) {
-  return typeof value === "string" ? value.trim() : "";
-}
+import {normalizeText} from "@/utils/normalize";
 
 export function resolveConversationTitle({
   isSharedPage = false,

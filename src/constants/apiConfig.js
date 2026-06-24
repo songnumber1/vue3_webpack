@@ -1,10 +1,6 @@
 /**
  * @file constants/api/apiPolicyResolver.js
  * @description API 요청 도메인 키 및 도메인별 런타임 제어 정책(로딩 인디케이터 토글, 중복 요청 자동 취소 가드) 선언과 해독을 전담하는 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 /**

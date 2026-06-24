@@ -1,10 +1,6 @@
 /**
  * @file adapters/modelAdapter.js
  * @description 백엔드 API 또는 Mock 시스템으로부터 수신된 원시 모델(Model) 데이터를 프론트엔드의 Chat 엔진, 스토어, 컴포넌트 뷰 레이어에서 다치지 않고 일관되게 다룰 수 있도록 정규화(Normalization)하는 어댑터 모듈입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {MODEL_API_KEYS as MODEL_KEYS} from "@/constants/api/modelApiKeys";

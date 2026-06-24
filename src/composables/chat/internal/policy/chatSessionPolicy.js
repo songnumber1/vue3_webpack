@@ -3,13 +3,7 @@
  * @description 대화방 세션의 Assistant/Studio 삭제, 표시용 Assistant 라벨, 입력 불가 상태를 한 곳에서 결정합니다.
  */
 
-function normalizeText(value) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function normalizeId(value) {
-  return normalizeText(String(value || ""));
-}
+import {normalizeId, normalizeText} from "@/utils/normalize";
 
 function firstNonEmptyText(...values) {
   return values.map(normalizeText).find(Boolean) || "";

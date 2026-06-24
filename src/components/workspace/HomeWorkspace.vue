@@ -17,12 +17,16 @@
     :studio-detail-disabled="studioDetailDisabled"
     :composer-expanded="isMainPromptExpanded"
     @suggestion-click="handleSuggestionClick"
-    @studio-detail="workspaceActions.openStudioDetail?.()"
+    @studio-detail="emit('studio-detail')"
   >
     <template #composer>
       <PromptComposer
         ref="mainPromptInputRef"
         :class="mainPromptClass"
+        @submit="emit('submit', $event)"
+        @update:model-value="emit('update-selected-model', $event)"
+        @focus="emit('prompt-focus', $event)"
+        @height-change="emit('prompt-resize', $event)"
         @expanded-change="handleMainPromptExpandedChange"
       />
     </template>
@@ -47,23 +51,25 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {
   CHAT_WORKSPACE_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
   createEmptyWorkspaceState,
-  createEmptyWorkspaceActions,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 const chatStreamStore = useChatStreamStore();
 const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
   useNavigationLock();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
+const emit = defineEmits([
+  "submit",
+  "update-selected-model",
+  "prompt-focus",
+  "prompt-resize",
+  "studio-detail",
+]);
+
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
-);
-const workspaceActions = inject(
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions()
 );
 const injectedIsMobile = computed(() => workspaceState.value.isMobile);
 const isMobile = useResolvedMobileMode(injectedIsMobile);

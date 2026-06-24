@@ -141,7 +141,7 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
+import {navigateToConversation} from "@/actions/chat/conversationRouteActions";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveContext} from "@/composables/app/responsiveContext";
@@ -152,7 +152,7 @@ import {createHistoryFromSearchResult} from "@/adapters/chatResponseAdapter";
 import {
   createEmptyWorkspaceState,
   CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
@@ -284,7 +284,6 @@ async function openChat(result) {
   try {
     await navigateToConversation({
       router,
-      chatStore,
       chatId,
       replace: false,
     });

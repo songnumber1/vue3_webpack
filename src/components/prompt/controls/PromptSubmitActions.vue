@@ -72,7 +72,7 @@ import {computed, inject} from "vue";
 import {
   PROMPT_TOOLBAR_STATE_KEY,
   createEmptyPromptToolbarState,
-} from "@/composables/chat/chatActionContext";
+} from "@/composables/chat/chatStateContext";
 
 defineEmits(["start-voice", "stop-voice"]);
 

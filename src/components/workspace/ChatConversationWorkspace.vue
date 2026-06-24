@@ -7,7 +7,7 @@
     :theme-name="themeName"
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
-    @studio-detail="workspaceActions.openStudioDetail?.()"
+    @studio-detail="emit('studio-detail')"
   />
 
   <MessageList
@@ -29,8 +29,8 @@
     :mobile-history-lazy-initial-count="mobileHistoryLazyInitialCount"
     :mobile-history-lazy-append-count="mobileHistoryLazyAppendCount"
     :readonly="readonly"
-    :continue-progressive-initial-history-render="
-      continueProgressiveInitialHistoryRender
+    @continue-progressive-initial-history-render="
+      handleContinueProgressiveInitialHistoryRender
     "
     @content-rendered="handleMessageContentRendered"
     @history-markdown-rendered="handleHistoryMarkdownRendered"
@@ -70,6 +70,10 @@
         'mobile-chat-prompt': isMobile,
         'mobile-keyboard-dock': isMobile,
       }"
+      @submit="emit('submit', $event)"
+      @update:model-value="emit('update-selected-model', $event)"
+      @focus="emit('prompt-focus', $event)"
+      @height-change="handlePromptHeightChange"
       @expanded-change="handlePromptExpandedChange"
     />
   </div>
@@ -132,14 +136,9 @@ import {LAYOUT_WIDTH} from "@/constants/layout";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {
   CHAT_WORKSPACE_STATE_KEY,
-  WORKSPACE_ACTIONS_KEY,
   createEmptyWorkspaceState,
-  createEmptyWorkspaceActions,
-} from "@/composables/chat/chatActionContext";
-
-function toLockValue(source) {
-  return Boolean(source?.value ?? source);
-}
+} from "@/composables/chat/chatStateContext";
+import {resolveBooleanSource} from "@/utils/interactionGuard";
 
 const {locale, t} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
@@ -149,13 +148,24 @@ const promptComposerRef = ref(null);
 const previewRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
+const emit = defineEmits([
+  "submit",
+  "regenerate",
+  "update-selected-model",
+  "prompt-focus",
+  "prompt-resize",
+  "message-content-rendered",
+  "scroll-bottom",
+  "history-rendered",
+  "history-markdown-rendered",
+  "continue-progressive-initial-history-render",
+  "load-previous-history",
+  "studio-detail",
+]);
+
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
-);
-const workspaceActions = inject(
-  WORKSPACE_ACTIONS_KEY,
-  createEmptyWorkspaceActions()
 );
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
@@ -237,7 +247,7 @@ const mobileHistoryLazyAppendCount = computed(
   () => workspaceState.value.mobileHistoryLazyAppendCount || 25
 );
 const isHistoryBusy = computed(
-  () => isChatHistoryLocked.value || toLockValue(isHistoryRendering)
+  () => isChatHistoryLocked.value || resolveBooleanSource(isHistoryRendering)
 );
 const isConversationActionBlocked = computed(
   () => isGlobalLocked.value || isStreamingLocked.value || isHistoryBusy.value
@@ -248,15 +258,15 @@ const chatPageLock = {
     () =>
       isConversationActionBlocked.value ||
       chatStreamStore.isStreaming ||
-      toLockValue(readonly) ||
-      toLockValue(isGenerating) ||
-      toLockValue(isActiveModelUnavailable)
+      resolveBooleanSource(readonly) ||
+      resolveBooleanSource(isGenerating) ||
+      resolveBooleanSource(isActiveModelUnavailable)
   ),
   isRegenerateBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
-      toLockValue(readonly) ||
-      toLockValue(isGenerating)
+      resolveBooleanSource(readonly) ||
+      resolveBooleanSource(isGenerating)
   ),
   isLoadPreviousBlocked: computed(
     () => isGlobalLocked.value || isStreamingLocked.value || isHistoryBusy.value
@@ -644,16 +654,16 @@ const {scheduleComposerHeightUpdate} = useConversationComposerHeight({
 });
 function scrollBottom() {
   if (chatPageLock.isScrollButtonBlocked.value) return;
-  workspaceActions.scrollBottom?.();
+  emit("scroll-bottom");
 }
 
-function continueProgressiveInitialHistoryRender() {
-  return workspaceActions.continueProgressiveInitialHistoryRender?.() ?? false;
+function handleContinueProgressiveInitialHistoryRender(complete) {
+  emit("continue-progressive-initial-history-render", complete);
 }
 
 function handleRegenerate(message) {
   if (chatPageLock.isRegenerateBlocked.value) return;
-  workspaceActions.regenerate?.(message);
+  emit("regenerate", message);
 }
 
 function handlePromptExpandedChange(expanded) {
@@ -674,23 +684,29 @@ function handleMessageContentRendered() {
     return;
   }
 
-  workspaceActions.handleMessageContentRendered?.();
+  emit("message-content-rendered");
   scheduleComposerHeightUpdate();
 }
 
 function handleHistoryMarkdownRendered() {
-  workspaceActions.handleHistoryMarkdownRendered?.();
+  emit("history-markdown-rendered");
   scheduleComposerHeightUpdate();
 }
 
 function handleHistoryRendered() {
-  workspaceActions.handleHistoryRendered?.();
+  emit("history-rendered");
+  scheduleComposerHeightUpdate();
+}
+
+function handlePromptHeightChange(payload) {
+  emit("prompt-resize", payload);
   scheduleComposerHeightUpdate();
 }
 
 function handleLoadPreviousHistory() {
   if (chatPageLock.isLoadPreviousBlocked.value) return false;
-  return workspaceActions.loadPreviousHistoryMessages?.() ?? false;
+  emit("load-previous-history");
+  return true;
 }
 
 watch(activeChatId, () => {

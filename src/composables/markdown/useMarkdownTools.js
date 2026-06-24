@@ -1,10 +1,6 @@
 /**
  * @file composables/markdown/useMarkdownTools.js
  * @description Markdown 내부 버튼/링크/도구 action을 담당하는 composable입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {
@@ -13,9 +9,6 @@ import {
 } from "@/platform/bridge/platformBridge";
 import {usePlatformStore} from "@/stores/platformStore";
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function tableToText(table) {
   // 네이티브 HTMLTableElement의 rows 컬렉션을 순회 가능한 배열로 가공합니다.
   return Array.from(table.rows)
@@ -28,9 +21,6 @@ function tableToText(table) {
     )
     .join("\n"); // 줄바꿈을 구분자로 묶어 최종 텍스트 청크 완성
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function tableToCsv(table) {
   // 테이블 엘리먼트를 CSV 파일 표준 규격 문자열 포맷으로 변환 덤프합니다.
   return Array.from(table.rows)
@@ -46,9 +36,6 @@ function tableToCsv(table) {
     )
     .join("\n");
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function downloadText(content, filename, type = "text/plain;charset=utf-8") {
   const blob = new Blob([content], {type}); // 전달받은 텍스트 콘텐츠를 바이너리 대형 객체(Blob) 버퍼로 포장
   const url = URL.createObjectURL(blob); // 브라우저가 다운로드 세션에 접근할 수 있는 고유 임시 blob: URL 생성을 통해 주소 앵커 확보
@@ -60,9 +47,6 @@ function downloadText(content, filename, type = "text/plain;charset=utf-8") {
   link.remove(); // 태스크 완료 후 메모리 청소를 위해 임시 부착한 앵커 가차없이 노드 철거
   URL.revokeObjectURL(url); // 브라우저 메모리 누수를 원천 차단하기 위해 임시 주소 자원을 소멸 해제
 }
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 래퍼 함수를 통해 중간 로직을 캡슐화합니다.
- */
 function downloadCsv(csv) {
   // [중요 인코딩 가드]: 한국어 환경의 MS Excel 등에서 CSV 파일을 열었을 때 글자가 유령처럼 전부 깨지는 대참사를 방지하기 위해,
   // 문자열 맨 앞에 UTF-8 바이트 순서 표시 마커인 BOM(\ufeff) 기호를 인위적으로 결합하여 내보냅니다.

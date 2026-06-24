@@ -1,10 +1,6 @@
 /**
  * @file composables/chat/useAutoScroll.js
- * @description 채팅 도메인 composable입니다. 질문 전송, 메시지 동기화, SSE 결과 반영, scroll/overlay action을 담당합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
+ * @description 채팅 화면에서 DOM 업데이트 이후 안전하게 하단 스크롤을 예약하는 composable입니다.
  */
 
 import {nextTick} from "vue";
@@ -14,9 +10,6 @@ import {nextTick} from "vue";
  * @description [브라우저 하드웨어 동기화 헬퍼] 가상 돔 변경 후 브라우저가 레이아웃을 계산(Reflow)하고
  * 화면을 실제로 그리는(Repaint) 타이밍의 안전한 최외각 마감 단락을 확보하기 위해 'Double RAF' 패턴을 구동합니다.
  * @param {Function} callback - 뷰포트 물리 스크롤 연산 등 최종 페인팅 완료 직후 집행할 콜백 함수
- */
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
  */
 function afterFrame(callback) {
   // SSR(서버 사이드 렌더링) 환경이거나 구형 브라우저 등 RAF API를 지원하지 않는 환경인 경우 비동기 매크로태스크(setTimeout)로 안전하게 폴백합니다.

@@ -5,6 +5,9 @@
 
 import {computed, ref, unref, watch} from "vue";
 import {useAppOverlayBackStore} from "@/stores/appOverlayBackStore";
+import {useNavigationStore} from "@/stores/navigationStore";
+import {useViewportStore} from "@/stores/viewportStore";
+import {resolveBlocked} from "@/utils/interactionGuard";
 
 const RESPONSE_OVERLAY_HISTORY_KEY = "__responseOverlayBack";
 
@@ -68,10 +71,10 @@ function resolveOverlayBackStore() {
   return overlayBackStoreInstance;
 }
 
-function shouldUseMobileBack(viewportStore) {
+function shouldUseMobileBack() {
   const injectedMobile = unref(configuredIsMobile.value);
   if (typeof injectedMobile === "boolean") return injectedMobile;
-  return Boolean(viewportStore?.isCompact);
+  return Boolean(useViewportStore()?.isCompact);
 }
 
 function markChatRouteLoadSuppressedIfNeeded() {
@@ -128,11 +131,11 @@ function ensurePopstateListener() {
   popstateBound = true;
 }
 
-function pushOverlayHistoryOnce(type, viewportStore) {
+function pushOverlayHistoryOnce(type) {
   const overlayBackStore = resolveOverlayBackStore();
 
   if (!canUseBrowserHistory()) return;
-  if (!shouldUseMobileBack(viewportStore)) return;
+  if (!shouldUseMobileBack()) return;
   if (!responseOverlayActiveType.value) return;
   if (overlayBackStore.mobileHistoryPushed) return;
 
@@ -161,11 +164,6 @@ function restoreOverlayHistoryIfNeeded() {
   return true;
 }
 
-function isBlocked(isBlockedInput) {
-  if (typeof isBlockedInput === "function") return Boolean(isBlockedInput());
-  return Boolean(unref(isBlockedInput));
-}
-
 export function configureResponseOverlay(options = {}) {
   if (Object.prototype.hasOwnProperty.call(options, "isMobile")) {
     configuredIsMobile.value = options.isMobile;
@@ -182,17 +180,17 @@ export function configureResponseOverlay(options = {}) {
   }
 }
 
-export function setupResponseOverlayBackGuard(viewportStore) {
+export function setupResponseOverlayBackGuard() {
   ensurePopstateListener();
 
   if (guardWatchersBound) return;
   guardWatchersBound = true;
 
   watch(
-    () => shouldUseMobileBack(viewportStore),
+    () => shouldUseMobileBack(),
     (mobile) => {
       if (mobile) {
-        pushOverlayHistoryOnce(responseOverlayActiveType.value, viewportStore);
+        pushOverlayHistoryOnce(responseOverlayActiveType.value);
         return;
       }
 
@@ -206,7 +204,7 @@ export function setupResponseOverlayBackGuard(viewportStore) {
       const overlayBackStore = resolveOverlayBackStore();
 
       if (open) {
-        pushOverlayHistoryOnce(responseOverlayActiveType.value, viewportStore);
+        pushOverlayHistoryOnce(responseOverlayActiveType.value);
         return;
       }
 
@@ -225,9 +223,9 @@ export function setupResponseOverlayBackGuard(viewportStore) {
   );
 }
 
-export function createResponseOverlayViewState(t, viewportStore) {
+export function createResponseOverlayViewState(t) {
   const isOpen = computed(() => Boolean(responseOverlayActiveType.value));
-  const isMobile = computed(() => shouldUseMobileBack(viewportStore));
+  const isMobile = computed(() => shouldUseMobileBack());
   const activeOverlayType = computed(() => responseOverlayActiveType.value);
   const overlayTitle = computed(() => {
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.NOTICE) {
@@ -301,15 +299,15 @@ export function createResponseOverlayViewState(t, viewportStore) {
 
 export function openResponseOverlay(
   type,
-  {ignoreBlock = false, isBlocked: blocked, viewportStore, navigationStore} = {}
+  {ignoreBlock = false, isBlocked: blocked} = {}
 ) {
   if (!RESPONSE_OVERLAY_TYPE_VALUES.includes(type)) return;
-  if (!ignoreBlock && isBlocked(blocked)) return;
+  if (!ignoreBlock && resolveBlocked(blocked)) return;
 
-  navigationStore?.setDrawerOpen?.(false);
+  useNavigationStore().setDrawerOpen?.(false);
   responseOverlayActiveType.value = type;
   resolveOverlayBackStore().setActiveOverlayType(type);
-  pushOverlayHistoryOnce(type, viewportStore);
+  pushOverlayHistoryOnce(type);
 }
 
 export function closeResponseOverlay(type = null) {

@@ -82,7 +82,7 @@
     <div
       v-if="drawerOpen"
       class="mobile-drawer-backdrop tw-fixed tw-inset-0 tw-bg-app-drawerOverlay"
-      @click="navigationStore.setDrawerOpen(false)"
+      @click="closeNavigationDrawer"
     ></div>
   </transition>
 
@@ -109,7 +109,7 @@
               type="button"
               :title="t('common.close')"
               :aria-label="t('common.close')"
-              @click="navigationStore.setDrawerOpen(false)"
+              @click="closeNavigationDrawer"
             >
               ×
             </button>
@@ -182,13 +182,9 @@
 /**
  * @file components/navigation/AppSidebar.vue
  * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
-import {computed, inject, nextTick, ref, watch} from "vue";
+import {computed, nextTick, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
@@ -212,8 +208,7 @@ import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
-import {navigateToConversation} from "@/composables/chat/internal/navigation/conversationUrlPolicy";
-import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
+import {navigateToConversation} from "@/actions/chat/conversationRouteActions";
 import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   navigateToMainAfterConversationReset,
@@ -223,11 +218,13 @@ import {
 } from "@/composables/chat/internal/navigation/chatNavigationReset";
 import {createPortalAssistantRoute} from "@/composables/chat/internal/navigation/portalAssistantRoutePolicy";
 import {logWarn} from "@/utils/logger";
-import {
-  CHAT_ACTIONS_KEY,
-  createEmptyChatActions,
-} from "@/composables/chat/chatActionContext";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import {resolveBlocked} from "@/utils/interactionGuard";
+import {
+  closeNavigationDrawer,
+  closeNavigationDrawerAndCollapsedRecent,
+  closeNavigationDrawerAndTransientPanels,
+} from "@/actions/navigation/navigationUiActions";
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
@@ -236,7 +233,7 @@ const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const historyDialogActions = inject(CHAT_ACTIONS_KEY, createEmptyChatActions());
+const emit = defineEmits(["history-menu-action"]);
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
 const {
   NAVIGATION_LOCK_SCOPES,
@@ -326,9 +323,6 @@ const {
   isHistorySelectBlocked,
   isNewChatBlocked,
 } = sidebarLock;
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function syncViewportMode() {
   isMobileSheet.value = shouldUseMobileLayout.value;
 }
@@ -338,40 +332,24 @@ function getHistoryId(item) {
 }
 
 function closeSidebarNavigationPanels() {
-  navigationStore.setDrawerOpen(false);
-  navigationStore.setCollapsedRecentOpen(false);
+  closeNavigationDrawerAndCollapsedRecent();
 }
 
 function closeAssistantSelector() {
   assistantMenuOpen.value = false;
 }
 
-function isBlocked(blockedRef) {
-  return Boolean(blockedRef?.value);
-}
-
-function createNavigationResetContext() {
-  return {
-    chatStore,
-    releaseLock,
-    chatHistoryScope: NAVIGATION_LOCK_SCOPES.chatHistory,
-    clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
-    cleanupActiveConversation: cleanupActiveConversationForNavigation,
-    navigationStore,
-    closeAssistantSelector,
-  };
-}
-
 function clearConversationNavigationState() {
-  clearConversationNavigationStateByPolicy(createNavigationResetContext());
+  clearConversationNavigationStateByPolicy();
 }
 
 function preparePortalNavigation() {
-  preparePortalConversationNavigation(createNavigationResetContext());
+  preparePortalConversationNavigation();
+  closeAssistantSelector();
 }
 
 function cleanupAfterPortalNavigation() {
-  cleanupAfterPortalConversationNavigation(createNavigationResetContext());
+  cleanupAfterPortalConversationNavigation();
 }
 
 async function navigatePortalAssistant(assistantId) {
@@ -391,7 +369,8 @@ async function navigateMainAfterReset() {
 }
 
 function resetConversationStateForRouteChange() {
-  resetConversationStateForRouteChangeByPolicy(createNavigationResetContext());
+  resetConversationStateForRouteChangeByPolicy();
+  closeAssistantSelector();
 }
 
 async function resetChatState({assistantId = null} = {}) {
@@ -412,14 +391,11 @@ async function resetChatState({assistantId = null} = {}) {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function openAssistantSelector() {
-  if (isBlocked(sidebarLock.isAssistantSelectBlocked)) return;
+  if (resolveBlocked(sidebarLock.isAssistantSelectBlocked)) return;
   syncViewportMode();
   assistantMenuOpen.value = !assistantMenuOpen.value;
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 async function selectAssistant(id) {
   if (isPortalAssistantId(id)) {
     if (isGlobalLocked.value || isStreamingLocked.value) return;
@@ -427,7 +403,7 @@ async function selectAssistant(id) {
     return;
   }
 
-  if (isBlocked(sidebarLock.isAssistantSelectBlocked)) return;
+  if (resolveBlocked(sidebarLock.isAssistantSelectBlocked)) return;
 
   await resetChatState({assistantId: id});
 
@@ -471,15 +447,12 @@ function closeHistoryMenu() {
   historyMenuReferenceEl.value = null;
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function selectHistoryMenuAction(action) {
   if (isHistoryMenuBlocked.value) return;
   const history = historyMenuTarget.value;
   historyMenuOpen.value = false;
   if (!history || !action) return;
-  historyDialogActions?.historyMenuAction?.({action, history});
+  emit("history-menu-action", {action, history});
 }
 
 /**
@@ -502,7 +475,7 @@ async function handleSelectHistoryCollapsed(item) {
 }
 
 async function selectHistory(item, options = {}) {
-  if (isBlocked(sidebarLock.isHistorySelectBlocked)) return false;
+  if (resolveBlocked(sidebarLock.isHistorySelectBlocked)) return false;
 
   const historyId = getHistoryId(item);
   if (!historyId) return false;
@@ -527,20 +500,18 @@ async function selectHistory(item, options = {}) {
 
   try {
     chatStore.setPendingSelectedChatId(historyId);
-    navigationStore.closeTransientPanels();
-    navigationStore.setDrawerOpen(false);
+    closeNavigationDrawerAndTransientPanels();
     navigationStore.setCollapsedRecentOpen(false);
 
     await navigateToConversation({
       router,
-      chatStore,
       chatId: historyId,
     }).catch(() => {});
 
     if (options.closeCollapsedRecent) {
       navigationStore.setCollapsedRecentOpen(false);
     } else {
-      navigationStore.setDrawerOpen(false);
+      closeNavigationDrawer();
     }
 
     await nextTick();
@@ -579,7 +550,7 @@ async function handleViewportModeChange(isCompact) {
 
   // PC 브라우저에서 모바일 폭으로 열려 있던 drawer가 웹 폭으로 전환될 때
   // 전역 .mobile-drawer fallback CSS가 남아 보이지 않도록 즉시 상태를 닫는다.
-  navigationStore.setDrawerOpen(false);
+  closeNavigationDrawer();
   assistantMenuOpen.value = false;
   closeHistoryMenu();
   await nextTick();
@@ -593,7 +564,7 @@ useEventListener(
   () => {
     syncViewportMode();
     if (!isCompactViewport.value && drawerOpen.value) {
-      navigationStore.setDrawerOpen(false);
+      closeNavigationDrawer();
     }
   },
   {passive: true}

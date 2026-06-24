@@ -2,10 +2,6 @@ import {DEFAULT_API_BASE_PATH} from "@/constants/apiMode";
 /**
  * @file platform/bridge/web/bridgeWebApiRuntime.js
  * @description Android WebView bridge와 일반 웹 fallback을 연결하는 platform adapter입니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {WebApiContract} from "../contract";
@@ -25,18 +21,12 @@ function getApiBaseUrl() {
   return configured.replace(/\/$/, "");
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function interpolatePath(path, payload) {
   return path.replace(/:([A-Za-z0-9_]+)/g, (_, key) =>
     encodeURIComponent(payload?.[key] ?? "")
   );
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function buildBackendUrl(contract, payload) {
   const rawPath =
     contract.httpPath || `/${contract.type?.toLowerCase?.() || ""}`;
@@ -44,9 +34,6 @@ function buildBackendUrl(contract, payload) {
   return `${getApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 function pickRequestBody(method, request) {
   const normalizedMethod = method.toUpperCase();
 
@@ -119,9 +106,6 @@ function normalizeBackendError(request, response, backendBody, contract) {
   return error;
 }
 
-/**
- * 이 모듈 내부의 세부 처리 단계입니다. 호출부에서 의미가 드러나지 않는 중간 로직을 캡슐화합니다.
- */
 async function requestBackend(request, contract) {
   const method = (contract.httpMethod || "POST").toUpperCase();
   const url = buildBackendUrl(contract, request);

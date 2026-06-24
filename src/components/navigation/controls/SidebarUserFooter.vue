@@ -59,10 +59,6 @@
 /**
  * @file components/navigation/controls/SidebarUserFooter.vue
  * @description 좌측 메뉴/드로어 관련 UI입니다. navigation store 상태와 사용자 메뉴 action을 화면에 연결합니다.
- *
- * 프리징 코드 주석 기준:
- * - 이 주석은 코드 추적을 돕기 위한 설명이며 런타임 동작을 변경하지 않습니다.
- * - 함수/상태가 다른 composable, store, component로 전달되는 경우 호출 방향을 먼저 확인하세요.
  */
 
 import {computed} from "vue";
@@ -72,9 +68,7 @@ import {storeToRefs} from "pinia";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useViewportStore} from "@/stores/viewportStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
@@ -90,8 +84,6 @@ import {
 const {t} = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const navigationStore = useNavigationStore();
-const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
 const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
   useNavigationLock();
@@ -115,8 +107,6 @@ const responseOverlay = {
     openSettingsOverlay({
       isMobile: shouldUseMobileLayout,
       isBlocked: isShellActionBlocked,
-      viewportStore,
-      navigationStore,
     }),
 };
 
@@ -132,7 +122,6 @@ const actions = {
   openPlayground: () =>
     openPlaygroundRoute({
       router,
-      navigationStore,
       isBlocked: isShellActionBlocked,
     }),
   openSwagger: () =>
@@ -140,8 +129,6 @@ const actions = {
   logout: () =>
     logoutApp({
       router,
-      navigationStore,
-      authStore,
       isBlocked: isShellActionBlocked,
       logScope: "SidebarUserFooter",
     }),

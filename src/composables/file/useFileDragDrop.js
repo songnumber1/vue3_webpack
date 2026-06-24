@@ -2,7 +2,6 @@
  * @file composables/file/useFileDragDrop.js
  * @description 특정 DOM 영역에 파일 드래그앤드롭 이벤트를 연결하는 범용 composable입니다.
  *
- * 프리징 코드 주석 기준:
  * - 이 모듈은 파일 선택 로직을 직접 수행하지 않고, 드롭된 File 배열만 상위 콜백으로 전달합니다.
  * - 호출부는 기존 첨부 파이프라인(addFiles 등)을 onDropFiles로 연결해 UI/UX 회귀를 최소화하세요.
  */
