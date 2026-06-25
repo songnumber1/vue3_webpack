@@ -376,10 +376,11 @@ async function refreshHistories({notifyOnError = false} = {}) {
 }
 
 function syncHistoriesInBackground(options = {}) {
-  Promise.resolve()
+  return Promise.resolve()
     .then(() => refreshHistories(options))
     .catch((error) => {
       logWarn("[ChatContainer] syncHistoriesInBackground 오류:", error);
+      return chatStore.histories;
     });
 }
 

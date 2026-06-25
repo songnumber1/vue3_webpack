@@ -192,6 +192,10 @@ export function useChatSubmit(options) {
       committer.commit();
 
       if (isNewConversationSubmit) {
+        // 회사 운영 흐름과 동일하게 new.do 이후 대화목록 갱신이 끝난 다음
+        // 신규 대화방에 입장하고 generation.do를 호출합니다.
+        await options.syncHistories?.();
+
         const nextRoute = createConversationRoute({
           chatId: targetHistoryId,
         });
@@ -203,10 +207,11 @@ export function useChatSubmit(options) {
           chatStreamStore.clearAllowedNavigation();
         });
         applyConversationActiveRoom({chatId: targetHistoryId});
+      } else {
+        options.syncHistories?.();
       }
 
       await nextTick();
-      options.syncHistories?.();
       await scrollAfterUserSubmit(options, normalized);
 
       await runAssistantStream({
