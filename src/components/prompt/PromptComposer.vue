@@ -93,7 +93,7 @@
     </p>
 
     <PromptModelBottomSheet
-      :open="modelMenuOpen && isMobileSheet"
+      :open="modelMenuOpen && isMobileSheet && !modelReadonly"
       :title="t('chat.modelSelect')"
       :model-value="modelValue"
       :models="currentModels"
@@ -519,6 +519,11 @@ function openModelSelector() {
 }
 
 function selectModel(id) {
+  if (props.disabled || props.modelReadonly) {
+    modelMenuOpen.value = false;
+    return;
+  }
+
   if (id !== props.modelValue) {
     promptControlStore.resetActivePromptTemplate();
   }
@@ -670,6 +675,14 @@ watch(
       promptControlStore.resetActivePromptTemplate();
     }
   }
+);
+
+watch(
+  () => props.modelReadonly,
+  (readonly) => {
+    if (readonly) modelMenuOpen.value = false;
+  },
+  {flush: "post"}
 );
 
 // ── [제출 제어 레이어] ──────────────────────────────────────────────────
@@ -871,6 +884,7 @@ const floating = computed(() => props.floating);
 const showHelp = computed(() => props.showHelp);
 const placeholder = computed(() => props.placeholder);
 const modelValue = computed(() => props.modelValue);
+const modelReadonly = computed(() => props.modelReadonly);
 const promptExpandToggleLabel = computed(() =>
   isPromptExpanded.value ? t("chat.inputCollapse") : t("chat.inputExpand")
 );

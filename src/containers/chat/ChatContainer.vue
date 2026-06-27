@@ -492,20 +492,24 @@ const runtimeIsActiveModelDeleted = computed(() =>
 const runtimeIsActiveModelUnavailable = computed(() =>
   Boolean(chatStore.activeSession?.isModelUnavailable)
 );
+const runtimeIsModelLocked = computed(
+  () => chatStore.isModelLocked || pageState.isConversationPage.value
+);
 const runtimeModels = computed(() => {
-  if (!chatStore.isModelLocked) return assistantStore.currentModels;
-  return [assistantStore.modelMap[chatStore.activeSession?.modelId]].filter(
-    Boolean
-  );
+  const lockedModelId = chatStore.activeSession?.modelId;
+  if (!runtimeIsModelLocked.value || !lockedModelId) {
+    return assistantStore.currentModels;
+  }
+
+  return [assistantStore.modelMap[lockedModelId]].filter(Boolean);
 });
 const runtimeSelectedModel = computed({
   get: () => chatStore.activeSession?.modelId || selectedModelIdRef.value,
   set: (id) => {
-    if (chatStore.isModelLocked) return;
+    if (runtimeIsModelLocked.value) return;
     assistantStore.selectModel(id);
   },
 });
-const runtimeIsModelLocked = computed(() => chatStore.isModelLocked);
 const runtimeConversations = computed(() => chatStore.messageMap);
 
 async function initializeRuntime() {
@@ -535,7 +539,7 @@ function shouldPreserveSidebarAssistantOnHistoryOpen() {
 }
 
 async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
-  if (!forNewChat && chatStore.isModelLocked) return;
+  if (!forNewChat && runtimeIsModelLocked.value) return;
   if (!assistantStore.assistantMap[id]) return;
   try {
     await preloadRuntimeExamplePrompts(id);
