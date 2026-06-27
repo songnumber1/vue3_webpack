@@ -17,142 +17,62 @@
       }"
       @submit.prevent="submit"
     >
-      <PromptAttachmentPreviewList
-        v-if="!usesDesktopTopActions"
-        :attachments="attachments"
-        @preview="previewImage"
-        @remove="removeAttachment"
-        @preview-error="markPreviewError"
-      />
-
-      <PromptTemplatePanelDesktop
-        v-if="hasSelectedTemplatePanel && !isMobileSheet"
-        :groups="selectedTemplateGroups"
-        @select-option="selectTemplateOption"
-      />
-
-      <PromptTemplatePanelMobile
-        v-if="hasSelectedTemplatePanel && isMobileSheet"
-        :groups="selectedTemplateGroups"
-        :active-mobile-group="activeMobileGroup"
-        @select-option="selectTemplateOption"
-        @open-mobile-group="openTemplateOptionSheet"
-        @close-mobile-group="closeTemplateOptionSheet"
-      />
-
-      <div
+      <PromptInputDesktop
         v-if="usesDesktopTopActions"
-        class="prompt-desktop-top-row tw-flex tw-min-w-0 tw-items-center tw-justify-between tw-gap-2"
-      >
-        <PromptToolbarDesktop
-          ref="toolbarRef"
-          layout-mode="top-actions"
-          class="prompt-toolbar-desktop-top"
-          @open-model="openModelSelector"
-          @open-tool="openToolSelector"
-          @close-tool="toolMenuOpen = false"
-          @open-attach="openAttachSelector"
-          @select-model="selectModel"
-          @open-file-picker="openFilePicker"
-        />
-        <button
-          class="prompt-expand-toggle prompt-expand-toggle--desktop-row"
-          type="button"
-          :title="promptExpandToggleLabel"
-          :aria-label="promptExpandToggleLabel"
-          :aria-pressed="isPromptExpanded"
-          @click="togglePromptExpanded"
-        >
-          <svg v-if="!isPromptExpanded" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-          <svg v-else viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
-        </button>
-      </div>
-
-      <PromptAttachmentPreviewList
-        v-if="usesDesktopTopActions"
-        class="prompt-attachment-preview--desktop-top-actions"
+        :ref="setPromptInputRef"
         :attachments="attachments"
+        :has-selected-template-panel="hasSelectedTemplatePanel"
+        :selected-template-groups="selectedTemplateGroups"
+        :is-prompt-expanded="isPromptExpanded"
+        :prompt-expand-toggle-label="promptExpandToggleLabel"
         @preview="previewImage"
-        @remove="removeAttachment"
+        @remove-attachment="removeAttachment"
         @preview-error="markPreviewError"
-      />
-
-      <button
-        v-else
-        class="prompt-expand-toggle"
-        type="button"
-        :title="promptExpandToggleLabel"
-        :aria-label="promptExpandToggleLabel"
-        :aria-pressed="isPromptExpanded"
-        @click="togglePromptExpanded"
-      >
-        <svg v-if="!isPromptExpanded" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-        <svg v-else viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M9 3v6H3M15 3v6h6M21 15h-6v6M3 15h6v6"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </svg>
-      </button>
-
-      <PromptTextarea
-        ref="textareaComponentRef"
+        @select-option="selectTemplateOption"
+        @open-model="openModelSelector"
+        @open-tool="openToolSelector"
+        @close-tool="toolMenuOpen = false"
+        @open-attach="openAttachSelector"
+        @select-model="selectModel"
+        @open-file-picker="openFilePicker"
         @focus="handleFocus"
         @blur="emit('blur')"
         @input="resize"
         @submit="submit"
         @paste="handlePaste"
-      />
-
-      <PromptSubmitActions
-        v-if="usesDesktopTopActions"
-        layout-mode="submit-only"
-        class="prompt-toolbar-desktop-submit"
         @start-voice="startVoiceInput"
         @stop-voice="stopVoiceInput"
+        @toggle-expanded="togglePromptExpanded"
       />
 
-      <PromptToolbarMobile
+      <PromptInputMobile
         v-else
-        ref="toolbarRef"
+        :ref="setPromptInputRef"
+        :attachments="attachments"
+        :has-selected-template-panel="hasSelectedTemplatePanel"
+        :selected-template-groups="selectedTemplateGroups"
+        :active-mobile-group="activeMobileGroup"
+        :is-prompt-expanded="isPromptExpanded"
+        :prompt-expand-toggle-label="promptExpandToggleLabel"
+        @preview="previewImage"
+        @remove-attachment="removeAttachment"
+        @preview-error="markPreviewError"
+        @select-option="selectTemplateOption"
+        @open-mobile-group="openTemplateOptionSheet"
+        @close-mobile-group="closeTemplateOptionSheet"
         @open-model="openModelSelector"
         @open-tool="openToolSelector"
         @open-attach="openAttachSelector"
         @select-model="selectModel"
         @open-file-picker="openFilePicker"
+        @focus="handleFocus"
+        @blur="emit('blur')"
+        @input="resize"
+        @submit="submit"
+        @paste="handlePaste"
         @start-voice="startVoiceInput"
         @stop-voice="stopVoiceInput"
+        @toggle-expanded="togglePromptExpanded"
       />
 
       <input
@@ -215,13 +135,8 @@ import {
   watch,
   inject,
 } from "vue";
-import PromptToolbarDesktop from "@/components/prompt/controls/PromptToolbarDesktop.vue";
-import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
-import PromptSubmitActions from "@/components/prompt/controls/PromptSubmitActions.vue";
-import PromptAttachmentPreviewList from "@/components/prompt/controls/PromptAttachmentPreviewList.vue";
-import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
-import PromptTemplatePanelDesktop from "@/components/prompt/controls/PromptTemplatePanelDesktop.vue";
-import PromptTemplatePanelMobile from "@/components/prompt/controls/PromptTemplatePanelMobile.vue";
+import PromptInputDesktop from "@/components/prompt/input/PromptInputDesktop.vue";
+import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
 import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
 import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
 import PromptToolBottomSheet from "@/components/prompt/tools/mobile/PromptToolBottomSheet.vue";
@@ -378,6 +293,11 @@ const {
   emit: handleComposerEvent,
   isExpanded: isPromptExpanded,
 });
+
+function setPromptInputRef(instance) {
+  toolbarRef.value = instance || null;
+  textareaComponentRef.value = instance || null;
+}
 
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
 // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
