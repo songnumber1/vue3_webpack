@@ -211,7 +211,6 @@ import {
   onMounted,
   provide,
   reactive,
-  ref,
   toRef,
   watch,
   inject,
@@ -357,7 +356,12 @@ const {
 
 // ── [텍스트 입력 + 리사이즈] ────────────────────────────────────────────
 // 사용자가 한 줄 혹은 여러 줄의 텍스트를 기재할 때 textarea 요소의 렌더링 물리 상태를 핸들링합니다.
-const isPromptExpanded = ref(false);
+const isPromptExpanded = computed({
+  get: () => promptControlStore.activePromptExpanded,
+  set: (value) => {
+    promptControlStore.setActivePromptExpanded(value);
+  },
+});
 
 const {
   text, // 사용자가 작성 중인 순수 텍스트 문자열 반응형 참조 객체 (Ref)
@@ -371,7 +375,6 @@ const {
   restoreTextareaAutoGrow, // 최대화 해제 후 textarea inline style을 기존 auto-grow 상태로 복원하는 함수
   clearText, // 전송 직후 반응형 값과 실제 textarea DOM 값을 함께 비우는 함수
 } = usePromptText({
-  isMobileSheet,
   emit: handleComposerEvent,
   isExpanded: isPromptExpanded,
 });
@@ -495,10 +498,14 @@ const canSubmit = computed(
  * @param {Object} [options={focus:true}] - 입력 즉시 커서 포커싱을 강제 적용할지 여부 제어 옵션
  */
 function setText(value, {focus = true} = {}) {
-  text.value = String(value || ""); // 값 갱신
+  text.value = String(value || "");
+
   nextTick(() => {
-    resize(); // 가상 DOM에 할당된 텍스트 길이를 판별하여 입력창 물리 높이 조정
-    if (focus) focusTextarea(); // 옵션 만족 시 인풋 박스 내부로 포커스 강제 이동
+    restoreTextareaAutoGrow();
+
+    if (focus) {
+      nextTick(focusTextarea);
+    }
   });
 }
 
@@ -684,9 +691,17 @@ watch(
     emit("expanded-change", expanded);
 
     await nextTick();
+
+    if (expanded) {
+      resize();
+    } else {
+      restoreTextareaAutoGrow();
+    }
+
+    await nextTick();
     emit("height-change", getLastHeight());
   },
-  {flush: "post"}
+  {flush: "post", immediate: true}
 );
 
 onBeforeUnmount(() => {
@@ -697,6 +712,27 @@ onBeforeUnmount(() => {
 });
 
 const usesDesktopTopActions = computed(() => !isMobileSheet.value);
+const promptLayoutMode = computed(() =>
+  isMobileSheet.value ? "mobile" : "desktop"
+);
+watch(
+  isMobileSheet,
+  async () => {
+    closeMenus();
+
+    await nextTick();
+
+    if (isPromptExpanded.value) {
+      resize();
+    } else {
+      restoreTextareaAutoGrow();
+    }
+
+    await nextTick();
+    handleComposerEvent("height-change", getLastHeight());
+  },
+  {flush: "post"}
+);
 
 provide(PROMPT_TEXTAREA_STATE_KEY, {
   text,
@@ -705,6 +741,7 @@ provide(PROMPT_TEXTAREA_STATE_KEY, {
   generating: computed(() => Boolean(props.generating)),
   canSubmit,
   expanded: computed(() => Boolean(isPromptExpanded.value)),
+  layoutMode: promptLayoutMode,
 });
 
 provide(

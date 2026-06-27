@@ -34,12 +34,18 @@ function clonePromptToolSettings(settings = {}) {
   };
 }
 
+function normalizePromptText(value) {
+  return typeof value === "string" ? value : String(value || "");
+}
+
 export const usePromptControlStore = defineStore("promptControl", {
   state: () => ({
     activePromptMenuMap: {},
     promptMobileSheetMap: {},
     activePromptToolSettingsKey: DRAFT_PROMPT_TOOL_SETTINGS_KEY,
     promptToolSettingsMap: {},
+    promptTextMap: {},
+    promptExpandedMap: {},
   }),
   getters: {
     hasAnyPromptMenuOpen: (state) =>
@@ -51,6 +57,18 @@ export const usePromptControlStore = defineStore("promptControl", {
       return clonePromptToolSettings(
         state.promptToolSettingsMap[key] || DEFAULT_PROMPT_TOOL_SETTINGS
       );
+    },
+    activePromptText: (state) => {
+      const key = normalizePromptToolSettingsKey(
+        state.activePromptToolSettingsKey
+      );
+      return normalizePromptText(state.promptTextMap[key]);
+    },
+    activePromptExpanded: (state) => {
+      const key = normalizePromptToolSettingsKey(
+        state.activePromptToolSettingsKey
+      );
+      return Boolean(state.promptExpandedMap[key]);
     },
   },
   actions: {
@@ -82,9 +100,12 @@ export const usePromptControlStore = defineStore("promptControl", {
     },
     setPromptMobileSheet(scopeId, value) {
       const key = normalizeScopeId(scopeId);
+      const nextValue = Boolean(value);
+      if (this.promptMobileSheetMap[key] === nextValue) return;
+
       this.promptMobileSheetMap = {
         ...this.promptMobileSheetMap,
-        [key]: Boolean(value),
+        [key]: nextValue,
       };
     },
     isPromptMobileSheet(scopeId) {
@@ -101,7 +122,61 @@ export const usePromptControlStore = defineStore("promptControl", {
     },
 
     setActivePromptToolSettingsKey(chatId) {
-      this.activePromptToolSettingsKey = normalizePromptToolSettingsKey(chatId);
+      const nextKey = normalizePromptToolSettingsKey(chatId);
+      if (this.activePromptToolSettingsKey === nextKey) return;
+
+      this.activePromptToolSettingsKey = nextKey;
+    },
+    getPromptTextKey() {
+      return normalizePromptToolSettingsKey(this.activePromptToolSettingsKey);
+    },
+    getPromptTextForKey(chatId) {
+      const key = normalizePromptToolSettingsKey(chatId);
+      return normalizePromptText(this.promptTextMap[key]);
+    },
+    setActivePromptText(value) {
+      const key = this.getPromptTextKey();
+      this.promptTextMap = {
+        ...this.promptTextMap,
+        [key]: normalizePromptText(value),
+      };
+    },
+    setPromptTextForKey(chatId, value) {
+      const key = normalizePromptToolSettingsKey(chatId);
+      this.promptTextMap = {
+        ...this.promptTextMap,
+        [key]: normalizePromptText(value),
+      };
+    },
+    clearActivePromptText() {
+      this.setActivePromptText("");
+    },
+    getPromptExpandedForKey(chatId) {
+      const key = normalizePromptToolSettingsKey(chatId);
+      return Boolean(this.promptExpandedMap[key]);
+    },
+    setActivePromptExpanded(value) {
+      const key = this.getPromptTextKey();
+      const nextValue = Boolean(value);
+      if (this.promptExpandedMap[key] === nextValue) return;
+
+      this.promptExpandedMap = {
+        ...this.promptExpandedMap,
+        [key]: nextValue,
+      };
+    },
+    setPromptExpandedForKey(chatId, value) {
+      const key = normalizePromptToolSettingsKey(chatId);
+      const nextValue = Boolean(value);
+      if (this.promptExpandedMap[key] === nextValue) return;
+
+      this.promptExpandedMap = {
+        ...this.promptExpandedMap,
+        [key]: nextValue,
+      };
+    },
+    clearActivePromptExpanded() {
+      this.setActivePromptExpanded(false);
     },
     getPromptToolSettingsKey() {
       return normalizePromptToolSettingsKey(this.activePromptToolSettingsKey);
@@ -153,6 +228,30 @@ export const usePromptControlStore = defineStore("promptControl", {
       );
 
       this.promptToolSettingsMap = nextPromptToolSettingsMap;
+
+      const nextPromptTextMap = {};
+      Object.entries(this.promptTextMap || {}).forEach(([chatId, value]) => {
+        if (
+          String(chatId) === keepId ||
+          String(chatId) === DRAFT_PROMPT_TOOL_SETTINGS_KEY
+        ) {
+          nextPromptTextMap[chatId] = normalizePromptText(value);
+        }
+      });
+      this.promptTextMap = nextPromptTextMap;
+
+      const nextPromptExpandedMap = {};
+      Object.entries(this.promptExpandedMap || {}).forEach(
+        ([chatId, value]) => {
+          if (
+            String(chatId) === keepId ||
+            String(chatId) === DRAFT_PROMPT_TOOL_SETTINGS_KEY
+          ) {
+            nextPromptExpandedMap[chatId] = Boolean(value);
+          }
+        }
+      );
+      this.promptExpandedMap = nextPromptExpandedMap;
     },
     promoteDraftPromptToolSettingsToChat(chatId) {
       const id = String(chatId || "").trim();
@@ -169,6 +268,24 @@ export const usePromptControlStore = defineStore("promptControl", {
         [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: clonePromptToolSettings(
           DEFAULT_PROMPT_TOOL_SETTINGS
         ),
+      };
+
+      const draftText = normalizePromptText(
+        this.promptTextMap[DRAFT_PROMPT_TOOL_SETTINGS_KEY]
+      );
+      this.promptTextMap = {
+        ...this.promptTextMap,
+        [id]: draftText,
+        [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: "",
+      };
+
+      const draftExpanded = Boolean(
+        this.promptExpandedMap[DRAFT_PROMPT_TOOL_SETTINGS_KEY]
+      );
+      this.promptExpandedMap = {
+        ...this.promptExpandedMap,
+        [id]: draftExpanded,
+        [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: false,
       };
       this.setActivePromptToolSettingsKey(id);
     },

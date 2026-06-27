@@ -26,12 +26,22 @@
  * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
  */
 
-import {computed, nextTick, ref, inject} from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  inject,
+  watch,
+} from "vue";
 import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatStateContext";
+import {PROMPT_TEXTAREA_HEIGHT} from "@/constants/promptComposer";
 
 const textareaRef = ref(null);
 const localText = ref("");
 const isComposing = ref(false);
+let applyFrame = 0;
 
 const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
 const textareaValue = computed(
@@ -46,9 +56,110 @@ const canSubmit = computed(() => Boolean(textareaState?.canSubmit?.value));
 const isExpanded = computed(() => Boolean(textareaState?.expanded?.value));
 
 const emit = defineEmits(["focus", "blur", "input", "submit", "paste"]);
+
+function isTextareaMeasurable(el) {
+  if (!el || typeof window === "undefined") return false;
+
+  const rect = el.getBoundingClientRect?.();
+  const style = window.getComputedStyle(el);
+
+  return (
+    style.display !== "none" &&
+    style.visibility !== "hidden" &&
+    rect &&
+    rect.width > 0
+  );
+}
+
+function resizeTextareaElement() {
+  const el = textareaRef.value;
+  if (!el || !isTextareaMeasurable(el)) return;
+
+  if (isExpanded.value) {
+    el.style.height = "100%";
+    el.style.maxHeight = "none";
+    el.style.overflowY = "auto";
+    return;
+  }
+
+  el.style.height = "auto";
+
+  const computedStyle = window.getComputedStyle(el);
+  const lineHeight = Number.parseFloat(computedStyle.lineHeight);
+  const paddingTop = Number.parseFloat(computedStyle.paddingTop) || 0;
+  const paddingBottom = Number.parseFloat(computedStyle.paddingBottom) || 0;
+  const borderTop = Number.parseFloat(computedStyle.borderTopWidth) || 0;
+  const borderBottom = Number.parseFloat(computedStyle.borderBottomWidth) || 0;
+  const resolvedLineHeight = Number.isFinite(lineHeight)
+    ? lineHeight
+    : PROMPT_TEXTAREA_HEIGHT.lineHeight;
+  const resolvedMaxRows = Math.max(
+    Number.parseInt(PROMPT_TEXTAREA_HEIGHT.maxRows, 10) || 1,
+    1
+  );
+  const maxHeight =
+    resolvedLineHeight * resolvedMaxRows +
+    paddingTop +
+    paddingBottom +
+    borderTop +
+    borderBottom;
+  const nextHeight = Math.min(
+    Math.max(el.scrollHeight, PROMPT_TEXTAREA_HEIGHT.min),
+    maxHeight
+  );
+
+  el.style.maxHeight = `${maxHeight}px`;
+  el.style.height = `${nextHeight}px`;
+  el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+}
+
+function emitInputAfterDomSync() {
+  const el = textareaRef.value;
+  if (!el) return;
+
+  resizeTextareaElement();
+  emit("input", {target: el});
+}
+
+function applyStateValueToDom() {
+  const el = textareaRef.value;
+  if (!el) return;
+
+  const nextValue = textareaValue.value || "";
+  if (el.value !== nextValue) {
+    el.value = nextValue;
+  }
+
+  emitInputAfterDomSync();
+}
+
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
+
+function cancelScheduledApplyStateValueToDom() {
+  if (typeof window === "undefined" || !applyFrame) return;
+
+  window.cancelAnimationFrame(applyFrame);
+  applyFrame = 0;
+}
+
+function scheduleApplyStateValueToDom() {
+  cancelScheduledApplyStateValueToDom();
+
+  nextTick(() => {
+    if (typeof window === "undefined") {
+      applyStateValueToDom();
+      return;
+    }
+
+    applyFrame = window.requestAnimationFrame(() => {
+      applyFrame = 0;
+      applyStateValueToDom();
+    });
+  });
+}
+
 function handleInput(event) {
   if (event?.isComposing || isComposing.value) return;
 
@@ -57,6 +168,11 @@ function handleInput(event) {
   } else {
     localText.value = event.target.value;
   }
+
+  // 실제 입력 이벤트가 발생한 textarea DOM을 기준으로 먼저 높이를 맞춥니다.
+  // PC <-> 모바일 전환 후 기존 값이 있는 상태에서 이어 입력하는 경우에도
+  // 부모/store 동기화 타이밍과 무관하게 auto-grow가 즉시 동작해야 합니다.
+  resizeTextareaElement();
   emit("input", event);
 }
 
@@ -81,7 +197,7 @@ function handleEnterSubmit(event) {
   if (event?.isComposing || isComposing.value) return;
 
   if (isExpanded.value) {
-    nextTick(() => emit("input", event));
+    nextTick(emitInputAfterDomSync);
     return;
   }
 
@@ -108,9 +224,27 @@ function submitFromKeyboard() {
 /**
  * Shift+Enter는 브라우저 기본 개행을 유지하고, DOM 값 반영 이후 높이를 다시 계산합니다.
  */
-function handleShiftEnter(event) {
-  nextTick(() => emit("input", event));
+function handleShiftEnter() {
+  nextTick(emitInputAfterDomSync);
 }
+
+watch(
+  () => textareaState?.layoutMode?.value,
+  scheduleApplyStateValueToDom,
+  {flush: "post"}
+);
+
+watch(textareaValue, scheduleApplyStateValueToDom, {flush: "post"});
+
+watch(isExpanded, scheduleApplyStateValueToDom, {flush: "post"});
+
+onMounted(() => {
+  scheduleApplyStateValueToDom();
+});
+
+onBeforeUnmount(() => {
+  cancelScheduledApplyStateValueToDom();
+});
 
 defineExpose({textareaRef});
 </script>
