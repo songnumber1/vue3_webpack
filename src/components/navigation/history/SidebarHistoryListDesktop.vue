@@ -135,14 +135,14 @@
 
 import {computed, nextTick, ref, watch} from "vue";
 import {autoUpdate, flip, offset, shift, useFloating} from "@floating-ui/vue";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {OverlayScrollbarsComponent} from "overlayscrollbars-vue";
 import "overlayscrollbars/overlayscrollbars.css";
 import {useI18n} from "vue-i18n";
 
 const {t} = useI18n();
-const responsiveContext = useResponsiveContext();
+const responsiveLayoutStore = useResponsiveLayoutStore();
 const {
   isActualAndroidRuntime,
   shouldUseOverlayScrollbar: shouldUseOverlayScrollbarByPolicy,
@@ -178,9 +178,7 @@ const tooltipReferenceRef = ref(null);
 const activeTooltipTitle = ref("");
 
 const isDesktopViewport = computed(() =>
-  Boolean(
-    responsiveContext.value?.isDesktop && !responsiveContext.value?.isMobile
-  )
+  Boolean(responsiveLayoutStore.isDesktop && !responsiveLayoutStore.isMobile)
 );
 
 const isTooltipEnabled = computed(

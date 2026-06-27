@@ -178,7 +178,7 @@
 <script setup>
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 const {t} = useI18n();
@@ -189,8 +189,8 @@ const props = defineProps({
   authorities: {type: Array, default: () => []},
 });
 const emit = defineEmits(["close", "add"]);
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const page = ref(1);
 const selectedIds = ref([]);
 const searchText = ref("");

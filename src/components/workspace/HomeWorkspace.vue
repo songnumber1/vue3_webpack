@@ -45,18 +45,26 @@ import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
-import {useResolvedMobileMode} from "@/composables/runtime/useResolvedMobileMode";
-import {useMainPromptState} from "@/composables/main/useMainPromptState";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatStateContext";
 
 const chatStreamStore = useChatStreamStore();
-const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
-  useNavigationLock();
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
 const emit = defineEmits([
@@ -71,8 +79,9 @@ const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const injectedIsMobile = computed(() => workspaceState.value.isMobile);
-const isMobile = useResolvedMobileMode(injectedIsMobile);
+const isMobile = computed(
+  () => workspaceState.value.isMobile || responsiveLayoutStore.isMobile
+);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
@@ -93,12 +102,15 @@ const mainAssistantIcon = computed(() =>
 const isMainPageActionBlocked = computed(
   () =>
     isGlobalLocked.value ||
-    isStreamingLocked.value ||
     chatStreamStore.isStreaming ||
     isChatHistoryLocked.value
 );
 const isPromptExampleBlocked = computed(() => isMainPageActionBlocked.value);
-const {mainPromptClass} = useMainPromptState({isMobile});
+const mainPromptClass = computed(() =>
+  isMobile.value
+    ? "mobile-keyboard-dock mobile-keyboard-dock--fixed mobile-main-fixed-prompt main-empty-state__prompt tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-prompt tw-box-border tw-w-[100dvw] tw-max-w-[100dvw] tw-overflow-hidden tw-bg-transparent tw-px-3 tw-pb-[max(12px,env(safe-area-inset-bottom))] tw-pt-2 tw-shadow-none"
+    : "desktop-center-prompt tw-w-[min(var(--layout-prompt-width,880px),100%)] tw-max-w-[var(--layout-prompt-width,880px)] tw-border-0 tw-p-0"
+);
 function handleSuggestionClick(item) {
   if (isPromptExampleBlocked.value) return;
 

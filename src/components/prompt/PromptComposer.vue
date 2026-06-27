@@ -131,6 +131,7 @@ import {
   onMounted,
   provide,
   reactive,
+  ref,
   toRef,
   watch,
   inject,
@@ -141,14 +142,34 @@ import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAtt
 import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
 import PromptToolBottomSheet from "@/components/prompt/tools/mobile/PromptToolBottomSheet.vue";
 import {useI18n} from "vue-i18n";
+import {useEventListener} from "@vueuse/core";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
-import {usePromptAttachment} from "@/composables/prompt/usePromptAttachment";
-import {usePromptSpeech} from "@/composables/prompt/usePromptSpeech";
-import {usePromptModel} from "@/composables/prompt/usePromptModel";
-import {usePromptTool} from "@/composables/prompt/usePromptTool";
-import {usePromptTemplate} from "@/composables/prompt/usePromptTemplate";
+import {
+  ANDROID_TO_JS_EVENT,
+  ATTACH_MENU_OPTIONS,
+  DEFAULT_FALLBACK_MODEL,
+  FILE_PICKER_TYPE,
+  IMAGE_PREVIEW_EVENT,
+  NATIVE_FILE_SELECTED_TYPE,
+  PROMPT_MENU_TYPE,
+  PROMPT_SPEECH_LANGUAGE,
+  PROMPT_TEMPLATE_MODEL_IDS,
+} from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
+import {useAssistantStore} from "@/stores/assistantStore";
+import {usePlatformStore} from "@/stores/platformStore";
+import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
+import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
+import {openNativeFilePicker} from "@/platform/bridge/platformBridge";
+import {
+  createBrowserAttachment,
+  createNativeAttachment,
+  imageAttachment,
+  revokeAttachmentUrl,
+} from "@/utils/attachment";
+import {logWarn} from "@/utils/logger";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
@@ -255,6 +276,8 @@ const attachmentDisabled = computed(() =>
 
 // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 프롬프트 제어 Pinia 스토어를 로드합니다.
 const promptControlStore = usePromptControlStore();
+const platformStore = usePlatformStore();
+const systemSettingsStore = useSystemSettingsStore();
 
 // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
 // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
@@ -300,77 +323,327 @@ function setPromptInputRef(instance) {
 }
 
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
-// 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집하는 파트입니다.
-const {
-  fileInputRef, // <input type="file" /> 실제 숨김 노드 접근용 Vue Ref
-  fileDropZoneRef, // 파일 드래그앤드롭 이벤트를 수신할 입력 박스 루트 DOM Ref
-  isFileDragging, // 현재 파일이 입력 박스 위로 드래그되고 있는지 여부
-  isFileDropDisabled, // 현재 모델/상태에서 파일 드롭이 차단되어 있는지 여부
-  attachments, // 현재 업로드되어 프롬프트 전송을 대기 중인 파일 오브젝트들의 반응형 배열 (Ref)
-  fileAccept, // 허용할 확장자 및 미디어 마임 타입 가이드 문자열 (예: "image/*,application/pdf")
-  captureMode, // 모바일 카메라 촬영 연동 시 전면/후면 지시 속성값
-  attachOptions, // 카메라 촬영, 갤러리 접근, 파일 탐색기 등 디바이스 맞춤형 선택지 구성 데이터
-  openAttachSelector, // 모바일 전용 첨부 바텀시트 메뉴를 트리거하여 노출시키는 함수
-  openFilePicker, // 네이티브/브라우저 표준 파일 선택 창을 활성화하는 함수
-  handleFileChange, // 탐색기 선택 완료에 따른 실제 파일 스트림 가공 인젝션 리스너
-  addFiles, // 클립보드 복사나 드래그 앤 드롭으로 들어온 파일들을 첨부 큐 배열에 밀어 넣는 함수
-  markPreviewError, // 업로드된 썸네일 미리보기 렌더링 실패 시 에러 폴백 이미지로 대체하는 핸들러
-  previewImage, // 현재 크게 보기 팝업 창에 올라간 대표 이미지 소스 컨텍스트
-  removeAttachment, // 대기 열에서 특정 첨부 파일 인덱스를 제외(삭제)하는 기능 함수
-  clearAttachments, // 전송 완결 등의 시점에 업로드 대기 배열을 완전히 비우는 청소 함수
-} = usePromptAttachment({
-  attachMenuOpen,
-  resize,
-  getLastHeight,
-  emit: handleComposerEvent,
-  disabled: attachmentDisabled,
-  toggleMenu,
+// 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집합니다.
+const fileInputRef = ref(null);
+const fileDropZoneRef = ref(null);
+const attachments = ref([]);
+const fileAccept = ref("");
+const captureMode = ref(null);
+
+const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
+const attachOptions = computed(() =>
+  ATTACH_MENU_OPTIONS.filter(
+    (option) => !option.requiresCamera || showCameraMenu.value
+  ).map((option) => ({
+    ...option,
+    label: t(option.labelKey),
+  }))
+);
+
+function openAttachSelector() {
+  if (attachmentDisabled.value) return;
+  toggleMenu(PROMPT_MENU_TYPE.attach);
+}
+
+async function openFilePicker(type = FILE_PICKER_TYPE.all) {
+  if (attachmentDisabled.value) return;
+  attachMenuOpen.value = false;
+
+  const option =
+    ATTACH_MENU_OPTIONS.find((item) => item.id === type) ||
+    ATTACH_MENU_OPTIONS.find((item) => item.id === FILE_PICKER_TYPE.all);
+
+  if (platformStore.info.isAndroidApp) {
+    try {
+      await openNativeFilePicker({
+        source: option.nativeSource,
+        multiple: option.multiple,
+        accept: option.accept,
+      });
+      return;
+    } catch (error) {
+      logWarn("Android file picker failed. Falling back to web input.", error);
+    }
+  }
+
+  const input = fileInputRef.value;
+  if (!input) return;
+
+  fileAccept.value = option.accept;
+  captureMode.value = option.capture;
+
+  input.setAttribute("accept", option.accept);
+  if (option.capture) input.setAttribute("capture", option.capture);
+  else input.removeAttribute("capture");
+
+  input.value = "";
+  input.click();
+}
+
+function handleNativeFileSelected(event) {
+  const detail = event?.detail || {};
+  if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
+
+  const nativeFiles = detail.payload?.files || [];
+  const mapped = nativeFiles.map(createNativeAttachment);
+
+  if (mapped.length) attachments.value = [...attachments.value, ...mapped];
+}
+
+function handleFileChange(event) {
+  addFiles(event.target.files);
+  event.target.value = "";
+}
+
+function addFiles(fileList) {
+  const mapped = Array.from(fileList || []).map(createBrowserAttachment);
+  if (!mapped.length) return;
+
+  attachments.value = [...attachments.value, ...mapped];
+
+  mapped
+    .filter((file) => file.kind === "image")
+    .forEach((attachment) => {
+      imageAttachment(attachment, (dataUrl) => {
+        const target = attachments.value.find(
+          (file) => file.id === attachment.id
+        );
+        if (!target) return;
+        target.dataUrl = dataUrl;
+        target.previewUrl = dataUrl;
+        target.previewError = false;
+      });
+    });
+
+  nextTick(() => {
+    resize();
+    handleComposerEvent("height-change", getLastHeight());
+  });
+}
+
+function markPreviewError(file) {
+  if (file) file.previewError = true;
+}
+
+function previewImage(file) {
+  if (!file) return;
+  const previewUrl = file.dataUrl || file.previewUrl || file.url || "";
+  window.dispatchEvent(
+    new CustomEvent(IMAGE_PREVIEW_EVENT, {
+      detail: {...file, url: file.url || previewUrl, previewUrl},
+    })
+  );
+}
+
+function removeAttachment(id) {
+  const target = attachments.value.find((file) => file.id === id);
+  revokeAttachmentUrl(target);
+
+  attachments.value = attachments.value.filter((file) => file.id !== id);
+  nextTick(resize);
+}
+
+function clearAttachments() {
+  attachments.value.forEach((file) => {
+    revokeAttachmentUrl(file);
+  });
+  attachments.value = [];
+}
+
+function handleDroppedFiles(files) {
+  if (attachmentDisabled.value) return;
+  addFiles(files);
+}
+
+const {isFileDragging, isFileDropDisabled} = useFileDragDrop({
+  targetRef: fileDropZoneRef,
+  enabled: computed(() => !attachmentDisabled.value),
+  onDropFiles: handleDroppedFiles,
 });
+
+useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
 // ── [음성 입력] ─────────────────────────────────────────────────────────
 // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
-const {
-  isMicEnabled, // 사용자가 마이크 장치 및 브라우저 오디오 보안 권한을 승인했는지 여부
-  isVoiceListening, // 현재 실시간으로 사용자의 음성을 받아쓰고 있는 활성 상태인지 나타내는 플래그
-  hasVoiceStopped, // 음성 인식이 도중에 침묵이나 시간 초과 등으로 자동 정지되었는지 여부
-  isSpeechSupported, // 현재 사용자 브라우저 엔진이 표준 Web Speech API 규격을 지원하는 기기인지 판단 플래그
-  speech, // 마이크 상태 값 복원 등 STT 코어 제어 인스턴스
-  startVoiceInput, // 마이크 인식을 활성화하고 음성 수신 스트림을 켜는 함수
-  stopVoiceInput, // 음성 인식을 수동으로 즉시 정지하고 종료하는 함수
-} = usePromptSpeech({text, resize, closeMenus, disabled, focusTextarea});
+const isMicEnabled = computed(
+  () => systemSettingsStore.useMicrophone && Boolean(platformStore.info.isMic)
+);
+
+const speech = useSpeechRecognition({
+  language: PROMPT_SPEECH_LANGUAGE,
+  onText: (nextText) => {
+    text.value = nextText;
+    nextTick(resize);
+  },
+});
+
+const isVoiceListening = speech.isListening;
+const hasVoiceStopped = speech.hasManualStop;
+const isSpeechSupported = speech.isSupported;
+
+function startVoiceInput() {
+  if (disabled.value || !isMicEnabled.value || !speech.isSupported.value) {
+    return;
+  }
+
+  closeMenus();
+  speech.start(text.value);
+}
+
+function stopVoiceInput() {
+  speech.stopByUser();
+  nextTick(() => {
+    focusTextarea();
+    resize();
+  });
+}
 
 // ── [모델 선택] ─────────────────────────────────────────────────────────
 // 현재 어시스턴트에서 스위칭 가능한 LLM 백엔드 모델 라인업을 동기화하고 변경을 허용합니다.
-const {currentModels, currentModel, openModelSelector, selectModel} =
-  usePromptModel({
-    props,
-    modelMenuOpen,
-    syncViewportMode,
-    toggleMenu,
-    emit: handleComposerEvent,
-  });
+const fallbackModels = computed(() => [
+  {id: props.modelValue, ...DEFAULT_FALLBACK_MODEL},
+]);
+const currentModels = computed(() =>
+  props.models.length ? props.models : fallbackModels.value
+);
+const currentModel = computed(
+  () =>
+    currentModels.value.find((model) => model.id === props.modelValue) ||
+    currentModels.value[0]
+);
+
+function openModelSelector() {
+  if (props.disabled || props.modelReadonly) return;
+  syncViewportMode();
+  toggleMenu(PROMPT_MENU_TYPE.model);
+}
+
+function selectModel(id) {
+  if (id !== props.modelValue) {
+    promptControlStore.resetActivePromptTemplate();
+  }
+
+  handleComposerEvent("update:modelValue", id);
+  modelMenuOpen.value = false;
+}
 
 // ── [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
 // 특정 페르소나나 업무 서식이 가미된 프롬프트 문틀(Template) 및 확장 API 기능(Tool)을 조합합니다.
-const {
-  selectedTemplate, // 현재 사용자가 마킹 선택한 활성 프롬프트 템플릿 객체
-  selectedTemplateGroups, // 카테고리(그룹)별로 분류된 선택 가능한 전체 템플릿 라인업 목록
-  hasSelectedTemplatePanel, // 현재 특정 서식 서랍 컴포넌트 창이 화면에 노출되고 있는지 여부
-  activeMobileGroup, // 모바일 화면에서 선택된 특정 카테고리 그룹 식별자
-  selectTemplateOption, // 특정 프롬프트 서식을 최종 선택하여 폼 지침으로 주입하는 함수
-  openTemplateOptionSheet, // 모바일 환경 서식 템플릿 바텀시트를 개방하는 함수
-  closeTemplateOptionSheet, // 모바일 서식 템플릿 바텀시트를 패쇄하는 함수
-} = usePromptTemplate({modelId: toRef(props, "modelValue")});
+const assistantStore = useAssistantStore();
+const activeMobileGroupId = ref("");
+const activePromptToolSettings = computed(
+  () => promptControlStore.activePromptToolSettings
+);
 
-const {openToolSelector} = usePromptTool({
-  props,
-  toolMenuOpen,
-  syncViewportMode,
-  toggleMenu,
-  text,
-  resize,
-  focusTextarea,
+function resolveLocaleValue(value = {}, localeCode = "ko") {
+  if (!value || typeof value !== "object") return "";
+  return value[localeCode] || value.ko || value.en || "";
+}
+
+function isSelectableTemplate(template = {}) {
+  if (!template?.id || template.default) return false;
+  if (!PROMPT_TEMPLATE_MODEL_IDS.includes(template.modelId)) return false;
+  return ["mail", "translate", "summary", "code"].includes(template.key);
+}
+
+function hasTemplateFields(template = {}) {
+  return Object.keys(template || {}).length > 0;
+}
+
+const currentModelTemplates = computed(() => {
+  const selectedModelId =
+    props.modelValue || assistantStore.selectedModelId || "";
+
+  return assistantStore.promptTemplates
+    .filter((template) => isSelectableTemplate(template))
+    .filter(
+      (template) => !template.modelId || template.modelId === selectedModelId
+    )
+    .sort((a, b) => a.order - b.order);
 });
+
+const selectedTemplate = computed(() => {
+  const selectedId = activePromptToolSettings.value.promptTemplateId;
+  if (!selectedId) return null;
+
+  return (
+    currentModelTemplates.value.find(
+      (template) => template.id === selectedId
+    ) || null
+  );
+});
+
+const selectedTemplateOptions = computed(
+  () => activePromptToolSettings.value.promptTemplateOptions || {}
+);
+
+const selectedTemplateGroups = computed(() => {
+  const template = selectedTemplate.value?.template || {};
+
+  return Object.entries(template)
+    .map(([groupId, group]) => {
+      const baseOptions = Array.isArray(group.content)
+        ? group.content.map((option) => ({
+            tag: option.tag || option.ko || option.en || "",
+            label: resolveLocaleValue(option, locale.value),
+          }))
+        : [];
+
+      const selectedTag =
+        selectedTemplateOptions.value[groupId] || baseOptions[0]?.tag || "";
+      const options = baseOptions.map((option) => ({
+        ...option,
+        active: option.tag === selectedTag,
+      }));
+      const selectedOption =
+        options.find((option) => option.active) || options[0] || null;
+
+      return {
+        id: groupId,
+        label: resolveLocaleValue(group, locale.value),
+        type: group.type || "radio",
+        options,
+        selectedTag,
+        selectedLabel: selectedOption?.label || "",
+      };
+    })
+    .filter((group) => group.label && group.options.length > 0);
+});
+
+const activeMobileGroup = computed(() => {
+  return (
+    selectedTemplateGroups.value.find(
+      (group) => group.id === activeMobileGroupId.value
+    ) || null
+  );
+});
+
+const hasSelectedTemplatePanel = computed(() => {
+  return Boolean(
+    selectedTemplate.value &&
+    hasTemplateFields(selectedTemplate.value.template) &&
+    selectedTemplateGroups.value.length > 0
+  );
+});
+
+function selectTemplateOption(groupId, optionTag) {
+  promptControlStore.setPromptTemplateOption(groupId, optionTag);
+  activeMobileGroupId.value = "";
+}
+
+function openTemplateOptionSheet(groupId) {
+  activeMobileGroupId.value = groupId;
+}
+
+function closeTemplateOptionSheet() {
+  activeMobileGroupId.value = "";
+}
+
+function openToolSelector() {
+  if (props.disabled || props.submitDisabled || props.hideToolActions) return;
+  syncViewportMode();
+  toggleMenu(PROMPT_MENU_TYPE.tool);
+}
 
 const selectedTemplateTool = computed(() => {
   const template = selectedTemplate.value;

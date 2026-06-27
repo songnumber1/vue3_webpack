@@ -114,13 +114,16 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useViewportStore} from "@/stores/viewportStore";
-import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -140,19 +143,24 @@ defineEmits(["studio-detail"]);
 const {t} = useI18n();
 const navigationStore = useNavigationStore();
 const chatStreamStore = useChatStreamStore();
-const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
-  useNavigationLock();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 const viewportStore = useViewportStore();
 const isAppShellActionBlocked = computed(
   () =>
     isGlobalLocked.value ||
-    isStreamingLocked.value ||
     isChatHistoryLocked.value ||
     chatStreamStore.isStreaming
 );
-const {openAssistantSheet} = useChatAssistantSheetState();
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
+const appShellStore = useAppShellStore();
+const openAssistantSheet = () => appShellStore.openAssistantSheet();
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
 const desktopAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 48)
 );

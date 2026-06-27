@@ -3,7 +3,7 @@
  * @description 앱 전역 navigation/action lock 상태를 scope 단위로 관리합니다.
  *
  * 이 store는 UI/UX 정책을 판단하지 않고 lock의 원본 상태만 보관합니다.
- * 화면별 차단 정책은 각 Vue에서 useNavigationLock과 관련 store를 직접 조합합니다.
+ * 화면별 차단 정책은 각 Vue에서 필요한 store를 직접 조합합니다.
  */
 
 import {defineStore} from "pinia";
@@ -11,12 +11,10 @@ import {defineStore} from "pinia";
 /**
  * 앱 전체에서 공유하는 표준 lock scope입니다.
  * - global: 앱 전체 이동/액션을 일시 차단해야 하는 경우
- * - streaming: 답변 생성 중 이동/중복 액션 차단
  * - chatHistory: 대화방 목록에서 방을 가져오는 중 다른 방 클릭 차단
  */
 export const NAVIGATION_LOCK_SCOPES = Object.freeze({
   global: "global",
-  streaming: "streaming",
   chatHistory: "chat-history",
 });
 

@@ -88,7 +88,7 @@ import McpMainPage from "@/components/mcp/McpMainPage.vue";
 import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
 import McpInfoPanel from "@/components/mcp/McpInfoPanel.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {
@@ -120,8 +120,8 @@ const emit = defineEmits([
   "go-page",
 ]);
 
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const injectedWorkspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)

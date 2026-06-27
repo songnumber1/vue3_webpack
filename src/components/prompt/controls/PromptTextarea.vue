@@ -42,6 +42,7 @@ const textareaRef = ref(null);
 const localText = ref("");
 const isComposing = ref(false);
 let applyFrame = 0;
+let lastHeight = 0;
 
 const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
 const textareaValue = computed(
@@ -73,13 +74,14 @@ function isTextareaMeasurable(el) {
 
 function resizeTextareaElement() {
   const el = textareaRef.value;
-  if (!el || !isTextareaMeasurable(el)) return;
+  if (!el || !isTextareaMeasurable(el)) return lastHeight;
 
   if (isExpanded.value) {
     el.style.height = "100%";
     el.style.maxHeight = "none";
     el.style.overflowY = "auto";
-    return;
+    lastHeight = el.offsetHeight || el.clientHeight || lastHeight || 0;
+    return lastHeight;
   }
 
   el.style.height = "auto";
@@ -111,6 +113,30 @@ function resizeTextareaElement() {
   el.style.maxHeight = `${maxHeight}px`;
   el.style.height = `${nextHeight}px`;
   el.style.overflowY = el.scrollHeight > maxHeight ? "auto" : "hidden";
+  lastHeight = nextHeight;
+  return nextHeight;
+}
+
+function resetTextareaAutoGrow() {
+  const el = textareaRef.value;
+  if (!el) return lastHeight;
+
+  el.style.height = "auto";
+  el.style.maxHeight = "";
+  el.style.overflowY = "";
+  el.scrollTop = 0;
+  el.scrollLeft = 0;
+  lastHeight = 0;
+  nextTick(resizeTextareaElement);
+  return lastHeight;
+}
+
+function getTextareaHeight() {
+  return lastHeight;
+}
+
+function focusTextarea() {
+  textareaRef.value?.focus();
 }
 
 function emitInputAfterDomSync() {
@@ -228,11 +254,9 @@ function handleShiftEnter() {
   nextTick(emitInputAfterDomSync);
 }
 
-watch(
-  () => textareaState?.layoutMode?.value,
-  scheduleApplyStateValueToDom,
-  {flush: "post"}
-);
+watch(() => textareaState?.layoutMode?.value, scheduleApplyStateValueToDom, {
+  flush: "post",
+});
 
 watch(textareaValue, scheduleApplyStateValueToDom, {flush: "post"});
 
@@ -246,5 +270,11 @@ onBeforeUnmount(() => {
   cancelScheduledApplyStateValueToDom();
 });
 
-defineExpose({textareaRef});
+defineExpose({
+  textareaRef,
+  resizeTextarea: resizeTextareaElement,
+  resetTextareaAutoGrow,
+  getTextareaHeight,
+  focusTextarea,
+});
 </script>

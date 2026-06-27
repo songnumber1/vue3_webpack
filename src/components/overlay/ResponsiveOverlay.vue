@@ -60,7 +60,7 @@
 import {computed, ref, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 
 const {t} = useI18n();
 const bodyRef = ref(null);
@@ -81,8 +81,8 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close"]);
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
 
 const isMobileFullscreen = computed(
   () => isMobile.value && props.mobileMode === "fullscreen"

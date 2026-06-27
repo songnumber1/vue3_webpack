@@ -128,7 +128,10 @@ import MessageList from "@/components/chat/MessageList.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
@@ -169,8 +172,13 @@ const workspaceState = inject(
 );
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
-const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
-  useNavigationLock();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 
 const mode = computed(() => workspaceState.value.mode);
 const activeChatId = computed(() => chatStore.selectedChatId || "");
@@ -250,7 +258,8 @@ const isHistoryBusy = computed(
   () => isChatHistoryLocked.value || resolveBooleanSource(isHistoryRendering)
 );
 const isConversationActionBlocked = computed(
-  () => isGlobalLocked.value || isStreamingLocked.value || isHistoryBusy.value
+  () =>
+    isGlobalLocked.value || chatStreamStore.isStreaming || isHistoryBusy.value
 );
 const chatPageLock = {
   isConversationActionBlocked,
@@ -269,7 +278,8 @@ const chatPageLock = {
       resolveBooleanSource(isGenerating)
   ),
   isLoadPreviousBlocked: computed(
-    () => isGlobalLocked.value || isStreamingLocked.value || isHistoryBusy.value
+    () =>
+      isGlobalLocked.value || chatStreamStore.isStreaming || isHistoryBusy.value
   ),
   isScrollButtonBlocked: computed(
     () => isGlobalLocked.value || isHistoryBusy.value

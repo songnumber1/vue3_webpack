@@ -205,10 +205,16 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
-import {navigateToConversation} from "@/actions/chat/conversationRouteActions";
+import {
+  applyConversationActiveRoom,
+  createConversationRoute,
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   navigateToMainAfterConversationReset,
@@ -220,11 +226,7 @@ import {createPortalAssistantRoute} from "@/composables/chat/internal/navigation
 import {logWarn} from "@/utils/logger";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {resolveBlocked} from "@/utils/interactionGuard";
-import {
-  closeNavigationDrawer,
-  closeNavigationDrawerAndCollapsedRecent,
-  closeNavigationDrawerAndTransientPanels,
-} from "@/actions/navigation/navigationUiActions";
+
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
@@ -235,14 +237,13 @@ const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const emit = defineEmits(["history-menu-action"]);
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
-const {
-  NAVIGATION_LOCK_SCOPES,
-  acquireLockIfFree,
-  releaseLock,
-  isGlobalLocked,
-  isStreamingLocked,
-  isChatHistoryLocked,
-} = useNavigationLock();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
@@ -299,9 +300,7 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
-const isStreamingBlocked = computed(
-  () => chatStreamStore.isStreaming || isStreamingLocked.value
-);
+const isStreamingBlocked = computed(() => chatStreamStore.isStreaming);
 const isChatHistoryBlocked = computed(() => isChatHistoryLocked.value);
 const isSidebarActionBlocked = computed(
   () =>
@@ -332,7 +331,7 @@ function getHistoryId(item) {
 }
 
 function closeSidebarNavigationPanels() {
-  closeNavigationDrawerAndCollapsedRecent();
+  navigationStore.closeTransientPanels();
 }
 
 function closeAssistantSelector() {
@@ -398,7 +397,7 @@ function openAssistantSelector() {
 
 async function selectAssistant(id) {
   if (isPortalAssistantId(id)) {
-    if (isGlobalLocked.value || isStreamingLocked.value) return;
+    if (isGlobalLocked.value || chatStreamStore.isStreaming) return;
     await navigatePortalAssistant(id);
     return;
   }
@@ -490,34 +489,39 @@ async function selectHistory(item, options = {}) {
     return false;
   }
 
-  const lockEntry = acquireLockIfFree(NAVIGATION_LOCK_SCOPES.chatHistory, {
-    owner: historyId,
-    reason: "sidebar-history-select",
-    meta: {source: options.source || "sidebar"},
-  });
+  const lockEntry = navigationLockStore.acquireIfFree(
+    NAVIGATION_LOCK_SCOPES.chatHistory,
+    {
+      owner: historyId,
+      reason: "sidebar-history-select",
+      meta: {source: options.source || "sidebar"},
+    }
+  );
 
   if (!lockEntry) return false;
 
   try {
     chatStore.setPendingSelectedChatId(historyId);
-    closeNavigationDrawerAndTransientPanels();
+    navigationStore.closeTransientPanels();
     navigationStore.setCollapsedRecentOpen(false);
 
-    await navigateToConversation({
-      router,
-      chatId: historyId,
-    }).catch(() => {});
+    const conversationRoute = createConversationRoute({chatId: historyId});
+    try {
+      await router.replace(conversationRoute).catch(() => {});
+    } finally {
+      applyConversationActiveRoom({chatId: historyId});
+    }
 
     if (options.closeCollapsedRecent) {
       navigationStore.setCollapsedRecentOpen(false);
     } else {
-      closeNavigationDrawer();
+      navigationStore.setDrawerOpen(false);
     }
 
     await nextTick();
     return true;
   } catch (_error) {
-    releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory, historyId);
+    navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory, historyId);
     chatStore.clearPendingSelectedChatId();
     return false;
   }
@@ -550,7 +554,7 @@ async function handleViewportModeChange(isCompact) {
 
   // PC 브라우저에서 모바일 폭으로 열려 있던 drawer가 웹 폭으로 전환될 때
   // 전역 .mobile-drawer fallback CSS가 남아 보이지 않도록 즉시 상태를 닫는다.
-  closeNavigationDrawer();
+  navigationStore.setDrawerOpen(false);
   assistantMenuOpen.value = false;
   closeHistoryMenu();
   await nextTick();
@@ -564,7 +568,7 @@ useEventListener(
   () => {
     syncViewportMode();
     if (!isCompactViewport.value && drawerOpen.value) {
-      closeNavigationDrawer();
+      navigationStore.setDrawerOpen(false);
     }
   },
   {passive: true}

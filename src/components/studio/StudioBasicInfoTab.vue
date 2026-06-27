@@ -81,7 +81,7 @@
 <script setup>
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 
 const {t} = useI18n();
 
@@ -91,8 +91,8 @@ defineProps({
   categoryOptions: {type: Array, default: () => []},
 });
 const emit = defineEmits(["update-field", "update-prompt", "open-category"]);
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 
 const formStackClass = "studio-form-stack tw-grid tw-min-w-0 tw-gap-3";
 const fieldClass = "tw-grid tw-min-w-0 tw-gap-1.5";

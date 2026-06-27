@@ -68,7 +68,7 @@
 
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
@@ -81,7 +81,8 @@ const props = defineProps({
   message: {type: Object, required: true},
 });
 defineEmits(["rendered"]);
-const {isInteractionBlocked} = useInteractionGuard();
+const chatStreamStore = useChatStreamStore();
+const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
 const showMessageActions = computed(() => !isInteractionBlocked.value);
 const hasAttachments = computed(
   () =>

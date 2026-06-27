@@ -162,7 +162,10 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
@@ -194,7 +197,7 @@ import {
   resolveConversationSessionState,
 } from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {useAppContext} from "@/composables/app/useAppContext";
-import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {useAutoScroll} from "@/composables/chat/useAutoScroll";
 import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
@@ -206,13 +209,13 @@ import {
   configureResponseOverlay,
   setupResponseOverlayBackGuard,
 } from "@/composables/overlay/responseOverlayActions";
-import {useChatAssistantSheetState} from "@/composables/chat/header/useChatAssistantSheetState";
+
 import {
   hasPendingChatNavigation,
   resolveActiveChatId,
   resolveHiddenConversationRoute,
 } from "@/composables/chat/internal/policy/chatRoutePolicy";
-import {useRouteMode} from "@/composables/route/useRouteMode";
+import {resolveRouteMode} from "@/constants/routeNames";
 import {deleteStudio} from "@/services/studioDetailService";
 import {registerActiveConversationCleanup} from "@/composables/chat/conversation/useActiveConversationCleanup";
 import {
@@ -235,7 +238,7 @@ import {
   normalizeNullableMessageId,
 } from "@/utils/normalize";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
-import {closeNavigationDrawerAndCollapsedRecent} from "@/actions/navigation/navigationUiActions";
+
 import {waitAnimationFrame} from "@/utils/frameScheduler";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
 import {
@@ -333,14 +336,13 @@ const chatStreamStore = useChatStreamStore();
 const apiRequestStore = useApiRequestStore();
 const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const navigationLock = useNavigationLock();
-const {
-  NAVIGATION_LOCK_SCOPES,
-  isGlobalLocked,
-  isStreamingLocked,
-  isChatHistoryLocked,
-  releaseLock,
-} = navigationLock;
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 const appBootstrap = useAppBootstrap();
 const {
   assistants: assistantListRef,
@@ -428,7 +430,7 @@ async function removeHistory(history) {
     throw error;
   }
 }
-const routeMode = useRouteMode();
+const routeMode = computed(() => resolveRouteMode(route.name));
 const conversationMessages = ref([]);
 
 const currentMode = computed(() => routeMode.value);
@@ -707,8 +709,19 @@ const runtime = {
 
 const {scrollToBottom} = useAutoScroll({value: null});
 const workspaceRef = ref(null);
-const {themeName} = useAppShellThemeState(theme.current);
-const {assistantSheetOpen} = useChatAssistantSheetState();
+const appShellStore = useAppShellStore();
+appShellStore.setThemeName(theme.current);
+const themeName = computed(() => appShellStore.themeName);
+const assistantSheetOpen = computed({
+  get: () => appShellStore.assistantSheetOpen,
+  set: (value) => {
+    if (value) {
+      appShellStore.openAssistantSheet();
+    } else {
+      appShellStore.closeAssistantSheet();
+    }
+  },
+});
 const autoScrollOnAnswer = computed(
   () => systemSettingsStore.autoScrollOnAnswer
 );
@@ -985,9 +998,9 @@ async function confirmHistoryDialog(value) {
 
       if (String(activeHistoryId.value) === String(target.id)) {
         conversationMessages.value = [];
-        releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+        navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-        releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+        navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
       }
     }
   } catch (error) {
@@ -1069,7 +1082,7 @@ async function resetChatState({assistantId = null} = {}) {
   }
 
   navigationStore.closeTransientPanels();
-  closeNavigationDrawerAndCollapsedRecent();
+  navigationStore.closeTransientPanels();
   clearForceBottom();
   await navigateToMainAfterReset();
 }
@@ -1231,12 +1244,14 @@ function getCurrentChatHistoryLockOwner() {
 }
 
 function releaseCurrentChatHistoryLock() {
-  const lockEntry = navigationLock.getLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+  const lockEntry = navigationLockStore.getLock(
+    NAVIGATION_LOCK_SCOPES.chatHistory
+  );
   if (!lockEntry) return;
 
   const currentOwner = getCurrentChatHistoryLockOwner();
   if (currentOwner && lockEntry.owner === currentOwner) {
-    navigationLock.releaseLock(
+    navigationLockStore.release(
       NAVIGATION_LOCK_SCOPES.chatHistory,
       currentOwner
     );
@@ -1244,12 +1259,12 @@ function releaseCurrentChatHistoryLock() {
   }
 
   if (!lockEntry.owner || lockEntry.meta?.source === "ChatContainer") {
-    navigationLock.releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+    navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
   }
 }
 
 function forceReleaseChatHistoryLock() {
-  navigationLock.releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+  navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
 }
 
 function beginHistoryRender() {
@@ -1257,7 +1272,7 @@ function beginHistoryRender() {
   historyMessagesLoaded.value = false;
   historyMarkdownVisible.value = false;
   isHistoryRendering.value = true;
-  navigationLock.acquireLockIfFree(NAVIGATION_LOCK_SCOPES.chatHistory, {
+  navigationLockStore.acquireIfFree(NAVIGATION_LOCK_SCOPES.chatHistory, {
     owner: String(
       activeHistoryId.value || chatStore.pendingSelectedChatId || "route"
     ),
@@ -1990,7 +2005,7 @@ const {isGenerating, submit, regenerate} = useChatSubmit({
   canWrite: () =>
     !isReadOnly.value &&
     !isHistoryRendering.value &&
-    !navigationLock.isChatHistoryLocked.value &&
+    !isChatHistoryLocked.value &&
     !isActiveModelUnavailable.value,
   isReadOnly,
   isActiveModelUnavailable,
@@ -2143,7 +2158,7 @@ const isChatContainerHistoryBusy = computed(
 const isConversationActionBlocked = computed(
   () =>
     isGlobalLocked.value ||
-    isStreamingLocked.value ||
+    chatStreamStore.isStreaming ||
     isChatContainerHistoryBusy.value
 );
 const chatPageLock = {
@@ -2235,7 +2250,7 @@ async function handleStudioDetailDelete(studio) {
 
   await deleteStudio(deletedStudioId).catch(() => null);
   studioRuntimeStore.markStudioDeleted(deletedStudioId);
-  releaseLock(NAVIGATION_LOCK_SCOPES.chatHistory);
+  navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
   closeStudioDetail();
 
   if (route.name === ROUTE_NAMES.MAIN) {

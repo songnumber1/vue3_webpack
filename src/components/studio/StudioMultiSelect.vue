@@ -59,7 +59,7 @@
 import {computed, ref} from "vue";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useI18n} from "vue-i18n";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import StudioMultiSelectBottomSheet from "@/components/studio/select/StudioMultiSelectBottomSheet.vue";
 import StudioMultiSelectFloatPanel from "@/components/studio/select/StudioMultiSelectFloatPanel.vue";
 const {t} = useI18n();
@@ -71,8 +71,8 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"]);
 const open = ref(false);
 const rootRef = ref(null);
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const visibleValues = computed(() => props.modelValue.slice(0, 2));
 const hiddenCount = computed(() =>
   Math.max(0, props.modelValue.length - visibleValues.value.length)

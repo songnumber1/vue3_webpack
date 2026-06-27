@@ -73,7 +73,12 @@ import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
 import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
-import {useStudioWorkspaceData} from "@/composables/studio/useStudioWorkspaceData";
+import {studioApiLive} from "@/api/live/studioApi.live";
+import {
+  adaptStudioAuthorityList,
+  adaptStudioList,
+  adaptStudioMainInfo,
+} from "@/adapters/studioResponseAdapter";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
 
@@ -81,17 +86,6 @@ const {t, locale} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const studioRuntimeStore = useStudioRuntimeStore();
-const studioData = useStudioWorkspaceData({
-  allLabel: t("studio.defaults.all"),
-  allDescription: t("studio.defaults.allDescription"),
-  defaultCategory: t("studio.defaults.common"),
-  defaultDescription: t("studio.defaults.studioDescription"),
-  defaultUser: t("studio.defaults.user"),
-  defaultKnowledge: t("studio.defaults.noKnowledge"),
-  publicScope: t("studio.defaults.publicScope"),
-  authScope: t("studio.defaults.authScope"),
-  createPromptExamples: createDefaultPromptExamples,
-});
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -665,7 +659,10 @@ async function loadStudioData() {
 }
 async function loadMainInfo() {
   try {
-    const mainInfo = await studioData.fetchMainInfo();
+    const mainInfo = adaptStudioMainInfo(await studioApiLive.getMainInfo(), {
+      allLabel: t("studio.defaults.all"),
+      allDescription: t("studio.defaults.allDescription"),
+    });
     if (mainInfo.categories.length) {
       studioCategoryOptions.value = mainInfo.categories;
       categoryOptions.value = studioCategoryOptions.value.filter(
@@ -684,7 +681,9 @@ async function loadMainInfo() {
 }
 async function loadAuthorityInfo() {
   try {
-    const data = await studioData.fetchAuthorityInfo();
+    const data = adaptStudioAuthorityList(
+      await studioApiLive.getAuthorityInfo()
+    );
     if (data.length) authorityOptions.value = data;
   } catch (error) {
     // 백엔드 미연결 개발 환경에서는 기본 데이터를 유지합니다.
@@ -692,12 +691,23 @@ async function loadAuthorityInfo() {
 }
 async function loadStudioList() {
   try {
-    const data = await studioData.fetchStudioList({
-      pageNo: 1,
-      pagePerCnt: 20,
-      categoryId: "",
-      topCnt: 4,
-    });
+    const data = adaptStudioList(
+      await studioApiLive.searchList({
+        pageNo: 1,
+        pagePerCnt: 20,
+        categoryId: "",
+        topCnt: 4,
+      }),
+      {
+        defaultCategory: t("studio.defaults.common"),
+        defaultDescription: t("studio.defaults.studioDescription"),
+        defaultUser: t("studio.defaults.user"),
+        defaultKnowledge: t("studio.defaults.noKnowledge"),
+        publicScope: t("studio.defaults.publicScope"),
+        authScope: t("studio.defaults.authScope"),
+        createPromptExamples: createDefaultPromptExamples,
+      }
+    );
     if (data.length) {
       studios.value = data;
       usesDefaultStudioData.value = false;

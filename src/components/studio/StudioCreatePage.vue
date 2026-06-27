@@ -181,7 +181,7 @@ import StudioFeatureTab from "@/components/studio/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 import StudioCreateActionBottomSheet from "@/components/studio/create/StudioCreateActionBottomSheet.vue";
 
@@ -201,8 +201,8 @@ defineProps({
   selectedAuthorities: {type: Array, default: () => []},
   allAuthoritiesChecked: {type: Boolean, default: false},
 });
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 
 const createPageRef = ref(null);
 const createFormRef = ref(null);

@@ -62,20 +62,10 @@
 import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import McpMainWorkspace from "@/components/mcp/McpMainWorkspace.vue";
-import {useMcpWorkspaceData} from "@/composables/mcp/useMcpWorkspaceData";
+import {mcpApiLive} from "@/api/live/mcpApi.live";
+import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
 
 const {t, locale} = useI18n();
-const mcpData = useMcpWorkspaceData({
-  allLabel: t("mcp.defaults.all"),
-  allDescription: t("mcp.defaults.allDescription"),
-  defaultCategory: t("mcp.defaults.common"),
-  defaultConnector: t("mcp.defaults.connector"),
-  defaultDescription: t("mcp.defaults.description"),
-  defaultUser: t("mcp.defaults.user"),
-  defaultCapability: t("mcp.defaults.capability"),
-  publicScope: t("mcp.defaults.publicScope"),
-  createPromptExamples: createDefaultPromptExamples,
-});
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -456,7 +446,10 @@ async function loadMcpData() {
 
 async function loadMainInfo() {
   try {
-    const mainInfo = await mcpData.fetchMainInfo();
+    const mainInfo = adaptMcpMainInfo(await mcpApiLive.getMainInfo(), {
+      allLabel: t("mcp.defaults.all"),
+      allDescription: t("mcp.defaults.allDescription"),
+    });
     if (mainInfo.categories.length) {
       mcpCategoryOptions.value = mainInfo.categories;
     }
@@ -467,12 +460,23 @@ async function loadMainInfo() {
 
 async function loadMcpList() {
   try {
-    const data = await mcpData.fetchMcpList({
-      pageNo: 1,
-      pagePerCnt: 20,
-      categoryId: "",
-      topCnt: 4,
-    });
+    const data = adaptMcpList(
+      await mcpApiLive.searchList({
+        pageNo: 1,
+        pagePerCnt: 20,
+        categoryId: "",
+        topCnt: 4,
+      }),
+      {
+        defaultCategory: t("mcp.defaults.common"),
+        defaultConnector: t("mcp.defaults.connector"),
+        defaultDescription: t("mcp.defaults.description"),
+        defaultUser: t("mcp.defaults.user"),
+        defaultCapability: t("mcp.defaults.capability"),
+        publicScope: t("mcp.defaults.publicScope"),
+        createPromptExamples: createDefaultPromptExamples,
+      }
+    );
     if (data.length) {
       mcps.value = data;
       usesDefaultMcpData.value = false;

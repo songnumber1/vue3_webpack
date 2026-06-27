@@ -103,7 +103,7 @@ import MobileSettingsMenuList from "@/components/settings/MobileSettingsMenuList
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 const props = defineProps({
@@ -115,8 +115,8 @@ const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const activeMenu = ref("");
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => Boolean(responsiveContext.value.isMobile));
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
 
 const headerTitle = computed(() => resolveMenuTitle(activeMenu.value));
 const guideSections = computed(() => tm("guide.sections"));

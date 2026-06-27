@@ -74,7 +74,7 @@
  * ChatHeader는 대화방/워크스페이스 헤더 역할만 유지합니다.
  */
 
-import {computed, inject} from "vue";
+import {computed, inject, nextTick} from "vue";
 import {useRouter} from "vue-router";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
@@ -82,6 +82,8 @@ import UserMenu from "@/components/menu/UserMenu.vue";
 import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import GuideIcon from "@/components/icons/GuideIcon.vue";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
+import {useAuthStore} from "@/stores/authStore";
+import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {
   openLanguageOverlay,
@@ -91,17 +93,20 @@ import {
   openSystemOverlay,
 } from "@/composables/overlay/responseOverlayActions";
 import {useAppContext} from "@/composables/app/useAppContext";
-import {useAppShellThemeState} from "@/composables/app/useAppShellThemeState";
+import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {authApiLive} from "@/api/live/authApi.live";
+import {ROUTE_NAMES} from "@/constants/routeNames";
+import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
+import {renderMermaidInElement} from "@/utils/mermaidRenderer";
+import {logWarn} from "@/utils/logger";
+import {resolveBlocked} from "@/utils/interactionGuard";
 import {
-  logoutApp,
-  openGuideRoute,
-  openPlaygroundRoute,
-  openSwaggerRoute,
-  openTermsRoute,
-  toggleThemeAction,
-} from "@/composables/app/appShellActions";
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
@@ -110,15 +115,26 @@ import {
 const {t} = useI18n();
 const router = useRouter();
 const chatStreamStore = useChatStreamStore();
-const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
-  useNavigationLock();
+const authStore = useAuthStore();
+const navigationStore = useNavigationStore();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 const {theme} = useAppContext();
-const {themeName: shellThemeName} = useAppShellThemeState(theme?.current);
+const appShellStore = useAppShellStore();
+appShellStore.setThemeName(theme?.current);
+const shellThemeName = computed({
+  get: () => appShellStore.themeName,
+  set: (value) => appShellStore.setThemeName(value),
+});
 const {shouldUseMobileLayout} = useRuntimeModeFlags();
 const isAppShellActionBlocked = computed(
   () =>
     isGlobalLocked.value ||
-    isStreamingLocked.value ||
     isChatHistoryLocked.value ||
     chatStreamStore.isStreaming
 );
@@ -142,29 +158,63 @@ const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const themeName = computed(
   () => workspaceState.value.themeName || shellThemeName.value || "light"
 );
+async function toggleTheme() {
+  if (resolveBlocked(isShellActionBlocked)) return;
+
+  try {
+    if (!theme?.toggle) return;
+
+    theme.toggle();
+    shellThemeName.value = theme.current;
+    await nextTick();
+
+    if (
+      isMermaidRenderingEnabledForPlatform(
+        getRuntimeSystemSettings(),
+        Boolean(shouldUseMobileLayout.value)
+      )
+    ) {
+      await renderMermaidInElement(document.querySelector(".message-list"), {
+        force: true,
+      });
+    }
+  } catch (error) {
+    logWarn("[ApplicationHeader] toggleTheme 오류:", error);
+  }
+}
+
+function openRoute(name, {closeDrawer = false} = {}) {
+  if (resolveBlocked(isShellActionBlocked)) return;
+  if (closeDrawer) navigationStore.setDrawerOpen(false);
+  router.push({name}).catch(() => {});
+}
+
+async function logout() {
+  if (resolveBlocked(isShellActionBlocked)) return;
+
+  try {
+    await authApiLive.logout();
+  } catch (error) {
+    logWarn("[ApplicationHeader] logout 오류:", error);
+  } finally {
+    resetAppBootstrapState();
+    authStore.resetAuth?.();
+    navigationStore.setDrawerOpen(false);
+    await router
+      .replace({
+        name: ROUTE_NAMES.LOGIN_REQUIRED,
+        query: {reason: "LOGIN_REQUIRED"},
+      })
+      .catch(() => {});
+  }
+}
+
 const shellActions = {
-  toggleTheme: () =>
-    toggleThemeAction({
-      theme,
-      themeName: shellThemeName,
-      isMobile: shouldUseMobileLayout,
-      isBlocked: isShellActionBlocked,
-      logScope: "ApplicationHeader",
-    }),
-  openSwagger: () =>
-    openSwaggerRoute({router, isBlocked: isShellActionBlocked}),
-  openPlayground: () =>
-    openPlaygroundRoute({
-      router,
-      isBlocked: isShellActionBlocked,
-    }),
-  openGuide: () => openGuideRoute({router, isBlocked: isShellActionBlocked}),
-  openTerms: () => openTermsRoute({router, isBlocked: isShellActionBlocked}),
-  logout: () =>
-    logoutApp({
-      router,
-      isBlocked: isShellActionBlocked,
-      logScope: "ApplicationHeader",
-    }),
+  toggleTheme,
+  openSwagger: () => openRoute(ROUTE_NAMES.SWAGGER),
+  openPlayground: () => openRoute(ROUTE_NAMES.PLAYGROUND, {closeDrawer: true}),
+  openGuide: () => openRoute(ROUTE_NAMES.GUIDE),
+  openTerms: () => openRoute(ROUTE_NAMES.TERMS, {closeDrawer: true}),
+  logout,
 };
 </script>

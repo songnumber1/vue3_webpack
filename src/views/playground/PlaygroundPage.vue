@@ -289,7 +289,10 @@ import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useViewportStore} from "@/stores/viewportStore";
-import {useNavigationLock} from "@/composables/navigation/useNavigationLock";
+import {
+  NAVIGATION_LOCK_SCOPES,
+  useNavigationLockStore,
+} from "@/stores/navigationLockStore";
 import {
   openNoticeOverlay,
   openPersonalizationOverlay,
@@ -299,8 +302,13 @@ const {t} = useI18n();
 const navigationStore = useNavigationStore();
 const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
-const {isGlobalLocked, isStreamingLocked, isChatHistoryLocked} =
-  useNavigationLock();
+const navigationLockStore = useNavigationLockStore();
+const isGlobalLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
+);
+const isChatHistoryLocked = computed(() =>
+  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
+);
 const {appInfo} = useAppContext();
 const {
   isCompactViewport,
@@ -311,7 +319,6 @@ const {
 const isAppShellActionBlocked = computed(
   () =>
     isGlobalLocked.value ||
-    isStreamingLocked.value ||
     isChatHistoryLocked.value ||
     chatStreamStore.isStreaming
 );

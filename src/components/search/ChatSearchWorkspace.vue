@@ -141,14 +141,20 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {navigateToConversation} from "@/actions/chat/conversationRouteActions";
+import {
+  applyConversationActiveRoom,
+  createConversationRoute,
+} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
-import {useChatSearch} from "@/composables/search/useChatSearch";
-import {createHistoryFromSearchResult} from "@/adapters/chatResponseAdapter";
+import {resolveChatApis} from "@/api/runtime/chatApis";
+import {
+  adaptChatSearchResponse,
+  createHistoryFromSearchResult,
+} from "@/adapters/chatResponseAdapter";
 import {
   createEmptyWorkspaceState,
   CHAT_WORKSPACE_STATE_KEY,
@@ -156,14 +162,10 @@ import {
 
 const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
-const chatSearch = useChatSearch({
-  fallbackTitle: t("chatSearch.untitled"),
-  limit: 200,
-});
 const router = useRouter();
 const chatStore = useChatStore();
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const injectedWorkspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
@@ -245,8 +247,19 @@ async function runSearch({resetPage = false} = {}) {
   lastSearchedKeyword.value = nextKeyword;
   if (resetPage) currentPage.value = 1;
   loading.value = true;
+
   try {
-    allResults.value = (await chatSearch.search(nextKeyword)).list;
+    const {chatHistoryApi} = resolveChatApis();
+    const response = await chatHistoryApi.searchChats({
+      keyword: nextKeyword,
+      searchText: nextKeyword,
+      query: nextKeyword,
+      limit: 200,
+    });
+    allResults.value = adaptChatSearchResponse(response, {
+      fallbackTitle: t("chatSearch.untitled"),
+      keyword: nextKeyword,
+    }).list;
   } catch (_error) {
     allResults.value = [];
   } finally {
@@ -282,11 +295,11 @@ async function openChat(result) {
   const query = isSearchMode.value && messageId ? {messageId} : undefined;
 
   try {
-    await navigateToConversation({
-      router,
-      chatId,
-      replace: false,
-    });
+    try {
+      await router.push(createConversationRoute({chatId}));
+    } finally {
+      applyConversationActiveRoom({chatId});
+    }
 
     if (query) {
       await router.replace({query}).catch(() => {});

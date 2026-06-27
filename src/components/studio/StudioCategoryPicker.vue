@@ -20,7 +20,7 @@
 
 <script setup>
 import {computed} from "vue";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import StudioCategoryBottomSheet from "@/components/studio/select/StudioCategoryBottomSheet.vue";
 import StudioCategoryDialog from "@/components/studio/select/StudioCategoryDialog.vue";
 
@@ -30,6 +30,6 @@ defineProps({
   selectedValue: {type: String, default: ""},
 });
 defineEmits(["close", "select"]);
-const responsiveContext = useResponsiveContext();
-const isMobile = computed(() => responsiveContext.value.isMobile);
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const isMobile = computed(() => responsiveLayoutStore.isMobile);
 </script>

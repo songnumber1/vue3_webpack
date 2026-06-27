@@ -82,8 +82,8 @@ import {
 } from "@/platform/scroll/overlayScrollbarController";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
-import {useInteractionGuard} from "@/composables/runtime/useInteractionGuard";
-import {useResponsiveContext} from "@/composables/app/responsiveContext";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
@@ -102,9 +102,10 @@ const props = defineProps({
 const {locale, t} = useI18n();
 const systemSettingsStore = useSystemSettingsStore();
 const {settings} = storeToRefs(systemSettingsStore);
-const responsiveContext = useResponsiveContext();
+const responsiveLayoutStore = useResponsiveLayoutStore();
+const chatStreamStore = useChatStreamStore();
 const emit = defineEmits(["rendered", "regenerate"]);
-const {isInteractionBlocked} = useInteractionGuard();
+const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
 const html = ref("");
 const reasoningHtml = ref("");
 const contentMarkdownRendered = ref(false);
@@ -140,7 +141,7 @@ const isMessageComplete = computed(
 const resolvedMermaidSettings = computed(() =>
   resolveMermaidPlatformSettings(
     settings.value,
-    Boolean(responsiveContext.value?.isMobile)
+    Boolean(responsiveLayoutStore.isMobile)
   )
 );
 const showMermaidHeader = computed(

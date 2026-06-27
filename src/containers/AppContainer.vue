@@ -14,7 +14,7 @@
  * @description 프로젝트 공통 JavaScript/Vue 모듈입니다. 하위 계층에서 재사용되는 상태, action, 렌더 보조 로직을 포함합니다.
  */
 
-import {computed, provide, watch, watchEffect} from "vue";
+import {computed, watch, watchEffect} from "vue";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
@@ -23,7 +23,6 @@ import {useAuthStore} from "@/stores/authStore";
 import {useRoute} from "vue-router";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
-import {RESPONSIVE_CONTEXT_KEY} from "@/composables/app/responsiveContext";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 
 /**
@@ -132,8 +131,6 @@ const responsiveContext = computed(() => ({
 watchEffect(() => {
   responsiveLayoutStore.setSnapshot(responsiveContext.value);
 });
-
-provide(RESPONSIVE_CONTEXT_KEY, responsiveContext);
 
 function syncScrollRuntimeClasses(isAndroidRuntime, useOverlayScrollbar) {
   if (typeof document === "undefined") return;
