@@ -6,38 +6,49 @@
 import {defineStore} from "pinia";
 
 /**
- * @description AI 모델이 토큰 스트리밍 응답(텍스트 한 글자씩 실시간 드로잉 타자 모션)을 뱉어내고 있는 도중인지 판별하여
- * 입력창 전송 버튼 잠금 및 자동 스크롤 하단 포커싱 트리거를 홀딩 보존하는 스토어입니다.
+ * @description 채팅 질문 전송 후 답변 성공/실패/취소가 확정되기 전까지
+ * 사용자 이동과 중복 전송을 막는 대기 상태를 관리합니다.
  */
 export const useChatStreamStore = defineStore("chatStream", {
-  // 스트리밍 플래그 상태 정의
   state: () => ({
-    isStreaming: false, // 현재 AI 모델 인프라가 대화 패킷을 타이핑 중인지 판별 플래그
+    isWait: false,
     /**
      * 새 채팅 생성 직후 프론트 내부에서 수행하는 hidden-only /chat entry 라우팅만
-     * 스트리밍 중 1회 통과시키기 위한 임시 허용권입니다.
+     * 대기 중 1회 통과시키기 위한 임시 허용권입니다.
      * 사용자 클릭 이동, 다른 대화방 이동, Studio/MCP 이동 허용 용도가 아닙니다.
      */
     allowedNavigation: null,
   }),
   actions: {
     /**
-     * AI 생성 인터페이스 가동 직전, 스트리밍 상태의 시작 신호탄을 점등 마킹합니다.
+     * 채팅 질문 전송 직후, 답변 처리 완료 전까지의 대기 상태를 시작합니다.
      */
-    start() {
-      this.isStreaming = true; // 스트리밍 가동 잠금 잠금 활성화
+    startWait() {
+      this.isWait = true;
     },
     /**
-     * AI가 마침표 토큰을 수신 완료했거나 통신 소켓 세션이 종료 완료되어 출력을 종료했음을 알리고 락을 해제합니다.
+     * 답변 성공/실패/취소/예외 처리 완료 후 대기 상태를 해제합니다.
+     */
+    finishWait() {
+      this.isWait = false;
+      this.clearAllowedNavigation();
+    },
+    /**
+     * 기존 호출부 호환용 별칭입니다.
+     */
+    start() {
+      this.startWait();
+    },
+    /**
+     * 기존 호출부 호환용 별칭입니다.
      */
     finish() {
-      this.isStreaming = false; // 잠금 전면 해제 릴리즈
-      this.clearAllowedNavigation();
+      this.finishWait();
     },
     /**
      * 새 채팅 생성 직후 hidden-only /chat entry로 이동하는 내부 라우팅만 1회 허용합니다.
      * 이 허용권은 새 채팅 생성 후 router.push/replace 직전에만 설정되며,
-     * 사용자 클릭/다른 라우트 이동은 기존처럼 스트리밍 가드가 차단합니다.
+     * 사용자 클릭/다른 라우트 이동은 기존처럼 대기 가드가 차단합니다.
      * @param {object} route - 허용할 라우트 대상
      */
     allowNavigationTo(route = {}) {
@@ -47,7 +58,7 @@ export const useChatStreamStore = defineStore("chatStream", {
       };
     },
     /**
-     * 전역 라우터 가드에서 스트리밍 중 허용된 내부 라우팅인지 확인하고,
+     * 전역 라우터 가드에서 대기 중 허용된 내부 라우팅인지 확인하고,
      * 일치하면 허용권을 즉시 소모합니다. 한 번 소모된 허용권은 재사용되지 않습니다.
      * @param {object} to - Vue Router의 목적지 라우트
      * @returns {boolean} 허용 여부

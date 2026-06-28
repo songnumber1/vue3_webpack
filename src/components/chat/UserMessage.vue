@@ -82,7 +82,7 @@ const props = defineProps({
 });
 defineEmits(["rendered"]);
 const chatStreamStore = useChatStreamStore();
-const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
+const isInteractionBlocked = computed(() => chatStreamStore.isWait);
 const showMessageActions = computed(() => !isInteractionBlocked.value);
 const hasAttachments = computed(
   () =>

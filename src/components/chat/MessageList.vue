@@ -122,6 +122,7 @@ const props = defineProps({
   historyRendering: {type: Boolean, default: false},
   historyMarkdownVisible: {type: Boolean, default: false},
   historyMessagesReady: {type: Boolean, default: false},
+  historyRenderKey: {type: [String, Number], default: ""},
   hasPreviousHistoryMessages: {type: Boolean, default: false},
   historyLazyTopThreshold: {type: Number, default: 300},
   historyLazyChunkSize: {type: Number, default: 50},
@@ -896,7 +897,9 @@ function clearStableTimers() {
 
 function clearHistoryRenderState() {
   historyRenderRunId += 1;
-  clearTrackedAnimationFrames();
+  clearStableTimers();
+  clearAfterRenderScrollState();
+  clearRenderedFrameScheduler();
   historyRenderCompleting = false;
   resetHistoryRenderLifecycleState();
 }
@@ -1418,6 +1421,7 @@ async function renderHistoryRoomPendingMermaidSequentially(runId) {
     await renderMermaidInElement(root, {
       renderRetryCount: isAndroidHistoryRenderRuntime() ? 3 : 1,
       renderRetryFrameGap: isAndroidHistoryRenderRuntime() ? 2 : 1,
+      shouldContinue: () => isCurrentHistoryRenderRun(runId),
       onTargetComplete: async (_target, processedCount) => {
         if (!isCurrentHistoryRenderRun(runId)) return;
         await updateHistoryRenderFrameAfterBatch(processedCount);
@@ -1426,8 +1430,12 @@ async function renderHistoryRoomPendingMermaidSequentially(runId) {
   } catch {
     // Mermaid 렌더링/문법 오류가 발생해도 history render는 계속 진행합니다.
   } finally {
-    fallbackPendingMermaidToCode(root);
+    if (isCurrentHistoryRenderRun(runId)) {
+      fallbackPendingMermaidToCode(root);
+    }
   }
+
+  if (!isCurrentHistoryRenderRun(runId)) return false;
 
   updateOverlayScrollbarFrame();
   applyHistoryRenderBottomScroll();
@@ -1797,6 +1805,36 @@ watch(
 
     refreshFocusSpacerAfterRender();
   }
+);
+
+watch(
+  () => props.historyRenderKey,
+  (nextKey, previousKey) => {
+    if (nextKey === previousKey) return;
+    clearHistoryRenderState();
+  },
+  {flush: "sync"}
+);
+
+watch(
+  () => props.messages,
+  async (nextMessages, previousMessages) => {
+    if (!props.historyRendering || nextMessages === previousMessages) return;
+
+    // 대화방 이동 중 이전 방 Mermaid/후처리 루프가 아직 진행 중이면
+    // 새 메시지 배열이 들어와도 historyRenderCompleting 때문에 새 방 렌더가
+    // 시작되지 않을 수 있습니다. 메시지 소스가 바뀌는 즉시 기존 run을
+    // 무효화해서 최신 방의 후처리만 진행되도록 합니다.
+    clearHistoryRenderState();
+
+    // 메시지 개수가 같은 방으로 이동하는 경우 length watcher가 다시 실행되지
+    // 않을 수 있으므로, DOM 교체 tick 이후 최신 메시지 기준 후처리를 직접 시작합니다.
+    if (props.historyMessagesReady) {
+      await nextTick();
+      startHistoryRoomRender();
+    }
+  },
+  {flush: "sync"}
 );
 
 watch(

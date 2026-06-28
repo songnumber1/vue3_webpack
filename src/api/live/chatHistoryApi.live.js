@@ -33,10 +33,11 @@ async function createChat(payload = {}) {
 /**
  * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
  */
-async function getChatHistoryDetail(payload = {}) {
+async function getChatHistoryDetail(payload = {}, options = {}) {
   const response = await httpClient.post(
     API_ENDPOINTS.CHAT_HISTORY_DETAIL,
-    payload
+    payload,
+    {signal: options.signal}
   );
   return unwrapResponseData(response, []);
 }
@@ -75,9 +76,10 @@ async function deleteChat(payload = {}) {
 /**
  * 공유 URL로 진입한 대화방의 존재 여부와 조회 메시지를 검증합니다.
  */
-async function getSharedConversation(payload = {}) {
+async function getSharedConversation(payload = {}, options = {}) {
   const response = await httpClient.post(API_ENDPOINTS.SHARED_INFO, payload, {
     apiKey: API_KEYS.SHARED_INFO,
+    signal: options.signal,
   });
   return unwrapResponseData(response, {});
 }

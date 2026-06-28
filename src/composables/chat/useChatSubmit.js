@@ -25,7 +25,7 @@ import {
   createConversationRoute,
   resolveActiveChatId,
 } from "@/composables/chat/internal/policy/chatRoutePolicy";
-// chatStreamStore.isStreaming을 생성 중 상태의 단일 기준으로 사용합니다.
+// chatStreamStore.isWait를 채팅 답변 처리 중 상태의 단일 기준으로 사용합니다.
 
 async function createConversationForSubmit(options, normalized) {
   const context = {
@@ -132,7 +132,7 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
 
 export function useChatSubmit(options) {
   const chatStreamStore = useChatStreamStore();
-  const isGenerating = computed(() => chatStreamStore.isStreaming);
+  const isGenerating = computed(() => chatStreamStore.isWait);
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
   const route = useRoute();
@@ -144,12 +144,12 @@ export function useChatSubmit(options) {
       chatStore.isActiveSharedRoom ||
       !canWrite(options) ||
       (!normalized.text && normalized.attachments.length === 0) ||
-      chatStreamStore.isStreaming
+      chatStreamStore.isWait
     ) {
       return;
     }
 
-    chatStreamStore.start();
+    chatStreamStore.startWait();
 
     const initialHistoryId = normalizeChatId(resolveActiveChatId());
     const isNewConversationSubmit = shouldCreateConversation(
@@ -196,10 +196,12 @@ export function useChatSubmit(options) {
         // 신규 대화방에 입장하고 generation.do를 호출합니다.
         await options.syncHistories?.();
 
+        const chatStore = useChatStore();
+        chatStore.setPendingSelectedChatId(targetHistoryId);
         const nextRoute = createConversationRoute({
           chatId: targetHistoryId,
         });
-        // chatStreamStore.isStreaming 상태에서 새 채팅방으로 입장해야 하므로,
+        // chatStreamStore.isWait 상태에서 새 채팅방으로 입장해야 하므로,
         // hidden-only 정책에 따라 /chat 라우팅만 1회 허용합니다.
         // 사용자가 클릭한 다른 대화방/Studio/MCP 이동은 router guard에서 계속 차단됩니다.
         chatStreamStore.allowNavigationTo(nextRoute);
@@ -230,7 +232,7 @@ export function useChatSubmit(options) {
         apiRequestStore.resumeOverlay();
         overlaySuppressed = false;
       }
-      chatStreamStore.finish();
+      chatStreamStore.finishWait();
     }
   }
 
@@ -238,7 +240,7 @@ export function useChatSubmit(options) {
     if (
       chatStore.isActiveSharedRoom ||
       !canWrite(options) ||
-      chatStreamStore.isStreaming
+      chatStreamStore.isWait
     ) {
       return;
     }
@@ -280,7 +282,7 @@ export function useChatSubmit(options) {
     // 자동 스크롤 OFF 재생성에서는 질문 박스를 화면 상단에 배치하기 위한
     // 하단 spacer 계산이 필요합니다. 이 계산은 MessageList의 loading=true 조건에서만
     // 동작하므로 commit/scroll 전에 생성 상태를 먼저 열어 둡니다.
-    chatStreamStore.start();
+    chatStreamStore.startWait();
 
     committer.commit();
     await nextTick();
@@ -309,7 +311,7 @@ export function useChatSubmit(options) {
         logPrefix: "[useChatSubmit] 재생성",
       });
     } finally {
-      chatStreamStore.finish();
+      chatStreamStore.finishWait();
     }
   }
 

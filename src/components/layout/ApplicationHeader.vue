@@ -104,10 +104,6 @@ import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {resolveBlocked} from "@/utils/interactionGuard";
 import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
-import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatStateContext";
@@ -117,13 +113,6 @@ const router = useRouter();
 const chatStreamStore = useChatStreamStore();
 const authStore = useAuthStore();
 const navigationStore = useNavigationStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const {theme} = useAppContext();
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme?.current);
@@ -132,12 +121,7 @@ const shellThemeName = computed({
   set: (value) => appShellStore.setThemeName(value),
 });
 const {shouldUseMobileLayout} = useRuntimeModeFlags();
-const isAppShellActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    isChatHistoryLocked.value ||
-    chatStreamStore.isStreaming
-);
+const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const overlayActionOptions = {
   isBlocked: isShellActionBlocked,

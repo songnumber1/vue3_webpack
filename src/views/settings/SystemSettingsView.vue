@@ -49,7 +49,6 @@ import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {authApiLive} from "@/api/live/authApi.live";
 import {logWarn} from "@/utils/logger";
-import {useNavigationLockStore} from "@/stores/navigationLockStore";
 import {syncViewportSettings} from "@/utils/applyViewportBreakpoint";
 import {
   DEFAULT_MOBILE_BREAKPOINT_PX,
@@ -83,7 +82,6 @@ const router = useRouter();
 const systemSettingsStore = useSystemSettingsStore();
 const platformStore = usePlatformStore();
 const authStore = useAuthStore();
-const navigationLockStore = useNavigationLockStore();
 const {settings} = storeToRefs(systemSettingsStore);
 
 const draft = reactive({...DEFAULT_SYSTEM_SETTINGS});
@@ -368,11 +366,10 @@ async function forceLogoutForPolicyChange() {
     const chatStreamStore = useChatStreamStore();
 
     // 인증/URL 정책 변경은 현재 대화 컨텍스트를 폐기하는 전역 정책 변경입니다.
-    // 대화방 렌더링 락이나 스트리밍 허용권이 남아 있으면 login-required 이동이
-    // 차단될 수 있으므로 로그아웃 처리 전에 채팅 이동 잠금을 명시적으로 정리합니다.
-    navigationLockStore.releaseAll();
+    // 대기 상태가 남아 있으면 login-required 이동이 차단될 수 있으므로
+    // 로그아웃 처리 전에 채팅 대기 상태를 명시적으로 정리합니다.
     chatStore.clearActiveSession();
-    chatStreamStore.finish();
+    chatStreamStore.finishWait();
     resetAppBootstrapState();
     authStore.resetAuth();
   }

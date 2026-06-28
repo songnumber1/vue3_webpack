@@ -56,7 +56,7 @@ export function resolveConversationEntryGuard({to} = {}) {
     to?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
     !pendingChatRoomId &&
-    !chatStreamStore?.isStreaming
+    !chatStreamStore?.isWait
   ) {
     return {name: ROUTE_NAMES.MAIN, replace: true};
   }

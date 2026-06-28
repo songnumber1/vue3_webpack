@@ -82,23 +82,12 @@ import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSetti
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
 import {resolveBlocked} from "@/utils/interactionGuard";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 
 const {t} = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
 const {settings: systemSettings} = storeToRefs(systemSettingsStore);
@@ -111,12 +100,7 @@ const themeName = computed({
   set: (value) => appShellStore.setThemeName(value),
 });
 const {shouldUseMobileLayout} = useRuntimeModeFlags();
-const isAppShellActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    isChatHistoryLocked.value ||
-    chatStreamStore.isStreaming
-);
+const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const responseOverlay = {
   openSettings: () =>

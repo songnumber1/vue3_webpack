@@ -162,10 +162,6 @@ import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
@@ -336,13 +332,6 @@ const chatStreamStore = useChatStreamStore();
 const apiRequestStore = useApiRequestStore();
 const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const appBootstrap = useAppBootstrap();
 const {
   assistants: assistantListRef,
@@ -459,7 +448,11 @@ const activeWorkspaceType = computed(() => {
 
 const activeHistoryId = computed(() => {
   if (pageState.isChatPage.value) {
-    return resolveActiveChatId();
+    return (
+      resolveActiveChatId() ||
+      String(chatStore.pendingSelectedChatId || "").trim() ||
+      null
+    );
   }
   if (pageState.isSharedPage.value) {
     return chatStore.activeRoomType === "shared"
@@ -550,7 +543,7 @@ async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   }
 }
 
-async function ensureRuntimeConversation(historyId) {
+async function ensureRuntimeConversation(historyId, options = {}) {
   const history = chatStore.getHistory(historyId);
   if (!history) return [];
 
@@ -576,12 +569,15 @@ async function ensureRuntimeConversation(historyId) {
   chatStore.setActiveSession(resolvedSession);
 
   if (!chatStore.messageMap[history.id]) {
-    const messages = await loadChatMessageRouters({
-      chatId: history.id,
-      assistId: resolvedSession?.assistantId || history.assistantId,
-      modelId: resolvedSession?.modelId || history.modelId,
-      studio: resolvedSession?.assistantType === "studio",
-    });
+    const messages = await loadChatMessageRouters(
+      {
+        chatId: history.id,
+        assistId: resolvedSession?.assistantId || history.assistantId,
+        modelId: resolvedSession?.modelId || history.modelId,
+        studio: resolvedSession?.assistantType === "studio",
+      },
+      options
+    );
     chatStore.setMessages(history.id, messages);
   }
 
@@ -981,7 +977,7 @@ function closeHistoryDialog() {
 }
 
 async function confirmHistoryDialog(value) {
-  if (chatStreamStore.isStreaming) return;
+  if (chatStreamStore.isWait) return;
 
   const target = historyDialogTarget.value;
   if (!target) {
@@ -1002,9 +998,7 @@ async function confirmHistoryDialog(value) {
 
       if (String(activeHistoryId.value) === String(target.id)) {
         conversationMessages.value = [];
-        navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-        navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
       }
     }
   } catch (error) {
@@ -1015,7 +1009,7 @@ async function confirmHistoryDialog(value) {
 }
 
 async function handleHistoryMenuAction({action, history} = {}) {
-  if (chatStreamStore.isStreaming) return;
+  if (chatStreamStore.isWait) return;
   if (!history || !action) return;
 
   runtime.syncHistoriesInBackground?.({notifyOnError: true});
@@ -1070,7 +1064,7 @@ async function navigateToMainAfterReset() {
 }
 
 async function resetChatState({assistantId = null} = {}) {
-  if (chatStreamStore.isStreaming) return;
+  if (chatStreamStore.isWait) return;
 
   clearConversationNavigationState();
   runtime.revokeMessageAttachments(conversationMessages.value);
@@ -1170,7 +1164,8 @@ const messageRenderPolicy = computed(() =>
     isMobile: Boolean(isMobile.value),
     selectedChat: activeHistory.value,
     searchTargetMessageId: route.query?.messageId,
-    showPcProgress: systemSettingsStore.settings.showPcProgress,
+    // PC ProgressBar는 제거되었으므로 PC 이력 렌더링은 항상 progressive 정책으로 유지합니다.
+    showPcProgress: false,
     settings: systemSettingsStore.settings,
   })
 );
@@ -1238,52 +1233,11 @@ async function flushConversationSwitchPaint({clearMessages = true} = {}) {
   await waitForNextPaint();
 }
 
-function getCurrentChatHistoryLockOwner() {
-  return String(
-    activeHistoryId.value ||
-      chatStore.pendingSelectedChatId ||
-      chatStore.selectedChatId ||
-      ""
-  ).trim();
-}
-
-function releaseCurrentChatHistoryLock() {
-  const lockEntry = navigationLockStore.getLock(
-    NAVIGATION_LOCK_SCOPES.chatHistory
-  );
-  if (!lockEntry) return;
-
-  const currentOwner = getCurrentChatHistoryLockOwner();
-  if (currentOwner && lockEntry.owner === currentOwner) {
-    navigationLockStore.release(
-      NAVIGATION_LOCK_SCOPES.chatHistory,
-      currentOwner
-    );
-    return;
-  }
-
-  if (!lockEntry.owner || lockEntry.meta?.source === "ChatContainer") {
-    navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
-  }
-}
-
-function forceReleaseChatHistoryLock() {
-  navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
-}
-
 function beginHistoryRender() {
   historyRenderFinishSeq += 1;
   historyMessagesLoaded.value = false;
   historyMarkdownVisible.value = false;
   isHistoryRendering.value = true;
-  navigationLockStore.acquireIfFree(NAVIGATION_LOCK_SCOPES.chatHistory, {
-    owner: String(
-      activeHistoryId.value || chatStore.pendingSelectedChatId || "route"
-    ),
-    reason: "history-render",
-    meta: {source: "ChatContainer"},
-  });
-
   if (
     isProgressAllowedForCurrentPlatform(
       systemSettingsStore.settings,
@@ -1301,7 +1255,6 @@ function finishHistoryRenderImmediately() {
   historyMessagesLoaded.value = false;
   historyMarkdownVisible.value = false;
   isHistoryRendering.value = false;
-  releaseCurrentChatHistoryLock();
   if (historyRenderOverlayActive) {
     apiRequestStore.stopOverlay();
   }
@@ -1320,8 +1273,7 @@ function finishHistoryRender() {
       const skipFinalScrollTarget = historyMarkdownVisible.value;
       isHistoryRendering.value = false;
       historyMarkdownVisible.value = false;
-      releaseCurrentChatHistoryLock();
-
+    
       if (skipFinalScrollTarget) return;
 
       await nextTick();
@@ -1399,7 +1351,6 @@ function invalidateHistoryRender() {
 function cleanupHistoryRender() {
   invalidateHistoryRender();
   historyMarkdownVisible.value = false;
-  forceReleaseChatHistoryLock();
   if (historyRenderOverlayActive) {
     apiRequestStore.stopOverlay();
     historyRenderOverlayActive = false;
@@ -1847,7 +1798,7 @@ async function applyPendingNewSubmitHistory(history) {
   await nextTick();
 }
 
-async function hydrateHistoryConversation({history, isCurrentLoad}) {
+async function hydrateHistoryConversation({history, isCurrentLoad, signal}) {
   chatStore.setPendingSelectedChatId(history.id);
   beginHistoryRender();
   const mermaidWarmupPromise = isMermaidRenderingEnabled()
@@ -1857,7 +1808,7 @@ async function hydrateHistoryConversation({history, isCurrentLoad}) {
   await flushConversationSwitchPaint();
   if (!isCurrentLoad()) return;
   chatStore.pruneInactiveMessageCache(history.id);
-  const loadedMessages = await runtime.ensureConversation(history.id);
+  const loadedMessages = await runtime.ensureConversation(history.id, {signal});
   if (hasMermaidInHistoryMessages(loadedMessages)) {
     await mermaidWarmupPromise;
   }
@@ -1869,7 +1820,7 @@ async function hydrateHistoryConversation({history, isCurrentLoad}) {
   chatStore.pruneInactiveMessageCache(history.id);
 }
 
-async function loadHistoryRouteConversation({isCurrentLoad}) {
+async function loadHistoryRouteConversation({isCurrentLoad, signal}) {
   if (pageState.isMainPage.value) {
     resetMainRouteConversation();
     return;
@@ -1891,7 +1842,7 @@ async function loadHistoryRouteConversation({isCurrentLoad}) {
     return;
   }
 
-  await hydrateHistoryConversation({history, isCurrentLoad});
+  await hydrateHistoryConversation({history, isCurrentLoad, signal});
 }
 
 async function redirectSharedNotFound() {
@@ -1906,14 +1857,14 @@ async function redirectSharedNotFound() {
   await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
 }
 
-async function loadSharedRouteConversation({isCurrentLoad}) {
+async function loadSharedRouteConversation({isCurrentLoad, signal}) {
   beginHistoryRender();
   await flushConversationSwitchPaint();
   if (!isCurrentLoad()) return;
 
   const sharedEntryId = getSharedEntryId();
   if (sharedEntryId) {
-    const result = await getSharedConversation(sharedEntryId);
+    const result = await getSharedConversation(sharedEntryId, {signal});
     if (!isCurrentLoad()) return;
     if (!result.exists) {
       await redirectSharedNotFound();
@@ -1937,7 +1888,7 @@ async function loadSharedRouteConversation({isCurrentLoad}) {
     return;
   }
 
-  const result = await getSharedConversation(activeHistoryId.value);
+  const result = await getSharedConversation(activeHistoryId.value, {signal});
   if (!isCurrentLoad()) return;
   if (!result.exists) {
     await redirectSharedNotFound();
@@ -1951,35 +1902,69 @@ async function loadSharedRouteConversation({isCurrentLoad}) {
 }
 
 let routeConversationLoadSeq = 0;
+let routeConversationAbortController = null;
+
+function isRouteConversationAbortError(error) {
+  return (
+    error?.name === "AbortError" ||
+    error?.code === "ERR_CANCELED" ||
+    error?.message === "canceled" ||
+    error?.message === "The mock request was aborted."
+  );
+}
+
+function abortRouteConversationLoad() {
+  routeConversationAbortController?.abort?.();
+  routeConversationAbortController = null;
+}
+
+function createRouteConversationLoadContext() {
+  abortRouteConversationLoad();
+
+  const loadSeq = ++routeConversationLoadSeq;
+  const controller =
+    typeof AbortController === "function" ? new AbortController() : null;
+
+  routeConversationAbortController = controller;
+
+  return {
+    signal: controller?.signal,
+    isCurrentLoad: () => loadSeq === routeConversationLoadSeq,
+  };
+}
 
 async function loadRouteConversation() {
-  const loadSeq = ++routeConversationLoadSeq;
-  const isCurrentLoad = () => loadSeq === routeConversationLoadSeq;
+  const {signal, isCurrentLoad} = createRouteConversationLoadContext();
 
   try {
     if (pageState.isSharedPage.value) {
-      await loadSharedRouteConversation({isCurrentLoad});
+      await loadSharedRouteConversation({isCurrentLoad, signal});
       return;
     }
 
-    await loadHistoryRouteConversation({isCurrentLoad});
+    await loadHistoryRouteConversation({isCurrentLoad, signal});
   } catch (error) {
-    if (isCurrentLoad()) {
-      if (pageState.isSharedPage.value) {
-        await redirectSharedNotFound({
-          message: error?.message || t("chat.sharedNotFoundMessage"),
-        });
-        return;
-      }
-      clearPendingSelectedChatId(activeHistoryId.value);
-      finishHistoryRender();
+    if (!isCurrentLoad() || isRouteConversationAbortError(error)) return;
+
+    if (pageState.isSharedPage.value) {
+      await redirectSharedNotFound({
+        message: error?.message || t("chat.sharedNotFoundMessage"),
+      });
+      return;
     }
+    clearPendingSelectedChatId(activeHistoryId.value);
+    finishHistoryRender();
     logWarn("[ChatContainer] loadRouteConversation 오류:", error);
+  } finally {
+    if (isCurrentLoad()) {
+      routeConversationAbortController = null;
+    }
   }
 }
 
 function invalidateRouteLoad() {
   routeConversationLoadSeq += 1;
+  abortRouteConversationLoad();
 }
 
 function shouldLoadRouteConversation() {
@@ -2009,7 +1994,6 @@ const {isGenerating, submit, regenerate} = useChatSubmit({
   canWrite: () =>
     !isReadOnly.value &&
     !isHistoryRendering.value &&
-    !isChatHistoryLocked.value &&
     !isActiveModelUnavailable.value,
   isReadOnly,
   isActiveModelUnavailable,
@@ -2156,21 +2140,18 @@ const showVirtualKeyboardDebugButton = computed(
   () => isMobile.value && showVirtualKeyboardDebug.value
 );
 
-const isChatContainerHistoryBusy = computed(
-  () => isChatHistoryLocked.value || resolveBooleanSource(isHistoryRendering)
+const isChatContainerHistoryBusy = computed(() =>
+  resolveBooleanSource(isHistoryRendering)
 );
 const isConversationActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    chatStreamStore.isStreaming ||
-    isChatContainerHistoryBusy.value
+  () => chatStreamStore.isWait || isChatContainerHistoryBusy.value
 );
 const chatPageLock = {
   isConversationActionBlocked,
   isSubmitBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
-      chatStreamStore.isStreaming ||
+      chatStreamStore.isWait ||
       resolveBooleanSource(isReadOnly) ||
       resolveBooleanSource(isGenerating) ||
       resolveBooleanSource(isActiveModelUnavailable)
@@ -2254,7 +2235,6 @@ async function handleStudioDetailDelete(studio) {
 
   await deleteStudio(deletedStudioId).catch(() => null);
   studioRuntimeStore.markStudioDeleted(deletedStudioId);
-  navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory);
   closeStudioDetail();
 
   if (route.name === ROUTE_NAMES.MAIN) {
@@ -2387,6 +2367,7 @@ provide(
     isHistoryRendering: isHistoryRendering.value,
     historyMarkdownVisible: historyMarkdownVisible.value,
     historyMessagesLoaded: historyMessagesLoaded.value,
+    historyRenderKey: activeHistoryId.value,
     hasPreviousHistoryMessages: hasPreviousHistoryMessages.value,
     historyLazyTopThreshold: historyLazyTopThreshold.value,
     historyLazyChunkSize: historyLazyChunkSize.value,

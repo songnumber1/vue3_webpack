@@ -290,10 +290,6 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
-import {
   openNoticeOverlay,
   openPersonalizationOverlay,
 } from "@/composables/overlay/responseOverlayActions";
@@ -302,13 +298,6 @@ const {t} = useI18n();
 const navigationStore = useNavigationStore();
 const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const {appInfo} = useAppContext();
 const {
   isCompactViewport,
@@ -316,12 +305,7 @@ const {
   isAndroidApp: isAndroidRuntime,
   isMobileBrowser,
 } = useRuntimeModeFlags();
-const isAppShellActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    isChatHistoryLocked.value ||
-    chatStreamStore.isStreaming
-);
+const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const overlayActionOptions = {
   isBlocked: () => isAppShellActionBlocked.value,
   viewportStore,

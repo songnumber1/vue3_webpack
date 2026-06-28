@@ -53,9 +53,12 @@ export async function deleteChatHistory(payload = {}) {
 /**
  * [원격 API 브릿지 - R 세부 대화 정보] 특정 방 내부로 입장했을 때 과거에 유저와 AI가 주고받았던 시간순 대화 말풍선 히스토리 리스트를 완벽하게 정형화 추출합니다.
  */
-export async function loadChatMessageRouters(payload = {}) {
+export async function loadChatMessageRouters(payload = {}, options = {}) {
   const {chatHistoryApi} = resolveChatApis();
-  const rawMessages = await chatHistoryApi.getChatHistoryDetail(payload);
+  const rawMessages = await chatHistoryApi.getChatHistoryDetail(
+    payload,
+    options
+  );
   return adaptMessageList(rawMessages);
 }
 

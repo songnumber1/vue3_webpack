@@ -1,6 +1,7 @@
 /**
  * @file composables/progress/progressPolicy.js
  * @description 전역 ProgressBar 표시 여부를 화면 너비가 아니라 플랫폼 설정 기준으로 판별합니다.
+ * PC에서는 ProgressBar를 사용하지 않고, 모바일 플랫폼에서만 설정값에 따라 표시합니다.
  */
 
 import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
@@ -42,5 +43,5 @@ export function isProgressAllowedForCurrentPlatform(
 
   return progressPlatform === PROGRESS_PLATFORMS.mobile
     ? settings.showMobileProgress === true
-    : settings.showPcProgress === true;
+    : false;
 }

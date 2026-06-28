@@ -6,19 +6,12 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
-import {
-  getPendingSelectedChatId,
-  resolveConversationEntryGuard,
-} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {resolveConversationEntryGuard} from "@/composables/chat/internal/policy/chatRoutePolicy";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {logInfo} from "@/utils/logger";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
@@ -215,52 +208,6 @@ function isRouteGuardBypassRoute(to = {}) {
   );
 }
 
-function isAllowedHistoryLockNavigation({to, from}) {
-  const chatStore = useChatStore();
-  const pendingHistoryId = getPendingSelectedChatId();
-
-  // 새대화/Assistant/Studio/MCP 선택은 현재 대화방 로딩을 취소하고 이탈하는 동작입니다.
-  // 늦게 들어온 history render lock이 남아 있어도 명시적인 포털 이동은 허용합니다.
-  if (
-    to.name === ROUTE_NAMES.MAIN ||
-    to.name === ROUTE_NAMES.CHAT_SEARCH ||
-    to.name === ROUTE_NAMES.STUDIO ||
-    to.name === ROUTE_NAMES.CONNECTOR_STORE
-  ) {
-    return true;
-  }
-
-  // Allow the internal route that opens the currently pending chat.
-  if (pendingHistoryId) {
-    return to.name === ROUTE_NAMES.CHAT_ENTRY;
-  }
-
-  if (to.fullPath && from?.fullPath && to.fullPath === from.fullPath) {
-    return true;
-  }
-
-  // Allow /shared/:id -> /shared after a valid shared room is confirmed.
-  if (
-    from?.name === ROUTE_NAMES.SHARED_ENTRY &&
-    to.name === ROUTE_NAMES.SHARED &&
-    chatStore.isActiveSharedRoom
-  ) {
-    return true;
-  }
-
-  // Allow shared-not-found flow to leave the shared route and return to main.
-  if (
-    (from?.name === ROUTE_NAMES.SHARED_ENTRY ||
-      from?.name === ROUTE_NAMES.SHARED) &&
-    to.name === ROUTE_NAMES.MAIN &&
-    !chatStore.isActiveSharedRoom
-  ) {
-    return true;
-  }
-
-  return false;
-}
-
 function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
   return routes.map((route) => {
     const ownMeta = route.meta || {};
@@ -283,16 +230,8 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
 
 function guardStreamingNavigation(to) {
   const chatStreamStore = useChatStreamStore();
-  if (!chatStreamStore.isStreaming) return true;
+  if (!chatStreamStore.isWait) return true;
   return chatStreamStore.consumeAllowedNavigation(to) ? true : false;
-}
-
-function guardHistoryNavigation({to, from}) {
-  const navigationLockStore = useNavigationLockStore();
-  if (!navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)) {
-    return true;
-  }
-  return isAllowedHistoryLockNavigation({to, from}) ? true : false;
 }
 
 function guardSharedRoute(to) {
@@ -351,7 +290,7 @@ function resolveGuardResult(result) {
 function registerRouteGuard(router, appInfo, context = {}) {
   const {authAxios} = context;
 
-  router.beforeEach(async (to, from) => {
+  router.beforeEach(async (to) => {
     const platformStore = usePlatformStore();
 
     platformStore.refresh(appInfo);
@@ -361,7 +300,6 @@ function registerRouteGuard(router, appInfo, context = {}) {
 
     const guardResults = [
       guardStreamingNavigation(to),
-      guardHistoryNavigation({to, from}),
       guardSharedRoute(to),
       guardHiddenConversationEntry(to),
       await guardAuth({to, authAxios}),

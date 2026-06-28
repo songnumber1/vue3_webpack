@@ -105,7 +105,7 @@ const {settings} = storeToRefs(systemSettingsStore);
 const responsiveLayoutStore = useResponsiveLayoutStore();
 const chatStreamStore = useChatStreamStore();
 const emit = defineEmits(["rendered", "regenerate"]);
-const isInteractionBlocked = computed(() => chatStreamStore.isStreaming);
+const isInteractionBlocked = computed(() => chatStreamStore.isWait);
 const html = ref("");
 const reasoningHtml = ref("");
 const contentMarkdownRendered = ref(false);

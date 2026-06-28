@@ -6,10 +6,6 @@
 import {nextTick} from "vue";
 import {useChatStore} from "@/stores/chatStore";
 import {useNavigationStore} from "@/stores/navigationStore";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/useActiveConversationCleanup";
 
@@ -18,14 +14,9 @@ function safeCall(callback, ...args) {
   return callback(...args);
 }
 
-function releaseChatHistoryLock() {
-  useNavigationLockStore().release(NAVIGATION_LOCK_SCOPES.chatHistory);
-}
-
 export function clearConversationNavigationState() {
   const chatStore = useChatStore();
   chatStore.clearPendingSelectedChatId?.();
-  releaseChatHistoryLock();
   chatStore.clearActiveSession?.();
 }
 
@@ -44,7 +35,6 @@ export function resetConversationStateForRouteChange() {
 
 export function preparePortalConversationNavigation() {
   useChatStore().clearPendingSelectedChatId?.();
-  releaseChatHistoryLock();
   closeConversationNavigationPanels();
 }
 

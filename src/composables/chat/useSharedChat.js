@@ -49,13 +49,16 @@ function createSharedUnavailableResponse(shareId) {
   );
 }
 
-export async function getSharedConversation(shareId) {
+export async function getSharedConversation(shareId, options = {}) {
   const normalizedShareId = String(shareId || "").trim();
   const {chatHistoryApi} = resolveChatApis();
 
   if (typeof chatHistoryApi?.getSharedConversation === "function") {
     return normalizeSharedResponse(
-      await chatHistoryApi.getSharedConversation({shareId: normalizedShareId}),
+      await chatHistoryApi.getSharedConversation(
+        {shareId: normalizedShareId},
+        options
+      ),
       normalizedShareId
     );
   }
@@ -66,8 +69,8 @@ export async function getSharedConversation(shareId) {
   return createSharedUnavailableResponse(normalizedShareId);
 }
 
-export async function loadSharedConversation(shareId) {
-  const result = await getSharedConversation(shareId);
+export async function loadSharedConversation(shareId, options = {}) {
+  const result = await getSharedConversation(shareId, options);
   if (!result.exists) {
     const error = new Error(result.message || "공유방을 찾을 수 없습니다.");
     error.code = result.code || "SHARED_NOT_FOUND";

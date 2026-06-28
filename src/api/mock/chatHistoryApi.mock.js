@@ -238,14 +238,15 @@ export const chatHistoryApiMock = {
     messageStore[chatId] = [];
     return resolveMock(history, 160);
   },
-  getChatHistoryDetail({chatId} = {}) {
+  getChatHistoryDetail({chatId} = {}, options = {}) {
     return resolveMock(
       attachMockReasoning(messageStore[chatId] || [], chatId),
-      180
+      180,
+      options
     );
   },
-  getSharedConversation({shareId} = {}) {
-    return resolveMock(buildSharedConversationResponse(shareId), 180);
+  getSharedConversation({shareId} = {}, options = {}) {
+    return resolveMock(buildSharedConversationResponse(shareId), 180, options);
   },
   searchChats(payload = {}) {
     return resolveMock(

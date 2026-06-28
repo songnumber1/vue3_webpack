@@ -120,10 +120,6 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -143,20 +139,8 @@ defineEmits(["studio-detail"]);
 const {t} = useI18n();
 const navigationStore = useNavigationStore();
 const chatStreamStore = useChatStreamStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const viewportStore = useViewportStore();
-const isAppShellActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    isChatHistoryLocked.value ||
-    chatStreamStore.isStreaming
-);
+const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const appShellStore = useAppShellStore();
 const openAssistantSheet = () => appShellStore.openAssistantSheet();
 const responsiveLayoutStore = useResponsiveLayoutStore();

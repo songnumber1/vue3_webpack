@@ -12,11 +12,38 @@ export function cloneMockData(value) {
 
   return JSON.parse(JSON.stringify(value));
 }
-export function mockDelay(ms = 120) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
+function createAbortError() {
+  const error = new Error("The mock request was aborted.");
+  error.name = "AbortError";
+  return error;
 }
-export async function resolveMock(value, delay = 120) {
-  await mockDelay(delay);
+
+export function mockDelay(ms = 120, options = {}) {
+  const {signal} = options;
+
+  if (signal?.aborted) {
+    return Promise.reject(createAbortError());
+  }
+
+  return new Promise((resolve, reject) => {
+    const cleanup = () => {
+      signal?.removeEventListener?.("abort", handleAbort);
+    };
+    const handleAbort = () => {
+      clearTimeout(timer);
+      cleanup();
+      reject(createAbortError());
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      resolve();
+    }, ms);
+
+    signal?.addEventListener?.("abort", handleAbort, {once: true});
+  });
+}
+export async function resolveMock(value, delay = 120, options = {}) {
+  await mockDelay(delay, options);
 
   return cloneMockData(value);
 }

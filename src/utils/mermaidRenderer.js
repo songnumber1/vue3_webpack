@@ -505,12 +505,18 @@ async function renderMermaidTargetWithRetries(mermaid, target, options = {}) {
 // Batch render flow
 // -----------------------------------------------------------------------------
 
+function shouldContinueMermaidRender(options = {}) {
+  return typeof options.shouldContinue !== "function" || options.shouldContinue();
+}
+
 async function renderMermaidTargetsWithRenderApi(
   mermaid,
   targets,
   options = {}
 ) {
   for (let index = 0; index < targets.length; index += 1) {
+    if (!shouldContinueMermaidRender(options)) break;
+
     const target = targets[index];
     if (!target.isConnected) continue;
 
@@ -520,19 +526,26 @@ async function renderMermaidTargetsWithRenderApi(
         target,
         options
       );
+      if (!shouldContinueMermaidRender(options) || !target.isConnected) break;
+
       if (rendered) {
         markMermaidCardState(target, "rendered");
       } else {
         showMermaidSourceAsCode(target);
       }
     } catch (error) {
+      if (!shouldContinueMermaidRender(options) || !target.isConnected) break;
+
       showMermaidSourceAsCode(target);
       logWarn(
         "Mermaid rendering failed. The source code block will remain visible.",
         error
       );
     } finally {
-      if (typeof options.onTargetComplete === "function") {
+      if (
+        shouldContinueMermaidRender(options) &&
+        typeof options.onTargetComplete === "function"
+      ) {
         await options.onTargetComplete(target, index + 1, targets.length);
       }
     }
@@ -568,11 +581,13 @@ function resetRenderedMermaid(root) {
  * @param {{force?: boolean}} options force=true면 기존 렌더 결과를 source text로 되돌린 뒤 재렌더합니다.
  */
 async function renderMermaidTargets(root, options = {}) {
-  if (!root) return;
+  if (!root || !shouldContinueMermaidRender(options)) return;
 
   if (options.force) {
     resetRenderedMermaid(root);
   }
+
+  if (!shouldContinueMermaidRender(options)) return;
 
   const targets = Array.from(
     root.querySelectorAll('.md-mermaid[data-mermaid-pending="true"]')
@@ -586,6 +601,8 @@ async function renderMermaidTargets(root, options = {}) {
   });
 
   const mermaid = await ensureMermaid(options);
+  if (!shouldContinueMermaidRender(options)) return;
+
   const liveTargets = targets.filter((target) => target.isConnected);
   if (!liveTargets.length) return;
 

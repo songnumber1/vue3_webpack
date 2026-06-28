@@ -99,7 +99,10 @@ export const useChatStore = defineStore("chat", {
       this.activeRoomType = id && type ? type : null;
     },
     setActiveChatRoom(chatId) {
-      this.setActiveRoom(chatId, ACTIVE_ROOM_TYPES.chat);
+      const id = String(chatId || "").trim();
+      this.selectedChatId = id || null;
+      this.setActiveRoom(id, ACTIVE_ROOM_TYPES.chat);
+      usePromptControlStore().setActivePromptToolSettingsKey(this.selectedChatId);
     },
     setActiveSharedRoom(shareId) {
       this.setActiveRoom(shareId, ACTIVE_ROOM_TYPES.shared);

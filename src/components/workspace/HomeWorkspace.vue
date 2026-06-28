@@ -48,23 +48,12 @@ import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
-import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatStateContext";
 
 const chatStreamStore = useChatStreamStore();
 const responsiveLayoutStore = useResponsiveLayoutStore();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
 const emit = defineEmits([
@@ -99,12 +88,7 @@ const studioDetailDisabled = computed(
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );
-const isMainPageActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    chatStreamStore.isStreaming ||
-    isChatHistoryLocked.value
-);
+const isMainPageActionBlocked = computed(() => chatStreamStore.isWait);
 const isPromptExampleBlocked = computed(() => isMainPageActionBlocked.value);
 const mainPromptClass = computed(() =>
   isMobile.value

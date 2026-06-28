@@ -205,10 +205,6 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
-import {
-  NAVIGATION_LOCK_SCOPES,
-  useNavigationLockStore,
-} from "@/stores/navigationLockStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
 import {
@@ -237,14 +233,6 @@ const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const emit = defineEmits(["history-menu-action"]);
 const {isCompactViewport, shouldUseMobileLayout} = useRuntimeModeFlags();
-const navigationLockStore = useNavigationLockStore();
-const isGlobalLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.global)
-);
-const isChatHistoryLocked = computed(() =>
-  navigationLockStore.isLocked(NAVIGATION_LOCK_SCOPES.chatHistory)
-);
-
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
   storeToRefs(chatStore);
@@ -300,14 +288,8 @@ const historyMenuReferenceEl = ref(null);
 const effectiveSelectedChatId = computed(
   () => pendingSelectedChatId.value || selectedChatId.value
 );
-const isStreamingBlocked = computed(() => chatStreamStore.isStreaming);
-const isChatHistoryBlocked = computed(() => isChatHistoryLocked.value);
-const isSidebarActionBlocked = computed(
-  () =>
-    isGlobalLocked.value ||
-    isStreamingBlocked.value ||
-    isChatHistoryBlocked.value
-);
+const isWaitBlocked = computed(() => chatStreamStore.isWait);
+const isSidebarActionBlocked = computed(() => isWaitBlocked.value);
 const sidebarLock = {
   isSidebarActionBlocked,
   isHistorySelectBlocked: computed(() => isSidebarActionBlocked.value),
@@ -332,6 +314,10 @@ function getHistoryId(item) {
 
 function closeSidebarNavigationPanels() {
   navigationStore.closeTransientPanels();
+}
+
+function closeNavigationDrawer() {
+  navigationStore.setDrawerOpen(false);
 }
 
 function closeAssistantSelector() {
@@ -397,7 +383,7 @@ function openAssistantSelector() {
 
 async function selectAssistant(id) {
   if (isPortalAssistantId(id)) {
-    if (isGlobalLocked.value || chatStreamStore.isStreaming) return;
+    if (chatStreamStore.isWait) return;
     await navigatePortalAssistant(id);
     return;
   }
@@ -479,38 +465,18 @@ async function selectHistory(item, options = {}) {
   const historyId = getHistoryId(item);
   if (!historyId) return false;
 
-  const currentHistoryId = String(
-    chatStore.pendingSelectedChatId ||
-      chatStore.activeRoomId ||
-      chatStore.selectedChatId ||
-      ""
-  ).trim();
-  if (currentHistoryId && currentHistoryId === historyId) {
+  const currentHistoryId = String(chatStore.selectedChatId || "").trim();
+  if (
+    route.name === ROUTE_NAMES.CHAT_ENTRY &&
+    currentHistoryId === historyId
+  ) {
     return false;
   }
-
-  const lockEntry = navigationLockStore.acquireIfFree(
-    NAVIGATION_LOCK_SCOPES.chatHistory,
-    {
-      owner: historyId,
-      reason: "sidebar-history-select",
-      meta: {source: options.source || "sidebar"},
-    }
-  );
-
-  if (!lockEntry) return false;
 
   try {
     chatStore.setPendingSelectedChatId(historyId);
     navigationStore.closeTransientPanels();
     navigationStore.setCollapsedRecentOpen(false);
-
-    const conversationRoute = createConversationRoute({chatId: historyId});
-    try {
-      await router.replace(conversationRoute).catch(() => {});
-    } finally {
-      applyConversationActiveRoom({chatId: historyId});
-    }
 
     if (options.closeCollapsedRecent) {
       navigationStore.setCollapsedRecentOpen(false);
@@ -519,9 +485,12 @@ async function selectHistory(item, options = {}) {
     }
 
     await nextTick();
+    await router
+      .replace(createConversationRoute({chatId: historyId}))
+      .catch(() => {});
+    applyConversationActiveRoom({chatId: historyId});
     return true;
   } catch (_error) {
-    navigationLockStore.release(NAVIGATION_LOCK_SCOPES.chatHistory, historyId);
     chatStore.clearPendingSelectedChatId();
     return false;
   }

@@ -123,7 +123,7 @@ function shouldUseOverlay(policy) {
   logPlatformDebug("sse.overlay", {
     result,
     policyOverlay: Boolean(policy.overlay),
-    showPcProgress: Boolean(settings.showPcProgress),
+    showPcProgress: false,
     showMobileProgress: Boolean(settings.showMobileProgress),
     platformOverride: settings.platformOverride,
     progressPlatform: platformStore.info?.isMobile ? "mobile" : "pc",
