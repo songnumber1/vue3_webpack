@@ -2042,8 +2042,7 @@ function bindDataEvents() {
     () => [
       route.params.id,
       route.params.shareId,
-      chatStore.activeRoomId,
-      chatStore.activeRoomType,
+      activeHistoryId.value,
       route.query?.messageId,
       currentMode.value,
     ],
