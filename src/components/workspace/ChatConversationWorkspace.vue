@@ -71,9 +71,6 @@
         'mobile-chat-prompt': isMobile,
         'mobile-keyboard-dock': isMobile,
       }"
-      @submit="emit('submit', $event)"
-      @update:model-value="emit('update-selected-model', $event)"
-      @focus="emit('prompt-focus', $event)"
       @height-change="handlePromptHeightChange"
       @expanded-change="handlePromptExpandedChange"
     />
@@ -149,11 +146,7 @@ const previewRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
 const emit = defineEmits([
-  "submit",
   "regenerate",
-  "update-selected-model",
-  "prompt-focus",
-  "prompt-resize",
   "message-content-rendered",
   "scroll-bottom",
   "history-rendered",
@@ -694,8 +687,7 @@ function handleHistoryRendered() {
   scheduleComposerHeightUpdate();
 }
 
-function handlePromptHeightChange(payload) {
-  emit("prompt-resize", payload);
+function handlePromptHeightChange() {
   scheduleComposerHeightUpdate();
 }
 

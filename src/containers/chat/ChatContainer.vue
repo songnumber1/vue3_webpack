@@ -8,10 +8,6 @@
     <HomeWorkspace
       v-if="activeWorkspaceType === 'main'"
       :ref="setWorkspaceRef"
-      @submit="handleWorkspaceSubmit"
-      @update-selected-model="handleWorkspaceSelectedModelUpdate"
-      @prompt-focus="refreshPromptViewport"
-      @prompt-resize="refreshPromptViewport"
       @studio-detail="openStudioDetail"
     />
 
@@ -22,11 +18,7 @@
         handleContinueProgressiveInitialHistoryRenderRequest
       "
       @load-previous-history="loadPreviousHistoryMessages"
-      @submit="handleWorkspaceSubmit"
       @regenerate="handleWorkspaceRegenerate"
-      @update-selected-model="handleWorkspaceSelectedModelUpdate"
-      @prompt-focus="refreshPromptViewport"
-      @prompt-resize="refreshPromptViewport"
       @message-content-rendered="handleMessageContentRendered"
       @scroll-bottom="handleWorkspaceScrollBottom"
       @history-rendered="finishHistoryRender"
@@ -237,6 +229,7 @@ import {resolveBooleanSource} from "@/utils/interactionGuard";
 
 import {waitAnimationFrame} from "@/utils/frameScheduler";
 import {useChatSubmit} from "@/composables/chat/useChatSubmit";
+import {providePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
 import {
   isSharedChat,
   resolveMessageRenderPolicy,
@@ -2393,6 +2386,13 @@ provide(
     placeholder: "",
   }))
 );
+
+providePromptComposerContext({
+  onSubmit: handleWorkspaceSubmit,
+  onUpdateSelectedModel: handleWorkspaceSelectedModelUpdate,
+  onFocus: refreshPromptViewport,
+  onHeightChange: refreshPromptViewport,
+});
 
 function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;

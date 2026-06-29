@@ -152,7 +152,7 @@
  * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
  */
 
-import {computed, reactive, ref, toRefs, inject} from "vue";
+import {computed, ref, inject} from "vue";
 import {useI18n} from "vue-i18n";
 import {
   PROMPT_TOOLBAR_STATE_KEY,
@@ -171,107 +171,27 @@ const toolbarState = inject(
   PROMPT_TOOLBAR_STATE_KEY,
   computed(createEmptyPromptToolbarState)
 );
-const props = reactive({
-  get disabled() {
-    return toolbarState.value.disabled;
-  },
-  get modelReadonly() {
-    return toolbarState.value.modelReadonly;
-  },
-  get modelValue() {
-    return toolbarState.value.modelValue;
-  },
-  get currentModel() {
-    return toolbarState.value.currentModel;
-  },
-  get models() {
-    return toolbarState.value.models;
-  },
-  get attachOptions() {
-    return toolbarState.value.attachOptions;
-  },
-  get selectedTemplateTool() {
-    return toolbarState.value.selectedTemplateTool;
-  },
-  get modelMenuOpen() {
-    return toolbarState.value.modelMenuOpen;
-  },
-  get toolMenuOpen() {
-    return toolbarState.value.toolMenuOpen;
-  },
-  get attachMenuOpen() {
-    return toolbarState.value.attachMenuOpen;
-  },
-  get isMobileSheet() {
-    return toolbarState.value.isMobileSheet;
-  },
-  get hideToolActions() {
-    return toolbarState.value.hideToolActions;
-  },
-  get hideAttachActions() {
-    return toolbarState.value.hideAttachActions;
-  },
-  get hideVoiceAction() {
-    return toolbarState.value.hideVoiceAction;
-  },
-  get canSubmit() {
-    return toolbarState.value.canSubmit;
-  },
-  get hasPromptText() {
-    return toolbarState.value.hasPromptText;
-  },
-  get isMicEnabled() {
-    return toolbarState.value.isMicEnabled;
-  },
-  get isVoiceListening() {
-    return toolbarState.value.isVoiceListening;
-  },
-  get hasVoiceStopped() {
-    return toolbarState.value.hasVoiceStopped;
-  },
-  get generating() {
-    return toolbarState.value.generating;
-  },
-  get isSpeechSupported() {
-    return toolbarState.value.isSpeechSupported;
-  },
-  get voiceStartLabel() {
-    return toolbarState.value.voiceStartLabel;
-  },
-  get voiceStopLabel() {
-    return toolbarState.value.voiceStopLabel;
-  },
-  get attachLabel() {
-    return toolbarState.value.attachLabel;
-  },
-  get sendLabel() {
-    return toolbarState.value.sendLabel;
-  },
-  get modelSelectLabel() {
-    return toolbarState.value.modelSelectLabel;
-  },
-  get readonlyTitle() {
-    return toolbarState.value.readonlyTitle;
-  },
-});
-const {
-  disabled,
-  modelReadonly,
-  currentModel,
-  toolMenuOpen,
-  attachMenuOpen,
-  selectedTemplateTool,
-  hideToolActions,
-  hideAttachActions,
-  canSubmit,
-  generating,
-  isSpeechSupported,
-  voiceStartLabel,
-  voiceStopLabel,
-  attachLabel,
-  sendLabel,
-  modelSelectLabel,
-} = toRefs(props);
+
+const disabled = computed(() => toolbarState.value.disabled);
+const modelReadonly = computed(() => toolbarState.value.modelReadonly);
+const currentModel = computed(() => toolbarState.value.currentModel);
+const toolMenuOpen = computed(() => toolbarState.value.toolMenuOpen);
+const attachMenuOpen = computed(() => toolbarState.value.attachMenuOpen);
+const selectedTemplateTool = computed(
+  () => toolbarState.value.selectedTemplateTool
+);
+const hideToolActions = computed(() => toolbarState.value.hideToolActions);
+const hideAttachActions = computed(() => toolbarState.value.hideAttachActions);
+const canSubmit = computed(() => toolbarState.value.canSubmit);
+const generating = computed(() => toolbarState.value.generating);
+const isSpeechSupported = computed(
+  () => toolbarState.value.isSpeechSupported
+);
+const voiceStartLabel = computed(() => toolbarState.value.voiceStartLabel);
+const voiceStopLabel = computed(() => toolbarState.value.voiceStopLabel);
+const attachLabel = computed(() => toolbarState.value.attachLabel);
+const sendLabel = computed(() => toolbarState.value.sendLabel);
+const modelSelectLabel = computed(() => toolbarState.value.modelSelectLabel);
 
 defineEmits([
   "open-model",
@@ -284,23 +204,23 @@ defineEmits([
 ]);
 
 const resolvedReadonlyTitle = computed(
-  () => props.readonlyTitle || t("prompt.modelReadonly")
+  () => toolbarState.value.readonlyTitle || t("prompt.modelReadonly")
 );
 const showVoiceStartButton = computed(
   () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isSpeechSupported &&
-    !props.hasPromptText &&
-    !props.isVoiceListening
+    !toolbarState.value.hideVoiceAction &&
+    !toolbarState.value.generating &&
+    toolbarState.value.isMicEnabled &&
+    toolbarState.value.isSpeechSupported &&
+    !toolbarState.value.hasPromptText &&
+    !toolbarState.value.isVoiceListening
 );
 const showVoiceStopButton = computed(
   () =>
-    !props.hideVoiceAction &&
-    !props.generating &&
-    props.isMicEnabled &&
-    props.isVoiceListening
+    !toolbarState.value.hideVoiceAction &&
+    !toolbarState.value.generating &&
+    toolbarState.value.isMicEnabled &&
+    toolbarState.value.isVoiceListening
 );
 
 defineExpose({modelRoot, toolRoot, attachRoot});

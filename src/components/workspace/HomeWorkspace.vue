@@ -23,10 +23,6 @@
       <PromptComposer
         ref="mainPromptInputRef"
         :class="mainPromptClass"
-        @submit="emit('submit', $event)"
-        @update:model-value="emit('update-selected-model', $event)"
-        @focus="emit('prompt-focus', $event)"
-        @height-change="emit('prompt-resize', $event)"
         @expanded-change="handleMainPromptExpandedChange"
       />
     </template>
@@ -56,13 +52,7 @@ const chatStreamStore = useChatStreamStore();
 const responsiveLayoutStore = useResponsiveLayoutStore();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
-const emit = defineEmits([
-  "submit",
-  "update-selected-model",
-  "prompt-focus",
-  "prompt-resize",
-  "studio-detail",
-]);
+const emit = defineEmits(["studio-detail"]);
 
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,

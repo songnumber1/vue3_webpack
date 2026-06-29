@@ -177,6 +177,7 @@ import {
   PROMPT_STATE_KEY,
   createEmptyPromptState,
 } from "@/composables/chat/chatStateContext";
+import {usePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
 
 const componentProps = defineProps({
   submitDisabled: {type: Boolean, default: false},
@@ -186,6 +187,7 @@ const componentProps = defineProps({
 });
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
+const composerContext = usePromptComposerContext();
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -234,10 +236,18 @@ const emit = defineEmits([
   "height-change",
 ]);
 
+function callComposerContext(actionName, payload) {
+  const action = composerContext?.[actionName];
+  if (typeof action !== "function") return false;
+
+  action(payload);
+  return true;
+}
+
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    emit("submit", payload);
+    if (!callComposerContext("onSubmit", payload)) emit("submit", payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -250,14 +260,18 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    emit("update:modelValue", payload);
+    if (!callComposerContext("onUpdateSelectedModel", payload)) {
+      emit("update:modelValue", payload);
+    }
     return;
   }
   if (eventName === "focus") {
+    callComposerContext("onFocus", payload);
     emit("focus", payload);
     return;
   }
   if (eventName === "height-change") {
+    callComposerContext("onHeightChange", payload);
     emit("height-change", payload);
     return;
   }
