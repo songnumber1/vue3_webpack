@@ -10,7 +10,7 @@
         type="button"
         :aria-label="t('studio.createPage.back')"
         :title="t('studio.createPage.back')"
-        @click="$emit('close')"
+        @click="createForm.closeCreate?.()"
       >
         <span class="studio-icon studio-icon--back" aria-hidden="true"></span>
       </button>
@@ -39,21 +39,21 @@
           <button
             type="button"
             :class="{active: createTab === 'basic'}"
-            @click="$emit('update-create-tab', 'basic')"
+            @click="createForm.updateCreateTab?.('basic')"
           >
             {{ t("studio.createPage.basic") }}
           </button>
           <button
             type="button"
             :class="{active: createTab === 'feature'}"
-            @click="$emit('update-create-tab', 'feature')"
+            @click="createForm.updateCreateTab?.('feature')"
           >
             {{ t("studio.createPage.feature") }}
           </button>
           <button
             type="button"
             :class="{active: createTab === 'share'}"
-            @click="$emit('update-create-tab', 'share')"
+            @click="createForm.updateCreateTab?.('share')"
           >
             {{ t("studio.createPage.share") }}
           </button>
@@ -67,38 +67,9 @@
           :overlay-options="studioCreateOverlayOptions"
           :keyboard-options="studioCreateKeyboardOptions"
         >
-          <StudioBasicInfoTab
-            v-if="createTab === 'basic'"
-            :draft="draft"
-            :selected-category-label="selectedCategoryLabel"
-            :category-options="categoryOptions"
-            @update-field="handleDraftField"
-            @update-prompt="handleDraftPrompt"
-            @open-category="$emit('open-category')"
-          />
-          <StudioFeatureTab
-            v-else-if="createTab === 'feature'"
-            :model-options="modelOptions"
-            :selected-models="draft.models"
-            :selected-rags="draft.rags"
-            :selected-mcps="draft.mcps"
-            :rag-options="ragOptions"
-            :mcp-options="mcpOptions"
-            @toggle-model="$emit('toggle-model', $event)"
-            @update-rags="$emit('update-rags', $event)"
-            @update-mcps="$emit('update-mcps', $event)"
-          />
-          <StudioShareScopeTab
-            v-else
-            :scope="draft.scope"
-            :authorities="selectedAuthorities"
-            :all-authorities-checked="allAuthoritiesChecked"
-            @update-scope="$emit('update-scope', $event)"
-            @open-authority-picker="$emit('open-authority-picker')"
-            @delete-checked-authorities="$emit('delete-checked-authorities')"
-            @toggle-all-authorities="$emit('toggle-all-authorities', $event)"
-            @toggle-authority="handleAuthorityToggle"
-          />
+          <StudioBasicInfoTab v-if="createTab === 'basic'" />
+          <StudioFeatureTab v-else-if="createTab === 'feature'" />
+          <StudioShareScopeTab v-else />
         </OverlayScrollContainer>
       </form>
 
@@ -128,23 +99,14 @@ import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 import StudioCreateActionBottomSheet from "@/components/studio/create/StudioCreateActionBottomSheet.vue";
+import {useStudioCreateForm} from "@/composables/studio/context/studioCreateFormContext";
 
 const {t} = useI18n();
-
-defineProps({
-  createTab: {type: String, default: "basic"},
-  draft: {type: Object, required: true},
-  preview: {type: Object, required: true},
-  previewInitial: {type: String, default: "A"},
-  previewPrompts: {type: Array, default: () => []},
-  selectedCategoryLabel: {type: String, default: ""},
-  categoryOptions: {type: Array, default: () => []},
-  modelOptions: {type: Array, default: () => []},
-  ragOptions: {type: Array, default: () => []},
-  mcpOptions: {type: Array, default: () => []},
-  selectedAuthorities: {type: Array, default: () => []},
-  allAuthoritiesChecked: {type: Boolean, default: false},
-});
+const createForm = useStudioCreateForm();
+const createTab = createForm.createTab;
+const preview = createForm.preview;
+const previewInitial = createForm.previewInitial;
+const previewPrompts = createForm.previewPrompts;
 
 const createPageRef = ref(null);
 const createFormRef = ref(null);
@@ -196,38 +158,12 @@ const studioCreateKeyboardOptions = Object.freeze({
   edgePaddingBottom: 28,
 });
 
-const emit = defineEmits([
-  "close",
-  "apply-preview",
-  "update-create-tab",
-  "update-draft-field",
-  "update-draft-prompt",
-  "open-category",
-  "toggle-model",
-  "update-rags",
-  "update-mcps",
-  "update-scope",
-  "open-authority-picker",
-  "delete-checked-authorities",
-  "toggle-all-authorities",
-  "toggle-authority",
-]);
-
-function handleDraftField(field, value) {
-  emit("update-draft-field", field, value);
-}
-function handleDraftPrompt(index, value) {
-  emit("update-draft-prompt", index, value);
-}
-function handleAuthorityToggle(deptId, checked) {
-  emit("toggle-authority", deptId, checked);
-}
 function handleMobileApply() {
   actionSheetOpen.value = false;
-  emit("apply-preview");
+  createForm.applyPreview?.();
 }
 function handleMobileClose() {
   actionSheetOpen.value = false;
-  emit("close");
+  createForm.closeCreate?.();
 }
 </script>

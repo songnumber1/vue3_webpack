@@ -13,7 +13,7 @@
       <button
         :class="['studio-select-like', selectLikeClass]"
         type="button"
-        @click="$emit('open-category')"
+        @click="createForm.openCategorySelector?.()"
       >
         <span>{{
           selectedCategoryLabel || t("studio.defaults.selectCategory")
@@ -58,30 +58,30 @@
         :class="controlClass"
         :value="draft.prompts[index - 1]"
         :placeholder="t('studio.basic.examplePrompt', {index})"
-        @input="$emit('update-prompt', index - 1, $event.target.value)"
+        @input="updatePrompt(index - 1, $event.target.value)"
     /></label>
   </div>
 </template>
 
 <script setup>
 import {useI18n} from "vue-i18n";
+import {useStudioCreateForm} from "@/composables/studio/context/studioCreateFormContext";
 
 const {t} = useI18n();
-
-defineProps({
-  draft: {type: Object, required: true},
-  selectedCategoryLabel: {type: String, default: ""},
-  categoryOptions: {type: Array, default: () => []},
-});
-const emit = defineEmits(["update-field", "update-prompt", "open-category"]);
+const createForm = useStudioCreateForm();
+const draft = createForm.draft;
+const selectedCategoryLabel = createForm.selectedCategoryLabel;
 
 const formStackClass = "studio-form-stack tw-grid tw-min-w-0 tw-gap-3";
 const fieldClass = "tw-grid tw-min-w-0 tw-gap-1.5";
 const controlClass =
   "tw-box-border tw-min-h-[42px] tw-w-full tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-3 tw-py-2.5 tw-font-[inherit] tw-text-inherit";
-const textareaClass = `${controlClass} tw-appearance-none focus:tw-outline-none focus:tw-border-studio-primary tw-resize-none`; 
+const textareaClass = `${controlClass} tw-appearance-none focus:tw-outline-none focus:tw-border-studio-primary tw-resize-none`;
 const selectLikeClass = `${controlClass} tw-flex tw-items-center tw-justify-between tw-text-left`;
 function updateField(field, value) {
-  emit("update-field", field, value);
+  createForm.updateDraftField?.(field, value);
+}
+function updatePrompt(index, value) {
+  createForm.updateDraftPrompt?.(index, value);
 }
 </script>

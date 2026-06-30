@@ -60,7 +60,7 @@
         role="assistant"
         :content="message.content"
         :show-regenerate="showRegenerate"
-        @regenerate="emit('regenerate', message)"
+        @regenerate="handleRegenerate"
       />
     </div>
   </article>
@@ -87,6 +87,7 @@ import {logWarn} from "@/utils/logger";
 import AssistantDuoLinks from "./AssistantDuoLinks.vue";
 import AssistantRagImages from "./AssistantRagImages.vue";
 import MessageActions from "./MessageActions.vue";
+import {useMessageActions} from "@/composables/chat/context/messageActionContext";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -98,7 +99,10 @@ const props = defineProps({
 });
 const {locale, t} = useI18n();
 const chatStreamStore = useChatStreamStore();
-const emit = defineEmits(["rendered", "regenerate"]);
+const messageActions = useMessageActions();
+function notifyRendered(type) {
+  messageActions.messageRendered?.({messageId: props.message.id, type});
+}
 const isInteractionBlocked = computed(() => chatStreamStore.isWait);
 const html = ref("");
 const reasoningHtml = ref("");
@@ -141,6 +145,10 @@ const showMermaidHeader = computed(
 const enableMermaidRendering = computed(
   () => resolvedMermaidSettings.value.enableMermaidRendering
 );
+
+function handleRegenerate() {
+  messageActions.regenerate?.(props.message);
+}
 
 const reasoningTitle = computed(() =>
   props.message.reasoningStatus === "thinking"
@@ -186,7 +194,7 @@ async function enhanceRenderedMarkdown({
     enhanceMarkdownScrollbars(root, {
       enabled: () => shouldUseOverlayScrollbar.value,
     });
-    emit("rendered", "enhanced");
+    notifyRendered("enhanced");
   } catch (error) {
     if (componentAlive) {
       logWarn("[AssistantMessage] markdown enhancement failed:", error);
@@ -233,7 +241,7 @@ async function renderContent() {
     if (enableMermaidRendering.value) {
       reservePendingMermaidHeight(contentRef.value);
     }
-    emit("rendered", "content");
+    notifyRendered("content");
 
     void enhanceRenderedMarkdown({
       root: contentRef.value,
@@ -253,7 +261,7 @@ async function renderContent() {
     await nextTick();
     if (!componentAlive || currentVersion !== renderVersion) return;
     contentMarkdownRendered.value = true;
-    emit("rendered", "content");
+    notifyRendered("content");
   }
 }
 
@@ -269,7 +277,7 @@ async function renderReasoningContent() {
     if (!props.message.reasoningContent) {
       reasoningHtml.value = "";
       reasoningMarkdownRendered.value = true;
-      emit("rendered", "reasoning");
+      notifyRendered("reasoning");
       return;
     }
 
@@ -290,7 +298,7 @@ async function renderReasoningContent() {
     if (enableMermaidRendering.value) {
       reservePendingMermaidHeight(reasoningRef.value);
     }
-    emit("rendered", "reasoning");
+    notifyRendered("reasoning");
 
     void enhanceRenderedMarkdown({
       root: reasoningRef.value,
@@ -310,7 +318,7 @@ async function renderReasoningContent() {
     await nextTick();
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     reasoningMarkdownRendered.value = true;
-    emit("rendered", "reasoning");
+    notifyRendered("reasoning");
   }
 }
 

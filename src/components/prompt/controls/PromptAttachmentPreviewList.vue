@@ -28,7 +28,7 @@
         <img
           :src="getPreviewUrl(file)"
           :alt="file.name"
-          @error="$emit('preview-error', file)"
+          @error="promptInputActions.markPreviewError?.(file)"
         />
       </div>
       <div
@@ -49,7 +49,7 @@
         @pointerdown.stop
         @mousedown.stop
         @touchstart.stop
-        @click.stop.prevent="$emit('remove', file.id)"
+        @click.stop.prevent="promptInputActions.removeAttachment?.(file.id)"
       >
         ×
       </button>
@@ -60,30 +60,27 @@
 <script setup>
 /**
  * @file components/prompt/controls/PromptAttachmentPreviewList.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. 텍스트, 첨부, 도구/모델 선택 이벤트를 composable action으로 전달합니다.
+ * @description 프롬프트 첨부 미리보기 목록입니다. 첨부 상태와 action은 PromptInput context에서 사용합니다.
  */
 
+import {computed, unref} from "vue";
 import {useI18n} from "vue-i18n";
 import {formatFileSize} from "@/utils/attachment";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+import {usePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
 const {t} = useI18n();
+const promptInputActions = usePromptInputActions();
+const promptInputState = usePromptInputState();
+const attachments = computed(() => unref(promptInputState.attachments) || []);
 
-defineProps({
-  attachments: {type: Array, default: () => []},
-});
-
-const emit = defineEmits(["preview", "remove", "preview-error"]);
-
-/**
- * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
- */
 function getPreviewUrl(file) {
   return file?.dataUrl || file?.previewUrl || file?.url || "";
 }
 
 function emitPreview(file) {
   if (file?.kind !== "image") return;
-  emit("preview", file);
+  promptInputActions.previewImage?.(file);
 }
 </script>
 

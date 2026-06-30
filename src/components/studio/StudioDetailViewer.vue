@@ -74,9 +74,6 @@
     <StudioDetailActionBottomSheet
       :open="actionsOpen && canManageStudio"
       :disabled="actionsDisabled"
-      @close="actionsOpen = false"
-      @edit="edit"
-      @delete="requestDelete"
     />
 
     <div
@@ -126,6 +123,10 @@ import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioInfoPanel from "@/components/studio/StudioInfoPanel.vue";
 import StudioDetailActionBottomSheet from "@/components/studio/detail/StudioDetailActionBottomSheet.vue";
+import {
+  provideStudioDetailActions,
+  useStudioDetailActions,
+} from "@/composables/studio/context/studioDetailActionContext";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
@@ -136,7 +137,7 @@ const props = defineProps({
   error: {type: String, default: ""},
 });
 
-const emit = defineEmits(["close", "edit", "delete"]);
+const parentStudioDetailActions = useStudioDetailActions();
 const {t} = useI18n();
 const actionsOpen = ref(false);
 const deleteConfirmOpen = ref(false);
@@ -146,6 +147,12 @@ const closeLabel = computed(() => t("common.close") || "닫기");
 const canManageStudio = computed(() =>
   Boolean(props.allowActions && props.studio?.isMine)
 );
+
+provideStudioDetailActions({
+  close: closeActionSheet,
+  edit,
+  delete: requestDelete,
+});
 
 watch(
   () => props.open,
@@ -161,7 +168,11 @@ watch(
 function close() {
   actionsOpen.value = false;
   deleteConfirmOpen.value = false;
-  emit("close");
+  parentStudioDetailActions.close?.();
+}
+
+function closeActionSheet() {
+  actionsOpen.value = false;
 }
 
 function toggleActions() {
@@ -172,7 +183,7 @@ function toggleActions() {
 function edit() {
   if (props.actionsDisabled || !props.studio) return;
   actionsOpen.value = false;
-  emit("edit", props.studio);
+  parentStudioDetailActions.edit?.(props.studio);
 }
 
 function requestDelete() {
@@ -185,7 +196,7 @@ function confirmDelete() {
   if (props.actionsDisabled || !props.studio) return;
   const studio = props.studio;
   deleteConfirmOpen.value = false;
-  emit("delete", studio);
+  parentStudioDetailActions.delete?.(studio);
 }
 </script>
 

@@ -34,8 +34,6 @@
           :message-dom-id="String(message.id || '')"
           :message-dom-role="message.role"
           :defer-mermaid-enhancement="historyRendering"
-          @rendered="handleMessageRendered(message.id, $event)"
-          @regenerate="$emit('regenerate', $event)"
         />
       </div>
       <div v-if="loading" class="typing-row">
@@ -97,6 +95,11 @@ import {
   RESIZE_RECALCULATE_DEBOUNCE_MS,
   STABLE_SCROLL_DELAYS,
 } from "@/composables/chat/internal/message-list/messageListScrollConstants";
+import {
+  provideMessageActions,
+  useMessageActions,
+} from "@/composables/chat/context/messageActionContext";
+import {useMessageRenderLifecycle} from "@/composables/chat/message/useMessageRenderLifecycle";
 
 
 const props = defineProps({
@@ -111,11 +114,8 @@ const props = defineProps({
   readonly: {type: Boolean, default: false},
 });
 
-const emit = defineEmits([
-  "content-rendered",
-  "history-rendered",
-  "regenerate",
-]);
+const parentMessageActions = useMessageActions();
+const renderLifecycle = useMessageRenderLifecycle(parentMessageActions);
 
 function createMessageTurnSectors(messages = []) {
   const sectors = [];
@@ -298,7 +298,7 @@ function clearRenderedFrameScheduler() {
 }
 
 function scheduleRenderedFrameUpdate(options = {}) {
-  emit("content-rendered");
+  renderLifecycle.notifyMessageContentRendered();
 
   const needsSpacer = options.spacer !== false;
   renderedFrameNeedsSpacer = renderedFrameNeedsSpacer || needsSpacer;
@@ -1145,7 +1145,7 @@ async function runHistoryRenderThenScrollSequence(runId) {
     historyRenderCompleting = false;
     if (isCurrentHistoryRenderRun(runId)) {
       finalizeHistoryRenderPostProcess();
-      emit("history-rendered");
+      renderLifecycle.notifyHistoryRendered();
     }
   }
 }
@@ -1249,7 +1249,9 @@ async function startHistoryRoomRender() {
 // -------------------------------------------------------------------------
 // Message rendered events and streaming scroll behavior
 // -------------------------------------------------------------------------
-function handleMessageRendered(messageId) {
+function handleMessageRendered(payload) {
+  const messageId = payload?.messageId ?? payload;
+
   if (props.historyRendering) {
     // 채팅방 입장 중에는 메시지별 rendered 이벤트를 누적 상태로 관리하지 않습니다.
     // API 완료 플래그가 켜진 뒤 startHistoryRoomRender()의 단일 try/finally 루프가
@@ -1264,6 +1266,11 @@ function handleMessageRendered(messageId) {
     return;
   }
 }
+
+provideMessageActions({
+  ...parentMessageActions,
+  messageRendered: handleMessageRendered,
+});
 
 // -------------------------------------------------------------------------
 // Watchers and DOM lifecycle

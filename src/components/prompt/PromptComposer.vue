@@ -16,34 +16,7 @@
       }"
       @submit.prevent="submit"
     >
-      <PromptInputMobile
-        :ref="setPromptInputRef"
-        :attachments="attachments"
-        :has-selected-template-panel="hasSelectedTemplatePanel"
-        :selected-template-groups="selectedTemplateGroups"
-        :active-mobile-group="activeMobileGroup"
-        :is-prompt-expanded="isPromptExpanded"
-        :prompt-expand-toggle-label="promptExpandToggleLabel"
-        @preview="previewImage"
-        @remove-attachment="removeAttachment"
-        @preview-error="markPreviewError"
-        @select-option="selectTemplateOption"
-        @open-mobile-group="openTemplateOptionSheet"
-        @close-mobile-group="closeTemplateOptionSheet"
-        @open-model="openModelSelector"
-        @open-tool="openToolSelector"
-        @open-attach="openAttachSelector"
-        @select-model="selectModel"
-        @open-file-picker="openFilePicker"
-        @focus="handleFocus"
-        @blur="emit('blur')"
-        @input="resize"
-        @submit="submit"
-        @paste="handlePaste"
-        @start-voice="startVoiceInput"
-        @stop-voice="stopVoiceInput"
-        @toggle-expanded="togglePromptExpanded"
-      />
+      <PromptInputMobile :ref="setPromptInputRef" />
 
       <input
         ref="fileInputRef"
@@ -146,6 +119,13 @@ import {
   createEmptyPromptState,
 } from "@/composables/chat/chatStateContext";
 import {usePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
+import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
+import {
+  providePromptInputActions,
+} from "@/composables/prompt/context/promptInputActionContext";
+import {
+  providePromptInputState,
+} from "@/composables/prompt/context/promptInputStateContext";
 
 const componentProps = defineProps({
   submitDisabled: {type: Boolean, default: false},
@@ -156,6 +136,7 @@ const componentProps = defineProps({
 
 const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
 const composerContext = usePromptComposerContext();
+const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
 const props = reactive({
   get disabled() {
     return promptState.value.disabled;
@@ -195,12 +176,6 @@ const props = reactive({
   },
 });
 
-const emit = defineEmits([
-  "blur",
-  "expanded-change",
-  "focus",
-  "height-change",
-]);
 
 function invokeComposerContext(actionName, payload) {
   const action = composerContext?.[actionName];
@@ -231,16 +206,14 @@ function handleComposerEvent(eventName, payload) {
   }
   if (eventName === "focus") {
     invokeComposerContext("onFocus", payload);
-    emit("focus", payload);
     return;
   }
   if (eventName === "height-change") {
-    invokeComposerContext("onHeightChange", payload);
-    emit("height-change", payload);
+    notifyPromptHeightChange(payload);
     return;
   }
   if (eventName === "blur") {
-    emit("blur", payload);
+    promptWorkspaceLayoutActions.onBlur?.(payload);
   }
 }
 
@@ -808,6 +781,15 @@ function submit() {
  * [클립보드 붙여넣기 래퍼] 사용자가 입력창 내부에서 Ctrl+V 등으로 외부 미디어나 텍스트를 붙여 넣을 때 작동하는 가드 핸들러입니다.
  * @param {ClipboardEvent} event - 브라우저 네이티브 클립보드 붙여넣기 이벤트 객체
  */
+function notifyPromptExpandedChange(expanded) {
+  promptWorkspaceLayoutActions.onExpandedChange?.(expanded);
+}
+
+function notifyPromptHeightChange(height) {
+  invokeComposerContext("onHeightChange", height);
+  promptWorkspaceLayoutActions.onHeightChange?.(height);
+}
+
 function handlePaste(event) {
   if (props.submitDisabled || props.hideAttachActions) return;
   // 텍스트 서브 모듈 유틸을 통해 클립보드 내 바이트 스트림 데이터(이미지 파일 등)를 먼저 확보합니다.
@@ -856,13 +838,46 @@ const promptExpandToggleLabel = computed(() =>
   isPromptExpanded.value ? t("chat.inputCollapse") : t("chat.inputExpand")
 );
 
+providePromptInputState({
+  attachments,
+  selectedTemplateGroups,
+  activeMobileGroup,
+  hasSelectedTemplatePanel,
+  isPromptExpanded,
+  promptExpandToggleLabel,
+});
+
+providePromptInputActions({
+  previewImage,
+  removeAttachment,
+  markPreviewError,
+  selectTemplateOption,
+  openTemplateOptionSheet,
+  closeTemplateOptionSheet,
+  openMobileGroup: openTemplateOptionSheet,
+  closeMobileGroup: closeTemplateOptionSheet,
+  openModelSelector,
+  openToolSelector,
+  openAttachSelector,
+  selectModel,
+  openFilePicker,
+  focus: handleFocus,
+  blur: () => handleComposerEvent("blur"),
+  input: resize,
+  submit,
+  paste: handlePaste,
+  startVoiceInput,
+  stopVoiceInput,
+  togglePromptExpanded,
+});
+
 watch(
   isPromptExpanded,
   async (expanded) => {
     if (typeof document !== "undefined") {
       document.body.classList.toggle("prompt-input-expanded", expanded);
     }
-    emit("expanded-change", expanded);
+    notifyPromptExpandedChange(expanded);
 
     await nextTick();
 
@@ -873,7 +888,7 @@ watch(
     }
 
     await nextTick();
-    emit("height-change", getLastHeight());
+    notifyPromptHeightChange(getLastHeight());
   },
   {flush: "post", immediate: true}
 );
@@ -882,7 +897,7 @@ onBeforeUnmount(() => {
   if (typeof document !== "undefined") {
     document.body.classList.remove("prompt-input-expanded");
   }
-  emit("expanded-change", false);
+  notifyPromptExpandedChange(false);
 });
 
 const promptLayoutMode = computed(() => "mobile");

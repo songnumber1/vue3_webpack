@@ -4,7 +4,7 @@
       type="button"
       role="menuitem"
       :disabled="disabled"
-      @click="$emit('edit')"
+      @click="studioDetailActions.edit?.()"
     >
       <span aria-hidden="true">✎</span>
       <span>{{ t("studio.detail.edit") }}</span>
@@ -14,7 +14,7 @@
       type="button"
       role="menuitem"
       :disabled="disabled"
-      @click="$emit('delete')"
+      @click="studioDetailActions.delete?.()"
     >
       <span aria-hidden="true">🗑</span>
       <span>{{ t("studio.detail.delete") }}</span>
@@ -24,13 +24,14 @@
 
 <script setup>
 import {useI18n} from "vue-i18n";
+import {useStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
 const {t} = useI18n();
+const studioDetailActions = useStudioDetailActions();
 defineProps({
   open: {type: Boolean, default: false},
   disabled: {type: Boolean, default: false},
 });
-defineEmits(["edit", "delete"]);
 </script>
 
 <style scoped lang="scss">

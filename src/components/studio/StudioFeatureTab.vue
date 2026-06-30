@@ -28,7 +28,7 @@
             class="tw-h-[18px] tw-w-[18px] tw-accent-studio-primary"
             type="checkbox"
             :value="model.value"
-            @change="$emit('toggle-model', model.value)"
+            @change="createForm.toggleModel?.(model.value)"
           />
           <span class="tw-grid tw-min-w-0 tw-gap-1">
             <strong class="tw-text-sm tw-font-extrabold tw-leading-snug">{{
@@ -54,7 +54,7 @@
         :model-value="selectedRags"
         :title="t('studio.feature.rag')"
         :options="ragOptions"
-        @update:model-value="$emit('update-rags', $event)"
+        @update:model-value="createForm.updateRags?.($event)"
       />
     </section>
 
@@ -70,24 +70,24 @@
         :model-value="selectedMcps"
         :title="t('studio.feature.mcp')"
         :options="mcpOptions"
-        @update:model-value="$emit('update-mcps', $event)"
+        @update:model-value="createForm.updateMcps?.($event)"
       />
     </section>
   </div>
 </template>
 
 <script setup>
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioMultiSelect from "@/components/studio/StudioMultiSelect.vue";
+import {useStudioCreateForm} from "@/composables/studio/context/studioCreateFormContext";
 const {t} = useI18n();
-
-defineProps({
-  modelOptions: {type: Array, default: () => []},
-  selectedModels: {type: Array, default: () => []},
-  selectedRags: {type: Array, default: () => []},
-  selectedMcps: {type: Array, default: () => []},
-  ragOptions: {type: Array, default: () => []},
-  mcpOptions: {type: Array, default: () => []},
-});
-defineEmits(["toggle-model", "update-rags", "update-mcps"]);
+const createForm = useStudioCreateForm();
+const draft = createForm.draft;
+const modelOptions = createForm.modelOptions;
+const selectedModels = computed(() => draft.models);
+const selectedRags = computed(() => draft.rags);
+const selectedMcps = computed(() => draft.mcps);
+const ragOptions = createForm.ragOptions;
+const mcpOptions = createForm.mcpOptions;
 </script>

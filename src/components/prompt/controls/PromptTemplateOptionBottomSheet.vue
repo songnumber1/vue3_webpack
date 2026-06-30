@@ -2,7 +2,7 @@
   <BaseBottomSheet
     :open="Boolean(group)"
     :title="group?.label || ''"
-    @close="$emit('close')"
+    @close="promptInputActions.closeTemplateOptionSheet?.()"
   >
     <button
       v-for="option in group?.options || []"
@@ -10,7 +10,7 @@
       class="bottom-sheet-option bottom-sheet-option--row prompt-template-sheet-option"
       :class="{'is-active': option.active}"
       type="button"
-      @click="$emit('select-option', group.id, option.tag)"
+      @click="promptInputActions.selectTemplateOption?.(group.id, option.tag)"
     >
       <strong>{{ option.label }}</strong>
       <span
@@ -24,13 +24,14 @@
 </template>
 
 <script setup>
+import {computed, unref} from "vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+import {usePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
-defineProps({
-  group: {type: Object, default: null},
-});
-
-defineEmits(["select-option", "close"]);
+const promptInputActions = usePromptInputActions();
+const promptInputState = usePromptInputState();
+const group = computed(() => unref(promptInputState.activeMobileGroup) || null);
 </script>
 
 <style scoped lang="scss">

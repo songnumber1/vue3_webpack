@@ -6,7 +6,7 @@
     :title="label"
     :aria-label="label"
     :aria-pressed="expanded"
-    @click="$emit('toggle')"
+    @click="promptInputActions.togglePromptExpanded?.()"
   >
     <svg v-if="!expanded" viewBox="0 0 24 24" aria-hidden="true">
       <path
@@ -37,11 +37,14 @@
  * @description 프롬프트 입력창 최대화/최소화 토글 버튼입니다.
  */
 
-defineProps({
-  expanded: {type: Boolean, default: false},
-  label: {type: String, required: true},
-  buttonClass: {type: [String, Array, Object], default: ""},
-});
+import {computed, unref} from "vue";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+import {usePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
-defineEmits(["toggle"]);
+const promptInputActions = usePromptInputActions();
+const promptInputState = usePromptInputState();
+
+const expanded = computed(() => Boolean(unref(promptInputState.isPromptExpanded)));
+const label = computed(() => unref(promptInputState.promptExpandToggleLabel) || "");
+const buttonClass = "";
 </script>

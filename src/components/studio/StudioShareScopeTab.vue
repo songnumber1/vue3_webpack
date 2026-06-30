@@ -12,7 +12,7 @@
           :checked="scope === 'public'"
           type="radio"
           value="public"
-          @change="$emit('update-scope', 'public')"
+          @change="createForm.updateScope?.('public')"
         />
         <span>{{ t("studio.share.public") }}</span>
       </label>
@@ -24,7 +24,7 @@
           :checked="scope === 'private'"
           type="radio"
           value="private"
-          @change="$emit('update-scope', 'private')"
+          @change="createForm.updateScope?.('private')"
         />
         <span>{{ t("studio.share.private") }}</span>
       </label>
@@ -44,14 +44,14 @@
           <button
             class="studio-button studio-button--primary-ghost tw-inline-flex tw-min-h-8 tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-border-studio-primary tw-bg-studio-surface tw-px-3 tw-font-bold tw-text-studio-primary"
             type="button"
-            @click="$emit('open-authority-picker')"
+            @click="createForm.openAuthorityPicker?.()"
           >
             + {{ t("studio.share.add") }}
           </button>
           <button
             class="studio-button studio-button--danger-ghost tw-inline-flex tw-min-h-8 tw-items-center tw-justify-center tw-rounded-studio tw-border tw-border-solid tw-bg-studio-surface tw-px-3 tw-font-bold"
             type="button"
-            @click="$emit('delete-checked-authorities')"
+            @click="createForm.deleteCheckedAuthorities?.()"
           >
             {{ t("studio.share.delete") }}
           </button>
@@ -67,7 +67,7 @@
             <input
               type="checkbox"
               :checked="allAuthoritiesChecked"
-              @change="$emit('toggle-all-authorities', $event.target.checked)"
+              @change="createForm.toggleAllAuthorities?.($event.target.checked)"
             />
           </div>
           <div role="columnheader">{{ t("studio.share.authorityName") }}</div>
@@ -84,7 +84,10 @@
               :checked="auth.checked"
               type="checkbox"
               @change="
-                $emit('toggle-authority', auth.deptId, $event.target.checked)
+                createForm.toggleAuthority?.(
+                  auth.deptId,
+                  $event.target.checked
+                )
               "
             />
           </div>
@@ -128,19 +131,13 @@
 </template>
 
 <script setup>
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
+import {useStudioCreateForm} from "@/composables/studio/context/studioCreateFormContext";
 const {t} = useI18n();
-
-defineProps({
-  scope: {type: String, default: "private"},
-  authorities: {type: Array, default: () => []},
-  allAuthoritiesChecked: {type: Boolean, default: false},
-});
-defineEmits([
-  "update-scope",
-  "open-authority-picker",
-  "delete-checked-authorities",
-  "toggle-all-authorities",
-  "toggle-authority",
-]);
+const createForm = useStudioCreateForm();
+const draft = createForm.draft;
+const scope = computed(() => draft.scope);
+const authorities = createForm.selectedAuthorities;
+const allAuthoritiesChecked = createForm.allAuthoritiesChecked;
 </script>

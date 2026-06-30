@@ -4,14 +4,12 @@
     :data-message-id="messageDomId"
     :data-message-role="messageDomRole"
     :message="message"
-    @rendered="$emit('rendered', $event)"
   />
   <AssistantErrorMessage
     v-else-if="isErrorMessage"
     :data-message-id="messageDomId"
     :data-message-role="messageDomRole"
     :message="message"
-    @rendered="$emit('rendered', $event)"
   />
   <AssistantMessage
     v-else
@@ -20,8 +18,6 @@
     :message="message"
     :show-regenerate="showRegenerate"
     :defer-mermaid-enhancement="deferMermaidEnhancement"
-    @rendered="$emit('rendered', $event)"
-    @regenerate="$emit('regenerate', $event)"
   />
 </template>
 
@@ -43,7 +39,6 @@ const props = defineProps({
   showRegenerate: {type: Boolean, default: true},
   deferMermaidEnhancement: {type: Boolean, default: false},
 });
-defineEmits(["rendered", "regenerate"]);
 
 const isErrorMessage = computed(
   () =>

@@ -3,22 +3,15 @@
     v-if="shellReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
-    @history-menu-action="handleHistoryMenuAction"
   >
     <HomeWorkspace
       v-if="activeWorkspaceType === 'main'"
       :ref="setWorkspaceRef"
-      @studio-detail="openStudioDetail"
     />
 
     <ChatConversationWorkspace
       v-else-if="activeWorkspaceType === 'conversation'"
       :ref="setWorkspaceRef"
-      @regenerate="handleWorkspaceRegenerate"
-      @message-content-rendered="handleMessageContentRendered"
-      @scroll-bottom="handleWorkspaceScrollBottom"
-      @history-rendered="finishHistoryRender"
-      @studio-detail="openStudioDetail"
     />
 
     <StudioWorkspace
@@ -60,9 +53,6 @@
       :is-mobile="isMobile"
       :allow-actions="true"
       :actions-disabled="isStudioDetailBlocked"
-      @close="closeStudioDetail"
-      @edit="handleStudioDetailEdit"
-      @delete="handleStudioDetailDelete"
     />
 
 
@@ -214,6 +204,10 @@ import {
   submitChatMessage,
 } from "@/composables/chat/chatSubmitActions";
 import {providePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
+import {provideChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
+import {provideMessageActions} from "@/composables/chat/context/messageActionContext";
+import {provideNavigationActions} from "@/composables/navigation/context/navigationActionContext";
+import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 import {
   isSharedChat,
   resolveMessageRenderPolicy,
@@ -1657,6 +1651,27 @@ useOverlayBackClose({
   isOpen: studioDetailOpen,
   close: closeStudioDetail,
   historyValue: "chat-studio-detail",
+});
+
+provideChatWorkspaceActions({
+  openStudioDetail,
+  scrollBottom: handleWorkspaceScrollBottom,
+});
+
+provideNavigationActions({
+  handleHistoryMenuAction,
+});
+
+provideMessageActions({
+  regenerate: handleWorkspaceRegenerate,
+  messageContentRendered: handleMessageContentRendered,
+  historyRendered: finishHistoryRender,
+});
+
+provideStudioDetailActions({
+  close: closeStudioDetail,
+  edit: handleStudioDetailEdit,
+  delete: handleStudioDetailDelete,
 });
 
 function isDeletedRuntimeStudioAssistant(assistant = null) {

@@ -18,28 +18,7 @@
       @close="closeDetail"
     />
 
-    <McpMainPage
-      v-else
-      :search-text="searchText"
-      :active-tab="activeTab"
-      :active-category="activeCategory"
-      :active-category-label="selectedListCategoryLabel"
-      :created-only="createdOnly"
-      :categories="mcpCategoryChips"
-      :mcps="pagedMcps"
-      :pages="paginationPages"
-      :current-page="currentPage"
-      :max-page="maxPage"
-      @update-search-text="searchText = $event"
-      @search="runSearch"
-      @update-active-tab="activeTab = $event"
-      @select-category="selectListCategory"
-      @update-created-only="createdOnly = $event"
-      @open-category-picker="categorySelectorOpen = true"
-      @open-create="openReadyDialog"
-      @open-detail="openDetail"
-      @go-page="goPage"
-    />
+    <McpMainPage v-else />
 
     <StudioCategoryPicker
       :open="categorySelectorOpen"
@@ -99,6 +78,8 @@ import {
 } from "@/composables/chat/chatStateContext";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
+import {provideMcpList} from "@/composables/mcp/context/mcpListContext";
+import {useMcpListController} from "@/composables/mcp/useMcpListController";
 
 const {t, locale} = useI18n();
 const injectedWorkspaceState = inject(
@@ -164,6 +145,36 @@ const pagedMcps = computed(() =>
 );
 const paginationPages = computed(() =>
   createStudioPaginationPages(currentPage.value, maxPage.value)
+);
+
+provideMcpList(
+  useMcpListController({
+    searchText,
+    activeTab,
+    activeCategory,
+    activeCategoryLabel: selectedListCategoryLabel,
+    createdOnly,
+    mcps: pagedMcps,
+    pages: paginationPages,
+    currentPage,
+    maxPage,
+    updateSearchText: (value) => {
+      searchText.value = value;
+    },
+    runSearch,
+    updateActiveTab: (value) => {
+      activeTab.value = value;
+    },
+    updateCreatedOnly: (value) => {
+      createdOnly.value = value;
+    },
+    openCategoryPicker: () => {
+      categorySelectorOpen.value = true;
+    },
+    openCreate: openReadyDialog,
+    openDetail,
+    goPage,
+  })
 );
 
 watch(activeTab, () => {

@@ -26,7 +26,6 @@
           hide-tool-actions
           hide-attach-actions
           hide-voice-action
-          @expanded-change="handlePreviewComposerExpandedChange"
         />
       </template>
     </MainEmptyState>
@@ -40,6 +39,7 @@
  * 기존 PromptComposer를 미리보기 전용 submit-disabled 상태로 표시하여 입력 UI는 보여주되 전송/SSE 등 실제 채팅 질의를 차단합니다.
  */
 import {computed, ref} from "vue";
+import {providePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 import {useI18n} from "vue-i18n";
 import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
@@ -67,6 +67,10 @@ const previewComposerExpanded = ref(false);
 function handlePreviewComposerExpandedChange(expanded) {
   previewComposerExpanded.value = Boolean(expanded);
 }
+
+providePromptWorkspaceLayoutActions({
+  onExpandedChange: handlePreviewComposerExpandedChange,
+});
 
 const previewSuggestions = computed(() =>
   (props.prompts || [])

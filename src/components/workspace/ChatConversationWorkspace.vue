@@ -7,7 +7,6 @@
     :theme-name="themeName"
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
-    @studio-detail="emit('studio-detail')"
   />
 
   <MessageList
@@ -21,9 +20,6 @@
     :history-render-key="historyRenderKey"
     :message-render-policy="messageRenderPolicy"
     :readonly="readonly"
-    @content-rendered="handleMessageContentRendered"
-    @history-rendered="handleHistoryRendered"
-    @regenerate="handleRegenerate"
   />
   <button
     v-if="
@@ -57,8 +53,6 @@
         'mobile-chat-prompt': isMobile,
         'mobile-keyboard-dock': isMobile,
       }"
-      @height-change="handlePromptHeightChange"
-      @expanded-change="handlePromptExpandedChange"
     />
   </div>
 
@@ -81,7 +75,6 @@ import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
 import MessageList from "@/components/chat/MessageList.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {
@@ -89,6 +82,12 @@ import {
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatStateContext";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
+import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
+import {providePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
+import {
+  provideMessageActions,
+  useMessageActions,
+} from "@/composables/chat/context/messageActionContext";
 
 const {t} = useI18n();
 const listRef = ref(null);
@@ -96,20 +95,13 @@ const composerSlotRef = ref(null);
 const promptComposerRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
-const emit = defineEmits([
-  "regenerate",
-  "message-content-rendered",
-  "scroll-bottom",
-  "history-rendered",
-  "studio-detail",
-]);
-
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
+const chatWorkspaceActions = useChatWorkspaceActions();
+const parentMessageActions = useMessageActions();
 const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
 const mode = computed(() => workspaceState.value.mode);
 const activeChatId = computed(() => chatStore.selectedChatId || "");
 const readonly = computed(() => workspaceState.value.readonly);
@@ -161,25 +153,7 @@ const messageRenderPolicy = computed(
   () => workspaceState.value.messageRenderPolicy || null
 );
 const isHistoryBusy = computed(() => resolveBooleanSource(isHistoryRendering));
-const isConversationActionBlocked = computed(
-  () => chatStreamStore.isWait || isHistoryBusy.value
-);
 const chatPageLock = {
-  isConversationActionBlocked,
-  isSubmitBlocked: computed(
-    () =>
-      isConversationActionBlocked.value ||
-      chatStreamStore.isWait ||
-      resolveBooleanSource(readonly) ||
-      resolveBooleanSource(isGenerating) ||
-      resolveBooleanSource(isActiveModelUnavailable)
-  ),
-  isRegenerateBlocked: computed(
-    () =>
-      isConversationActionBlocked.value ||
-      resolveBooleanSource(readonly) ||
-      resolveBooleanSource(isGenerating)
-  ),
   isScrollButtonBlocked: computed(() => isHistoryBusy.value),
 };
 
@@ -198,13 +172,9 @@ const {scheduleComposerHeightUpdate} = useConversationComposerHeight(
 );
 function scrollBottom() {
   if (chatPageLock.isScrollButtonBlocked.value) return;
-  emit("scroll-bottom");
+  chatWorkspaceActions.scrollBottom?.();
 }
 
-function handleRegenerate(message) {
-  if (chatPageLock.isRegenerateBlocked.value) return;
-  emit("regenerate", message);
-}
 
 function handlePromptExpandedChange(expanded) {
   isPromptExpandedInChat.value = Boolean(expanded);
@@ -219,24 +189,33 @@ function collapsePromptExpandedForChatSwitch() {
   scheduleComposerHeightUpdate();
 }
 
-function handleMessageContentRendered() {
-  if (isHistoryRendering.value) {
-    return;
-  }
 
-  emit("message-content-rendered");
+function handleMessageContentRendered() {
+  if (!isHistoryRendering.value) {
+    parentMessageActions.messageContentRendered?.();
+  }
   scheduleComposerHeightUpdate();
 }
 
-
 function handleHistoryRendered() {
-  emit("history-rendered");
+  parentMessageActions.historyRendered?.();
   scheduleComposerHeightUpdate();
 }
 
 function handlePromptHeightChange() {
   scheduleComposerHeightUpdate();
 }
+
+provideMessageActions({
+  ...parentMessageActions,
+  messageContentRendered: handleMessageContentRendered,
+  historyRendered: handleHistoryRendered,
+});
+
+providePromptWorkspaceLayoutActions({
+  onExpandedChange: handlePromptExpandedChange,
+  onHeightChange: handlePromptHeightChange,
+});
 
 watch(activeChatId, () => {
   collapsePromptExpandedForChatSwitch();

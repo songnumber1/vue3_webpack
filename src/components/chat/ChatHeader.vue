@@ -33,7 +33,7 @@
         :disabled="studioDetailDisabled"
         aria-label="Studio 상세 보기"
         title="Studio 상세 보기"
-        @click.stop="$emit('studio-detail')"
+        @click.stop="openStudioDetail"
       >
         ⓘ
       </button>
@@ -67,6 +67,7 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
+import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
 
 const props = defineProps({
   mode: {type: String, default: "main"},
@@ -78,12 +79,11 @@ const props = defineProps({
   studioDetailDisabled: {type: Boolean, default: false},
 });
 
-defineEmits(["studio-detail"]);
-
 const {t} = useI18n();
 const chatStreamStore = useChatStreamStore();
 const viewportStore = useViewportStore();
 const appShellStore = useAppShellStore();
+const chatWorkspaceActions = useChatWorkspaceActions();
 const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const isMobile = computed(() => true);
 const mobileAssistantIcon = computed(() =>
@@ -115,6 +115,11 @@ function openSettings() {
     isMobile,
     isBlocked: () => isAppShellActionBlocked.value,
   });
+}
+
+function openStudioDetail() {
+  if (props.studioDetailDisabled) return;
+  chatWorkspaceActions.openStudioDetail?.();
 }
 </script>
 

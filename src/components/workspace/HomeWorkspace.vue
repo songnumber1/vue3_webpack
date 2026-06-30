@@ -17,13 +17,11 @@
     :studio-detail-disabled="studioDetailDisabled"
     :composer-expanded="isMainPromptExpanded"
     @suggestion-click="handleSuggestionClick"
-    @studio-detail="emit('studio-detail')"
   >
     <template #composer>
       <PromptComposer
         ref="mainPromptInputRef"
         :class="mainPromptClass"
-        @expanded-change="handleMainPromptExpandedChange"
       />
     </template>
   </MainEmptyState>
@@ -42,6 +40,7 @@ import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {providePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
@@ -50,7 +49,6 @@ import {
 const chatStreamStore = useChatStreamStore();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
-const emit = defineEmits(["studio-detail"]);
 
 const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
@@ -90,6 +88,10 @@ function handleSuggestionClick(item) {
 function handleMainPromptExpandedChange(expanded) {
   isMainPromptExpanded.value = Boolean(expanded);
 }
+
+providePromptWorkspaceLayoutActions({
+  onExpandedChange: handleMainPromptExpandedChange,
+});
 </script>
 
 <style scoped lang="scss">

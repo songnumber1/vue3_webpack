@@ -4,34 +4,7 @@
     aria-label="Assistant Studio"
   >
     <template v-if="createOpen">
-      <StudioCreatePage
-        :create-tab="createTab"
-        :draft="draft"
-        :preview="preview"
-        :preview-initial="previewInitial"
-        :preview-prompts="previewPrompts"
-        :selected-category-label="selectedCategoryLabel"
-        :category-options="categoryOptions"
-        :model-options="modelOptions"
-        :rag-options="ragOptions"
-        :mcp-options="mcpOptions"
-        :selected-authorities="selectedAuthorities"
-        :all-authorities-checked="allAuthoritiesChecked"
-        @close="closeCreate"
-        @apply-preview="applyPreview"
-        @update-create-tab="createTab = $event"
-        @update-draft-field="updateDraftField"
-        @update-draft-prompt="updateDraftPrompt"
-        @open-category="categorySelectorOpen = true"
-        @toggle-model="toggleModel"
-        @update-rags="draft.rags = $event"
-        @update-mcps="draft.mcps = $event"
-        @update-scope="draft.scope = $event"
-        @open-authority-picker="authorityPickerOpen = true"
-        @delete-checked-authorities="deleteCheckedAuthorities"
-        @toggle-all-authorities="toggleAllAuthorities"
-        @toggle-authority="toggleAuthority"
-      />
+      <StudioCreatePage />
 
       <StudioCategoryPicker
         :open="categorySelectorOpen"
@@ -65,34 +38,12 @@
         :theme-name="workspaceState.themeName"
       />
 
-      <StudioMainPage
-        v-show="!studioDetailOpen"
-        :search-text="searchText"
-        :active-tab="activeTab"
-        :active-category="activeCategory"
-        :active-category-label="selectedListCategoryLabel"
-        :categories="studioCategoryChips"
-        :studios="pagedStudios"
-        :pages="paginationPages"
-        :current-page="currentPage"
-        :max-page="maxPage"
-        @update-search-text="searchText = $event"
-        @search="runSearch"
-        @update-active-tab="activeTab = $event"
-        @select-category="selectListCategory"
-        @open-category-picker="listCategorySelectorOpen = true"
-        @open-create="openCreate"
-        @open-detail="openStudioDetail"
-        @go-page="goPage"
-      />
+      <StudioMainPage v-show="!studioDetailOpen" />
 
       <StudioDetailViewer
         :open="studioDetailOpen"
         :studio="selectedStudio"
         :allow-actions="true"
-        @close="closeStudioDetail"
-        @edit="editStudioFromDetail"
-        @delete="deleteStudioFromDetail"
       />
 
       <StudioCategoryPicker
@@ -135,6 +86,11 @@ import {
 } from "@/composables/chat/chatStateContext";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
+import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
+import {provideStudioCreateForm} from "@/composables/studio/context/studioCreateFormContext";
+import {useStudioCreateFormController} from "@/composables/studio/create/useStudioCreateFormController";
+import {provideStudioList} from "@/composables/studio/context/studioListContext";
+import {useStudioListController} from "@/composables/studio/useStudioListController";
 
 const {t, locale} = useI18n();
 const route = useRoute();
@@ -165,6 +121,11 @@ useOverlayBackClose({
   isOpen: studioDetailOpen,
   close: closeStudioDetail,
   historyValue: "studio-detail",
+});
+provideStudioDetailActions({
+  close: closeStudioDetail,
+  edit: editStudioFromDetail,
+  delete: deleteStudioFromDetail,
 });
 const editingStudioId = ref(null);
 const isResolvingEdit = ref(false);
@@ -252,6 +213,63 @@ const previewInitial = computed(() =>
 );
 const previewPrompts = computed(() =>
   preview.prompts.filter(Boolean).slice(0, 4)
+);
+
+provideStudioList(
+  useStudioListController({
+    searchText,
+    activeTab,
+    activeCategory,
+    activeCategoryLabel: selectedListCategoryLabel,
+    studios: pagedStudios,
+    pages: paginationPages,
+    currentPage,
+    maxPage,
+    updateSearchText: (value) => {
+      searchText.value = value;
+    },
+    runSearch,
+    updateActiveTab: (value) => {
+      activeTab.value = value;
+    },
+    openCategoryPicker: () => {
+      listCategorySelectorOpen.value = true;
+    },
+    openCreate,
+    openDetail: openStudioDetail,
+    goPage,
+  })
+);
+
+provideStudioCreateForm(
+  useStudioCreateFormController({
+    createTab,
+    draft,
+    preview,
+    previewInitial,
+    previewPrompts,
+    selectedCategoryLabel,
+    categoryOptions,
+    modelOptions,
+    ragOptions,
+    mcpOptions,
+    selectedAuthorities,
+    allAuthoritiesChecked,
+    closeCreate,
+    applyPreview,
+    updateCreateTab,
+    updateDraftField,
+    updateDraftPrompt,
+    openCategorySelector,
+    toggleModel,
+    updateRags,
+    updateMcps,
+    updateScope,
+    openAuthorityPicker,
+    deleteCheckedAuthorities,
+    toggleAllAuthorities,
+    toggleAuthority,
+  })
 );
 
 watch(activeTab, () => {
@@ -888,11 +906,29 @@ function applyPreview() {
   preview.description = draft.description;
   preview.prompts = [...draft.prompts];
 }
+function updateCreateTab(tab) {
+  createTab.value = tab;
+}
 function updateDraftField(field, value) {
   draft[field] = value;
 }
 function updateDraftPrompt(index, value) {
   draft.prompts[index] = value;
+}
+function openCategorySelector() {
+  categorySelectorOpen.value = true;
+}
+function updateRags(items) {
+  draft.rags = items;
+}
+function updateMcps(items) {
+  draft.mcps = items;
+}
+function updateScope(scope) {
+  draft.scope = scope;
+}
+function openAuthorityPicker() {
+  authorityPickerOpen.value = true;
 }
 function selectCreateCategory(value) {
   updateDraftField("category", value);

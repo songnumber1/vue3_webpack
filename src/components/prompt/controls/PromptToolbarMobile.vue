@@ -12,7 +12,7 @@
           :disabled="disabled || modelReadonly"
           :title="modelReadonly ? resolvedReadonlyTitle : undefined"
           :aria-label="modelSelectLabel"
-          @click="$emit('open-model')"
+          @click="promptInputActions.openModelSelector?.()"
         >
           <span>{{ currentModel.label }}</span>
           <svg viewBox="0 0 20 20" aria-hidden="true">
@@ -46,7 +46,7 @@
           :aria-label="
             selectedTemplateTool ? selectedTemplateTool.label : 'Tools'
           "
-          @click="$emit('open-tool')"
+          @click="promptInputActions.openToolSelector?.()"
         >
           <img
             v-if="selectedTemplateTool?.iconSrc"
@@ -70,7 +70,7 @@
           :title="attachLabel"
           :aria-label="attachLabel"
           :disabled="disabled"
-          @click="$emit('open-attach')"
+          @click="promptInputActions.openAttachSelector?.()"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -93,7 +93,7 @@
       :disabled="disabled || !isSpeechSupported"
       :title="voiceStartLabel"
       :aria-label="voiceStartLabel"
-      @click="$emit('start-voice')"
+      @click="promptInputActions.startVoiceInput?.()"
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path
@@ -122,7 +122,7 @@
       :disabled="disabled"
       :title="voiceStopLabel"
       :aria-label="voiceStopLabel"
-      @click="$emit('stop-voice')"
+      @click="promptInputActions.stopVoiceInput?.()"
     >
       <span aria-hidden="true"></span>
     </button>
@@ -158,11 +158,13 @@ import {
   PROMPT_TOOLBAR_STATE_KEY,
   createEmptyPromptToolbarState,
 } from "@/composables/chat/chatStateContext";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
 
 const {t} = useI18n();
 const modelRoot = ref(null);
 const toolRoot = ref(null);
 const attachRoot = ref(null);
+const promptInputActions = usePromptInputActions();
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -192,16 +194,6 @@ const voiceStopLabel = computed(() => toolbarState.value.voiceStopLabel);
 const attachLabel = computed(() => toolbarState.value.attachLabel);
 const sendLabel = computed(() => toolbarState.value.sendLabel);
 const modelSelectLabel = computed(() => toolbarState.value.modelSelectLabel);
-
-defineEmits([
-  "open-model",
-  "open-tool",
-  "open-attach",
-  "select-model",
-  "open-file-picker",
-  "start-voice",
-  "stop-voice",
-]);
 
 const resolvedReadonlyTitle = computed(
   () => toolbarState.value.readonlyTitle || t("prompt.modelReadonly")

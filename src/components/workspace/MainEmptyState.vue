@@ -25,7 +25,7 @@
           :disabled="studioDetailDisabled"
           aria-label="Studio 상세 보기"
           title="Studio 상세 보기"
-          @click.stop="emit('studio-detail')"
+          @click.stop="handleStudioDetailClick"
         >
           ⓘ
         </button>
@@ -69,8 +69,11 @@
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
+import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
 
 const {t} = useI18n();
+
+const chatWorkspaceActions = useChatWorkspaceActions();
 
 const props = defineProps({
   preview: {type: Boolean, default: false},
@@ -88,7 +91,7 @@ const props = defineProps({
   studioDetailDisabled: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(["suggestion-click", "studio-detail"]);
+const emit = defineEmits(["suggestion-click"]);
 
 const resolvedTitle = computed(() => props.title || t("chat.startQuestion"));
 const normalizedSuggestions = computed(() =>
@@ -118,6 +121,11 @@ const normalizedSuggestions = computed(() =>
 function handleSuggestionClick(item) {
   if (props.disableInteractions) return;
   emit("suggestion-click", item);
+}
+
+function handleStudioDetailClick() {
+  if (props.studioDetailDisabled) return;
+  chatWorkspaceActions.openStudioDetail?.();
 }
 </script>
 

@@ -26,16 +26,16 @@
           :value="searchText"
           type="search"
           :placeholder="t('mcp.searchPlaceholder')"
-          @input="$emit('update-search-text', $event.target.value)"
+          @input="updateSearchText($event.target.value)"
           class="tw-box-border tw-min-h-[42px] tw-w-full tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-py-2.5 tw-pl-3 tw-pr-12 tw-font-[inherit] tw-text-inherit"
-          @keydown.enter.prevent="$emit('search')"
+          @keydown.enter.prevent="runSearch()"
         />
         <button
           class="studio-search-button tw-absolute tw-right-1 tw-top-1 tw-inline-flex tw-h-[34px] tw-min-h-[34px] tw-w-[34px] tw-shrink-0 tw-cursor-pointer tw-items-center tw-justify-center tw-rounded-studio tw-border-0 tw-bg-transparent tw-text-studio-text hover:tw-bg-studio-controlHover"
           type="button"
           :aria-label="t('mcp.searchAction')"
           :title="t('mcp.searchAction')"
-          @click="$emit('search')"
+          @click="runSearch()"
         >
           <span
             class="studio-icon studio-icon--search"
@@ -61,7 +61,7 @@
               activeTab === 'all',
           }"
           type="button"
-          @click="$emit('update-active-tab', 'all')"
+          @click="updateActiveTab('all')"
         >
           {{ t("mcp.allConnectors") }}
         </button>
@@ -73,7 +73,7 @@
               activeTab === 'mine',
           }"
           type="button"
-          @click="$emit('update-active-tab', 'mine')"
+          @click="updateActiveTab('mine')"
         >
           {{ t("mcp.myConnectors") }}
         </button>
@@ -81,7 +81,7 @@
       <button
         class="studio-button studio-button--primary studio-create-entry tw-mb-2 tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
-        @click="$emit('open-create')"
+        @click="openCreate()"
       >
         {{ t("mcp.create") }}
       </button>
@@ -90,7 +90,7 @@
         type="button"
         :aria-label="t('mcp.create')"
         :title="t('mcp.create')"
-        @click="$emit('open-create')"
+        @click="openCreate()"
       >
         <span class="studio-icon studio-icon--plus" aria-hidden="true"></span>
       </button>
@@ -101,7 +101,7 @@
       class="studio-mobile-category-select tw-shrink-0 tw-items-center tw-justify-between"
       type="button"
       :aria-label="t('mcp.categorySelect')"
-      @click="$emit('open-category-picker')"
+      @click="openCategoryPicker()"
     >
       <span>{{ activeCategoryLabel }}</span>
       <span
@@ -121,7 +121,7 @@
           :checked="createdOnly"
           class="tw-m-0 tw-h-4 tw-w-4 tw-shrink-0 tw-accent-studio-primary"
           type="checkbox"
-          @change="$emit('update-created-only', $event.target.checked)"
+          @change="updateCreatedOnly($event.target.checked)"
         />
         <span>{{ t("mcp.createdOnly") }}</span>
       </label>
@@ -152,7 +152,7 @@
             body-class="studio-card__body tw-grid tw-min-w-0 tw-gap-[5px]"
             more-class="studio-card__more tw-absolute tw-right-[14px] tw-top-3 tw-inline-flex tw-items-center tw-justify-center tw-text-studio-muted tw-font-black tw-tracking-[1px]"
             meta-class="studio-card__meta tw-col-span-full tw-text-xs tw-text-studio-muted"
-            @open="$emit('open-detail', $event)"
+            @open="openDetail"
           />
         </div>
       </div>
@@ -167,7 +167,7 @@
         type="button"
         :disabled="currentPage === 1"
         :aria-label="t('mcp.pagination.first')"
-        @click="$emit('go-page', 1)"
+        @click="goPage(1)"
       >
         <span
           class="studio-icon studio-icon--page-first"
@@ -179,7 +179,7 @@
         type="button"
         :disabled="currentPage === 1"
         :aria-label="t('mcp.pagination.previous')"
-        @click="$emit('go-page', currentPage - 1)"
+        @click="goPage(currentPage - 1)"
       >
         <span
           class="studio-icon studio-icon--page-prev"
@@ -200,7 +200,7 @@
           'tw-border-transparent tw-bg-transparent tw-opacity-100 disabled:tw-cursor-default disabled:tw-opacity-100':
             page.ellipsis,
         }"
-        @click="!page.ellipsis && $emit('go-page', page.value)"
+        @click="!page.ellipsis && goPage(page.value)"
       >
         {{ page.label }}
       </button>
@@ -209,7 +209,7 @@
         type="button"
         :disabled="currentPage === maxPage"
         :aria-label="t('mcp.pagination.next')"
-        @click="$emit('go-page', currentPage + 1)"
+        @click="goPage(currentPage + 1)"
       >
         <span
           class="studio-icon studio-icon--page-next"
@@ -221,7 +221,7 @@
         type="button"
         :disabled="currentPage === maxPage"
         :aria-label="t('mcp.pagination.last')"
-        @click="$emit('go-page', maxPage)"
+        @click="goPage(maxPage)"
       >
         <span
           class="studio-icon studio-icon--page-last"
@@ -235,6 +235,7 @@
 <script setup>
 import {ref} from "vue";
 import {useI18n} from "vue-i18n";
+import {useMcpList} from "@/composables/mcp/context/mcpListContext";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
@@ -242,18 +243,26 @@ const {t} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const listAreaRef = ref(null);
 
-const props = defineProps({
-  searchText: {type: String, default: ""},
-  activeTab: {type: String, default: "all"},
-  activeCategory: {type: String, default: "ALL"},
-  activeCategoryLabel: {type: String, default: ""},
-  createdOnly: {type: Boolean, default: false},
-  categories: {type: Array, default: () => []},
-  mcps: {type: Array, default: () => []},
-  pages: {type: Array, default: () => []},
-  currentPage: {type: Number, default: 1},
-  maxPage: {type: Number, default: 1},
-});
+const mcpList = useMcpList();
+const {
+  searchText,
+  activeTab,
+  activeCategory,
+  activeCategoryLabel,
+  createdOnly,
+  mcps,
+  pages,
+  currentPage,
+  maxPage,
+  updateSearchText,
+  runSearch,
+  updateActiveTab,
+  updateCreatedOnly,
+  openCategoryPicker,
+  openCreate,
+  openDetail,
+  goPage,
+} = mcpList;
 
 useOverlayScrollbar(
   listAreaRef,
@@ -262,23 +271,11 @@ useOverlayScrollbar(
     enabled: () => shouldUseOverlayScrollbar.value,
     disableOnMobile: false,
     watchSource: () => [
-      props.activeTab,
-      props.activeCategory,
-      props.currentPage,
-      props.mcps.length,
+      activeTab.value,
+      activeCategory.value,
+      currentPage.value,
+      mcps.value.length,
     ],
   }
 );
-
-defineEmits([
-  "update-search-text",
-  "search",
-  "update-active-tab",
-  "select-category",
-  "open-category-picker",
-  "open-create",
-  "open-detail",
-  "update-created-only",
-  "go-page",
-]);
 </script>

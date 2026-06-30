@@ -1,51 +1,19 @@
 <template>
-  <PromptAttachmentPreviewList
-    :attachments="attachments"
-    @preview="$emit('preview', $event)"
-    @remove="$emit('remove-attachment', $event)"
-    @preview-error="$emit('preview-error', $event)"
-  />
+  <PromptAttachmentPreviewList />
 
-  <PromptTemplatePanelMobile
-    v-if="hasSelectedTemplatePanel"
-    :groups="selectedTemplateGroups"
-    :active-mobile-group="activeMobileGroup"
-    @select-option="$emit('select-option', $event)"
-    @open-mobile-group="$emit('open-mobile-group', $event)"
-    @close-mobile-group="$emit('close-mobile-group')"
-  />
+  <PromptTemplatePanelMobile v-if="hasSelectedTemplatePanel" />
 
-  <PromptExpandToggle
-    :expanded="isPromptExpanded"
-    :label="promptExpandToggleLabel"
-    @toggle="$emit('toggle-expanded')"
-  />
+  <PromptExpandToggle />
 
-  <PromptTextarea
-    ref="textareaComponentRef"
-    @focus="$emit('focus')"
-    @blur="$emit('blur')"
-    @input="$emit('input', $event)"
-    @submit="$emit('submit')"
-    @paste="$emit('paste', $event)"
-  />
+  <PromptTextarea ref="textareaComponentRef" />
 
-  <PromptToolbarMobile
-    ref="toolbarRef"
-    @open-model="$emit('open-model')"
-    @open-tool="$emit('open-tool')"
-    @open-attach="$emit('open-attach')"
-    @select-model="$emit('select-model', $event)"
-    @open-file-picker="$emit('open-file-picker', $event)"
-    @start-voice="$emit('start-voice')"
-    @stop-voice="$emit('stop-voice')"
-  />
+  <PromptToolbarMobile ref="toolbarRef" />
 </template>
 
 <script setup>
 /**
  * @file components/prompt/input/PromptInputMobile.vue
- * @description 모바일 전용 PromptComposer 입력 row입니다. 모바일 row DOM을 PC row와 분리해 전환 후 높이/row 상태를 단순화합니다.
+ * @description 모바일 전용 PromptComposer 입력 row입니다. 하위 입력 컨트롤은 PromptInput context로 상태/action을 공유합니다.
  */
 
 import {computed, ref} from "vue";
@@ -54,42 +22,14 @@ import PromptExpandToggle from "@/components/prompt/controls/PromptExpandToggle.
 import PromptTemplatePanelMobile from "@/components/prompt/controls/PromptTemplatePanelMobile.vue";
 import PromptTextarea from "@/components/prompt/controls/PromptTextarea.vue";
 import PromptToolbarMobile from "@/components/prompt/controls/PromptToolbarMobile.vue";
+import {usePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
-const props = defineProps({
-  attachments: {type: Array, default: () => []},
-  hasSelectedTemplatePanel: {type: Boolean, default: false},
-  selectedTemplateGroups: {type: Array, default: () => []},
-  activeMobileGroup: {type: Object, default: null},
-  isPromptExpanded: {type: Boolean, default: false},
-  promptExpandToggleLabel: {type: String, required: true},
-});
-
-void props;
-
-defineEmits([
-  "preview",
-  "remove-attachment",
-  "preview-error",
-  "select-option",
-  "open-mobile-group",
-  "close-mobile-group",
-  "open-model",
-  "open-tool",
-  "open-attach",
-  "select-model",
-  "open-file-picker",
-  "focus",
-  "blur",
-  "input",
-  "submit",
-  "paste",
-  "start-voice",
-  "stop-voice",
-  "toggle-expanded",
-]);
-
+const promptInputState = usePromptInputState();
 const toolbarRef = ref(null);
 const textareaComponentRef = ref(null);
+const hasSelectedTemplatePanel = computed(() =>
+  Boolean(promptInputState.hasSelectedTemplatePanel?.value)
+);
 
 const textareaRef = computed(() => {
   const exposed = textareaComponentRef.value;

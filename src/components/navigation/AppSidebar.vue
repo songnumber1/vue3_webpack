@@ -125,11 +125,12 @@ import {
 import {logWarn} from "@/utils/logger";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {resolveBlocked} from "@/utils/interactionGuard";
+import {useNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
-const emit = defineEmits(["history-menu-action"]);
+const navigationActions = useNavigationActions();
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
@@ -303,7 +304,7 @@ function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   closeHistoryMenu();
   if (!history || !action) return;
-  emit("history-menu-action", {action, history});
+  navigationActions.handleHistoryMenuAction?.({action, history});
 }
 
 async function handleSelectHistory(item) {

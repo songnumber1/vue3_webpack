@@ -23,8 +23,8 @@
             <img
               :src="getPreviewUrl(file)"
               :alt="file.name"
-              @load="$emit('rendered')"
-              @error="$emit('rendered')"
+              @load="notifyRendered"
+              @error="notifyRendered"
             />
           </button>
           <a
@@ -72,6 +72,7 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
+import {useMessageActions} from "@/composables/chat/context/messageActionContext";
 
 const {t} = useI18n();
 /**
@@ -80,7 +81,7 @@ const {t} = useI18n();
 const props = defineProps({
   message: {type: Object, required: true},
 });
-defineEmits(["rendered"]);
+const messageActions = useMessageActions();
 const chatStreamStore = useChatStreamStore();
 const isInteractionBlocked = computed(() => chatStreamStore.isWait);
 const showMessageActions = computed(() => !isInteractionBlocked.value);
@@ -98,6 +99,10 @@ function getPreviewUrl(file) {
 /**
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
+function notifyRendered() {
+  messageActions.messageRendered?.({messageId: props.message.id, type: "attachment"});
+}
+
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent(IMAGE_PREVIEW_EVENT, {

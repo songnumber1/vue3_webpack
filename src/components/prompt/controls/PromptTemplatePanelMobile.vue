@@ -19,30 +19,26 @@
           class="prompt-template-mobile-chip tw-inline-flex tw-min-h-8 tw-flex-none tw-cursor-pointer tw-items-center tw-justify-center tw-whitespace-nowrap tw-rounded-[5px] tw-border tw-border-solid tw-border-app-controlBorder tw-bg-app-surface tw-px-[10px] tw-py-[6px] tw-font-app tw-text-sm tw-font-extrabold tw-leading-[1.2] tw-text-app-text"
           type="button"
           :aria-label="`${group.label}: ${group.selectedLabel}`"
-          @click="$emit('open-mobile-group', group.id)"
+          @click="promptInputActions.openTemplateOptionSheet?.(group.id)"
         >
           <span>{{ group.selectedLabel }}</span>
         </button>
       </div>
     </div>
 
-    <PromptTemplateOptionBottomSheet
-      :group="activeMobileGroup"
-      @select-option="(...args) => $emit('select-option', ...args)"
-      @close="$emit('close-mobile-group')"
-    />
+    <PromptTemplateOptionBottomSheet />
   </section>
 </template>
 
 <script setup>
+import {computed, unref} from "vue";
 import PromptTemplateOptionBottomSheet from "@/components/prompt/controls/PromptTemplateOptionBottomSheet.vue";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+import {usePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
-defineProps({
-  groups: {type: Array, default: () => []},
-  activeMobileGroup: {type: Object, default: null},
-});
-
-defineEmits(["select-option", "open-mobile-group", "close-mobile-group"]);
+const promptInputActions = usePromptInputActions();
+const promptInputState = usePromptInputState();
+const groups = computed(() => unref(promptInputState.selectedTemplateGroups) || []);
 </script>
 
 <style scoped lang="scss"></style>

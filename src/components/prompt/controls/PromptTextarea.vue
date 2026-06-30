@@ -7,8 +7,8 @@
     :disabled="isDisabled"
     :placeholder="resolvedPlaceholder"
     rows="1"
-    @focus="$emit('focus')"
-    @blur="$emit('blur')"
+    @focus="promptInputActions.focus?.()"
+    @blur="promptInputActions.blur?.()"
     @input="handleInput"
     @compositionstart="handleCompositionStart"
     @compositionend="handleCompositionEnd"
@@ -16,7 +16,7 @@
     @keydown.shift.enter="handleShiftEnter"
     @keydown.ctrl.enter.prevent="handleModifiedEnterSubmit"
     @keydown.meta.enter.prevent="handleModifiedEnterSubmit"
-    @paste="$emit('paste', $event)"
+    @paste="promptInputActions.paste?.($event)"
   />
 </template>
 
@@ -36,6 +36,7 @@ import {
   watch,
 } from "vue";
 import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatStateContext";
+import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
 import {PROMPT_TEXTAREA_HEIGHT} from "@/constants/promptComposer";
 
 const textareaRef = ref(null);
@@ -45,6 +46,7 @@ let applyFrame = 0;
 let lastHeight = 0;
 
 const textareaState = inject(PROMPT_TEXTAREA_STATE_KEY, null);
+const promptInputActions = usePromptInputActions();
 const textareaValue = computed(
   () => textareaState?.text?.value ?? localText.value
 );
@@ -56,7 +58,6 @@ const isGenerating = computed(() => Boolean(textareaState?.generating?.value));
 const canSubmit = computed(() => Boolean(textareaState?.canSubmit?.value));
 const isExpanded = computed(() => Boolean(textareaState?.expanded?.value));
 
-const emit = defineEmits(["focus", "blur", "input", "submit", "paste"]);
 
 function isTextareaMeasurable(el) {
   if (!el || typeof window === "undefined") return false;
@@ -144,7 +145,7 @@ function emitInputAfterDomSync() {
   if (!el) return;
 
   resizeTextareaElement();
-  emit("input", {target: el});
+  promptInputActions.input?.({target: el});
 }
 
 function applyStateValueToDom() {
@@ -199,7 +200,7 @@ function handleInput(event) {
   // PC <-> 모바일 전환 후 기존 값이 있는 상태에서 이어 입력하는 경우에도
   // 부모/store 동기화 타이밍과 무관하게 auto-grow가 즉시 동작해야 합니다.
   resizeTextareaElement();
-  emit("input", event);
+  promptInputActions.input?.(event);
 }
 
 /**
@@ -244,7 +245,7 @@ function handleModifiedEnterSubmit(event) {
 function submitFromKeyboard() {
   if (isDisabled.value || isGenerating.value || !canSubmit.value) return;
 
-  emit("submit");
+  promptInputActions.submit?.();
 }
 
 /**

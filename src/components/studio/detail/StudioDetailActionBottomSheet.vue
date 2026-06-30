@@ -6,14 +6,14 @@
     initial-snap="content"
     :min-height="220"
     :max-ratio="0.65"
-    @close="$emit('close')"
+    @close="studioDetailActions.close?.()"
   >
     <div class="studio-detail-action-sheet__list">
       <button
         class="bottom-sheet-option bottom-sheet-option--row studio-detail-action-sheet__option"
         type="button"
         :disabled="disabled"
-        @click="$emit('edit')"
+        @click="studioDetailActions.edit?.()"
       >
         <span aria-hidden="true">✎</span>
         <strong>{{ t("studio.detail.edit") }}</strong>
@@ -22,7 +22,7 @@
         class="bottom-sheet-option bottom-sheet-option--row studio-detail-action-sheet__option studio-detail-action-sheet__option--danger"
         type="button"
         :disabled="disabled"
-        @click="$emit('delete')"
+        @click="studioDetailActions.delete?.()"
       >
         <span aria-hidden="true">🗑</span>
         <strong>{{ t("studio.detail.delete") }}</strong>
@@ -34,13 +34,14 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
+import {useStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
 const {t} = useI18n();
+const studioDetailActions = useStudioDetailActions();
 defineProps({
   open: {type: Boolean, default: false},
   disabled: {type: Boolean, default: false},
 });
-defineEmits(["close", "edit", "delete"]);
 </script>
 
 <style scoped lang="scss">
