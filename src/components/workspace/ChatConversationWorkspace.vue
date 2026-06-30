@@ -22,7 +22,6 @@
     :message-render-policy="messageRenderPolicy"
     :readonly="readonly"
     @content-rendered="handleMessageContentRendered"
-    @history-markdown-rendered="handleHistoryMarkdownRendered"
     @history-rendered="handleHistoryRendered"
     @regenerate="handleRegenerate"
   />
@@ -102,7 +101,6 @@ const emit = defineEmits([
   "message-content-rendered",
   "scroll-bottom",
   "history-rendered",
-  "history-markdown-rendered",
   "studio-detail",
 ]);
 
@@ -230,10 +228,6 @@ function handleMessageContentRendered() {
   scheduleComposerHeightUpdate();
 }
 
-function handleHistoryMarkdownRendered() {
-  emit("history-markdown-rendered");
-  scheduleComposerHeightUpdate();
-}
 
 function handleHistoryRendered() {
   emit("history-rendered");

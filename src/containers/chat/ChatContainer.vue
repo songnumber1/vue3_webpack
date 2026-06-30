@@ -18,7 +18,6 @@
       @message-content-rendered="handleMessageContentRendered"
       @scroll-bottom="handleWorkspaceScrollBottom"
       @history-rendered="finishHistoryRender"
-      @history-markdown-rendered="revealHistoryMarkdown"
       @studio-detail="openStudioDetail"
     />
 

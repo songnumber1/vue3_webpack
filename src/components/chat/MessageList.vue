@@ -113,7 +113,6 @@ const props = defineProps({
 
 const emit = defineEmits([
   "content-rendered",
-  "history-markdown-rendered",
   "history-rendered",
   "regenerate",
 ]);
