@@ -11,7 +11,6 @@ import App from "@/App.vue";
 import {resolveAppConfig} from "@/core/config/appConfig";
 import AppContainer from "@/containers/AppContainer.vue";
 import {resolveAxios} from "@/core/resolver/axios";
-import {resolveAuthAxios} from "@/core/resolver/authAxios";
 import {applyInterceptors} from "@/core/resolver/interceptor";
 import {resolveApi} from "@/core/resolver/api";
 import {resolveRouter} from "@/core/resolver/router";
@@ -50,10 +49,7 @@ export async function bootstrap() {
   // 6. 일반 공통 API 통신에 사용할 표준 HTTP 비동기 통신 라이브러리(Axios) 기본 인스턴스를 생성합니다.
   const axios = resolveAxios(appInfo);
 
-  // 7. 토큰 갱신(Refresh) 및 유저 인증 헤더가 자동 주입되는 보안/인증 전용 HTTP 비동기 통신(Axios) 인스턴스를 별도로 분리 생성합니다.
-  const authAxios = resolveAuthAxios(appInfo);
-
-  // 8. 전역 모달, 토스트 알림 등 애플리케이션 수준의 하위 공통 에러 UI 레이어를 플랫폼 명세에 맞게 생성합니다.
+  // 7. 전역 모달, 토스트 알림 등 애플리케이션 수준의 하위 공통 에러 UI 레이어를 플랫폼 명세에 맞게 생성합니다.
   const errorUI = resolveErrorUI(appInfo, bridge);
 
   // 9. 현재 기기 환경에 맞춰 네트워크 대역폭 손실을 최소화할 수 있는 업로드 프로토콜 인프라(Chunked/Form) 전략을 구성합니다.
@@ -65,8 +61,8 @@ export async function bootstrap() {
   // 11. 가공 완료된 HTTP 인스턴스들을 바탕으로 프론트엔드 비즈니스 로직(Service/Repository 레이어)에서 직접 호출할 API 명세 집합을 빌드합니다.
   const api = resolveApi(appInfo, axios);
 
-  // 12. 라우팅 전환 시 인증 인스턴스(`authAxios`)를 검증하여 페이지 접근 권한을 판단하는 클라이언트 라우터 설정을 로드합니다.
-  const router = resolveRouter(appInfo, {authAxios});
+  // 11. 라우팅 전환 시 공통 Axios의 세션 쿠키로 페이지 접근 권한을 판단하는 클라이언트 라우터 설정을 로드합니다.
+  const router = resolveRouter(appInfo, {axios});
 
   // 13. 현재 앱의 단일 글로벌 레이아웃 컴포넌트(Layout)를 가동합니다.
   const Layout = AppContainer;
@@ -99,7 +95,7 @@ export async function bootstrap() {
   // 20. 해상도 및 모바일 반응형 이벤트를 중앙 제어하는 뷰포트 스토어(`useViewportStore`)를 로드합니다.
   const viewportStore = useViewportStore();
   // 설정 정보에 정의된 모바일 브레이크포인트 임계값 크기를 전달하여 실시간 화면 감지 리스너를 실행시킵니다.
-  viewportStore.install({breakpoint: appInfo.mobileBreakpoint});
+  viewportStore.install();
 
   // 21. 하이브리드 웹뷰 앱이 완전히 구동되기 전(HTML이 다 파싱되기 이전) 네이티브에서 선제적으로 발생해 임시 대기 배열에 쌓여있던 펜딩 이벤트가 있다면,
   if (
@@ -121,7 +117,6 @@ export async function bootstrap() {
     storage,
     theme,
     axios,
-    authAxios,
     api,
     errorUI,
     upload,

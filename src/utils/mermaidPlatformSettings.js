@@ -1,17 +1,7 @@
 /**
  * @file utils/mermaidPlatformSettings.js
- * @description 플랫폼별 Mermaid 표시/렌더링 설정을 선택하는 순수 유틸입니다.
+ * @description PC/Mobile을 구분하지 않는 Mermaid 렌더링 설정 유틸입니다.
  */
-
-import {
-  DEFAULT_MOBILE_BREAKPOINT_PX,
-  PLATFORM_OVERRIDE_MODES,
-} from "@/constants/systemSettings";
-
-export const MERMAID_SETTING_DEVICE_MODES = Object.freeze({
-  pc: "pc",
-  mobile: "mobile",
-});
 
 function readMermaidBooleanSetting(value, fallback = true) {
   if (value === undefined || value === null || value === "") return fallback;
@@ -25,78 +15,20 @@ function readMermaidBooleanSetting(value, fallback = true) {
   return fallback;
 }
 
-export function isForcedMobileMermaidPlatform(platformOverride) {
-  return (
-    platformOverride === PLATFORM_OVERRIDE_MODES.androidChrome ||
-    platformOverride === PLATFORM_OVERRIDE_MODES.androidWebView
-  );
-}
-
-function isBrowserMobileViewport(settings = {}) {
-  if (typeof document !== "undefined") {
-    if (document.body?.classList?.contains("mobile-mode")) return true;
-  }
-
-  if (typeof window === "undefined") return false;
-
-  const breakpoint = Number(settings.mobileBreakpoint);
-  const normalizedBreakpoint =
-    Number.isFinite(breakpoint) && breakpoint > 0
-      ? breakpoint
-      : DEFAULT_MOBILE_BREAKPOINT_PX;
-
-  return Number(window.innerWidth || 0) <= normalizedBreakpoint;
-}
-
-export function resolveMermaidSettingDeviceMode(
-  settings = {},
-  isMobile = undefined
-) {
-  if (isForcedMobileMermaidPlatform(settings.platformOverride)) {
-    return MERMAID_SETTING_DEVICE_MODES.mobile;
-  }
-
-  const shouldUseMobile =
-    typeof isMobile === "boolean"
-      ? isMobile
-      : isBrowserMobileViewport(settings);
-
-  return shouldUseMobile
-    ? MERMAID_SETTING_DEVICE_MODES.mobile
-    : MERMAID_SETTING_DEVICE_MODES.pc;
-}
-
-export function resolveMermaidPlatformSettings(settings = {}, isMobile) {
-  const deviceMode = resolveMermaidSettingDeviceMode(settings, isMobile);
-
-  if (deviceMode === MERMAID_SETTING_DEVICE_MODES.mobile) {
-    return {
-      deviceMode,
-      showMermaidHeader: readMermaidBooleanSetting(
-        settings.mobileShowMermaidHeader,
-        true
-      ),
-      enableMermaidRendering: readMermaidBooleanSetting(
-        settings.mobileEnableMermaidRendering,
-        true
-      ),
-    };
-  }
-
+export function resolveMermaidPlatformSettings(settings = {}) {
   return {
-    deviceMode,
+    deviceMode: "common",
     showMermaidHeader: readMermaidBooleanSetting(
-      settings.pcShowMermaidHeader,
+      settings.showMermaidHeader,
       true
     ),
     enableMermaidRendering: readMermaidBooleanSetting(
-      settings.pcEnableMermaidRendering,
+      settings.enableMermaidRendering,
       true
     ),
   };
 }
 
-export function isMermaidRenderingEnabledForPlatform(settings = {}, isMobile) {
-  return resolveMermaidPlatformSettings(settings, isMobile)
-    .enableMermaidRendering;
+export function isMermaidRenderingEnabledForPlatform(settings = {}) {
+  return resolveMermaidPlatformSettings(settings).enableMermaidRendering;
 }

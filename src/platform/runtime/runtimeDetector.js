@@ -3,8 +3,6 @@
  * @description 브라우저/모바일/WebView 실행 환경 차이를 흡수하는 platform 계층입니다.
  */
 
-import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
-import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 
@@ -65,27 +63,19 @@ export function isAndroidWebViewUserAgent() {
  * * * **반환 런타임 유형 종류 목록:**
  * - {@link STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW} : 네이티브 앱 브릿지가 감지된 경우
  * - {@link STREAM_RUNTIME_TYPES.ANDROID_CHROME} : 순정 안드로이드 크롬 브라우저 환경인 경우
- * - {@link STREAM_RUNTIME_TYPES.DESKTOP_BROWSER} : 상기 모바일 조건에 부합하지 않는 기본 PC/데스크톱 환경인 경우
+ * - {@link STREAM_RUNTIME_TYPES.MOBILE_BROWSER} : 상기 모바일 조건에 부합하지 않는 기본 모바일 브라우저 환경인 경우
  * * @returns {string} {@link STREAM_RUNTIME_TYPES}에 정의된 런타임 문자열 상수 값
  * @see {@link hasAndroidWebViewBridge} 웹뷰 판단 함수
  * @see {@link isAndroidChromeUserAgent} 크롬 브라우저 판단 함수
  */
 export function resolveStreamRuntimeType() {
-  const settings = getRuntimeSystemSettings();
-  const override = settings.platformOverride || PLATFORM_OVERRIDE_MODES.auto;
   const hasBridge = hasAndroidWebViewBridge();
   const isAndroidChromeUa = isAndroidChromeUserAgent();
   const isAndroidWebViewUa = isAndroidWebViewUserAgent();
-  let runtimeType = STREAM_RUNTIME_TYPES.DESKTOP_BROWSER;
-  let reason = "desktop-browser-default";
+  let runtimeType = STREAM_RUNTIME_TYPES.MOBILE_BROWSER;
+  let reason = "mobile-browser-default";
 
-  if (override === PLATFORM_OVERRIDE_MODES.androidChrome) {
-    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_CHROME;
-    reason = "forced-android-chrome";
-  } else if (override === PLATFORM_OVERRIDE_MODES.androidWebView) {
-    runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
-    reason = "forced-android-webview";
-  } else if (hasBridge || isAndroidWebViewUa) {
+  if (hasBridge || isAndroidWebViewUa) {
     runtimeType = STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW;
     reason = hasBridge
       ? "actual-android-webview-bridge"
@@ -96,7 +86,6 @@ export function resolveStreamRuntimeType() {
   }
 
   logPlatformDebug("sse.runtime", {
-    override,
     runtimeType,
     reason,
     hasAndroidWebViewBridge: hasBridge,
@@ -134,14 +123,14 @@ export function isAndroidWebViewRuntime(
 }
 
 /**
- * 지정된 런타임 환경 또는 현재의 실행 환경이 '데스크톱 브라우저'인지 판단합니다.
+ * 지정된 런타임 환경 또는 현재의 실행 환경이 '모바일 브라우저'인지 판단합니다.
  * @param {string} [runtimeType=resolveStreamRuntimeType()] - 검사할 런타임 타입 문자열 (생략 시 {@link resolveStreamRuntimeType}의 결과값 사용)
- * @returns {boolean} 데스크톱 브라우저 런타임 환경과 완벽히 일치하면 true, 아니면 false
- * @see {@link STREAM_RUNTIME_TYPES.DESKTOP_BROWSER}
+ * @returns {boolean} 모바일 브라우저 런타임 환경과 완벽히 일치하면 true, 아니면 false
+ * @see {@link STREAM_RUNTIME_TYPES.MOBILE_BROWSER}
  */
-export function isDesktopBrowserRuntime(
+export function isMobileBrowserRuntime(
   runtimeType = resolveStreamRuntimeType()
 ) {
-  // 주입받거나 판별된 runtimeType 파라미터가 상수의 DESKTOP_BROWSER 값과 일치하는지 비교 검증합니다.
-  return runtimeType === STREAM_RUNTIME_TYPES.DESKTOP_BROWSER;
+  // 주입받거나 판별된 runtimeType 파라미터가 상수의 MOBILE_BROWSER 값과 일치하는지 비교 검증합니다.
+  return runtimeType === STREAM_RUNTIME_TYPES.MOBILE_BROWSER;
 }

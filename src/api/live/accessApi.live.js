@@ -5,11 +5,11 @@
 
 import {httpClient} from "@/api/clients/httpClient";
 import {adaptGenericApiBody} from "@/adapters/assistantResponseAdapter";
-import {resolveAuthPolicy} from "@/auth/authPolicy";
+import {resolveSessionAuthConfig} from "@/auth/authPolicy";
 
 export async function getAccessInfo(payload = {}) {
   const response = await httpClient.post(
-    resolveAuthPolicy().accessInfoUrl,
+    resolveSessionAuthConfig().accessInfoUrl,
     payload
   );
 

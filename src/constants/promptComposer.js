@@ -23,7 +23,7 @@ export const PROMPT_SPEECH_LANGUAGE = "ko-KR";
 export const PROMPT_TEXTAREA_HEIGHT = Object.freeze({
   min: 38,
   mobileMax: 136,
-  desktopMax: 160,
+  max: 160,
   maxRows: 8,
   lineHeight: 20,
 });

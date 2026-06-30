@@ -73,7 +73,6 @@
  */
 
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
-import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {
@@ -83,8 +82,6 @@ import {
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
 import AssistantDuoLinks from "./AssistantDuoLinks.vue";
@@ -100,9 +97,6 @@ const props = defineProps({
   deferMermaidEnhancement: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
-const systemSettingsStore = useSystemSettingsStore();
-const {settings} = storeToRefs(systemSettingsStore);
-const responsiveLayoutStore = useResponsiveLayoutStore();
 const chatStreamStore = useChatStreamStore();
 const emit = defineEmits(["rendered", "regenerate"]);
 const isInteractionBlocked = computed(() => chatStreamStore.isWait);
@@ -139,10 +133,7 @@ const isMessageComplete = computed(
 );
 
 const resolvedMermaidSettings = computed(() =>
-  resolveMermaidPlatformSettings(
-    settings.value,
-    Boolean(responsiveLayoutStore.isMobile)
-  )
+  resolveMermaidPlatformSettings()
 );
 const showMermaidHeader = computed(
   () => resolvedMermaidSettings.value.showMermaidHeader

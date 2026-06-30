@@ -2,7 +2,7 @@ import {resolveStreamRuntimeType} from "@/platform/runtime/runtimeDetector";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {createStreamRequestContext} from "@/api/sse/common/streamRequest";
-import {createDesktopSseLifecycle} from "@/api/sse/browser/desktop/desktopLifecycle";
+import {createMobileBrowserSseLifecycle} from "@/api/sse/browser/mobile/mobileBrowserLifecycle";
 import {createChromeSseLifecycle} from "@/api/sse/browser/chrome/chromeLifecycle";
 import {createAndroidWebViewSseLifecycle} from "@/api/sse/webview/android/androidWebViewLifecycle";
 
@@ -15,7 +15,7 @@ function createLifecycle(runtimeType) {
     return createChromeSseLifecycle();
   }
 
-  return createDesktopSseLifecycle();
+  return createMobileBrowserSseLifecycle();
 }
 
 export function createSseRuntimeContext() {

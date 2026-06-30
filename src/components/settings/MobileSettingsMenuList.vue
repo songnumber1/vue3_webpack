@@ -1,25 +1,7 @@
 <template>
   <nav class="mobile-settings-list" :aria-label="t('common.settings')">
-    <button
-      v-if="systemSettings.showGuideButton"
-      class="mobile-settings-item"
-      type="button"
-      @click="$emit('select', 'guide')"
-    >
-      <span class="mobile-settings-item-icon" aria-hidden="true">
-        <img :src="guideIcon" alt="" />
-      </span>
-      <span>
-        <strong>{{ t("common.guide") }}</strong>
-        <small>{{ t("guide.subtitle") }}</small>
-      </span>
-      <span class="mobile-settings-item-arrow" aria-hidden="true">
-        <ChevronRightIcon />
-      </span>
-    </button>
 
     <button
-      v-if="systemSettings.showNoticeMenu"
       class="mobile-settings-item"
       type="button"
       @click="$emit('select', 'notice')"
@@ -37,7 +19,6 @@
     </button>
 
     <button
-      v-if="systemSettings.showPrivacyMenu"
       class="mobile-settings-item"
       type="button"
       @click="$emit('select', 'privacy')"
@@ -55,7 +36,6 @@
     </button>
 
     <button
-      v-if="systemSettings.showTermsMenu"
       class="mobile-settings-item"
       type="button"
       @click="$emit('select', 'terms')"
@@ -73,7 +53,6 @@
     </button>
 
     <button
-      v-if="systemSettings.showPersonalizationMenu"
       class="mobile-settings-item"
       type="button"
       @click="$emit('select', 'personalization')"
@@ -90,40 +69,6 @@
       </span>
     </button>
 
-    <button
-      class="mobile-settings-item"
-      type="button"
-      @click="$emit('select', 'system')"
-    >
-      <span class="mobile-settings-item-icon" aria-hidden="true">
-        <img :src="systemIcon" alt="" />
-      </span>
-      <span>
-        <strong>{{ t("common.system") }}</strong>
-        <small>{{ t("menu.systemSummary") }}</small>
-      </span>
-      <span class="mobile-settings-item-arrow" aria-hidden="true">
-        <ChevronRightIcon />
-      </span>
-    </button>
-
-    <button
-      v-if="systemSettings.showPlaygroundMenu"
-      class="mobile-settings-item"
-      type="button"
-      @click="$emit('select', 'playground')"
-    >
-      <span class="mobile-settings-item-icon" aria-hidden="true">
-        <img :src="playgroundIcon" alt="" />
-      </span>
-      <span>
-        <strong>{{ t("common.playground") }}</strong>
-        <small>{{ t("menu.playgroundSummary") }}</small>
-      </span>
-      <span class="mobile-settings-item-arrow" aria-hidden="true">
-        <ChevronRightIcon />
-      </span>
-    </button>
 
     <button
       class="mobile-settings-item"
@@ -164,19 +109,12 @@
 <script setup>
 import {useI18n} from "vue-i18n";
 import ChevronRightIcon from "@/components/icons/ChevronRightIcon.vue";
-import guideIcon from "@/assets/img/settings/guide.svg";
 import noticeIcon from "@/assets/img/settings/notice.svg";
 import privacyIcon from "@/assets/img/settings/privacy.svg";
 import termsIcon from "@/assets/img/settings/terms.svg";
 import personalizationIcon from "@/assets/img/settings/personalization.svg";
-import systemIcon from "@/assets/img/settings/system.svg";
 import chatManagementIcon from "@/assets/img/settings/chat-management.svg";
 import languageIcon from "@/assets/img/settings/language.svg";
-import playgroundIcon from "@/assets/img/settings/playground.svg";
-
-defineProps({
-  systemSettings: {type: Object, required: true},
-});
 
 defineEmits(["select"]);
 

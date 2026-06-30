@@ -6,10 +6,6 @@ body.mobile-mode .chat-container-root {
   background: var(--mobile-bg);
 }
 
-body.mobile-mode .desktop-sidebar {
-  display: none;
-}
-
 body.mobile-mode .chat-workspace {
   grid-template-rows: auto minmax(0, 1fr) auto;
   background: var(--mobile-bg);
@@ -49,7 +45,6 @@ body.mobile-mode .model-menu {
   border-radius: 24px;
 }
 
-body.mobile-mode .desktop-empty-actions,
 body.mobile-mode .empty-center {
   display: none;
 }

@@ -4,61 +4,10 @@
 .chat-container-root {
   height: 100%;
   display: grid;
-  grid-template-columns: var(--layout-sidebar-width, 260px) minmax(0, 1fr);
+  grid-template-columns: 1fr;
   background: var(--chat-bg);
   color: var(--text);
   overflow: hidden;
-}
-
-.desktop-sidebar {
-  min-width: 0;
-  min-height: 0;
-  border-right: 1px solid var(--sidebar-border);
-  background: var(--sidebar-bg);
-}
-
-.chat-container-root--sidebar-collapsed {
-  grid-template-columns: var(--layout-sidebar-collapsed-width, 68px) minmax(
-      0,
-      1fr
-    );
-}
-
-.desktop-sidebar--collapsed {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-}
-
-.collapsed-sidebar {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  padding: 14px 8px;
-}
-
-.collapsed-nav-button {
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--control-border);
-  border-radius: 14px;
-  background: var(--control-bg);
-  color: var(--text);
-  cursor: pointer;
-  @include grid-center;
-  font-size: var(--font-size-xl);
-  font-weight: 900;
-  transition:
-    background var(--duration-fast),
-    transform var(--duration-fast),
-    border-color var(--duration-fast);
-}
-
-.collapsed-nav-button:hover {
-  background: var(--control-hover);
-  transform: translateY(-1px);
 }
 
 .topbar-actions {
@@ -297,13 +246,6 @@
   @include grid-center;
   overflow: hidden;
 }
-.desktop-empty-actions {
-  position: absolute;
-  top: 14px;
-  right: 20px;
-  display: flex;
-  gap: 10px;
-}
 .empty-center {
   width: min(var(--layout-chat-empty-state-width, 760px), calc(100% - 40px));
   display: flex;
@@ -318,11 +260,6 @@
   line-height: 1.25;
   letter-spacing: -0.04em;
   font-weight: 600;
-}
-.desktop-center-prompt {
-  width: min(650px, 100%);
-  padding: 0 !important;
-  border: 0 !important;
 }
 .suggestion-row {
   @include flex-center;

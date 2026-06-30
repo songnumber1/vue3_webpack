@@ -5,7 +5,7 @@
  */
 
 /* Mobile chat detail typography ownership. Keep body text readable without the
-   oversized/over-bold desktop markdown hierarchy bleeding into mobile. */
+   oversized/over-bold legacy markdown hierarchy bleeding into mobile. */
 body.mobile-mode .message-list {
   font-size: var(--message-plain-mobile-font-size, 15px) !important;
   line-height: 1.58 !important;

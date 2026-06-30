@@ -137,10 +137,10 @@ body.mobile-mode
   overscroll-behavior: contain !important;
   touch-action: manipulation;
 }
-body.mobile-mode .desktop-center-prompt.prompt-wrap--floating,
+body.mobile-mode .mobile-main-fixed-prompt.prompt-wrap--floating,
 body.mobile-mode
   .chat-container-root--mode-main
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   position: static !important;
   bottom: auto !important;
   transform: none;

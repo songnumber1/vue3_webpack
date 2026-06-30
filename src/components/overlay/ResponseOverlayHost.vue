@@ -22,11 +22,6 @@
       @close="closeResponseOverlayByBackOrDirect"
       @applied="emit('applied')"
     />
-    <SystemSettingsView
-      v-else-if="activeOverlayType === APP_OVERLAY_TYPES.SYSTEM"
-      @close="closeResponseOverlayByBackOrDirect"
-      @applied="emit('applied')"
-    />
   </ResponsiveOverlay>
 
   <LanguageSelectSheet
@@ -40,7 +35,6 @@
     v-else-if="activeOverlayType === APP_OVERLAY_TYPES.MOBILE_SETTINGS"
     :open="isOpen"
     @close="closeResponseOverlayByBackOrDirect"
-    @desktop-open="handleMobileSettingsDesktopOpen"
     @applied="emit('applied')"
   />
 </template>
@@ -58,12 +52,10 @@ import MobileSettingsPanel from "@/views/settings/MobileSettingsPanel.vue";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
-import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import {
   APP_OVERLAY_TYPES,
   closeResponseOverlayByBackOrDirect,
   createResponseOverlayViewState,
-  handleMobileSettingsDesktopOpen,
   setupResponseOverlayBackGuard,
 } from "@/composables/overlay/responseOverlayActions";
 

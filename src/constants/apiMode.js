@@ -3,7 +3,7 @@
  * @description 여러 계층에서 공유하는 상수 모음입니다. UI/런타임/이미지/설정 값의 단일 출처 역할을 합니다.
  */
 
-import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
+import {APP_RUNTIME_POLICY} from "@/constants/appRuntimePolicy";
 
 /**
  * 로컬 개발 환경(localhost, 내부 IP 등)에서 간혹 발생할 수 있는 HTTPS 인증서 통신 오류를 방지하기 위해,
@@ -45,11 +45,10 @@ export const SERVER_API_BASE_URL = normalizeLocalHttpUrl(
 /**
  * 클라이언트가 모크 데이터(가짜 데이터) 대신 실제 백엔드 서버 API를 바라보고 동작해야 하는 상황인지 판단합니다.
  * @returns {boolean} 실제 외부 서버와 통신해야 하는 상태면 true, 아니라면 false
- * @see {@link getRuntimeSystemSettings} 런타임 중에 변경될 수 있는 전역 시스템 제어 설정 스토어/유틸
+ * @see {@link APP_RUNTIME_POLICY} 시스템 설정 화면 제거 후 사용하는 고정 API 정책
  */
 export function shouldUseServerApi() {
-  // 현재 메모리에 적재된 시스템 설정 정보를 읽어와 실제 API 통신 플래그(`useRealApi`)가 온전히 true 값으로 셋팅되어 있는지 검사합니다.
-  return getRuntimeSystemSettings().useRealApi === true;
+  return APP_RUNTIME_POLICY.useRealApi === true;
 }
 
 /**

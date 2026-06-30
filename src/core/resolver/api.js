@@ -24,7 +24,7 @@ const androidApi = {
 /**
  * @description 현재 앱의 인프라 정보와 Axios/Fetch 등 네이티브 HTTP 통신 인스턴스를 하향 주입받아, 환경에 맞는 최적의 API 객체를 동적 빌드하고 의존성 주입(DI) 파이프라인을 체결해주는 리졸버 마스터 함수입니다.
  * @param {object} appInfo - core/config 단에서 파싱이 완료되어 넘어온 앱의 환경 정보 스냅샷 (`env`, `platform` 등 포함)
- * @param {object} http - Axios 플러그인 등 토큰 인터셉터 가드가 완비된 네이티브 HTTP 클라이언트 통신 인스턴스
+ * @param {object} http - 세션 인터셉터가 적용된 공통 Axios 통신 인스턴스
  * @returns {object} 하위 비즈니스 컴포넌트 및 스토어 레이어에서 `api.sendMessage(payload)` 형태로 즉시 호출 가능한 완성형 API 세트
  */
 export function resolveApi(appInfo, http) {

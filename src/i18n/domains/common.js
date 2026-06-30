@@ -338,7 +338,7 @@ export const commonMessages = {
         label: "Overlay",
         title: "Modal / Full Screen",
         description:
-          "Check that the shared overlay provider switches between desktop modal and mobile full-screen panel.",
+          "Check that the shared overlay provider switches between legacy modal and mobile full-screen panel.",
         openNotice: "Open notice overlay",
         openPersonalization: "Open personalization overlay",
       },

@@ -8,13 +8,6 @@
   gap: 12px;
 }
 
-.mobile-topbar--desktop-main .topbar-left {
-  flex: 1 1 auto;
-}
-
-.mobile-topbar--desktop-main .model-trigger--assistant {
-  display: none;
-}
 
 .conversation-title-wrap {
   min-width: 0;
@@ -75,13 +68,7 @@
   max-width: 100%;
 }
 
-body.desktop-mode .settings-toggle {
-  display: none;
-}
 
-body.desktop-mode .chat-workspace > .mobile-topbar {
-  border-bottom: 0;
-}
 
 body.mobile-mode .chat-container-root {
   grid-template-columns: minmax(0, 1fr);

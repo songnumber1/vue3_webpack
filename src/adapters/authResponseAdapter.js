@@ -26,9 +26,6 @@ const USER_AGREEMENT_STATUSES = new Set([
   "user-agree",
 ]);
 
-const ACCESS_TOKEN_KEYS = [A.ACCESS_TOKEN, A.ACCESS_TOKEN_SNAKE];
-const REFRESH_TOKEN_KEYS = [A.REFRESH_TOKEN, A.REFRESH_TOKEN_SNAKE];
-
 const AUTH_SUCCESS_KEYS = [A.SUCCESS, R.SUCCESS, R.OK];
 const AUTH_CODE_KEYS = [A.CODE, R.CODE];
 const AUTH_MESSAGE_KEYS = [A.MESSAGE, R.MESSAGE, R.ERROR_MESSAGE];
@@ -86,19 +83,6 @@ export function unwrapAuthResponseBody(response, fallback = {}) {
   return unwrapApiBody(response, fallback) || fallback;
 }
 
-export function adaptAuthTokens(source = {}, fallbackRefreshToken = "") {
-  const body = unwrapAuthResponseBody(source, {});
-  const accessToken = readAuthValue(body, ACCESS_TOKEN_KEYS, "") || "";
-  const refreshToken =
-    readAuthValue(body, REFRESH_TOKEN_KEYS, "") || fallbackRefreshToken || "";
-
-  return {
-    accessToken,
-    refreshToken,
-    raw: body,
-  };
-}
-
 export function adaptAuthApiResponse(response = {}) {
   const body = unwrapAuthResponseBody(response, {});
 
@@ -113,12 +97,7 @@ export function adaptAuthApiResponse(response = {}) {
     authenticated: normalizeOptionalBoolean(
       readAuthValue(body, [A.AUTHENTICATED], undefined)
     ),
-    authMode: readAuthValue(body, [A.AUTH_MODE], ""),
     user: readAuthValue(body, AUTH_USER_KEYS, null),
-    accessToken: readAuthValue(body, ACCESS_TOKEN_KEYS, "") || "",
-    refreshToken: readAuthValue(body, REFRESH_TOKEN_KEYS, "") || "",
-    expiresIn: readAuthValue(body, [A.EXPIRES_IN], undefined),
-    tokenType: readAuthValue(body, [A.TOKEN_TYPE], ""),
     raw: body,
   };
 }
@@ -135,7 +114,7 @@ export function normalizeAuthAccessInfo(accessInfo = {}) {
   // 1. 상태(status) 키 후보군을 조회하여 문자열 소문자 정형화를 적용합니다.
   const status = normalizeStatus(findObjectValue(accessInfo, AUTH_STATUS_KEYS));
 
-  // 2. 토큰 유효 여부(valid) 관련 키 후보군을 안전하게 확보합니다.
+  // 2. 세션 유효 여부(valid) 관련 키 후보군을 안전하게 확보합니다.
   const valid = findObjectValue(accessInfo, AUTH_VALID_KEYS);
 
   // 3. 내부 유저 세부 정보 객체(user) 관련 키 후보군을 확보합니다.

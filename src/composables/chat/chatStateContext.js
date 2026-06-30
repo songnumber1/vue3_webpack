@@ -31,7 +31,7 @@ export function createEmptyWorkspaceState() {
   return {
     mode: "main",
     readonly: false,
-    isMobile: false,
+    isMobile: true,
     assistantLabel: "Assistant",
     assistant: null,
     conversationTitle: "",
@@ -42,18 +42,14 @@ export function createEmptyWorkspaceState() {
     isGenerating: false,
     messages: [],
     showScrollBottom: false,
-    autoScrollOnAnswer: false,
     isHistoryRendering: false,
     historyMessagesLoaded: false,
-    hasPreviousHistoryMessages: false,
-    historyLazyTopThreshold: 96,
-    historyLazyChunkSize: 100,
   };
 }
 
 export function createEmptyPromptState() {
   return {
-    isMobile: false,
+    isMobile: true,
     floating: false,
     showHelp: false,
     selectedModel: "",
@@ -77,7 +73,7 @@ export function createEmptyPromptToolbarState() {
     modelMenuOpen: false,
     toolMenuOpen: false,
     attachMenuOpen: false,
-    isMobileSheet: false,
+    isMobileSheet: true,
     canSubmit: false,
     hasPromptText: false,
     isMicEnabled: false,

@@ -1,5 +1,5 @@
 /**
- * @file composables/chat/conversation/useActiveConversationCleanup.js
+ * @file composables/chat/conversation/activeConversationCleanupRegistry.js
  * @description 현재 활성 ChatContainer가 소유한 메시지 배열/첨부 리소스 정리 함수를 영역 밖 action에서 재사용하기 위한 얇은 registry입니다.
  * UI 컴포넌트에 직접 로직을 박지 않고 Sidebar action에서도 기존 대화방 첨부 Blob URL 정리를 유지합니다.
  */

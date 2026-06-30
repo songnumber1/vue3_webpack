@@ -4,7 +4,6 @@
  */
 
 import {defineStore} from "pinia";
-import {MOBILE_BREAKPOINT_PX} from "@/platform/viewport/viewportConstants";
 
 /**
  * @description 서버 사이드 렌더링(SSR) 컨텍스트 유무를 체크하고, 현재 브라우저의 레이아웃 뷰포트(Layout Viewport) 및 비주얼 뷰포트(Visual Viewport) 물리 해상도를 실시간 연산 추출합니다.
@@ -36,7 +35,6 @@ function readViewport() {
  * @property {number} height - 브라우저 창 전체의 레이아웃 세로 픽셀 높이
  * @property {number} visualWidth - 가상 스크롤바/소프트 자판을 제외하고 실제 인간의 눈에 식별 가능한 가로폭
  * @property {number} visualHeight - 가상 스크롤바/소프트 자판을 제외하고 실제 인간의 눈에 식별 가능한 세로폭
- * @property {number} mobileBreakpoint - 모바일 UI(컴팩트 모드) 진입을 허용하는 한계 임계점 중단점 픽셀 수치
  * @property {boolean} installed - 창 크기 및 뷰포트 추적 목적 전역 네이티브 이벤트 리스너의 개통 등록 완료 유무 플래그
  * @property {Function|null} cleanup - 메모리 누수(Leak) 방지를 위한 전역 이벤트 리스너 영구 바인딩 해제 소멸 커맨드 함수
  */
@@ -50,7 +48,6 @@ export const useViewportStore = defineStore("viewport", {
     height: 0,
     visualWidth: 0,
     visualHeight: 0,
-    mobileBreakpoint: MOBILE_BREAKPOINT_PX, // 시스템 기본 중단점 상수 바인딩 (초기값)
     installed: false,
     cleanup: null,
   }),
@@ -71,33 +68,13 @@ export const useViewportStore = defineStore("viewport", {
     },
 
     /**
-     * @description 현재 유효 가로 너비를 기준 중단점(mobileBreakpoint)과 대조하여 컴팩트 모바일 레이아웃(LNB 수축, 하단 탭 점등 등) 활성화 유무를 도출합니다.
-     * @param {ViewportState} state - Pinia 내부 반응형 상태 객  체
-     * @returns {boolean} 모바일 컴팩트 뷰포트 부합 여부 플래그
+     * @description 모바일 전용 앱이므로 항상 컴팩트 레이아웃을 사용합니다.
+     * @returns {boolean} 모바일 컴팩트 뷰포트 플래그
      */
-    isCompact: (state) => {
-      const candidates = [state.visualWidth, state.width].filter(
-        (value) => Number.isFinite(value) && value > 0
-      );
-      const effectiveWidth = candidates.length ? Math.min(...candidates) : 0;
-
-      // 유효 해상도가 존재하며, 그것이 미리 설정된 모바일 반응형 상한 임계선 이하인지 도출 연산
-      return effectiveWidth > 0 && effectiveWidth <= state.mobileBreakpoint;
-    },
+    isCompact: () => true,
   },
 
   actions: {
-    /**
-     * @description 반응형 중단점 기준 수치를 동적으로 임의 조정 세팅합니다.
-     * @param {number|string} value - 새롭게 지정할 임계 중단점 해상도 수치
-     * @returns {void}
-     */
-    setBreakpoint(value) {
-      const next = Number(value);
-      // 무결한 한계 양의 정수 규격 구조체인지 검증 가드 처리 후 상태 갱신
-      if (Number.isFinite(next) && next > 0) this.mobileBreakpoint = next;
-    },
-
     /**
      * @description 현재 물리 브라우저 DOM 콘텍스트의 화면 가시 영역을 즉각 스캔하여 스토어의 내부 상태값들을 강제 수직 동기화합니다.
      * @returns {void}
@@ -112,12 +89,9 @@ export const useViewportStore = defineStore("viewport", {
 
     /**
      * @description 뷰포트 추적 코어 엔진을 개통합니다. 브라우저의 리사이즈, 모바일 기기 회전(Orientation), 비주얼 스크롤 파이프라인에 동기화 훅을 연결합니다.
-     * @param {object} [options={}] - 부트스트랩 인입 초기화 커스텀 옵션 팩
-     * @param {number} [options.breakpoint=MOBILE_BREAKPOINT_PX] - 오버라이드할 초기 반응형 임계 중단점
      * @returns {void}
      */
-    install({breakpoint = MOBILE_BREAKPOINT_PX} = {}) {
-      this.setBreakpoint(breakpoint); // 중단점 픽셀 우선 설정
+    install() {
       this.refresh(); // 현재 날것의 윈도우 스냅샷 1차 즉시 추출
 
       // 이미 이벤트 리스너가 가동 중이거나 서버 사이드 렌더링 환경인 경우 중복 바인딩 파손을 방지하기 위한 이중 가드 처리
@@ -127,7 +101,7 @@ export const useViewportStore = defineStore("viewport", {
       const refresh = () => this.refresh();
 
       // [성능 최적화 패시브 옵션 주입] 브라우저 스크롤 및 리사이즈 성능 저하를 방어하기 위해 { passive: true } 구문을 동반 개통 수립
-      window.addEventListener("resize", refresh, {passive: true}); // PC 창 크기 변화 대응
+      window.addEventListener("resize", refresh, {passive: true});
       window.addEventListener("orientationchange", refresh, {passive: true}); // 스마트폰 가로/세로 화면 회전 핸들링 대응
 
       // 모바일 웹뷰 가상 자판 온오프 및 핀치 줌에 의한 마이크로 해상도 왜곡 현상을 전가 방어 모니터링하기 위해 visualViewport 버스에 락인

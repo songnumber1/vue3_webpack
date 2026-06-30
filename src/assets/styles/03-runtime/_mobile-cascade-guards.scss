@@ -15,7 +15,6 @@
 @use "./mobile-cascade/sidebar-guard" as *;
 @use "./mobile-cascade/main-screen-guard" as *;
 @use "./mobile-cascade/markdown-heading-guard" as *;
-@use "./mobile-cascade/main-prompt-fallback-guard" as *;
 @use "./mobile-cascade/message-typography-guard" as *;
 @use "./mobile-cascade/main-composer-dock-guard" as *;
 @use "./mobile-cascade/chat-message-list-guard" as *;

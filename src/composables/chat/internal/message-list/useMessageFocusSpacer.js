@@ -6,15 +6,15 @@ function getElementTopInScroll(container, target) {
   return container.scrollTop + targetRect.top - containerRect.top;
 }
 
-export function useMessageFocusSpacer({
+export function useMessageFocusSpacer(
   props,
   getScrollElement,
-  getLatestUserMessageElement,
-}) {
+  getLatestUserMessageElement
+) {
   const streamFocusSpacerHeight = ref(0);
 
   function recalculateFocusSpacerHeight(options = {}) {
-    if (props.autoScrollOnAnswer || !props.loading) {
+    if (!props.loading) {
       streamFocusSpacerHeight.value = 0;
       return;
     }

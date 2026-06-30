@@ -11,42 +11,12 @@
       class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt"
       :class="{
         'prompt-box--expanded': isPromptExpanded,
-        'prompt-box--desktop-top-actions': usesDesktopTopActions,
         'prompt-box--file-dragging': isFileDragging,
         'prompt-box--file-drop-disabled': isFileDropDisabled,
       }"
       @submit.prevent="submit"
     >
-      <PromptInputDesktop
-        v-if="usesDesktopTopActions"
-        :ref="setPromptInputRef"
-        :attachments="attachments"
-        :has-selected-template-panel="hasSelectedTemplatePanel"
-        :selected-template-groups="selectedTemplateGroups"
-        :is-prompt-expanded="isPromptExpanded"
-        :prompt-expand-toggle-label="promptExpandToggleLabel"
-        @preview="previewImage"
-        @remove-attachment="removeAttachment"
-        @preview-error="markPreviewError"
-        @select-option="selectTemplateOption"
-        @open-model="openModelSelector"
-        @open-tool="openToolSelector"
-        @close-tool="toolMenuOpen = false"
-        @open-attach="openAttachSelector"
-        @select-model="selectModel"
-        @open-file-picker="openFilePicker"
-        @focus="handleFocus"
-        @blur="emit('blur')"
-        @input="resize"
-        @submit="submit"
-        @paste="handlePaste"
-        @start-voice="startVoiceInput"
-        @stop-voice="stopVoiceInput"
-        @toggle-expanded="togglePromptExpanded"
-      />
-
       <PromptInputMobile
-        v-else
         :ref="setPromptInputRef"
         :attachments="attachments"
         :has-selected-template-panel="hasSelectedTemplatePanel"
@@ -136,7 +106,6 @@ import {
   watch,
   inject,
 } from "vue";
-import PromptInputDesktop from "@/components/prompt/input/PromptInputDesktop.vue";
 import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
 import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
 import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
@@ -159,7 +128,6 @@ import {
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {usePlatformStore} from "@/stores/platformStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
 import {openNativeFilePicker} from "@/platform/bridge/platformBridge";
@@ -230,13 +198,11 @@ const props = reactive({
 const emit = defineEmits([
   "blur",
   "expanded-change",
-  "submit",
-  "update:modelValue",
   "focus",
   "height-change",
 ]);
 
-function callComposerContext(actionName, payload) {
+function invokeComposerContext(actionName, payload) {
   const action = composerContext?.[actionName];
   if (typeof action !== "function") return false;
 
@@ -247,7 +213,7 @@ function callComposerContext(actionName, payload) {
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    if (!callComposerContext("onSubmit", payload)) emit("submit", payload);
+    invokeComposerContext("onSubmit", payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -260,18 +226,16 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    if (!callComposerContext("onUpdateSelectedModel", payload)) {
-      emit("update:modelValue", payload);
-    }
+    invokeComposerContext("onUpdateSelectedModel", payload);
     return;
   }
   if (eventName === "focus") {
-    callComposerContext("onFocus", payload);
+    invokeComposerContext("onFocus", payload);
     emit("focus", payload);
     return;
   }
   if (eventName === "height-change") {
-    callComposerContext("onHeightChange", payload);
+    invokeComposerContext("onHeightChange", payload);
     emit("height-change", payload);
     return;
   }
@@ -291,7 +255,6 @@ const attachmentDisabled = computed(() =>
 // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 프롬프트 제어 Pinia 스토어를 로드합니다.
 const promptControlStore = usePromptControlStore();
 const platformStore = usePlatformStore();
-const systemSettingsStore = useSystemSettingsStore();
 
 // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
 // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
@@ -300,8 +263,7 @@ const {
   modelMenuOpen, // AI 모델 변경 드롭다운 모달 개폐 상태 (Boolean)
   toolMenuOpen, // 부가 플러그인 툴 목록 모달 개폐 상태 (Boolean)
   attachMenuOpen, // 파일 업로드 첨부 방식 선택 모달 개폐 상태 (Boolean)
-  isMobileSheet, // 현재 레이아웃이 모바일 하단 바텀시트로 그려져야 하는지 여부
-  syncViewportMode, // 디바이스 스크린 규격을 분석하여 모바일/PC 상태 플래그를 정문화하는 메서드
+  isMobileSheet, // 모바일 하단 바텀시트 렌더링 고정 플래그
   closeMenus, // 현재 열려 있는 모든 하위 도구 레이어 팝업을 일괄 폐쇄하는 메서드
   toggleMenu, // 특정 타깃 도구 팝업 메뉴를 토글식으로 열고 닫는 제어 메서드
 } = usePromptMenu();
@@ -326,10 +288,7 @@ const {
   focusTextarea, // 텍스트 입력창으로 포커스 커서를 강제 이동(주입)시키는 제어 함수
   restoreTextareaAutoGrow, // 최대화 해제 후 textarea inline style을 기존 auto-grow 상태로 복원하는 함수
   clearText, // 전송 직후 반응형 값과 실제 textarea DOM 값을 함께 비우는 함수
-} = usePromptText({
-  emit: handleComposerEvent,
-  isExpanded: isPromptExpanded,
-});
+} = usePromptText(handleComposerEvent);
 
 function setPromptInputRef(instance) {
   toolbarRef.value = instance || null;
@@ -469,19 +428,17 @@ function handleDroppedFiles(files) {
   addFiles(files);
 }
 
-const {isFileDragging, isFileDropDisabled} = useFileDragDrop({
-  targetRef: fileDropZoneRef,
-  enabled: computed(() => !attachmentDisabled.value),
-  onDropFiles: handleDroppedFiles,
-});
+const {isFileDragging, isFileDropDisabled} = useFileDragDrop(
+  fileDropZoneRef,
+  computed(() => !attachmentDisabled.value),
+  handleDroppedFiles
+);
 
 useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
 // ── [음성 입력] ─────────────────────────────────────────────────────────
 // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
-const isMicEnabled = computed(
-  () => systemSettingsStore.useMicrophone && Boolean(platformStore.info.isMic)
-);
+const isMicEnabled = computed(() => false);
 
 const speech = useSpeechRecognition({
   language: PROMPT_SPEECH_LANGUAGE,
@@ -528,7 +485,6 @@ const currentModel = computed(
 
 function openModelSelector() {
   if (props.disabled || props.modelReadonly) return;
-  syncViewportMode();
   toggleMenu(PROMPT_MENU_TYPE.model);
 }
 
@@ -660,7 +616,6 @@ function closeTemplateOptionSheet() {
 
 function openToolSelector() {
   if (props.disabled || props.submitDisabled || props.hideToolActions) return;
-  syncViewportMode();
   toggleMenu(PROMPT_MENU_TYPE.tool);
 }
 
@@ -705,7 +660,7 @@ watch(
 /** 답변 스트리밍 중에도 입력창과 주변 액션 UI는 잠그지 않고, 전송 버튼만 generating 상태로 progress를 표시합니다. */
 const actionDisabled = computed(() => disabled.value);
 
-/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 useChatSubmit에서 generating으로 방어합니다. */
+/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 chatSubmitActions에서 generating으로 방어합니다. */
 const canSubmit = computed(
   () =>
     !props.submitDisabled &&
@@ -885,11 +840,9 @@ function collapsePromptExpanded() {
 }
 
 // ── [생명주기 마운트] ────────────────────────────────────────────────────
-// 실제 DOM 트리가 기기 브라우저에 최종 활성화 안착한 시점에 최초 동기화 세팅을 구동합니다.
-// orientationchange 및 window.visualViewport 이벤트 추적은 usePromptMenu의 syncViewportMode 리스너에서 전담합니다.
+// 실제 DOM 트리가 기기 브라우저에 최종 활성화 안착한 시점에 입력창 높이를 맞춥니다.
 onMounted(() => {
-  syncViewportMode(); // 현재 접속한 해상도가 PC 규격인지 Mobile 규격인지 1차 분석 완료 고정
-  resize(); // 초기 기본 1줄 상태 폼 레이아웃 드로잉 스펙 고정
+  resize();
 });
 
 // 부모 템플릿 마크업 HTML 영역 내부에서 단 한 번의 구조 분해로 연결 바인딩할 수 있도록 모든 API 인터페이스 자원을 최종 추출 반환합니다.
@@ -932,28 +885,7 @@ onBeforeUnmount(() => {
   emit("expanded-change", false);
 });
 
-const usesDesktopTopActions = computed(() => !isMobileSheet.value);
-const promptLayoutMode = computed(() =>
-  isMobileSheet.value ? "mobile" : "desktop"
-);
-watch(
-  isMobileSheet,
-  async () => {
-    closeMenus();
-
-    await nextTick();
-
-    if (isPromptExpanded.value) {
-      resize();
-    } else {
-      restoreTextareaAutoGrow();
-    }
-
-    await nextTick();
-    handleComposerEvent("height-change", getLastHeight());
-  },
-  {flush: "post"}
-);
+const promptLayoutMode = computed(() => "mobile");
 
 provide(PROMPT_TEXTAREA_STATE_KEY, {
   text,

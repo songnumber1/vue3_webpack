@@ -299,17 +299,6 @@ body:not(.actual-android-runtime)
   display: none;
 }
 
-body.desktop-mode:not(.mobile-mode):not(.actual-android-runtime)
-  .md-code-action--interpreter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  min-width: 34px;
-  height: 30px;
-  padding: 0;
-}
-
 body.mobile-mode .md-code-action--interpreter,
 body.actual-android-runtime .md-code-action--interpreter {
   display: none !important;

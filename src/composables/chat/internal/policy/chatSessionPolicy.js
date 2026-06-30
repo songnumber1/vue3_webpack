@@ -21,11 +21,11 @@ export function resolveHistoryAssistantLabel(history = {}, session = {}) {
   );
 }
 
-export function isStudioConversationSession({
+export function isStudioConversationSession(
   history = {},
   session = {},
-  assistant = null,
-} = {}) {
+  assistant = null
+) {
   return Boolean(
     session?.assistantType === "studio" ||
     history?.assistantType === "studio" ||
@@ -35,19 +35,19 @@ export function isStudioConversationSession({
   );
 }
 
-export function resolveDeletedStudioSessionState({
+export function resolveDeletedStudioSessionState(
   history = {},
   session = {},
   assistantMap = {},
-  studioRuntimeStore = null,
-} = {}) {
+  studioRuntimeStore = null
+) {
   const assistantId = normalizeId(session?.assistantId || history?.assistantId);
   const assistant = assistantMap?.[assistantId] || null;
-  const isStudioSession = isStudioConversationSession({
+  const isStudioSession = isStudioConversationSession(
     history,
     session,
-    assistant,
-  });
+    assistant
+  );
   const isDeleted = Boolean(
     isStudioSession &&
     assistantId &&
@@ -64,12 +64,12 @@ export function resolveDeletedStudioSessionState({
   };
 }
 
-export function markSessionAsMissingAssistant({
+export function markSessionAsMissingAssistant(
   session = {},
   assistantId = "",
   assistantLabel = "",
-  assistantType = "studio",
-} = {}) {
+  assistantType = "studio"
+) {
   const deletedAssistantId = normalizeId(assistantId || session?.assistantId);
   const deletedAssistantLabel = firstNonEmptyText(
     session?.displayAssistantLabel,
@@ -92,14 +92,14 @@ export function markSessionAsMissingAssistant({
   };
 }
 
-export function resolveConversationSessionState({
+export function resolveConversationSessionState(
   history = {},
   session = null,
   assistantMap = {},
   assistants = [],
   studioRuntimeStore = null,
-  preserveSidebarAssistant = false,
-} = {}) {
+  preserveSidebarAssistant = false
+) {
   if (!session) {
     return {
       session: null,
@@ -112,22 +112,22 @@ export function resolveConversationSessionState({
   }
 
   const nextSession = {...session};
-  const deletedStudio = resolveDeletedStudioSessionState({
+  const deletedStudio = resolveDeletedStudioSessionState(
     history,
-    session: nextSession,
+    nextSession,
     assistantMap,
-    studioRuntimeStore,
-  });
+    studioRuntimeStore
+  );
 
   if (deletedStudio.isDeleted) {
     Object.assign(
       nextSession,
-      markSessionAsMissingAssistant({
-        session: nextSession,
-        assistantId: deletedStudio.assistantId,
-        assistantLabel: deletedStudio.displayLabel,
-        assistantType: "studio",
-      })
+      markSessionAsMissingAssistant(
+        nextSession,
+        deletedStudio.assistantId,
+        deletedStudio.displayLabel,
+        "studio"
+      )
     );
   }
 

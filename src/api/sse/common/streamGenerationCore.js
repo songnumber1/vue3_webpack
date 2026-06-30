@@ -1,63 +1,81 @@
-import {applyGenerationStreamData} from "@/api/sse/common/generationStreamParser";
-import {createGenerationStreamError} from "@/adapters/sseResponseAdapter";
 import {SSE} from "@/api/sse/vendor/sse";
 import {createChunkCommitter} from "@/api/sse/common/chunkCommitter";
 import {createAbortError} from "@/api/sse/common/sseErrors";
-import {resolveGenerationRequestId} from "@/adapters/generationResponseAdapter";
 import {
   resolveGenerationUrl,
   resolveSseAuthOptions,
 } from "@/api/sse/common/streamRequest";
-import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
+import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
+
+function readFirstString(...values) {
+  const found = values.find(
+    (value) => typeof value === "string" && value.trim()
+  );
+  return found ? found.trim() : "";
+}
+
+function resolveGenerationRequestId(payload = {}) {
+  return readFirstString(
+    payload?.[G.REQUEST_ID],
+    payload?.[G.REQUEST_ID_SNAKE],
+    payload?.[G.MESSAGE_ID],
+    payload?.[G.RESPONSE_MESSAGE_ID]
+  );
+}
+
+function createGenerationStreamError(
+  message = "generation stream returned error",
+  code = "SSE_STREAM_ERROR",
+  status
+) {
+  const error = new Error(message || "generation stream returned error");
+  error.name = "GenerationStreamError";
+  error.streamError = true;
+  error.streamErrorCode = code || "SSE_STREAM_ERROR";
+  if (status) error.status = status;
+  return error;
+}
 
 function readEventErrorMessage(event) {
   const rawData = event?.data;
-  if (typeof rawData === "string" && rawData.trim()) {
-    try {
-      const parsed = JSON.parse(rawData);
-      return (
-        parsed?.error?.message ||
-        parsed?.errorMessage ||
-        parsed?.message ||
-        rawData
-      );
-    } catch (_error) {
-      return rawData;
-    }
-  }
-
+  if (typeof rawData === "string" && rawData.trim()) return rawData;
   return event?.message || "generation stream failed";
-}
-
-function readEventErrorCode(event) {
-  const rawData = event?.data;
-  if (typeof rawData === "string" && rawData.trim()) {
-    try {
-      const parsed = JSON.parse(rawData);
-      return parsed?.error?.code || parsed?.errorCode || parsed?.code;
-    } catch (_error) {
-      return undefined;
-    }
-  }
-
-  return undefined;
 }
 
 function createSseEventError(event) {
   const status = event?.status || event?.responseCode;
-  return createGenerationStreamError({
-    message: readEventErrorMessage(event),
-    code: readEventErrorCode(event) || "SSE_EVENT_ERROR",
-    status,
-  });
+  return createGenerationStreamError(
+    readEventErrorMessage(event),
+    "SSE_EVENT_ERROR",
+    status
+  );
+}
+
+function applyTextGenerationStreamData(raw, accumulated) {
+  const text = String(raw || "");
+  const normalized = text.trim();
+
+  if (!normalized) {
+    return {accumulated, changed: false, done: false};
+  }
+
+  if (normalized === "[DONE]") {
+    return {accumulated, changed: false, done: true};
+  }
+
+  return {
+    accumulated: accumulated + text,
+    changed: true,
+    done: false,
+  };
 }
 
 function createGenerationDoneMissingError() {
-  const error = createGenerationStreamError({
-    message: "generation stream closed before DONE",
-    code: "SSE_DONE_MISSING",
-  });
+  const error = createGenerationStreamError(
+    "generation stream closed before DONE",
+    "SSE_DONE_MISSING"
+  );
   error.doneMissing = true;
   return error;
 }
@@ -69,34 +87,24 @@ function getUnauthorizedStreamStatus(error) {
   return status === 401 || status === 403 ? status : 0;
 }
 
-function isUnauthorizedStreamError(error) {
-  return Boolean(getUnauthorizedStreamStatus(error));
-}
-
-export async function runSseGenerationStream({
+export async function runSseGenerationStream(
   payload,
   handlers,
   controller,
   lifecycle,
-  runtimeType = "unknown",
-}) {
-  const {onChunk, onReasonChunk, onComplete} = handlers || {};
+  runtimeType = "unknown"
+) {
+  const {onChunk, onComplete} = handlers || {};
 
   const committer = createChunkCommitter(onChunk);
-  const reasonCommitter = createChunkCommitter(onReasonChunk);
   let source = null;
   let accumulated = "";
-  let reasonAccumulated = "";
   let completed = false;
   let settled = false;
 
   const cleanupLifecycle = lifecycle?.install?.({
     controller,
-    flush: () =>
-      Promise.all([
-        committer.flush(accumulated),
-        reasonCommitter.flush(reasonAccumulated),
-      ]),
+    flush: () => committer.flush(accumulated),
   });
 
   const requestId = resolveGenerationRequestId(payload);
@@ -145,17 +153,9 @@ export async function runSseGenerationStream({
             throw controller.signal.reason || createAbortError("Aborted");
           }
 
-          const nextState = applyGenerationStreamData({
-            raw: event.data,
-            accumulated,
-            reasonAccumulated,
-          });
+          const nextState = applyTextGenerationStreamData(event.data, accumulated);
           accumulated = nextState.accumulated;
-          reasonAccumulated = nextState.reasonAccumulated;
 
-          if (nextState.reasonChanged) {
-            reasonCommitter.update(reasonAccumulated);
-          }
           if (nextState.changed) {
             lifecycle?.onAccumulated?.({accumulated, committer});
           }
@@ -198,41 +198,17 @@ export async function runSseGenerationStream({
   };
 
   try {
-    let authOptions = await resolveSseAuthOptions();
+    const authOptions = resolveSseAuthOptions();
 
     try {
       await executeStream(authOptions);
     } catch (error) {
-      const unauthorizedStatus = getUnauthorizedStreamStatus(error);
-      if (unauthorizedStatus && !controller?.signal?.aborted) {
-        if (!authOptions.policy.isJwt || unauthorizedStatus === 403) {
-          resetAuthStateSafely();
-          throw error;
-        }
-
-        const accessToken = await refreshAccessTokenOnce();
-        authOptions = {
-          ...authOptions,
-          headers: {
-            ...authOptions.headers,
-            Authorization: `Bearer ${accessToken}`,
-          },
-        };
-        closeSource();
-        try {
-          await executeStream(authOptions);
-        } catch (retryError) {
-          if (isUnauthorizedStreamError(retryError)) {
-            resetAuthStateSafely();
-          }
-          throw retryError;
-        }
-      } else {
-        throw error;
+      if (getUnauthorizedStreamStatus(error) && !controller?.signal?.aborted) {
+        resetAuthStateSafely();
       }
+      throw error;
     }
 
-    await reasonCommitter.flush(reasonAccumulated);
     await committer.flush(accumulated);
     await onComplete?.({requestId});
 
@@ -240,14 +216,11 @@ export async function runSseGenerationStream({
       completed: true,
       requestId,
       accumulated,
-      reasonAccumulated,
       runtimeType,
     };
   } catch (error) {
-    await reasonCommitter.flush(reasonAccumulated);
     await committer.flush(accumulated);
     error.accumulated = accumulated;
-    error.reasonAccumulated = reasonAccumulated;
     error.generationRequestId = requestId;
     throw error;
   } finally {

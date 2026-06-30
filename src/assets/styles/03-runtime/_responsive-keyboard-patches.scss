@@ -1,8 +1,6 @@
-/* Responsive keyboard patch aggregator.
-   The original payload was split by responsibility in Step 7-B.
-   Keep this file imported immediately after 03-runtime/keyboard so the historical cascade position is preserved. */
+/* Mobile keyboard patch aggregator.
+   Mobile keyboard patches are imported in mobile-only mode. */
 @use "./responsive-keyboard/shared-message-prompt-icons" as *;
-@use "./responsive-keyboard/desktop-topbar-model" as *;
 @use "./responsive-keyboard/mobile-shell-visibility" as *;
 @use "./responsive-keyboard/mobile-topbar-prompt-model" as *;
 @use "./responsive-keyboard/mobile-sidebar-drawer" as *;

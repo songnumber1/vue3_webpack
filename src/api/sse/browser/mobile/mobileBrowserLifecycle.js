@@ -1,12 +1,12 @@
 import {abortGenerationController} from "@/api/sse/common/sseErrors";
 
-export function createDesktopSseLifecycle() {
+export function createMobileBrowserSseLifecycle() {
   return {
     install({controller}) {
       if (typeof window === "undefined") return () => {};
 
       const handlePageEnd = () => {
-        abortGenerationController(controller, "page lifecycle ended");
+        abortGenerationController(controller, "mobile browser lifecycle ended");
       };
 
       window.addEventListener("pagehide", handlePageEnd, {capture: true});

@@ -9,7 +9,7 @@
  * AppContainer is the most stable Vue-owned mobile layout marker. Keep these
  * selectors in addition to body.mobile-mode so the mobile baseline does not
  * depend on body class synchronization timing during Android WebView/Chrome
- * resize, keyboard, or breakpoint transitions.
+ * resize, keyboard, or mobile viewport transitions.
  */
 .app-container--compact .chat-container-root--mode-main {
   height: var(--layout-viewport-height, 100dvh) !important;
@@ -98,11 +98,7 @@
 .app-container--compact
   .empty-stage--mobile-main
   .main-empty-state__composer-dock
-  .mobile-main-fixed-prompt,
-.app-container--compact
-  .empty-stage--mobile-main
-  .main-empty-state__composer-dock
-  .desktop-center-prompt {
+  .mobile-main-fixed-prompt {
   position: static !important;
   inset: auto !important;
   z-index: auto !important;

@@ -81,18 +81,6 @@
   place-items: center;
 }
 
-@mixin desktop-mode {
-  body.desktop-mode & {
-    @content;
-  }
-}
-
-@mixin desktop-root {
-  body.desktop-mode {
-    @content;
-  }
-}
-
 @mixin viewport-height-lock(
   $height: var(--layout-viewport-height, 100dvh),
   $important: false

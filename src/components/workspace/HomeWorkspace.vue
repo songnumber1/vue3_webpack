@@ -42,14 +42,12 @@ import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {
   CHAT_WORKSPACE_STATE_KEY,
   createEmptyWorkspaceState,
 } from "@/composables/chat/chatStateContext";
 
 const chatStreamStore = useChatStreamStore();
-const responsiveLayoutStore = useResponsiveLayoutStore();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
 const emit = defineEmits(["studio-detail"]);
@@ -58,9 +56,7 @@ const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const isMobile = computed(
-  () => workspaceState.value.isMobile || responsiveLayoutStore.isMobile
-);
+const isMobile = computed(() => true);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
@@ -80,10 +76,9 @@ const mainAssistantIcon = computed(() =>
 );
 const isMainPageActionBlocked = computed(() => chatStreamStore.isWait);
 const isPromptExampleBlocked = computed(() => isMainPageActionBlocked.value);
-const mainPromptClass = computed(() =>
-  isMobile.value
-    ? "mobile-keyboard-dock mobile-keyboard-dock--fixed mobile-main-fixed-prompt main-empty-state__prompt tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-prompt tw-box-border tw-w-[100dvw] tw-max-w-[100dvw] tw-overflow-hidden tw-bg-transparent tw-px-3 tw-pb-[max(12px,env(safe-area-inset-bottom))] tw-pt-2 tw-shadow-none"
-    : "desktop-center-prompt tw-w-[min(var(--layout-prompt-width,880px),100%)] tw-max-w-[var(--layout-prompt-width,880px)] tw-border-0 tw-p-0"
+const mainPromptClass = computed(
+  () =>
+    "mobile-keyboard-dock mobile-keyboard-dock--fixed mobile-main-fixed-prompt main-empty-state__prompt tw-fixed tw-inset-x-0 tw-bottom-0 tw-z-prompt tw-box-border tw-w-[100dvw] tw-max-w-[100dvw] tw-overflow-hidden tw-bg-transparent tw-px-3 tw-pb-[max(12px,env(safe-area-inset-bottom))] tw-pt-2 tw-shadow-none"
 );
 function handleSuggestionClick(item) {
   if (isPromptExampleBlocked.value) return;

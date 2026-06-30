@@ -1,18 +1,14 @@
 <template>
   <teleport to="body">
-    <transition :name="isMobile ? 'mobile-page' : 'modal-fade'">
+    <transition name="mobile-page">
       <div
         v-if="open"
-        class="responsive-overlay"
+        class="responsive-overlay responsive-overlay--mobile"
         :class="overlayClasses"
         :data-overlay-mode="overlayMode"
       >
-        <div
-          v-if="!isMobile"
-          class="responsive-overlay-backdrop app-dialog-backdrop"
-        ></div>
         <section
-          :key="panelRenderKey"
+          :key="overlayMode"
           class="responsive-panel app-dialog-panel"
           :class="panelClass"
           role="dialog"
@@ -54,20 +50,16 @@
 <script setup>
 /**
  * @file components/overlay/ResponsiveOverlay.vue
- * @description 재사용 UI 컴포넌트입니다. 화면 상태는 상위 props/action에서 받고 내부에서는 렌더와 사용자 이벤트만 처리합니다.
+ * @description 모바일 전용 overlay입니다. fullscreen/page 또는 dialog 형태만 렌더링합니다.
  */
 
 import {computed, ref, toRef, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayRegistration} from "@/composables/overlay/useOverlayRegistration";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 
 const {t} = useI18n();
 const bodyRef = ref(null);
 
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
 const props = defineProps({
   open: {type: Boolean, default: false},
   title: {type: String, required: true},
@@ -81,49 +73,28 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close"]);
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
 
-const isMobileFullscreen = computed(
-  () => isMobile.value && props.mobileMode === "fullscreen"
+const isDialog = computed(() => props.mobileMode === "dialog");
+const overlayMode = computed(() =>
+  isDialog.value ? "mobile-dialog" : "mobile-fullscreen"
 );
-const isMobileDialog = computed(
-  () => isMobile.value && props.mobileMode === "dialog"
-);
-
-const overlayMode = computed(() => {
-  if (isMobileFullscreen.value) return "mobile-fullscreen";
-  if (isMobileDialog.value) return "mobile-dialog";
-
-  return "desktop-dialog";
-});
-
 const overlayClasses = computed(() => ({
-  "responsive-overlay--desktop": !isMobile.value,
-  "responsive-overlay--mobile": isMobileFullscreen.value,
-  "responsive-overlay--mobile-dialog": isMobileDialog.value,
+  "responsive-overlay--mobile-dialog": isDialog.value,
 }));
+const showMobileBackButton = computed(() => !isDialog.value);
+const showCloseButton = computed(() => isDialog.value);
 
-const panelRenderKey = computed(() => overlayMode.value);
-
-const showMobileBackButton = computed(() => isMobileFullscreen.value);
-const showCloseButton = computed(() => !isMobileFullscreen.value);
-
-useOverlayRegistration({
-  open: toRef(props, "open"),
-  kind: "responsive-overlay",
-  mode: overlayMode,
-});
+useOverlayRegistration(toRef(props, "open"), "responsive-overlay", overlayMode);
 
 watch(
-  () => [props.open, isMobile.value, props.mobileMode],
+  () => [props.open, overlayMode.value],
   () => {
     if (typeof document === "undefined") return;
     if (props.open) {
       document.body.dataset.responsiveOverlayMode = overlayMode.value;
-    } else if (document.body?.dataset?.responsiveOverlayMode) {
-      delete document.body.dataset.responsiveOverlayMode;
+      return;
     }
+    delete document.body.dataset.responsiveOverlayMode;
   },
   {immediate: true}
 );

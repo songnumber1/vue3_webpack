@@ -15,7 +15,6 @@ export const APP_OVERLAY_TYPES = Object.freeze({
   NOTICE: "notice",
   PRIVACY: "privacy",
   PERSONALIZATION: "personalization",
-  SYSTEM: "system",
   LANGUAGE: "language",
   MOBILE_SETTINGS: "mobile-settings",
 });
@@ -33,7 +32,6 @@ const RESPONSIVE_OVERLAY_TYPES = Object.freeze([
   APP_OVERLAY_TYPES.NOTICE,
   APP_OVERLAY_TYPES.PRIVACY,
   APP_OVERLAY_TYPES.PERSONALIZATION,
-  APP_OVERLAY_TYPES.SYSTEM,
 ]);
 
 const STANDALONE_OVERLAY_TYPES = Object.freeze([
@@ -237,9 +235,6 @@ export function createResponseOverlayViewState(t) {
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.PERSONALIZATION) {
       return t("personalization.title");
     }
-    if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.SYSTEM) {
-      return t("common.system");
-    }
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.LANGUAGE) {
       return t("common.language");
     }
@@ -258,9 +253,6 @@ export function createResponseOverlayViewState(t) {
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.PERSONALIZATION) {
       return t("personalization.subtitle");
     }
-    if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.SYSTEM) {
-      return t("menu.systemSummary");
-    }
     return "";
   });
   const overlayRenderMode = computed(() => {
@@ -278,11 +270,7 @@ export function createResponseOverlayViewState(t) {
   const usesStandaloneOverlay = computed(
     () => overlayRenderMode.value === RESPONSE_OVERLAY_RENDER_MODES.STANDALONE
   );
-  const overlayPanelClass = computed(() =>
-    responseOverlayActiveType.value === APP_OVERLAY_TYPES.SYSTEM
-      ? "responsive-panel--system-settings"
-      : ""
-  );
+  const overlayPanelClass = computed(() => "");
 
   return {
     activeOverlayType,
@@ -347,10 +335,6 @@ export function openPersonalizationOverlay(options) {
   openResponseOverlay(APP_OVERLAY_TYPES.PERSONALIZATION, options);
 }
 
-export function openSystemOverlay(options) {
-  openResponseOverlay(APP_OVERLAY_TYPES.SYSTEM, options);
-}
-
 export function openLanguageOverlay(options) {
   openResponseOverlay(APP_OVERLAY_TYPES.LANGUAGE, options);
 }
@@ -366,17 +350,4 @@ export function openSettingsOverlay(options = {}) {
     return;
   }
   openPersonalizationOverlay(options);
-}
-
-export function handleMobileSettingsDesktopOpen(target) {
-  if (!RESPONSE_OVERLAY_TYPE_VALUES.includes(target)) return;
-
-  const overlayBackStore = resolveOverlayBackStore();
-  responseOverlayActiveType.value = target;
-  overlayBackStore.setActiveOverlayType(target);
-
-  if (overlayBackStore.mobileHistoryPushed && canUseBrowserHistory()) {
-    overlayBackStore.markRestoringMobileHistory();
-    window.history.back();
-  }
 }

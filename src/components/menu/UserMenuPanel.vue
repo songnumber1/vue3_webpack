@@ -5,7 +5,6 @@
     role="menu"
   >
     <button
-      v-if="systemSettings.showNoticeMenu"
       class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
       type="button"
       role="menuitem"
@@ -15,7 +14,6 @@
       <small>{{ t("menu.noticeSummary") }}</small>
     </button>
     <button
-      v-if="systemSettings.showPrivacyMenu"
       class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
       type="button"
       role="menuitem"
@@ -25,7 +23,6 @@
       <small>{{ t("menu.privacySummary") }}</small>
     </button>
     <button
-      v-if="systemSettings.showTermsMenu"
       class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
       type="button"
       role="menuitem"
@@ -35,7 +32,6 @@
       <small>{{ t("menu.termsSummary") }}</small>
     </button>
     <button
-      v-if="systemSettings.showPersonalizationMenu"
       class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
       type="button"
       role="menuitem"
@@ -45,26 +41,6 @@
       <small>{{ t("menu.personalizationSummary") }}</small>
     </button>
     <button
-      class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
-      type="button"
-      role="menuitem"
-      @click="$emit('select', 'system')"
-    >
-      <strong>{{ t("common.system") }}</strong>
-      <small>{{ t("menu.systemSummary") }}</small>
-    </button>
-    <button
-      v-if="systemSettings.showPlaygroundMenu"
-      class="user-menu-item tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-text hover:tw-bg-app-controlHover"
-      type="button"
-      role="menuitem"
-      @click="$emit('select', 'playground')"
-    >
-      <strong>{{ t("common.playground") }}</strong>
-      <small>{{ t("menu.playgroundSummary") }}</small>
-    </button>
-    <button
-      v-if="systemSettings.showLogoutButton"
       class="user-menu-item user-menu-item--danger tw-block tw-w-full tw-cursor-pointer tw-rounded-xl tw-border-0 tw-bg-transparent tw-px-3 tw-py-2.5 tw-text-left tw-text-app-danger hover:tw-bg-app-controlHover"
       type="button"
       role="menuitem"
@@ -114,7 +90,6 @@ const props = defineProps({
   languageOpen: {type: Boolean, default: false},
   languageOptions: {type: Array, default: () => []},
   currentLocale: {type: String, default: ""},
-  systemSettings: {type: Object, required: true},
 });
 
 defineEmits(["select", "toggle-language", "select-locale"]);

@@ -66,20 +66,19 @@ function isMovingInsideCurrentTarget(event) {
 /**
  * @function useFileDragDrop
  * @description 지정한 targetRef를 파일 드롭존으로 만들고 드래그 상태를 외부로 제공합니다.
- * @param {Object} options - 드래그앤드롭 동작 옵션입니다.
- * @param {Ref<HTMLElement|null>} options.targetRef - 이벤트를 연결할 DOM ref입니다.
- * @param {boolean|Ref<boolean>|ComputedRef<boolean>|Function} [options.enabled=true] - 드롭 허용 여부입니다.
- * @param {Function} [options.onDropFiles] - 드롭 성공 시 File 배열을 전달받는 콜백입니다.
- * @param {Function} [options.onDropRejected] - 비활성 상태 드롭 등 거부 상황을 전달받는 콜백입니다.
- * @param {boolean|Ref<boolean>|ComputedRef<boolean>|Function} [options.preventOnDisabled=true] - 비활성 상태에서도 브라우저 기본 파일 열기를 막을지 여부입니다.
+ * @param {Ref<HTMLElement|null>} targetRef - 이벤트를 연결할 DOM ref입니다.
+ * @param {boolean|Ref<boolean>|ComputedRef<boolean>|Function} [enabled=true] - 드롭 허용 여부입니다.
+ * @param {Function} [onDropFiles] - 드롭 성공 시 File 배열을 전달받는 콜백입니다.
+ * @param {Function} [onDropRejected] - 비활성 상태 드롭 등 거부 상황을 전달받는 콜백입니다.
+ * @param {boolean|Ref<boolean>|ComputedRef<boolean>|Function} [preventOnDisabled=true] - 비활성 상태에서도 브라우저 기본 파일 열기를 막을지 여부입니다.
  */
-export function useFileDragDrop({
+export function useFileDragDrop(
   targetRef,
   enabled = true,
   onDropFiles,
   onDropRejected,
-  preventOnDisabled = true,
-} = {}) {
+  preventOnDisabled = true
+) {
   const dragDepth = ref(0);
   const isFileDragging = ref(false);
 

@@ -1,7 +1,6 @@
 /**
  * @file composables/ui/useOverlayScrollPolicy.js
- * @description OverlayScrollbars 사용 여부를 한 곳에서 판별하는 정책 composable입니다.
- * 기본 모드는 전체 런타임에서 OverlayScrollbars를 사용하도록 ALL로 전환합니다.
+ * @description 모바일 전용 OverlayScrollbars 사용 정책을 제공합니다.
  */
 import {computed} from "vue";
 import {usePlatformStore} from "@/stores/platformStore";
@@ -9,7 +8,6 @@ import {
   DEFAULT_OVERLAY_SCROLL_MODE,
   OVERLAY_SCROLL_MODE,
   isActualAndroidOverlayRuntime,
-  shouldUseOverlayScrollbarForRuntime,
 } from "@/platform/scroll/scrollRuntimePolicy";
 
 export {
@@ -18,43 +16,20 @@ export {
   isActualAndroidOverlayRuntime,
 };
 
-/**
- * OverlayScrollbars 사용 정책을 제공합니다.
- * OverlayScrollbars 사용 여부를 단일 정책으로 제공합니다.
- * @returns {object} OverlayScroll 정책 계산값 묶음
- */
 export function useOverlayScrollPolicy() {
   const platformStore = usePlatformStore();
-
   const platformInfo = computed(() => platformStore.info || {});
   const overlayScrollMode = computed(() => DEFAULT_OVERLAY_SCROLL_MODE);
   const isActualAndroidRuntime = computed(() =>
     isActualAndroidOverlayRuntime(platformInfo.value)
   );
 
-  const shouldUseOverlayScrollbar = computed(() =>
-    shouldUseOverlayScrollbarForRuntime(
-      platformInfo.value,
-      overlayScrollMode.value
-    )
-  );
-
-  const shouldUseNativeScrollbar = computed(
-    () => !shouldUseOverlayScrollbar.value
-  );
-
-  const scrollRuntimeClass = computed(() =>
-    shouldUseOverlayScrollbar.value
-      ? "overlay-scroll-runtime"
-      : "native-scroll-runtime"
-  );
-
   return {
     platformInfo,
     overlayScrollMode,
     isActualAndroidRuntime,
-    shouldUseOverlayScrollbar,
-    shouldUseNativeScrollbar,
-    scrollRuntimeClass,
+    shouldUseOverlayScrollbar: computed(() => true),
+    shouldUseNativeScrollbar: computed(() => false),
+    scrollRuntimeClass: computed(() => "overlay-scroll-runtime"),
   };
 }

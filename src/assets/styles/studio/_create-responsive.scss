@@ -2,7 +2,7 @@
    This file keeps the original Studio cascade slot and preserves declaration order. */
 
 /* -----------------------------------------------------------------------------
-   Shared create controls and desktop preview
+   Shared create controls and mobile preview
 ----------------------------------------------------------------------------- */
 /* --- create/_create-responsive-01.scss --- */
 /* Studio create final responsive polish: PC preview suppression, mobile icon toolbar, keyboard-safe scrolling. */
@@ -112,45 +112,7 @@
   width: 18px;
   height: 18px;
   accent-color: var(--studio-primary);
-}
-
-body.desktop-mode .studio-create-page .studio-preview__card {
-  min-height: 100%;
-  padding: 48px 34px;
-  justify-content: center;
-  background:
-    radial-gradient(
-      circle at 50% 0%,
-      color-mix(in srgb, var(--studio-primary) 10%, transparent),
-      transparent 38%
-    ),
-    var(--studio-surface);
-}
-
-body.desktop-mode .studio-create-page .studio-preview__card h2 {
-  margin-top: 18px;
-  font-size: 26px;
-  line-height: 1.25;
-}
-
-/* --- mobile/_create-responsive-04.scss --- */
-body.desktop-mode .studio-create-page .studio-preview__card p {
-  max-width: 420px;
-  margin: 8px auto 22px;
-  line-height: 1.55;
-}
-
-/* --- create/_create-responsive-05.scss --- */
-body.desktop-mode .studio-create-page .studio-prompt-grid--preview {
-  width: min(100%, 520px);
-  margin: 0 auto;
-}
-
-body.desktop-mode .studio-create-page .studio-prompt-grid--preview:empty {
-  display: none;
-}
-
-/* -----------------------------------------------------------------------------
+}/* -----------------------------------------------------------------------------
    Mobile create layout and safe-area guards
 ----------------------------------------------------------------------------- */
 /* --- mobile/_create-responsive-06.scss --- */
@@ -371,9 +333,9 @@ body.mobile-mode
 }
 
 /* -----------------------------------------------------------------------------
-   Desktop preview and Android keyboard stability guards
+   Mobile preview and Android keyboard stability guards
 ----------------------------------------------------------------------------- */
-/* Targeted fix: keep Studio create preview visible on desktop and make Android keyboard focus stable. */
+/* Targeted fix: keep Studio create preview visible on mobile and make Android keyboard focus stable. */
 
 body.mobile-mode
   .chat-container-root--mode-studio
@@ -603,27 +565,7 @@ body.mobile-mode
   scroll-margin-bottom: calc(
     132px + env(safe-area-inset-bottom, 0px)
   ) !important;
-}
-
-/* -----------------------------------------------------------------------------
-   Final tab header and textarea paint guards
------------------------------------------------------------------------------ */
-/* Studio create scroll/focus correction: keep both PC and mobile tab headers out of the scroll container.
-   Only the active tab content scrolls; this also keeps Android textarea focus behavior consistent. */
-body.desktop-mode .studio-create-page .studio-create-form {
-  height: 100%;
-  overflow: hidden !important;
-}
-
-/* --- create/_create-responsive-09.scss --- */
-body.desktop-mode .studio-create-page .studio-create-content {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
-
-/* --- mobile/_create-responsive-10.scss --- */
+}/* --- mobile/_create-responsive-10.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-create-content,
 body.mobile-mode
   .chat-container-root--keyboard-open.chat-container-root--mode-studio

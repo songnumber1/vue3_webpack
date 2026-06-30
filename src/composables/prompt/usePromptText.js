@@ -6,7 +6,7 @@
 import {computed, nextTick, ref} from "vue";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 
-export function usePromptText({emit}) {
+export function usePromptText(emit) {
   const promptControlStore = usePromptControlStore();
 
   const text = computed({

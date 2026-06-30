@@ -18,11 +18,7 @@ import {
   isSupportedMobileMicBrowser,
   resolveBasePlatform,
 } from "./browserDetector";
-import {
-  getForcedPlatformOverride,
-  resolveForcedPlatform,
-} from "./platformOverride";
-import {resolveViewportInfo} from "./platformBreakpoint";
+import {resolveViewportInfo} from "./mobileViewportInfo";
 
 export function resolveDetailedPlatform(baseAppInfo = {}) {
   const nav = getNavigator();
@@ -43,46 +39,31 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     : hasExtensionRuntime()
       ? RUN_ENV.EXTENSION
       : RUN_ENV.BROWSER;
-  const detectedDevice = detectDevice({
-    env: detectedEnv,
-    browserName: detectedBrowserName,
-  });
-  const actualPlatform = createActualPlatformInfo({
-    env: detectedEnv,
-    runtime: detectedRuntime,
-    device: detectedDevice,
-    browserName: detectedBrowserName,
-    browserVersion: detectedBrowserVersion,
-  });
-  const forcedPlatform = resolveForcedPlatform({
-    baseAppInfo,
-    detected: {
-      env: detectedEnv,
-      runtime: detectedRuntime,
-      device: detectedDevice,
-      browserName: detectedBrowserName,
-      browserVersion: detectedBrowserVersion,
-    },
-  });
-
-  const browserName = forcedPlatform.browserName;
-  const browserVersion = forcedPlatform.browserVersion;
-  const env = forcedPlatform.env;
-  const runtime = forcedPlatform.runtime;
-  const device = forcedPlatform.device;
+  const detectedDevice = detectDevice(detectedEnv, detectedBrowserName);
+  const actualPlatform = createActualPlatformInfo(
+    detectedEnv,
+    detectedRuntime,
+    detectedDevice,
+    detectedBrowserName,
+    detectedBrowserVersion
+  );
+  const browserName = detectedBrowserName;
+  const browserVersion = detectedBrowserVersion;
+  const env = detectedEnv;
+  const runtime = detectedRuntime;
+  const device = detectedDevice;
   const isAndroid = env === PLATFORM.ANDROID;
   const isWindows = env === PLATFORM.WINDOWS;
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
   const isAndroidWebView = isAndroid && browserName === "android-webview";
-  const isMobile = isAndroid;
-  const isMobileBrowser = isMobile && !isNativeApp && browserName === "chrome";
+  const isMobile = true;
+  const isMobileBrowser = !isNativeApp;
   const isActuallySamsungBrowser =
     actualPlatform.browser === "samsung-browser" ||
     /SamsungBrowser\//i.test(ua);
   const isSupportedRuntime =
-    !isActuallySamsungBrowser &&
-    (forcedPlatform.isForced || isSupportedBrowserName(browserName, {env}));
+    !isActuallySamsungBrowser && isSupportedBrowserName(browserName);
   const isUnsupportedBrowser = !isSupportedRuntime;
   const unsupportedReason = isActuallySamsungBrowser
     ? "unsupported-samsung-browser"
@@ -91,18 +72,13 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       : "";
   const isAccess = !isUnsupportedBrowser;
   const viewportInfo = resolveViewportInfo(baseAppInfo);
-  const isMic = isSupportedMobileMicBrowser({
+  const isMic = isSupportedMobileMicBrowser(
     isAndroid,
     isMobileBrowser,
-    browserName,
-  });
-  const platformOverride = getForcedPlatformOverride(
-    baseAppInfo.platformOverride
+    browserName
   );
-
   logPlatformDebug("platform.resolve", {
-    platformOverride,
-    isPlatformForced: forcedPlatform.isForced,
+    isPlatformForced: false,
     actualPlatform: actualPlatform.label,
     resolved: {
       env,
@@ -120,7 +96,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       height: viewportInfo.height,
       visualWidth: viewportInfo.visualWidth,
       compactWidth: viewportInfo.compactWidth,
-      compactBreakpoint: viewportInfo.compactBreakpoint,
     },
   });
 
@@ -153,13 +128,12 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isMobile,
     isMobileBrowser,
     isMic,
-    isPlatformForced: forcedPlatform.isForced,
-    platformOverride,
+    isPlatformForced: false,
     isChrome: browserName === "chrome",
     isFirefox: browserName === "firefox",
     isSupportedRuntime,
     isSamsungBrowser: isActuallySamsungBrowser,
-    isPc: isWindows || env === PLATFORM.MAC || env === PLATFORM.LINUX,
+    isPc: false,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",
     appBuildVersion: baseAppInfo.appBuildVersion || "",
     bridgeVersion:
@@ -173,7 +147,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
         typeof window === "undefined" ? 1 : window.devicePixelRatio || 1,
     },
     viewport: {width: viewportInfo.width, height: viewportInfo.height},
-    compactBreakpoint: viewportInfo.compactBreakpoint,
     updatedAt: new Date().toISOString(),
   };
 }

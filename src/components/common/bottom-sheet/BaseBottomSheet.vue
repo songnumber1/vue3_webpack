@@ -127,11 +127,7 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "back"]);
 
-useOverlayRegistration({
-  open: toRef(props, "open"),
-  kind: "bottom-sheet",
-  mode: "mobile-sheet",
-});
+useOverlayRegistration(toRef(props, "open"), "bottom-sheet", "mobile-sheet");
 
 const sheetRef = ref(null);
 const bodyRef = ref(null);

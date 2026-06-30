@@ -30,7 +30,7 @@ body.mobile-mode .empty-stage--mobile-main {
 
 body.mobile-mode
   .empty-stage--mobile-main
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   transform: translateZ(0);
 }
 
@@ -51,7 +51,7 @@ body.mobile-mode
 
 body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   bottom: 0 !important;
 }
 
@@ -100,7 +100,7 @@ body.mobile-mode .sidebar-content--mobile .assistant-trigger span {
 
 .prompt-wrap,
 .prompt-wrap--floating,
-.desktop-center-prompt {
+.mobile-main-fixed-prompt {
   background: transparent;
 }
 
@@ -115,7 +115,7 @@ body.mobile-mode .sidebar-content--mobile .assistant-trigger span {
   background-clip: padding-box;
 }
 
-:root[data-theme="dark"] .desktop-center-prompt .prompt-box,
+:root[data-theme="dark"] .mobile-main-fixed-prompt .prompt-box,
 :root[data-theme="dark"] .prompt-wrap--floating .prompt-box {
   box-shadow: var(--shadow-prompt);
 }
@@ -137,7 +137,7 @@ body.mobile-mode
 }
 body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   bottom: 0 !important;
   transform: translate3d(0, var(--keyboard-height, 0px), 0);
 }
@@ -165,7 +165,7 @@ body.mobile-mode
 }
 body.mobile-mode
   .chat-container-root--mode-main.chat-container-root--keyboard-open
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   bottom: 0 !important;
   transform: none;
 }
@@ -196,7 +196,7 @@ body.mobile-mode .empty-stage--mobile-main .empty-center {
 }
 body.mobile-mode
   .empty-stage--mobile-main
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -217,7 +217,7 @@ body.mobile-mode
 }
 body.mobile-mode
   .empty-stage--mobile-main
-  .desktop-center-prompt.prompt-wrap--floating
+  .mobile-main-fixed-prompt.prompt-wrap--floating
   .prompt-box {
   margin: 0 auto;
   max-width: min(100%, var(--layout-prompt-width, 880px));
@@ -255,7 +255,7 @@ body.mobile-mode .chat-container-root--mode-main .empty-stage--mobile-main {
 }
 body.mobile-mode
   .chat-container-root--mode-main
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   position: fixed !important;
   left: 0 !important;
   right: 0 !important;
@@ -276,7 +276,7 @@ body.mobile-mode
 }
 body.mobile-mode
   .chat-container-root--mode-main
-  .desktop-center-prompt.prompt-wrap--floating
+  .mobile-main-fixed-prompt.prompt-wrap--floating
   .prompt-box {
   max-width: min(100%, var(--layout-prompt-width, 880px));
   margin: 0 auto;
@@ -378,7 +378,7 @@ body.mobile-mode
 }
 body.mobile-mode
   .chat-container-root--mode-main
-  .desktop-center-prompt.prompt-wrap--floating {
+  .mobile-main-fixed-prompt.prompt-wrap--floating {
   position: static !important;
   bottom: auto !important;
   transform: none;

@@ -1,11 +1,11 @@
 import {nextTick, onBeforeUnmount, onMounted, watch} from "vue";
 
-export function useConversationComposerHeight({
+export function useConversationComposerHeight(
   composerSlotRef,
   isHistoryRendering,
   watchSources = [],
-  onBeforeUpdate,
-} = {}) {
+  onBeforeUpdate
+) {
   let composerResizeObserver = null;
   let composerHeightTimerIds = [];
   let composerHeightRafId = 0;

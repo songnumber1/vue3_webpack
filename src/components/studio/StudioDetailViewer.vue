@@ -1,25 +1,15 @@
 <template>
-  <div
-    v-if="open && studio"
-    class="studio-detail-viewer"
-    :class="{'studio-detail-viewer--mobile': isMobile}"
-    role="presentation"
-  >
+  <div v-if="open && studio" class="studio-detail-viewer" role="presentation">
     <div class="studio-detail-viewer__backdrop" @click.self="close"></div>
 
     <article
       class="studio-detail-viewer__panel"
-      :class="{
-        'studio-detail-viewer__panel--mobile': isMobile,
-        'studio-detail-viewer__panel--desktop': !isMobile,
-      }"
       role="dialog"
       aria-modal="true"
       :aria-label="t('studio.detail.title')"
     >
       <header class="studio-detail-viewer__header">
         <button
-          v-if="isMobile"
           class="studio-detail-viewer__icon-button studio-detail-viewer__back"
           type="button"
           :aria-label="t('common.back')"
@@ -28,11 +18,9 @@
           ‹
         </button>
 
-        <strong v-if="isMobile" class="studio-detail-viewer__title">
+        <strong class="studio-detail-viewer__title">
           {{ studio.name }}
         </strong>
-
-        <span v-else class="studio-detail-viewer__spacer"></span>
 
         <button
           v-if="canManageStudio"
@@ -81,17 +69,10 @@
           {{ closeLabel }}
         </button>
       </footer>
-
-      <StudioDetailActionFloatMenu
-        :open="actionsOpen && canManageStudio && !isMobile"
-        :disabled="actionsDisabled"
-        @edit="edit"
-        @delete="requestDelete"
-      />
     </article>
 
     <StudioDetailActionBottomSheet
-      :open="actionsOpen && canManageStudio && isMobile"
+      :open="actionsOpen && canManageStudio"
       :disabled="actionsDisabled"
       @close="actionsOpen = false"
       @edit="edit"
@@ -145,12 +126,10 @@ import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import StudioInfoPanel from "@/components/studio/StudioInfoPanel.vue";
 import StudioDetailActionBottomSheet from "@/components/studio/detail/StudioDetailActionBottomSheet.vue";
-import StudioDetailActionFloatMenu from "@/components/studio/detail/StudioDetailActionFloatMenu.vue";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
   studio: {type: Object, default: null},
-  isMobile: {type: Boolean, default: false},
   allowActions: {type: Boolean, default: true},
   actionsDisabled: {type: Boolean, default: false},
   loading: {type: Boolean, default: false},
@@ -178,12 +157,6 @@ watch(
   }
 );
 
-watch(
-  () => props.isMobile,
-  () => {
-    actionsOpen.value = false;
-  }
-);
 
 function close() {
   actionsOpen.value = false;
@@ -234,33 +207,20 @@ function confirmDelete() {
 
 .studio-detail-viewer__panel {
   position: absolute;
+  inset: 0;
   box-sizing: border-box;
   display: flex;
-  min-width: 0;
-  min-height: 0;
-  flex-direction: column;
-  background: var(--studio-surface, #fff);
-  color: var(--studio-text, #111827);
-  overflow: hidden;
-}
-
-.studio-detail-viewer__panel--desktop {
-  top: 50%;
-  left: 50%;
-  width: min(var(--layout-studio-modal-width, 760px), calc(100vw - 32px));
-  max-height: calc(100vh - 48px);
-  transform: translate(-50%, -50%);
-  border-radius: var(--radius-dialog, 8px);
-  box-shadow: var(--shadow-dialog, 0 24px 64px rgba(15, 23, 42, 0.2));
-}
-
-.studio-detail-viewer__panel--mobile {
-  inset: 0;
   width: 100dvw;
   height: 100dvh;
   max-width: none;
   max-height: none;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
   border-radius: 0;
+  background: var(--studio-surface, #fff);
+  color: var(--studio-text, #111827);
+  overflow: hidden;
 }
 
 .studio-detail-viewer__header {
@@ -277,13 +237,6 @@ function confirmDelete() {
   background: var(--studio-surface, #fff);
 }
 
-.studio-detail-viewer__panel--desktop .studio-detail-viewer__header {
-  justify-content: flex-end;
-  min-height: 42px;
-  padding: 8px 10px 0;
-  border-bottom: 0;
-}
-
 .studio-detail-viewer__title {
   min-width: 0;
   flex: 1 1 auto;
@@ -293,9 +246,6 @@ function confirmDelete() {
   font-size: 17px;
 }
 
-.studio-detail-viewer__spacer {
-  flex: 1 1 auto;
-}
 
 .studio-detail-viewer__icon-button {
   display: inline-flex;

@@ -161,10 +161,6 @@
   transform: translateY(105%);
 }
 
-body.desktop-mode .bottom-sheet,
-body.desktop-mode .bottom-sheet-backdrop {
-  display: none;
-}
 body.mobile-mode .empty-stage {
   @include grid-center;
   padding: 18px 16px calc(18px + env(safe-area-inset-bottom));

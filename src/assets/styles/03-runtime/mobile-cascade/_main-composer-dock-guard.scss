@@ -7,7 +7,7 @@
 /*
  * E-2.7 mobile composer structure guard.
  * The mobile main prompt is now rendered in .main-empty-state__composer-dock,
- * outside the desktop .empty-center flow. These rules intentionally do not
+ * outside the legacy .empty-center flow. These rules intentionally do not
  * require body.mobile-mode only; the Vue mobile class on MainEmptyState is the
  * primary ownership marker and body.mobile-mode remains a compatibility guard.
  */
@@ -47,19 +47,11 @@ body.mobile-mode .main-empty-state__composer-dock > * {
 .empty-stage--mobile-main
   .main-empty-state__composer-dock
   .mobile-main-fixed-prompt,
-.empty-stage--mobile-main
-  .main-empty-state__composer-dock
-  .desktop-center-prompt,
 body.mobile-mode .main-empty-state__composer-dock .mobile-main-fixed-prompt,
-body.mobile-mode .main-empty-state__composer-dock .desktop-center-prompt,
 body.mobile-mode
   .chat-container-root--mode-main
   .main-empty-state__composer-dock
-  .mobile-main-fixed-prompt,
-body.mobile-mode
-  .chat-container-root--mode-main
-  .main-empty-state__composer-dock
-  .desktop-center-prompt {
+  .mobile-main-fixed-prompt {
   position: static !important;
   inset: auto !important;
   z-index: auto !important;

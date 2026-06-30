@@ -59,7 +59,7 @@ const props = defineProps({
   attachments: {type: Array, default: () => []},
   hasSelectedTemplatePanel: {type: Boolean, default: false},
   selectedTemplateGroups: {type: Array, default: () => []},
-  activeMobileGroup: {type: String, default: ""},
+  activeMobileGroup: {type: Object, default: null},
   isPromptExpanded: {type: Boolean, default: false},
   promptExpandToggleLabel: {type: String, required: true},
 });

@@ -54,19 +54,8 @@ body.mobile-mode .shared-readonly-icon svg {
   padding-right: 0 !important;
 }
 
-body.desktop-mode .message--user {
-  grid-template-columns: 38px minmax(0, 1fr) !important;
-}
 
-body.desktop-mode .message--user .avatar {
-  display: none !important;
-}
 
-body.desktop-mode .message--user .bubble {
-  grid-column: 2 !important;
-  justify-self: end !important;
-  max-width: min(780px, 100%) !important;
-}
 
 body.mobile-mode .message--user .bubble {
   max-width: 100% !important;

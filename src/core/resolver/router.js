@@ -6,7 +6,7 @@ import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveConversationEntryGuard} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {resolveConversationEntryGuard} from "@/composables/chat/chatRoomActions";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
@@ -244,10 +244,10 @@ function guardSharedRoute(to) {
 }
 
 function guardHiddenConversationEntry(to) {
-  return resolveConversationEntryGuard({to});
+  return resolveConversationEntryGuard(to);
 }
 
-async function guardAuth({to, authAxios}) {
+async function guardAuth(to, axios) {
   const requiresAuth = shouldCheckAuth(to);
 
   debugRouteGuard("navigation", {
@@ -263,14 +263,14 @@ async function guardAuth({to, authAxios}) {
 
   if (!requiresAuth) return true;
 
-  const authResult = await ensureRouteAuthenticated({to, authAxios});
+  const authResult = await ensureRouteAuthenticated(to, axios);
   if (authResult.authenticated) return true;
 
   debugRouteGuard("redirect login-required", authResult);
   return createLoginRequiredRedirect(to, authResult.reason);
 }
 
-function guardVersion({to, appInfo}) {
+function guardVersion(to, appInfo) {
   const platformStore = usePlatformStore();
   if (!platformStore.isAccess) return true;
   if (to.meta?.skipVersionCheck) return true;
@@ -288,7 +288,7 @@ function resolveGuardResult(result) {
 }
 
 function registerRouteGuard(router, appInfo, context = {}) {
-  const {authAxios} = context;
+  const {axios} = context;
 
   router.beforeEach(async (to) => {
     const platformStore = usePlatformStore();
@@ -302,8 +302,8 @@ function registerRouteGuard(router, appInfo, context = {}) {
       guardStreamingNavigation(to),
       guardSharedRoute(to),
       guardHiddenConversationEntry(to),
-      await guardAuth({to, authAxios}),
-      guardVersion({to, appInfo}),
+      await guardAuth(to, axios),
+      guardVersion(to, appInfo),
     ];
 
     for (const result of guardResults) {

@@ -19,8 +19,8 @@ export const LoginRequest = BaseRequest.extend({
 
 export const LoginData = z.object({
   token: z.string().openapi({
-    description: "JWT 토큰",
-    example: "mock.jwt.token",
+    description: "세션 토큰",
+    example: "mock.session.token",
   }),
 });
 

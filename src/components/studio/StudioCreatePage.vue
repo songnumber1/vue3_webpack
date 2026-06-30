@@ -235,7 +235,7 @@ const createFormClass = computed(() => [
   // Keep the panel border/padding/radius owned by Studio SCSS.
   // Tailwind shell classes here should only provide sizing/scroll behavior;
   // adding tw-border/tw-rounded/tw-p-* duplicates the legacy tab panel border,
-  // making the create tabs look thicker on desktop and boxed on mobile.
+  // making the create tabs look thicker on legacy layouts.
   "studio-create-form tw-min-h-0 tw-bg-studio-surface",
   isMobile.value
     ? "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden"
@@ -243,7 +243,7 @@ const createFormClass = computed(() => [
 ]);
 
 const createTabsClass = computed(() => [
-  // The tab header has desktop/mobile-specific SCSS guards for border, spacing,
+  // The tab header has mobile-specific SCSS guards for border, spacing,
   // sticky offsets and active underline. Avoid Tailwind border/negative-margin
   // utilities here so the before_front tab header remains visually identical.
   "studio-create-tabs tw-shrink-0 tw-overflow-x-auto tw-bg-studio-surface",

@@ -11,12 +11,11 @@ import {
 } from "@/constants/apiMode";
 import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
-import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
+import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {
-  applyAuthRequestConfig,
-  handleAuthResponseError,
+  applySessionRequestConfig,
+  handleSessionAuthError,
 } from "@/auth/httpAuthInterceptor";
 import {createId} from "@/utils/id";
 
@@ -47,13 +46,9 @@ function getApiRequestStore() {
 function shouldShowOverlay(policy) {
   try {
     if (!policy.overlay) return false;
-    const systemSettingsStore = useSystemSettingsStore();
     const platformStore = usePlatformStore();
 
-    return isProgressAllowedForCurrentPlatform(
-      systemSettingsStore.settings,
-      platformStore.info
-    );
+    return isProgressAllowedForCurrentPlatform(platformStore.info);
   } catch (_error) {
     // Pinia 스토어 활성화 전 시점 등 초기 부트스트랩 에러 발생 시 예외 크래시 방지를 위해 false 가드 처리
     return false;
@@ -83,7 +78,7 @@ export function createHttpClient() {
   const client = axios.create({
     baseURL: resolveBaseURL(),
     timeout: Number(process.env.VUE_APP_API_TIMEOUT || 15000), // 렌더링 지연 방지를 위해 기본 15초 타임아웃 락인
-    withCredentials: true, // 실제 요청 직전 authPolicy(session/jwt)에 따라 동적으로 보정
+    withCredentials: true, // session cookie 인증 고정
     headers: {
       "Content-Type": "application/json",
     },
@@ -91,7 +86,7 @@ export function createHttpClient() {
 
   // 2. [Request Interceptor] 네트워크 패킷이 브라우저 밖으로 방출되기 직전에 거치는 전처리 관문 개통
   client.interceptors.request.use((config) => {
-    config = applyAuthRequestConfig(config);
+    config = applySessionRequestConfig(config);
     const apiPolicy = resolveApiPolicy(config.apiKey);
     const apiRequestStore = getApiRequestStore();
 
@@ -138,8 +133,7 @@ export function createHttpClient() {
       apiRequestStore.unregisterController(error.config?.__apiRequestKey);
       if (error.config?.__apiOverlay) apiRequestStore.stopOverlay();
 
-      // JWT 모드에서는 access token 만료(401) 시 refresh 후 원 요청을 1회 재시도합니다.
-      return handleAuthResponseError(error, client);
+      return handleSessionAuthError(error, client);
     }
   );
 

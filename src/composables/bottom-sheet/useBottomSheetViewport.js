@@ -4,12 +4,10 @@
  */
 
 import {useEventListener} from "@vueuse/core";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   BOTTOM_SHEET_REFRESH_EVENTS,
   BOTTOM_SHEET_SNAP_RATIO,
   BOTTOM_SHEET_VIEWPORT_REFRESH_DELAY_MS,
-  MOBILE_BREAKPOINT_PX,
 } from "@/platform/viewport/viewportConstants";
 import {
   getSafeAreaBottom,
@@ -33,17 +31,11 @@ import {
 export function createBottomSheetViewport(options) {
   const {props, sheetRef, bodyRef} = options;
 
-  // 피나(Pinia) 시스템 설정 전역 스토어로부터 하드웨어 혹은 어드민 레이어에서 강제 지정한 시트 최소/최대 높이 제한 영역 경계값을 안전하게 조회합니다.
-  function getSystemBottomSheetBounds() {
-    try {
-      const store = useSystemSettingsStore();
-      return {
-        minHeight: Number(store.bottomSheetMinHeight) || props.minHeight, // 시스템 스토어 설정을 1순위로 채택하되, 부재 시 컴포넌트 Props 기본 하한선 백업
-        maxHeight: Number(store.bottomSheetMaxHeight) || 0, // 0은 시스템 차원의 강제 상한선 제한이 없음을 의미
-      };
-    } catch (_error) {
-      return {minHeight: props.minHeight, maxHeight: 0}; // SSR 환경 등 스토어 접근 불가 시 예외 오작동 방어 폴백
-    }
+  function getBottomSheetBounds() {
+    return {
+      minHeight: props.minHeight,
+      maxHeight: props.maxHeight || 0,
+    };
   }
 
   // 모바일 가상 키보드가 팝업되었을 때 실시간으로 압축되는 실제 가시 화면 영역 높이(VisualViewport.height)를 픽셀 단위로 측정합니다.
@@ -51,9 +43,9 @@ export function createBottomSheetViewport(options) {
     return readViewportHeight();
   }
 
-  // 기기의 현재 미디어 해상도 너비가 사전에 정의된 모바일 브레이크포인트(예: 768px) 미만의 모바일 레이아웃 상태인지 진단합니다.
+  // 모바일 전용 앱이므로 BottomSheet는 항상 모바일 viewport 기준으로 계산합니다.
   function isMobileViewport() {
-    return readIsMobileViewport(MOBILE_BREAKPOINT_PX);
+    return readIsMobileViewport();
   }
 
   // 리스트 옵션들을 제외한 바텀 시트 고유의 뼈대 구성품(드래그 놉 영역 + 타이틀 헤더 바 + 테두리 패딩 및 보정 상산값)의 합산 픽셀 높이를 동적 계산합니다.
@@ -121,7 +113,7 @@ export function createBottomSheetViewport(options) {
 
   // 플랫폼 분기 및 뼈대 수치를 기반으로, 이 바텀 시트가 물리적으로 축소될 수 있는 최종 최하한선 절대 높이(픽셀)를 확정합니다.
   function getMinimumSheetHeight() {
-    const {minHeight} = getSystemBottomSheetBounds();
+    const {minHeight} = getBottomSheetBounds();
     if (!isMobileViewport()) return props.minHeight; // 모바일 뷰포트가 아닌 와이드 데스크톱 모드일 때는 Props 원품 설정을 그대로 관철
 
     // 모바일인 경우: 시스템 지정 최소 하한선과 (크롬 영역 높이 + 3개 옵션 보장 높이) 중 더 큰 값을 최종 마지노선 최소 높이로 타협 선택
@@ -135,15 +127,15 @@ export function createBottomSheetViewport(options) {
   function clampHeight(height) {
     const viewportHeight = getViewportHeight(); // 가용 뷰포트 전체 높이 로드
     const preferredMinHeight = getMinimumSheetHeight(); // 유효 최소 보장 하한선 로드
-    const systemBounds = getSystemBottomSheetBounds(); // 시스템 스토어 경계면 데이터 로드
+    const sheetBounds = getBottomSheetBounds();
 
     // [최대 상한선 공식]: '전체 뷰포트 * 허용 최대 배율' 공식에서 노치 디바이스 및 아이폰 하단 홈 바 영역(`SafeAreaBottom`) 픽셀을 추가로 차감하여 안전 상한선 도출
     const ratioMaxHeight =
       Math.floor(viewportHeight * props.maxRatio) - getSafeAreaBottom();
 
     // 시스템 관리자 설정 상한선 규격이 존재하는 경우, 비율 상한선과 비교하여 더 타이트한(작은) 상한선 수치를 최종 타깃으로 확정
-    const configuredMaxHeight = systemBounds.maxHeight
-      ? Math.min(systemBounds.maxHeight, ratioMaxHeight)
+    const configuredMaxHeight = sheetBounds.maxHeight
+      ? Math.min(sheetBounds.maxHeight, ratioMaxHeight)
       : ratioMaxHeight;
 
     const maxHeight = Math.max(preferredMinHeight, configuredMaxHeight); // 최대 상한선이 최소 하한선보다 붕괴되어 작아지는 논리 모순 오류 원천 방어 가드

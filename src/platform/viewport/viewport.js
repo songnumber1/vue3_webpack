@@ -3,14 +3,6 @@
  * @description 브라우저 viewport, VisualViewport, 모바일 키보드, safe-area 관련 런타임 보정 모듈입니다.
  */
 
-import {MOBILE_BREAKPOINT_PX} from "@/platform/viewport/viewportConstants";
-
-/**
- * @type {number}
- * @description 시스템 레이아웃에서 반응형 모바일 크기를 판정하기 위한 기본 중단점(Breakpoint) 픽셀 상수입니다.
- */
-export const DEFAULT_MOBILE_BREAKPOINT_PX = MOBILE_BREAKPOINT_PX;
-
 /**
  * @description 현재 접속한 모바일 브라우저의 엔진 계열(User Agent)을 분석하여 식별 코드를 반환합니다.
  * @returns {"chrome"} 지원 대상 모바일 브라우저 계열 식별자
@@ -58,21 +50,11 @@ export function getViewportSize() {
 }
 
 /**
- * @description 현재 클라이언트 화면이 인가된 중단점 이하의 '모바일 컴팩트 뷰포트' 상태인지 판별합니다.
- * @param {number} [breakpoint=DEFAULT_MOBILE_BREAKPOINT_PX] - 비교 대조군으로 삼을 픽셀 중단점 임계값
- * @returns {boolean} 모바일 해상도 진입 부합 플래그
+ * @description 모바일 전용 앱이므로 브라우저 런타임에서는 항상 모바일 viewport로 취급합니다.
+ * @returns {boolean} 모바일 viewport 플래그
  */
-export function isMobileViewport(breakpoint = DEFAULT_MOBILE_BREAKPOINT_PX) {
-  if (typeof window === "undefined") return false; // SSR 예외 방어
-
-  // [모바일 키보드 인입 충돌 방지] 비주얼 뷰포트 너비와 레이아웃 뷰포트 너비 중 가장 협소하게 압축된 값을 최종 너비로 안전 채택
-  const width = Math.min(
-    window.visualViewport?.width || window.innerWidth || 0,
-    window.innerWidth || window.visualViewport?.width || 0
-  );
-
-  // 유효한 물리 픽셀 해상도이면서 지정된 모바일 임계 범위 이하인지 평가 연산
-  return width > 0 && width <= breakpoint;
+export function isMobileViewport() {
+  return typeof window !== "undefined";
 }
 
 /**
@@ -102,7 +84,7 @@ export function readRootPixelVar(name) {
  * @param {number} [options.fallback=720] - 모든 스캔 수치가 부재할 시 적용할 전역 폴백 디폴트 높이
  * @returns {number} 최종 연산 확정된 물리 뷰포트 높이 값
  */
-export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
+export function getViewportHeight(minHeight = 320, fallback = 720) {
   if (typeof window === "undefined") return fallback;
 
   // 디바이스 기하학 요소 다중 후보 스냅샷 수집
@@ -121,13 +103,13 @@ export function getViewportHeight({minHeight = 320, fallback = 720} = {}) {
 
   if (!candidates.length) return fallback; // 유효 후보 부재 시 사전에 정의된 대안 폴백 반환
 
-  // 현재 모바일 반응형 뷰포트 내부 조건이 충족되었고, 소프트 자판 축소 등으로 visualHeight가 실시간 확보된 경우
+  // 소프트 자판 축소 등으로 visualHeight가 실시간 확보된 경우
   if (isMobileViewport() && visualHeight > 0) {
     // 자판이 화면을 가릴 때 화면이 찌그러지는 문제를 막기 위해 visualHeight와 최소 보증치 중 큰 값을 안전 채택
     return Math.max(visualHeight, minHeight);
   }
 
-  // 데스크톱 혹은 일반적인 레이아웃 상태에서는 범용 window.innerHeight를 우선 순위로 둔 후 예외 방어 조합 처리
+  // 일반적인 레이아웃 상태에서는 범용 window.innerHeight를 우선 순위로 둔 후 예외 방어 조합 처리
   return Math.max(innerHeight || visualHeight || clientHeight, minHeight);
 }
 

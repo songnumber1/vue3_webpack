@@ -7,8 +7,8 @@
  * 스트림 실행 런타임 환경 유형을 정의하는 상수 객체입니다.
  */
 export const STREAM_RUNTIME_TYPES = Object.freeze({
-  /** 데스크톱 브라우저 환경 (`"desktop-browser"`) */
-  DESKTOP_BROWSER: "desktop-browser",
+  /** 모바일 전용 브라우저 환경 (`"mobile-browser"`) */
+  MOBILE_BROWSER: "mobile-browser",
 
   /** 안드로이드 순정 크롬 브라우저 환경 (`"android-chrome"`) */
   ANDROID_CHROME: "android-chrome",

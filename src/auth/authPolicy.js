@@ -1,71 +1,36 @@
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {AUTH_MODES} from "@/auth/authConstants";
 import {resolveStreamRuntimeType} from "@/platform/runtime/runtimeDetector";
 import {STREAM_RUNTIME_TYPES} from "@/platform/runtime/runtimeTypes";
 
-function normalizeMode(value, fallback) {
-  return value === AUTH_MODES.JWT || value === AUTH_MODES.SESSION
-    ? value
-    : fallback;
-}
+export const SESSION_AUTH_URLS = Object.freeze({
+  loginUrl: "/login.do",
+  tempLoginUrl: "/temp-login.do",
+  accessInfoUrl: "/access/info.do",
+  logoutUrl: "/logout.do",
+});
 
-function readSettings() {
-  try {
-    return useSystemSettingsStore().settings || {};
-  } catch (_error) {
-    return {};
-  }
-}
+export const AUTH_CLIENT_PLATFORM_HEADER = "X-Client-Platform";
 
 export function resolveClientPlatform() {
   const runtimeType = resolveStreamRuntimeType();
   if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_WEBVIEW)
     return "android-webview";
   if (runtimeType === STREAM_RUNTIME_TYPES.ANDROID_CHROME) return "mobile-web";
-  return "web";
+  return "mobile-web";
 }
 
-export function resolveAuthPolicy() {
-  const settings = readSettings();
-  const platform = resolveClientPlatform();
-  const mobileLike = platform !== "web";
-  const authMode = normalizeMode(
-    mobileLike ? settings.mobileAuthMode : settings.webAuthMode,
-    mobileLike ? AUTH_MODES.JWT : AUTH_MODES.SESSION
-  );
-  const jwt = authMode === AUTH_MODES.JWT;
-
+export function resolveSessionAuthConfig() {
   return {
-    platform,
-    authMode,
-    isJwt: jwt,
-    isSession: !jwt,
-    withCredentials: jwt ? Boolean(settings.jwtWithCredentials) : true,
-    loginUrl: mobileLike ? settings.mobileLoginUrl : settings.webLoginUrl,
-    tempLoginUrl: settings.tempLoginUrl || "/temp-login.do",
-    accessInfoUrl: settings.accessInfoUrl || "/access/info.do",
-    logoutUrl: settings.logoutUrl || "/logout.do",
-    refreshUrl: settings.jwtRefreshUrl || "/auth/refresh.do",
+    platform: resolveClientPlatform(),
+    withCredentials: true,
+    ...SESSION_AUTH_URLS,
   };
-}
-
-export function isAuthRefreshUrl(url = "") {
-  return String(url).includes("/auth/refresh.do");
 }
 
 export function isAuthPublicUrl(url = "") {
   const value = String(url || "");
-  const policy = resolveAuthPolicy();
   return [
-    policy.loginUrl,
-    policy.tempLoginUrl,
-    policy.logoutUrl,
-    policy.refreshUrl,
-    "/login.do",
-    "/temp-login.do",
-    "/logout.do",
-    "/auth/refresh.do",
-  ]
-    .filter(Boolean)
-    .some((path) => value.includes(path));
+    SESSION_AUTH_URLS.loginUrl,
+    SESSION_AUTH_URLS.tempLoginUrl,
+    SESSION_AUTH_URLS.logoutUrl,
+  ].some((path) => value.includes(path));
 }

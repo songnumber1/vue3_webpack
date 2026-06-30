@@ -5,16 +5,12 @@
 
 import {httpClient} from "@/api/clients/httpClient";
 import {API_KEYS} from "@/constants/apiConfig";
-import {resolveAuthPolicy} from "@/auth/authPolicy";
-import {setTokens, clearTokens} from "@/auth/tokenStore";
-import {
-  adaptAuthApiResponse,
-  adaptAuthTokens,
-} from "@/adapters/authResponseAdapter";
+import {resolveSessionAuthConfig} from "@/auth/authPolicy";
+import {adaptAuthApiResponse} from "@/adapters/authResponseAdapter";
 
 export const authApiLive = {
   async checkLogin() {
-    const response = await httpClient.get(resolveAuthPolicy().loginUrl, {
+    const response = await httpClient.get(resolveSessionAuthConfig().loginUrl, {
       apiKey: API_KEYS.LOGIN,
     });
     return adaptAuthApiResponse(response);
@@ -22,30 +18,23 @@ export const authApiLive = {
 
   async tempLogin(payload = {}) {
     const response = await httpClient.post(
-      resolveAuthPolicy().tempLoginUrl,
+      resolveSessionAuthConfig().tempLoginUrl,
       payload,
       {
         apiKey: API_KEYS.LOGIN,
       }
     );
-    const data = adaptAuthApiResponse(response);
-    const tokens = adaptAuthTokens(data);
-    setTokens(tokens);
-    return data;
+    return adaptAuthApiResponse(response);
   },
 
   async logout() {
-    try {
-      const response = await httpClient.post(
-        resolveAuthPolicy().logoutUrl,
-        undefined,
-        {
-          apiKey: API_KEYS.LOGIN,
-        }
-      );
-      return adaptAuthApiResponse(response);
-    } finally {
-      clearTokens();
-    }
+    const response = await httpClient.post(
+      resolveSessionAuthConfig().logoutUrl,
+      undefined,
+      {
+        apiKey: API_KEYS.LOGIN,
+      }
+    );
+    return adaptAuthApiResponse(response);
   },
 };

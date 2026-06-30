@@ -25,18 +25,15 @@
 
         <main
           class="mobile-settings-body"
-          :class="{'mobile-settings-body--system': activeMenu === 'system'}"
         >
           <MobileSettingsMenuList
             v-if="!activeMenu"
-            :system-settings="systemSettings"
             @select="selectMenuItem"
           />
 
           <section
             v-else
             class="mobile-settings-detail"
-            :class="{'mobile-settings-detail--system': activeMenu === 'system'}"
           >
             <div
               v-if="activeMenu === 'guide'"
@@ -56,12 +53,6 @@
             <NoticeView v-else-if="activeMenu === 'notice'" />
             <PrivacyPolicyView v-else-if="activeMenu === 'privacy'" />
             <PersonalizationView v-else-if="activeMenu === 'personalization'" />
-            <SystemSettingsView
-              v-else-if="activeMenu === 'system'"
-              @close="closePanel"
-              @applied="$emit('applied')"
-            />
-
             <section
               v-else-if="activeMenu === 'chatManagement'"
               class="settings-placeholder-card"
@@ -97,27 +88,18 @@ import {useRouter} from "vue-router";
 import NoticeView from "@/views/settings/NoticeView.vue";
 import PrivacyPolicyView from "@/views/settings/PrivacyPolicyView.vue";
 import PersonalizationView from "@/views/settings/PersonalizationView.vue";
-import SystemSettingsView from "@/views/settings/SystemSettingsView.vue";
 import MobileSettingsLanguageOptions from "@/components/settings/MobileSettingsLanguageOptions.vue";
 import MobileSettingsMenuList from "@/components/settings/MobileSettingsMenuList.vue";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
-import {storeToRefs} from "pinia";
 import ChevronLeftIcon from "@/components/icons/ChevronLeftIcon.vue";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 
 const props = defineProps({
   open: {type: Boolean, default: false},
 });
-const emit = defineEmits(["close", "desktop-open", "applied"]);
+const emit = defineEmits(["close", "applied"]);
 const {t, tm} = useI18n();
 const router = useRouter();
-const systemSettingsStore = useSystemSettingsStore();
-const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 const activeMenu = ref("");
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
-
 const headerTitle = computed(() => resolveMenuTitle(activeMenu.value));
 const guideSections = computed(() => tm("guide.sections"));
 
@@ -127,7 +109,6 @@ function resolveMenuTitle(key) {
   if (key === "notice") return t("common.notice");
   if (key === "privacy") return t("common.privacy");
   if (key === "personalization") return t("common.personalization");
-  if (key === "system") return t("common.system");
   if (key === "chatManagement") return t("settings.chatManagement");
   if (key === "language") return t("common.language");
   return t("common.settings");
@@ -168,16 +149,4 @@ watch(
   }
 );
 
-watch(
-  () => [props.open, isMobile.value],
-  ([open, currentIsMobile]) => {
-    if (!open || currentIsMobile) return;
-    if (!activeMenu.value) {
-      closePanel();
-    } else {
-      emit("desktop-open", activeMenu.value || "personalization");
-      activeMenu.value = "";
-    }
-  }
-);
 </script>

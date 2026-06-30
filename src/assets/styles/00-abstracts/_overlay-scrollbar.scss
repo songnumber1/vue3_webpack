@@ -196,7 +196,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container:not(.app-container--native-scroll-runtime)
   .studio-category-chips,
 .app-container:not(.app-container--native-scroll-runtime)
-  .prompt-template-desktop-options,
 .app-container:not(.app-container--native-scroll-runtime)
   .prompt-template-mobile-options,
 .app-container:not(.app-container--native-scroll-runtime)
@@ -217,7 +216,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container:not(.app-container--native-scroll-runtime)
   .studio-category-chips::-webkit-scrollbar,
 .app-container:not(.app-container--native-scroll-runtime)
-  .prompt-template-desktop-options::-webkit-scrollbar,
 .app-container:not(.app-container--native-scroll-runtime)
   .prompt-template-mobile-options::-webkit-scrollbar,
 .app-container:not(.app-container--native-scroll-runtime)
@@ -238,7 +236,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container:not(.app-container--native-scroll-runtime)
   .studio-category-chips::-webkit-scrollbar-track,
 .app-container:not(.app-container--native-scroll-runtime)
-  .prompt-template-desktop-options::-webkit-scrollbar-track,
 .app-container:not(.app-container--native-scroll-runtime)
   .prompt-template-mobile-options::-webkit-scrollbar-track,
 .app-container:not(.app-container--native-scroll-runtime)
@@ -258,7 +255,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container:not(.app-container--native-scroll-runtime)
   .studio-category-chips::-webkit-scrollbar-thumb,
 .app-container:not(.app-container--native-scroll-runtime)
-  .prompt-template-desktop-options::-webkit-scrollbar-thumb,
 .app-container:not(.app-container--native-scroll-runtime)
   .prompt-template-mobile-options::-webkit-scrollbar-thumb,
 .app-container:not(.app-container--native-scroll-runtime)
@@ -287,7 +283,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container--native-scroll-runtime .mobile-drawer .sidebar-history,
 .app-container--native-scroll-runtime .system-settings-scroll,
 .app-container--native-scroll-runtime .studio-category-chips,
-.app-container--native-scroll-runtime .prompt-template-desktop-options,
 .app-container--native-scroll-runtime .prompt-template-mobile-options,
 .app-container--native-scroll-runtime .attachment-preview-row,
 .app-container--native-scroll-runtime .md-table-wrapper,
@@ -324,7 +319,6 @@ body.dark-mode .os-theme-chat-app,
   .system-settings-scroll::-webkit-scrollbar,
 .app-container--native-scroll-runtime .studio-category-chips::-webkit-scrollbar,
 .app-container--native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar,
 .app-container--native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar,
 .app-container--native-scroll-runtime
@@ -375,7 +369,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container--native-scroll-runtime
   .studio-category-chips::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
@@ -436,7 +429,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container--native-scroll-runtime .mobile-drawer .sidebar-history,
 .app-container--native-scroll-runtime .system-settings-scroll,
 .app-container--native-scroll-runtime .studio-category-chips,
-.app-container--native-scroll-runtime .prompt-template-desktop-options,
 .app-container--native-scroll-runtime .prompt-template-mobile-options,
 .app-container--native-scroll-runtime .attachment-preview-row,
 .app-container--native-scroll-runtime .md-table-wrapper,
@@ -473,7 +465,6 @@ body.dark-mode .os-theme-chat-app,
   .system-settings-scroll::-webkit-scrollbar,
 .app-container--native-scroll-runtime .studio-category-chips::-webkit-scrollbar,
 .app-container--native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar,
 .app-container--native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar,
 .app-container--native-scroll-runtime
@@ -524,7 +515,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container--native-scroll-runtime
   .studio-category-chips::-webkit-scrollbar-track,
 .app-container--native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar-track,
 .app-container--native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar-track,
 .app-container--native-scroll-runtime
@@ -574,7 +564,6 @@ body.dark-mode .os-theme-chat-app,
 .app-container--native-scroll-runtime
   .studio-category-chips::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar-thumb,
 .app-container--native-scroll-runtime
@@ -593,11 +582,6 @@ body.dark-mode .os-theme-chat-app,
   border-radius: initial !important;
 }
 
-.app-container--actual-pc-runtime
-  [data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
-  padding-inline-end: max(12px, env(safe-area-inset-right, 0px)) !important;
-  box-sizing: border-box;
-}
 
 /* Scroll policy final guard v3.
    Runtime classes are mirrored on body/html so teleported panels
@@ -621,7 +605,6 @@ body.native-scroll-runtime .collapsed-recent-list,
 body.native-scroll-runtime .mobile-drawer .sidebar-history,
 body.native-scroll-runtime .system-settings-scroll,
 body.native-scroll-runtime .studio-category-chips,
-body.native-scroll-runtime .prompt-template-desktop-options,
 body.native-scroll-runtime .prompt-template-mobile-options,
 body.native-scroll-runtime .attachment-preview-row,
 body.native-scroll-runtime .md-table-wrapper,
@@ -651,7 +634,6 @@ body.native-scroll-runtime .collapsed-recent-list::-webkit-scrollbar,
 body.native-scroll-runtime .mobile-drawer .sidebar-history::-webkit-scrollbar,
 body.native-scroll-runtime .system-settings-scroll::-webkit-scrollbar,
 body.native-scroll-runtime .studio-category-chips::-webkit-scrollbar,
-body.native-scroll-runtime .prompt-template-desktop-options::-webkit-scrollbar,
 body.native-scroll-runtime .prompt-template-mobile-options::-webkit-scrollbar,
 body.native-scroll-runtime .attachment-preview-row::-webkit-scrollbar,
 body.native-scroll-runtime .md-table-wrapper::-webkit-scrollbar,
@@ -687,7 +669,6 @@ body.native-scroll-runtime
 body.native-scroll-runtime .system-settings-scroll::-webkit-scrollbar-track,
 body.native-scroll-runtime .studio-category-chips::-webkit-scrollbar-track,
 body.native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar-track,
 body.native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar-track,
 body.native-scroll-runtime .attachment-preview-row::-webkit-scrollbar-track,
@@ -721,7 +702,6 @@ body.native-scroll-runtime
 body.native-scroll-runtime .system-settings-scroll::-webkit-scrollbar-thumb,
 body.native-scroll-runtime .studio-category-chips::-webkit-scrollbar-thumb,
 body.native-scroll-runtime
-  .prompt-template-desktop-options::-webkit-scrollbar-thumb,
 body.native-scroll-runtime
   .prompt-template-mobile-options::-webkit-scrollbar-thumb,
 body.native-scroll-runtime .attachment-preview-row::-webkit-scrollbar-thumb,
@@ -736,19 +716,4 @@ body.native-scroll-runtime
   border-radius: initial !important;
 }
 
-body.actual-pc-runtime
-  .studio-workspace
-  .studio-list-area[data-overlay-scrollbar-enhanced="true"],
-body.overlay-scroll-runtime
-  .studio-workspace
-  .studio-list-area[data-overlay-scrollbar-enhanced="true"] {
-  overflow: hidden !important;
-}
 
-body.actual-pc-runtime
-  [data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"],
-body.overlay-scroll-runtime
-  [data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
-  padding-inline-end: max(12px, env(safe-area-inset-right, 0px)) !important;
-  box-sizing: border-box;
-}

@@ -5,19 +5,13 @@
 
 import {defineStore} from "pinia";
 import {resolveDetailedPlatform} from "@/platform/platformDetector";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 /**
- * 하드웨어 장치 설정 스토어의 가상 디바이스 강제 치환 프리셋 상태값을 읽어와
- * 네이티브 플랫폼 계산 함수 측에 하향 상속 연계 주입해주는 중간 추상화 조율 보정식입니다.
+ * 시스템 설정 화면 제거 후 플랫폼 계산에는 실제 런타임 감지값만 주입합니다.
  */
-function withRuntimePlatformOverride(baseAppInfo = {}) {
-  const systemSettingsStore = useSystemSettingsStore();
-
+function withRuntimePlatformPolicy(baseAppInfo = {}) {
   return {
     ...baseAppInfo,
-    platformOverride: systemSettingsStore.platformOverride, // 디버깅용 장치 강제 에뮬레이팅 오버라이드 식별 키
-    mobileBreakpoint: systemSettingsStore.mobileBreakpoint, // 모바일 화면 레이아웃 스위칭용 물리 중단점 수치 해상도 수치
   };
 }
 
@@ -60,7 +54,7 @@ export const usePlatformStore = defineStore("platform", {
      */
     initialize(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform(
-        withRuntimePlatformOverride(baseAppInfo)
+        withRuntimePlatformPolicy(baseAppInfo)
       );
       // 네이티브 브라우저 윈도우 객체의 온라인 가용 플래그 정보를 숏서킷 스캔 동기화 마운트
       this.network.online =
@@ -72,7 +66,7 @@ export const usePlatformStore = defineStore("platform", {
      */
     refresh(baseAppInfo = {}) {
       this.info = resolveDetailedPlatform(
-        withRuntimePlatformOverride({...this.info, ...baseAppInfo})
+        withRuntimePlatformPolicy({...this.info, ...baseAppInfo})
       );
     },
     /**

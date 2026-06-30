@@ -14,35 +14,6 @@
     </button>
     <div class="sidebar-user-actions">
       <button
-        v-if="systemSettings.showThemeButton"
-        class="sidebar-user-action"
-        type="button"
-        :aria-label="t('common.theme')"
-        @click="actions.toggleTheme()"
-      >
-        <span class="theme-glyph"></span>
-      </button>
-      <button
-        v-if="systemSettings.showPlaygroundMenu"
-        class="sidebar-user-action"
-        type="button"
-        :aria-label="t('common.playground')"
-        :title="t('common.playground')"
-        @click="actions.openPlayground()"
-      >
-        <span class="playground-glyph">▦</span>
-      </button>
-      <button
-        v-if="systemSettings.showSwaggerButton"
-        class="sidebar-user-action"
-        type="button"
-        :aria-label="t('common.swagger')"
-        @click="actions.openSwagger()"
-      >
-        <SwaggerDocIcon />
-      </button>
-      <button
-        v-if="systemSettings.showLogoutButton"
         class="sidebar-user-action sidebar-user-action--logout"
         type="button"
         :aria-label="t('common.logout')"
@@ -65,9 +36,7 @@ import {computed, nextTick} from "vue";
 import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
-import SwaggerDocIcon from "@/components/icons/SwaggerDocIcon.vue";
 import {useAuthStore} from "@/stores/authStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
@@ -77,7 +46,6 @@ import {useAppShellStore} from "@/stores/appShellStore";
 import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {authApiLive} from "@/api/live/authApi.live";
 import {ROUTE_NAMES} from "@/constants/routeNames";
-import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
 import {logWarn} from "@/utils/logger";
@@ -88,9 +56,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 const chatStreamStore = useChatStreamStore();
 const navigationStore = useNavigationStore();
-const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
-const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
 const {theme} = useAppContext();
 const appShellStore = useAppShellStore();
@@ -121,10 +87,7 @@ async function toggleTheme() {
     await nextTick();
 
     if (
-      isMermaidRenderingEnabledForPlatform(
-        getRuntimeSystemSettings(),
-        Boolean(shouldUseMobileLayout.value)
-      )
+      isMermaidRenderingEnabledForPlatform()
     ) {
       await renderMermaidInElement(document.querySelector(".message-list"), {
         force: true,

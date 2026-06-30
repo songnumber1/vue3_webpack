@@ -4,7 +4,6 @@
 :root {
   --duration-fast: 160ms;
 
-  --breakpoint-mobile: 768px;
   --layout-sidebar-width: 260px;
   --layout-sidebar-collapsed-width: 68px;
   --layout-message-width: 880px;
@@ -90,12 +89,12 @@
   --shadow-prompt: 0 8px 26px rgba(15, 23, 42, 0.1);
 
   --message-user-radius: 22px;
-  --message-user-desktop-max: min(720px, 74%);
+  --message-user-max: min(720px, 74%);
   --message-user-mobile-max: 88%;
   --message-user-padding: 17px 19px 11px;
   --message-user-mobile-padding: 12px 16px;
   --message-plain-font-size: var(--font-size-fixed-17);
-  --message-plain-desktop-compact-font-size: var(--font-size-fixed-15);
+  --message-plain-compact-font-size: var(--font-size-fixed-15);
   --message-plain-mobile-font-size: var(--font-size-fixed-15);
   --message-plain-line-height: 1.66;
   --message-user-meta: var(--text-muted);
@@ -162,12 +161,12 @@
   --shadow-prompt: 0 8px 26px rgba(0, 0, 0, 0.34);
 
   --message-user-radius: 22px;
-  --message-user-desktop-max: min(720px, 74%);
+  --message-user-max: min(720px, 74%);
   --message-user-mobile-max: 88%;
   --message-user-padding: 17px 19px 11px;
   --message-user-mobile-padding: 12px 16px;
   --message-plain-font-size: var(--font-size-fixed-17);
-  --message-plain-desktop-compact-font-size: var(--font-size-fixed-15);
+  --message-plain-compact-font-size: var(--font-size-fixed-15);
   --message-plain-mobile-font-size: var(--font-size-fixed-15);
   --message-plain-line-height: 1.66;
   --message-user-meta: var(--text-muted);
@@ -180,7 +179,7 @@
   --layout-mobile-assistant-trigger-max: min(72vw, 320px);
   --layout-mobile-drawer-footer-gap: 28px;
   --layout-mobile-message-gutter: 16px;
-  --layout-desktop-message-gutter: 24px;
+  --layout-message-gutter: 24px;
 }
 
 :root[data-theme="light"] {

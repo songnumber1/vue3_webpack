@@ -65,7 +65,7 @@ export async function loadChatMessageRouters(payload = {}, options = {}) {
 /**
  * [원격 API 브릿지 - 서브 추천 컴포넌트] 특정 어시스턴트방 하단에 배치할 단발성 추천 예시 힌트 질문 칩 배열 데이터 목록을 패치합니다.
  */
-export async function loadExamplePrompts({assistantId, studioYN = false} = {}) {
+export async function loadExamplePrompts(assistantId, studioYN = false) {
   const {examplePromptApi} = resolveChatApis();
   const response = await examplePromptApi.getExamplePrompts({
     assistId: assistantId,

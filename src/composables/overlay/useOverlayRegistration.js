@@ -33,7 +33,7 @@ function createOverlayId(kind) {
  * @param {Function|Ref<string>|string} config.mode - 상황별 우선순위나 스태킹 컨텍스트를 다르게 매핑하기 위한 동적 스크리닝 모드 플래그
  * @returns {Object} 템플릿 마크업 영역에서 HTML data-id 속성 등으로 커스텀 바인딩할 수 있는 { overlayId } 결과물
  */
-export function useOverlayRegistration({open, kind, mode}) {
+export function useOverlayRegistration(open, kind, mode) {
   // 1. 전역 오버레이 스택을 관리하는 Pinia/Vuex 마스터 상태 저장소를 인입합니다.
   const overlayStore = useOverlayStore();
 

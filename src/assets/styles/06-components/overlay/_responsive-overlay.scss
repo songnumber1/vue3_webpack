@@ -86,17 +86,13 @@
 }
 
 .menu-pop-enter-active,
-.menu-pop-leave-active,
-.modal-fade-enter-active,
-.modal-fade-leave-active {
+.menu-pop-leave-active {
   transition:
     opacity 160ms ease,
     transform 160ms ease;
 }
 .menu-pop-enter-from,
-.menu-pop-leave-to,
-.modal-fade-enter-from,
-.modal-fade-leave-to {
+.menu-pop-leave-to {
   opacity: 0;
   transform: translateY(-4px);
 }

@@ -22,7 +22,7 @@
 }
 
 .mobile-main-fixed-prompt .prompt-box,
-.desktop-center-prompt .prompt-box {
+.mobile-main-fixed-prompt .prompt-box {
   width: min(100%, var(--layout-prompt-width, 880px));
 }
 
@@ -186,7 +186,7 @@ body.mobile-mode .prompt-box textarea {
   box-shadow: var(--shadow-menu);
 }
 
-.desktop-center-prompt {
+.mobile-main-fixed-prompt {
   order: 3;
 }
 
@@ -379,7 +379,7 @@ body.mobile-mode .mobile-bottom-prompt {
   display: none !important;
 }
 
-body.mobile-mode .desktop-center-prompt {
+body.mobile-mode .mobile-main-fixed-prompt {
   display: block !important;
   width: 100% !important;
 }
@@ -449,10 +449,6 @@ body.mobile-mode .prompt-box--gemini .send-button {
   stroke-linejoin: round;
 }
 
-body.desktop-mode .desktop-center-prompt {
-  width: min(var(--layout-prompt-width, 880px), calc(100vw - 420px));
-}
-
 // -----------------------------------------------------------------------------
 // Voice controls
 // -----------------------------------------------------------------------------
@@ -514,55 +510,8 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   box-shadow: none;
 }
 
-/* Desktop prompt top action row. Applies only to PC layouts; mobile keeps the
+/* Mobile prompt top action row. Applies only to PC layouts; mobile keeps the
    existing textarea-first/toolbar-bottom structure and keyboard rules. */
-body.desktop-mode .prompt-box--desktop-top-actions .prompt-desktop-top-row {
-  display: flex !important;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-width: 0;
-}
-
-body.desktop-mode .prompt-box--desktop-top-actions .prompt-toolbar-desktop-top {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-expand-toggle--desktop-row {
-  position: static !important;
-  inset: auto !important;
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
-body.desktop-mode .prompt-box--desktop-top-actions > .prompt-textarea {
-  padding-right: 0 !important;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions.prompt-box--expanded
-  > .prompt-textarea--expanded {
-  padding-top: 4px !important;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-toolbar-desktop-submit {
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-toolbar-desktop-submit
-  .prompt-action-row {
-  justify-content: flex-end !important;
-}
-
 .prompt-tool-menu .prompt-submenu-arrow,
 .prompt-tool-submenu .prompt-submenu-arrow,
 .bottom-sheet-submenu-arrow {
@@ -688,183 +637,12 @@ body.mobile-mode .prompt-box--expanded .prompt-action-row {
   flex: 0 0 auto;
 }
 
-/* Desktop main: expanded prompt should replace the empty-state content rather
+/* Mobile main: expanded prompt should replace the empty-state content rather
    than remaining after the logo/title/suggestion chips. Keep the sidebar,
    application header, and footer untouched. */
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) {
-  align-items: stretch !important;
-  justify-content: stretch !important;
-  padding: 16px 24px !important;
-}
-
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .empty-center {
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  justify-content: stretch !important;
-  align-items: stretch !important;
-  gap: 0 !important;
-  transform: none !important;
-}
-
-body.desktop-mode
-  .main-empty-state:has(.prompt-wrap--expanded)
-  .main-empty-state__composer-dock {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 auto !important;
-  overflow: hidden !important;
-}
-
-body.desktop-mode
-  .main-empty-state:has(.prompt-wrap--expanded)
-  .empty-assistant-logo,
-body.desktop-mode
-  .main-empty-state:has(.prompt-wrap--expanded)
-  .main-empty-state__logo,
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) h1,
-body.desktop-mode
-  .main-empty-state:has(.prompt-wrap--expanded)
-  .main-empty-state__subtitle,
-body.desktop-mode .main-empty-state:has(.prompt-wrap--expanded) .suggestion-row,
-body.desktop-mode
-  .main-empty-state:has(.prompt-wrap--expanded)
-  .main-empty-state__suggestions {
-  display: none !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-main
-  .desktop-center-prompt.prompt-wrap--expanded,
-body.desktop-mode
-  .chat-container-root--mode-main
-  .mobile-main-fixed-prompt.prompt-wrap--expanded {
-  position: static !important;
-  inset: auto !important;
-  display: flex !important;
-  flex: 1 1 auto !important;
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-main
-  .prompt-wrap--expanded
-  .prompt-box--expanded {
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  max-height: 100% !important;
-}
-
-/* Desktop chat/shared: do not let the expanded composer enlarge the page and
+/* Mobile chat/shared: do not let the expanded composer enlarge the page and
    create browser/workspace scroll. The composer occupies the message area with
    a small, stable header gap and shrinks as the browser height shrinks. */
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded),
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded) {
-  grid-template-rows: auto minmax(0, 1fr) !important;
-  overflow: hidden !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .message-list-shell,
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .message-list-shell,
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .message-list,
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .message-list,
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .typing-row,
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-workspace:has(.chat-composer-slot .prompt-wrap--expanded)
-  .typing-row {
-  display: none !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-composer-slot:has(.prompt-wrap--expanded),
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-composer-slot:has(.prompt-wrap--expanded) {
-  grid-row: 2 !important;
-  align-self: stretch !important;
-  justify-self: center !important;
-  display: flex !important;
-  align-items: stretch !important;
-  width: min(var(--layout-prompt-width, 880px), calc(100% - 40px)) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin: 16px auto 16px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-composer-slot
-  .prompt-wrap--expanded,
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-composer-slot
-  .prompt-wrap--expanded {
-  display: flex !important;
-  flex: 1 1 auto !important;
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-
-body.desktop-mode
-  .chat-container-root--mode-chat
-  .chat-composer-slot
-  .prompt-wrap--expanded
-  .prompt-box--expanded,
-body.desktop-mode
-  .chat-container-root--mode-shared
-  .chat-composer-slot
-  .prompt-wrap--expanded
-  .prompt-box--expanded {
-  width: 100% !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  max-height: 100% !important;
-}
-
 /* Mobile main/chat: expanded prompt is an overlay below the visible mobile
    header. The wrapper owns the available visual viewport; the box fills it.
    This avoids stale app-height calculations when Android Chrome/WebView shows
@@ -927,31 +705,3 @@ body.prompt-input-expanded .scroll-bottom-button {
 }
 
 /* PC top-action prompt corrections. Keep mobile composer unchanged. */
-body.desktop-mode
-  .prompt-box--desktop-top-actions.prompt-box--expanded
-  .prompt-model-menu {
-  top: calc(100% + 10px) !important;
-  bottom: auto !important;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-attachment-preview--desktop-top-actions {
-  order: 2;
-  width: 100%;
-  align-self: stretch;
-}
-
-body.desktop-mode .prompt-box--desktop-top-actions .prompt-desktop-top-row {
-  order: 1;
-}
-
-body.desktop-mode .prompt-box--desktop-top-actions > .prompt-textarea {
-  order: 3;
-}
-
-body.desktop-mode
-  .prompt-box--desktop-top-actions
-  .prompt-toolbar-desktop-submit {
-  order: 4;
-}

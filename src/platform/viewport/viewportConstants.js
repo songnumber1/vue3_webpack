@@ -1,10 +1,8 @@
 /**
  * @file platform/viewport/viewportConstants.js
- * @description 브라우저 viewport, VisualViewport, 모바일 키보드, safe-area 관련 런타임 보정 모듈입니다.
+ * @description 모바일 viewport 보정에 필요한 최소 상수입니다.
  */
 
-export const MOBILE_BREAKPOINT_PX =
-  process.env.VUE_APP_SYSTEM_MOBILE_BREAKPOINT;
 
 export const MIN_VIEWPORT_HEIGHT_PX = 320;
 

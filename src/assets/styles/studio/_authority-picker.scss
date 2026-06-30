@@ -66,7 +66,7 @@ body.mobile-mode
 }
 
 /* --- authority/_authority-picker-03.scss --- */
-/* Studio authority picker follow-up: searchable, paged grid with stable desktop/mobile typography. */
+/* Studio authority picker follow-up: searchable, paged grid with stable mobile typography. */
 .studio-icon--more {
   mask-image: url("../img/studio/more.svg");
   -webkit-mask-image: url("../img/studio/more.svg");
@@ -124,22 +124,7 @@ body.mobile-mode
   transform: translateY(-50%);
   color: var(--studio-muted);
   pointer-events: none;
-}
-
-body.desktop-mode .studio-picker--authority {
-  width: min(780px, calc(100vw - 48px)) !important;
-  max-height: min(680px, calc(100vh - 48px)) !important;
-}
-
-body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
-  min-height: 310px;
-}
-
-body.desktop-mode .studio-picker--authority .studio-picker__footer--authority {
-  padding: 14px 16px !important;
-}
-
-/* --- mobile/_authority-picker-08.scss --- */
+}/* --- mobile/_authority-picker-08.scss --- */
 body.mobile-mode .chat-container-root--mode-studio .studio-picker--authority {
   height: 100% !important;
   max-height: none !important;
@@ -264,86 +249,7 @@ body.mobile-mode
   min-height: 44px;
   font-size: var(--text-size-body-sm, 14px);
   font-weight: 800;
-}
-
-/* --- authority/_authority-picker-09.scss --- */
-/* Authority picker grid sizing fix: avoid mobile horizontal scroll and give desktop description enough room. */
-body.desktop-mode .studio-picker--authority {
-  width: min(860px, calc(100vw - 48px)) !important;
-  max-height: min(
-    var(--layout-studio-authority-max-height, 820px),
-    calc(100vh - 48px)
-  ) !important;
-}
-
-body.desktop-mode .studio-picker--authority .studio-authority-picker__body {
-  min-height: 520px !important;
-}
-
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker__grid-shell {
-  min-height: 420px !important;
-}
-
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__head,
-body.desktop-mode .studio-picker--authority .studio-authority-picker-grid__row {
-  grid-template-columns: 48px minmax(96px, 0.55fr) minmax(360px, 2.45fr) !important;
-  min-width: 0 !important;
-}
-
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__head
-  > div,
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__row
-  > div {
-  min-height: 52px !important;
-  padding: 10px 14px !important;
-}
-
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__head
-  > div:first-child,
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__row
-  > div:first-child {
-  justify-content: center !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__head
-  > div:nth-child(2),
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__row
-  > div:nth-child(2) {
-  justify-content: flex-start !important;
-  white-space: nowrap !important;
-}
-
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__head
-  > div:nth-child(3),
-body.desktop-mode
-  .studio-picker--authority
-  .studio-authority-picker-grid__row
-  > div:nth-child(3) {
-  justify-content: flex-start !important;
-  white-space: normal !important;
-  word-break: keep-all !important;
-  overflow-wrap: anywhere !important;
-}
-
-/* --- mobile/_authority-picker-10.scss --- */
+}/* --- mobile/_authority-picker-10.scss --- */
 body.mobile-mode
   .chat-container-root--mode-studio
   .studio-authority-picker__body {
@@ -532,7 +438,7 @@ body.mobile-mode
 
 /* --- pagination/_authority-picker-11.scss --- */
 /* A-stage hotfix: authority picker pagination belongs to the picker layout, not the share-tab shell.
-   Keep it centered above the footer on both desktop dialogs and mobile picker pages. */
+   Keep it centered above the footer on both mobile panels and mobile picker pages. */
 .studio-picker--authority .studio-authority-pagination {
   flex: 0 0 auto !important;
   display: flex !important;
@@ -570,13 +476,7 @@ body.mobile-mode
 .studio-picker--authority .studio-authority-pagination button:disabled {
   cursor: not-allowed !important;
   opacity: 0.45 !important;
-}
-
-body.desktop-mode .studio-picker--authority .studio-authority-pagination {
-  padding: 12px 16px 16px !important;
-}
-
-/* --- mobile/_authority-picker-12.scss --- */
+}/* --- mobile/_authority-picker-12.scss --- */
 body.mobile-mode
   .chat-container-root--mode-studio
   .studio-picker--authority

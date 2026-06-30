@@ -19,50 +19,6 @@
   border-radius: var(--dialog-option-radius);
 }
 
-.responsive-overlay--desktop {
-  padding: 24px;
-  place-items: center;
-}
-
-.responsive-overlay--desktop .responsive-panel {
-  width: min(720px, 100%);
-  height: auto;
-  max-width: calc(100vw - 48px);
-  max-height: min(var(--layout-dialog-max-height, 760px), calc(100vh - 56px));
-  border: 1px solid var(--dialog-panel-border);
-  border-radius: var(--dialog-radius);
-}
-
-.responsive-overlay--desktop .responsive-panel-header {
-  min-height: var(--dialog-header-min-height);
-  padding: var(--dialog-header-padding);
-}
-
-.responsive-overlay--desktop .responsive-panel-body {
-  padding: var(--dialog-body-padding);
-}
-
-body.desktop-mode .responsive-overlay--desktop.responsive-overlay--mobile,
-body.desktop-mode
-  .responsive-overlay--desktop.responsive-overlay--mobile-dialog {
-  padding: 24px;
-  place-items: center;
-}
-
-body.desktop-mode
-  .responsive-overlay--desktop.responsive-overlay--mobile
-  .responsive-panel,
-body.desktop-mode
-  .responsive-overlay--desktop.responsive-overlay--mobile-dialog
-  .responsive-panel {
-  width: min(720px, 100%);
-  height: auto;
-  max-width: calc(100vw - 48px);
-  max-height: min(var(--layout-dialog-max-height, 760px), calc(100vh - 56px));
-  border: 1px solid var(--dialog-panel-border);
-  border-radius: var(--dialog-radius);
-}
-
 .bottom-sheet-back {
   flex: 0 0 auto;
   width: 38px;
@@ -131,7 +87,7 @@ body.mobile-mode
 /* Step 3-3 stabilization: mobile fullscreen overlays must follow the
    runtime visual viewport variables, not static 100dvh. This keeps notice,
    terms, personalization, and system pages full-screen after PC -> mobile
-   breakpoint changes and while Android/WebView keyboard metrics update. */
+   mobile viewport changes and while Android/WebView keyboard metrics update. */
 body.mobile-mode .responsive-overlay.responsive-overlay--mobile {
   position: fixed !important;
   inset: 0 auto auto 0 !important;
@@ -183,31 +139,9 @@ body.mobile-mode
 
 /* Stage D-2 guard: keep ResponsiveOverlay modes stable after Tailwind shell migration.
    These rules intentionally use data-overlay-mode because the component already
-   computes the final mode from breakpoint + mobileMode. They prevent the known
-   regressions where mobile fullscreen rendered like a desktop modal or where
-   desktop dialogs inherited mobile fullscreen sizing during PC <-> mobile resize. */
-.responsive-overlay[data-overlay-mode="desktop-dialog"] {
-  position: fixed !important;
-  inset: 0 !important;
-  display: grid !important;
-  place-items: center !important;
-  padding: 24px !important;
-  overflow: hidden !important;
-}
-
-.responsive-overlay[data-overlay-mode="desktop-dialog"] .responsive-panel {
-  width: min(720px, 100%) !important;
-  height: auto !important;
-  max-width: calc(100vw - 48px) !important;
-  max-height: min(
-    var(--layout-dialog-max-height, 760px),
-    calc(100vh - 56px)
-  ) !important;
-  margin: auto !important;
-  border: 1px solid var(--dialog-panel-border) !important;
-  border-radius: var(--dialog-radius) !important;
-}
-
+   computes the final mode from mobile overlay mode. They prevent the known
+   regressions where mobile fullscreen rendered like a legacy modal or where
+   mobile panels inherited mobile fullscreen sizing during PC <-> mobile resize. */
 .responsive-overlay[data-overlay-mode="mobile-fullscreen"] {
   position: fixed !important;
   inset: 0 auto auto 0 !important;

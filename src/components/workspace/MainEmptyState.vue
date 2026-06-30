@@ -2,7 +2,7 @@
   <section
     class="empty-stage empty-stage--main main-empty-state tw-flex tw-h-full tw-min-h-0 tw-w-full tw-items-center tw-justify-center tw-overflow-hidden tw-bg-app-chat tw-px-6 tw-py-8"
     :class="{
-      'empty-stage--mobile-main': isMobile,
+      'empty-stage--mobile-main': true,
       'main-empty-state--preview': preview,
       'main-empty-state--composer-expanded': composerExpanded,
     }"
@@ -37,15 +37,11 @@
         {{ subtitle }}
       </p>
       <div class="main-empty-state__composer-dock" aria-label="Main prompt">
-        <slot v-if="!isMobile" name="composer"></slot>
-        <slot v-else name="composer"></slot>
+        <slot name="composer"></slot>
       </div>
       <div
         v-if="normalizedSuggestions.length"
         class="suggestion-row suggestion-row--between main-empty-state__suggestions tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-center tw-gap-2"
-        :class="{
-          'main-empty-state__suggestions--desktop-list': !isMobile,
-        }"
       >
         <button
           v-for="item in normalizedSuggestions"
@@ -77,7 +73,6 @@ import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
 const {t} = useI18n();
 
 const props = defineProps({
-  isMobile: {type: Boolean, default: false},
   preview: {type: Boolean, default: false},
   disableInteractions: {type: Boolean, default: false},
   composerExpanded: {type: Boolean, default: false},
@@ -160,178 +155,8 @@ function handleSuggestionClick(item) {
 }
 
 /*
- * Desktop main page order is title -> composer -> suggestions.
- * Keep this selector global and restricted to the real main route so global
- * suggestion-row grid rules and Studio preview styles cannot move the prompt
- * suggestions back above the composer.
- */
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__center
-) {
-  align-items: center !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .desktop-center-prompt
-) {
-  order: 10 !important;
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__suggestions--desktop-list
-) {
-  order: 20 !important;
-  display: flex !important;
-  grid-template-columns: none !important;
-  flex-direction: column !important;
-  flex-wrap: nowrap !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  margin-top: 4px !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__suggestions--desktop-list
-    .suggestion-chip
-) {
-  width: 100% !important;
-  max-width: 100% !important;
-  justify-content: flex-start !important;
-  text-align: left !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__suggestions--desktop-list
-    .suggestion-chip-text
-) {
-  display: block !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-/*
- * When the PC main composer is expanded, hide the surrounding empty-state
- * content and let the input occupy the same vertical space including the
- * suggestion area. This class-based fallback avoids relying only on :has().
- */
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-) {
-  align-items: stretch !important;
-  justify-content: stretch !important;
-  padding: 16px 24px !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__center
-) {
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  flex: 1 1 auto !important;
-  justify-content: stretch !important;
-  align-items: stretch !important;
-  gap: 0 !important;
-  transform: none !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__logo
-),
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__title
-),
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__subtitle
-),
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .main-empty-state__suggestions
-) {
-  display: none !important;
-}
-
-:global(
-  body.desktop-mode
-    .chat-container-root--mode-main
-    .main-empty-state--composer-expanded:not(.main-empty-state--preview):not(
-      .empty-stage--mobile-main
-    )
-    .desktop-center-prompt.prompt-wrap--expanded
-) {
-  order: 10 !important;
-  display: flex !important;
-  flex: 1 1 auto !important;
-  width: min(var(--layout-prompt-width, 880px), 100%) !important;
-  max-width: var(--layout-prompt-width, 880px) !important;
-  height: 100% !important;
-  min-height: 0 !important;
-  margin: 0 auto !important;
-}
-
-/*
  * Mobile main composer owns a separate dock outside .empty-center.
- * This prevents the prompt from staying in the desktop empty-state flow when
+ * This keeps the prompt out of the legacy empty-state flow when
  * body.mobile-mode, viewportStore, or Tailwind utility timing briefly disagree.
  */
 .empty-stage--mobile-main {
@@ -367,10 +192,7 @@ function handleSuggestionClick(item) {
 
 .empty-stage--mobile-main
   .main-empty-state__composer-dock
-  .mobile-main-fixed-prompt,
-.empty-stage--mobile-main
-  .main-empty-state__composer-dock
-  .desktop-center-prompt {
+  .mobile-main-fixed-prompt {
   position: static !important;
   inset: auto !important;
   box-sizing: border-box;

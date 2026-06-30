@@ -1,6 +1,6 @@
 import {createId} from "@/utils/id";
 
-export function createLocalHistory({text, assistant, model}) {
+export function createLocalHistory(text, assistant, model) {
   const id = createId();
 
   return {

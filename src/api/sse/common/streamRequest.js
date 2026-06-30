@@ -6,41 +6,23 @@ import {
 } from "@/constants/apiMode";
 import {API_KEYS, resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {usePlatformStore} from "@/stores/platformStore";
-import {isProgressAllowedForCurrentPlatform} from "@/composables/progress/progressPolicy";
+import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {logPlatformDebug} from "@/platform/platformDebug";
-import {resolveAuthPolicy} from "@/auth/authPolicy";
-import {getAccessToken} from "@/auth/tokenStore";
-import {refreshAccessTokenOnce} from "@/auth/refreshTokenService";
+import {resolveSessionAuthConfig} from "@/auth/authPolicy";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 import {createId} from "@/utils/id";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 
-export async function resolveSseAuthOptions() {
-  const policy = resolveAuthPolicy();
-  const headers = {
-    "X-Client-Platform": policy.platform,
-    "X-Auth-Mode": policy.authMode,
-  };
-
-  if (policy.isJwt) {
-    let token = getAccessToken();
-    if (!token) {
-      try {
-        token = await refreshAccessTokenOnce();
-      } catch (_error) {
-        token = "";
-      }
-    }
-    if (token) headers.Authorization = `Bearer ${token}`;
-  }
+export function resolveSseAuthOptions() {
+  const policy = resolveSessionAuthConfig();
 
   return {
-    policy,
-    withCredentials: policy.withCredentials,
-    credentials: policy.withCredentials ? "include" : "same-origin",
-    headers,
+    withCredentials: true,
+    credentials: "include",
+    headers: {
+      "X-Client-Platform": policy.platform,
+    },
   };
 }
 
@@ -80,28 +62,7 @@ export async function fetchGenerationResult(requestId) {
     buildOptions(authOptions.headers)
   );
 
-  if (response.status === 403) {
-    resetAuthStateSafely();
-    return null;
-  }
-
-  if (response.status === 401 && authOptions.policy.isJwt) {
-    try {
-      const accessToken = await refreshAccessTokenOnce();
-      response = await fetch(
-        resolveGenerationResultUrl(requestId),
-        buildOptions({
-          ...authOptions.headers,
-          Authorization: `Bearer ${accessToken}`,
-        })
-      );
-      if (response.status === 401 || response.status === 403) {
-        resetAuthStateSafely();
-      }
-    } catch (_error) {
-      return null;
-    }
-  } else if (response.status === 401) {
+  if (response.status === 401 || response.status === 403) {
     resetAuthStateSafely();
     return null;
   }
@@ -112,20 +73,15 @@ export async function fetchGenerationResult(requestId) {
 }
 
 function shouldUseOverlay(policy) {
-  const settings = useSystemSettingsStore();
   const platformStore = usePlatformStore();
 
   const result = Boolean(
-    policy.overlay &&
-    isProgressAllowedForCurrentPlatform(settings.settings, platformStore.info)
+    policy.overlay && isProgressAllowedForCurrentPlatform(platformStore.info)
   );
 
   logPlatformDebug("sse.overlay", {
     result,
     policyOverlay: Boolean(policy.overlay),
-    showPcProgress: false,
-    showMobileProgress: Boolean(settings.showMobileProgress),
-    platformOverride: settings.platformOverride,
     progressPlatform: platformStore.info?.isMobile ? "mobile" : "pc",
   });
 

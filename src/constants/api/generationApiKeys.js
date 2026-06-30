@@ -1,7 +1,6 @@
 /**
  * @file constants/api/generationApiKeys.js
  * @description generation.do 요청 payload 및 일반 generation 결과 원본 key 모음입니다.
- * SSE/OpenAI 호환 스트림 응답 전용 key는 sseResponseKeys.js에서 관리합니다.
  */
 
 export const GENERATION_API_KEYS = Object.freeze({

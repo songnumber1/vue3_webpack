@@ -472,10 +472,6 @@ function rehypeCodeBlockWrapper() {
                 tagName: "div",
                 properties: {className: ["md-code-actions"]},
                 children: [
-                  codeActionButton(
-                    "interpreter",
-                    mdLabel("markdown.codeInterpreter")
-                  ),
                   codeActionButton("copy", mdLabel("markdown.copyCode")),
                 ],
               },

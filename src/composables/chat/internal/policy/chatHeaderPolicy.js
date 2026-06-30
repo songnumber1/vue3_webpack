@@ -5,12 +5,12 @@
 
 import {normalizeText} from "@/utils/normalize";
 
-export function resolveConversationTitle({
+export function resolveConversationTitle(
   isSharedPage = false,
   activeHistoryId = "",
   activeHistory = null,
-  t = null,
-} = {}) {
+  t = null
+) {
   if (isSharedPage) {
     if (typeof t === "function") {
       return t("chat.sharedConversationTitle", {
@@ -23,11 +23,11 @@ export function resolveConversationTitle({
   return normalizeText(activeHistory?.title);
 }
 
-export function resolveWorkspaceAssistantLabel({
+export function resolveWorkspaceAssistantLabel(
   activeSession = null,
   currentAssistant = null,
-  fallbackLabel = "Assistant",
-} = {}) {
+  fallbackLabel = "Assistant"
+) {
   const displayAssistantLabel = normalizeText(
     activeSession?.displayAssistantLabel
   );

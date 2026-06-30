@@ -1,6 +1,3 @@
-import {PLATFORM_OVERRIDE_MODES} from "@/constants/systemSettings";
-import {getRuntimeSystemSettings} from "@/utils/systemSettingsRuntime";
-
 export function isAndroidHistoryRenderRuntime() {
   if (typeof window === "undefined" || typeof navigator === "undefined") {
     return false;
@@ -14,43 +11,6 @@ export function isAndroidHistoryRenderRuntime() {
     bodyClassList?.contains("android-webview") ||
     bodyClassList?.contains("android-chrome")
   );
-}
-
-function isForcedAndroidPlatformOverride() {
-  const override = getRuntimeSystemSettings().platformOverride;
-  return (
-    override === PLATFORM_OVERRIDE_MODES.androidChrome ||
-    override === PLATFORM_OVERRIDE_MODES.androidWebView
-  );
-}
-
-function isCompactHistoryViewport() {
-  if (typeof window === "undefined" || typeof document === "undefined") {
-    return false;
-  }
-
-  if (document.body?.classList?.contains("mobile-mode")) return true;
-
-  const settings = getRuntimeSystemSettings();
-  const breakpoint = Number(settings.mobileBreakpoint);
-  const limit =
-    Number.isFinite(breakpoint) && breakpoint > 0 ? breakpoint : 768;
-  const width = Math.min(
-    window.visualViewport?.width || Number.POSITIVE_INFINITY,
-    window.innerWidth || Number.POSITIVE_INFINITY,
-    document.documentElement?.clientWidth || Number.POSITIVE_INFINITY
-  );
-
-  return Number.isFinite(width) && width > 0 && width <= limit;
-}
-
-export function shouldUseManualHistoryLoadMode() {
-  if (isAndroidHistoryRenderRuntime()) return true;
-
-  // PC 브라우저에서 Android 플랫폼을 강제 설정한 경우에는 실제 Android 런타임이 아니므로
-  // 데스크톱 폭에서는 PC 자동 lazy load를 유지합니다. 단, 모바일 사이즈로 줄여
-  // Android 모바일 UX를 검증할 때는 명시적 버튼 방식을 사용합니다.
-  return isForcedAndroidPlatformOverride() && isCompactHistoryViewport();
 }
 
 function canElementScroll(element) {

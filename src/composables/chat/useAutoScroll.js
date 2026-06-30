@@ -40,7 +40,7 @@ function afterFrame(callback) {
 export function useAutoScroll(targetRef) {
   /**
    * @function scrollToBottom
-   * @description 외부 스트리밍 파이프라인(`useChatSubmit`) 또는 UI 컨트롤러가 실시간 토큰 인입 시점마다 무한 연사 호출하는 물리 스크롤 제어 함수입니다.
+   * @description 외부 스트리밍 파이프라인(`chatSubmitActions`) 또는 UI 컨트롤러가 실시간 토큰 인입 시점마다 무한 연사 호출하는 물리 스크롤 제어 함수입니다.
    * @param {Object} [options={}] - 스크롤 애니메이션 형태 및 가이드 속성 팩 (예: behavior: "smooth" | "auto")
    */
   async function scrollToBottom(options = {}) {

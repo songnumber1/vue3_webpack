@@ -15,7 +15,7 @@ import {
   resolveAuthAccessResult,
   unwrapAuthResponseBody,
 } from "@/adapters/authResponseAdapter";
-import {resolveAuthPolicy} from "@/auth/authPolicy";
+import {resolveSessionAuthConfig} from "@/auth/authPolicy";
 import {API_REQUEST_KEYS as Q} from "@/constants/api/apiRequestKeys";
 import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 import {ROUTE_NAMES} from "@/constants/routeNames";
@@ -51,12 +51,12 @@ function debugAuthGuard(...args) {
 }
 
 /**
- * 백엔드 서버 측에 실제 유저의 토큰/계정 유효성 정보(access/info.do)를 요청합니다.
- * @param {import("axios").AxiosInstance} authAxios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
+ * 백엔드 서버 측에 현재 세션의 계정 유효성 정보(access/info.do)를 요청합니다.
+ * @param {import("axios").AxiosInstance} axios - 유저 인증 수단이 탑재된 가공 완료된 Axios 인스턴스
  * @param {Object} payload - {@link createAccessPayload} 유틸로 가공된 파라미터 본문
  * @returns {Promise<Object>} 서버로부터 전달받은 가공되지 않은 순수 인증 결과 객체
  */
-async function requestAccessInfo(authAxios, payload) {
+async function requestAccessInfo(axios, payload) {
   // 디버그 활성화 상태 시 현재 실서버 인증 API 요청 상태를 로깅합니다.
   debugAuthGuard("request access/info.do", {
     mode: "live",
@@ -64,14 +64,14 @@ async function requestAccessInfo(authAxios, payload) {
     payload,
   });
 
-  // 부트스트랩 단계에서 인증 Axios 인스턴스가 주입되지 않았다면 예외를 발생시킵니다.
-  if (!authAxios) {
-    throw new Error("[authGuard] Auth axios instance is not initialized.");
+  // 부트스트랩 단계에서 세션 Axios 인스턴스가 주입되지 않았다면 예외를 발생시킵니다.
+  if (!axios) {
+    throw new Error("[authGuard] Session axios instance is not initialized.");
   }
 
-  // 준비된 인증용 Axios 인스턴스를 통해 백엔드 엔드포인트로 POST 비동기 요청을 전달합니다.
-  const response = await authAxios.post(
-    resolveAuthPolicy().accessInfoUrl || API_ENDPOINTS.ACCESS_INFO,
+  // 준비된 공통 Axios 인스턴스를 통해 백엔드 엔드포인트로 POST 비동기 요청을 전달합니다.
+  const response = await axios.post(
+    resolveSessionAuthConfig().accessInfoUrl || API_ENDPOINTS.ACCESS_INFO,
     payload
   );
 
@@ -102,12 +102,12 @@ function resetAppBootstrapAfterAuthFailure() {
  * [외부 노출 메인 함수] 목적지 경로로의 전환이 안전한지 검증하고 인증 상태에 따라 전역 스토어를 갱신합니다.
  * @param {Object} context - 라우터 가드 실행 콘텍스트
  * @param {Object} context.to - 이동하고자 하는 목적지 라우트 객체
- * @param {import("axios").AxiosInstance} context.authAxios - 통신에 활용할 인증 Axios 인스턴스
+ * @param {import("axios").AxiosInstance} context.axios - 통신에 활용할 세션 Axios 인스턴스
  * @param {boolean} [context.force=false] - 캐시를 무시하고 무조건 서버에 재검증 API를 쏠지 여부 플래그
  * @returns {Promise<Object>} 인증 최종 성공 여부(`authenticated`) 및 결과 리포트 객체
  * @see {@link useAuthStore} 사용자 인증 상태값을 영구 기록 및 변동시키는 Pinia 전역 스토어
  */
-export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
+export async function ensureRouteAuthenticated(to, axios, force = false) {
   const authStore = useAuthStore();
 
   // 캐시 옵션이 켜져 있고 강제 갱신(force)이 아니며, 이미 한 번 로그인을 체크했고 인증 상태가 유효하다면 API 호출을 생략합니다.
@@ -132,7 +132,7 @@ export async function ensureRouteAuthenticated({to, authAxios, force = false}) {
 
   try {
     // 백엔드 인증 엔진으로부터 계정 정보 데이터를 수집합니다.
-    const accessInfo = await requestAccessInfo(authAxios, payload);
+    const accessInfo = await requestAccessInfo(axios, payload);
     // 수집된 데이터를 프론트엔드가 즉시 읽을 수 있는 플랫한 규격 객체로 가공합니다.
     const result = normalizeAccessResult(accessInfo);
 

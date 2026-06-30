@@ -5,13 +5,13 @@
 
 import {isNativeApp} from "@/core/config/appConfig";
 import {
-  applyAuthRequestConfig,
-  handleAuthResponseError,
+  applySessionRequestConfig,
+  handleSessionAuthError,
   isAuthExpiredStatus,
 } from "@/auth/httpAuthInterceptor";
 
 /**
- * @description 일반 웹(Web) 브라우저 환경에서 작동하는 Axios 요청 인터셉터입니다. 로컬 스토리지에서 인증 토큰을 꺼내 헤더에 주입합니다.
+ * @description 모바일 웹 환경에서 세션 쿠키 요청 헤더를 주입합니다.
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
  * @returns {void}
  */
@@ -19,11 +19,11 @@ import {
  * 계산된 설정 또는 사용자 선택 값을 실제 상태/DOM에 적용합니다.
  */
 function applyWebRequestInterceptor(instance) {
-  instance.interceptors.request.use((config) => applyAuthRequestConfig(config));
+  instance.interceptors.request.use((config) => applySessionRequestConfig(config));
 }
 
 /**
- * @description 하이브리드 네이티브 앱(Native App) 환경에서 작동하는 Axios 요청 인터셉터입니다. 네이티브 브릿지나 수임 정보에서 토큰을 추출하고 앱 환경 메타 헤더를 함께 주입합니다.
+ * @description 하이브리드 네이티브 앱 환경에서 세션 쿠키 요청 헤더와 앱 메타 헤더를 함께 주입합니다.
  * @param {import('axios').AxiosInstance} instance - 인터셉터를 부착할 Axios 인스턴스
  * @param {object} bridge - 안드로이드 네이티브 WebView 자바스크립트 인터페이스 브릿지 객체
  * @param {object} appInfo - 애플리케이션 코어 빌드 및 버전 정보 구조체
@@ -34,7 +34,7 @@ function applyWebRequestInterceptor(instance) {
  */
 function applyNativeRequestInterceptor(instance, bridge, appInfo) {
   instance.interceptors.request.use((config) => {
-    config = applyAuthRequestConfig(config);
+    config = applySessionRequestConfig(config);
 
     // [원격 서버 분석 및 로그 수집용] 현재 구동 중인 앱의 네이티브 메타 데이터를 커스텀 X-헤더 파싱 영역에 영구 동기화
     config.headers["X-App-Version"] = appInfo?.appVersion || ""; // 앱 릴리스 버전 (예: 1.2.0)
@@ -57,7 +57,7 @@ function applyNativeRequestInterceptor(instance, bridge, appInfo) {
 function notifyHttpError(error, errorUI) {
   const status = error?.response?.status; // 인입된 HTTP Status Code 스캔
 
-  // 인증 토큰/세션 만료 혹은 비인가 접근 제한 사태 발생 시
+  // 세션 만료 혹은 비인가 접근 제한 사태 발생 시
   if (isAuthExpiredStatus(status)) {
     errorUI?.notify?.("인증 정보가 만료되었습니다.");
   }
@@ -75,10 +75,9 @@ function applyResponseInterceptor(instance, errorUI) {
 
     // 케이스 B: 백엔드 API 레이어에서 에러 예외 핸들링 판정이 반환되어 400~500대 코드가 인입된 경우
     async (error) => {
-      // 인증 방식별 만료 처리(JWT refresh/retry, Session reset)는 auth strategy에 위임합니다.
-      // JWT refresh 대상 401은 재시도 결과가 최종 실패로 확정된 뒤에만 알림을 표시해 중복/오탐 알림을 방지합니다.
+      // session 만료 상태는 공통 인증 에러 핸들러에서 정리합니다.
       try {
-        return await handleAuthResponseError(error, instance);
+        return await handleSessionAuthError(error);
       } catch (finalError) {
         notifyHttpError(finalError, errorUI);
         return Promise.reject(finalError);
@@ -105,7 +104,7 @@ export function applyInterceptors(instance, appInfo, context = {}) {
     // 앱 전용 인터셉터 가동: 네이티브 브릿지 메모리 노크 버스 및 하드웨어 버전 헤더 세트 주입
     applyNativeRequestInterceptor(instance, bridge, appInfo);
   } else {
-    // 범용 모바일 웹 / 데스크톱 웹 환경: 표준 스토리지 영역을 참조하여 웹 전용 토큰 바인딩 수립
+    // 모바일 웹 환경: 세션 쿠키 요청 헤더 주입
     applyWebRequestInterceptor(instance);
   }
 

@@ -29,7 +29,6 @@
         :language-open="languageOpen"
         :language-options="languageOptions"
         :current-locale="currentLocale"
-        :system-settings="systemSettings"
         @select="select"
         @toggle-language="toggleLanguageOpen"
         @select-locale="selectLocale"
@@ -52,22 +51,18 @@ import UserMenuPanel from "@/components/menu/UserMenuPanel.vue";
 import {setAppLocale} from "@/i18n/appI18n";
 import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useAuthStore} from "@/stores/authStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 
 const emit = defineEmits([
   "notice",
   "privacy",
   "terms",
   "personalization",
-  "system",
   "playground",
   "logout",
 ]);
 const {t, locale} = useI18n();
 const authStore = useAuthStore();
-const systemSettingsStore = useSystemSettingsStore();
 const {userName} = storeToRefs(authStore);
-const {settings: systemSettings} = storeToRefs(systemSettingsStore);
 
 const open = ref(false);
 const languageOpen = ref(false);

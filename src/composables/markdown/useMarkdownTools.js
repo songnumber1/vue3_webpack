@@ -57,28 +57,6 @@ function downloadCsv(csv) {
   );
 }
 
-function isDesktopCodeInterpreterRuntime() {
-  if (typeof document === "undefined") return false;
-  const body = document.body;
-  return (
-    body?.classList?.contains("desktop-mode") &&
-    !body.classList.contains("mobile-mode") &&
-    !body.classList.contains("actual-android-runtime")
-  );
-}
-
-function dispatchCodeInterpreterOpen({code, language}) {
-  if (typeof window === "undefined" || !isDesktopCodeInterpreterRuntime())
-    return;
-  window.dispatchEvent(
-    new CustomEvent("ds-code-interpreter-open", {
-      detail: {
-        code: String(code || ""),
-        language: String(language || "text"),
-      },
-    })
-  );
-}
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
@@ -173,12 +151,6 @@ async function handleCodeAction(button) {
   // 마크다운 파서 및 하이라이터가 소스코드를 가공 처리했으므로 어트리뷰트에 은닉 보관해 둔 순수 텍스트 소스를 우선 수집하되, 없을 시 네이티브 본문 문자열로 백업 수집
   const code = pre?.getAttribute("data-md-code-source") || pre?.innerText || "";
   const action = button.dataset.mdCodeAction;
-
-  if (action === "interpreter") {
-    const language = card?.getAttribute("data-md-code-language") || "text";
-    dispatchCodeInterpreterOpen({code, language});
-    return;
-  }
 
   // 기능 분기: 프로그래밍 코드 블록 원본 그대로 시스템 클립보드에 바인딩
   if (action === "copy" && code) {

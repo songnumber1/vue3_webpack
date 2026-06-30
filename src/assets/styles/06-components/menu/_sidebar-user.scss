@@ -24,10 +24,6 @@
   @include grid-center;
 }
 
-body.desktop-mode .desktop-sidebar .sidebar-user,
-body.desktop-mode .desktop-sidebar .collapsed-user-button {
-  display: none !important;
-}
 body.mobile-mode .sidebar-content--mobile {
   padding-bottom: 0 !important;
 }

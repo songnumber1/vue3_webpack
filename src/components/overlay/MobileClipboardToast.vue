@@ -19,17 +19,14 @@
 
 import {onBeforeUnmount, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
-import {usePlatformStore} from "@/stores/platformStore";
 import {
   APP_CLIPBOARD_COPIED_EVENT,
   APP_TOAST_REQUESTED_EVENT,
-  shouldUseMobileFeedbackChannel,
 } from "@/utils/appFeedback";
 
 const TOAST_DURATION_MS = 2200;
 
 const {t} = useI18n();
-const platformStore = usePlatformStore();
 const visible = ref(false);
 const message = ref("");
 let timerId = 0;
@@ -40,17 +37,12 @@ function clearTimer() {
   timerId = 0;
 }
 
-function shouldShowMobileToast() {
-  return shouldUseMobileFeedbackChannel(platformStore.info || {});
-}
-
 function hideToast() {
   clearTimer();
   visible.value = false;
 }
 
 function showToast(event) {
-  if (!shouldShowMobileToast()) return;
   message.value =
     event.detail?.toastMessage ||
     event.detail?.message ||

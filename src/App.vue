@@ -28,7 +28,6 @@
       </div>
     </section>
     <router-view v-else />
-    <DesktopClipboardNote />
     <MobileClipboardToast />
     <ProgressOverlay />
   </AppLayout>
@@ -42,13 +41,9 @@
 
 import {useI18n} from "vue-i18n";
 import {usePlatformStore} from "@/stores/platformStore";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import ProgressOverlay from "@/components/overlay/ProgressOverlay.vue";
-import DesktopClipboardNote from "@/components/overlay/DesktopClipboardNote.vue";
 import MobileClipboardToast from "@/components/overlay/MobileClipboardToast.vue";
 
 const {t} = useI18n();
 const platformStore = usePlatformStore();
-const systemSettingsStore = useSystemSettingsStore();
-systemSettingsStore.init();
 </script>

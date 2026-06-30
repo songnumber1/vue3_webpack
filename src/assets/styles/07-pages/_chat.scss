@@ -1,43 +1,4 @@
-/* Migrated from src/assets/styles/pages/chat/targeted-chat-polish.css.
-   First Sass migration rule: preserve selectors, declarations, and !important usage. */
 @use "../00-abstracts/mixins" as *;
-body.desktop-mode .message--user {
-  width: 100%;
-  max-width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  grid-template-columns: minmax(0, 1fr);
-}
-body.desktop-mode .message--user .bubble {
-  grid-column: 1;
-  justify-self: end;
-  margin-left: auto;
-  margin-right: 0;
-}
-body.desktop-mode .message--user .bubble-content--plain {
-  font-size: var(--message-plain-desktop-compact-font-size, 15px);
-}
-body.desktop-mode .desktop-sidebar .assistant-option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-body.desktop-mode .desktop-sidebar .assistant-option-main {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-}
-body.desktop-mode .desktop-sidebar .assistant-option-main strong,
-body.desktop-mode .desktop-sidebar .assistant-option-main small {
-  max-width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-body.desktop-mode .desktop-sidebar .option-selected-indicator {
-  flex: 0 0 auto;
-}
 body.mobile-mode .message--user .bubble {
   padding-bottom: 8px;
 }

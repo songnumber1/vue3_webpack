@@ -308,23 +308,8 @@ body.mobile-mode
   line-height: 1.2;
 }
 
-body.desktop-mode .responsive-panel--system-settings,
-body.mobile-mode .responsive-panel--system-settings {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 
-body.desktop-mode .responsive-panel--system-settings .responsive-panel-body,
-body.mobile-mode .responsive-panel--system-settings .responsive-panel-body {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  padding: 0;
-}
 
-body.desktop-mode .responsive-panel--system-settings .system-settings-view,
 body.mobile-mode .responsive-panel--system-settings .system-settings-view {
   width: 100%;
   flex: 1 1 auto;
@@ -332,17 +317,11 @@ body.mobile-mode .responsive-panel--system-settings .system-settings-view {
   min-height: 0;
 }
 
-body.desktop-mode .responsive-panel--system-settings .system-settings-scroll,
 body.mobile-mode .responsive-panel--system-settings .system-settings-scroll {
   overflow-y: auto;
   overscroll-behavior: contain;
 }
 
-body.desktop-mode
-  .responsive-overlay--desktop
-  .responsive-panel--system-settings {
-  height: min(var(--layout-system-dialog-height, 760px), calc(100vh - 56px));
-}
 
 body.mobile-mode
   .responsive-overlay--mobile-dialog
@@ -405,7 +384,6 @@ body.mobile-mode
   box-shadow: 0 -10px 24px rgba(15, 23, 42, 0.06);
 }
 
-body.desktop-mode .system-settings-footer .playground-button,
 body.mobile-mode .system-settings-footer .playground-button {
   min-width: 86px;
   min-height: 44px;
@@ -417,8 +395,6 @@ body.mobile-mode .system-settings-footer .playground-button {
   letter-spacing: -0.01em;
 }
 
-body.desktop-mode .system-settings-footer .playground-button--primary,
-body.desktop-mode .system-settings-footer .system-settings-apply-button,
 body.mobile-mode .system-settings-footer .playground-button--primary,
 body.mobile-mode .system-settings-footer .system-settings-apply-button {
   border-color: var(--primary);
@@ -426,14 +402,6 @@ body.mobile-mode .system-settings-footer .system-settings-apply-button {
   color: #fff;
 }
 
-body.desktop-mode .system-settings-footer .playground-button--primary:hover,
-body.desktop-mode
-  .system-settings-footer
-  .playground-button--primary:focus-visible,
-body.desktop-mode .system-settings-footer .system-settings-apply-button:hover,
-body.desktop-mode
-  .system-settings-footer
-  .system-settings-apply-button:focus-visible,
 body.mobile-mode .system-settings-footer .playground-button--primary:hover,
 body.mobile-mode
   .system-settings-footer
@@ -455,7 +423,6 @@ body.mobile-mode .system-settings-footer .playground-button {
 }
 
 /* Regression guard: system settings uses the inner settings list as the only scroll target. */
-body.desktop-mode .responsive-panel--system-settings .system-settings-view,
 body.mobile-mode .responsive-panel--system-settings .system-settings-view,
 .mobile-settings-detail .system-settings-view {
   height: 100%;
@@ -465,7 +432,6 @@ body.mobile-mode .responsive-panel--system-settings .system-settings-view,
   flex-direction: column;
 }
 
-body.desktop-mode .responsive-panel--system-settings .system-settings-scroll,
 body.mobile-mode .responsive-panel--system-settings .system-settings-scroll,
 .mobile-settings-detail .system-settings-scroll {
   flex: 1 1 0;
@@ -478,30 +444,8 @@ body.mobile-mode .responsive-panel--system-settings .system-settings-scroll,
 }
 
 /* System popup size restoration after D-2 overlay guards.
-   The generic ResponsiveOverlay desktop dialog guard intentionally caps panels at
+   The generic ResponsiveOverlay mobile panel guard intentionally caps panels at
    720px. System settings contains two-column/long form controls, so it needs the
-   wider before_front desktop footprint while keeping the same mobile/fullscreen
+   mobile panel footprint while keeping fullscreen
    behavior. Keep this scoped to the system panel only. */
-body.desktop-mode
-  .responsive-overlay[data-overlay-mode="desktop-dialog"]
-  .responsive-panel--system-settings {
-  width: min(960px, calc(100vw - 64px)) !important;
-  max-width: min(960px, calc(100vw - 64px)) !important;
-  min-width: min(720px, calc(100vw - 64px)) !important;
-  height: min(
-    var(--layout-system-dialog-height, 760px),
-    calc(100vh - 56px)
-  ) !important;
-  max-height: min(
-    var(--layout-system-dialog-height, 760px),
-    calc(100vh - 56px)
-  ) !important;
-}
 
-body.desktop-mode
-  .responsive-overlay[data-overlay-mode="desktop-dialog"]
-  .responsive-panel--system-settings
-  .responsive-panel-body {
-  min-height: 0;
-  overflow: hidden;
-}

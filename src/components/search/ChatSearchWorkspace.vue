@@ -141,10 +141,7 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {
-  applyConversationActiveRoom,
-  createConversationRoute,
-} from "@/composables/chat/internal/policy/chatRoutePolicy";
+import {openChatRoom, clearPendingChatRoom} from "@/composables/chat/chatRoomActions";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
@@ -287,27 +284,20 @@ async function openChat(result) {
 
   ensureSearchResultHistory(result, chatId);
 
-  chatStore.setPendingSelectedChatId(chatId);
-
   const messageId = String(
     result?.messageId || result?.targetMessageId || ""
   ).trim();
   const query = isSearchMode.value && messageId ? {messageId} : undefined;
 
   try {
-    try {
-      await router.push(createConversationRoute({chatId}));
-    } finally {
-      applyConversationActiveRoom({chatId});
-    }
+    const opened = await openChatRoom(router, chatId);
+    if (!opened) return;
 
     if (query) {
       await router.replace({query}).catch(() => {});
     }
   } catch (_error) {
-    if (String(chatStore.pendingSelectedChatId) === chatId) {
-      chatStore.clearPendingSelectedChatId();
-    }
+    clearPendingChatRoom(chatId);
   }
 }
 

@@ -4,8 +4,7 @@
  * E-2 freeze baseline rule:
  * - Do not delete or rename active imports in this file during freeze.
  * - Runtime, platform, dialog, bottom-sheet and Studio/MCP imports are kept
- *   intentionally because they protect PC dialog sizing, Android native scroll,
- *   PC OverlayScrollbars fallback, mobile bottom sheets and Studio/MCP screens.
+ *   intentionally because they protect Android native scroll, mobile bottom sheets and Studio/MCP screens.
  * - Deletion candidates are documented in
  *   doc/tailwind-migration/E2_FREEZE_SCSS_BASELINE_REPORT.md and must be removed
  *   only in E-3 after screen-level verification.
@@ -35,11 +34,9 @@
 @use "./04-platform/android-chrome-webview" as *;
 
 /* 3. Application/chat layout baseline. */
-@use "./05-layout/application-frame" as *;
 @use "./05-layout/header" as *;
 @use "./05-layout/sidebar" as *;
 @use "./05-layout/sidebar-mobile" as *;
-@use "./05-layout/responsive" as *;
 @use "./05-layout/chat-core" as *;
 @use "./05-layout/chat-mobile" as *;
 
@@ -51,7 +48,6 @@
 @use "./06-components/overlay/responsive-overlay" as *;
 @use "./07-pages/guide" as *;
 @use "./07-pages/playground" as *;
-@use "./06-components/menu/topbar-actions" as *;
 @use "./06-components/menu/user-menu" as *;
 @use "./06-components/menu/service-menu" as *;
 @use "./06-components/menu/sidebar-user" as *;
@@ -85,9 +81,7 @@
 /* 7. E-2.5 final mobile cascade guard: keep last so mobile cascade overrides cannot win. */
 @use "./03-runtime/mobile-cascade-guards" as *;
 
-/* 8. PC prompt consistency guard: main/chat prompt border alignment only. */
-@use "./06-components/prompt/prompt-desktop" as *;
-@use "./06-components/code-interpreter/panel" as *;
+/* 8. Mobile prompt expanded guard. */
 @use "./06-components/prompt/prompt-expanded" as *;
 
 /* 9. Final OverlayScrollContainer cascade guard: keep last so page/mobile hotfixes cannot override shared viewport rules. */

@@ -3,7 +3,7 @@
  * @description 브라우저 viewport, VisualViewport, 모바일 키보드, safe-area 관련 런타임 보정 모듈입니다.
  */
 
-import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {
   KEYBOARD_THRESHOLD_PX,
@@ -13,13 +13,13 @@ import {
   VIEWPORT_GUARD_DELAY_MS,
   VIEWPORT_GUARD_EVENTS,
 } from "@/platform/viewport/viewportConstants";
-import {KEYBOARD_MODES} from "@/constants/systemSettings";
-import {useSystemSettingsStore} from "@/stores/systemSettingsStore";
 import {
   getMobileBrowserFamily,
   getViewportSize,
 } from "@/platform/viewport/viewport";
 
+const VIEWPORT_KEYBOARD_MODE = "adjustResize";
+const USE_VIRTUAL_KEYBOARD = true;
 /**
  * [Viewport/Keyboard Guard]
  * 모바일 브라우저는 주소창, 키보드, WebView resize 정책에 따라 innerHeight와 visualViewport 값이 다르게 변합니다.
@@ -122,7 +122,7 @@ function setCssViewportVars(
   const browserFamily = getMobileBrowserFamily();
   const rawMetrics = getKeyboardMetrics(size, baselineHeight);
   const isResizeMode =
-    keyboardMode === KEYBOARD_MODES.adjustResize && resizeEnabled;
+    keyboardMode === "adjustResize" && resizeEnabled;
   const layoutHeight = rawMetrics.layoutHeight;
   const keyboardHeight = isResizeMode ? rawMetrics.keyboardHeight : 0;
   const composerInset = isResizeMode ? rawMetrics.composerInset : 0;
@@ -199,7 +199,7 @@ function removeKeyboardModeVars() {
  *
  * 핵심 역할:
  * 1. resize/orientation/visualViewport/focus 이벤트를 한 곳에서 수집합니다.
- * 2. 모바일 breakpoint와 keyboard mode에 맞춰 CSS 변수를 갱신합니다.
+ * 2. 모바일 keyboard mode에 맞춰 CSS 변수를 갱신합니다.
  * 3. composer, bottom sheet, chat layout이 동일한 viewport 기준을 사용하게 합니다.
  *
  * @param {{onChange?: Function}} options viewport 변경 콜백
@@ -207,7 +207,6 @@ function removeKeyboardModeVars() {
  */
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
-  const systemSettingsStore = useSystemSettingsStore();
   const viewportHeight = ref(0);
   const viewportWidth = ref(0);
   const keyboardOpen = ref(false);
@@ -216,11 +215,7 @@ export function useViewportGuard(options = {}) {
   let resizeFrame = null;
   let mounted = false;
 
-  const isCompact = computed(
-    () =>
-      viewportWidth.value > 0 &&
-      viewportWidth.value <= systemSettingsStore.mobileBreakpoint
-  );
+  const isCompact = computed(() => true);
   // 실제 viewport 측정과 CSS 변수 반영을 수행하는 단일 진입점입니다.
   function apply() {
     if (typeof window === "undefined" || typeof document === "undefined")
@@ -242,21 +237,21 @@ export function useViewportGuard(options = {}) {
     if (!baselineHeight.value)
       baselineHeight.value = stableHeight || size.height;
 
-    const keyboardMode = systemSettingsStore.keyboardMode;
+    const keyboardMode = VIEWPORT_KEYBOARD_MODE;
     const metrics = setCssViewportVars(
       size,
       baselineHeight.value,
       keyboardMode,
-      systemSettingsStore.useVirtualKeyboard
+      USE_VIRTUAL_KEYBOARD
     );
 
-    if (keyboardMode === KEYBOARD_MODES.adjustPan && isCompact.value) {
+    if (keyboardMode === "adjustPan" && isCompact.value) {
       panFocusedElementIntoView();
     }
 
     keyboardOpen.value =
-      keyboardMode === KEYBOARD_MODES.adjustResize &&
-      systemSettingsStore.useVirtualKeyboard &&
+      keyboardMode === "adjustResize" &&
+      USE_VIRTUAL_KEYBOARD &&
       isCompact.value &&
       metrics.keyboardHeight > KEYBOARD_THRESHOLD_PX;
     onChange({
@@ -304,16 +299,6 @@ export function useViewportGuard(options = {}) {
   }
   useEventListener(document, "focusin", scheduleApply, {passive: true});
   useEventListener(document, "focusout", handleFocusOut, {passive: true});
-
-  watch(
-    () => [
-      systemSettingsStore.keyboardMode,
-      systemSettingsStore.useVirtualKeyboard,
-      systemSettingsStore.mobileBreakpoint,
-    ],
-    scheduleApply,
-    {flush: "post"}
-  );
 
   onMounted(() => {
     mounted = true;
