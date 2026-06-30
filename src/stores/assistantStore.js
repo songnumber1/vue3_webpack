@@ -93,20 +93,8 @@ export const useAssistantStore = defineStore("assistant", {
     setExamplePrompts(assistantId, prompts = []) {
       this.examplePromptMap = {
         ...this.examplePromptMap,
-        [assistantId]: prompts, // 동적 키 바인딩 맵 최신화
+        [assistantId]: prompts,
       };
-    },
-    /**
-     * 시스템에서 공급된 프롬프트 추천 가이드 사전 전체를 통째로 스왑 갱신합니다.
-     */
-    setExamplePromptMap(promptMap = {}) {
-      this.examplePromptMap = {...promptMap};
-    },
-    /**
-     * 어드민 백엔드에서 전송된 프롬프트 조립 템플릿 마스터 목록을 배열 버퍼에 영구 동기화합니다.
-     */
-    setPromptTemplates(templates = []) {
-      this.promptTemplates = [...templates];
     },
   },
 });

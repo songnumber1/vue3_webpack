@@ -10,22 +10,7 @@
     /></label>
     <label :class="['studio-category-field', fieldClass]">
       {{ t("studio.basic.category") }}
-      <select
-        v-if="!isMobile"
-        :class="['studio-select-like', 'studio-select-native', controlClass]"
-        :value="draft.category"
-        @change="updateField('category', $event.target.value)"
-      >
-        <option
-          v-for="category in categoryOptions"
-          :key="category.value"
-          :value="category.value"
-        >
-          {{ category.label }}
-        </option>
-      </select>
       <button
-        v-else
         :class="['studio-select-like', selectLikeClass]"
         type="button"
         @click="$emit('open-category')"
@@ -79,9 +64,7 @@
 </template>
 
 <script setup>
-import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 
 const {t} = useI18n();
 
@@ -91,17 +74,12 @@ defineProps({
   categoryOptions: {type: Array, default: () => []},
 });
 const emit = defineEmits(["update-field", "update-prompt", "open-category"]);
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => responsiveLayoutStore.isMobile);
 
 const formStackClass = "studio-form-stack tw-grid tw-min-w-0 tw-gap-3";
 const fieldClass = "tw-grid tw-min-w-0 tw-gap-1.5";
 const controlClass =
   "tw-box-border tw-min-h-[42px] tw-w-full tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-3 tw-py-2.5 tw-font-[inherit] tw-text-inherit";
-const textareaClass = computed(
-  () =>
-    `${controlClass} tw-appearance-none focus:tw-outline-none focus:tw-border-studio-primary ${isMobile.value ? "tw-resize-none" : "tw-resize-y"}`
-);
+const textareaClass = `${controlClass} tw-appearance-none focus:tw-outline-none focus:tw-border-studio-primary tw-resize-none`; 
 const selectLikeClass = `${controlClass} tw-flex tw-items-center tw-justify-between tw-text-left`;
 function updateField(field, value) {
   emit("update-field", field, value);

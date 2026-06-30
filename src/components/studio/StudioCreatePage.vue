@@ -6,7 +6,6 @@
   >
     <header :class="createHeaderClass">
       <button
-        v-if="isMobile"
         class="studio-create-panel__back studio-create-icon-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         :aria-label="t('studio.createPage.back')"
@@ -19,60 +18,7 @@
         class="studio-create-panel__title tw-min-w-0 tw-truncate tw-text-lg tw-font-black"
         >{{ t("studio.createPage.title") }}</strong
       >
-      <div
-        v-if="!isMobile"
-        class="studio-create-actions tw-flex tw-shrink-0 tw-items-center tw-justify-end tw-gap-2 tw-flex-wrap"
-      >
-        <button
-          class="studio-button studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
-          type="button"
-          :aria-label="t('studio.createPage.apply')"
-          :title="t('studio.createPage.apply')"
-          @click="$emit('apply-preview')"
-        >
-          <span
-            class="studio-icon studio-icon--apply"
-            aria-hidden="true"
-          ></span>
-          <span>{{ t("studio.createPage.apply") }}</span>
-        </button>
-        <button
-          class="studio-button studio-create-action-button"
-          type="button"
-          :aria-label="t('studio.createPage.save')"
-          :title="t('studio.createPage.save')"
-        >
-          <span class="studio-icon studio-icon--save" aria-hidden="true"></span>
-          <span>{{ t("studio.createPage.save") }}</span>
-        </button>
-        <button
-          class="studio-button studio-button--primary studio-create-action-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
-          type="button"
-          :aria-label="t('studio.createPage.register')"
-          :title="t('studio.createPage.register')"
-        >
-          <span
-            class="studio-icon studio-icon--register"
-            aria-hidden="true"
-          ></span>
-          <span>{{ t("studio.createPage.register") }}</span>
-        </button>
-        <button
-          class="studio-button studio-create-action-button"
-          type="button"
-          :aria-label="t('studio.createPage.close')"
-          :title="t('studio.createPage.close')"
-          @click="$emit('close')"
-        >
-          <span
-            class="studio-icon studio-icon--close"
-            aria-hidden="true"
-          ></span>
-          <span>{{ t("studio.createPage.close") }}</span>
-        </button>
-      </div>
       <button
-        v-else
         class="studio-create-panel__menu studio-create-icon-button tw-inline-flex tw-shrink-0 tw-items-center tw-justify-center"
         type="button"
         :aria-label="t('studio.createPage.actionMenu')"
@@ -165,7 +111,6 @@
     </div>
 
     <StudioCreateActionBottomSheet
-      v-if="isMobile"
       :open="actionSheetOpen"
       @close="actionSheetOpen = false"
       @apply="handleMobileApply"
@@ -181,7 +126,6 @@ import StudioFeatureTab from "@/components/studio/StudioFeatureTab.vue";
 import StudioShareScopeTab from "@/components/studio/StudioShareScopeTab.vue";
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import StudioPreview from "@/components/studio/StudioPreview.vue";
 import StudioCreateActionBottomSheet from "@/components/studio/create/StudioCreateActionBottomSheet.vue";
 
@@ -201,8 +145,6 @@ defineProps({
   selectedAuthorities: {type: Array, default: () => []},
   allAuthoritiesChecked: {type: Boolean, default: false},
 });
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => responsiveLayoutStore.isMobile);
 
 const createPageRef = ref(null);
 const createFormRef = ref(null);
@@ -212,23 +154,17 @@ const actionSheetOpen = ref(false);
 
 const createPageClass = computed(() => [
   "studio-create-page tw-min-h-0 tw-bg-studio-bg tw-text-studio-text tw-flex tw-flex-col",
-  isMobile.value
-    ? "tw-flex-1 tw-h-full tw-overflow-hidden"
-    : "tw-fixed tw-left-0 tw-right-0 tw-top-appHeader tw-bottom-appFooter tw-z-stickyControl",
+  "tw-flex-1 tw-h-full tw-overflow-hidden",
 ]);
 
 const createHeaderClass = computed(() => [
   "studio-create-panel__head tw-flex tw-shrink-0 tw-items-center tw-justify-between tw-gap-3 tw-border-b tw-border-solid tw-border-studio-border tw-bg-studio-surface",
-  isMobile.value
-    ? "tw-min-h-[calc(52px+env(safe-area-inset-top,0px))] tw-px-2 tw-pt-[env(safe-area-inset-top,0px)] tw-pb-0"
-    : "tw-min-h-[58px] tw-px-[clamp(18px,3vw,32px)] tw-py-0",
+  "tw-min-h-[calc(52px+env(safe-area-inset-top,0px))] tw-px-2 tw-pt-[env(safe-area-inset-top,0px)] tw-pb-0",
 ]);
 
 const createLayoutClass = computed(() => [
   "studio-create-layout tw-flex-1 tw-min-h-0",
-  isMobile.value
-    ? "tw-block tw-overflow-hidden tw-p-3"
-    : "tw-grid tw-grid-cols-[minmax(480px,0.95fr)_minmax(420px,0.85fr)] tw-items-stretch tw-gap-4 tw-overflow-hidden tw-px-[clamp(18px,3vw,32px)] tw-pt-4 tw-pb-[18px]",
+  "tw-block tw-overflow-hidden tw-p-3",
 ]);
 
 const createFormClass = computed(() => [
@@ -237,9 +173,7 @@ const createFormClass = computed(() => [
   // adding tw-border/tw-rounded/tw-p-* duplicates the legacy tab panel border,
   // making the create tabs look thicker on legacy layouts.
   "studio-create-form tw-min-h-0 tw-bg-studio-surface",
-  isMobile.value
-    ? "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden"
-    : "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden",
+  "tw-flex tw-h-full tw-w-full tw-flex-col tw-overflow-hidden",
 ]);
 
 const createTabsClass = computed(() => [

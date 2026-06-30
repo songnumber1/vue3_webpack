@@ -96,29 +96,8 @@
       </button>
     </div>
 
-    <div
-      v-if="activeTab === 'all' && !isMobile"
-      class="studio-category-chips tw-mx-auto tw-mb-3 tw-mt-[-4px] tw-flex tw-w-full tw-max-w-studio tw-shrink-0 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-visible"
-      :aria-label="t('mcp.categoryLabel')"
-    >
-      <button
-        v-for="category in categories"
-        :key="category.value"
-        type="button"
-        class="tw-min-h-8 tw-shrink-0 tw-cursor-pointer tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-[13px] tw-font-bold tw-text-studio-muted hover:tw-bg-studio-controlHover"
-        :class="{
-          active: activeCategory === category.value,
-          'tw-border-studio-primary tw-bg-studio-primary tw-text-app-textOnPrimary':
-            activeCategory === category.value,
-        }"
-        @click="$emit('select-category', category.value)"
-      >
-        {{ category.label }}
-      </button>
-    </div>
-
     <button
-      v-if="activeTab === 'all' && isMobile"
+      v-if="activeTab === 'all'"
       class="studio-mobile-category-select tw-shrink-0 tw-items-center tw-justify-between"
       type="button"
       :aria-label="t('mcp.categorySelect')"
@@ -254,17 +233,14 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import ResourceCard from "@/components/common/catalog/ResourceCard.vue";
 const {t} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const listAreaRef = ref(null);
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => Boolean(responsiveLayoutStore.isMobile));
 
 const props = defineProps({
   searchText: {type: String, default: ""},

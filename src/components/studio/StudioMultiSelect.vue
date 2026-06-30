@@ -1,5 +1,5 @@
 <template>
-  <div ref="rootRef" class="studio-multi-select tw-relative tw-min-w-0">
+  <div class="studio-multi-select tw-relative tw-min-w-0">
     <button
       class="studio-multi-select__trigger tw-flex tw-min-h-[44px] tw-w-full tw-min-w-0 tw-items-center tw-justify-between tw-gap-2 tw-rounded-studio tw-border tw-border-solid tw-border-studio-border tw-bg-studio-surface tw-px-3 tw-text-left tw-text-inherit"
       type="button"
@@ -32,19 +32,7 @@
         aria-hidden="true"
       ></span>
     </button>
-
     <StudioMultiSelectBottomSheet
-      v-if="isMobile"
-      :open="open"
-      :model-value="modelValue"
-      :title="title"
-      :options="options"
-      @close="open = false"
-      @toggle="toggle"
-    />
-
-    <StudioMultiSelectFloatPanel
-      v-else
       :open="open"
       :model-value="modelValue"
       :title="title"
@@ -57,11 +45,8 @@
 
 <script setup>
 import {computed, ref} from "vue";
-import {useOutsideClick} from "@/composables/events/useOutsideClick";
 import {useI18n} from "vue-i18n";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import StudioMultiSelectBottomSheet from "@/components/studio/select/StudioMultiSelectBottomSheet.vue";
-import StudioMultiSelectFloatPanel from "@/components/studio/select/StudioMultiSelectFloatPanel.vue";
 const {t} = useI18n();
 const props = defineProps({
   modelValue: {type: Array, default: () => []},
@@ -70,19 +55,10 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 const open = ref(false);
-const rootRef = ref(null);
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const visibleValues = computed(() => props.modelValue.slice(0, 2));
 const hiddenCount = computed(() =>
   Math.max(0, props.modelValue.length - visibleValues.value.length)
 );
-
-useOutsideClick(rootRef, () => {
-  if (!isMobile.value && open.value) {
-    open.value = false;
-  }
-});
 function toggle(option) {
   const next = props.modelValue.includes(option)
     ? props.modelValue.filter((item) => item !== option)

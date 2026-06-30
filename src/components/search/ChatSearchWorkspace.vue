@@ -1,7 +1,6 @@
 <template>
   <section class="chat-search-workspace" :aria-label="t('chatSearch.title')">
     <ChatHeader
-      v-if="isMobile"
       mode="main"
       :assistant-label="workspaceState.assistantLabel"
       :assistant="workspaceState.assistant"
@@ -144,7 +143,6 @@ import {useChatStore} from "@/stores/chatStore";
 import {openChatRoom, clearPendingChatRoom} from "@/composables/chat/chatRoomActions";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {resolveChatApis} from "@/api/runtime/chatApis";
@@ -161,8 +159,6 @@ const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const router = useRouter();
 const chatStore = useChatStore();
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const injectedWorkspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
@@ -179,7 +175,7 @@ const currentPage = ref(1);
 const debounceTimer = ref(null);
 const listAreaRef = ref(null);
 
-const pageSize = computed(() => (isMobile.value ? 10 : 12));
+const pageSize = computed(() => 10);
 const totalPages = computed(() =>
   Math.max(1, Math.ceil(allResults.value.length / pageSize.value))
 );
@@ -270,7 +266,7 @@ function goToPage(page) {
 }
 
 function createVisiblePages(current, total) {
-  const maxCount = isMobile.value ? 3 : 5;
+  const maxCount = 3;
   const half = Math.floor(maxCount / 2);
   let start = Math.max(1, current - half);
   const end = Math.min(total, start + maxCount - 1);

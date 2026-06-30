@@ -3,35 +3,51 @@
     class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text"
     aria-label="Assistant Studio"
   >
-    <StudioCreateContainer
-      v-if="createOpen"
-      :create-tab="createTab"
-      :draft="draft"
-      :preview="preview"
-      :preview-initial="previewInitial"
-      :preview-prompts="previewPrompts"
-      :selected-category-label="selectedCategoryLabel"
-      :category-options="categoryOptions"
-      :model-options="modelOptions"
-      :rag-options="ragOptions"
-      :mcp-options="mcpOptions"
-      :selected-authorities="selectedAuthorities"
-      :available-authorities="availableAuthorities"
-      :all-authorities-checked="allAuthoritiesChecked"
-      @close="closeCreate"
-      @apply-preview="applyPreview"
-      @update-create-tab="createTab = $event"
-      @update-draft-field="updateDraftField"
-      @update-draft-prompt="updateDraftPrompt"
-      @toggle-model="toggleModel"
-      @update-rags="draft.rags = $event"
-      @update-mcps="draft.mcps = $event"
-      @update-scope="draft.scope = $event"
-      @add-authority="addAuthority"
-      @delete-checked-authorities="deleteCheckedAuthorities"
-      @toggle-all-authorities="toggleAllAuthorities"
-      @toggle-authority="toggleAuthority"
-    />
+    <template v-if="createOpen">
+      <StudioCreatePage
+        :create-tab="createTab"
+        :draft="draft"
+        :preview="preview"
+        :preview-initial="previewInitial"
+        :preview-prompts="previewPrompts"
+        :selected-category-label="selectedCategoryLabel"
+        :category-options="categoryOptions"
+        :model-options="modelOptions"
+        :rag-options="ragOptions"
+        :mcp-options="mcpOptions"
+        :selected-authorities="selectedAuthorities"
+        :all-authorities-checked="allAuthoritiesChecked"
+        @close="closeCreate"
+        @apply-preview="applyPreview"
+        @update-create-tab="createTab = $event"
+        @update-draft-field="updateDraftField"
+        @update-draft-prompt="updateDraftPrompt"
+        @open-category="categorySelectorOpen = true"
+        @toggle-model="toggleModel"
+        @update-rags="draft.rags = $event"
+        @update-mcps="draft.mcps = $event"
+        @update-scope="draft.scope = $event"
+        @open-authority-picker="authorityPickerOpen = true"
+        @delete-checked-authorities="deleteCheckedAuthorities"
+        @toggle-all-authorities="toggleAllAuthorities"
+        @toggle-authority="toggleAuthority"
+      />
+
+      <StudioCategoryPicker
+        :open="categorySelectorOpen"
+        :categories="categoryOptions"
+        :selected-value="draft.category"
+        @close="categorySelectorOpen = false"
+        @select="selectCreateCategory"
+      />
+
+      <StudioAuthorityPicker
+        :open="authorityPickerOpen"
+        :authorities="availableAuthorities"
+        @close="authorityPickerOpen = false"
+        @add="addAuthorityFromPicker"
+      />
+    </template>
 
     <div
       v-else-if="isResolvingEdit"
@@ -39,26 +55,54 @@
       aria-hidden="true"
     ></div>
 
-    <StudioMainWorkspace
-      v-else
-      :search-text="searchText"
-      :active-tab="activeTab"
-      :active-category="activeCategory"
-      :active-category-label="selectedListCategoryLabel"
-      :categories="studioCategoryChips"
-      :studios="pagedStudios"
-      :pages="paginationPages"
-      :current-page="currentPage"
-      :max-page="maxPage"
-      @update-search-text="searchText = $event"
-      @search="runSearch"
-      @update-active-tab="activeTab = $event"
-      @select-category="selectListCategory"
-      @open-create="openCreate"
-      @edit-studio="openEdit"
-      @delete-studio="deleteStudio"
-      @go-page="goPage"
-    />
+    <template v-else>
+      <ChatHeader
+        v-if="!studioDetailOpen"
+        mode="studio"
+        :assistant-label="workspaceState.assistantLabel"
+        :assistant="workspaceState.assistant"
+        conversation-title="Assistant Studio"
+        :theme-name="workspaceState.themeName"
+      />
+
+      <StudioMainPage
+        v-show="!studioDetailOpen"
+        :search-text="searchText"
+        :active-tab="activeTab"
+        :active-category="activeCategory"
+        :active-category-label="selectedListCategoryLabel"
+        :categories="studioCategoryChips"
+        :studios="pagedStudios"
+        :pages="paginationPages"
+        :current-page="currentPage"
+        :max-page="maxPage"
+        @update-search-text="searchText = $event"
+        @search="runSearch"
+        @update-active-tab="activeTab = $event"
+        @select-category="selectListCategory"
+        @open-category-picker="listCategorySelectorOpen = true"
+        @open-create="openCreate"
+        @open-detail="openStudioDetail"
+        @go-page="goPage"
+      />
+
+      <StudioDetailViewer
+        :open="studioDetailOpen"
+        :studio="selectedStudio"
+        :allow-actions="true"
+        @close="closeStudioDetail"
+        @edit="editStudioFromDetail"
+        @delete="deleteStudioFromDetail"
+      />
+
+      <StudioCategoryPicker
+        :open="listCategorySelectorOpen && !studioDetailOpen"
+        :categories="studioCategoryChips"
+        :selected-value="activeCategory"
+        @close="listCategorySelectorOpen = false"
+        @select="selectListCategoryFromPicker"
+      />
+    </template>
   </section>
 </template>
 
@@ -68,11 +112,15 @@
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, inject, onMounted, reactive, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
-import StudioMainWorkspace from "@/components/studio/StudioMainWorkspace.vue";
-import StudioCreateContainer from "@/components/studio/StudioCreateContainer.vue";
+import ChatHeader from "@/components/chat/ChatHeader.vue";
+import StudioMainPage from "@/components/studio/StudioMainPage.vue";
+import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
+import StudioCreatePage from "@/components/studio/StudioCreatePage.vue";
+import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
+import StudioAuthorityPicker from "@/components/studio/StudioAuthorityPicker.vue";
 import {studioApiLive} from "@/api/live/studioApi.live";
 import {
   adaptStudioAuthorityList,
@@ -81,11 +129,24 @@ import {
 } from "@/adapters/studioResponseAdapter";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatStateContext";
+import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
+import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 
 const {t, locale} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const studioRuntimeStore = useStudioRuntimeStore();
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
+const workspaceState = computed(
+  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+);
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -95,6 +156,16 @@ const pageSize = 6;
 const submittedSearchText = ref("");
 const createOpen = ref(false);
 const createTab = ref("basic");
+const categorySelectorOpen = ref(false);
+const authorityPickerOpen = ref(false);
+const listCategorySelectorOpen = ref(false);
+const selectedStudio = ref(null);
+const studioDetailOpen = computed(() => Boolean(selectedStudio.value));
+useOverlayBackClose({
+  isOpen: studioDetailOpen,
+  close: closeStudioDetail,
+  historyValue: "studio-detail",
+});
 const editingStudioId = ref(null);
 const isResolvingEdit = ref(false);
 
@@ -173,26 +244,9 @@ const pagedStudios = computed(() =>
     currentPage.value * pageSize
   )
 );
-const paginationPages = computed(() => {
-  const last = maxPage.value;
-  if (last <= 7)
-    return Array.from({length: last}, (_, index) => ({
-      key: `p${index + 1}`,
-      value: index + 1,
-      label: String(index + 1),
-    }));
-  const pages = [{key: "p1", value: 1, label: "1"}];
-  if (currentPage.value > 4)
-    pages.push({key: "dots-start", label: "...", ellipsis: true});
-  const start = Math.max(2, currentPage.value - 1);
-  const end = Math.min(last - 1, currentPage.value + 1);
-  for (let page = start; page <= end; page += 1)
-    pages.push({key: `p${page}`, value: page, label: String(page)});
-  if (currentPage.value < last - 3)
-    pages.push({key: "dots-end", label: "...", ellipsis: true});
-  pages.push({key: `p${last}`, value: last, label: String(last)});
-  return pages;
-});
+const paginationPages = computed(() =>
+  createStudioPaginationPages(currentPage.value, maxPage.value)
+);
 const previewInitial = computed(() =>
   (preview.name || "A").slice(0, 1).toUpperCase()
 );
@@ -202,6 +256,7 @@ const previewPrompts = computed(() =>
 
 watch(activeTab, () => {
   currentPage.value = 1;
+  if (activeTab.value !== "all") listCategorySelectorOpen.value = false;
 });
 watch(activeCategory, () => {
   currentPage.value = 1;
@@ -723,6 +778,24 @@ function runSearch() {
 function selectListCategory(value) {
   activeCategory.value = value;
 }
+function selectListCategoryFromPicker(value) {
+  selectListCategory(value);
+  listCategorySelectorOpen.value = false;
+}
+function openStudioDetail(studio) {
+  selectedStudio.value = normalizeStudioDetail(studio);
+}
+function closeStudioDetail() {
+  selectedStudio.value = null;
+}
+function editStudioFromDetail(studio) {
+  selectedStudio.value = null;
+  openEdit(studio);
+}
+function deleteStudioFromDetail(studio) {
+  selectedStudio.value = null;
+  deleteStudio(studio);
+}
 function goPage(page) {
   currentPage.value = Math.min(maxPage.value, Math.max(1, page));
 }
@@ -820,6 +893,15 @@ function updateDraftField(field, value) {
 }
 function updateDraftPrompt(index, value) {
   draft.prompts[index] = value;
+}
+function selectCreateCategory(value) {
+  updateDraftField("category", value);
+  categorySelectorOpen.value = false;
+}
+function addAuthorityFromPicker(auth) {
+  const items = Array.isArray(auth) ? auth : [auth];
+  items.forEach(addAuthority);
+  authorityPickerOpen.value = false;
 }
 function toggleModel(value) {
   draft.models = draft.models.includes(value)

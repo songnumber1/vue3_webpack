@@ -9,7 +9,7 @@ import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useNavigationStore} from "@/stores/navigationStore";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {normalizeId as normalizeChatRouteId} from "@/utils/normalize";
 import {normalizeChatId} from "@/utils/normalize";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/activeConversationCleanupRegistry";
@@ -154,10 +154,7 @@ export function clearConversationNavigationState() {
 }
 
 export function closeConversationNavigationPanels() {
-  const navigationStore = useNavigationStore();
-  navigationStore.closeTransientPanels?.();
-  navigationStore.setDrawerOpen?.(false);
-  navigationStore.setCollapsedRecentOpen?.(false);
+  useAppShellStore().closeTransientShellPanels?.();
 }
 
 export function resetConversationStateForRouteChange() {

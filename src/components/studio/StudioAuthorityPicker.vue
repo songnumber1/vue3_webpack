@@ -12,7 +12,6 @@
     >
       <header class="studio-picker__head studio-picker__head--authority">
         <button
-          v-if="isMobile"
           class="studio-picker__back"
           type="button"
           :aria-label="t('common.back')"
@@ -178,7 +177,6 @@
 <script setup>
 import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 const {t} = useI18n();
@@ -189,13 +187,11 @@ const props = defineProps({
   authorities: {type: Array, default: () => []},
 });
 const emit = defineEmits(["close", "add"]);
-const responsiveLayoutStore = useResponsiveLayoutStore();
-const isMobile = computed(() => responsiveLayoutStore.isMobile);
 const page = ref(1);
 const selectedIds = ref([]);
 const searchText = ref("");
 const gridShellRef = ref(null);
-const pageSize = computed(() => (isMobile.value ? 8 : 8));
+const pageSize = 8;
 const normalizedSearchText = computed(() =>
   searchText.value.trim().toLowerCase()
 );
@@ -209,12 +205,12 @@ const filteredAuthorities = computed(() => {
   });
 });
 const maxPage = computed(() =>
-  Math.max(1, Math.ceil(filteredAuthorities.value.length / pageSize.value))
+  Math.max(1, Math.ceil(filteredAuthorities.value.length / pageSize))
 );
 const pagedAuthorities = computed(() =>
   filteredAuthorities.value.slice(
-    (page.value - 1) * pageSize.value,
-    page.value * pageSize.value
+    (page.value - 1) * pageSize,
+    page.value * pageSize
   )
 );
 const pageItems = computed(() =>
@@ -265,7 +261,7 @@ watch(
     }
   }
 );
-watch([filteredAuthorities, pageSize], () => {
+watch(filteredAuthorities, () => {
   if (page.value > maxPage.value) page.value = maxPage.value;
 });
 watch(searchText, () => {

@@ -3,7 +3,23 @@
     class="studio-workspace tw-flex tw-h-full tw-min-h-0 tw-w-full tw-min-w-0 tw-flex-col tw-overflow-hidden tw-bg-studio-bg tw-text-studio-text"
     aria-label="Connector Store"
   >
-    <McpMainWorkspace
+    <ChatHeader
+      v-if="!mobileDetailMcp"
+      mode="studio"
+      :assistant-label="workspaceState.assistantLabel"
+      :assistant="workspaceState.assistant"
+      conversation-title="Connector Store"
+      :theme-name="workspaceState.themeName"
+    />
+
+    <McpMobileDetailPage
+      v-if="mobileDetailMcp"
+      :mcp="mobileDetailMcp"
+      @close="closeDetail"
+    />
+
+    <McpMainPage
+      v-else
       :search-text="searchText"
       :active-tab="activeTab"
       :active-category="activeCategory"
@@ -19,8 +35,18 @@
       @update-active-tab="activeTab = $event"
       @select-category="selectListCategory"
       @update-created-only="createdOnly = $event"
+      @open-category-picker="categorySelectorOpen = true"
       @open-create="openReadyDialog"
+      @open-detail="openDetail"
       @go-page="goPage"
+    />
+
+    <StudioCategoryPicker
+      :open="categorySelectorOpen"
+      :categories="mcpCategoryChips"
+      :selected-value="activeCategory"
+      @close="categorySelectorOpen = false"
+      @select="selectListCategoryFromPicker"
     />
 
     <div
@@ -59,13 +85,29 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, inject, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
-import McpMainWorkspace from "@/components/mcp/McpMainWorkspace.vue";
+import ChatHeader from "@/components/chat/ChatHeader.vue";
+import McpMainPage from "@/components/mcp/McpMainPage.vue";
+import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
+import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {mcpApiLive} from "@/api/live/mcpApi.live";
 import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatStateContext";
+import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
+import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 
 const {t, locale} = useI18n();
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
+);
+const workspaceState = computed(
+  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+);
 
 const searchText = ref("");
 const activeTab = ref("all");
@@ -75,6 +117,14 @@ const currentPage = ref(1);
 const pageSize = 6;
 const submittedSearchText = ref("");
 const readyDialogOpen = ref(false);
+const mobileDetailMcp = ref(null);
+const mcpDetailOpen = computed(() => Boolean(mobileDetailMcp.value));
+useOverlayBackClose({
+  isOpen: mcpDetailOpen,
+  close: closeDetail,
+  historyValue: "mcp-detail",
+});
+const categorySelectorOpen = ref(false);
 const usesDefaultMcpData = ref(true);
 const mcpCategoryOptions = ref(createDefaultCategoryOptions());
 const mcps = ref(createDefaultMcps());
@@ -112,29 +162,13 @@ const pagedMcps = computed(() =>
     currentPage.value * pageSize
   )
 );
-const paginationPages = computed(() => {
-  const last = maxPage.value;
-  if (last <= 7)
-    return Array.from({length: last}, (_, index) => ({
-      key: `p${index + 1}`,
-      value: index + 1,
-      label: String(index + 1),
-    }));
-  const pages = [{key: "p1", value: 1, label: "1"}];
-  if (currentPage.value > 4)
-    pages.push({key: "dots-start", label: "...", ellipsis: true});
-  const start = Math.max(2, currentPage.value - 1);
-  const end = Math.min(last - 1, currentPage.value + 1);
-  for (let page = start; page <= end; page += 1)
-    pages.push({key: `p${page}`, value: page, label: String(page)});
-  if (currentPage.value < last - 3)
-    pages.push({key: "dots-end", label: "...", ellipsis: true});
-  pages.push({key: `p${last}`, value: last, label: String(last)});
-  return pages;
-});
+const paginationPages = computed(() =>
+  createStudioPaginationPages(currentPage.value, maxPage.value)
+);
 
 watch(activeTab, () => {
   currentPage.value = 1;
+  if (activeTab.value !== "all") categorySelectorOpen.value = false;
 });
 watch(activeCategory, () => {
   currentPage.value = 1;
@@ -493,6 +527,19 @@ function runSearch() {
 
 function selectListCategory(value) {
   activeCategory.value = value;
+}
+
+function selectListCategoryFromPicker(value) {
+  selectListCategory(value);
+  categorySelectorOpen.value = false;
+}
+
+function openDetail(mcp) {
+  mobileDetailMcp.value = mcp;
+}
+
+function closeDetail() {
+  mobileDetailMcp.value = null;
 }
 
 function goPage(page) {

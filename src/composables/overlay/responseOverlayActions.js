@@ -4,9 +4,8 @@
  */
 
 import {computed, ref, unref, watch} from "vue";
-import {useAppOverlayBackStore} from "@/stores/appOverlayBackStore";
-import {useNavigationStore} from "@/stores/navigationStore";
-import {useViewportStore} from "@/stores/viewportStore";
+import {useOverlayStore} from "@/stores/overlayStore";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {resolveBlocked} from "@/utils/interactionGuard";
 
 const RESPONSE_OVERLAY_HISTORY_KEY = "__responseOverlayBack";
@@ -64,7 +63,7 @@ function stopRouterPopStateSideEffects(event) {
 
 function resolveOverlayBackStore() {
   if (!overlayBackStoreInstance) {
-    overlayBackStoreInstance = useAppOverlayBackStore();
+    overlayBackStoreInstance = useOverlayStore();
   }
   return overlayBackStoreInstance;
 }
@@ -72,7 +71,7 @@ function resolveOverlayBackStore() {
 function shouldUseMobileBack() {
   const injectedMobile = unref(configuredIsMobile.value);
   if (typeof injectedMobile === "boolean") return injectedMobile;
-  return Boolean(useViewportStore()?.isCompact);
+  return true;
 }
 
 function markChatRouteLoadSuppressedIfNeeded() {
@@ -292,7 +291,7 @@ export function openResponseOverlay(
   if (!RESPONSE_OVERLAY_TYPE_VALUES.includes(type)) return;
   if (!ignoreBlock && resolveBlocked(blocked)) return;
 
-  useNavigationStore().setDrawerOpen?.(false);
+  useAppShellStore().setDrawerOpen(false);
   responseOverlayActiveType.value = type;
   resolveOverlayBackStore().setActiveOverlayType(type);
   pushOverlayHistoryOnce(type);

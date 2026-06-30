@@ -8,6 +8,7 @@ import {defineStore} from "pinia";
 export const useAppShellStore = defineStore("appShell", {
   state: () => ({
     themeName: "light",
+    drawerOpen: false,
     assistantSheetOpen: false,
   }),
   actions: {
@@ -15,14 +16,18 @@ export const useAppShellStore = defineStore("appShell", {
       if (!nextTheme) return;
       this.themeName = nextTheme;
     },
+    setDrawerOpen(value) {
+      this.drawerOpen = Boolean(value);
+    },
+    closeTransientShellPanels() {
+      this.drawerOpen = false;
+      this.assistantSheetOpen = false;
+    },
     openAssistantSheet() {
       this.assistantSheetOpen = true;
     },
     closeAssistantSheet() {
       this.assistantSheetOpen = false;
-    },
-    toggleAssistantSheet() {
-      this.assistantSheetOpen = !this.assistantSheetOpen;
     },
   },
 });

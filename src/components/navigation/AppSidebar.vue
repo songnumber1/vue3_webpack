@@ -21,7 +21,6 @@
           <SidebarAssistantSelector
             :assistants="visibleAssistants"
             :selected-assistant-id="selectedAssistantId"
-            mobile
             @toggle="openAssistantSelector"
           />
           <div class="sidebar-top-actions tw-flex tw-items-center tw-gap-2">
@@ -110,8 +109,8 @@ import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFoote
 import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
 import {
@@ -134,12 +133,12 @@ const emit = defineEmits(["history-menu-action"]);
 const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
-const navigationStore = useNavigationStore();
+const appShellStore = useAppShellStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
   storeToRefs(chatStore);
-const {drawerOpen} = storeToRefs(navigationStore);
+const {drawerOpen} = storeToRefs(appShellStore);
 
 const assistantMenuOpen = ref(false);
 const historyMenuOpen = ref(false);
@@ -201,11 +200,11 @@ function getHistoryId(item) {
 }
 
 function closeSidebarNavigationPanels() {
-  navigationStore.closeTransientPanels();
+  appShellStore.closeTransientShellPanels();
 }
 
 function closeNavigationDrawer() {
-  navigationStore.setDrawerOpen(false);
+  appShellStore.setDrawerOpen(false);
 }
 
 function closeAssistantSelector() {
@@ -327,8 +326,8 @@ async function selectHistory(item) {
   }
 
   try {
-    navigationStore.closeTransientPanels();
-    navigationStore.setDrawerOpen(false);
+    appShellStore.closeTransientShellPanels();
+    appShellStore.setDrawerOpen(false);
     await nextTick();
     return await enterChatRoom(router, historyId);
   } catch (_error) {

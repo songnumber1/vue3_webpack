@@ -1,13 +1,3 @@
-/**
- * @file stores/promptControlStore.js
- * @description PromptComposer 하위 메뉴/바텀시트 열림 상태와 입력 도구 설정을 Pinia에서 관리합니다.
- *
- * 2단계 리팩토링 기준:
- * - UI 구조와 props/emit 연결은 변경하지 않습니다.
- * - PC/모바일 direct import 분리를 위해 Prompt Tool 상태를 chatStore에서 분리합니다.
- * - 기존 chatStore API는 호환 proxy로 유지합니다.
- */
-
 import {defineStore} from "pinia";
 import {
   DEFAULT_PROMPT_TOOL_SETTINGS,
@@ -38,6 +28,21 @@ function normalizePromptText(value) {
   return typeof value === "string" ? value : String(value || "");
 }
 
+function getActivePromptKey(state) {
+  return normalizePromptToolSettingsKey(state.activePromptToolSettingsKey);
+}
+
+function updatePromptToolSettings(settingsMap, key, updater) {
+  const current = clonePromptToolSettings(
+    settingsMap[key] || DEFAULT_PROMPT_TOOL_SETTINGS
+  );
+  updater(current);
+  return {
+    ...settingsMap,
+    [key]: current,
+  };
+}
+
 export const usePromptControlStore = defineStore("promptControl", {
   state: () => ({
     activePromptMenuMap: {},
@@ -51,25 +56,15 @@ export const usePromptControlStore = defineStore("promptControl", {
     hasAnyPromptMenuOpen: (state) =>
       Object.values(state.activePromptMenuMap || {}).some(Boolean),
     activePromptToolSettings: (state) => {
-      const key = normalizePromptToolSettingsKey(
-        state.activePromptToolSettingsKey
-      );
+      const key = getActivePromptKey(state);
       return clonePromptToolSettings(
         state.promptToolSettingsMap[key] || DEFAULT_PROMPT_TOOL_SETTINGS
       );
     },
-    activePromptText: (state) => {
-      const key = normalizePromptToolSettingsKey(
-        state.activePromptToolSettingsKey
-      );
-      return normalizePromptText(state.promptTextMap[key]);
-    },
-    activePromptExpanded: (state) => {
-      const key = normalizePromptToolSettingsKey(
-        state.activePromptToolSettingsKey
-      );
-      return Boolean(state.promptExpandedMap[key]);
-    },
+    activePromptText: (state) =>
+      normalizePromptText(state.promptTextMap[getActivePromptKey(state)]),
+    activePromptExpanded: (state) =>
+      Boolean(state.promptExpandedMap[getActivePromptKey(state)]),
   },
   actions: {
     getActivePromptMenu(scopeId) {
@@ -108,9 +103,6 @@ export const usePromptControlStore = defineStore("promptControl", {
         [key]: nextValue,
       };
     },
-    isPromptMobileSheet(scopeId) {
-      return Boolean(this.promptMobileSheetMap[normalizeScopeId(scopeId)]);
-    },
     clearPromptScope(scopeId) {
       const key = normalizeScopeId(scopeId);
       const nextMenus = {...this.activePromptMenuMap};
@@ -127,36 +119,15 @@ export const usePromptControlStore = defineStore("promptControl", {
 
       this.activePromptToolSettingsKey = nextKey;
     },
-    getPromptTextKey() {
-      return normalizePromptToolSettingsKey(this.activePromptToolSettingsKey);
-    },
-    getPromptTextForKey(chatId) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      return normalizePromptText(this.promptTextMap[key]);
-    },
     setActivePromptText(value) {
-      const key = this.getPromptTextKey();
+      const key = getActivePromptKey(this);
       this.promptTextMap = {
         ...this.promptTextMap,
         [key]: normalizePromptText(value),
       };
-    },
-    setPromptTextForKey(chatId, value) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      this.promptTextMap = {
-        ...this.promptTextMap,
-        [key]: normalizePromptText(value),
-      };
-    },
-    clearActivePromptText() {
-      this.setActivePromptText("");
-    },
-    getPromptExpandedForKey(chatId) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      return Boolean(this.promptExpandedMap[key]);
     },
     setActivePromptExpanded(value) {
-      const key = this.getPromptTextKey();
+      const key = getActivePromptKey(this);
       const nextValue = Boolean(value);
       if (this.promptExpandedMap[key] === nextValue) return;
 
@@ -164,31 +135,9 @@ export const usePromptControlStore = defineStore("promptControl", {
         ...this.promptExpandedMap,
         [key]: nextValue,
       };
-    },
-    setPromptExpandedForKey(chatId, value) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      const nextValue = Boolean(value);
-      if (this.promptExpandedMap[key] === nextValue) return;
-
-      this.promptExpandedMap = {
-        ...this.promptExpandedMap,
-        [key]: nextValue,
-      };
-    },
-    clearActivePromptExpanded() {
-      this.setActivePromptExpanded(false);
-    },
-    getPromptToolSettingsKey() {
-      return normalizePromptToolSettingsKey(this.activePromptToolSettingsKey);
-    },
-    getPromptToolSettingsForKey(chatId) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      return clonePromptToolSettings(
-        this.promptToolSettingsMap[key] || DEFAULT_PROMPT_TOOL_SETTINGS
-      );
     },
     ensurePromptToolSettings() {
-      const key = this.getPromptToolSettingsKey();
+      const key = getActivePromptKey(this);
       if (!this.promptToolSettingsMap[key]) {
         this.promptToolSettingsMap = {
           ...this.promptToolSettingsMap,
@@ -197,15 +146,8 @@ export const usePromptControlStore = defineStore("promptControl", {
       }
       return key;
     },
-    setPromptToolSettingsForKey(chatId, settings) {
-      const key = normalizePromptToolSettingsKey(chatId);
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: clonePromptToolSettings(settings),
-      };
-    },
     resetActivePromptToolSettings() {
-      const key = this.getPromptToolSettingsKey();
+      const key = getActivePromptKey(this);
       this.promptToolSettingsMap = {
         ...this.promptToolSettingsMap,
         [key]: clonePromptToolSettings(DEFAULT_PROMPT_TOOL_SETTINGS),
@@ -291,77 +233,76 @@ export const usePromptControlStore = defineStore("promptControl", {
     },
     resetActivePromptTemplate() {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      current.promptTemplateId = null;
-      current.promptTemplateOptions = {};
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          current.promptTemplateId = null;
+          current.promptTemplateOptions = {};
+        }
+      );
     },
     setActivePromptTemplate(templateId) {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      const nextTemplateId =
-        current.promptTemplateId === templateId ? null : templateId;
-      current.promptTemplateId = nextTemplateId;
-      current.promptTemplateOptions = {};
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          current.promptTemplateId =
+            current.promptTemplateId === templateId ? null : templateId;
+          current.promptTemplateOptions = {};
+        }
+      );
     },
     setPromptTemplateOption(groupId, optionTag) {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      current.promptTemplateOptions = {
-        ...current.promptTemplateOptions,
-        [groupId]: optionTag,
-      };
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          current.promptTemplateOptions = {
+            ...current.promptTemplateOptions,
+            [groupId]: optionTag,
+          };
+        }
+      );
     },
     setWebSearchEnabled(enabled) {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      current.webSearchEnabled = Boolean(enabled);
-      if (!enabled) current.webSearch = null;
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          current.webSearchEnabled = Boolean(enabled);
+          if (!enabled) current.webSearch = null;
+        }
+      );
     },
     toggleKnowledgeSearchOption(optionId) {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      const values = Array.isArray(current.knowledgeSearch)
-        ? current.knowledgeSearch
-        : [];
-      current.knowledgeSearch = values.includes(optionId)
-        ? values.filter((value) => value !== optionId)
-        : [...values, optionId];
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          const values = Array.isArray(current.knowledgeSearch)
+            ? current.knowledgeSearch
+            : [];
+          current.knowledgeSearch = values.includes(optionId)
+            ? values.filter((value) => value !== optionId)
+            : [...values, optionId];
+        }
+      );
     },
     toggleWebSearchEngine(engineId) {
       const key = this.ensurePromptToolSettings();
-      const current = clonePromptToolSettings(this.promptToolSettingsMap[key]);
-      current.webSearch = current.webSearch === engineId ? null : engineId;
-      current.webSearchEnabled = Boolean(current.webSearch);
-
-      this.promptToolSettingsMap = {
-        ...this.promptToolSettingsMap,
-        [key]: current,
-      };
+      this.promptToolSettingsMap = updatePromptToolSettings(
+        this.promptToolSettingsMap,
+        key,
+        (current) => {
+          current.webSearch = current.webSearch === engineId ? null : engineId;
+          current.webSearchEnabled = Boolean(current.webSearch);
+        }
+      );
     },
   },
 });

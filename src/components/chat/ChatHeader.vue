@@ -63,7 +63,6 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellStore} from "@/stores/appShellStore";
@@ -82,7 +81,6 @@ const props = defineProps({
 defineEmits(["studio-detail"]);
 
 const {t} = useI18n();
-const navigationStore = useNavigationStore();
 const chatStreamStore = useChatStreamStore();
 const viewportStore = useViewportStore();
 const appShellStore = useAppShellStore();
@@ -103,7 +101,7 @@ function openDrawer() {
   const activeElement =
     typeof document !== "undefined" ? document.activeElement : null;
   if (activeElement?.blur) activeElement.blur();
-  navigationStore.setDrawerOpen(true);
+  appShellStore.setDrawerOpen(true);
   refreshViewportSoon();
 }
 

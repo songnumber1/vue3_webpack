@@ -82,7 +82,7 @@ function shouldUseOverlay(policy) {
   logPlatformDebug("sse.overlay", {
     result,
     policyOverlay: Boolean(policy.overlay),
-    progressPlatform: platformStore.info?.isMobile ? "mobile" : "pc",
+    progressPlatform: "mobile",
   });
 
   return result;

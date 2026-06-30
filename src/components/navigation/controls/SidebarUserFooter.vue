@@ -37,7 +37,6 @@ import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useAuthStore} from "@/stores/authStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
 import {useAppContext} from "@/composables/app/useAppContext";
@@ -55,7 +54,6 @@ const {t} = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
 const chatStreamStore = useChatStreamStore();
-const navigationStore = useNavigationStore();
 const {userName} = storeToRefs(authStore);
 
 const {theme} = useAppContext();
@@ -100,7 +98,7 @@ async function toggleTheme() {
 
 function openRoute(name, {closeDrawer = false} = {}) {
   if (resolveBlocked(isShellActionBlocked)) return;
-  if (closeDrawer) navigationStore.setDrawerOpen(false);
+  if (closeDrawer) appShellStore.setDrawerOpen(false);
   router.push({name}).catch(() => {});
 }
 
@@ -114,7 +112,7 @@ async function logout() {
   } finally {
     resetAppBootstrapState();
     authStore.resetAuth?.();
-    navigationStore.setDrawerOpen(false);
+    appShellStore.setDrawerOpen(false);
     await router
       .replace({
         name: ROUTE_NAMES.LOGIN_REQUIRED,

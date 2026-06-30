@@ -14,24 +14,13 @@ import {computed, watch, watchEffect} from "vue";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {useAuthStore} from "@/stores/authStore";
-import {usePlatformStore} from "@/stores/platformStore";
 import {useRoute} from "vue-router";
-import {useResponsiveLayoutStore} from "@/stores/responsiveLayoutStore";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 
-const MOBILE_LAYOUT_SNAPSHOT = Object.freeze({
-  isMobile: true,
-  isCompactViewport: true,
-  isMobileBrowser: true,
-});
-
-const platformStore = usePlatformStore();
-const responsiveLayoutStore = useResponsiveLayoutStore();
 const appBootstrap = useAppBootstrap();
 const authStore = useAuthStore();
 const route = useRoute();
 
-const platformInfo = computed(() => platformStore.info || {});
 
 const {
   isActualAndroidRuntime,
@@ -68,14 +57,6 @@ watch(
   },
   {immediate: true}
 );
-
-watchEffect(() => {
-  responsiveLayoutStore.setSnapshot({
-    ...MOBILE_LAYOUT_SNAPSHOT,
-    isAndroidApp: platformInfo.value.isAndroidApp,
-    isAndroidWebView: platformInfo.value.isAndroidWebView,
-  });
-});
 
 function syncMobileRuntimeClasses({isAndroidRuntime, useOverlayScrollbar}) {
   if (typeof document === "undefined") return;

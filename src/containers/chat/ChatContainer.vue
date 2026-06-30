@@ -125,7 +125,6 @@ import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {
   CHAT_WORKSPACE_STATE_KEY,
@@ -179,13 +178,13 @@ import {useAutoScroll} from "@/composables/chat/useAutoScroll";
 import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
 import {usePlatformStore} from "@/stores/platformStore";
-import {useViewportStore} from "@/stores/viewportStore";
 import {syncMobileViewportSettings} from "@/utils/syncMobileViewportSettings";
 import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {
   configureResponseOverlay,
   setupResponseOverlayBackGuard,
 } from "@/composables/overlay/responseOverlayActions";
+import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 
 import {
   cleanupAfterPortalConversationNavigation,
@@ -224,7 +223,7 @@ import {
   resolveConversationTitle,
   resolveWorkspaceAssistantLabel,
 } from "@/composables/chat/internal/policy/chatHeaderPolicy";
-import {useAppOverlayBackStore} from "@/stores/appOverlayBackStore";
+import {useOverlayStore} from "@/stores/overlayStore";
 import {getSharedConversation} from "@/composables/chat/useSharedChat";
 
 /**
@@ -248,15 +247,6 @@ const props = defineProps({
 
 const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
-function shouldUseMobilePlatformLayout(platformInfo = {}) {
-  return Boolean(
-    platformInfo.isMobileBrowser ||
-    platformInfo.isAndroidApp ||
-    platformInfo.isNativeApp ||
-    platformInfo.isNativeRuntime
-  );
-}
-
 function waitForNextPaint() {
   if (typeof window === "undefined") return Promise.resolve();
   return new Promise((resolve) => {
@@ -273,7 +263,6 @@ const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const apiRequestStore = useApiRequestStore();
-const navigationStore = useNavigationStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const appBootstrap = useAppBootstrap();
 const {
@@ -408,7 +397,6 @@ pageState.activeHistoryId = activeHistoryId;
 const {t, locale} = useI18n();
 const {theme} = useAppContext();
 const platformStore = usePlatformStore();
-const viewportStore = useViewportStore();
 
 syncMobileViewportSettings();
 
@@ -663,16 +651,10 @@ const assistantSheetOpen = computed({
 const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
   useImagePreview();
 
-const isCompactScreen = computed(() => viewportStore.isCompact);
-const platformInfo = computed(() => platformStore.info || {});
-const isMobile = computed(() =>
-  Boolean(
-    isCompactScreen.value || shouldUseMobilePlatformLayout(platformInfo.value)
-  )
-);
+const isMobile = computed(() => true);
 
 function updateMobileState() {
-  // isMobile은 computed라 별도 갱신이 필요 없습니다.
+  // 모바일 전용 UI라 별도 갱신이 필요 없습니다.
 }
 
 configureResponseOverlay({
@@ -992,8 +974,7 @@ async function resetChatState({assistantId = null} = {}) {
     assistantSheetOpen.value = false;
   }
 
-  navigationStore.closeTransientPanels();
-  navigationStore.closeTransientPanels();
+  appShellStore.closeTransientShellPanels();
   await navigateToMainAfterReset();
 }
 
@@ -1030,7 +1011,7 @@ function cleanupUiResources() {
 }
 
 const runtimeReady = ref(false);
-const overlayBackStore = useAppOverlayBackStore();
+const overlayBackStore = useOverlayStore();
 const messages = conversationMessages;
 const assistants = runtime.assistants;
 const currentAssistant = runtime.currentAssistant;
@@ -1672,6 +1653,11 @@ const isStudioDetailBlocked = computed(
 
 const studioDetailStudio = ref(null);
 const studioDetailOpen = computed(() => Boolean(studioDetailStudio.value));
+useOverlayBackClose({
+  isOpen: studioDetailOpen,
+  close: closeStudioDetail,
+  historyValue: "chat-studio-detail",
+});
 
 function isDeletedRuntimeStudioAssistant(assistant = null) {
   const id = String(assistant?.id || "").trim();

@@ -13,8 +13,6 @@ export function shouldShowMobileProgress(isMobileLayout) {
   return SHOW_MOBILE_PROGRESS === true && Boolean(isMobileLayout);
 }
 
-export function isProgressAllowedForCurrentPlatform(platformInfo = {}) {
-  return shouldShowMobileProgress(
-    Boolean(platformInfo?.isMobile || platformInfo?.isCompactViewport)
-  );
+export function isProgressAllowedForCurrentPlatform() {
+  return shouldShowMobileProgress(true);
 }

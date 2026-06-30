@@ -15,7 +15,6 @@ export function syncMobileViewportSettings() {
     viewport: {
       width: viewportStore.width,
       visualWidth: viewportStore.visualWidth,
-      isCompact: viewportStore.isCompact,
     },
   });
 }

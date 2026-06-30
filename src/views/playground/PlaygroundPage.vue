@@ -287,7 +287,6 @@ import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
 import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useNavigationStore} from "@/stores/navigationStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {
   openNoticeOverlay,
@@ -295,7 +294,6 @@ import {
 } from "@/composables/overlay/responseOverlayActions";
 
 const {t} = useI18n();
-const navigationStore = useNavigationStore();
 const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
 const {appInfo} = useAppContext();
@@ -309,7 +307,6 @@ const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const overlayActionOptions = {
   isBlocked: () => isAppShellActionBlocked.value,
   viewportStore,
-  navigationStore,
 };
 const responseOverlay = {
   openNotice: () => openNoticeOverlay(overlayActionOptions),

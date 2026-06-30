@@ -12,12 +12,6 @@
       <span>{{ currentAssistant.label }}</span>
       <ChevronDownIcon class="chevron chevron--selector" />
     </button>
-    <AssistantFloatMenu
-      :open="open && !mobile"
-      :assistants="assistants"
-      :selected-assistant-id="selectedAssistantId"
-      @select="$emit('select', $event)"
-    />
   </div>
 </template>
 
@@ -30,19 +24,15 @@
 import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import AssistantFloatMenu from "@/components/assistant/select/AssistantFloatMenu.vue";
-
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
  */
 const props = defineProps({
   assistants: {type: Array, default: () => []},
   selectedAssistantId: {type: String, default: ""},
-  open: {type: Boolean, default: false},
-  mobile: {type: Boolean, default: false},
 });
 
-defineEmits(["toggle", "select"]);
+defineEmits(["toggle"]);
 
 const {t} = useI18n();
 const rootRef = ref(null);

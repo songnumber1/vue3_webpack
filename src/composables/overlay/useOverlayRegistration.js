@@ -53,7 +53,7 @@ export function useOverlayRegistration(open, kind, mode) {
     (isOpen) => {
       if (isOpen) {
         // 화면에 모달이 활성화된 경우 전역 매니저 스토어에 등록하여 Z-Index 정렬 및 ESC 닫기 타깃 대열에 합류시킵니다.
-        overlayStore.registerOverlay({id, kind, mode: overlayMode.value});
+        overlayStore.registerOverlay(id, kind, overlayMode.value);
       } else {
         // 닫히는 순간 스택 배열에서 안전하게 탈락 소거시킵니다.
         overlayStore.unregisterOverlay(id);
@@ -66,7 +66,7 @@ export function useOverlayRegistration(open, kind, mode) {
   // 오버레이가 이미 화면에 열려있는 상태에서 풀스크린 모드 전환 등 내부 스타일 분기가 치환될 때 스토어의 메타데이터를 정밀 실시간 동기화합니다.
   watch(overlayMode, (nextMode) => {
     if (!open?.value) return; // 현재 오버레이가 닫혀있는 휴면 상태라면 동기화 연산을 가드 차단합니다.
-    overlayStore.registerOverlay({id, kind, mode: nextMode});
+    overlayStore.registerOverlay(id, kind, nextMode);
   });
 
   // ── 🧹 [컴포넌트 생명주기 마감: 메모리 누수 방어 가드] ──────────────────
