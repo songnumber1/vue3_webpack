@@ -7,6 +7,7 @@ import {
 } from "@/api/sse/common/streamRequest";
 import {resetAuthStateSafely} from "@/auth/httpAuthInterceptor";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
+import {resolveGenerationStreamParserFromPayload} from "@/api/sse/common/generationStreamParsers";
 
 function readFirstString(...values) {
   const found = values.find(
@@ -37,6 +38,24 @@ function createGenerationStreamError(
   return error;
 }
 
+const DEFAULT_GENERATION_STREAM_TIMEOUT_MS = 120000;
+
+function resolveGenerationStreamTimeoutMs() {
+  const raw = Number(process.env.VUE_APP_GENERATION_STREAM_TIMEOUT || 0);
+  return Number.isFinite(raw) && raw > 0
+    ? raw
+    : DEFAULT_GENERATION_STREAM_TIMEOUT_MS;
+}
+
+function createGenerationTimeoutError() {
+  const error = createGenerationStreamError(
+    "generation stream timed out",
+    "SSE_STREAM_TIMEOUT"
+  );
+  error.timeout = true;
+  return error;
+}
+
 function readEventErrorMessage(event) {
   const rawData = event?.data;
   if (typeof rawData === "string" && rawData.trim()) return rawData;
@@ -52,24 +71,6 @@ function createSseEventError(event) {
   );
 }
 
-function applyTextGenerationStreamData(raw, accumulated) {
-  const text = String(raw || "");
-  const normalized = text.trim();
-
-  if (!normalized) {
-    return {accumulated, changed: false, done: false};
-  }
-
-  if (normalized === "[DONE]") {
-    return {accumulated, changed: false, done: true};
-  }
-
-  return {
-    accumulated: accumulated + text,
-    changed: true,
-    done: false,
-  };
-}
 
 function createGenerationDoneMissingError() {
   const error = createGenerationStreamError(
@@ -108,6 +109,7 @@ export async function runSseGenerationStream(
   });
 
   const requestId = resolveGenerationRequestId(payload);
+  const parseStreamMessage = resolveGenerationStreamParserFromPayload(payload);
 
   const closeSource = () => {
     if (!source) return;
@@ -122,16 +124,30 @@ export async function runSseGenerationStream(
     settled = false;
 
     await new Promise((resolve, reject) => {
+      let timeoutId = null;
+      const clearStreamTimeout = () => {
+        if (!timeoutId) return;
+        clearTimeout(timeoutId);
+        timeoutId = null;
+      };
       const finishResolve = () => {
         if (settled) return;
         settled = true;
+        clearStreamTimeout();
         resolve();
       };
       const finishReject = (error) => {
         if (settled) return;
         settled = true;
+        clearStreamTimeout();
+        closeSource();
         reject(error);
       };
+
+      const timeoutMs = resolveGenerationStreamTimeoutMs();
+      timeoutId = setTimeout(() => {
+        finishReject(createGenerationTimeoutError());
+      }, timeoutMs);
 
       source = new SSE(resolveGenerationUrl(), {
         start: false,
@@ -153,7 +169,7 @@ export async function runSseGenerationStream(
             throw controller.signal.reason || createAbortError("Aborted");
           }
 
-          const nextState = applyTextGenerationStreamData(event.data, accumulated);
+          const nextState = parseStreamMessage(event.data, accumulated);
           accumulated = nextState.accumulated;
 
           if (nextState.changed) {

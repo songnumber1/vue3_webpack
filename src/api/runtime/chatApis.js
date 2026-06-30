@@ -9,12 +9,14 @@ import {modelApiMock} from "@/api/mock/modelApi.mock";
 import {examplePromptApiMock} from "@/api/mock/examplePromptApi.mock";
 import {promptTemplateApiMock} from "@/api/mock/promptTemplateApi.mock";
 import {chatHistoryApiMock} from "@/api/mock/chatHistoryApi.mock";
+import {generationErrorApiMock} from "@/api/mock/generationErrorApi.mock";
 import {accessApiLive} from "@/api/live/accessApi.live";
 import {assistantApiLive} from "@/api/live/assistantApi.live";
 import {modelApiLive} from "@/api/live/modelApi.live";
 import {examplePromptApiLive} from "@/api/live/examplePromptApi.live";
 import {promptTemplateApiLive} from "@/api/live/promptTemplateApi.live";
 import {chatHistoryApiLive} from "@/api/live/chatHistoryApi.live";
+import {generationErrorApiLive} from "@/api/live/generationErrorApi.live";
 import {shouldUseFrontendMockApi} from "@/constants/apiMode";
 
 /**
@@ -47,6 +49,7 @@ export function resolveChatApis() {
       examplePromptApi: examplePromptApiMock,
       promptTemplateApi: promptTemplateApiMock,
       chatHistoryApi: chatHistoryApiMock,
+      generationErrorApi: generationErrorApiMock,
     };
   }
 
@@ -58,5 +61,6 @@ export function resolveChatApis() {
     examplePromptApi: examplePromptApiLive,
     promptTemplateApi: promptTemplateApiLive,
     chatHistoryApi: chatHistoryApiLive,
+    generationErrorApi: generationErrorApiLive,
   };
 }

@@ -22,6 +22,7 @@ export const API_ENDPOINTS = Object.freeze({
   EXAMPLE_PROMPTS: "/example-prompts/list.do",
   PROMPT_TEMPLATES: "/prompt-templates/info.do",
   GENERATION: "/generation.do",
+  GENERATION_ERROR: "/error.do",
   STUDIO_SEARCH_MAIN_INFO: "/studio/search/main/info.do",
   STUDIO_AUTHORITY_INFO: "/studio/main/ssg/info",
   STUDIO_SEARCH_LIST: "/studio/search/list.do",

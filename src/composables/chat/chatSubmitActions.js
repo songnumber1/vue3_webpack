@@ -11,9 +11,14 @@ import {
   createAssistantMessageCommitter,
   createAssistantStreamingPatch,
 } from "@/composables/chat/chatMessageActions";
-import {runAssistantStream} from "@/composables/chat/chatStreamActions";
+import {
+  createGenerationPayload,
+  runAssistantStream,
+} from "@/composables/chat/chatStreamActions";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {normalizeChatId} from "@/utils/normalize";
+import {loadGenerationErrorMessages} from "@/composables/chat/runtime/chatRuntimeApi";
+import {isGenerationErrorTestChat} from "@/constants/generationErrorTest";
 import {
   enterNewSubmitChatRoom,
   resolveActiveChatId,
@@ -92,6 +97,42 @@ async function waitForKeyboardViewportToSettle() {
   } finally {
     viewport.removeEventListener("resize", handleResize);
   }
+}
+
+
+async function replaceWithMockGenerationErrorMessages({
+  normalized,
+  targetHistoryId,
+  selectedAssistantId,
+  selectedModel,
+  setConversation,
+  renderAfterStream,
+  logPrefix = "[chatSubmitActions]",
+}) {
+  const payload = createGenerationPayload(
+    normalized,
+    targetHistoryId,
+    selectedAssistantId,
+    selectedModel
+  );
+  const messages = await loadGenerationErrorMessages(payload, {
+    code: "MOCK_FORCED_GENERATION_ERROR",
+    message: "error 답변 채팅에서 mock error.do 흐름을 강제 실행했습니다.",
+  });
+
+  if (!Array.isArray(messages) || messages.length === 0) {
+    logWarn(`${logPrefix} mock error.do 응답 메시지가 없습니다.`);
+    return false;
+  }
+
+  setConversation(targetHistoryId, messages);
+  await nextTick();
+
+  if (typeof renderAfterStream === "function") {
+    await renderAfterStream();
+  }
+
+  return true;
 }
 
 function createStreamScrollScheduler() {
@@ -324,18 +365,35 @@ async function submitPrompt(payload) {
     await nextTick();
     await scrollAfterUserSubmit(scrollLatestSubmittedUserMessage, normalized);
 
+    const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
+    const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
+
+    if (isGenerationErrorTestChat(targetHistoryId)) {
+      await replaceWithMockGenerationErrorMessages({
+        normalized,
+        targetHistoryId,
+        selectedAssistantId,
+        selectedModel,
+        setConversation: setConversationMessages,
+        renderAfterStream: renderAfterAssistantStream,
+        logPrefix: "[chatSubmitActions]",
+      });
+      return;
+    }
+
     await runAssistantStream(
       normalized,
       targetHistoryId,
-      resolveSubmitAssistantId(assistantStore, chatStore),
-      resolveSubmitModelId(assistantStore, chatStore),
+      selectedAssistantId,
+      selectedModel,
       renderAfterAssistantStream,
       committer.commit,
       committer.getAssistantMessage,
       scheduleStreamScroll,
       "(응답 생성이 중단되었습니다.)",
       "(응답 생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions]"
+      "[chatSubmitActions]",
+      {setConversation: setConversationMessages}
     );
   } finally {
     if (overlaySuppressed) {
@@ -405,18 +463,35 @@ async function regenerateResponse(message = {}) {
   });
 
   try {
+    const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
+    const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
+
+    if (isGenerationErrorTestChat(targetHistoryId)) {
+      await replaceWithMockGenerationErrorMessages({
+        normalized,
+        targetHistoryId,
+        selectedAssistantId,
+        selectedModel,
+        setConversation: setConversationMessages,
+        renderAfterStream: renderAfterAssistantStream,
+        logPrefix: "[chatSubmitActions] 재생성",
+      });
+      return;
+    }
+
     await runAssistantStream(
       normalized,
       targetHistoryId,
-      resolveSubmitAssistantId(assistantStore, chatStore),
-      resolveSubmitModelId(assistantStore, chatStore),
+      selectedAssistantId,
+      selectedModel,
       renderAfterAssistantStream,
       committer.commit,
       committer.getAssistantMessage,
       scheduleStreamScroll,
       "(응답 재생성이 중단되었습니다.)",
       "(응답 재생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions] 재생성"
+      "[chatSubmitActions] 재생성",
+      {setConversation: setConversationMessages}
     );
   } finally {
     chatStreamStore.finishWait();

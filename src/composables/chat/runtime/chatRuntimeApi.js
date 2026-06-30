@@ -73,3 +73,16 @@ export async function loadExamplePrompts(assistantId, studioYN = false) {
   });
   return adaptExamplePromptList(response);
 }
+
+export async function loadGenerationErrorMessages(payload = {}, cause = {}) {
+  const {generationErrorApi} = resolveChatApis();
+  if (typeof generationErrorApi?.createGenerationErrorMessages !== "function") {
+    return [];
+  }
+
+  const rawMessages = await generationErrorApi.createGenerationErrorMessages(
+    payload,
+    cause
+  );
+  return adaptMessageList(rawMessages);
+}

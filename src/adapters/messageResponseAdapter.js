@@ -25,6 +25,12 @@ function readArray(...values) {
   return found || [];
 }
 
+const ERROR_MESSAGE_ROLE = "error";
+
+function isErrorRole(value) {
+  return String(value || "").toLowerCase() === ERROR_MESSAGE_ROLE;
+}
+
 function normalizeRole(value) {
   return value === MESSAGE_ROLES.USER
     ? MESSAGE_ROLES.USER
@@ -48,12 +54,15 @@ export function adaptMessageItem(raw = {}) {
     raw[R.BODY],
     reasoningContent
   );
-  const status = firstDefined(raw[M.STATUS], raw[R.STATUS]);
-  const error = raw[R.ERROR] === true || status === "error";
+  const sourceRole = raw[M.ROLE];
+  const sourceStatus = firstDefined(raw[M.STATUS], raw[R.STATUS]);
+  const status = isErrorRole(sourceRole) ? "error" : sourceStatus;
+  const error =
+    isErrorRole(sourceRole) || raw[R.ERROR] === true || status === "error";
 
   return {
     id: firstDefined(raw[M.ID], raw[M.MESSAGE_ID], raw[M.RESPONSE_MESSAGE_ID]),
-    role: normalizeRole(raw[M.ROLE]),
+    role: normalizeRole(sourceRole),
     content,
     status: status || (error ? "error" : "complete"),
     error,

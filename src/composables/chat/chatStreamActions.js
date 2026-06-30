@@ -1,6 +1,7 @@
 import {nextTick} from "vue";
 import {isGenerationAbortError, streamGeneration} from "@/api/sse/sse";
 import {fetchGenerationResult} from "@/api/sse/common/streamRequest";
+import {loadGenerationErrorMessages} from "@/composables/chat/runtime/chatRuntimeApi";
 import {logWarn} from "@/utils/logger";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {createId} from "@/utils/id";
@@ -52,7 +53,7 @@ function resolveStyleOptions(settings = {}) {
   return values;
 }
 
-function createGenerationPayload(
+export function createGenerationPayload(
   normalized,
   chatId,
   selectedAssistantId,
@@ -148,6 +149,50 @@ async function resolveGenerationResultContent(requestId) {
   }
 }
 
+function createGenerationErrorCause(error, fallbackMessage) {
+  return {
+    code: resolveStreamErrorCode(error),
+    message: resolveStreamErrorMessage(error, fallbackMessage),
+    errorMessage: resolveStreamErrorMessage(error, fallbackMessage),
+    timeout: error?.timeout === true,
+    doneMissing: error?.doneMissing === true,
+    status: error?.status,
+  };
+}
+
+async function replaceWithGenerationErrorMessages({
+  payload,
+  chatId,
+  error,
+  setConversation,
+  renderAfterStream,
+  errorFallbackMessage,
+  logPrefix,
+}) {
+  if (!payload || typeof setConversation !== "function") return false;
+
+  try {
+    const messages = await loadGenerationErrorMessages(
+      payload,
+      createGenerationErrorCause(error, errorFallbackMessage)
+    );
+
+    if (!Array.isArray(messages) || messages.length === 0) return false;
+
+    setConversation(chatId, messages);
+    await nextTick();
+
+    if (typeof renderAfterStream === "function") {
+      await renderAfterStream();
+    }
+
+    return true;
+  } catch (fallbackError) {
+    logWarn(`${logPrefix} error.do fallback failed:`, fallbackError);
+    return false;
+  }
+}
+
 function commitStreamError(
   error,
   commit,
@@ -206,16 +251,21 @@ export async function runAssistantStream(
   scheduleStreamScroll,
   abortFallbackMessage,
   errorFallbackMessage,
-  logPrefix = "[chatStreamActions]"
+  logPrefix = "[chatStreamActions]",
+  options = {}
 ) {
+  let generationPayload = null;
+
   try {
+    generationPayload = createGenerationPayload(
+      normalized,
+      chatId,
+      selectedAssistantId,
+      selectedModel
+    );
+
     await streamGeneration(
-      createGenerationPayload(
-        normalized,
-        chatId,
-        selectedAssistantId,
-        selectedModel
-      ),
+      generationPayload,
       {
         onChunk: async (content) => {
           await commitFirstAnswerChunk(content, getAssistantMessage, commit);
@@ -238,6 +288,19 @@ export async function runAssistantStream(
       `${logPrefix} ${isAbort ? "스트리밍이 중단되었습니다" : "스트리밍 오류"}:`,
       error
     );
+
+    if (!isAbort) {
+      const replaced = await replaceWithGenerationErrorMessages({
+        payload: generationPayload,
+        chatId,
+        error,
+        setConversation: options.setConversation,
+        renderAfterStream,
+        errorFallbackMessage,
+        logPrefix,
+      });
+      if (replaced) return;
+    }
 
     const syncedContent = await resolveGenerationResultContent(
       error.generationRequestId
