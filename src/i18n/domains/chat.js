@@ -93,7 +93,13 @@ export const chatMessages = {
         renameTitle: "대화방 제목 변경",
         selectedConversation: "선택한 대화방",
         deleteMessage: "'{title}'을(를) 삭제하시겠습니까?",
-        shareSelected: "공유 버튼을 선택했습니다.",
+        shareTitle: "대화방 공유",
+        shareMessage: "'{title}'을(를) 공유하시겠습니까?",
+        shareLinkField: "공유 링크",
+        sharePendingMessage:
+          "공유 링크가 아직 생성되지 않았습니다. 공유를 진행하면 대화방 목록을 갱신합니다.",
+        shareAction: "공유하기",
+        copyShareLink: "링크 복사",
         titleField: "대화방 제목",
       },
       historySync: {
@@ -240,7 +246,13 @@ export const chatMessages = {
         renameTitle: "Rename chat",
         selectedConversation: "selected chat",
         deleteMessage: "Delete '{title}'?",
-        shareSelected: "Share was selected.",
+        shareTitle: "Share chat",
+        shareMessage: "Share '{title}'?",
+        shareLinkField: "Share link",
+        sharePendingMessage:
+          "A share link has not been created yet. Sharing will refresh the chat list.",
+        shareAction: "Share",
+        copyShareLink: "Copy link",
         titleField: "Conversation title",
       },
       historySync: {

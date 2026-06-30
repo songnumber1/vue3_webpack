@@ -1,0 +1,175 @@
+/**
+ * Common Modal component styles.
+ * AppModal is used for real blocking dialogs, so the panel must not depend on
+ * feature-specific ResponsiveOverlay/FeedbackDialog selectors for its surface.
+ */
+
+.app-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: grid;
+  place-items: center;
+  padding: max(18px, env(safe-area-inset-top)) 18px
+    max(18px, env(safe-area-inset-bottom));
+  color: var(--dialog-panel-text, var(--text, #202123));
+}
+
+.app-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--dialog-backdrop-strong, rgba(0, 0, 0, 0.45));
+}
+
+.app-modal__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, var(--app-modal-width, 520px));
+  max-height: min(var(--app-modal-max-height, 760px), calc(100dvh - 36px));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  outline: 0;
+  border: 1px solid var(--dialog-panel-border, var(--control-border, #e5e7eb));
+  border-radius: var(--dialog-radius, 5px);
+  background: var(--dialog-panel-bg, var(--surface, #ffffff));
+  color: var(--dialog-panel-text, var(--text, #202123));
+  box-shadow: var(
+    --dialog-panel-shadow,
+    0 22px 80px rgba(15, 23, 42, 0.2)
+  );
+}
+
+.app-modal[data-modal-size="sm"] {
+  --app-modal-width: 420px;
+}
+
+.app-modal[data-modal-size="md"] {
+  --app-modal-width: 520px;
+}
+
+.app-modal[data-modal-size="lg"] {
+  --app-modal-width: 720px;
+}
+
+.app-modal[data-modal-size="fullscreen"] {
+  padding: 0;
+}
+
+.app-modal[data-modal-size="fullscreen"] .app-modal__panel {
+  width: 100%;
+  height: var(--app-height, 100dvh);
+  max-height: var(--app-height, 100dvh);
+  border-radius: 0;
+}
+
+.app-modal__header,
+.app-modal__footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: var(--dialog-header-padding, 14px 16px);
+  background: var(--dialog-panel-bg, var(--surface, #ffffff));
+}
+
+.app-modal__header {
+  min-height: var(--dialog-header-min-height, 58px);
+  border-bottom: 1px solid
+    var(--dialog-panel-border, var(--control-border, #e5e7eb));
+}
+
+.app-modal__footer {
+  justify-content: flex-end;
+  border-top: 1px solid
+    var(--dialog-panel-border, var(--control-border, #e5e7eb));
+}
+
+.app-modal__heading {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.app-modal__title,
+.app-modal__subtitle {
+  display: block;
+}
+
+.app-modal__title {
+  margin: 0;
+  color: var(--dialog-panel-text, var(--text, #202123));
+  font-size: var(--dialog-title-font-size, var(--font-size-fixed-15));
+  font-weight: var(--dialog-title-font-weight, 800);
+  line-height: var(--dialog-title-line-height, 1.35);
+}
+
+.app-modal__subtitle {
+  margin-top: 3px;
+  color: var(--text-muted, #6b7280);
+  font-size: var(--dialog-caption-font-size, var(--font-size-fixed-12));
+  line-height: var(--dialog-caption-line-height, 1.35);
+}
+
+.app-modal__body {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--dialog-body-padding, 16px);
+  background: var(--dialog-panel-bg, var(--surface, #ffffff));
+  color: var(--dialog-panel-text, var(--text, #202123));
+  font-size: var(--dialog-body-font-size, var(--font-size-fixed-14));
+  line-height: var(--dialog-body-line-height, 1.5);
+}
+
+.app-modal__close {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+  border: 1px solid var(--dialog-panel-border, var(--control-border, #e5e7eb));
+  border-radius: var(--dialog-close-radius, 5px);
+  background: var(--control-bg, #f8fafc);
+  color: var(--dialog-panel-text, var(--text, #202123));
+  font-size: var(--font-size-fixed-20, 20px);
+  line-height: 1;
+}
+
+.app-modal__close:hover,
+.app-modal__close:focus-visible {
+  background: var(--control-hover-bg, var(--control-bg, #f1f5f9));
+}
+
+.app-modal-fade-enter-active,
+.app-modal-fade-leave-active {
+  transition: opacity 160ms ease;
+}
+
+.app-modal-fade-enter-from,
+.app-modal-fade-leave-to {
+  opacity: 0;
+}
+
+.chat-history-dialog {
+  color: var(--dialog-panel-text, var(--text, #202123));
+}
+
+.chat-history-dialog__field span {
+  color: var(--dialog-panel-text, var(--text, #202123));
+  font-weight: 700;
+}
+
+.chat-history-dialog__message {
+  color: var(--text-muted, #6b7280);
+}
+
+.chat-history-dialog__input {
+  background: var(--control-bg, #ffffff);
+  color: var(--dialog-panel-text, var(--text, #202123));
+}
+
+body.mobile-mode .app-modal {
+  padding: max(16px, env(safe-area-inset-top)) 16px
+    max(16px, env(safe-area-inset-bottom));
+}
+
+body.mobile-mode .app-modal__panel {
+  width: min(100%, 420px);
+  max-height: min(var(--app-height, 100dvh), calc(100dvh - 32px));
+}

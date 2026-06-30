@@ -46,6 +46,7 @@
 @use "./06-components/chat/readonly-input" as *;
 @use "./06-components/icon/app-icon" as *;
 @use "./06-components/overlay/responsive-overlay" as *;
+@use "./06-components/modal/app-modal" as *;
 @use "./07-pages/guide" as *;
 @use "./07-pages/playground" as *;
 @use "./06-components/menu/user-menu" as *;

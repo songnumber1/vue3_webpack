@@ -55,36 +55,17 @@
       :actions-disabled="isStudioDetailBlocked"
     />
 
-
     <ChatHistoryConfirmDialog
       :open="historyDialogOpen"
       :mode="historyDialogMode"
       :title="historyDialogTitle"
       :message="historyDialogMessage"
       :initial-title="historyDialogTarget?.title || ''"
+      :share-url="historyDialogShareUrl"
       @cancel="closeHistoryDialog"
       @confirm="confirmHistoryDialog"
     />
 
-    <ResponsiveOverlay
-      :open="historyNoticeOpen"
-      :title="t('common.notice')"
-      mobile-mode="dialog"
-      @close="historyNoticeOpen = false"
-    >
-      <div class="chat-history-dialog">
-        <p class="chat-history-dialog__message">{{ historyNoticeMessage }}</p>
-        <div class="chat-history-dialog__actions">
-          <button
-            class="playground-button"
-            type="button"
-            @click="historyNoticeOpen = false"
-          >
-            {{ t("common.confirm") }}
-          </button>
-        </div>
-      </div>
-    </ResponsiveOverlay>
   </ChatLayout>
 
   <div v-else class="chat-bootstrap-loading" aria-live="polite">
@@ -125,7 +106,6 @@ import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
 import ResponseOverlayHost from "@/components/overlay/ResponseOverlayHost.vue";
 import ChatHistoryConfirmDialog from "@/components/navigation/history/ChatHistoryConfirmDialog.vue";
-import ResponsiveOverlay from "@/components/overlay/ResponsiveOverlay.vue";
 import StudioDetailViewer from "@/components/studio/StudioDetailViewer.vue";
 import HomeWorkspace from "@/components/workspace/HomeWorkspace.vue";
 import ChatConversationWorkspace from "@/components/workspace/ChatConversationWorkspace.vue";
@@ -841,24 +821,50 @@ const layoutKeyboardOpen = computed(
 const historyDialogOpen = ref(false);
 const historyDialogMode = ref("rename");
 const historyDialogTarget = ref(null);
-const historyNoticeOpen = ref(false);
-const historyNoticeMessage = ref("");
 
-const historyDialogTitle = computed(() =>
-  historyDialogMode.value === "delete"
-    ? t("chat.historyDialog.deleteTitle")
-    : t("chat.historyDialog.renameTitle")
-);
+const historyDialogTitle = computed(() => {
+  if (historyDialogMode.value === "delete") {
+    return t("chat.historyDialog.deleteTitle");
+  }
 
-const historyDialogMessage = computed(() =>
-  historyDialogMode.value === "delete"
-    ? t("chat.historyDialog.deleteMessage", {
-        title:
-          historyDialogTarget.value?.title ||
-          t("chat.historyDialog.selectedConversation"),
-      })
-    : ""
-);
+  if (historyDialogMode.value === "share") {
+    return t("chat.historyDialog.shareTitle");
+  }
+
+  return t("chat.historyDialog.renameTitle");
+});
+
+const historyDialogShareUrl = computed(() => {
+  const sharedId = String(historyDialogTarget.value?.sharedId || "").trim();
+  if (!sharedId || typeof window === "undefined") return "";
+
+  const href = router.resolve({
+    name: ROUTE_NAMES.SHARED_ENTRY,
+    params: {id: sharedId},
+  }).href;
+
+  return new URL(href, window.location.origin).toString();
+});
+
+const historyDialogMessage = computed(() => {
+  if (historyDialogMode.value === "delete") {
+    return t("chat.historyDialog.deleteMessage", {
+      title:
+        historyDialogTarget.value?.title ||
+        t("chat.historyDialog.selectedConversation"),
+    });
+  }
+
+  if (historyDialogMode.value === "share") {
+    return t("chat.historyDialog.shareMessage", {
+      title:
+        historyDialogTarget.value?.title ||
+        t("chat.historyDialog.selectedConversation"),
+    });
+  }
+
+  return "";
+});
 
 function closeHistoryDialog() {
   historyDialogOpen.value = false;
@@ -889,6 +895,11 @@ async function confirmHistoryDialog(value) {
         conversationMessages.value = [];
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
       }
+      return;
+    }
+
+    if (historyDialogMode.value === "share") {
+      runtime.syncHistoriesInBackground?.({notifyOnError: true});
     }
   } catch (error) {
     logWarn("[ChatContainer] confirmHistoryDialog 오류:", error);
@@ -920,9 +931,9 @@ async function handleHistoryMenuAction({action, history} = {}) {
   }
 
   if (action === "share") {
-    runtime.syncHistoriesInBackground?.({notifyOnError: true});
-    historyNoticeMessage.value = t("chat.historyDialog.shareSelected");
-    historyNoticeOpen.value = true;
+    historyDialogTarget.value = history;
+    historyDialogMode.value = "share";
+    historyDialogOpen.value = true;
     return;
   }
 
