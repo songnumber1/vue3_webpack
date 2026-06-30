@@ -20,3 +20,35 @@
 @use "./mobile-cascade/chat-message-list-guard" as *;
 @use "./mobile-cascade/compact-main-screen-guard" as *;
 @use "./mobile-cascade/compact-message-sidebar-guard" as *;
+
+/* Final guard: BaseBottomSheet exposes --bottom-sheet-height from drag/snap state.
+   Keep this last so Studio/MCP sheet-specific height:auto rules cannot disable
+   user resizing. */
+body.mobile-mode .bottom-sheet.app-bottom-sheet-panel,
+body.mobile-mode .bottom-sheet {
+  height: var(--bottom-sheet-height, auto) !important;
+  max-height: calc(var(--app-height, 100dvh) - env(safe-area-inset-bottom, 0px)) !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  transition: height 160ms ease, transform 210ms ease !important;
+  will-change: height, transform;
+}
+
+body.mobile-mode .bottom-sheet.bottom-sheet--dragging {
+  transition: none !important;
+}
+
+body.mobile-mode .bottom-sheet .bottom-sheet-body {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+body.mobile-mode .bottom-sheet .bottom-sheet-drag-area {
+  flex: 0 0 auto !important;
+  touch-action: none !important;
+}
