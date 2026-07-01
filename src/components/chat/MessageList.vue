@@ -100,6 +100,9 @@ import {
   useMessageActions,
 } from "@/composables/chat/context/messageActionContext";
 import {useMessageRenderLifecycle} from "@/composables/chat/message/useMessageRenderLifecycle";
+import {useChatStore} from "@/stores/chatStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useMessageGenerationSse} from "@/composables/chat/message-list/useMessageGenerationSse";
 
 
 const props = defineProps({
@@ -116,6 +119,14 @@ const props = defineProps({
 
 const parentMessageActions = useMessageActions();
 const renderLifecycle = useMessageRenderLifecycle(parentMessageActions);
+const chatStore = useChatStore();
+const chatStreamStore = useChatStreamStore();
+const messageGenerationSse = useMessageGenerationSse({
+  onText: updateStreamingAssistantMessage,
+  onDone: completeStreamingAssistantMessage,
+  onError: failStreamingAssistantMessage,
+});
+let activeGenerationKey = "";
 
 function createMessageTurnSectors(messages = []) {
   const sectors = [];
@@ -1272,9 +1283,100 @@ provideMessageActions({
   messageRendered: handleMessageRendered,
 });
 
+
+// -------------------------------------------------------------------------
+// MessageList-owned generation stream
+// -------------------------------------------------------------------------
+function resolvePendingGenerationKey(pending = {}) {
+  return [
+    pending.chatId || "",
+    pending.assistantMessageId || "",
+    pending.type || "",
+  ].join(":");
+}
+
+function updatePendingAssistantMessage(pending = {}, patch = {}) {
+  const chatId = String(pending.chatId || "").trim();
+  const assistantMessageId = String(pending.assistantMessageId || "").trim();
+  if (!chatId || !assistantMessageId) return;
+
+  const currentMessages = chatStore.messageMap?.[chatId] || props.messages || [];
+  const nextMessages = currentMessages.map((message) =>
+    String(message?.id || "") === assistantMessageId
+      ? {...message, ...patch}
+      : message
+  );
+
+  chatStore.setMessages(chatId, nextMessages);
+}
+
+let activeGenerationPending = null;
+
+function finishPendingGeneration() {
+  activeGenerationKey = "";
+  activeGenerationPending = null;
+  chatStreamStore.finishWait();
+}
+
+function updateStreamingAssistantMessage(content) {
+  if (!activeGenerationPending) return;
+
+  updatePendingAssistantMessage(activeGenerationPending, {
+    content,
+    status: "streaming",
+    reasoningStatus: "completed",
+  });
+  scrollToBottom({behavior: "auto"});
+  scheduleRenderedFrameUpdate({bottomState: true});
+}
+
+function completeStreamingAssistantMessage() {
+  if (!activeGenerationPending) return;
+
+  updatePendingAssistantMessage(activeGenerationPending, {
+    status: "complete",
+    reasoningStatus: "completed",
+  });
+  scrollToBottomAfterRender({behavior: "auto"});
+  finishPendingGeneration();
+}
+
+function failStreamingAssistantMessage(error) {
+  if (!activeGenerationPending) return;
+
+  updatePendingAssistantMessage(activeGenerationPending, {
+    status: "error",
+    error: true,
+    errorMessage: error?.message || "",
+    reasoningStatus: "completed",
+  });
+  finishPendingGeneration();
+}
+
+function runPendingGeneration(pending = {}) {
+  const generationKey = resolvePendingGenerationKey(pending);
+  if (!generationKey || activeGenerationKey === generationKey) return;
+
+  activeGenerationKey = generationKey;
+  activeGenerationPending = pending;
+  chatStreamStore.clearPendingGeneration();
+  messageGenerationSse.start(pending.payload || {});
+}
+
 // -------------------------------------------------------------------------
 // Watchers and DOM lifecycle
 // -------------------------------------------------------------------------
+
+watch(
+  () => [chatStreamStore.pendingGeneration, chatStore.selectedChatId],
+  ([pending, selectedChatId]) => {
+    if (!pending) return;
+    if (String(pending.chatId || "") !== String(selectedChatId || "")) return;
+    runPendingGeneration(pending);
+  },
+  {immediate: true}
+);
+
 watch(
   () => [
     props.loading,
@@ -1370,6 +1472,7 @@ onBeforeUnmount(() => {
   clearRenderedFrameScheduler();
   clearTrackedAnimationFrames();
   clearResizeRecalculateScheduler();
+  messageGenerationSse.close();
   cleanupOverlayScrollbar();
   if (typeof window === "undefined") return;
   window.removeEventListener("resize", scheduleResizeRecalculate);

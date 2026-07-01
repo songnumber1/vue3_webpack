@@ -5,25 +5,86 @@ import {useChatStore} from "@/stores/chatStore";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {logWarn} from "@/utils/logger";
+import {createId} from "@/utils/id";
 import {shouldUseServerApi} from "@/constants/apiMode";
+import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 import {
   createAssistantMessage,
   createAssistantMessageCommitter,
   createAssistantStreamingPatch,
 } from "@/composables/chat/chatMessageActions";
-import {
-  createGenerationPayload,
-  runAssistantStream,
-} from "@/composables/chat/chatStreamActions";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {normalizeChatId} from "@/utils/normalize";
-import {loadGenerationErrorMessages} from "@/composables/chat/runtime/chatRuntimeApi";
-import {isGenerationErrorTestChat} from "@/constants/generationErrorTest";
 import {
   enterNewSubmitChatRoom,
   resolveActiveChatId,
 } from "@/composables/chat/chatRoomActions";
 // chatStreamStore.isWait를 채팅 답변 처리 중 상태의 단일 기준으로 사용합니다.
+
+
+function createRequestPayload(base = {}) {
+  const msgId = createId("message");
+  const respMsgId = createId("message");
+  return {
+    [G.MESSAGE_ID]: msgId,
+    [G.RESPONSE_MESSAGE_ID]: respMsgId,
+    ...base,
+  };
+}
+
+function resolvePromptToolSettings() {
+  const promptControlStore = usePromptControlStore();
+  return promptControlStore.activePromptToolSettings || {};
+}
+
+function resolveStyleOptions(settings = {}) {
+  const values = [];
+
+  Object.values(settings.promptTemplateOptions || {}).forEach((value) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item) values.push(String(item));
+      });
+      return;
+    }
+
+    if (value) values.push(String(value));
+  });
+
+  return values;
+}
+
+function createGenerationPayload(normalized, chatId, selectedAssistantId, selectedModel) {
+  const resolvedChatId = normalizeChatId(chatId);
+
+  if (!resolvedChatId) {
+    throw new Error("generation.do payload requires chatId from new.do or current route.");
+  }
+
+  const settings = resolvePromptToolSettings();
+  const knowledgeSearch = Array.isArray(settings.knowledgeSearch)
+    ? settings.knowledgeSearch.filter(Boolean)
+    : [];
+
+  return createRequestPayload({
+    [G.CHAT_ID]: resolvedChatId,
+    [G.ASSIST_ID]: selectedAssistantId || "",
+    [G.MODEL_ID]: selectedModel || "",
+    [G.STUDIO]: false,
+    [G.INTENTION]: "직접입력",
+    [G.RAG]: knowledgeSearch.length > 0,
+    [G.RAG_COT]: false,
+    [G.IMAGE_S3_PATH_LEGACY]: null,
+    [G.SOURCE_TYPE]: "internal",
+    [G.ARRAY_OPTIONS]: knowledgeSearch,
+    [G.MESSAGE_FILE_HISTORY]: null,
+    [G.STYLES]: resolveStyleOptions(settings),
+    [G.BODY]: normalized.text,
+    [G.BYTE_SIZE]: 10000,
+    [G.LAST_FEDERATION_INFO]: null,
+    [G.UI_STATE_INFO_WRAPPER]: null,
+  });
+}
 
 function wait(ms) {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -99,47 +160,6 @@ async function waitForKeyboardViewportToSettle() {
   }
 }
 
-
-async function replaceWithMockGenerationErrorMessages({
-  normalized,
-  targetHistoryId,
-  selectedAssistantId,
-  selectedModel,
-  setConversation,
-  renderAfterStream,
-  logPrefix = "[chatSubmitActions]",
-}) {
-  const payload = createGenerationPayload(
-    normalized,
-    targetHistoryId,
-    selectedAssistantId,
-    selectedModel
-  );
-  const messages = await loadGenerationErrorMessages(payload, {
-    code: "MOCK_FORCED_GENERATION_ERROR",
-    message: "error 답변 채팅에서 mock error.do 흐름을 강제 실행했습니다.",
-  });
-
-  if (!Array.isArray(messages) || messages.length === 0) {
-    logWarn(`${logPrefix} mock error.do 응답 메시지가 없습니다.`);
-    return false;
-  }
-
-  setConversation(targetHistoryId, messages);
-  await nextTick();
-
-  if (typeof renderAfterStream === "function") {
-    await renderAfterStream();
-  }
-
-  return true;
-}
-
-function createStreamScrollScheduler() {
-  // 현재 고정 정책에서는 답변 chunk 수신마다 자동 하단 보정을 하지 않습니다.
-  // 스트림 스케줄러는 stream core와의 callback 계약만 유지합니다.
-  return () => {};
-}
 
 async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
   await nextTick();
@@ -270,6 +290,26 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
     .find((item) => item.role === "user");
 }
 
+function setPendingGeneration({
+  chatStreamStore,
+  normalized,
+  chatId,
+  assistantId,
+  modelId,
+  assistantMessage,
+  type,
+}) {
+  chatStreamStore.setPendingGeneration({
+    type,
+    chatId,
+    assistantMessageId: assistantMessage?.id || "",
+    assistantId,
+    modelId,
+    normalized,
+    payload: createGenerationPayload(normalized, chatId, assistantId, modelId),
+  });
+}
+
 
 let createRemoteConversationForSubmit = null;
 let createLocalConversationForSubmit = null;
@@ -278,7 +318,6 @@ let setConversationMessages = null;
 let getCurrentMessagesForSubmit = null;
 let scrollLatestSubmittedUserMessage = null;
 let syncHistoriesForSubmit = null;
-let renderAfterAssistantStream = null;
 let canSubmitMessage = null;
 let submitRouter = null;
 let submitRoute = null;
@@ -317,6 +356,7 @@ async function submitPrompt(payload) {
   const initialHistoryId = normalizeChatId(resolveActiveChatId());
   const isNewConversationSubmit = shouldCreateConversation(initialHistoryId, route);
   let overlaySuppressed = false;
+  let generationHandedOff = false;
 
   if (isNewConversationSubmit) {
     apiRequestStore.suppressOverlay();
@@ -351,8 +391,6 @@ async function submitPrompt(payload) {
       messages,
       assistantMessage
     );
-    const scheduleStreamScroll = createStreamScrollScheduler();
-
     committer.commit();
 
     if (isNewConversationSubmit) {
@@ -368,39 +406,24 @@ async function submitPrompt(payload) {
     const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
     const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
 
-    if (isGenerationErrorTestChat(targetHistoryId)) {
-      await replaceWithMockGenerationErrorMessages({
-        normalized,
-        targetHistoryId,
-        selectedAssistantId,
-        selectedModel,
-        setConversation: setConversationMessages,
-        renderAfterStream: renderAfterAssistantStream,
-        logPrefix: "[chatSubmitActions]",
-      });
-      return;
-    }
-
-    await runAssistantStream(
+    setPendingGeneration({
+      chatStreamStore,
       normalized,
-      targetHistoryId,
-      selectedAssistantId,
-      selectedModel,
-      renderAfterAssistantStream,
-      committer.commit,
-      committer.getAssistantMessage,
-      scheduleStreamScroll,
-      "(응답 생성이 중단되었습니다.)",
-      "(응답 생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions]",
-      {setConversation: setConversationMessages}
-    );
+      chatId: targetHistoryId,
+      assistantId: selectedAssistantId,
+      modelId: selectedModel,
+      assistantMessage: committer.getAssistantMessage(),
+      type: "submit",
+    });
+    generationHandedOff = true;
   } finally {
     if (overlaySuppressed) {
       apiRequestStore.resumeOverlay();
       overlaySuppressed = false;
     }
-    chatStreamStore.finishWait();
+    if (!generationHandedOff) {
+      chatStreamStore.finishWait();
+    }
   }
 }
 
@@ -448,7 +471,7 @@ async function regenerateResponse(message = {}) {
     assistantMessage,
     setConversationMessages
   );
-  const scheduleStreamScroll = createStreamScrollScheduler();
+  let generationHandedOff = false;
 
   chatStreamStore.startWait();
 
@@ -466,35 +489,20 @@ async function regenerateResponse(message = {}) {
     const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
     const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
 
-    if (isGenerationErrorTestChat(targetHistoryId)) {
-      await replaceWithMockGenerationErrorMessages({
-        normalized,
-        targetHistoryId,
-        selectedAssistantId,
-        selectedModel,
-        setConversation: setConversationMessages,
-        renderAfterStream: renderAfterAssistantStream,
-        logPrefix: "[chatSubmitActions] 재생성",
-      });
-      return;
-    }
-
-    await runAssistantStream(
+    setPendingGeneration({
+      chatStreamStore,
       normalized,
-      targetHistoryId,
-      selectedAssistantId,
-      selectedModel,
-      renderAfterAssistantStream,
-      committer.commit,
-      committer.getAssistantMessage,
-      scheduleStreamScroll,
-      "(응답 재생성이 중단되었습니다.)",
-      "(응답 재생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions] 재생성",
-      {setConversation: setConversationMessages}
-    );
+      chatId: targetHistoryId,
+      assistantId: selectedAssistantId,
+      modelId: selectedModel,
+      assistantMessage: committer.getAssistantMessage(),
+      type: "regenerate",
+    });
+    generationHandedOff = true;
   } finally {
-    chatStreamStore.finishWait();
+    if (!generationHandedOff) {
+      chatStreamStore.finishWait();
+    }
   }
 }
 
@@ -518,7 +526,7 @@ export function configureChatSubmit(
   getCurrentMessagesForSubmit = getCurrentMessages;
   scrollLatestSubmittedUserMessage = scrollLatestUserMessage;
   syncHistoriesForSubmit = syncHistories;
-  renderAfterAssistantStream = renderAfterStream;
+  void renderAfterStream;
   canSubmitMessage = canWriteCallback;
   submitRouter = router || null;
   submitRoute = route || null;
