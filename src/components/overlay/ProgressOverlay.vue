@@ -25,19 +25,16 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {usePlatformStore} from "@/stores/platformStore";
 import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 
 const {t} = useI18n();
 const apiRequestStore = useApiRequestStore();
-const platformStore = usePlatformStore();
 const {isOverlayVisible} = storeToRefs(apiRequestStore);
 
 // ProgressBar는 코드가 startOverlay()로 명시적으로 요청한 경우에만 표시 후보가 됩니다.
-// 실제 표시 여부는 시스템 설정이 아니라 채팅 런타임 고정 정책의 PC/Mobile 기준으로 결정합니다.
+// 실제 표시 여부는 시스템 설정이 아니라 채팅 런타임의 모바일 progress 고정 정책으로 결정합니다.
 const visible = computed(
   () =>
-    Boolean(isOverlayVisible.value) &&
-    isProgressAllowedForCurrentPlatform(platformStore.info)
+    Boolean(isOverlayVisible.value) && isProgressAllowedForCurrentPlatform()
 );
 </script>

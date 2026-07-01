@@ -126,7 +126,7 @@ function webSuccess(data = {}, message = t("platformBridge.browserHandled")) {
 /**
  * 클립보드 복사 요청을 현재 플랫폼에 맞게 처리합니다.
  * Android 앱에서는 네이티브 브릿지를 사용하고, 웹에서는 Clipboard API fallback 후
- * PC note/mobile toast 이벤트를 발생시킵니다.
+ * note/toast 이벤트를 발생시킵니다.
  */
 export async function copyClipboardByPlatform(text) {
   logPlatformDebug("feedback.clipboard.route", {
@@ -134,7 +134,6 @@ export async function copyClipboardByPlatform(text) {
     channel: getFeedbackChannel(),
     platform: getStore().info?.env,
     browser: getStore().info?.browser,
-    isPlatformForced: getStore().info?.isPlatformForced,
   });
 
   const successMessage = t("clipboardNote.message");
@@ -328,7 +327,6 @@ export async function showToastByPlatform(message, options = {}) {
     channel: getFeedbackChannel(),
     platform: getStore().info?.env,
     browser: getStore().info?.browser,
-    isPlatformForced: getStore().info?.isPlatformForced,
   });
 
   const normalizedMessage = String(message || "").trim();

@@ -25,9 +25,9 @@ body.dark-mode .os-theme-chat-app,
 }
 
 /*
-  PC 런타임 fallback scrollbar.
-  - 화면 폭이 mobile-mode로 전환되어도 실제 PC 런타임이면 overlay-style scrollbar를 유지합니다.
-  - 실제 Android Chrome/WebView 런타임에서는 아래 fallback을 적용하지 않고 native scroll로 둡니다.
+  Runtime fallback scrollbar.
+  - Overlay scrollbar runtime에서는 얇은 fallback scrollbar를 유지합니다.
+  - Native scrollbar runtime에서는 아래 fallback을 적용하지 않습니다.
 */
 .app-container:not(.app-container--native-scroll-runtime) .message-list,
 .app-container:not(.app-container--native-scroll-runtime)
@@ -387,11 +387,8 @@ body.dark-mode .os-theme-chat-app,
   border-radius: initial;
 }
 
-/* Step scroll-policy v3:
-   OverlayScrollbars 활성화 여부는 화면 폭(mobile-mode)이 아니라 실제 플랫폼 기준입니다.
-   실제 Android Chrome/WebView에서는 JS 인스턴스와 CSS scrollbar 커스터마이징을 모두 비활성화합니다.
-   PC에서는 모바일 사이즈로 줄어들어도 OverlayScrollbars가 유지되므로 input/textarea/select와 겹치지 않게
-   활성화된 스크롤 컨테이너에만 우측 여백을 예약합니다. */
+/* Overlay scrollbar gap guard.
+   Scrollbar가 컨텐츠와 겹치지 않도록 활성화된 스크롤 컨테이너에만 우측 여백을 예약합니다. */
 .app-container:not(.app-container--native-scroll-runtime)
   [data-overlay-scrollbar-enhanced="true"][data-overlay-scrollbar-gap="true"] {
   --overlay-scrollbar-content-gap: 12px;
@@ -403,8 +400,7 @@ body.dark-mode .os-theme-chat-app,
 }
 
 /* Runtime scroll policy guard.
-   Actual Android Chrome/WebView must use browser-native scrollbars even when the UI is in mobile-mode.
-   Actual PC must keep OverlayScrollbars and the reserved gap even when the viewport is narrow enough to use mobile layout. */
+   Native scrollbar runtime에서는 overlay gap과 커스텀 scrollbar를 해제합니다. */
 .app-container--native-scroll-runtime [data-overlay-scrollbar-enhanced="true"] {
   padding-inline-end: 0 !important;
   scrollbar-width: auto !important;

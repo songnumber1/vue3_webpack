@@ -85,7 +85,6 @@ const viewportStore = useViewportStore();
 const appShellStore = useAppShellStore();
 const chatWorkspaceActions = useChatWorkspaceActions();
 const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
-const isMobile = computed(() => true);
 const mobileAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 20)
 );
@@ -112,7 +111,7 @@ function openAssistant() {
 
 function openSettings() {
   openSettingsOverlay({
-    isMobile,
+    isMobile: true,
     isBlocked: () => isAppShellActionBlocked.value,
   });
 }

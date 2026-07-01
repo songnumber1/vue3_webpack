@@ -15,8 +15,7 @@
  * prompt rules live in _prompt-composer.scss, but the legacy mobile cascade is
  * intentionally imported later and re-applies the normal bottom-docked prompt
  * geometry. These selectors only run while the prompt is expanded and
- * body.mobile-mode is active, so the PC expanded layout and collapsed mobile
- * prompt remain unchanged.
+ * body.mobile-mode is active, so collapsed prompt behavior remains unchanged.
  */
 
 body.mobile-mode.prompt-input-expanded {
@@ -104,8 +103,7 @@ body.mobile-mode.prompt-input-expanded
 }
 
 /* Chat screen: cover the gap area with background and start the prompt after a
-   small header gap. This matches the PC expanded chat behavior: a visual gap is
-   kept, but the old conversation never shows behind it. */
+   small header gap. The old conversation should never show behind the overlay. */
 body.mobile-mode.prompt-input-expanded
   .chat-container-root--mode-chat
   .chat-composer-slot:has(.prompt-wrap--expanded),
@@ -233,7 +231,7 @@ body.mobile-mode.prompt-input-expanded
  * remaining visual issue was only the text cursor/content starting too far from
  * the top edge while the prompt is expanded. Keep this patch scoped to the
  * expanded state so collapsed prompt sizing, toolbar layout, keyboard handling,
- * and PC/mobile geometry remain unchanged.
+ * and the current mobile geometry remains unchanged.
  */
 
 body.prompt-input-expanded {

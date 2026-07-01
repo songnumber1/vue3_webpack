@@ -283,7 +283,7 @@
 
 /* Mermaid renders its own SVG/foreignObject tree.
    Keep the SVG at Mermaid's intrinsic size and let the card body scroll horizontally.
-   Scaling the SVG to 100% can clip the right edge on PC and can amplify Android
+   Scaling the SVG to 100% can clip the right edge and can amplify Android
    font-metric differences inside nodes. */
 .md-mermaid svg[data-diagram-id],
 .md-mermaid svg[aria-roledescription],

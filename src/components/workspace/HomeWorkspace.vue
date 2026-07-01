@@ -1,6 +1,5 @@
 <template>
   <ChatHeader
-    v-if="isMobile"
     mode="main"
     :assistant-label="assistantLabel"
     :assistant="assistant"
@@ -9,13 +8,11 @@
   />
 
   <MainEmptyState
-    :is-mobile="isMobile"
     :assistant-icon="mainAssistantIcon"
     :assistant-label="assistantLabel"
     :suggestions="suggestions"
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
-    :composer-expanded="isMainPromptExpanded"
     @suggestion-click="handleSuggestionClick"
   >
     <template #composer>
@@ -54,7 +51,6 @@ const workspaceState = inject(
   CHAT_WORKSPACE_STATE_KEY,
   computed(createEmptyWorkspaceState)
 );
-const isMobile = computed(() => true);
 const assistantLabel = computed(() => workspaceState.value.assistantLabel);
 const assistant = computed(() => workspaceState.value.assistant);
 const conversationTitle = computed(
@@ -90,6 +86,7 @@ function handleMainPromptExpandedChange(expanded) {
 }
 
 providePromptWorkspaceLayoutActions({
+  isExpanded: isMainPromptExpanded,
   onExpandedChange: handleMainPromptExpandedChange,
 });
 </script>

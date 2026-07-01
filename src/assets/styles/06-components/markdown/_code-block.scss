@@ -88,12 +88,12 @@ body.mobile-mode .markdown-body pre {
 }
 
 /*
- * G8.1 PC chat code-block color hotfix.
+ * G8.1 code-block color hotfix.
  *
- * PC 답변 코드 블록에서 rehype-highlight/github-dark 색상과 legacy markdown
+ * 답변 코드 블록에서 rehype-highlight/github-dark 색상과 legacy markdown
  * code 배경 규칙이 겹치면 실제 코드 영역이 밝게 보이면서 토큰 대비가 낮아질 수 있다.
- * 실제 Android 모바일 코드 블록은 현재 정상이라 actual-android-runtime은 건드리지 않고,
- * PC 데스크톱과 PC 모바일 사이즈의 md-code-card 내부 pre/code/hljs 색상만 고정한다.
+ * actual-android-runtime은 네이티브 렌더 안정성을 위해 건드리지 않고,
+ * 나머지 런타임의 md-code-card 내부 pre/code/hljs 색상만 고정한다.
  */
 body:not(.actual-android-runtime)
   .message--assistant
@@ -294,7 +294,7 @@ body:not(.actual-android-runtime)
   color: #ffa657 !important;
 }
 
-/* PC-only code interpreter action belongs to the markdown code block toolbar. */
+/* Code interpreter action belongs to the markdown code block toolbar. */
 .md-code-action--interpreter {
   display: none;
 }

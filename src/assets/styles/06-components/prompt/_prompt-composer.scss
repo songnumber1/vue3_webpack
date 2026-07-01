@@ -510,8 +510,7 @@ body.mobile-mode .prompt-box--gemini .voice-button:disabled {
   box-shadow: none;
 }
 
-/* Mobile prompt top action row. Applies only to PC layouts; mobile keeps the
-   existing textarea-first/toolbar-bottom structure and keyboard rules. */
+/* Prompt menu typography and top action controls. */
 .prompt-tool-menu .prompt-submenu-arrow,
 .prompt-tool-submenu .prompt-submenu-arrow,
 .bottom-sheet-submenu-arrow {
@@ -704,4 +703,3 @@ body.prompt-input-expanded .scroll-bottom-button {
   display: none !important;
 }
 
-/* PC top-action prompt corrections. Keep mobile composer unchanged. */

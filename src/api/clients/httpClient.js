@@ -11,7 +11,6 @@ import {
 } from "@/constants/apiMode";
 import {resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {usePlatformStore} from "@/stores/platformStore";
 import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {
   applySessionRequestConfig,
@@ -34,7 +33,7 @@ function resolveBaseURL() {
 }
 
 /**
- * @description 특정 API 키에 선언된 개별 정책(Policy)과 시스템 설정/플랫폼 스토어를 대조하여, 네트워크 통신 도중 ProgressBar를 표시할지 판별합니다.
+ * @description 특정 API 키에 선언된 개별 정책(Policy)을 기준으로 네트워크 통신 도중 ProgressBar를 표시할지 판별합니다.
  * @param {object} policy - `resolveApiPolicy` 파이프라인에서 추출된 해당 API의 정책 규격 객체
  * @returns {boolean} 전역 ProgressBar 가동 여부 플래그
  */
@@ -46,11 +45,9 @@ function getApiRequestStore() {
 function shouldShowOverlay(policy) {
   try {
     if (!policy.overlay) return false;
-    const platformStore = usePlatformStore();
-
-    return isProgressAllowedForCurrentPlatform(platformStore.info);
+    return isProgressAllowedForCurrentPlatform();
   } catch (_error) {
-    // Pinia 스토어 활성화 전 시점 등 초기 부트스트랩 에러 발생 시 예외 크래시 방지를 위해 false 가드 처리
+    // 초기 부트스트랩 시점의 예외 크래시 방지를 위해 false 가드 처리
     return false;
   }
 }

@@ -53,7 +53,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const runtime = detectedRuntime;
   const device = detectedDevice;
   const isAndroid = env === PLATFORM.ANDROID;
-  const isWindows = env === PLATFORM.WINDOWS;
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
   const isAndroidWebView = isAndroid && browserName === "android-webview";
@@ -78,7 +77,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     browserName
   );
   logPlatformDebug("platform.resolve", {
-    isPlatformForced: false,
     actualPlatform: actualPlatform.label,
     resolved: {
       env,
@@ -118,7 +116,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     languages: Array.from(nav.languages || []),
     isAccess,
     unsupportedReason,
-    isWindows,
     isAndroid,
     isNativeApp,
     isNativeRuntime: isNativeApp,
@@ -128,12 +125,10 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isMobile,
     isMobileBrowser,
     isMic,
-    isPlatformForced: false,
     isChrome: browserName === "chrome",
     isFirefox: browserName === "firefox",
     isSupportedRuntime,
     isSamsungBrowser: isActuallySamsungBrowser,
-    isPc: false,
     appVersion: getAppVersionFromBridge() || baseAppInfo.appVersion || "1.0.0",
     appBuildVersion: baseAppInfo.appBuildVersion || "",
     bridgeVersion:

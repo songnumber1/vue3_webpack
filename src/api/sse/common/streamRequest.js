@@ -6,7 +6,6 @@ import {
 } from "@/constants/apiMode";
 import {API_KEYS, resolveApiPolicy} from "@/constants/apiConfig";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
-import {usePlatformStore} from "@/stores/platformStore";
 import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {logPlatformDebug} from "@/platform/platformDebug";
 import {resolveSessionAuthConfig} from "@/auth/authPolicy";
@@ -73,11 +72,7 @@ export async function fetchGenerationResult(requestId) {
 }
 
 function shouldUseOverlay(policy) {
-  const platformStore = usePlatformStore();
-
-  const result = Boolean(
-    policy.overlay && isProgressAllowedForCurrentPlatform(platformStore.info)
-  );
+  const result = Boolean(policy.overlay && isProgressAllowedForCurrentPlatform());
 
   logPlatformDebug("sse.overlay", {
     result,

@@ -98,11 +98,10 @@ body.mobile-mode .chat-container-root--mode-studio .studio-pagination {
   width: 100% !important;
   margin: 12px 0 0 !important;
   padding: 14px 0 calc(18px + env(safe-area-inset-bottom, 0px)) !important;
-}/* Android OverlayScrollbars runtime guard.
-   When the global policy is ALL, actual Android must receive the same fixed
-   scroll viewport sizing that PC OverlayScrollbars already uses. Without this,
-   the mobile Studio/MCP cascade can leave .studio-list-area visible/auto-height,
-   so OverlayScrollbars owns a viewport with no scrollable height. */
+}/* OverlayScrollbars runtime guard.
+   Fixed scroll viewport sizing prevents the mobile Studio/MCP cascade from leaving
+   .studio-list-area visible/auto-height, so OverlayScrollbars always owns a
+   scrollable viewport. */
 .app-container--overlay-scroll-runtime
   .chat-container-root--mode-studio
   .studio-workspace,

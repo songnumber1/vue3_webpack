@@ -3,7 +3,7 @@
  * @description 모바일 전용 프롬프트 하단 메뉴 상태를 관리합니다.
  */
 
-import {computed, onBeforeUnmount, ref, watch} from "vue";
+import {computed, onBeforeUnmount, readonly, ref, watch} from "vue";
 import {PROMPT_MENU_TYPE} from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 
@@ -27,7 +27,7 @@ export function usePromptMenu() {
   const promptMenuScopeId = `prompt-menu-${Math.random().toString(36).slice(2)}`;
 
   const toolbarRef = ref(null);
-  const isMobileSheet = computed(() => true);
+  const isMobileSheet = readonly(ref(true));
   const activeMenu = computed(() =>
     promptControlStore.getActivePromptMenu(promptMenuScopeId)
   );
@@ -78,8 +78,6 @@ export function usePromptMenu() {
   watch(() => promptControlStore.hasAnyPromptMenuOpen, syncPromptMenuClass, {
     immediate: true,
   });
-
-  promptControlStore.setPromptMobileSheet(promptMenuScopeId, true);
 
   onBeforeUnmount(() => {
     promptControlStore.clearPromptScope(promptMenuScopeId);

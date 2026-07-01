@@ -197,7 +197,7 @@ function handleInput(event) {
   }
 
   // 실제 입력 이벤트가 발생한 textarea DOM을 기준으로 먼저 높이를 맞춥니다.
-  // PC <-> 모바일 전환 후 기존 값이 있는 상태에서 이어 입력하는 경우에도
+  // 반응형 전환 후 기존 값이 있는 상태에서 이어 입력하는 경우에도
   // 부모/store 동기화 타이밍과 무관하게 auto-grow가 즉시 동작해야 합니다.
   resizeTextareaElement();
   promptInputActions.input?.(event);

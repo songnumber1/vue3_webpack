@@ -42,7 +42,6 @@ import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions"
 import {useAppContext} from "@/composables/app/useAppContext";
 import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {useRuntimeModeFlags} from "@/composables/app/useRuntimeModeFlags";
 import {authApiLive} from "@/api/live/authApi.live";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
@@ -63,13 +62,12 @@ const themeName = computed({
   get: () => appShellStore.themeName,
   set: (value) => appShellStore.setThemeName(value),
 });
-const {shouldUseMobileLayout} = useRuntimeModeFlags();
 const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const responseOverlay = {
   openSettings: () =>
     openSettingsOverlay({
-      isMobile: shouldUseMobileLayout,
+      isMobile: true,
       isBlocked: isShellActionBlocked,
     }),
 };

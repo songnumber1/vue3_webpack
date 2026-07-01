@@ -46,11 +46,9 @@ function updatePromptToolSettings(settingsMap, key, updater) {
 export const usePromptControlStore = defineStore("promptControl", {
   state: () => ({
     activePromptMenuMap: {},
-    promptMobileSheetMap: {},
     activePromptToolSettingsKey: DRAFT_PROMPT_TOOL_SETTINGS_KEY,
     promptToolSettingsMap: {},
     promptTextMap: {},
-    promptExpandedMap: {},
   }),
   getters: {
     hasAnyPromptMenuOpen: (state) =>
@@ -63,8 +61,6 @@ export const usePromptControlStore = defineStore("promptControl", {
     },
     activePromptText: (state) =>
       normalizePromptText(state.promptTextMap[getActivePromptKey(state)]),
-    activePromptExpanded: (state) =>
-      Boolean(state.promptExpandedMap[getActivePromptKey(state)]),
   },
   actions: {
     getActivePromptMenu(scopeId) {
@@ -93,24 +89,11 @@ export const usePromptControlStore = defineStore("promptControl", {
     isPromptMenuOpen(scopeId, menuType) {
       return this.getActivePromptMenu(scopeId) === menuType;
     },
-    setPromptMobileSheet(scopeId, value) {
-      const key = normalizeScopeId(scopeId);
-      const nextValue = Boolean(value);
-      if (this.promptMobileSheetMap[key] === nextValue) return;
-
-      this.promptMobileSheetMap = {
-        ...this.promptMobileSheetMap,
-        [key]: nextValue,
-      };
-    },
     clearPromptScope(scopeId) {
       const key = normalizeScopeId(scopeId);
       const nextMenus = {...this.activePromptMenuMap};
-      const nextSheets = {...this.promptMobileSheetMap};
       delete nextMenus[key];
-      delete nextSheets[key];
       this.activePromptMenuMap = nextMenus;
-      this.promptMobileSheetMap = nextSheets;
     },
 
     setActivePromptToolSettingsKey(chatId) {
@@ -124,16 +107,6 @@ export const usePromptControlStore = defineStore("promptControl", {
       this.promptTextMap = {
         ...this.promptTextMap,
         [key]: normalizePromptText(value),
-      };
-    },
-    setActivePromptExpanded(value) {
-      const key = getActivePromptKey(this);
-      const nextValue = Boolean(value);
-      if (this.promptExpandedMap[key] === nextValue) return;
-
-      this.promptExpandedMap = {
-        ...this.promptExpandedMap,
-        [key]: nextValue,
       };
     },
     ensurePromptToolSettings() {
@@ -182,18 +155,6 @@ export const usePromptControlStore = defineStore("promptControl", {
       });
       this.promptTextMap = nextPromptTextMap;
 
-      const nextPromptExpandedMap = {};
-      Object.entries(this.promptExpandedMap || {}).forEach(
-        ([chatId, value]) => {
-          if (
-            String(chatId) === keepId ||
-            String(chatId) === DRAFT_PROMPT_TOOL_SETTINGS_KEY
-          ) {
-            nextPromptExpandedMap[chatId] = Boolean(value);
-          }
-        }
-      );
-      this.promptExpandedMap = nextPromptExpandedMap;
     },
     promoteDraftPromptToolSettingsToChat(chatId) {
       const id = String(chatId || "").trim();
@@ -221,14 +182,6 @@ export const usePromptControlStore = defineStore("promptControl", {
         [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: "",
       };
 
-      const draftExpanded = Boolean(
-        this.promptExpandedMap[DRAFT_PROMPT_TOOL_SETTINGS_KEY]
-      );
-      this.promptExpandedMap = {
-        ...this.promptExpandedMap,
-        [id]: draftExpanded,
-        [DRAFT_PROMPT_TOOL_SETTINGS_KEY]: false,
-      };
       this.setActivePromptToolSettingsKey(id);
     },
     resetActivePromptTemplate() {

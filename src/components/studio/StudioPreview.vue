@@ -17,7 +17,6 @@
       :subtitle="resolvedSubtitle"
       :suggestions="previewSuggestions"
       disable-interactions
-      :composer-expanded="previewComposerExpanded"
     >
       <template #composer>
         <PromptComposer
@@ -69,6 +68,7 @@ function handlePreviewComposerExpandedChange(expanded) {
 }
 
 providePromptWorkspaceLayoutActions({
+  isExpanded: previewComposerExpanded,
   onExpandedChange: handlePreviewComposerExpandedChange,
 });
 

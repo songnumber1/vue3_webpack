@@ -243,12 +243,7 @@ const {
 
 // ── [텍스트 입력 + 리사이즈] ────────────────────────────────────────────
 // 사용자가 한 줄 혹은 여러 줄의 텍스트를 기재할 때 textarea 요소의 렌더링 물리 상태를 핸들링합니다.
-const isPromptExpanded = computed({
-  get: () => promptControlStore.activePromptExpanded,
-  set: (value) => {
-    promptControlStore.setActivePromptExpanded(value);
-  },
-});
+const isPromptExpanded = ref(false);
 
 const {
   text, // 사용자가 작성 중인 순수 텍스트 문자열 반응형 참조 객체 (Ref)

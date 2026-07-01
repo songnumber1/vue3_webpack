@@ -10,7 +10,7 @@
   width: 100%;
 }
 
-/* Studio mobile list/action refinements. Keep PC layout unchanged. */
+/* Studio mobile list/action refinements. */
 .studio-icon--plus {
   mask-image: url("../img/studio/plus.svg");
   -webkit-mask-image: url("../img/studio/plus.svg");
@@ -171,7 +171,7 @@ body.mobile-mode .chat-container-root--mode-studio .studio-picker--category {
 /* -----------------------------------------------------------------------------
    Mobile Studio sheet and pagination guards
 ----------------------------------------------------------------------------- */
-/* Studio mobile bug fixes: keep PC unchanged and align mobile with existing sheet/list behavior. */
+/* Studio mobile bug fixes: align with existing sheet/list behavior. */
 body.mobile-mode .chat-container-root--mode-studio .studio-workspace {
   height: 100%;
   min-height: 0;

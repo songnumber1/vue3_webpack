@@ -147,7 +147,6 @@ import {useAppShellStore} from "@/stores/appShellStore";
 import {useAutoScroll} from "@/composables/chat/useAutoScroll";
 import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
-import {usePlatformStore} from "@/stores/platformStore";
 import {syncMobileViewportSettings} from "@/utils/syncMobileViewportSettings";
 import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {
@@ -370,8 +369,6 @@ pageState.activeHistoryId = activeHistoryId;
 
 const {t, locale} = useI18n();
 const {theme} = useAppContext();
-const platformStore = usePlatformStore();
-
 syncMobileViewportSettings();
 
 const runtimeCurrentAssistant = computed(
@@ -1112,10 +1109,7 @@ function beginHistoryRender() {
   historyMessagesLoaded.value = false;
   historyMarkdownVisible.value = false;
   isHistoryRendering.value = true;
-  if (
-    isProgressAllowedForCurrentPlatform(platformStore.info) &&
-    !historyRenderOverlayActive
-  ) {
+  if (isProgressAllowedForCurrentPlatform() && !historyRenderOverlayActive) {
     apiRequestStore.startOverlay();
     historyRenderOverlayActive = true;
   }

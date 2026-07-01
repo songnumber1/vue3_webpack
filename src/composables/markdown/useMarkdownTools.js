@@ -209,7 +209,7 @@ export function useMarkdownTools(contentRef) {
 
     const href = anchor.getAttribute("href");
     if (!href || href.startsWith("#")) return; // 단순 인페이지 앵커(ID 해시태그 이동 목점) 수치라면 네이티브 스크롤로 가도록 바이패스
-    if (!platformStore.info.isAndroidApp) return; // 일반 PC 웹 브라우저 환경인 경우 네이티브 타깃 링크 처리가 불필요하므로 바이패스 예외 이탈
+    if (!platformStore.info.isAndroidApp) return; // 네이티브 타깃 링크 처리가 불필요한 일반 브라우저는 바이패스
 
     // [중요 인앱 웹뷰 가드]: 안드로이드 네이티브 앱 환경 내부 웹뷰인 경우, 링크를 그냥 클릭하면 하이브리드 앱 화면 자체가
     // 외부 사이트로 넘어가서 채팅 세션이 완전히 폭파되는 심각한 오류가 있으므로 네이티브 웹뷰 주소 점프를 강제 압착 셧다운 처리합니다.

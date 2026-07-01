@@ -64,7 +64,7 @@
 <script setup>
 /**
  * @file components/common/modal/AppModal.vue
- * @description PC/모바일 공통으로 사용하는 재사용 Modal입니다. 상태와 실제 액션은 상위에서 제어하고, 이 컴포넌트는 backdrop/scroll lock/slot 렌더링만 담당합니다.
+ * @description 공통으로 사용하는 재사용 Modal입니다. 상태와 실제 액션은 상위에서 제어하고, 이 컴포넌트는 backdrop/scroll lock/slot 렌더링만 담당합니다.
  */
 
 import {computed, nextTick, onBeforeUnmount, ref, toRef, watch} from "vue";
