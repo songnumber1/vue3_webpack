@@ -16,6 +16,7 @@ export const ROUTE_NAMES = Object.freeze({
   GUIDE: "guide",
   SHARED: "shared",
   SHARED_ENTRY: "shared-entry",
+  SHARE_CHAT_ENTRY: "share-chat-entry",
   PLAYGROUND: "playground",
   TERMS: "terms",
   LOGIN_REQUIRED: "login-required",
@@ -25,6 +26,7 @@ export const ROUTE_NAMES = Object.freeze({
 export const CHAT_ROUTE_NAMES = Object.freeze([
   ROUTE_NAMES.CHAT_DETAIL,
   ROUTE_NAMES.CHAT_ENTRY,
+  ROUTE_NAMES.SHARE_CHAT_ENTRY,
 ]);
 
 export const STUDIO_ROUTE_NAMES = Object.freeze([

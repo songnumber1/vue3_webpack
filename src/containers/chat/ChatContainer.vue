@@ -351,6 +351,10 @@ const activeWorkspaceType = computed(() => {
 });
 
 const activeHistoryId = computed(() => {
+  if (route.name === ROUTE_NAMES.SHARE_CHAT_ENTRY) {
+    return String(route.params?.id || "").trim() || null;
+  }
+
   if (pageState.isChatPage.value) {
     return (
       resolveActiveChatId() ||
@@ -831,13 +835,23 @@ const historyDialogTitle = computed(() => {
   return t("chat.historyDialog.renameTitle");
 });
 
+function resolveHistoryShareChatId(history) {
+  return String(
+    history?.id ||
+      history?.chatId ||
+      history?.raw?.chatId ||
+      history?.sharedId ||
+      ""
+  ).trim();
+}
+
 const historyDialogShareUrl = computed(() => {
-  const sharedId = String(historyDialogTarget.value?.sharedId || "").trim();
-  if (!sharedId || typeof window === "undefined") return "";
+  const chatId = resolveHistoryShareChatId(historyDialogTarget.value);
+  if (!chatId || typeof window === "undefined") return "";
 
   const href = router.resolve({
-    name: ROUTE_NAMES.SHARED_ENTRY,
-    params: {id: sharedId},
+    name: ROUTE_NAMES.SHARE_CHAT_ENTRY,
+    params: {id: chatId},
   }).href;
 
   return new URL(href, window.location.origin).toString();
@@ -1037,6 +1051,33 @@ function findHistory(id) {
 }
 
 const activeHistory = computed(() => findHistory(activeHistoryId.value));
+
+function isShareChatEntryRoute() {
+  return route.name === ROUTE_NAMES.SHARE_CHAT_ENTRY;
+}
+
+async function findHistoryWithShareChatRefresh(id) {
+  const targetId = normalizeHistoryId(id);
+  if (!targetId) return null;
+
+  const cachedHistory = findHistory(targetId);
+  if (cachedHistory || !isShareChatEntryRoute()) return cachedHistory;
+
+  await refreshHistories({notifyOnError: false});
+  return findHistory(targetId);
+}
+
+async function replaceShareChatEntryWithChatRoute(historyId) {
+  if (!isShareChatEntryRoute()) return;
+
+  const id = normalizeHistoryId(historyId);
+  if (id) {
+    chatStore.setPendingSelectedChatId(id);
+    chatStore.setActiveChatRoom(id);
+  }
+
+  await router.replace({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {});
+}
 
 const isReadOnly = computed(
   () =>
@@ -1329,7 +1370,7 @@ async function loadHistoryRouteConversation({isCurrentLoad, signal}) {
     return;
   }
 
-  const history = findHistory(activeHistoryId.value);
+  const history = await findHistoryWithShareChatRefresh(activeHistoryId.value);
   if (!history) {
     await redirectMissingHistory();
     return;
@@ -1341,6 +1382,10 @@ async function loadHistoryRouteConversation({isCurrentLoad, signal}) {
   }
 
   await hydrateHistoryConversation({history, isCurrentLoad, signal});
+
+  if (isCurrentLoad()) {
+    await replaceShareChatEntryWithChatRoute(history.id);
+  }
 }
 
 async function redirectSharedNotFound() {

@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory} from "vue-router";
+import {createRouter, createWebHashHistory} from "vue-router";
 import AssistantRouterView from "@/views/AssistantRouterView.vue";
 import MainPage from "@/views/MainPage.vue";
 import {isAndroidApp} from "@/core/config/appConfig";
@@ -68,6 +68,13 @@ const baseRoutes = [
       {
         path: "chat/:id",
         name: ROUTE_NAMES.CHAT_DETAIL,
+        component: ChatPage,
+        props: true,
+        meta: {title: "Chat"},
+      },
+      {
+        path: "share-chat/:id",
+        name: ROUTE_NAMES.SHARE_CHAT_ENTRY,
         component: ChatPage,
         props: true,
         meta: {title: "Chat"},
@@ -328,7 +335,7 @@ export function resolveRouter(appInfo, context = {}) {
     fallbackRoute,
   ]);
 
-  const router = createRouter({history: createWebHistory(), routes});
+  const router = createRouter({history: createWebHashHistory(), routes});
   registerRouteGuard(router, appInfo, context);
 
   return router;
