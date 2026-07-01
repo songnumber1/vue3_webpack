@@ -56,7 +56,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
   const isAndroidWebView = isAndroid && browserName === "android-webview";
-  const isMobile = true;
   const isMobileBrowser = !isNativeApp;
   const isActuallySamsungBrowser =
     actualPlatform.browser === "samsung-browser" ||
@@ -84,7 +83,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       device,
       browser: browserName,
       isAndroid,
-      isMobile,
       isMobileBrowser,
       isAndroidApp,
       isCompactViewport: viewportInfo.isCompactViewport,
@@ -122,7 +120,6 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isCompactViewport: viewportInfo.isCompactViewport,
     isAndroidApp,
     isAndroidWebView,
-    isMobile,
     isMobileBrowser,
     isMic,
     isChrome: browserName === "chrome",

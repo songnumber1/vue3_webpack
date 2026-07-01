@@ -69,12 +69,10 @@
 import {computed, unref} from "vue";
 import {useI18n} from "vue-i18n";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
-import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
 import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 
 const {t} = useI18n();
 
-const chatWorkspaceActions = useChatWorkspaceActions();
 const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
 
 const props = defineProps({
@@ -92,7 +90,7 @@ const props = defineProps({
   studioDetailDisabled: {type: Boolean, default: false},
 });
 
-const emit = defineEmits(["suggestion-click"]);
+const emit = defineEmits(["suggestion-click", "studio-detail-click"]);
 
 const resolvedTitle = computed(() => props.title || t("chat.startQuestion"));
 const isComposerExpanded = computed(() =>
@@ -130,7 +128,7 @@ function handleSuggestionClick(item) {
 
 function handleStudioDetailClick() {
   if (props.studioDetailDisabled) return;
-  chatWorkspaceActions.openStudioDetail?.();
+  emit("studio-detail-click");
 }
 </script>
 

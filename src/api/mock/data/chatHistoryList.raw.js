@@ -1,10 +1,4 @@
 import {PERFORMANCE_CHAT_HISTORY_RAW} from "@/api/mock/data/performanceChatHistory.raw";
-import {
-  GENERATION_ERROR_TEST_CHAT_ID,
-  GENERATION_ERROR_TEST_CHAT_TITLE,
-  GENERATION_ERROR_TEST_MODEL_ID,
-} from "@/constants/generationErrorTest";
-
 /**
  * @file api/mock/data/chatHistoryList.raw.js
  * @description 채팅 검색/대화 이력 개발용 mock 데이터입니다. API 미사용 시에도 검색, 페이징, 상세 이동 흐름을 검증할 수 있도록 100개 샘플을 제공합니다.
@@ -12,18 +6,6 @@ import {
 
 export const CHAT_HISTORY_LIST_RAW = [
   ...PERFORMANCE_CHAT_HISTORY_RAW,
-  {
-    chatTitle: GENERATION_ERROR_TEST_CHAT_TITLE,
-    chatId: GENERATION_ERROR_TEST_CHAT_ID,
-    modeId: GENERATION_ERROR_TEST_MODEL_ID,
-    modelId: GENERATION_ERROR_TEST_MODEL_ID,
-    bookmarkYN: false,
-    dayGroup: 0,
-    chatEndDt: "2026-06-30T09:00:00Z",
-    userId: "user-1234",
-    sharedId: null,
-    mockErrorTest: true,
-  },
   {
     chatTitle: "공유 - 공동상속주택 1가구 2주택 양도세",
     chatId: "chat-search-sample-001",

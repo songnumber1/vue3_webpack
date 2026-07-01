@@ -1,9 +1,4 @@
 import {PERFORMANCE_CHAT_MESSAGES_RAW} from "@/api/mock/data/performanceChatMessages.raw";
-import {
-  GENERATION_ERROR_TEST_CHAT_ID,
-  GENERATION_ERROR_TEST_CHAT_TITLE,
-} from "@/constants/generationErrorTest";
-
 /**
  * @file api/mock/data/chatMessages.raw.js
  * @description 채팅 목록 mock 데이터의 chatId와 1:1 매칭되는 상세 대화 mock 데이터입니다.
@@ -11,36 +6,6 @@ import {
  */
 
 export const CHAT_MESSAGES_RAW = {
-  [GENERATION_ERROR_TEST_CHAT_ID]: [
-    {
-      role: "user",
-      content:
-        "이 방에서 질문을 보내면 generation.do 대신 mock error.do 흐름으로 전체 메시지 교체를 확인할 예정입니다.",
-      id: `${GENERATION_ERROR_TEST_CHAT_ID}-user-1`,
-      chatId: GENERATION_ERROR_TEST_CHAT_ID,
-      isSend: true,
-      isRAG: false,
-      isRagCot: false,
-      intention: "직접입력",
-      sendTime: "2026-06-30T09:00:00Z",
-      tags: ["mock", "error-test"],
-      refreences: [],
-    },
-    {
-      role: "assistant",
-      content:
-        `${GENERATION_ERROR_TEST_CHAT_TITLE} 방입니다. 다음 단계에서 이 chatId를 기준으로 전송 시 mock error.do를 강제 실행합니다.`,
-      id: `${GENERATION_ERROR_TEST_CHAT_ID}-assistant-1`,
-      chatId: GENERATION_ERROR_TEST_CHAT_ID,
-      isSend: true,
-      isRAG: false,
-      isRagCot: false,
-      intention: null,
-      sendTime: "2026-06-30T09:00:05Z",
-      tags: ["mock", "error-test"],
-      refreences: [],
-    },
-  ],
   "chat-search-sample-001": [
     {
       role: "user",

@@ -2,10 +2,10 @@
   <section class="chat-search-workspace" :aria-label="t('chatSearch.title')">
     <ChatHeader
       mode="main"
-      :assistant-label="workspaceState.assistantLabel"
-      :assistant="workspaceState.assistant"
+      :assistant-label="assistantLabel"
+      :assistant="assistant"
       :conversation-title="t('chatSearch.title')"
-      :theme-name="workspaceState.themeName"
+      :theme-name="themeName"
     />
 
     <div class="chat-search-scroll">
@@ -137,9 +137,10 @@
  * @file components/search/ChatSearchWorkspace.vue
  * @description Studio 목록 레이아웃 리듬을 사용하는 채팅 검색 화면입니다.
  */
-import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
+import {useAppShellStore} from "@/stores/appShellStore";
 import {openChatRoom, clearPendingChatRoom} from "@/composables/chat/chatRoomActions";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -150,23 +151,17 @@ import {
   adaptChatSearchResponse,
   createHistoryFromSearchResult,
 } from "@/adapters/chatResponseAdapter";
-import {
-  createEmptyWorkspaceState,
-  CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
 
 const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const router = useRouter();
 const chatStore = useChatStore();
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
+const appShellStore = useAppShellStore();
+const assistant = computed(() => chatStore.currentAssistant);
+const assistantLabel = computed(
+  () => String(assistant.value?.label || "").trim() || t("chat.assistant")
 );
-const workspaceState = computed(
-  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
-);
-
+const themeName = computed(() => appShellStore.themeName);
 const keyword = ref("");
 const lastSearchedKeyword = ref("");
 const allResults = ref([]);

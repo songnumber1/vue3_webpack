@@ -10,18 +10,18 @@
 import {watch} from "vue";
 import ChatContainer from "@/containers/chat/ChatContainer.vue";
 import {storeToRefs} from "pinia";
-import {useAssistantStore} from "@/stores/assistantStore";
+import {useChatStore} from "@/stores/chatStore";
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 
 const ASSISTANT_STUDIO_PORTAL_ID = ASSISTANT_PORTAL_IDS.STUDIO;
-const assistantStore = useAssistantStore();
-const {assistants} = storeToRefs(assistantStore);
+const chatStore = useChatStore();
+const {assistants} = storeToRefs(chatStore);
 
 watch(
   assistants,
   () => {
-    if (assistantStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID]) {
-      assistantStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
+    if (chatStore.assistantMap[ASSISTANT_STUDIO_PORTAL_ID]) {
+      chatStore.selectAssistant(ASSISTANT_STUDIO_PORTAL_ID);
     }
   },
   {immediate: true}

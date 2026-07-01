@@ -12,7 +12,7 @@ function readBooleanEnv(value, fallback) {
 
 export const USE_REAL_API = readBooleanEnv(
   process.env.VUE_APP_SYSTEM_USE_REAL_API,
-  true
+  false
 );
 
 export const APP_RUNTIME_POLICY = Object.freeze({

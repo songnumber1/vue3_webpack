@@ -67,7 +67,8 @@ import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
-import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
+
+const emit = defineEmits(["open-studio-detail"]);
 
 const props = defineProps({
   mode: {type: String, default: "main"},
@@ -83,7 +84,6 @@ const {t} = useI18n();
 const chatStreamStore = useChatStreamStore();
 const viewportStore = useViewportStore();
 const appShellStore = useAppShellStore();
-const chatWorkspaceActions = useChatWorkspaceActions();
 const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const mobileAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 20)
@@ -111,14 +111,13 @@ function openAssistant() {
 
 function openSettings() {
   openSettingsOverlay({
-    isMobile: true,
     isBlocked: () => isAppShellActionBlocked.value,
   });
 }
 
 function openStudioDetail() {
   if (props.studioDetailDisabled) return;
-  chatWorkspaceActions.openStudioDetail?.();
+  emit("open-studio-detail");
 }
 </script>
 

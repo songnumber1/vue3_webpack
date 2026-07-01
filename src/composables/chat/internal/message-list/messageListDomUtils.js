@@ -1,4 +1,6 @@
-import {normalizeMessageId} from "@/utils/normalize";
+function normalizeMessageId(value) {
+  return typeof value === "string" ? value.trim() : String(value || "").trim();
+}
 
 export function getElementOffsetTopWithinScroll(element, container) {
   if (!element || !container) return 0;

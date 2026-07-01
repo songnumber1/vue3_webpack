@@ -106,7 +106,6 @@ import SidebarHistoryListMobile from "@/components/navigation/history/SidebarHis
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatHistoryActionBottomSheet from "@/components/navigation/history/ChatHistoryActionBottomSheet.vue";
 import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFooter.vue";
-import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
@@ -125,21 +124,19 @@ import {
 import {logWarn} from "@/utils/logger";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {resolveBlocked} from "@/utils/interactionGuard";
-import {useNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
-const navigationActions = useNavigationActions();
-const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const appShellStore = useAppShellStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
+const {assistants, selectedAssistantId} = storeToRefs(chatStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
   storeToRefs(chatStore);
 const {drawerOpen} = storeToRefs(appShellStore);
+const emit = defineEmits(["history-menu-action"]);
 
 const assistantMenuOpen = ref(false);
 const historyMenuOpen = ref(false);
@@ -167,14 +164,14 @@ function isDeletedRuntimeStudio(assistant = null) {
 }
 
 async function preloadRuntimeExamplePrompts(assistantId) {
-  if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
+  if (!assistantId || chatStore.examplePromptMap[assistantId]) return;
   try {
-    const assistant = assistantStore.assistantMap[assistantId];
+    const assistant = chatStore.assistantMap[assistantId];
     const prompts = await loadExamplePrompts(
       assistantId,
       assistant?.type === "studio"
     );
-    assistantStore.setExamplePrompts(assistantId, prompts);
+    chatStore.setExamplePrompts(assistantId, prompts);
   } catch (error) {
     logWarn("[AppSidebar] preloadExamplePrompts 오류:", error);
   }
@@ -182,10 +179,10 @@ async function preloadRuntimeExamplePrompts(assistantId) {
 
 async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   if (!forNewChat && chatStore.isModelLocked) return;
-  if (!assistantStore.assistantMap[id]) return;
+  if (!chatStore.assistantMap[id]) return;
   try {
     await preloadRuntimeExamplePrompts(id);
-    assistantStore.selectAssistant(id);
+    chatStore.selectAssistant(id);
     if (forNewChat) chatStore.clearActiveSession();
   } catch (error) {
     logWarn("[AppSidebar] selectAssistant 오류:", error);
@@ -229,7 +226,7 @@ async function navigatePortalAssistant(assistantId) {
   const targetRoute = createPortalAssistantRoute(assistantId);
 
   preparePortalNavigation();
-  assistantStore.selectAssistant(assistantId);
+  chatStore.selectAssistant(assistantId);
   await router.push(targetRoute).catch(() => {});
   cleanupAfterPortalNavigation();
 }
@@ -304,7 +301,7 @@ function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   closeHistoryMenu();
   if (!history || !action) return;
-  navigationActions.handleHistoryMenuAction?.({action, history});
+  emit("history-menu-action", {action, history});
 }
 
 async function handleSelectHistory(item) {

@@ -16,26 +16,15 @@
       @wheel.passive="handleUserScrollIntent"
       @pointerdown.passive="handleUserScrollIntent"
     >
-      <div
-        v-for="(sector, sectorIndex) in messageTurnSectors"
-        :key="sector.id"
-        class="message-turn-sector"
-        :class="{
-          'message-turn-sector--last':
-            shouldApplyLastTurnSectorMinHeight(sectorIndex),
-        }"
-        :style="getTurnSectorStyle(sectorIndex)"
-      >
-        <ChatMessageRouter
-          v-for="message in sector.messages"
-          :key="message.id"
-          :message="message"
-          :show-regenerate="!readonly && isLastAssistantMessage(message)"
-          :message-dom-id="String(message.id || '')"
-          :message-dom-role="message.role"
-          :defer-mermaid-enhancement="historyRendering"
-        />
-      </div>
+      <ChatMessageRouter
+        v-for="message in messages"
+        :key="message.id"
+        :message="message"
+        :show-regenerate="!readonly && isLastAssistantMessage(message)"
+        :message-dom-id="String(message.id || '')"
+        :message-dom-role="message.role"
+        :defer-mermaid-enhancement="historyRendering"
+      />
       <div v-if="loading" class="typing-row">
         <span></span><span></span><span></span>
       </div>
@@ -51,10 +40,9 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import ChatMessageRouter from "./ChatMessageRouter.vue";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
-import {useMessageFocusSpacer} from "@/composables/chat/internal/message-list/useMessageFocusSpacer";
 import {
   destroyOverlayScrollbar,
   getOverlayScrollbarViewport,
@@ -70,7 +58,6 @@ import {waitAnimationFrames} from "@/utils/frameScheduler";
 import {
   findMessageElementById,
   getElementOffsetTopWithinScroll,
-  getFirstMessageElement,
 } from "@/composables/chat/internal/message-list/messageListDomUtils";
 import {
   applyWindowFallbackScroll,
@@ -80,7 +67,6 @@ import {
   isAssistantErrorMessage,
   scrollElementToTarget,
 } from "@/composables/chat/internal/message-list/messageListScrollUtils";
-import {MESSAGE_SCROLL_TARGET_TYPES} from "@/composables/chat/internal/message-list/messageRenderPolicyTypes";
 import {
   BOTTOM_THRESHOLD,
   HISTORY_RENDER_ANDROID_DOM_READY_MAX_FRAMES,
@@ -99,11 +85,9 @@ import {
   provideMessageActions,
   useMessageActions,
 } from "@/composables/chat/context/messageActionContext";
-import {useMessageRenderLifecycle} from "@/composables/chat/message/useMessageRenderLifecycle";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useMessageGenerationSse} from "@/composables/chat/message-list/useMessageGenerationSse";
-
+import {useMessageGenerationSse} from "@/composables/chat/useChatQuestionAnswer";
 
 const props = defineProps({
   visible: {type: Boolean, default: true},
@@ -118,75 +102,16 @@ const props = defineProps({
 });
 
 const parentMessageActions = useMessageActions();
-const renderLifecycle = useMessageRenderLifecycle(parentMessageActions);
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const messageGenerationSse = useMessageGenerationSse({
   onText: updateStreamingAssistantMessage,
+  onReasoning: updateStreamingAssistantReasoning,
   onDone: completeStreamingAssistantMessage,
   onError: failStreamingAssistantMessage,
 });
 let activeGenerationKey = "";
-
-function createMessageTurnSectors(messages = []) {
-  const sectors = [];
-
-  for (let index = 0; index < messages.length; index += 1) {
-    const message = messages[index];
-    const nextMessage = messages[index + 1];
-    const sectorMessages = [message];
-
-    if (message?.role === "user" && nextMessage?.role === "assistant") {
-      sectorMessages.push(nextMessage);
-      index += 1;
-    }
-
-    sectors.push({
-      id: sectorMessages
-        .map((item, itemIndex) => String(item?.id || `${index}-${itemIndex}`))
-        .join("__"),
-      messages: sectorMessages,
-    });
-  }
-
-  return sectors;
-}
-
-const messageTurnSectors = computed(() =>
-  createMessageTurnSectors(props.messages)
-);
-
-const lastTurnSectorMinHeight = ref(0);
-let lastTurnSectorResizeObserver = null;
-let lastTurnSectorResizeFrame = 0;
-
-function isLastTurnSector(sectorIndex) {
-  return (
-    sectorIndex >= 0 && sectorIndex === messageTurnSectors.value.length - 1
-  );
-}
-
-function shouldApplyLastTurnSectorMinHeight(sectorIndex) {
-  if (props.loading || !isLastTurnSector(sectorIndex)) {
-    return false;
-  }
-
-  const sector = messageTurnSectors.value[sectorIndex];
-  return sector?.messages?.some((message) => message?.role === "assistant");
-}
-
-function getTurnSectorStyle(sectorIndex) {
-  if (
-    !shouldApplyLastTurnSectorMinHeight(sectorIndex) ||
-    lastTurnSectorMinHeight.value <= 0
-  ) {
-    return null;
-  }
-
-  return {
-    minHeight: `${lastTurnSectorMinHeight.value}px`,
-  };
-}
+let activeGenerationPending = null;
 
 function isLastAssistantMessage(message) {
   if (!message || message.role !== "assistant") {
@@ -309,7 +234,7 @@ function clearRenderedFrameScheduler() {
 }
 
 function scheduleRenderedFrameUpdate(options = {}) {
-  renderLifecycle.notifyMessageContentRendered();
+  parentMessageActions.messageContentRendered?.();
 
   const needsSpacer = options.spacer !== false;
   renderedFrameNeedsSpacer = renderedFrameNeedsSpacer || needsSpacer;
@@ -396,15 +321,40 @@ function resetLatestUserMessageCache() {
   latestUserMessageCacheKey = "";
 }
 
-const {
-  streamFocusSpacerHeight,
-  recalculateFocusSpacerHeight,
-  refreshFocusSpacerAfterRender,
-} = useMessageFocusSpacer(
-  props,
-  getScrollElement,
-  getLatestUserMessageElement
-);
+const streamFocusSpacerHeight = ref(0);
+
+function recalculateFocusSpacerHeight(options = {}) {
+  if (!props.loading) {
+    streamFocusSpacerHeight.value = 0;
+    return;
+  }
+
+  const el = getScrollElement();
+  const target = getLatestUserMessageElement();
+  if (!el || !target) {
+    streamFocusSpacerHeight.value = 0;
+    return;
+  }
+
+  const offset = Number.isFinite(options.offset) ? options.offset : 16;
+  const currentSpacer = streamFocusSpacerHeight.value || 0;
+  const naturalScrollHeight = Math.max(0, el.scrollHeight - currentSpacer);
+  const targetTop = getElementOffsetTopWithinScroll(target, el);
+  const requiredSpacer = Math.ceil(
+    targetTop - offset + el.clientHeight - naturalScrollHeight
+  );
+  const maxUsefulSpacer = Math.max(0, el.clientHeight - offset);
+
+  streamFocusSpacerHeight.value = Math.max(
+    0,
+    Math.min(requiredSpacer, maxUsefulSpacer)
+  );
+}
+
+async function refreshFocusSpacerAfterRender(options = {}) {
+  await nextTick();
+  recalculateFocusSpacerHeight(options);
+}
 
 // -------------------------------------------------------------------------
 // Bottom state and message target controller
@@ -448,23 +398,14 @@ function scrollMessageListToBottom({behavior = "auto"} = {}) {
   return true;
 }
 
-function scrollToFirstMessage({behavior = "auto"} = {}) {
+function scrollToTop({behavior = "auto"} = {}) {
   const el = getScrollElement();
   if (!el) return false;
 
-  const target = getFirstMessageElement(scrollRef.value || el);
-  if (!target) {
-    el.scrollTop = 0;
-    updateBottomState();
-    return true;
-  }
-
-  const top = getElementOffsetTopWithinScroll(target, el);
-  const nextTop = getSafeScrollTop(el, top);
   if (typeof el.scrollTo === "function") {
-    el.scrollTo({top: nextTop, behavior});
+    el.scrollTo({top: 0, behavior});
   } else {
-    el.scrollTop = nextTop;
+    el.scrollTop = 0;
   }
   updateBottomState();
   return true;
@@ -494,24 +435,6 @@ function scrollToMessage(
   }
   updateBottomState();
   return true;
-}
-
-function applyScrollTarget(scrollTarget = {}, options = {}) {
-  const type = scrollTarget?.type || MESSAGE_SCROLL_TARGET_TYPES.bottom;
-  const behavior = options.behavior || scrollTarget.behavior || "auto";
-
-  if (type === MESSAGE_SCROLL_TARGET_TYPES.message) {
-    return scrollToMessage(scrollTarget.messageId, {
-      behavior,
-      block: scrollTarget.block || options.block || "center",
-    });
-  }
-
-  if (type === MESSAGE_SCROLL_TARGET_TYPES.first) {
-    return scrollToFirstMessage({behavior});
-  }
-
-  return scrollMessageListToBottom({behavior});
 }
 
 function applyElementScroll(target, options = {}) {
@@ -558,48 +481,21 @@ function scrollToLatestUserMessage(options = {}) {
   // 예약 타이머는 stableScrollTimerIds로 관리하여 사용자가 wheel/touch로 스크롤하면
   // handleUserScrollIntent()에서 즉시 취소되므로 답변 수신 중 수동 스크롤은 존중됩니다.
   if (props.loading) {
-    const delays = options.initialOnly ? [0, 32, 80] : [0, 32, 80, 160];
-    delays.forEach((delay) => {
-      const timerId = window.setTimeout(() => {
-        scheduleTrackedAnimationFrame(() => {
-          applyLatestUserAnchor({...options, behavior: "auto"});
-        });
-      }, delay);
-      stableScrollTimerIds.push(timerId);
-    });
+    scheduleStableScrolls(
+      options.initialOnly ? [0, 32, 80] : [0, 32, 80, 160],
+      () => applyLatestUserAnchor({...options, behavior: "auto"})
+    );
     return;
   }
 
   if (!options.stable) return;
 
-  const delays = options.keyboardOpenOnSubmit
-    ? KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS
-    : STABLE_SCROLL_DELAYS;
-
-  delays.forEach((delay) => {
-    const timerId = window.setTimeout(() => {
-      scheduleTrackedAnimationFrame(() => {
-        applyLatestUserAnchor({...options, behavior: "auto"});
-      });
-    }, delay);
-    stableScrollTimerIds.push(timerId);
-  });
-}
-
-function scrollToInitialTarget(scrollTarget = {}, options = {}) {
-  clearStableTimers();
-  return applyScrollTarget(scrollTarget || {type: "bottom"}, {
-    behavior: "auto",
-    block: "center",
-    ...options,
-  });
-}
-
-// -------------------------------------------------------------------------
-// History-render scroll policy
-// -------------------------------------------------------------------------
-function shouldApplyHistoryRenderScroll() {
-  return props.historyRendering === true;
+  scheduleStableScrolls(
+    options.keyboardOpenOnSubmit
+      ? KEYBOARD_SUBMIT_STABLE_SCROLL_DELAYS
+      : STABLE_SCROLL_DELAYS,
+    () => applyLatestUserAnchor({...options, behavior: "auto"})
+  );
 }
 
 // -------------------------------------------------------------------------
@@ -618,13 +514,23 @@ function clearStableTimers() {
   clearTrackedAnimationFrames();
 }
 
+function scheduleStableScrolls(delays = [], callback = () => {}) {
+  if (typeof window === "undefined") return;
+
+  delays.forEach((delay) => {
+    const timerId = window.setTimeout(() => {
+      scheduleTrackedAnimationFrame(callback);
+    }, delay);
+    stableScrollTimerIds.push(timerId);
+  });
+}
+
 function clearHistoryRenderState() {
   historyRenderRunId += 1;
   clearStableTimers();
   clearAfterRenderScrollState();
   clearRenderedFrameScheduler();
   historyRenderCompleting = false;
-  resetHistoryRenderLifecycleState();
 }
 
 // -------------------------------------------------------------------------
@@ -801,19 +707,12 @@ function isHistoryRenderDomReady(domIndex = createHistoryRenderDomIndex()) {
   return true;
 }
 
-function isHistoryRenderMarkdownReady(
-  domIndex = createHistoryRenderDomIndex()
-) {
-  return (
-    isHistoryRenderDomReady(domIndex) && isHistoryRenderContentReady(domIndex)
-  );
-}
-
 function isHistoryRenderPostProcessReady(
   domIndex = createHistoryRenderDomIndex()
 ) {
   return (
-    isHistoryRenderMarkdownReady(domIndex) &&
+    isHistoryRenderDomReady(domIndex) &&
+    isHistoryRenderContentReady(domIndex) &&
     isHistoryRenderMermaidDomReady(domIndex.root)
   );
 }
@@ -848,32 +747,35 @@ function applyBottomScroll(behavior = "auto") {
   }
 }
 
-function shouldAutoHistoryRenderBottomScroll() {
-  // 대화방 이력 진입 시에는 메시지 렌더 정책의 초기 스크롤 대상으로 이동합니다.
-  return props.historyRendering === true;
-}
-
-function applyHistoryRenderInitialScrollTarget(options = {}) {
-  if (!shouldAutoHistoryRenderBottomScroll()) return;
-  if (!shouldApplyHistoryRenderScroll?.(options)) return;
+function applyHistoryRenderScrollTarget() {
+  // 대화방 이력 진입 중에는 MessageList가 숨겨진 상태에서
+  // 공유방/검색/일반방 정책에 맞는 초기 스크롤 위치를 계속 보정합니다.
+  if (props.historyRendering !== true) return false;
 
   const target = props.messageRenderPolicy?.scrollTarget || {type: "bottom"};
-  const applied = applyScrollTarget(target, {
-    behavior: "auto",
-    block: "center",
-  });
+  const behavior = target?.behavior || "auto";
 
-  if (target?.type === "bottom") {
-    userIsAtBottom.value = true;
-  } else {
+  if (target?.type === "message") {
+    const applied = scrollToMessage(target.messageId, {
+      behavior,
+      block: target.block || "center",
+    });
     updateBottomState();
+    return applied;
   }
 
+  if (target?.type === "first") {
+    return scrollToTop({behavior});
+  }
+
+  const applied = scrollMessageListToBottom({behavior});
+  userIsAtBottom.value = true;
   return applied;
 }
 
-function applyHistoryRenderBottomScroll() {
-  return applyHistoryRenderInitialScrollTarget();
+function syncHistoryRenderScrollFrame() {
+  updateOverlayScrollbarFrame();
+  return applyHistoryRenderScrollTarget();
 }
 
 function applyBottomScrollAfterRender() {
@@ -928,7 +830,7 @@ function scrollToBottom(options = {}) {
 
   if (props.historyRendering) {
     clearStableTimers();
-    applyHistoryRenderBottomScroll();
+    applyHistoryRenderScrollTarget();
     return;
   }
 
@@ -939,22 +841,16 @@ function scrollToBottom(options = {}) {
 
   if (!stable) return;
 
-  STABLE_SCROLL_DELAYS.forEach((delay) => {
-    const timerId = window.setTimeout(() => {
-      applyBottomScroll("auto");
-    }, delay);
-    stableScrollTimerIds.push(timerId);
-  });
+  scheduleStableScrolls(STABLE_SCROLL_DELAYS, () => applyBottomScroll("auto"));
 }
 
 function handlePendingAfterRenderMessageRendered(messageId) {
-  if (!pendingAfterRenderAssistantIds) return false;
+  if (!pendingAfterRenderAssistantIds) return;
 
   pendingAfterRenderAssistantIds.delete(String(messageId ?? ""));
   if (!pendingAfterRenderAssistantIds.size) {
     applyBottomScrollAfterRender();
   }
-  return true;
 }
 
 function getIsAtBottom() {
@@ -971,8 +867,7 @@ function isCurrentHistoryRenderRun(runId) {
 
 async function updateHistoryRenderFrameAfterBatch(processedCount = 0) {
   if (processedCount % HISTORY_RENDER_MERMAID_BATCH_SIZE !== 0) return;
-  updateOverlayScrollbarFrame();
-  applyHistoryRenderBottomScroll();
+  syncHistoryRenderScrollFrame();
   await nextTick();
   await waitAnimationFrames(1);
 }
@@ -989,15 +884,13 @@ async function renderHistoryRoomPendingMermaidSequentially(runId) {
 
   if (!isMermaidRenderingEnabled()) {
     fallbackPendingMermaidToCode(root);
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
+    syncHistoryRenderScrollFrame();
     return true;
   }
 
   const targets = getPendingHistoryRenderMermaidTargets(root);
   if (!targets.length) {
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
+    syncHistoryRenderScrollFrame();
     return true;
   }
 
@@ -1021,8 +914,7 @@ async function renderHistoryRoomPendingMermaidSequentially(runId) {
 
   if (!isCurrentHistoryRenderRun(runId)) return false;
 
-  updateOverlayScrollbarFrame();
-  applyHistoryRenderBottomScroll();
+  syncHistoryRenderScrollFrame();
   return true;
 }
 
@@ -1066,8 +958,7 @@ async function waitForHistoryRenderLayoutStability(runId) {
     await waitAnimationFrames(1);
     if (!isCurrentHistoryRenderRun(runId)) return false;
 
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
+    syncHistoryRenderScrollFrame();
     await nextTick();
     if (!isCurrentHistoryRenderRun(runId)) return false;
 
@@ -1084,19 +975,15 @@ async function waitForHistoryRenderLayoutStability(runId) {
     }
   }
 
-  updateOverlayScrollbarFrame();
-  applyHistoryRenderBottomScroll();
+  syncHistoryRenderScrollFrame();
   return true;
 }
 
 function finalizeHistoryRenderPostProcess() {
   const root = scrollRef.value;
   fallbackPendingMermaidToCode(root);
-  updateOverlayScrollbarFrame();
-  applyHistoryRenderBottomScroll();
+  syncHistoryRenderScrollFrame();
 }
-
-function resetHistoryRenderLifecycleState() {}
 
 async function waitForHistoryRenderDomReady(runId) {
   const maxFrames = isAndroidHistoryRenderRuntime()
@@ -1140,23 +1027,21 @@ async function runHistoryRenderThenScrollSequence(runId) {
     if (!isCurrentHistoryRenderRun(runId)) return;
 
     recalculateFocusSpacerHeight();
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
+    syncHistoryRenderScrollFrame();
 
     await waitForHistoryRenderLayoutStability(runId);
     if (!isCurrentHistoryRenderRun(runId)) return;
 
-    updateOverlayScrollbarFrame();
-    applyHistoryRenderBottomScroll();
+    syncHistoryRenderScrollFrame();
     await nextTick();
     await waitAnimationFrames(2);
-    applyHistoryRenderBottomScroll();
+    applyHistoryRenderScrollTarget();
     updateBottomState();
   } finally {
     historyRenderCompleting = false;
     if (isCurrentHistoryRenderRun(runId)) {
       finalizeHistoryRenderPostProcess();
-      renderLifecycle.notifyHistoryRendered();
+      parentMessageActions.historyRendered?.();
     }
   }
 }
@@ -1273,16 +1158,13 @@ function handleMessageRendered(payload) {
 
   scheduleRenderedFrameUpdate({spacer: !props.loading});
 
-  if (handlePendingAfterRenderMessageRendered(messageId)) {
-    return;
-  }
+  handlePendingAfterRenderMessageRendered(messageId);
 }
 
 provideMessageActions({
   ...parentMessageActions,
   messageRendered: handleMessageRendered,
 });
-
 
 // -------------------------------------------------------------------------
 // MessageList-owned generation stream
@@ -1310,7 +1192,16 @@ function updatePendingAssistantMessage(pending = {}, patch = {}) {
   chatStore.setMessages(chatId, nextMessages);
 }
 
-let activeGenerationPending = null;
+function updateActiveAssistantMessage(patch = {}) {
+  if (!activeGenerationPending) return false;
+  updatePendingAssistantMessage(activeGenerationPending, patch);
+  return true;
+}
+
+function refreshStreamingScrollState() {
+  scrollToBottom({behavior: "auto"});
+  scheduleRenderedFrameUpdate({bottomState: true});
+}
 
 function finishPendingGeneration() {
   activeGenerationKey = "";
@@ -1319,48 +1210,76 @@ function finishPendingGeneration() {
 }
 
 function updateStreamingAssistantMessage(content) {
-  if (!activeGenerationPending) return;
+  if (!updateActiveAssistantMessage({content, status: "streaming"})) return;
+  refreshStreamingScrollState();
+}
 
-  updatePendingAssistantMessage(activeGenerationPending, {
-    content,
-    status: "streaming",
-    reasoningStatus: "completed",
-  });
-  scrollToBottom({behavior: "auto"});
-  scheduleRenderedFrameUpdate({bottomState: true});
+function updateStreamingAssistantReasoning(reasoningContent) {
+  if (
+    !updateActiveAssistantMessage({
+      reasoningContent,
+      reasoningStatus: "thinking",
+      status: "streaming",
+    })
+  ) {
+    return;
+  }
+
+  refreshStreamingScrollState();
 }
 
 function completeStreamingAssistantMessage() {
-  if (!activeGenerationPending) return;
+  if (
+    !updateActiveAssistantMessage({
+      status: "complete",
+      reasoningStatus: "completed",
+    })
+  ) {
+    return;
+  }
 
-  updatePendingAssistantMessage(activeGenerationPending, {
-    status: "complete",
-    reasoningStatus: "completed",
-  });
   scrollToBottomAfterRender({behavior: "auto"});
   finishPendingGeneration();
 }
 
 function failStreamingAssistantMessage(error) {
-  if (!activeGenerationPending) return;
+  if (
+    !updateActiveAssistantMessage({
+      status: "error",
+      error: true,
+      errorMessage: error?.message || "",
+      reasoningStatus: "completed",
+    })
+  ) {
+    return;
+  }
 
-  updatePendingAssistantMessage(activeGenerationPending, {
-    status: "error",
-    error: true,
-    errorMessage: error?.message || "",
-    reasoningStatus: "completed",
-  });
   finishPendingGeneration();
+}
+
+function startPendingGeneration(pending = {}, generationKey = "") {
+  activeGenerationKey = generationKey;
+  activeGenerationPending = pending;
+  chatStreamStore.clearPendingGeneration();
+
+  try {
+    messageGenerationSse.start(pending.payload || {});
+  } catch (error) {
+    failStreamingAssistantMessage(error);
+  }
 }
 
 function runPendingGeneration(pending = {}) {
   const generationKey = resolvePendingGenerationKey(pending);
   if (!generationKey || activeGenerationKey === generationKey) return;
 
-  activeGenerationKey = generationKey;
-  activeGenerationPending = pending;
-  chatStreamStore.clearPendingGeneration();
-  messageGenerationSse.start(pending.payload || {});
+  startPendingGeneration(pending, generationKey);
+}
+
+function consumePendingGeneration(pending, selectedChatId) {
+  if (!pending) return;
+  if (String(pending.chatId || "") !== String(selectedChatId || "")) return;
+  runPendingGeneration(pending);
 }
 
 // -------------------------------------------------------------------------
@@ -1370,9 +1289,7 @@ function runPendingGeneration(pending = {}) {
 watch(
   () => [chatStreamStore.pendingGeneration, chatStore.selectedChatId],
   ([pending, selectedChatId]) => {
-    if (!pending) return;
-    if (String(pending.chatId || "") !== String(selectedChatId || "")) return;
-    runPendingGeneration(pending);
+    consumePendingGeneration(pending, selectedChatId);
   },
   {immediate: true}
 );
@@ -1466,14 +1383,14 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  clearStableTimers();
-  clearAfterRenderScrollState();
   clearHistoryRenderState();
-  clearRenderedFrameScheduler();
-  clearTrackedAnimationFrames();
   clearResizeRecalculateScheduler();
   messageGenerationSse.close();
+  if (activeGenerationPending) {
+    finishPendingGeneration();
+  }
   cleanupOverlayScrollbar();
+
   if (typeof window === "undefined") return;
   window.removeEventListener("resize", scheduleResizeRecalculate);
   window.visualViewport?.removeEventListener(
@@ -1483,80 +1400,11 @@ onBeforeUnmount(() => {
   removeUserScrollIntentListeners(window);
 });
 
-function getMessageListVerticalPadding(element) {
-  if (!element || typeof window === "undefined") {
-    return 0;
-  }
-
-  const style = window.getComputedStyle(element);
-  const paddingTop = Number.parseFloat(style.paddingTop || "0") || 0;
-  const paddingBottom = Number.parseFloat(style.paddingBottom || "0") || 0;
-
-  return paddingTop + paddingBottom;
-}
-
-function updateLastTurnSectorMinHeight() {
-  if (lastTurnSectorResizeFrame) {
-    cancelAnimationFrame(lastTurnSectorResizeFrame);
-  }
-
-  lastTurnSectorResizeFrame = requestAnimationFrame(() => {
-    lastTurnSectorResizeFrame = 0;
-    const element = scrollRef.value;
-    const viewportHeight = Math.floor(element?.clientHeight || 0);
-    const verticalPadding = Math.ceil(getMessageListVerticalPadding(element));
-    const bottomAnchorHeight = Math.ceil(bottomRef.value?.offsetHeight || 0);
-
-    lastTurnSectorMinHeight.value = Math.max(
-      0,
-      viewportHeight - verticalPadding - bottomAnchorHeight
-    );
-  });
-}
-
-onMounted(() => {
-  nextTick(updateLastTurnSectorMinHeight);
-
-  if (typeof ResizeObserver !== "undefined" && scrollRef.value) {
-    lastTurnSectorResizeObserver = new ResizeObserver(() => {
-      updateLastTurnSectorMinHeight();
-    });
-    lastTurnSectorResizeObserver.observe(scrollRef.value);
-  }
-});
-
-onBeforeUnmount(() => {
-  if (lastTurnSectorResizeFrame) {
-    cancelAnimationFrame(lastTurnSectorResizeFrame);
-    lastTurnSectorResizeFrame = 0;
-  }
-
-  if (lastTurnSectorResizeObserver) {
-    lastTurnSectorResizeObserver.disconnect();
-    lastTurnSectorResizeObserver = null;
-  }
-});
-
-watch(
-  () => [props.messages.length, props.loading],
-  () => {
-    nextTick(updateLastTurnSectorMinHeight);
-  }
-);
-
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      nextTick(updateLastTurnSectorMinHeight);
-    }
-  }
-);
-
 defineExpose({
   scrollToBottom,
   scrollToBottomAfterRender,
-  scrollToInitialTarget,
+  scrollToTop,
+  scrollToMessage,
   scrollToLatestUserMessage,
   isAtBottom: getIsAtBottom,
   getScrollElement,
@@ -1570,16 +1418,6 @@ defineExpose({
   overflow-anchor: none;
 }
 
-.message-turn-sector {
-  display: contents;
-}
-
-.message-turn-sector--last {
-  display: flow-root;
-  box-sizing: border-box;
-  width: 100%;
-  min-width: 0;
-}
 
 .message-list--history-rendering {
   /*

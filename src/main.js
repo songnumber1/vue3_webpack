@@ -11,12 +11,6 @@ import "@/assets/styles/tailwind/index.scss";
 import {bootstrap} from "@/core/bootstrap";
 import "@/assets/styles/index.scss";
 
-if (process.env.NODE_ENV === "development") {
-  import(
-    /* webpackChunkName: "virtual-keyboard-debug-style" */
-    "@/assets/styles/09-features/virtual-keyboard-debug.scss"
-  );
-}
 import {installViewportCssVars} from "@/platform/viewport/viewportCssVars";
 
 installViewportCssVars();

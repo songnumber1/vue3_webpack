@@ -67,7 +67,6 @@ const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const responseOverlay = {
   openSettings: () =>
     openSettingsOverlay({
-      isMobile: true,
       isBlocked: isShellActionBlocked,
     }),
 };

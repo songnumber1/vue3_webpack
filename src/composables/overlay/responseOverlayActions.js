@@ -39,7 +39,6 @@ const STANDALONE_OVERLAY_TYPES = Object.freeze([
 ]);
 
 export const responseOverlayActiveType = ref(null);
-const configuredIsMobile = ref(null);
 const suppressChatRouteLoad = ref(false);
 const suppressChatRouteLoadId = ref(null);
 let popstateBound = false;
@@ -69,8 +68,6 @@ function resolveOverlayBackStore() {
 }
 
 function shouldUseMobileBack() {
-  const injectedMobile = unref(configuredIsMobile.value);
-  if (typeof injectedMobile === "boolean") return injectedMobile;
   return true;
 }
 
@@ -162,9 +159,6 @@ function restoreOverlayHistoryIfNeeded() {
 }
 
 export function configureResponseOverlay(options = {}) {
-  if (Object.prototype.hasOwnProperty.call(options, "isMobile")) {
-    configuredIsMobile.value = options.isMobile;
-  }
   if (
     Object.prototype.hasOwnProperty.call(options, "shouldSuppressChatRouteLoad")
   ) {
@@ -222,7 +216,6 @@ export function setupResponseOverlayBackGuard() {
 
 export function createResponseOverlayViewState(t) {
   const isOpen = computed(() => Boolean(responseOverlayActiveType.value));
-  const isMobile = computed(() => shouldUseMobileBack());
   const activeOverlayType = computed(() => responseOverlayActiveType.value);
   const overlayTitle = computed(() => {
     if (responseOverlayActiveType.value === APP_OVERLAY_TYPES.NOTICE) {
@@ -274,7 +267,6 @@ export function createResponseOverlayViewState(t) {
   return {
     activeOverlayType,
     isOpen,
-    isMobile,
     overlayTitle,
     overlaySubtitle,
     overlayRenderMode,
@@ -343,10 +335,5 @@ export function openMobileSettingsOverlay(options) {
 }
 
 export function openSettingsOverlay(options = {}) {
-  const mobile = unref(options.isMobile);
-  if (mobile) {
-    openMobileSettingsOverlay(options);
-    return;
-  }
-  openPersonalizationOverlay(options);
+  openMobileSettingsOverlay(options);
 }

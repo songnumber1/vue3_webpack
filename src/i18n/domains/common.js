@@ -61,23 +61,6 @@ export const commonMessages = {
     overlayProgress: {
       apiProcessing: "API 요청 처리 중입니다.",
     },
-    virtualKeyboardDebug: {
-      button: "키보드",
-      body: "실제 키는 제공하지 않습니다. Android Chrome 기준 확인용이며 실제 기기와 높이/동작이 다를 수 있습니다.",
-      titles: {
-        adjustNothing: "가상 키보드 테스트 영역 · adjustNothing",
-        adjustPan: "가상 키보드 테스트 영역 · adjustPan",
-        adjustResize: "가상 키보드 테스트 영역 · adjustResize",
-      },
-      descriptions: {
-        adjustNothing:
-          "현재 모드는 화면 보정 없이 가상 키보드 영역만 덮어서 보여줍니다.",
-        adjustPan:
-          "현재 모드는 CSS resize 없이 화면 내용을 위로 밀어 올리는 pan 동작을 흉내냅니다.",
-        adjustResize:
-          "현재 모드는 CSS 키보드 높이 변수를 적용해 입력 영역과 컨텐츠 하단 여백을 조정합니다.",
-      },
-    },
     platformBridge: {
       browserHandled: "브라우저에서 처리되었습니다.",
       browserFileInputRequired:
@@ -298,23 +281,6 @@ export const commonMessages = {
     },
     overlayProgress: {
       apiProcessing: "Processing API request.",
-    },
-    virtualKeyboardDebug: {
-      button: "Keyboard",
-      body: "This area does not provide real keys. It is for Android Chrome checks and may differ from real device height and behavior.",
-      titles: {
-        adjustNothing: "Virtual keyboard test area · adjustNothing",
-        adjustPan: "Virtual keyboard test area · adjustPan",
-        adjustResize: "Virtual keyboard test area · adjustResize",
-      },
-      descriptions: {
-        adjustNothing:
-          "This mode only overlays the virtual keyboard area without screen correction.",
-        adjustPan:
-          "This mode simulates pan behavior by moving content toward the focused input without CSS resize correction.",
-        adjustResize:
-          "This mode applies CSS keyboard height variables to adjust the input area and bottom content spacing.",
-      },
     },
     platformBridge: {
       browserHandled: "Handled in the browser.",

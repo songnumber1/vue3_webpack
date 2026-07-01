@@ -12,6 +12,7 @@ export function createEmptyPromptWorkspaceLayoutActions() {
   return {
     isExpanded: ref(false),
     onBlur: null,
+    onFocus: null,
     onExpandedChange: null,
     onHeightChange: null,
   };

@@ -30,7 +30,6 @@ export const VIEWPORT_GUARD_EVENTS = Object.freeze([
   "orientationchange",
   "pageshow",
   "visibilitychange",
-  "virtual-keyboard-debug:changed",
 ]);
 
 export const VIEWPORT_GUARD_CUSTOM_EVENT = "viewportguard:applied";

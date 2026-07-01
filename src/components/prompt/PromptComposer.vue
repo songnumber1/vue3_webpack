@@ -64,7 +64,7 @@
 <script setup>
 /**
  * @file components/prompt/PromptComposer.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
+ * @description 프롬프트 입력 UI 컴포넌트입니다. 전역 모델/생성 상태는 Pinia에서 직접 읽고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
 import {
@@ -77,7 +77,6 @@ import {
   ref,
   toRef,
   watch,
-  inject,
 } from "vue";
 import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
 import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
@@ -99,7 +98,9 @@ import {
   PROMPT_TEMPLATE_MODEL_IDS,
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
-import {useAssistantStore} from "@/stores/assistantStore";
+import {useChatStore} from "@/stores/chatStore";
+import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {submitChatMessage} from "@/composables/chat/useChatQuestionAnswer";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
@@ -115,10 +116,7 @@ import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
-  PROMPT_STATE_KEY,
-  createEmptyPromptState,
 } from "@/composables/chat/chatStateContext";
-import {usePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
 import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 import {
   providePromptInputActions,
@@ -134,15 +132,32 @@ const componentProps = defineProps({
   hideVoiceAction: {type: Boolean, default: false},
 });
 
-const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
-const composerContext = usePromptComposerContext();
+const chatStore = useChatStore();
+const chatStreamStore = useChatStreamStore();
 const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
+const activeSessionModelId = computed(() =>
+  String(chatStore.activeSession?.modelId || "").trim()
+);
+const promptModelReadonly = computed(() =>
+  Boolean(chatStore.isModelLocked || activeSessionModelId.value)
+);
+const promptModels = computed(() => {
+  const lockedModelId = activeSessionModelId.value;
+  if (promptModelReadonly.value && lockedModelId) {
+    return [chatStore.modelMap[lockedModelId]].filter(Boolean);
+  }
+  return chatStore.currentModels;
+});
+const promptModelValue = computed(() =>
+  activeSessionModelId.value || chatStore.selectedModelId || ""
+);
+
 const props = reactive({
   get disabled() {
-    return promptState.value.disabled;
+    return false;
   },
   get generating() {
-    return promptState.value.generating;
+    return chatStreamStore.isWait;
   },
   get submitDisabled() {
     return componentProps.submitDisabled;
@@ -157,38 +172,30 @@ const props = reactive({
     return componentProps.hideVoiceAction;
   },
   get floating() {
-    return promptState.value.floating;
+    return false;
   },
   get showHelp() {
-    return promptState.value.showHelp;
+    return false;
   },
   get placeholder() {
-    return promptState.value.placeholder;
+    return "";
   },
   get modelValue() {
-    return promptState.value.selectedModel;
+    return promptModelValue.value;
   },
   get models() {
-    return promptState.value.models;
+    return promptModels.value;
   },
   get modelReadonly() {
-    return promptState.value.modelReadonly;
+    return promptModelReadonly.value;
   },
 });
 
 
-function invokeComposerContext(actionName, payload) {
-  const action = composerContext?.[actionName];
-  if (typeof action !== "function") return false;
-
-  action(payload);
-  return true;
-}
-
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    invokeComposerContext("onSubmit", payload);
+    submitChatMessage(payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -201,11 +208,11 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    invokeComposerContext("onUpdateSelectedModel", payload);
+    chatStore.selectModel(payload);
     return;
   }
   if (eventName === "focus") {
-    invokeComposerContext("onFocus", payload);
+    promptWorkspaceLayoutActions.onFocus?.(payload);
     return;
   }
   if (eventName === "height-change") {
@@ -472,7 +479,6 @@ function selectModel(id) {
 
 // ── [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
 // 특정 페르소나나 업무 서식이 가미된 프롬프트 문틀(Template) 및 확장 API 기능(Tool)을 조합합니다.
-const assistantStore = useAssistantStore();
 const activeMobileGroupId = ref("");
 const activePromptToolSettings = computed(
   () => promptControlStore.activePromptToolSettings
@@ -495,9 +501,9 @@ function hasTemplateFields(template = {}) {
 
 const currentModelTemplates = computed(() => {
   const selectedModelId =
-    props.modelValue || assistantStore.selectedModelId || "";
+    props.modelValue || chatStore.selectedModelId || "";
 
-  return assistantStore.promptTemplates
+  return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
     .filter(
       (template) => !template.modelId || template.modelId === selectedModelId
@@ -628,7 +634,7 @@ watch(
 /** 답변 스트리밍 중에도 입력창과 주변 액션 UI는 잠그지 않고, 전송 버튼만 generating 상태로 progress를 표시합니다. */
 const actionDisabled = computed(() => disabled.value);
 
-/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 chatSubmitActions에서 generating으로 방어합니다. */
+/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 채팅 제출 파이프라인에서 generating으로 방어합니다. */
 const canSubmit = computed(
   () =>
     !props.submitDisabled &&
@@ -781,7 +787,6 @@ function notifyPromptExpandedChange(expanded) {
 }
 
 function notifyPromptHeightChange(height) {
-  invokeComposerContext("onHeightChange", height);
   promptWorkspaceLayoutActions.onHeightChange?.(height);
 }
 

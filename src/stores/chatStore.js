@@ -18,8 +18,25 @@ export const useChatStore = defineStore("chat", {
     activeSession: null,
     messageMap: {},
     pendingNewSubmitChatIds: {},
+    assistants: [],
+    assistantMap: {},
+    models: [],
+    allModels: [],
+    modelMap: {},
+    modelMapByAssistant: {},
+    selectedAssistantId: "",
+    selectedModelId: "",
+    examplePromptMap: {},
+    promptTemplates: [],
   }),
   getters: {
+    currentAssistant: (state) =>
+      state.assistantMap[state.selectedAssistantId] ||
+      state.assistants[0] ||
+      null,
+    currentModels: (state) =>
+      state.modelMapByAssistant[state.selectedAssistantId] || [],
+    currentModel: (state) => state.modelMap[state.selectedModelId] || null,
     isActiveSharedRoom: (state) =>
       state.activeRoomType === ACTIVE_ROOM_TYPES.shared,
     isModelLocked: (state) => Boolean(state.activeSession?.readonlyModel),
@@ -126,6 +143,41 @@ export const useChatStore = defineStore("chat", {
         history,
         ...this.histories.filter((item) => item.id !== history.id),
       ];
+    },
+    setBootstrapData(payload = {}) {
+      this.assistants = payload.assistants || [];
+      this.assistantMap = payload.assistantMap || {};
+      this.models = payload.models || [];
+      this.allModels = payload.allModels || payload.models || [];
+      this.modelMap = payload.modelMap || {};
+      this.modelMapByAssistant = payload.modelMapByAssistant || {};
+      this.selectedAssistantId =
+        payload.initialAssistantId || this.assistants[0]?.id || "";
+      this.selectedModelId =
+        payload.initialModelId || this.currentModels[0]?.id || "";
+      this.examplePromptMap = payload.examplePromptMap || {};
+      this.promptTemplates = payload.promptTemplates || [];
+    },
+    selectAssistant(id) {
+      if (!this.assistantMap[id]) return;
+      this.selectedAssistantId = id;
+
+      const models = this.modelMapByAssistant[id] || [];
+      if (!models.some((model) => model.id === this.selectedModelId)) {
+        this.selectedModelId = models[0]?.id || "";
+      }
+    },
+    selectModel(id) {
+      const model = this.modelMap[id];
+      if (!model) return;
+      if (model.assistId !== this.selectedAssistantId) return;
+      this.selectedModelId = id;
+    },
+    setExamplePrompts(assistantId, prompts = []) {
+      this.examplePromptMap = {
+        ...this.examplePromptMap,
+        [assistantId]: prompts,
+      };
     },
   },
 });

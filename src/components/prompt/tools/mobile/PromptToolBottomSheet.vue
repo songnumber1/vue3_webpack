@@ -61,7 +61,7 @@ import {computed, ref, watch} from "vue";
 import {storeToRefs} from "pinia";
 import {useI18n} from "vue-i18n";
 import BaseBottomSheet from "@/components/common/bottom-sheet/BaseBottomSheet.vue";
-import {useAssistantStore} from "@/stores/assistantStore";
+import {useChatStore} from "@/stores/chatStore";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {PROMPT_TEMPLATE_MODEL_IDS} from "@/constants/promptComposer";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
@@ -90,7 +90,7 @@ const props = defineProps({
 const emit = defineEmits(["close"]);
 
 const {t, locale} = useI18n();
-const assistantStore = useAssistantStore();
+const chatStore = useChatStore();
 const promptControlStore = usePromptControlStore();
 const {activePromptToolSettings} = storeToRefs(promptControlStore);
 
@@ -114,8 +114,8 @@ const selectedWebSearchEngine = computed(
 );
 
 const selectableTemplates = computed(() => {
-  const modelId = props.modelValue || assistantStore.selectedModelId || "";
-  return assistantStore.promptTemplates
+  const modelId = props.modelValue || chatStore.selectedModelId || "";
+  return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
     .filter((template) => !template.modelId || template.modelId === modelId)
     .sort((a, b) => a.order - b.order)

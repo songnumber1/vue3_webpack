@@ -10,8 +10,6 @@ import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {normalizeId as normalizeChatRouteId} from "@/utils/normalize";
-import {normalizeChatId} from "@/utils/normalize";
 import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/activeConversationCleanupRegistry";
 
 export const CHAT_ENTRY_ROUTE_NAME = ROUTE_NAMES.CHAT_ENTRY;
@@ -28,8 +26,20 @@ const PORTAL_ASSISTANT_ID_BY_ROUTE_NAME = Object.freeze({
   [ROUTE_NAMES.CONNECTOR_STORE]: ASSISTANT_PORTAL_IDS.CONNECTOR_STORE,
 });
 
+function normalizeText(value) {
+  return typeof value === "string" ? value.trim() : String(value || "").trim();
+}
+
+function normalizeChatRouteId(value) {
+  return normalizeText(value);
+}
+
+function normalizeChatId(value) {
+  return normalizeText(value);
+}
+
 function normalizePortalKey(value) {
-  return String(value || "").trim();
+  return normalizeText(value);
 }
 
 function safeCall(callback, ...args) {
