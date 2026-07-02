@@ -9,10 +9,6 @@ export const CHAT_RUNTIME_POLICY = Object.freeze({
   showMobileProgress: SHOW_MOBILE_PROGRESS,
 });
 
-export function shouldShowMobileProgress(isMobileLayout) {
-  return SHOW_MOBILE_PROGRESS === true && Boolean(isMobileLayout);
-}
-
 export function isProgressAllowedForCurrentPlatform() {
-  return shouldShowMobileProgress(true);
+  return SHOW_MOBILE_PROGRESS === true;
 }

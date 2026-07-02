@@ -5,10 +5,6 @@
 
 const MOBILE_VIEWPORT_MODE = "mobile";
 
-export function isMobileLikeViewport() {
-  return true;
-}
-
 export function syncViewportModeClass() {
   if (typeof document === "undefined") return true;
   const {body} = document;

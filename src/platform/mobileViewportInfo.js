@@ -7,6 +7,5 @@ export function resolveViewportInfo() {
     height: size.height,
     visualWidth: size.width,
     compactWidth: size.width,
-    isCompactViewport: true,
   };
 }

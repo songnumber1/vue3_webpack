@@ -6,6 +6,7 @@ import {usePromptControlStore} from "@/stores/promptControlStore";
 import {createId} from "@/utils/id";
 import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
 import {ROUTE_NAMES} from "@/constants/routeNames";
+import {normalizeChatId} from "@/utils/normalize";
 import {
   enterNewSubmitChatRoom,
   resolveActiveChatId,
@@ -16,11 +17,11 @@ import {
 } from "@/api/sse/common/streamRequest";
 import {SSE} from "@/api/sse/vendor/sse";
 import {shouldUseFrontendMockApi} from "@/constants/apiMode";
+import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
+import {createChatHistory, loadChatHistoryList} from "@/composables/chat/runtime/chatRuntimeApi";
+import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
+import {logWarn} from "@/utils/logger";
 
-
-function normalizeChatId(value) {
-  return typeof value === "string" ? value.trim() : String(value || "").trim();
-}
 
 export function createUserMessage(normalized) {
   return {
@@ -63,73 +64,14 @@ export function revokeMessageAttachments(items = []) {
   });
 }
 
-export function appendUserAndAssistantMessages(chatId, normalized) {
+export function appendUserAndAssistantMessages(chatId, normalized, assistantPatch = {}) {
   const chatStore = useChatStore();
   const currentMessages = chatStore.messageMap[chatId] || [];
   const userMessage = createUserMessage(normalized);
-  const assistantMessage = createAssistantMessage();
-  const nextMessages = [...currentMessages, userMessage, assistantMessage];
+  const assistantMessage = createAssistantMessage(assistantPatch);
 
-  chatStore.setMessages(chatId, nextMessages);
-  return {messages: nextMessages, assistantMessage};
-}
-
-export function patchAssistantMessage(messages, assistantMessage, patch = {}) {
-  const nextAssistantMessage = {...assistantMessage, ...patch};
-  const nextMessages = messages.map((message) =>
-    message.id === nextAssistantMessage.id ? nextAssistantMessage : message
-  );
-
-  return {
-    messages: nextMessages,
-    assistantMessage: nextAssistantMessage,
-  };
-}
-
-export function appendAssistantChunk(assistantMessage, content) {
-  return {
-    ...assistantMessage,
-    content,
-    status: "streaming",
-  };
-}
-
-export function markAssistantMessageError(assistantMessage, errorPatch = {}) {
-  return {
-    ...assistantMessage,
-    status: "error",
-    error: true,
-    reasoningStatus: "completed",
-    ...errorPatch,
-  };
-}
-
-export function createAssistantMessageCommitter(
-  chatId,
-  initialMessages,
-  initialAssistantMessage,
-  setConversation
-) {
-  let liveMessages = initialMessages;
-  let liveAssistantMessage = initialAssistantMessage;
-
-  function commit(patch = {}) {
-    const nextState = patchAssistantMessage(
-      liveMessages,
-      liveAssistantMessage,
-      patch
-    );
-
-    liveAssistantMessage = nextState.assistantMessage;
-    liveMessages = nextState.messages;
-    setConversation(chatId, liveMessages);
-  }
-
-  return {
-    commit,
-    getAssistantMessage: () => liveAssistantMessage,
-    getMessages: () => liveMessages,
-  };
+  chatStore.setMessages(chatId, [...currentMessages, userMessage, assistantMessage]);
+  return {userMessage, assistantMessage};
 }
 
 // chatStreamStore.isWait를 채팅 답변 처리 중 상태의 단일 기준으로 사용합니다.
@@ -167,7 +109,7 @@ function resolveStyleOptions(settings = {}) {
   return values;
 }
 
-function createGenerationPayload(normalized, chatId, selectedAssistantId, selectedModel) {
+export function createGenerationPayload(normalized, chatId, selectedAssistantId, selectedModel) {
   const resolvedChatId = normalizeChatId(chatId);
 
   if (!resolvedChatId) {
@@ -267,7 +209,7 @@ async function waitForKeyboardViewportToSettle() {
   }
 }
 
-async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
+async function scrollAfterUserSubmit(normalized = {}) {
   await nextTick();
 
   if (normalized.keyboardOpenOnSubmit) {
@@ -275,7 +217,7 @@ async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
     await nextTick();
   }
 
-  await scrollLatestUserMessage({
+  await scrollChatToLatestUserMessage({
     behavior: "auto",
     stable: false,
     initialOnly: true,
@@ -285,20 +227,86 @@ async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
   });
 }
 
-async function createConversationForSubmit(
-  createRemoteConversation,
-  normalized,
-  chatStore
-) {
+function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
+  const model = modelMap[history?.modelId] || null;
+  const assistant = assistantMap[history?.assistantId || model?.assistId] || null;
+  const modelMissing = Boolean(history?.modelId && !model);
+  const assistantMissing = Boolean((history?.assistantId || model?.assistId) && !assistant);
+  const modelDeleted = Boolean(model?.isDeleted);
+  const unavailableReason = modelDeleted
+    ? "deleted"
+    : modelMissing
+      ? "missing-model"
+      : assistantMissing
+        ? "missing-assistant"
+        : "";
+
+  return {
+    chatId: history?.id || "",
+    assistantId: assistant?.id || history?.assistantId || model?.assistId || "",
+    assistantType: assistant?.type || history?.assistantType || "",
+    assistantLabel: assistant?.label || history?.assistantLabel || "",
+    modelId: model?.id || history?.modelId || "",
+    modelName: model?.label || history?.modelLabel || "",
+    modelType: model?.type || "",
+    isModelDeleted: modelDeleted,
+    isModelMissing: modelMissing,
+    isAssistantMissing: assistantMissing,
+    isModelUnavailable: Boolean(unavailableReason),
+    modelUnavailableReason: unavailableReason,
+    displayAssistantId: "",
+    displayAssistantLabel: "",
+    readonlyModel: true,
+  };
+}
+
+async function syncSubmitHistories({notifyOnError = false} = {}) {
+  const chatStore = useChatStore();
+
+  try {
+    const histories = await loadChatHistoryList({
+      assistantMap: chatStore.assistantMap,
+      modelMap: chatStore.modelMap,
+    });
+    chatStore.setHistories(histories);
+    return histories;
+  } catch (error) {
+    logWarn("[useChatQuestionAnswer] sync histories failed:", error);
+    if (notifyOnError) await notifyChatHistorySyncFailed(error);
+    return chatStore.histories;
+  }
+}
+
+async function createConversationForSubmit(normalized, chatStore) {
   const assistantId = resolveSubmitAssistantId(chatStore);
   const modelId = resolveSubmitModelId(chatStore);
-
-  return createRemoteConversation({
-    text: normalized.text,
-    assistantId,
+  const assistant = chatStore.assistantMap?.[assistantId] || null;
+  const chatId = createId();
+  const rawHistory = await createChatHistory({
+    chatId,
+    assistId: assistantId,
     modelId,
+    ChatTilte: normalized.text.slice(0, 20) || normalized.text,
+    studio: assistant?.type === "studio",
   });
+  const history = adaptChatHistory(rawHistory, {
+    assistantMap: chatStore.assistantMap,
+    modelMap: chatStore.modelMap,
+  });
+
+  if (!history?.id) {
+    throw new Error("new.do response does not contain chatId.");
+  }
+
+  chatStore.addHistory(history);
+  chatStore.setMessages(history.id, []);
+  chatStore.setActiveSession(
+    createSessionFromHistory(history, chatStore.modelMap, chatStore.assistantMap)
+  );
+
+  return history;
 }
+
 
 function shouldCreateConversation(targetHistoryId, currentRoute = {}) {
   // URL 숨김 모드에서는 기존 대화방도 /chat(chat-entry) 라우트를 사용합니다.
@@ -323,11 +331,7 @@ async function ensureConversationForSubmit(
     return targetHistoryId;
   }
 
-  const history = await createConversationForSubmit(
-    createRemoteConversationForSubmit,
-    normalized,
-    chatStore
-  );
+  const history = await createConversationForSubmit(normalized, chatStore);
   targetHistoryId = normalizeChatId(history?.id);
 
   if (!targetHistoryId) {
@@ -350,27 +354,14 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
 }
 
 
-let createRemoteConversationForSubmit = null;
-let appendMessagesForSubmit = null;
-let setConversationMessages = null;
-let getCurrentMessagesForSubmit = null;
-let scrollLatestSubmittedUserMessage = null;
-let syncHistoriesForSubmit = null;
-let canSubmitMessage = null;
-let submitRouter = null;
-let submitRoute = null;
-
-async function submitPrompt(payload) {
+async function runChatSubmit(payload, {router, route} = {}) {
   const chatStreamStore = useChatStreamStore();
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
-  const route = submitRoute;
-  const router = submitRouter;
   const normalized = normalizePromptPayload(payload);
 
   if (
     chatStore.isActiveSharedRoom ||
-    !canSubmitMessage() ||
     (!normalized.text && normalized.attachments.length === 0) ||
     chatStreamStore.isWait
   ) {
@@ -380,7 +371,10 @@ async function submitPrompt(payload) {
   chatStreamStore.startWait();
 
   const initialHistoryId = normalizeChatId(resolveActiveChatId());
-  const isNewConversationSubmit = shouldCreateConversation(initialHistoryId, route);
+  const isNewConversationSubmit = shouldCreateConversation(
+    initialHistoryId,
+    route
+  );
   let overlaySuppressed = false;
   let generationHandedOff = false;
 
@@ -403,52 +397,34 @@ async function submitPrompt(payload) {
       );
     }
 
-    const {messages, assistantMessage} = appendMessagesForSubmit(
+    const {assistantMessage} = appendUserAndAssistantMessages(
       targetHistoryId,
-      normalized
+      normalized,
+      createAssistantStreamingPatch(isSelectedModelReasoning(chatStore))
     );
-
-    const committer = createAssistantMessageCommitter(
-      targetHistoryId,
-      messages,
-      {
-        ...assistantMessage,
-        ...createAssistantStreamingPatch(
-          isSelectedModelReasoning(chatStore)
-        ),
-      },
-      setConversationMessages
-    );
-    committer.commit();
 
     if (isNewConversationSubmit) {
-      await syncHistoriesForSubmit();
+      await syncSubmitHistories({notifyOnError: true});
       const entered = await enterNewSubmitChatRoom(
         router,
         chatStreamStore,
         targetHistoryId
       );
-      if (!entered) {
-        throw new Error("chat route navigation failed");
-      }
+      if (!entered) throw new Error("chat route navigation failed");
     } else {
-      syncHistoriesForSubmit();
+      syncSubmitHistories({notifyOnError: true});
     }
 
     await nextTick();
-    await scrollAfterUserSubmit(scrollLatestSubmittedUserMessage, normalized);
+    await scrollAfterUserSubmit(normalized);
 
     const selectedAssistantId = resolveSubmitAssistantId(chatStore);
     const selectedModel = resolveSubmitModelId(chatStore);
 
-    const pendingAssistantMessage = committer.getAssistantMessage();
-    chatStreamStore.setPendingGeneration({
-      type: "submit",
+    startChatGeneration({
+      url: resolveGenerationUrl(),
       chatId: targetHistoryId,
-      assistantMessageId: pendingAssistantMessage?.id || "",
-      assistantId: selectedAssistantId,
-      modelId: selectedModel,
-      normalized,
+      assistantMessageId: assistantMessage.id,
       payload: createGenerationPayload(
         normalized,
         targetHistoryId,
@@ -468,13 +444,12 @@ async function submitPrompt(payload) {
   }
 }
 
-async function regenerateResponse(message = {}) {
+async function runRegenerateAnswer(message = {}) {
   const chatStreamStore = useChatStreamStore();
   const chatStore = useChatStore();
 
   if (
     chatStore.isActiveSharedRoom ||
-    !canSubmitMessage() ||
     chatStreamStore.isWait
   ) {
     return;
@@ -483,7 +458,7 @@ async function regenerateResponse(message = {}) {
   const targetHistoryId = normalizeChatId(resolveActiveChatId());
   if (!targetHistoryId) return;
 
-  const currentMessages = getCurrentMessagesForSubmit();
+  const currentMessages = chatStore.messageMap?.[targetHistoryId] || [];
   const assistantIndex = currentMessages.findIndex(
     (item) => item.id === message.id
   );
@@ -500,23 +475,17 @@ async function regenerateResponse(message = {}) {
     attachments: userMessage.attachments || [],
   });
   const assistantMessage = createAssistantMessage(
-    createAssistantStreamingPatch(
-      isSelectedModelReasoning(chatStore)
-    )
-  );
-  const committer = createAssistantMessageCommitter(
-    targetHistoryId,
-    [...currentMessages.slice(0, assistantIndex), assistantMessage],
-    assistantMessage,
-    setConversationMessages
+    createAssistantStreamingPatch(isSelectedModelReasoning(chatStore))
   );
   let generationHandedOff = false;
 
   chatStreamStore.startWait();
-
-  committer.commit();
+  chatStore.setMessages(targetHistoryId, [
+    ...currentMessages.slice(0, assistantIndex),
+    assistantMessage,
+  ]);
   await nextTick();
-  await scrollLatestSubmittedUserMessage({
+  await scrollChatToLatestUserMessage({
     behavior: "auto",
     stable: false,
     initialOnly: true,
@@ -528,14 +497,10 @@ async function regenerateResponse(message = {}) {
     const selectedAssistantId = resolveSubmitAssistantId(chatStore);
     const selectedModel = resolveSubmitModelId(chatStore);
 
-    const pendingAssistantMessage = committer.getAssistantMessage();
-    chatStreamStore.setPendingGeneration({
-      type: "regenerate",
+    startChatGeneration({
+      url: resolveGenerationUrl(),
       chatId: targetHistoryId,
-      assistantMessageId: pendingAssistantMessage?.id || "",
-      assistantId: selectedAssistantId,
-      modelId: selectedModel,
-      normalized,
+      assistantMessageId: assistantMessage.id,
       payload: createGenerationPayload(
         normalized,
         targetHistoryId,
@@ -551,38 +516,16 @@ async function regenerateResponse(message = {}) {
   }
 }
 
-export function configureChatSubmit(
-  createRemoteConversation,
-  appendUserAndAssistantMessages,
-  setConversation,
-  getCurrentMessages,
-  scrollLatestUserMessage,
-  syncHistories,
-  canWriteCallback,
-  router,
-  route
-) {
-  createRemoteConversationForSubmit = createRemoteConversation;
-  appendMessagesForSubmit = appendUserAndAssistantMessages;
-  setConversationMessages = setConversation;
-  getCurrentMessagesForSubmit = getCurrentMessages;
-  scrollLatestSubmittedUserMessage = scrollLatestUserMessage;
-  syncHistoriesForSubmit = syncHistories;
-  canSubmitMessage = canWriteCallback;
-  submitRouter = router;
-  submitRoute = route;
-}
-
-export async function submitChatMessage(payload) {
-  return submitPrompt(payload);
+export async function submitChatMessage(payload, context = {}) {
+  return runChatSubmit(payload, context);
 }
 
 export async function regenerateLastAnswer(message) {
-  return regenerateResponse(message);
+  return runRegenerateAnswer(message);
 }
 
 // -----------------------------------------------------------------------------
-// MessageList generation SSE
+// generation.do stream
 // -----------------------------------------------------------------------------
 
 const DONE_MESSAGE = "[DONE]";
@@ -661,10 +604,10 @@ function readReasoning(raw) {
   ]);
 }
 
-function createGenerationSource(payload) {
+function createGenerationSource(payload, url = "") {
   const authOptions = resolveSseAuthOptions();
 
-  return new SSE(resolveGenerationUrl(), {
+  return new SSE(url || resolveGenerationUrl(), {
     start: false,
     method: "POST",
     withCredentials: authOptions.withCredentials,
@@ -692,7 +635,7 @@ function splitText(text, size) {
   return result;
 }
 
-export function useMessageGenerationSse({onText, onReasoning, onDone, onError} = {}) {
+export function createGenerationStream({url = "", onText, onReasoning, onDone, onError} = {}) {
   let eventSource = null;
   let timeoutId = null;
   let mockTimerId = null;
@@ -798,7 +741,7 @@ export function useMessageGenerationSse({onText, onReasoning, onDone, onError} =
   }
 
   function startLive(payload = {}, onMessage) {
-    eventSource = createGenerationSource(payload);
+    eventSource = createGenerationSource(payload, url);
 
     eventSource.onmessage = (event) => {
       try {
@@ -835,4 +778,277 @@ export function useMessageGenerationSse({onText, onReasoning, onDone, onError} =
   }
 
   return {start, close};
+}
+
+// -----------------------------------------------------------------------------
+// question/answer view and generation runner
+// -----------------------------------------------------------------------------
+
+const CHAT_SCROLL_READY_MAX_FRAMES = 60;
+
+const chatMessageView = {
+  registered: false,
+  scrollToBottom: () => false,
+  scrollToBottomAfterRender: () => false,
+  scrollToTop: () => false,
+  scrollToMessage: () => false,
+  scrollToLatestUserMessage: () => false,
+  isAtBottom: () => true,
+  scheduleRenderedFrameUpdate: () => {},
+};
+
+let latestUserScrollTimerIds = [];
+let pendingBottomScrollRafId = 0;
+let pendingBottomScrollFrameCount = 0;
+let activeGeneration = null;
+let activeGenerationSse = null;
+
+function clearLatestUserScrollTimers() {
+  latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  latestUserScrollTimerIds = [];
+}
+
+function clearPendingBottomScrollScheduler() {
+  if (!pendingBottomScrollRafId || typeof window === "undefined") {
+    pendingBottomScrollRafId = 0;
+    pendingBottomScrollFrameCount = 0;
+    return;
+  }
+
+  window.cancelAnimationFrame(pendingBottomScrollRafId);
+  pendingBottomScrollRafId = 0;
+  pendingBottomScrollFrameCount = 0;
+}
+
+function applyBottomScrollWhenListReady(options = {}) {
+  if (!chatMessageView.registered) return false;
+
+  if (options.afterRender) {
+    chatMessageView.scrollToBottomAfterRender({
+      ...options,
+      force: true,
+      stable: true,
+    });
+  } else {
+    chatMessageView.scrollToBottom({...options, force: true, stable: true});
+  }
+
+  return true;
+}
+
+function scheduleBottomScrollWhenListReady(options = {}) {
+  clearPendingBottomScrollScheduler();
+  if (typeof window === "undefined") return;
+
+  const check = () => {
+    pendingBottomScrollRafId = 0;
+    pendingBottomScrollFrameCount += 1;
+    if (applyBottomScrollWhenListReady(options)) {
+      pendingBottomScrollFrameCount = 0;
+      return;
+    }
+
+    if (pendingBottomScrollFrameCount >= CHAT_SCROLL_READY_MAX_FRAMES) {
+      pendingBottomScrollFrameCount = 0;
+      return;
+    }
+
+    pendingBottomScrollRafId = window.requestAnimationFrame(check);
+  };
+
+  pendingBottomScrollRafId = window.requestAnimationFrame(check);
+}
+
+export async function scrollChatToBottom(options = {}) {
+  clearPendingBottomScrollScheduler();
+
+  if (!chatMessageView.registered) {
+    if (options.force || options.stable) scheduleBottomScrollWhenListReady(options);
+    return;
+  }
+
+  if (options.afterRender) {
+    chatMessageView.scrollToBottomAfterRender(options);
+  } else {
+    chatMessageView.scrollToBottom(options);
+  }
+}
+
+export async function scrollChatToInitialTarget(scrollTarget = {}, options = {}) {
+  const target = scrollTarget || {type: "bottom"};
+  const behavior = options.behavior || target.behavior || "auto";
+
+  if (target.type === "message") {
+    return chatMessageView.scrollToMessage(target.messageId, {
+      behavior,
+      block: target.block || options.block || "center",
+    });
+  }
+
+  if (target.type === "first") {
+    return chatMessageView.scrollToTop({behavior});
+  }
+
+  await scrollChatToBottom({force: true, behavior, ...options});
+  return true;
+}
+
+export async function scrollChatToLatestUserMessage(options = {}) {
+  clearLatestUserScrollTimers();
+
+  const apply = () => {
+    chatMessageView.scrollToLatestUserMessage({
+      stable: true,
+      ...options,
+    });
+    return true;
+  };
+
+  if (options.initialOnly) {
+    const timerId = window.setTimeout(() => {
+      apply();
+      clearLatestUserScrollTimers();
+    }, 0);
+    latestUserScrollTimerIds.push(timerId);
+    return;
+  }
+
+  [0, 32, 80, 160, 320].forEach((delay) => {
+    const timerId = window.setTimeout(apply, delay);
+    latestUserScrollTimerIds.push(timerId);
+  });
+}
+
+export function isChatScrolledToBottom() {
+  return chatMessageView.isAtBottom();
+}
+
+export function clearChatQuestionAnswerScrollState() {
+  clearLatestUserScrollTimers();
+  clearPendingBottomScrollScheduler();
+}
+
+function updateGenerationAssistantMessage(generation = {}, patch = {}) {
+  const chatStore = useChatStore();
+  const chatId = String(generation.chatId || "").trim();
+  const assistantMessageId = String(generation.assistantMessageId || "").trim();
+  if (!chatId || !assistantMessageId) return false;
+
+  const currentMessages = chatStore.messageMap?.[chatId] || [];
+  chatStore.setMessages(
+    chatId,
+    currentMessages.map((message) =>
+      String(message?.id || "") === assistantMessageId
+        ? {...message, ...patch}
+        : message
+    )
+  );
+  return true;
+}
+
+function refreshGenerationScroll() {
+  chatMessageView.scrollToBottom({behavior: "auto"});
+  chatMessageView.scheduleRenderedFrameUpdate({bottomState: true});
+}
+
+function finishActiveGeneration() {
+  activeGeneration = null;
+  activeGenerationSse = null;
+  useChatStreamStore().finishWait();
+}
+
+export function stopChatGeneration() {
+  activeGenerationSse?.close?.();
+  activeGenerationSse = null;
+}
+
+export function startChatGeneration({url = "", payload = {}, chatId = "", assistantMessageId = ""} = {}) {
+  stopChatGeneration();
+
+  activeGeneration = {chatId, assistantMessageId};
+  activeGenerationSse = createGenerationStream({
+    url,
+    onText(content) {
+      updateGenerationAssistantMessage(activeGeneration, {
+        content,
+        status: "streaming",
+      });
+      refreshGenerationScroll();
+    },
+    onReasoning(reasoningContent) {
+      updateGenerationAssistantMessage(activeGeneration, {
+        reasoningContent,
+        reasoningStatus: "thinking",
+        status: "streaming",
+      });
+      refreshGenerationScroll();
+    },
+    onDone() {
+      updateGenerationAssistantMessage(activeGeneration, {
+        status: "complete",
+        reasoningStatus: "completed",
+      });
+      chatMessageView.scrollToBottomAfterRender({behavior: "auto"});
+      finishActiveGeneration();
+    },
+    onError(error) {
+      updateGenerationAssistantMessage(activeGeneration, {
+        status: "error",
+        error: true,
+        errorMessage: error?.message || "",
+        reasoningStatus: "completed",
+      });
+      finishActiveGeneration();
+    },
+  });
+
+  try {
+    activeGenerationSse.start(payload);
+  } catch (error) {
+    updateGenerationAssistantMessage(activeGeneration, {
+      status: "error",
+      error: true,
+      errorMessage: error?.message || "",
+      reasoningStatus: "completed",
+    });
+    finishActiveGeneration();
+  }
+}
+
+export function useChatQuestionAnswerView({
+  scrollToBottom,
+  scrollToBottomAfterRender,
+  scrollToTop,
+  scrollToMessage,
+  scrollToLatestUserMessage,
+  isAtBottom,
+  scheduleRenderedFrameUpdate,
+} = {}) {
+  chatMessageView.registered = true;
+  chatMessageView.scrollToBottom = scrollToBottom || (() => false);
+  chatMessageView.scrollToBottomAfterRender =
+    scrollToBottomAfterRender || (() => false);
+  chatMessageView.scrollToTop = scrollToTop || (() => false);
+  chatMessageView.scrollToMessage = scrollToMessage || (() => false);
+  chatMessageView.scrollToLatestUserMessage =
+    scrollToLatestUserMessage || (() => false);
+  chatMessageView.isAtBottom = isAtBottom || (() => true);
+  chatMessageView.scheduleRenderedFrameUpdate =
+    scheduleRenderedFrameUpdate || (() => {});
+
+  function cleanup() {
+    stopChatGeneration();
+    if (activeGeneration) finishActiveGeneration();
+    clearChatQuestionAnswerScrollState();
+    chatMessageView.registered = false;
+    chatMessageView.scrollToBottom = () => false;
+    chatMessageView.scrollToBottomAfterRender = () => false;
+    chatMessageView.scrollToTop = () => false;
+    chatMessageView.scrollToMessage = () => false;
+    chatMessageView.scrollToLatestUserMessage = () => false;
+    chatMessageView.isAtBottom = () => true;
+    chatMessageView.scheduleRenderedFrameUpdate = () => {};
+  }
+
+  return {cleanup};
 }

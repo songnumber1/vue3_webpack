@@ -134,9 +134,9 @@ export function getBridgeVersionFromBridge() {
 
 export function isSupportedMobileMicBrowser(
   isAndroid,
-  isMobileBrowser,
+  isBrowserRuntime,
   browserName
 ) {
-  if (!isAndroid || !isMobileBrowser) return false;
+  if (!isAndroid || !isBrowserRuntime) return false;
   return browserName === "chrome";
 }

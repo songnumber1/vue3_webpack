@@ -37,10 +37,6 @@
             <dd>{{ containerMode }}</dd>
           </div>
           <div>
-            <dt>compact</dt>
-            <dd>{{ isCompactViewport ? "true" : "false" }}</dd>
-          </div>
-          <div>
             <dt>native</dt>
             <dd>{{ isNativeRuntime ? "true" : "false" }}</dd>
           </div>
@@ -49,8 +45,8 @@
             <dd>{{ isAndroidRuntime ? "true" : "false" }}</dd>
           </div>
           <div>
-            <dt>mobile browser</dt>
-            <dd>{{ isMobileBrowser ? "true" : "false" }}</dd>
+            <dt>browser runtime</dt>
+            <dd>{{ isBrowserRuntime ? "true" : "false" }}</dd>
           </div>
         </dl>
       </article>
@@ -298,10 +294,9 @@ const viewportStore = useViewportStore();
 const chatStreamStore = useChatStreamStore();
 const {appInfo} = useAppContext();
 const {
-  isCompactViewport,
   isNativeRuntime,
   isAndroidApp: isAndroidRuntime,
-  isMobileBrowser,
+  isBrowserRuntime,
 } = useRuntimeModeFlags();
 const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
 const overlayActionOptions = {
@@ -323,13 +318,13 @@ const containerMode = computed(() =>
 );
 const clipboardFeedbackTarget = computed(() => {
   if (isAndroidRuntime.value) return t("playground.clipboard.androidTarget");
-  if (isMobileBrowser.value) return t("playground.clipboard.mobileTarget");
+  if (isBrowserRuntime.value) return t("playground.clipboard.mobileTarget");
 
   return t("playground.clipboard.webTarget");
 });
 const toastFeedbackTarget = computed(() => {
   if (isAndroidRuntime.value) return t("playground.toast.androidTarget");
-  if (isMobileBrowser.value) return t("playground.toast.mobileTarget");
+  if (isBrowserRuntime.value) return t("playground.toast.mobileTarget");
 
   return t("playground.toast.webTarget");
 });

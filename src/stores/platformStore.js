@@ -16,7 +16,7 @@ export const usePlatformStore = defineStore("platform", {
     isNativeRuntime: (state) =>
       state.info.isNativeRuntime || state.info.isNativeApp,
     isAndroidApp: (state) => state.info.isAndroidApp,
-    isMobileBrowser: (state) => state.info.isMobileBrowser,
+    isBrowserRuntime: (state) => state.info.isBrowserRuntime,
   },
   actions: {
     initialize(baseAppInfo = {}) {

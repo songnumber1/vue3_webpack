@@ -36,7 +36,7 @@
     </p>
 
     <PromptModelBottomSheet
-      :open="modelMenuOpen && isMobileSheet && !modelReadonly"
+      :open="modelMenuOpen && !modelReadonly"
       :title="t('chat.modelSelect')"
       :model-value="modelValue"
       :models="currentModels"
@@ -45,14 +45,14 @@
     />
 
     <PromptToolBottomSheet
-      :open="toolMenuOpen && isMobileSheet"
+      :open="toolMenuOpen"
       :title="t('chat.tools')"
       :model-value="modelValue"
       @close="toolMenuOpen = false"
     />
 
     <PromptAttachBottomSheet
-      :open="attachMenuOpen && isMobileSheet"
+      :open="attachMenuOpen"
       :title="t('chat.attach')"
       :attach-options="attachOptions"
       @close="attachMenuOpen = false"
@@ -64,7 +64,7 @@
 <script setup>
 /**
  * @file components/prompt/PromptComposer.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. 전역 모델/생성 상태는 Pinia에서 직접 읽고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
+ * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
 import {
@@ -77,6 +77,7 @@ import {
   ref,
   toRef,
   watch,
+  inject,
 } from "vue";
 import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
 import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
@@ -99,8 +100,6 @@ import {
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {submitChatMessage} from "@/composables/chat/useChatQuestionAnswer";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
@@ -116,7 +115,10 @@ import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
+  PROMPT_STATE_KEY,
+  createEmptyPromptState,
 } from "@/composables/chat/chatStateContext";
+import {usePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
 import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 import {
   providePromptInputActions,
@@ -132,32 +134,15 @@ const componentProps = defineProps({
   hideVoiceAction: {type: Boolean, default: false},
 });
 
-const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
+const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
+const composerContext = usePromptComposerContext();
 const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
-const activeSessionModelId = computed(() =>
-  String(chatStore.activeSession?.modelId || "").trim()
-);
-const promptModelReadonly = computed(() =>
-  Boolean(chatStore.isModelLocked || activeSessionModelId.value)
-);
-const promptModels = computed(() => {
-  const lockedModelId = activeSessionModelId.value;
-  if (promptModelReadonly.value && lockedModelId) {
-    return [chatStore.modelMap[lockedModelId]].filter(Boolean);
-  }
-  return chatStore.currentModels;
-});
-const promptModelValue = computed(() =>
-  activeSessionModelId.value || chatStore.selectedModelId || ""
-);
-
 const props = reactive({
   get disabled() {
-    return false;
+    return promptState.value.disabled;
   },
   get generating() {
-    return chatStreamStore.isWait;
+    return promptState.value.generating;
   },
   get submitDisabled() {
     return componentProps.submitDisabled;
@@ -172,30 +157,38 @@ const props = reactive({
     return componentProps.hideVoiceAction;
   },
   get floating() {
-    return false;
+    return promptState.value.floating;
   },
   get showHelp() {
-    return false;
+    return promptState.value.showHelp;
   },
   get placeholder() {
-    return "";
+    return promptState.value.placeholder;
   },
   get modelValue() {
-    return promptModelValue.value;
+    return promptState.value.selectedModel;
   },
   get models() {
-    return promptModels.value;
+    return promptState.value.models;
   },
   get modelReadonly() {
-    return promptModelReadonly.value;
+    return promptState.value.modelReadonly;
   },
 });
 
 
+function invokeComposerContext(actionName, payload) {
+  const action = composerContext?.[actionName];
+  if (typeof action !== "function") return false;
+
+  action(payload);
+  return true;
+}
+
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    submitChatMessage(payload);
+    invokeComposerContext("onSubmit", payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -208,11 +201,11 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    chatStore.selectModel(payload);
+    invokeComposerContext("onUpdateSelectedModel", payload);
     return;
   }
   if (eventName === "focus") {
-    promptWorkspaceLayoutActions.onFocus?.(payload);
+    invokeComposerContext("onFocus", payload);
     return;
   }
   if (eventName === "height-change") {
@@ -243,7 +236,6 @@ const {
   modelMenuOpen, // AI 모델 변경 드롭다운 모달 개폐 상태 (Boolean)
   toolMenuOpen, // 부가 플러그인 툴 목록 모달 개폐 상태 (Boolean)
   attachMenuOpen, // 파일 업로드 첨부 방식 선택 모달 개폐 상태 (Boolean)
-  isMobileSheet, // 모바일 하단 바텀시트 렌더링 고정 플래그
   closeMenus, // 현재 열려 있는 모든 하위 도구 레이어 팝업을 일괄 폐쇄하는 메서드
   toggleMenu, // 특정 타깃 도구 팝업 메뉴를 토글식으로 열고 닫는 제어 메서드
 } = usePromptMenu();
@@ -479,6 +471,7 @@ function selectModel(id) {
 
 // ── [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
 // 특정 페르소나나 업무 서식이 가미된 프롬프트 문틀(Template) 및 확장 API 기능(Tool)을 조합합니다.
+const chatStore = useChatStore();
 const activeMobileGroupId = ref("");
 const activePromptToolSettings = computed(
   () => promptControlStore.activePromptToolSettings
@@ -710,8 +703,6 @@ function isSoftKeyboardLikelyOpen() {
 }
 
 function blurTextareaForMobileSubmit() {
-  if (!isMobileSheet.value) return false;
-
   const textarea = getTextareaElement();
   const activeElement =
     typeof document !== "undefined" ? document.activeElement : null;
@@ -787,6 +778,7 @@ function notifyPromptExpandedChange(expanded) {
 }
 
 function notifyPromptHeightChange(height) {
+  invokeComposerContext("onHeightChange", height);
   promptWorkspaceLayoutActions.onHeightChange?.(height);
 }
 
@@ -925,7 +917,6 @@ provide(
     modelMenuOpen: modelMenuOpen.value,
     toolMenuOpen: toolMenuOpen.value,
     attachMenuOpen: attachMenuOpen.value,
-    isMobileSheet: isMobileSheet.value,
     canSubmit: canSubmit.value,
     hasPromptText: hasPromptText.value,
     hideToolActions: componentProps.hideToolActions,

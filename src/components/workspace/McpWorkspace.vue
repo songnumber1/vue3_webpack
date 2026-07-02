@@ -6,10 +6,10 @@
     <ChatHeader
       v-if="!mobileDetailMcp"
       mode="studio"
-      :assistant-label="assistantLabel"
-      :assistant="assistant"
+      :assistant-label="workspaceState.assistantLabel"
+      :assistant="workspaceState.assistant"
       conversation-title="Connector Store"
-      :theme-name="themeName"
+      :theme-name="workspaceState.themeName"
     />
 
     <McpMobileDetailPage
@@ -64,29 +64,32 @@
 </template>
 
 <script setup>
-import {computed, onMounted, ref, watch} from "vue";
+import {computed, inject, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
-import {useChatStore} from "@/stores/chatStore";
-import {useAppShellStore} from "@/stores/appShellStore";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import McpMainPage from "@/components/mcp/McpMainPage.vue";
 import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {mcpApiLive} from "@/api/live/mcpApi.live";
 import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatStateContext";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 import {provideMcpList} from "@/composables/mcp/context/mcpListContext";
 import {useMcpListController} from "@/composables/mcp/useMcpListController";
 
 const {t, locale} = useI18n();
-const chatStore = useChatStore();
-const appShellStore = useAppShellStore();
-const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(
-  () => String(assistant.value?.label || "").trim() || t("chat.assistant")
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
 );
-const themeName = computed(() => appShellStore.themeName);
+const workspaceState = computed(
+  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+);
+
 const searchText = ref("");
 const activeTab = ref("all");
 const activeCategory = ref("ALL");

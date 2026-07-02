@@ -14,7 +14,6 @@
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
     @suggestion-click="handleSuggestionClick"
-    @studio-detail-click="emit('open-studio-detail')"
   >
     <template #composer>
       <PromptComposer
@@ -31,64 +30,41 @@
  * @description 실제 메인 라우트 전용 workspace입니다. 메인 빈 화면 UI는 MainEmptyState를 공유하고,
  * 실제 PromptComposer만 slot으로 주입하여 Studio 미리보기와 UI를 함께 관리합니다.
  */
-import {computed, ref} from "vue";
+import {computed, ref, inject} from "vue";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import MainEmptyState from "@/components/workspace/MainEmptyState.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
-import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useAppShellStore} from "@/stores/appShellStore";
-import {useI18n} from "vue-i18n";
 import {providePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
-import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
+import {
+  CHAT_WORKSPACE_STATE_KEY,
+  createEmptyWorkspaceState,
+} from "@/composables/chat/chatStateContext";
 
-const emit = defineEmits(["open-studio-detail", "prompt-viewport-refresh"]);
-
-const {t, locale} = useI18n();
-const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
-const appShellStore = useAppShellStore();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
 
-const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(
-  () => String(assistant.value?.label || "").trim() || t("chat.assistant")
+const workspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
 );
-const conversationTitle = computed(() => "");
-const themeName = computed(() => appShellStore.themeName);
-const suggestions = computed(() => {
-  const prompts =
-    chatStore.examplePromptMap[chatStore.selectedAssistantId] || [];
-  const isEnglish = locale.value === "en";
-
-  return prompts
-    .slice(0, PROMPT_SUGGESTION_LIMIT)
-    .map((prompt) => {
-      const localizedTitle = isEnglish
-        ? prompt.titleEn || prompt.titleKo
-        : prompt.titleKo || prompt.titleEn;
-      const localizedContent = isEnglish
-        ? prompt.contentEn || prompt.contentKo || localizedTitle
-        : prompt.contentKo || prompt.contentEn || localizedTitle;
-      const text = localizedTitle || localizedContent;
-      const content = localizedContent || localizedTitle;
-
-      return {
-        id: prompt.id,
-        text,
-        title: content || text,
-        prompt: content || text,
-      };
-    })
-    .filter((item) => item.text && item.prompt);
-});
+const assistantLabel = computed(() => workspaceState.value.assistantLabel);
+const assistant = computed(() => workspaceState.value.assistant);
+const conversationTitle = computed(
+  () => workspaceState.value.conversationTitle
+);
+const themeName = computed(() => workspaceState.value.themeName);
+const suggestions = computed(() => workspaceState.value.suggestions || []);
 const showStudioDetailButton = computed(() =>
   isStudioAssistant(assistant.value)
 );
-const studioDetailDisabled = computed(() => chatStreamStore.isWait);
+const studioDetailDisabled = computed(
+  () =>
+    workspaceState.value.isGenerating || workspaceState.value.isHistoryRendering
+);
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );
@@ -109,14 +85,8 @@ function handleMainPromptExpandedChange(expanded) {
   isMainPromptExpanded.value = Boolean(expanded);
 }
 
-function refreshPromptViewport() {
-  emit("prompt-viewport-refresh");
-}
-
 providePromptWorkspaceLayoutActions({
   isExpanded: isMainPromptExpanded,
-  onFocus: refreshPromptViewport,
-  onHeightChange: refreshPromptViewport,
   onExpandedChange: handleMainPromptExpandedChange,
 });
 </script>

@@ -67,10 +67,6 @@ function resolveOverlayBackStore() {
   return overlayBackStoreInstance;
 }
 
-function shouldUseMobileBack() {
-  return true;
-}
-
 function markChatRouteLoadSuppressedIfNeeded() {
   if (!unref(suppressChatRouteLoad.value)) return;
 
@@ -129,7 +125,6 @@ function pushOverlayHistoryOnce(type) {
   const overlayBackStore = resolveOverlayBackStore();
 
   if (!canUseBrowserHistory()) return;
-  if (!shouldUseMobileBack()) return;
   if (!responseOverlayActiveType.value) return;
   if (overlayBackStore.mobileHistoryPushed) return;
 
@@ -176,18 +171,6 @@ export function setupResponseOverlayBackGuard() {
 
   if (guardWatchersBound) return;
   guardWatchersBound = true;
-
-  watch(
-    () => shouldUseMobileBack(),
-    (mobile) => {
-      if (mobile) {
-        pushOverlayHistoryOnce(responseOverlayActiveType.value);
-        return;
-      }
-
-      restoreOverlayHistoryIfNeeded();
-    }
-  );
 
   watch(
     () => Boolean(responseOverlayActiveType.value),

@@ -3,7 +3,7 @@
  * @description 브라우저 viewport, VisualViewport, 모바일 키보드, safe-area 관련 런타임 보정 모듈입니다.
  */
 
-import {computed, onBeforeUnmount, onMounted, ref} from "vue";
+import {onBeforeUnmount, onMounted, ref} from "vue";
 import {useEventListener} from "@vueuse/core";
 import {
   KEYBOARD_THRESHOLD_PX,
@@ -203,7 +203,7 @@ function removeKeyboardModeVars() {
  * 3. composer, bottom sheet, chat layout이 동일한 viewport 기준을 사용하게 합니다.
  *
  * @param {{onChange?: Function}} options viewport 변경 콜백
- * @returns {{viewportHeight: import('vue').Ref<number>, viewportWidth: import('vue').Ref<number>, keyboardOpen: import('vue').Ref<boolean>, isCompact: import('vue').ComputedRef<boolean>, refreshViewport: Function}}
+ * @returns {{viewportHeight: import('vue').Ref<number>, viewportWidth: import('vue').Ref<number>, keyboardOpen: import('vue').Ref<boolean>, refreshViewport: Function}}
  */
 export function useViewportGuard(options = {}) {
   const onChange = options.onChange || (() => {});
@@ -215,7 +215,6 @@ export function useViewportGuard(options = {}) {
   let resizeFrame = null;
   let mounted = false;
 
-  const isCompact = computed(() => true);
   // 실제 viewport 측정과 CSS 변수 반영을 수행하는 단일 진입점입니다.
   function apply() {
     if (typeof window === "undefined" || typeof document === "undefined")
@@ -245,19 +244,17 @@ export function useViewportGuard(options = {}) {
       USE_VIRTUAL_KEYBOARD
     );
 
-    if (keyboardMode === "adjustPan" && isCompact.value) {
+    if (keyboardMode === "adjustPan") {
       panFocusedElementIntoView();
     }
 
     keyboardOpen.value =
       keyboardMode === "adjustResize" &&
       USE_VIRTUAL_KEYBOARD &&
-      isCompact.value &&
       metrics.keyboardHeight > KEYBOARD_THRESHOLD_PX;
     onChange({
       ...size,
       keyboardOpen: keyboardOpen.value,
-      isCompact: isCompact.value,
     });
     window.dispatchEvent(new CustomEvent(VIEWPORT_GUARD_CUSTOM_EVENT));
   }
@@ -315,7 +312,6 @@ export function useViewportGuard(options = {}) {
     viewportHeight,
     viewportWidth,
     keyboardOpen,
-    isCompact,
     refreshViewport: scheduleApply,
   };
 }

@@ -6,7 +6,7 @@
       [`chat-container-root--mode-${mode}`]: true,
     }"
   >
-    <AppSidebar @history-menu-action="$emit('history-menu-action', $event)" />
+    <AppSidebar />
     <main class="chat-workspace tw-min-h-0 tw-min-w-0 tw-overflow-hidden">
       <slot />
     </main>
@@ -21,8 +21,6 @@
 
 import AppSidebar from "@/components/navigation/AppSidebar.vue";
 
-
-defineEmits(["history-menu-action"]);
 
 defineProps({
   keyboardOpen: {type: Boolean, default: false},

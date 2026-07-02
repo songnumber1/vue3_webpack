@@ -1,5 +1,9 @@
 <template>
-  <div class="app-container" :class="containerClasses" data-layout="mobile">
+  <div
+    class="app-container app-container--mobile app-container--compact app-container--compact-browser"
+    :class="containerClasses"
+    data-layout="mobile"
+  >
     <slot />
   </div>
 </template>
@@ -22,11 +26,7 @@ const authStore = useAuthStore();
 const route = useRoute();
 
 
-const {
-  isActualAndroidRuntime,
-  shouldUseOverlayScrollbar,
-  shouldUseNativeScrollbar,
-} = useOverlayScrollPolicy();
+const {isActualAndroidRuntime} = useOverlayScrollPolicy();
 
 function shouldBootstrapAppForRoute(targetRoute) {
   if (!targetRoute) return false;
@@ -78,16 +78,12 @@ function syncMobileRuntimeClasses({isAndroidRuntime, useOverlayScrollbar}) {
 watchEffect(() => {
   syncMobileRuntimeClasses({
     isAndroidRuntime: isActualAndroidRuntime.value,
-    useOverlayScrollbar: shouldUseOverlayScrollbar.value,
+    useOverlayScrollbar: true,
   });
 });
 
 const containerClasses = computed(() => ({
-  "app-container--mobile": true,
-  "app-container--compact": true,
-  "app-container--compact-browser": true,
   "app-container--actual-android-runtime": isActualAndroidRuntime.value,
-  "app-container--native-scroll-runtime": shouldUseNativeScrollbar.value,
-  "app-container--overlay-scroll-runtime": shouldUseOverlayScrollbar.value,
+  "app-container--overlay-scroll-runtime": true,
 }));
 </script>

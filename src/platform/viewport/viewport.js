@@ -50,14 +50,6 @@ export function getViewportSize() {
 }
 
 /**
- * @description 모바일 전용 앱이므로 브라우저 런타임에서는 항상 모바일 viewport로 취급합니다.
- * @returns {boolean} 모바일 viewport 플래그
- */
-export function isMobileViewport() {
-  return typeof window !== "undefined";
-}
-
-/**
  * @description CSS `:root` 혹은 `html` 돔 엘리먼트에 문자열로 보존 중인 커스텀 속성(CSS 변수) 값을 파싱하여 순수 실수(Float) 숫자로 반환합니다.
  * @param {string} name - 탐색하고자 하는 CSS 변수 식별 문자열 (예: "--app-height")
  * @returns {number} 파싱이 완료된 픽셀 수치 데이터 (실패 및 유실 시 0)
@@ -103,11 +95,8 @@ export function getViewportHeight(minHeight = 320, fallback = 720) {
 
   if (!candidates.length) return fallback; // 유효 후보 부재 시 사전에 정의된 대안 폴백 반환
 
-  // 소프트 자판 축소 등으로 visualHeight가 실시간 확보된 경우
-  if (isMobileViewport() && visualHeight > 0) {
-    // 자판이 화면을 가릴 때 화면이 찌그러지는 문제를 막기 위해 visualHeight와 최소 보증치 중 큰 값을 안전 채택
-    return Math.max(visualHeight, minHeight);
-  }
+  // 소프트 자판 축소 등으로 visualHeight가 실시간 확보된 경우 안전 채택
+  if (visualHeight > 0) return Math.max(visualHeight, minHeight);
 
   // 일반적인 레이아웃 상태에서는 범용 window.innerHeight를 우선 순위로 둔 후 예외 방어 조합 처리
   return Math.max(innerHeight || visualHeight || clientHeight, minHeight);

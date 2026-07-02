@@ -4,7 +4,6 @@ export const useChatStreamStore = defineStore("chatStream", {
   state: () => ({
     isWait: false,
     allowedNavigation: null,
-    pendingGeneration: null,
   }),
   actions: {
     startWait() {
@@ -39,12 +38,6 @@ export const useChatStreamStore = defineStore("chatStream", {
     },
     clearAllowedNavigation() {
       this.allowedNavigation = null;
-    },
-    setPendingGeneration(payload = null) {
-      this.pendingGeneration = payload;
-    },
-    clearPendingGeneration() {
-      this.pendingGeneration = null;
     },
   },
 });

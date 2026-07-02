@@ -21,8 +21,6 @@
         :key="message.id"
         :message="message"
         :show-regenerate="!readonly && isLastAssistantMessage(message)"
-        :message-dom-id="String(message.id || '')"
-        :message-dom-role="message.role"
         :defer-mermaid-enhancement="historyRendering"
       />
       <div v-if="loading" class="typing-row">
@@ -85,9 +83,7 @@ import {
   provideMessageActions,
   useMessageActions,
 } from "@/composables/chat/context/messageActionContext";
-import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useMessageGenerationSse} from "@/composables/chat/useChatQuestionAnswer";
+import {useChatQuestionAnswerView} from "@/composables/chat/useChatQuestionAnswer";
 
 const props = defineProps({
   visible: {type: Boolean, default: true},
@@ -102,16 +98,6 @@ const props = defineProps({
 });
 
 const parentMessageActions = useMessageActions();
-const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
-const messageGenerationSse = useMessageGenerationSse({
-  onText: updateStreamingAssistantMessage,
-  onReasoning: updateStreamingAssistantReasoning,
-  onDone: completeStreamingAssistantMessage,
-  onError: failStreamingAssistantMessage,
-});
-let activeGenerationKey = "";
-let activeGenerationPending = null;
 
 function isLastAssistantMessage(message) {
   if (!message || message.role !== "assistant") {
@@ -1167,132 +1153,21 @@ provideMessageActions({
 });
 
 // -------------------------------------------------------------------------
-// MessageList-owned generation stream
+// MessageList generation view bridge
 // -------------------------------------------------------------------------
-function resolvePendingGenerationKey(pending = {}) {
-  return [
-    pending.chatId || "",
-    pending.assistantMessageId || "",
-    pending.type || "",
-  ].join(":");
-}
-
-function updatePendingAssistantMessage(pending = {}, patch = {}) {
-  const chatId = String(pending.chatId || "").trim();
-  const assistantMessageId = String(pending.assistantMessageId || "").trim();
-  if (!chatId || !assistantMessageId) return;
-
-  const currentMessages = chatStore.messageMap?.[chatId] || props.messages || [];
-  const nextMessages = currentMessages.map((message) =>
-    String(message?.id || "") === assistantMessageId
-      ? {...message, ...patch}
-      : message
-  );
-
-  chatStore.setMessages(chatId, nextMessages);
-}
-
-function updateActiveAssistantMessage(patch = {}) {
-  if (!activeGenerationPending) return false;
-  updatePendingAssistantMessage(activeGenerationPending, patch);
-  return true;
-}
-
-function refreshStreamingScrollState() {
-  scrollToBottom({behavior: "auto"});
-  scheduleRenderedFrameUpdate({bottomState: true});
-}
-
-function finishPendingGeneration() {
-  activeGenerationKey = "";
-  activeGenerationPending = null;
-  chatStreamStore.finishWait();
-}
-
-function updateStreamingAssistantMessage(content) {
-  if (!updateActiveAssistantMessage({content, status: "streaming"})) return;
-  refreshStreamingScrollState();
-}
-
-function updateStreamingAssistantReasoning(reasoningContent) {
-  if (
-    !updateActiveAssistantMessage({
-      reasoningContent,
-      reasoningStatus: "thinking",
-      status: "streaming",
-    })
-  ) {
-    return;
-  }
-
-  refreshStreamingScrollState();
-}
-
-function completeStreamingAssistantMessage() {
-  if (
-    !updateActiveAssistantMessage({
-      status: "complete",
-      reasoningStatus: "completed",
-    })
-  ) {
-    return;
-  }
-
-  scrollToBottomAfterRender({behavior: "auto"});
-  finishPendingGeneration();
-}
-
-function failStreamingAssistantMessage(error) {
-  if (
-    !updateActiveAssistantMessage({
-      status: "error",
-      error: true,
-      errorMessage: error?.message || "",
-      reasoningStatus: "completed",
-    })
-  ) {
-    return;
-  }
-
-  finishPendingGeneration();
-}
-
-function startPendingGeneration(pending = {}, generationKey = "") {
-  activeGenerationKey = generationKey;
-  activeGenerationPending = pending;
-  chatStreamStore.clearPendingGeneration();
-
-  try {
-    messageGenerationSse.start(pending.payload || {});
-  } catch (error) {
-    failStreamingAssistantMessage(error);
-  }
-}
-
-function runPendingGeneration(pending = {}) {
-  const generationKey = resolvePendingGenerationKey(pending);
-  if (!generationKey || activeGenerationKey === generationKey) return;
-
-  startPendingGeneration(pending, generationKey);
-}
-
-function consumePendingGeneration(pending, selectedChatId) {
-  if (!pending) return;
-  if (String(pending.chatId || "") !== String(selectedChatId || "")) return;
-  runPendingGeneration(pending);
-}
+const chatQuestionAnswerView = useChatQuestionAnswerView({
+  scrollToBottom,
+  scrollToBottomAfterRender,
+  scrollToTop,
+  scrollToMessage,
+  scrollToLatestUserMessage,
+  isAtBottom: getIsAtBottom,
+  scheduleRenderedFrameUpdate,
+});
 
 // -------------------------------------------------------------------------
 // Watchers and DOM lifecycle
 // -------------------------------------------------------------------------
-
-watch(
-  () => [chatStreamStore.pendingGeneration, chatStore.selectedChatId],
-  ([pending, selectedChatId]) => {
-    consumePendingGeneration(pending, selectedChatId);
-  },
-  {immediate: true}
-);
 
 watch(
   () => [
@@ -1385,10 +1260,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   clearHistoryRenderState();
   clearResizeRecalculateScheduler();
-  messageGenerationSse.close();
-  if (activeGenerationPending) {
-    finishPendingGeneration();
-  }
+  chatQuestionAnswerView.cleanup();
   cleanupOverlayScrollbar();
 
   if (typeof window === "undefined") return;

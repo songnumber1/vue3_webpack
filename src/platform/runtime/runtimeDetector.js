@@ -123,12 +123,12 @@ export function isAndroidWebViewRuntime(
 }
 
 /**
- * 지정된 런타임 환경 또는 현재의 실행 환경이 '모바일 브라우저'인지 판단합니다.
+ * 지정된 런타임 환경 또는 현재의 실행 환경이 브라우저 기본 런타임인지 판단합니다.
  * @param {string} [runtimeType=resolveStreamRuntimeType()] - 검사할 런타임 타입 문자열 (생략 시 {@link resolveStreamRuntimeType}의 결과값 사용)
- * @returns {boolean} 모바일 브라우저 런타임 환경과 완벽히 일치하면 true, 아니면 false
+ * @returns {boolean} 브라우저 기본 런타임 환경과 완벽히 일치하면 true, 아니면 false
  * @see {@link STREAM_RUNTIME_TYPES.MOBILE_BROWSER}
  */
-export function isMobileBrowserRuntime(
+export function isBrowserRuntime(
   runtimeType = resolveStreamRuntimeType()
 ) {
   // 주입받거나 판별된 runtimeType 파라미터가 상수의 MOBILE_BROWSER 값과 일치하는지 비교 검증합니다.

@@ -124,10 +124,12 @@ import {
 import {logWarn} from "@/utils/logger";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {resolveBlocked} from "@/utils/interactionGuard";
+import {useNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 
 const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
+const navigationActions = useNavigationActions();
 const chatStore = useChatStore();
 const chatStreamStore = useChatStreamStore();
 const appShellStore = useAppShellStore();
@@ -136,7 +138,6 @@ const {assistants, selectedAssistantId} = storeToRefs(chatStore);
 const {histories, pendingSelectedChatId, selectedChatId} =
   storeToRefs(chatStore);
 const {drawerOpen} = storeToRefs(appShellStore);
-const emit = defineEmits(["history-menu-action"]);
 
 const assistantMenuOpen = ref(false);
 const historyMenuOpen = ref(false);
@@ -301,7 +302,7 @@ function selectHistoryMenuAction(action) {
   const history = historyMenuTarget.value;
   closeHistoryMenu();
   if (!history || !action) return;
-  emit("history-menu-action", {action, history});
+  navigationActions.handleHistoryMenuAction?.({action, history});
 }
 
 async function handleSelectHistory(item) {

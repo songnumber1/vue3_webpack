@@ -18,7 +18,6 @@ export function useRuntimeModeFlags() {
   const platformStore = usePlatformStore();
   const platformInfo = computed(() => platformStore.info || {});
 
-  const mobileOnlyLayout = computed(() => true);
   const isNativeRuntime = computed(() =>
     Boolean(
       platformInfo.value.isNativeRuntime || platformInfo.value.isNativeApp
@@ -34,11 +33,10 @@ export function useRuntimeModeFlags() {
 
   return {
     platformInfo,
-    isCompactViewport: mobileOnlyLayout,
     isNativeRuntime,
     isAndroidApp,
     isActualAndroidRuntime,
     isActualAndroidWebViewRuntime,
-    isMobileBrowser: mobileOnlyLayout,
+    isBrowserRuntime: computed(() => Boolean(platformInfo.value.isBrowserRuntime)),
   };
 }

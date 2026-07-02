@@ -31,7 +31,7 @@ import {logWarn} from "@/utils/logger";
  * @see {@link resolveBridge} 안드로이드인 경우 네이티브 설정을 연동합니다.
  */
 export async function bootstrap() {
-  // 1. 현재 화면 크기를 추적하여 HTML/Body 태그에 모바일/데스크톱 대응용 CSS 클래스(예: .is-mobile)를 동적으로 삽입합니다.
+  // 1. 현재 화면 크기를 추적하여 HTML/Body 태그에 모바일 전용 CSS 클래스를 동적으로 삽입합니다.
   installViewportModeClass();
 
   // 2. 현재 실행 환경(운영체제, 빌드 환경, 모바일 브레이크포인트 등)의 메타 설정 정보를 빌드 시스템으로부터 읽어옵니다.

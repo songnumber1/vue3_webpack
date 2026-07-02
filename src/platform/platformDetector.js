@@ -56,7 +56,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const isNativeApp = runtime === RUN_ENV.NATIVE;
   const isAndroidApp = isAndroid && hasBridge;
   const isAndroidWebView = isAndroid && browserName === "android-webview";
-  const isMobileBrowser = !isNativeApp;
+  const isBrowserRuntime = !isNativeApp;
   const isActuallySamsungBrowser =
     actualPlatform.browser === "samsung-browser" ||
     /SamsungBrowser\//i.test(ua);
@@ -72,7 +72,7 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
   const viewportInfo = resolveViewportInfo(baseAppInfo);
   const isMic = isSupportedMobileMicBrowser(
     isAndroid,
-    isMobileBrowser,
+    isBrowserRuntime,
     browserName
   );
   logPlatformDebug("platform.resolve", {
@@ -83,9 +83,8 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
       device,
       browser: browserName,
       isAndroid,
-      isMobileBrowser,
+      isBrowserRuntime,
       isAndroidApp,
-      isCompactViewport: viewportInfo.isCompactViewport,
     },
     viewport: {
       width: viewportInfo.width,
@@ -117,10 +116,9 @@ export function resolveDetailedPlatform(baseAppInfo = {}) {
     isAndroid,
     isNativeApp,
     isNativeRuntime: isNativeApp,
-    isCompactViewport: viewportInfo.isCompactViewport,
     isAndroidApp,
     isAndroidWebView,
-    isMobileBrowser,
+    isBrowserRuntime,
     isMic,
     isChrome: browserName === "chrome",
     isFirefox: browserName === "firefox",

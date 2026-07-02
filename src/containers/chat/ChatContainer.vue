@@ -3,37 +3,15 @@
     v-if="shellReady"
     :keyboard-open="layoutKeyboardOpen"
     :mode="routeMode"
-    @history-menu-action="handleHistoryMenuAction"
   >
     <HomeWorkspace
       v-if="activeWorkspaceType === 'main'"
       :ref="setWorkspaceRef"
-      @open-studio-detail="openStudioDetail"
-      @prompt-viewport-refresh="refreshPromptViewport"
     />
 
     <ChatConversationWorkspace
       v-else-if="activeWorkspaceType === 'conversation'"
       :ref="setWorkspaceRef"
-      :mode="routeMode"
-      :readonly="isReadOnly"
-      :assistant-label="workspaceAssistantLabel"
-      :assistant="currentAssistant"
-      :conversation-title="activeConversationTitle"
-      :theme-name="themeName"
-      :is-active-model-deleted="Boolean(chatStore.activeSession?.isModelDeleted)"
-      :is-active-model-unavailable="isActiveModelUnavailable"
-      :is-generating="isGenerating"
-      :messages="messages"
-      :show-scroll-bottom="showScrollBottom"
-      :is-history-rendering="isHistoryRendering"
-      :history-markdown-visible="historyMarkdownVisible"
-      :history-messages-loaded="historyMessagesLoaded"
-      :history-render-key="activeHistoryId || ''"
-      :message-render-policy="messageRenderPolicy"
-      @open-studio-detail="openStudioDetail"
-      @scroll-bottom="handleWorkspaceScrollBottom"
-      @prompt-viewport-refresh="refreshPromptViewport"
     />
 
     <StudioWorkspace
@@ -105,6 +83,7 @@ import {
   nextTick,
   onBeforeUnmount,
   onMounted,
+  provide,
   ref,
   watch,
 } from "vue";
@@ -116,6 +95,10 @@ import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
+import {
+  CHAT_WORKSPACE_STATE_KEY,
+  PROMPT_STATE_KEY,
+} from "@/composables/chat/chatStateContext";
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -131,12 +114,9 @@ import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
-import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
 import {
-  createChatHistory,
   deleteChatHistory,
   loadChatHistoryList,
   loadChatMessageRouters,
@@ -175,15 +155,28 @@ import {
   isStudioAssistant,
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
+import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
+import {
+  normalizeHistoryId,
+  normalizeId,
+  normalizeNullableMessageId,
+  normalizeText,
+} from "@/utils/normalize";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
 
 import {
-  appendUserAndAssistantMessages as appendMessagesToChat,
-  configureChatSubmit,
+  clearChatQuestionAnswerScrollState,
+  isChatScrolledToBottom,
   regenerateLastAnswer,
   revokeMessageAttachments,
+  scrollChatToBottom,
+  scrollChatToInitialTarget,
+  submitChatMessage,
 } from "@/composables/chat/useChatQuestionAnswer";
+import {providePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
+import {provideChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
 import {provideMessageActions} from "@/composables/chat/context/messageActionContext";
+import {provideNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 import {MESSAGE_SCROLL_TARGET_TYPES} from "@/composables/chat/internal/message-list/messageRenderPolicyTypes";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
@@ -209,24 +202,6 @@ const props = defineProps({
   workspace: {type: String, default: ""},
 });
 
-const LIST_READY_SCROLL_MAX_FRAMES = 60;
-
-function normalizeText(value) {
-  return typeof value === "string" ? value.trim() : String(value || "").trim();
-}
-
-function normalizeId(value) {
-  return normalizeText(value);
-}
-
-function normalizeNullableMessageId(value) {
-  const id = normalizeId(value);
-  return id || null;
-}
-
-function normalizeHistoryId(value) {
-  return normalizeId(value);
-}
 
 function hasSharedId(chat) {
   return String(chat?.sharedId || "").trim().length > 0;
@@ -409,7 +384,7 @@ const activeHistoryId = computed(() => {
 });
 pageState.activeHistoryId = activeHistoryId;
 
-const {t} = useI18n();
+const {t, locale} = useI18n();
 const {theme} = useAppContext();
 syncMobileViewportSettings();
 
@@ -757,51 +732,6 @@ async function ensureRuntimeConversation(historyId, options = {}) {
   return chatStore.messageMap[history.id] || [];
 }
 
-async function createRemoteRuntimeConversation({
-  text,
-  assistantId,
-  modelId,
-} = {}) {
-  const chatId = createId();
-  const chatTitle = String(text || "")
-    .trim()
-    .slice(0, 20);
-  const assistant = chatStore.assistantMap?.[assistantId] || null;
-  const rawHistory = await createChatHistory({
-    chatId,
-    assistId: assistantId,
-    modelId,
-    ChatTilte: chatTitle || String(text || "").trim(),
-    studio: assistant?.type === "studio",
-  });
-  const history = adaptChatHistory(rawHistory, {
-    assistantMap: chatStore.assistantMap,
-    modelMap: chatStore.modelMap,
-  });
-
-  if (!history?.id) {
-    throw new Error("new.do response does not contain chatId.");
-  }
-
-  chatStore.addHistory(history);
-  chatStore.setMessages(history.id, []);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      chatStore.modelMap,
-      chatStore.assistantMap
-    )
-  );
-
-  return history;
-}
-
-
-function appendRuntimeUserAndAssistantMessages(chatId, normalized) {
-  return appendMessagesToChat(chatId, normalized);
-}
-
-
 const runtime = {
   initialize: initializeRuntime,
   assistants: assistantListRef,
@@ -823,10 +753,7 @@ const runtime = {
   removeHistory,
   selectAssistant: selectRuntimeAssistant,
   ensureConversation: ensureRuntimeConversation,
-  setMessages: chatStore.setMessages.bind(chatStore),
-  createRemoteConversation: createRemoteRuntimeConversation,
   clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
-  appendUserAndAssistantMessages: appendRuntimeUserAndAssistantMessages,
   revokeMessageAttachments,
 };
 
@@ -857,163 +784,9 @@ setupResponseOverlayBackGuard();
 
 const showScrollBottom = ref(false);
 let bottomStateTimer = 0;
-let latestUserScrollTimerIds = [];
-let pendingBottomScrollRafId = 0;
-let pendingBottomScrollFrameCount = 0;
-
-function getMessageListRef() {
-  const exposed = workspaceRef.value?.listRef;
-  if (exposed?.scrollToBottom || exposed?.scrollToLatestUserMessage) {
-    return exposed;
-  }
-  if (
-    exposed?.value?.scrollToBottom ||
-    exposed?.value?.scrollToLatestUserMessage
-  ) {
-    return exposed.value;
-  }
-  return null;
-}
-
-function clearLatestUserScrollTimers() {
-  latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-  latestUserScrollTimerIds = [];
-}
-
-function clearPendingBottomScrollScheduler() {
-  if (!pendingBottomScrollRafId || typeof window === "undefined") {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount = 0;
-    return;
-  }
-
-  window.cancelAnimationFrame(pendingBottomScrollRafId);
-  pendingBottomScrollRafId = 0;
-  pendingBottomScrollFrameCount = 0;
-}
-
 function updateScrollBottomButton() {
-  const list = getMessageListRef();
   showScrollBottom.value =
-    Boolean(pageState.isConversationPage?.value) &&
-    Boolean(list && !list.isAtBottom?.());
-}
-
-function applyBottomScrollWhenListReady(options = {}) {
-  const list = getMessageListRef();
-  if (!list?.scrollToBottom) return false;
-
-  if (options.afterRender && list.scrollToBottomAfterRender) {
-    list.scrollToBottomAfterRender({...options, force: true, stable: true});
-  } else {
-    list.scrollToBottom({...options, force: true, stable: true});
-  }
-
-  updateScrollBottomButton();
-  return true;
-}
-
-function scheduleBottomScrollWhenListReady(options = {}) {
-  clearPendingBottomScrollScheduler();
-
-  if (applyBottomScrollWhenListReady(options)) return;
-  if (typeof window === "undefined") return;
-
-  const check = () => {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount += 1;
-
-    if (applyBottomScrollWhenListReady(options)) {
-      pendingBottomScrollFrameCount = 0;
-      return;
-    }
-
-    if (pendingBottomScrollFrameCount >= LIST_READY_SCROLL_MAX_FRAMES) {
-      pendingBottomScrollFrameCount = 0;
-      updateScrollBottomButton();
-      return;
-    }
-
-    pendingBottomScrollRafId = window.requestAnimationFrame(check);
-  };
-
-  pendingBottomScrollRafId = window.requestAnimationFrame(check);
-}
-
-async function scrollBottom(options = {}) {
-  const list = getMessageListRef();
-  if (list?.scrollToBottom) {
-    clearPendingBottomScrollScheduler();
-    if (options.afterRender && list.scrollToBottomAfterRender) {
-      list.scrollToBottomAfterRender(options);
-    } else {
-      list.scrollToBottom(options);
-    }
-    updateScrollBottomButton();
-    return;
-  }
-
-  updateScrollBottomButton();
-
-  if (options.force || options.stable) {
-    scheduleBottomScrollWhenListReady(options);
-  }
-}
-
-async function scrollInitialTarget(scrollTarget = {}, options = {}) {
-  const target = scrollTarget || {type: MESSAGE_SCROLL_TARGET_TYPES.bottom};
-  const behavior = options.behavior || target.behavior || "auto";
-  const list = getMessageListRef();
-
-  if (target.type === MESSAGE_SCROLL_TARGET_TYPES.message) {
-    const applied = list?.scrollToMessage?.(target.messageId, {
-      behavior,
-      block: target.block || options.block || "center",
-    });
-    updateScrollBottomButton();
-    return Boolean(applied);
-  }
-
-  if (target.type === MESSAGE_SCROLL_TARGET_TYPES.first) {
-    const applied = list?.scrollToTop?.({behavior});
-    updateScrollBottomButton();
-    return Boolean(applied);
-  }
-
-  await scrollBottom({force: true, behavior, ...options});
-  return true;
-}
-
-async function scrollLatestUserMessage(options = {}) {
-  clearLatestUserScrollTimers();
-
-  const apply = () => {
-    const list = getMessageListRef();
-    if (!list?.scrollToLatestUserMessage) return false;
-
-    list.scrollToLatestUserMessage({
-      stable: true,
-      ...options,
-    });
-    updateScrollBottomButton();
-    return true;
-  };
-
-  if (apply()) return;
-
-  if (options.initialOnly) {
-    const timerId = window.setTimeout(() => {
-      apply();
-      clearLatestUserScrollTimers();
-    }, 0);
-    latestUserScrollTimerIds.push(timerId);
-    return;
-  }
-
-  [0, 32, 80, 160, 320].forEach((delay) => {
-    const timerId = window.setTimeout(apply, delay);
-    latestUserScrollTimerIds.push(timerId);
-  });
+    Boolean(pageState.isConversationPage?.value) && !isChatScrolledToBottom();
 }
 
 function scheduleBottomStateCheck() {
@@ -1027,8 +800,7 @@ function handleMessageContentRendered() {
 
 function cleanupScrollResources() {
   window.clearTimeout(bottomStateTimer);
-  clearLatestUserScrollTimers();
-  clearPendingBottomScrollScheduler();
+  clearChatQuestionAnswerScrollState();
 }
 
 const {keyboardOpen, refreshViewport} = useViewportGuard({
@@ -1226,7 +998,7 @@ function bindUiEvents() {
 function handleRuntimeOverlayApplied() {
   syncMobileViewportSettings();
   refreshViewport();
-  scrollBottom({stable: true});
+  scrollChatToBottom({stable: true});
 }
 
 function cleanupConversationForNavigation() {
@@ -1249,11 +1021,14 @@ const overlayBackStore = useOverlayStore();
 const messages = conversationMessages;
 const assistants = runtime.assistants;
 const currentAssistant = runtime.currentAssistant;
+const models = runtime.models;
 const selectedAssistantId = runtime.selectedAssistantId;
 const selectedModel = runtime.selectedModel;
+const isModelLocked = runtime.isModelLocked;
 const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
 const activeSession = runtime.activeSession;
 const histories = runtime.histories;
+const currentExamplePrompts = runtime.currentExamplePrompts;
 
 function findHistory(id) {
   const targetId = normalizeHistoryId(id);
@@ -1405,19 +1180,19 @@ function finishHistoryRender() {
 
       await nextTick();
       if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
+      await scrollChatToInitialTarget(messageRenderPolicy.value.scrollTarget, {
         behavior: "auto",
       });
 
       await waitForNextPaint();
       if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
+      await scrollChatToInitialTarget(messageRenderPolicy.value.scrollTarget, {
         behavior: "auto",
       });
 
       await waitForNextPaint();
       if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
+      await scrollChatToInitialTarget(messageRenderPolicy.value.scrollTarget, {
         behavior: "auto",
       });
     } finally {
@@ -1451,22 +1226,6 @@ function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
   return true;
 }
 
-function setConversationPreservingLazyHistory(chatId, nextMessages) {
-  messages.value = Array.isArray(nextMessages) ? nextMessages : [];
-  runtime.setMessages(chatId, messages.value);
-}
-
-function appendUserAndAssistantMessagesPreservingLazyHistory(
-  chatId,
-  normalized
-) {
-  const result = runtime.appendUserAndAssistantMessages(chatId, normalized);
-  if (Array.isArray(result.messages)) {
-    messages.value = result.messages;
-  }
-  return result;
-}
-
 const activeConversationTitle = computed(() =>
   resolveConversationTitle(
     pageState.isSharedPage.value,
@@ -1483,6 +1242,33 @@ const workspaceAssistantLabel = computed(() =>
     t("chat.assistant")
   )
 );
+
+const suggestions = computed(() => {
+  const assistantPrompts = currentExamplePrompts.value || [];
+  const isEnglish = locale.value === "en";
+
+  return assistantPrompts
+    .slice(0, PROMPT_SUGGESTION_LIMIT)
+    .map((prompt) => {
+      const localizedTitle = isEnglish
+        ? prompt.titleEn || prompt.titleKo
+        : prompt.titleKo || prompt.titleEn;
+      const localizedContent = isEnglish
+        ? prompt.contentEn || prompt.contentKo || localizedTitle
+        : prompt.contentKo || prompt.contentEn || localizedTitle;
+
+      const text = localizedTitle || localizedContent;
+      const content = localizedContent || localizedTitle;
+
+      return {
+        id: prompt.id,
+        text,
+        title: content || text,
+        prompt: content || text,
+      };
+    })
+    .filter((item) => item.text && item.prompt);
+});
 
 function resetMainRouteConversation() {
   finishHistoryRender();
@@ -1706,34 +1492,6 @@ function shouldLoadRouteConversation() {
   return pageState.isMainPage.value || pageState.isConversationPage.value;
 }
 
-function syncHistoriesAfterChatSubmit() {
-  return runtime.syncHistoriesInBackground({notifyOnError: true});
-}
-
-function canSubmitChatMessage() {
-  return (
-    !isReadOnly.value &&
-    !isHistoryRendering.value &&
-    !isActiveModelUnavailable.value
-  );
-}
-
-function getVisibleChatMessagesForSubmit() {
-  return Array.isArray(messages.value) ? messages.value : [];
-}
-
-configureChatSubmit(
-  runtime.createRemoteConversation,
-  appendUserAndAssistantMessagesPreservingLazyHistory,
-  setConversationPreservingLazyHistory,
-  getVisibleChatMessagesForSubmit,
-  scrollLatestUserMessage,
-  syncHistoriesAfterChatSubmit,
-  canSubmitChatMessage,
-  router,
-  route
-);
-
 const isGenerating = computed(() => chatStreamStore.isWait);
 
 function isRouteLoadSourceChanged(nextSource = [], previousSource = []) {
@@ -1888,6 +1646,15 @@ useOverlayBackClose({
   isOpen: studioDetailOpen,
   close: closeStudioDetail,
   historyValue: "chat-studio-detail",
+});
+
+provideChatWorkspaceActions({
+  openStudioDetail,
+  scrollBottom: handleWorkspaceScrollBottom,
+});
+
+provideNavigationActions({
+  handleHistoryMenuAction,
 });
 
 provideMessageActions({
@@ -2075,13 +1842,66 @@ function setWorkspaceRef(el) {
   workspaceRef.value = el;
 }
 
+provide(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(() => ({
+    mode: routeMode.value,
+    readonly: isReadOnly.value,
+    assistantLabel: workspaceAssistantLabel.value,
+    assistant: currentAssistant.value,
+    conversationTitle: activeConversationTitle.value,
+    themeName: themeName.value,
+    suggestions: suggestions.value,
+    isActiveModelDeleted: Boolean(chatStore.activeSession?.isModelDeleted),
+    isActiveModelUnavailable: isActiveModelUnavailable.value,
+    isGenerating: isGenerating.value,
+    messages: messages.value,
+    showScrollBottom: showScrollBottom.value,
+    isHistoryRendering: isHistoryRendering.value,
+    historyMarkdownVisible: historyMarkdownVisible.value,
+    historyMessagesLoaded: historyMessagesLoaded.value,
+    historyRenderKey: activeHistoryId.value,
+    messageRenderPolicy: messageRenderPolicy.value,
+  }))
+);
+
+provide(
+  PROMPT_STATE_KEY,
+  computed(() => ({
+    floating: false,
+    showHelp: false,
+    selectedModel: selectedModel.value,
+    models: models.value,
+    disabled: isReadOnly.value,
+    generating: isGenerating.value,
+    modelReadonly: isModelLocked.value,
+    placeholder: "",
+  }))
+);
+
+providePromptComposerContext({
+  onSubmit: handleWorkspaceSubmit,
+  onUpdateSelectedModel: handleWorkspaceSelectedModelUpdate,
+  onFocus: refreshPromptViewport,
+  onHeightChange: refreshPromptViewport,
+});
+
+function handleWorkspaceSubmit(payload) {
+  if (chatPageLock.isSubmitBlocked.value) return;
+  submitChatMessage(payload, {router, route});
+}
+
 function handleWorkspaceRegenerate(message) {
   if (chatPageLock.isRegenerateBlocked.value) return;
   regenerateLastAnswer(message);
 }
 
+function handleWorkspaceSelectedModelUpdate(value) {
+  selectedModel.value = value;
+}
+
 function handleWorkspaceScrollBottom() {
-  scrollBottom({force: true, behavior: "smooth", stable: true});
+  scrollChatToBottom({force: true, behavior: "smooth", stable: true});
 }
 </script>
 

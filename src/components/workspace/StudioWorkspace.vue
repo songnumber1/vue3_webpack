@@ -32,10 +32,10 @@
       <ChatHeader
         v-if="!studioDetailOpen"
         mode="studio"
-        :assistant-label="assistantLabel"
-        :assistant="assistant"
+        :assistant-label="workspaceState.assistantLabel"
+        :assistant="workspaceState.assistant"
         conversation-title="Assistant Studio"
-        :theme-name="themeName"
+        :theme-name="workspaceState.themeName"
       />
 
       <StudioMainPage v-show="!studioDetailOpen" />
@@ -63,7 +63,7 @@
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
-import {computed, onMounted, reactive, ref, watch} from "vue";
+import {computed, inject, onMounted, reactive, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -79,9 +79,11 @@ import {
   adaptStudioMainInfo,
 } from "@/adapters/studioResponseAdapter";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
-import {useChatStore} from "@/stores/chatStore";
-import {useAppShellStore} from "@/stores/appShellStore";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
+import {
+  createEmptyWorkspaceState,
+  CHAT_WORKSPACE_STATE_KEY,
+} from "@/composables/chat/chatStateContext";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
@@ -94,13 +96,14 @@ const {t, locale} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const studioRuntimeStore = useStudioRuntimeStore();
-const chatStore = useChatStore();
-const appShellStore = useAppShellStore();
-const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(
-  () => String(assistant.value?.label || "").trim() || t("chat.assistant")
+const injectedWorkspaceState = inject(
+  CHAT_WORKSPACE_STATE_KEY,
+  computed(createEmptyWorkspaceState)
 );
-const themeName = computed(() => appShellStore.themeName);
+const workspaceState = computed(
+  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+);
+
 const searchText = ref("");
 const activeTab = ref("all");
 const activeCategory = ref("ALL");

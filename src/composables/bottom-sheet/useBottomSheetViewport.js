@@ -12,7 +12,6 @@ import {
 import {
   getSafeAreaBottom,
   getViewportHeight as readViewportHeight,
-  isMobileViewport as readIsMobileViewport,
 } from "@/platform/viewport/viewport";
 import {
   DEFAULT_OPTION_HEIGHT_PX,
@@ -41,11 +40,6 @@ export function createBottomSheetViewport(options) {
   // 모바일 가상 키보드가 팝업되었을 때 실시간으로 압축되는 실제 가시 화면 영역 높이(VisualViewport.height)를 픽셀 단위로 측정합니다.
   function getViewportHeight() {
     return readViewportHeight();
-  }
-
-  // 모바일 전용 앱이므로 BottomSheet는 항상 모바일 viewport 기준으로 계산합니다.
-  function isMobileViewport() {
-    return readIsMobileViewport();
   }
 
   // 리스트 옵션들을 제외한 바텀 시트 고유의 뼈대 구성품(드래그 놉 영역 + 타이틀 헤더 바 + 테두리 패딩 및 보정 상산값)의 합산 픽셀 높이를 동적 계산합니다.
@@ -114,9 +108,7 @@ export function createBottomSheetViewport(options) {
   // 플랫폼 분기 및 뼈대 수치를 기반으로, 이 바텀 시트가 물리적으로 축소될 수 있는 최종 최하한선 절대 높이(픽셀)를 확정합니다.
   function getMinimumSheetHeight() {
     const {minHeight} = getBottomSheetBounds();
-    if (!isMobileViewport()) return props.minHeight; // 모바일 뷰포트가 아닌 와이드 데스크톱 모드일 때는 Props 원품 설정을 그대로 관철
-
-    // 모바일인 경우: 시스템 지정 최소 하한선과 (크롬 영역 높이 + 3개 옵션 보장 높이) 중 더 큰 값을 최종 마지노선 최소 높이로 타협 선택
+    // 시스템 지정 최소 하한선과 (크롬 영역 높이 + 3개 옵션 보장 높이) 중 더 큰 값을 최종 마지노선 최소 높이로 타협 선택
     return Math.max(
       minHeight,
       getSheetChromeHeight() + getMinimumVisibleBodyHeight()
@@ -174,7 +166,6 @@ export function createBottomSheetViewport(options) {
     getInitialHeight,
     getMinimumSheetHeight,
     getViewportHeight,
-    isMobileViewport,
   };
 }
 
