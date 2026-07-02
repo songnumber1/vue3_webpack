@@ -63,14 +63,20 @@
         ref="attachRoot"
         class="prompt-selector-wrap attach-menu-wrap tw-relative tw-min-w-0"
       >
+        <input
+          ref="attachInputRef"
+          class="tw-sr-only"
+          type="file"
+          accept=".jpg,image/jpeg"
+          @change="handleAttachFileChange"
+        />
         <button
           class="prompt-icon-action attach-button tw-inline-flex tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-solid tw-border-app-controlBorder tw-transition"
-          :class="{'prompt-icon-action--active': attachMenuOpen}"
           type="button"
           :title="attachLabel"
           :aria-label="attachLabel"
           :disabled="disabled"
-          @click="promptInputActions.openAttachSelector?.()"
+          @click="openAttachFilePicker"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path
@@ -164,6 +170,7 @@ const {t} = useI18n();
 const modelRoot = ref(null);
 const toolRoot = ref(null);
 const attachRoot = ref(null);
+const attachInputRef = ref(null);
 const promptInputActions = usePromptInputActions();
 
 /**
@@ -178,7 +185,6 @@ const disabled = computed(() => toolbarState.value.disabled);
 const modelReadonly = computed(() => toolbarState.value.modelReadonly);
 const currentModel = computed(() => toolbarState.value.currentModel);
 const toolMenuOpen = computed(() => toolbarState.value.toolMenuOpen);
-const attachMenuOpen = computed(() => toolbarState.value.attachMenuOpen);
 const selectedTemplateTool = computed(
   () => toolbarState.value.selectedTemplateTool
 );
@@ -194,6 +200,16 @@ const voiceStopLabel = computed(() => toolbarState.value.voiceStopLabel);
 const attachLabel = computed(() => toolbarState.value.attachLabel);
 const sendLabel = computed(() => toolbarState.value.sendLabel);
 const modelSelectLabel = computed(() => toolbarState.value.modelSelectLabel);
+
+function openAttachFilePicker() {
+  if (disabled.value) return;
+  attachInputRef.value?.click();
+}
+
+function handleAttachFileChange(event) {
+  promptInputActions.addFiles?.(event.target.files);
+  event.target.value = "";
+}
 
 const resolvedReadonlyTitle = computed(
   () => toolbarState.value.readonlyTitle || t("prompt.modelReadonly")

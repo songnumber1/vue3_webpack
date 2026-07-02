@@ -16,7 +16,6 @@ export const DEFAULT_PROMPT_TOOL_SETTINGS = Object.freeze({
 export const PROMPT_MENU_TYPE = Object.freeze({
   model: "model",
   tool: "tool",
-  attach: "attach",
 });
 export const PROMPT_SPEECH_LANGUAGE = "ko-KR";
 
@@ -28,22 +27,7 @@ export const PROMPT_TEXTAREA_HEIGHT = Object.freeze({
   lineHeight: 20,
 });
 
-export const ANDROID_TO_JS_EVENT = "android-to-js";
-export const NATIVE_FILE_SELECTED_TYPE = "ON_FILE_SELECTED";
 export const IMAGE_PREVIEW_EVENT = "chat:image-preview";
-
-export const FILE_PICKER_TYPE = Object.freeze({
-  camera: "camera",
-  image: "image",
-  all: "all",
-});
-
-export const FILE_ACCEPT = Object.freeze({
-  image: "image/*",
-  all: "",
-});
-
-export const CAMERA_CAPTURE_MODE = "environment";
 
 export const DEFAULT_FALLBACK_MODEL = Object.freeze({
   label: "빠른 모델",
@@ -53,37 +37,4 @@ export const DEFAULT_FALLBACK_MODEL = Object.freeze({
 export const PROMPT_TEMPLATE_MODEL_IDS = Object.freeze([
   "model-ds-thinking",
   "model-ds-rag",
-]);
-
-export const ATTACH_MENU_OPTIONS = Object.freeze([
-  {
-    id: FILE_PICKER_TYPE.camera,
-    icon: "📷",
-    labelKey: "chat.attachOptions.camera",
-    nativeSource: FILE_PICKER_TYPE.camera,
-    accept: FILE_ACCEPT.image,
-    capture: CAMERA_CAPTURE_MODE,
-    multiple: false,
-    requiresCamera: true,
-  },
-  {
-    id: FILE_PICKER_TYPE.image,
-    icon: "🖼️",
-    labelKey: "chat.attachOptions.image",
-    nativeSource: FILE_PICKER_TYPE.image,
-    accept: FILE_ACCEPT.image,
-    capture: null,
-    multiple: true,
-    requiresCamera: false,
-  },
-  {
-    id: FILE_PICKER_TYPE.all,
-    icon: "📎",
-    labelKey: "chat.attachOptions.file",
-    nativeSource: FILE_PICKER_TYPE.all,
-    accept: FILE_ACCEPT.all,
-    capture: null,
-    multiple: true,
-    requiresCamera: false,
-  },
 ]);

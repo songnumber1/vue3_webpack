@@ -6,27 +6,22 @@
   >
     <HomeWorkspace
       v-if="activeWorkspaceType === 'main'"
-      :ref="setWorkspaceRef"
     />
 
     <ChatConversationWorkspace
       v-else-if="activeWorkspaceType === 'conversation'"
-      :ref="setWorkspaceRef"
     />
 
     <StudioWorkspace
       v-else-if="activeWorkspaceType === 'studio'"
-      :ref="setWorkspaceRef"
     />
 
     <McpWorkspace
       v-else-if="activeWorkspaceType === 'mcp'"
-      :ref="setWorkspaceRef"
     />
 
     <ChatSearchWorkspace
       v-else-if="activeWorkspaceType === 'chat-search'"
-      :ref="setWorkspaceRef"
     />
 
     <!-- 이미지 크게 보기 -->
@@ -116,12 +111,9 @@ import {useChatStore} from "@/stores/chatStore";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
-import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
 import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
 import {
-  createChatHistory,
   deleteChatHistory,
   loadChatHistoryList,
   loadChatMessageRouters,
@@ -130,12 +122,8 @@ import {
   updateChatBookmark,
 } from "@/composables/chat/runtime/chatRuntimeApi";
 import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
+import {revokeMessageAttachments} from "@/composables/chat/chatMessageActions";
 import {
-  appendUserAndAssistantMessages as appendMessagesToChat,
-  revokeMessageAttachments,
-} from "@/composables/chat/chatMessageActions";
-import {
-  createLocalHistory,
   createSessionFromHistory,
 } from "@/composables/chat/runtime/chatSessionFactory";
 import {
@@ -144,7 +132,6 @@ import {
 } from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {useAutoScroll} from "@/composables/chat/useAutoScroll";
 import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
 import {syncMobileViewportSettings} from "@/utils/syncMobileViewportSettings";
@@ -178,8 +165,10 @@ import {normalizeHistoryId} from "@/utils/normalize";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
 
 import {
-  configureChatSubmit,
+  isChatScrolledToBottom,
   regenerateLastAnswer,
+  scrollChatToBottom,
+  scrollChatToInitialTarget,
   submitChatMessage,
 } from "@/composables/chat/chatSubmitActions";
 import {providePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
@@ -217,8 +206,6 @@ const WORKSPACE_TYPES = Object.freeze({
 const props = defineProps({
   workspace: {type: String, default: ""},
 });
-
-const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 function waitForNextPaint() {
   if (typeof window === "undefined") return Promise.resolve();
@@ -485,100 +472,6 @@ async function ensureRuntimeConversation(historyId, options = {}) {
   return chatStore.messageMap[history.id] || [];
 }
 
-function createFallbackHistoryForNewSubmit({
-  chatId,
-  chatTitle,
-  assistantId,
-  modelId,
-} = {}) {
-  return adaptChatHistory(
-    {
-      chatId,
-      chatTitle: chatTitle || "새 대화",
-      assistId: assistantId,
-      modelId,
-      modeId: modelId,
-      bookmarkYN: false,
-      chatEndDt: new Date().toISOString(),
-    },
-    {
-      assistantMap: assistantStore.assistantMap,
-      modelMap: assistantStore.modelMap,
-    }
-  );
-}
-
-async function createRemoteRuntimeConversation({
-  text,
-  assistantId,
-  modelId,
-} = {}) {
-  const chatId = createId();
-  const chatTitle = String(text || "")
-    .trim()
-    .slice(0, 20);
-  const assistant = assistantStore.assistantMap?.[assistantId] || null;
-  const rawHistory = await createChatHistory({
-    chatId,
-    assistId: assistantId,
-    modelId,
-    ChatTilte: chatTitle || String(text || "").trim(),
-    studio: assistant?.type === "studio",
-  });
-  let history = adaptChatHistory(rawHistory, {
-    assistantMap: assistantStore.assistantMap,
-    modelMap: assistantStore.modelMap,
-  });
-
-  if (!history?.id) {
-    logWarn(
-      "[ChatContainer] new.do 응답에 chatId가 없어 요청 chatId로 대체합니다.",
-      rawHistory
-    );
-    history = createFallbackHistoryForNewSubmit({
-      chatId,
-      chatTitle: chatTitle || String(text || "").trim(),
-      assistantId,
-      modelId,
-    });
-  }
-
-  chatStore.addHistory(history);
-  chatStore.setMessages(history.id, []);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      assistantStore.modelMap,
-      assistantStore.assistantMap
-    )
-  );
-
-  return history;
-}
-
-function createLocalRuntimeConversation({text} = {}) {
-  const history = createLocalHistory(
-    text,
-    assistantStore.currentAssistant,
-    assistantStore.currentModel || assistantStore.currentModels[0]
-  );
-  chatStore.addHistory(history);
-  chatStore.setMessages(history.id, []);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      assistantStore.modelMap,
-      assistantStore.assistantMap
-    )
-  );
-
-  return history;
-}
-
-function appendRuntimeUserAndAssistantMessages(chatId, normalized) {
-  return appendMessagesToChat(chatId, normalized);
-}
-
 const runtime = {
   initialize: initializeRuntime,
   assistants: assistantListRef,
@@ -600,16 +493,10 @@ const runtime = {
   removeHistory,
   selectAssistant: selectRuntimeAssistant,
   ensureConversation: ensureRuntimeConversation,
-  setMessages: chatStore.setMessages.bind(chatStore),
-  createRemoteConversation: createRemoteRuntimeConversation,
-  createLocalConversation: createLocalRuntimeConversation,
   clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
-  appendUserAndAssistantMessages: appendRuntimeUserAndAssistantMessages,
   revokeMessageAttachments,
 };
 
-const {scrollToBottom} = useAutoScroll({value: null});
-const workspaceRef = ref(null);
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme.current);
 const themeName = computed(() => appShellStore.themeName);
@@ -643,157 +530,20 @@ setupResponseOverlayBackGuard();
 
 const showScrollBottom = ref(false);
 let bottomStateTimer = 0;
-let latestUserScrollTimerIds = [];
-let pendingBottomScrollRafId = 0;
-let pendingBottomScrollFrameCount = 0;
-
-function getMessageListRef() {
-  const exposed = workspaceRef.value?.listRef;
-  if (exposed?.scrollToBottom || exposed?.scrollToLatestUserMessage) {
-    return exposed;
-  }
-  if (
-    exposed?.value?.scrollToBottom ||
-    exposed?.value?.scrollToLatestUserMessage
-  ) {
-    return exposed.value;
-  }
-  return null;
-}
-
-function clearLatestUserScrollTimers() {
-  latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-  latestUserScrollTimerIds = [];
-}
-
-function clearPendingBottomScrollScheduler() {
-  if (!pendingBottomScrollRafId || typeof window === "undefined") {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount = 0;
-    return;
-  }
-
-  window.cancelAnimationFrame(pendingBottomScrollRafId);
-  pendingBottomScrollRafId = 0;
-  pendingBottomScrollFrameCount = 0;
-}
-
 function updateScrollBottomButton() {
-  const list = getMessageListRef();
   showScrollBottom.value =
-    Boolean(pageState.isConversationPage?.value) &&
-    Boolean(list && !list.isAtBottom?.());
-}
-
-function applyBottomScrollWhenListReady(options = {}) {
-  const list = getMessageListRef();
-  if (!list?.scrollToBottom) return false;
-
-  if (options.afterRender && list.scrollToBottomAfterRender) {
-    list.scrollToBottomAfterRender({...options, force: true, stable: true});
-  } else {
-    list.scrollToBottom({...options, force: true, stable: true});
-  }
-
-  updateScrollBottomButton();
-  return true;
-}
-
-function scheduleBottomScrollWhenListReady(options = {}) {
-  clearPendingBottomScrollScheduler();
-
-  if (applyBottomScrollWhenListReady(options)) return;
-  if (typeof window === "undefined") return;
-
-  const check = () => {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount += 1;
-
-    if (applyBottomScrollWhenListReady(options)) {
-      pendingBottomScrollFrameCount = 0;
-      return;
-    }
-
-    if (pendingBottomScrollFrameCount >= LIST_READY_SCROLL_MAX_FRAMES) {
-      pendingBottomScrollFrameCount = 0;
-      updateScrollBottomButton();
-      return;
-    }
-
-    pendingBottomScrollRafId = window.requestAnimationFrame(check);
-  };
-
-  pendingBottomScrollRafId = window.requestAnimationFrame(check);
+    Boolean(pageState.isConversationPage?.value) && !isChatScrolledToBottom();
 }
 
 async function scrollBottom(options = {}) {
-  const list = getMessageListRef();
-  if (list?.scrollToBottom) {
-    clearPendingBottomScrollScheduler();
-    if (options.afterRender && list.scrollToBottomAfterRender) {
-      list.scrollToBottomAfterRender(options);
-    } else {
-      list.scrollToBottom(options);
-    }
-    updateScrollBottomButton();
-    return;
-  }
-
-  await scrollToBottom(options);
+  scrollChatToBottom(options);
   updateScrollBottomButton();
-
-  if (options.force || options.stable) {
-    scheduleBottomScrollWhenListReady(options);
-  }
 }
 
 async function scrollInitialTarget(scrollTarget = {}, options = {}) {
-  const list = getMessageListRef();
-  if (list?.scrollToInitialTarget) {
-    list.scrollToInitialTarget(scrollTarget, {behavior: "auto", ...options});
-    updateScrollBottomButton();
-    return true;
-  }
-
-  if (scrollTarget?.type === "bottom") {
-    await scrollBottom({force: true, behavior: "auto", ...options});
-    return true;
-  }
-
+  scrollChatToInitialTarget(scrollTarget, {behavior: "auto", ...options});
   updateScrollBottomButton();
-  return false;
-}
-
-async function scrollLatestUserMessage(options = {}) {
-  clearLatestUserScrollTimers();
-
-  const apply = () => {
-    const list = getMessageListRef();
-    if (!list?.scrollToLatestUserMessage) return false;
-
-    list.scrollToLatestUserMessage({
-      stable: true,
-      ...options,
-    });
-    updateScrollBottomButton();
-    return true;
-  };
-
-  if (apply()) return;
-
-  if (options.initialOnly) {
-    const timerId = window.setTimeout(() => {
-      apply();
-      clearLatestUserScrollTimers();
-    }, 0);
-    latestUserScrollTimerIds.push(timerId);
-    return;
-  }
-
-  [0, 32, 80, 160, 320].forEach((delay) => {
-    const timerId = window.setTimeout(apply, delay);
-    latestUserScrollTimerIds.push(timerId);
-  });
+  return true;
 }
 
 function scheduleBottomStateCheck() {
@@ -807,8 +557,6 @@ function handleMessageContentRendered() {
 
 function cleanupScrollResources() {
   window.clearTimeout(bottomStateTimer);
-  clearLatestUserScrollTimers();
-  clearPendingBottomScrollScheduler();
 }
 
 const {keyboardOpen, refreshViewport} = useViewportGuard({
@@ -1213,10 +961,6 @@ function finishHistoryRender() {
   void revealAfterPaint();
 }
 
-async function renderAfterStream() {
-  await nextTick();
-  await waitForNextPaint();
-}
 
 function cleanupHistoryRender() {
   finishHistoryRenderImmediately();
@@ -1235,21 +979,6 @@ function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
   return true;
 }
 
-function setConversationPreservingLazyHistory(chatId, nextMessages) {
-  messages.value = Array.isArray(nextMessages) ? nextMessages : [];
-  runtime.setMessages(chatId, messages.value);
-}
-
-function appendUserAndAssistantMessagesPreservingLazyHistory(
-  chatId,
-  normalized
-) {
-  const result = runtime.appendUserAndAssistantMessages(chatId, normalized);
-  if (Array.isArray(result.messages)) {
-    messages.value = result.messages;
-  }
-  return result;
-}
 
 const activeConversationTitle = computed(() =>
   resolveConversationTitle(
@@ -1514,35 +1243,6 @@ function shouldLoadRouteConversation() {
   return pageState.isMainPage.value || pageState.isConversationPage.value;
 }
 
-function syncHistoriesAfterChatSubmit() {
-  return runtime.syncHistoriesInBackground({notifyOnError: true});
-}
-
-function canSubmitChatMessage() {
-  return (
-    !isReadOnly.value &&
-    !isHistoryRendering.value &&
-    !isActiveModelUnavailable.value
-  );
-}
-
-function getVisibleChatMessagesForSubmit() {
-  return Array.isArray(messages.value) ? messages.value : [];
-}
-
-configureChatSubmit(
-  runtime.createRemoteConversation,
-  runtime.createLocalConversation,
-  appendUserAndAssistantMessagesPreservingLazyHistory,
-  setConversationPreservingLazyHistory,
-  getVisibleChatMessagesForSubmit,
-  scrollLatestUserMessage,
-  syncHistoriesAfterChatSubmit,
-  renderAfterStream,
-  canSubmitChatMessage,
-  router,
-  route
-);
 
 const isGenerating = computed(() => chatStreamStore.isWait);
 
@@ -1893,10 +1593,6 @@ watch(
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function setWorkspaceRef(el) {
-  workspaceRef.value = el;
-}
-
 provide(
   CHAT_WORKSPACE_STATE_KEY,
   computed(() => ({
@@ -1945,7 +1641,7 @@ providePromptComposerContext({
 
 function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;
-  submitChatMessage(payload);
+  submitChatMessage(payload, {router, route});
 }
 
 function handleWorkspaceRegenerate(message) {

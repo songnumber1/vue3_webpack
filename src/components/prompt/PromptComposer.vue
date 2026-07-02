@@ -18,15 +18,6 @@
     >
       <PromptInputMobile :ref="setPromptInputRef" />
 
-      <input
-        ref="fileInputRef"
-        class="visually-hidden-file-input tw-sr-only"
-        type="file"
-        multiple
-        :accept="fileAccept"
-        :capture="captureMode"
-        @change="handleFileChange"
-      />
     </form>
     <p
       v-if="showHelp"
@@ -51,13 +42,6 @@
       @close="toolMenuOpen = false"
     />
 
-    <PromptAttachBottomSheet
-      :open="attachMenuOpen && isMobileSheet"
-      :title="t('chat.attach')"
-      :attach-options="attachOptions"
-      @close="attachMenuOpen = false"
-      @open-file-picker="openFilePicker"
-    />
   </footer>
 </template>
 
@@ -80,37 +64,27 @@ import {
   inject,
 } from "vue";
 import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
-import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
 import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
 import PromptToolBottomSheet from "@/components/prompt/tools/mobile/PromptToolBottomSheet.vue";
 import {useI18n} from "vue-i18n";
-import {useEventListener} from "@vueuse/core";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
 import {
-  ANDROID_TO_JS_EVENT,
-  ATTACH_MENU_OPTIONS,
   DEFAULT_FALLBACK_MODEL,
-  FILE_PICKER_TYPE,
   IMAGE_PREVIEW_EVENT,
-  NATIVE_FILE_SELECTED_TYPE,
   PROMPT_MENU_TYPE,
   PROMPT_SPEECH_LANGUAGE,
   PROMPT_TEMPLATE_MODEL_IDS,
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useAssistantStore} from "@/stores/assistantStore";
-import {usePlatformStore} from "@/stores/platformStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
-import {openNativeFilePicker} from "@/platform/bridge/platformBridge";
 import {
   createBrowserAttachment,
-  createNativeAttachment,
   imageAttachment,
   revokeAttachmentUrl,
 } from "@/utils/attachment";
-import {logWarn} from "@/utils/logger";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
@@ -227,7 +201,6 @@ const attachmentDisabled = computed(() =>
 
 // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 프롬프트 제어 Pinia 스토어를 로드합니다.
 const promptControlStore = usePromptControlStore();
-const platformStore = usePlatformStore();
 
 // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
 // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
@@ -235,7 +208,6 @@ const {
   toolbarRef, // 하단 프롬프트 툴바 컨테이너 DOM 노드 접근용 Vue Ref
   modelMenuOpen, // AI 모델 변경 드롭다운 모달 개폐 상태 (Boolean)
   toolMenuOpen, // 부가 플러그인 툴 목록 모달 개폐 상태 (Boolean)
-  attachMenuOpen, // 파일 업로드 첨부 방식 선택 모달 개폐 상태 (Boolean)
   isMobileSheet, // 모바일 하단 바텀시트 렌더링 고정 플래그
   closeMenus, // 현재 열려 있는 모든 하위 도구 레이어 팝업을 일괄 폐쇄하는 메서드
   toggleMenu, // 특정 타깃 도구 팝업 메뉴를 토글식으로 열고 닫는 제어 메서드
@@ -265,77 +237,8 @@ function setPromptInputRef(instance) {
 
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
 // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집합니다.
-const fileInputRef = ref(null);
 const fileDropZoneRef = ref(null);
 const attachments = ref([]);
-const fileAccept = ref("");
-const captureMode = ref(null);
-
-const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
-const attachOptions = computed(() =>
-  ATTACH_MENU_OPTIONS.filter(
-    (option) => !option.requiresCamera || showCameraMenu.value
-  ).map((option) => ({
-    ...option,
-    label: t(option.labelKey),
-  }))
-);
-
-function openAttachSelector() {
-  if (attachmentDisabled.value) return;
-  toggleMenu(PROMPT_MENU_TYPE.attach);
-}
-
-async function openFilePicker(type = FILE_PICKER_TYPE.all) {
-  if (attachmentDisabled.value) return;
-  attachMenuOpen.value = false;
-
-  const option =
-    ATTACH_MENU_OPTIONS.find((item) => item.id === type) ||
-    ATTACH_MENU_OPTIONS.find((item) => item.id === FILE_PICKER_TYPE.all);
-
-  if (platformStore.info.isAndroidApp) {
-    try {
-      await openNativeFilePicker({
-        source: option.nativeSource,
-        multiple: option.multiple,
-        accept: option.accept,
-      });
-      return;
-    } catch (error) {
-      logWarn("Android file picker failed. Falling back to web input.", error);
-    }
-  }
-
-  const input = fileInputRef.value;
-  if (!input) return;
-
-  fileAccept.value = option.accept;
-  captureMode.value = option.capture;
-
-  input.setAttribute("accept", option.accept);
-  if (option.capture) input.setAttribute("capture", option.capture);
-  else input.removeAttribute("capture");
-
-  input.value = "";
-  input.click();
-}
-
-function handleNativeFileSelected(event) {
-  const detail = event?.detail || {};
-  if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
-
-  const nativeFiles = detail.payload?.files || [];
-  const mapped = nativeFiles.map(createNativeAttachment);
-
-  if (mapped.length) attachments.value = [...attachments.value, ...mapped];
-}
-
-function handleFileChange(event) {
-  addFiles(event.target.files);
-  event.target.value = "";
-}
-
 function addFiles(fileList) {
   const mapped = Array.from(fileList || []).map(createBrowserAttachment);
   if (!mapped.length) return;
@@ -401,8 +304,6 @@ const {isFileDragging, isFileDropDisabled} = useFileDragDrop(
   computed(() => !attachmentDisabled.value),
   handleDroppedFiles
 );
-
-useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
 // ── [음성 입력] ─────────────────────────────────────────────────────────
 // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
@@ -853,9 +754,8 @@ providePromptInputActions({
   closeMobileGroup: closeTemplateOptionSheet,
   openModelSelector,
   openToolSelector,
-  openAttachSelector,
   selectModel,
-  openFilePicker,
+  addFiles,
   focus: handleFocus,
   blur: () => handleComposerEvent("blur"),
   input: resize,
@@ -916,10 +816,8 @@ provide(
     currentModel: currentModel.value,
     models: currentModels.value,
     selectedTemplateTool: selectedTemplateTool.value,
-    attachOptions: attachOptions.value,
     modelMenuOpen: modelMenuOpen.value,
     toolMenuOpen: toolMenuOpen.value,
-    attachMenuOpen: attachMenuOpen.value,
     isMobileSheet: isMobileSheet.value,
     canSubmit: canSubmit.value,
     hasPromptText: hasPromptText.value,

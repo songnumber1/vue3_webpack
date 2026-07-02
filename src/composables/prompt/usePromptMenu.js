@@ -40,11 +40,6 @@ export function usePromptMenu() {
     promptMenuScopeId,
     PROMPT_MENU_TYPE.tool
   );
-  const attachMenuOpen = createMenuOpenRef(
-    promptMenuScopeId,
-    PROMPT_MENU_TYPE.attach
-  );
-
   function syncPromptMenuClass() {
     if (typeof document === "undefined") return;
     document.documentElement.classList.toggle(
@@ -89,7 +84,6 @@ export function usePromptMenu() {
     activeMenu,
     modelMenuOpen,
     toolMenuOpen,
-    attachMenuOpen,
     isMobileSheet,
     closeMenus,
     openMenu,

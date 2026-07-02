@@ -100,7 +100,9 @@ import {
   useMessageActions,
 } from "@/composables/chat/context/messageActionContext";
 import {useMessageRenderLifecycle} from "@/composables/chat/message/useMessageRenderLifecycle";
+import {registerChatQuestionAnswerView} from "@/composables/chat/chatSubmitActions";
 
+let cleanupChatQuestionAnswerView = null;
 
 const props = defineProps({
   visible: {type: Boolean, default: true},
@@ -1412,6 +1414,14 @@ function updateLastTurnSectorMinHeight() {
 }
 
 onMounted(() => {
+  cleanupChatQuestionAnswerView = registerChatQuestionAnswerView({
+    scrollToBottom,
+    scrollToBottomAfterRender,
+    scrollToInitialTarget,
+    scrollToLatestUserMessage,
+    isAtBottom: getIsAtBottom,
+  });
+
   nextTick(updateLastTurnSectorMinHeight);
 
   if (typeof ResizeObserver !== "undefined" && scrollRef.value) {
@@ -1423,6 +1433,9 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  cleanupChatQuestionAnswerView?.();
+  cleanupChatQuestionAnswerView = null;
+
   if (lastTurnSectorResizeFrame) {
     cancelAnimationFrame(lastTurnSectorResizeFrame);
     lastTurnSectorResizeFrame = 0;

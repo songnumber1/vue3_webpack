@@ -1,24 +1,30 @@
 import {nextTick} from "vue";
+import {streamGeneration} from "@/api/sse/sse";
 import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useChatStore} from "@/stores/chatStore";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useAssistantStore} from "@/stores/assistantStore";
 import {logWarn} from "@/utils/logger";
+import {createId} from "@/utils/id";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {
+  appendUserAndAssistantMessages,
   createAssistantMessage,
-  createAssistantMessageCommitter,
   createAssistantStreamingPatch,
 } from "@/composables/chat/chatMessageActions";
-import {
-  createGenerationPayload,
-  runAssistantStream,
-} from "@/composables/chat/chatStreamActions";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {normalizeChatId} from "@/utils/normalize";
-import {loadGenerationErrorMessages} from "@/composables/chat/runtime/chatRuntimeApi";
-import {isGenerationErrorTestChat} from "@/constants/generationErrorTest";
+import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
+import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
+import {
+  createChatHistory,
+  loadChatHistoryList,
+} from "@/composables/chat/runtime/chatRuntimeApi";
+import {
+  createLocalHistory,
+  createSessionFromHistory,
+} from "@/composables/chat/runtime/chatSessionFactory";
 import {
   enterNewSubmitChatRoom,
   resolveActiveChatId,
@@ -33,6 +39,47 @@ function waitAnimationFrame() {
   return new Promise((resolve) => window.requestAnimationFrame(resolve));
 }
 
+let chatQuestionAnswerView = {};
+
+export function registerChatQuestionAnswerView(view = {}) {
+  chatQuestionAnswerView = view;
+  return () => {
+    if (chatQuestionAnswerView === view) {
+      chatQuestionAnswerView = {};
+    }
+  };
+}
+
+export function isChatScrolledToBottom() {
+  return chatQuestionAnswerView.isAtBottom?.() === true;
+}
+
+export function scrollChatToBottom(options = {}) {
+  const view = chatQuestionAnswerView;
+  if (options.afterRender && view.scrollToBottomAfterRender) {
+    view.scrollToBottomAfterRender(options);
+    return;
+  }
+  view.scrollToBottom?.(options);
+}
+
+export function scrollChatToInitialTarget(scrollTarget = {}, options = {}) {
+  if (chatQuestionAnswerView.scrollToInitialTarget) {
+    chatQuestionAnswerView.scrollToInitialTarget(scrollTarget, options);
+    return true;
+  }
+  if (scrollTarget?.type === "bottom") {
+    scrollChatToBottom(options);
+    return true;
+  }
+  return false;
+}
+
+async function renderAfterAssistantStream() {
+  await nextTick();
+  await waitAnimationFrame();
+}
+
 function normalizePromptPayload(payload) {
   if (typeof payload === "string") {
     return {text: payload.trim(), attachments: [], keyboardOpenOnSubmit: false};
@@ -43,10 +90,6 @@ function normalizePromptPayload(payload) {
     attachments: Array.isArray(payload?.attachments) ? payload.attachments : [],
     keyboardOpenOnSubmit: payload?.keyboardOpenOnSubmit === true,
   };
-}
-
-function canWrite(canWriteCallback) {
-  return typeof canWriteCallback === "function" ? canWriteCallback() : true;
 }
 
 function resolveSubmitAssistantId(assistantStore, chatStore) {
@@ -100,48 +143,122 @@ async function waitForKeyboardViewportToSettle() {
 }
 
 
-async function replaceWithMockGenerationErrorMessages({
-  normalized,
-  targetHistoryId,
-  selectedAssistantId,
-  selectedModel,
-  setConversation,
-  renderAfterStream,
-  logPrefix = "[chatSubmitActions]",
-}) {
-  const payload = createGenerationPayload(
-    normalized,
-    targetHistoryId,
-    selectedAssistantId,
-    selectedModel
-  );
-  const messages = await loadGenerationErrorMessages(payload, {
-    code: "MOCK_FORCED_GENERATION_ERROR",
-    message: "error 답변 채팅에서 mock error.do 흐름을 강제 실행했습니다.",
+
+function createRequestPayload(base = {}) {
+  return {
+    [G.MESSAGE_ID]: createId("message"),
+    [G.RESPONSE_MESSAGE_ID]: createId("message"),
+    ...base,
+  };
+}
+
+function resolvePromptToolSettings() {
+  const promptControlStore = usePromptControlStore();
+  return promptControlStore.activePromptToolSettings || {};
+}
+
+function resolveStyleOptions(settings = {}) {
+  const values = [];
+
+  Object.values(settings.promptTemplateOptions || {}).forEach((value) => {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item) values.push(String(item));
+      });
+      return;
+    }
+
+    if (value) values.push(String(value));
   });
 
-  if (!Array.isArray(messages) || messages.length === 0) {
-    logWarn(`${logPrefix} mock error.do 응답 메시지가 없습니다.`);
-    return false;
-  }
-
-  setConversation(targetHistoryId, messages);
-  await nextTick();
-
-  if (typeof renderAfterStream === "function") {
-    await renderAfterStream();
-  }
-
-  return true;
+  return values;
 }
 
-function createStreamScrollScheduler() {
-  // 현재 고정 정책에서는 답변 chunk 수신마다 자동 하단 보정을 하지 않습니다.
-  // 스트림 스케줄러는 stream core와의 callback 계약만 유지합니다.
-  return () => {};
+export function createGenerationPayload(
+  normalized,
+  chatId,
+  selectedAssistantId,
+  selectedModel
+) {
+  const resolvedChatId = normalizeChatId(chatId);
+  const settings = resolvePromptToolSettings();
+  const knowledgeSearch = Array.isArray(settings.knowledgeSearch)
+    ? settings.knowledgeSearch.filter(Boolean)
+    : [];
+
+  return createRequestPayload({
+    [G.CHAT_ID]: resolvedChatId,
+    [G.ASSIST_ID]: selectedAssistantId || "",
+    [G.MODEL_ID]: selectedModel || "",
+    [G.STUDIO]: false,
+    [G.INTENTION]: "직접입력",
+    [G.RAG]: knowledgeSearch.length > 0,
+    [G.RAG_COT]: false,
+    [G.IMAGE_S3_PATH_LEGACY]: null,
+    [G.SOURCE_TYPE]: "internal",
+    [G.ARRAY_OPTIONS]: knowledgeSearch,
+    [G.MESSAGE_FILE_HISTORY]: null,
+    [G.STYLES]: resolveStyleOptions(settings),
+    [G.BODY]: normalized.text,
+    [G.BYTE_SIZE]: 10000,
+    [G.LAST_FEDERATION_INFO]: null,
+    [G.UI_STATE_INFO_WRAPPER]: null,
+  });
 }
 
-async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
+async function commitFirstAnswerChunk(content, getAssistantMessage, commit) {
+  if (getAssistantMessage().reasoningStatus === "thinking") {
+    commit({reasoningStatus: "completed", content});
+    await nextTick();
+    return;
+  }
+
+  commit({content});
+}
+
+export async function startChatGeneration({
+  normalized,
+  chatId,
+  assistantId,
+  modelId,
+  updateAssistant,
+  getAssistant,
+}) {
+  try {
+    const generationPayload = createGenerationPayload(
+      normalized,
+      chatId,
+      assistantId,
+      modelId
+    );
+
+    await streamGeneration(generationPayload, {
+      onChunk: async (content) => {
+        await commitFirstAnswerChunk(content, getAssistant, updateAssistant);
+      },
+      onComplete: () => {
+        updateAssistant({status: "complete", reasoningStatus: "completed"});
+      },
+    });
+
+    updateAssistant({status: "complete", reasoningStatus: "completed"});
+    await renderAfterAssistantStream();
+  } catch (error) {
+    logWarn("[chatSubmitActions] 스트리밍 오류:", error);
+    updateAssistant({
+      status: "error",
+      error: true,
+      errorTitle: "답변 생성 실패",
+      errorMessage: "응답 생성 중 오류가 발생했습니다.",
+      errorCode: "SSE_STREAM_ERROR",
+      reasoningStatus: "completed",
+    });
+  }
+}
+
+
+
+async function scrollAfterUserSubmit(normalized = {}) {
   await nextTick();
 
   if (normalized.keyboardOpenOnSubmit) {
@@ -149,44 +266,63 @@ async function scrollAfterUserSubmit(scrollLatestUserMessage, normalized = {}) {
     await nextTick();
   }
 
-  await scrollLatestUserMessage?.({
+  chatQuestionAnswerView.scrollToLatestUserMessage?.({
     behavior: "auto",
     stable: false,
     initialOnly: true,
     offset: 16,
-    pageFallback: normalized.keyboardOpenOnSubmit === true,
     keyboardOpenOnSubmit: normalized.keyboardOpenOnSubmit === true,
   });
 }
 
-async function createConversationForSubmit(
-  createRemoteConversation,
-  createLocalConversation,
-  normalized,
-  assistantStore,
-  chatStore
-) {
+async function createConversationForSubmit(normalized, assistantStore, chatStore) {
   const assistantId = resolveSubmitAssistantId(assistantStore, chatStore);
   const modelId = resolveSubmitModelId(assistantStore, chatStore);
 
-  try {
-    return await createRemoteConversation({
-      text: normalized.text,
-      assistantId,
-      modelId,
-    });
-  } catch (error) {
-    if (shouldUseServerApi()) {
-      logWarn("[chatSubmitActions] new.do 호출 실패:", error);
-      throw error;
-    }
-
-    logWarn(
-      "[chatSubmitActions] new.do 호출 실패, local conversation으로 대체:",
-      error
+  if (!shouldUseServerApi()) {
+    const history = createLocalHistory(
+      normalized.text,
+      assistantStore.currentAssistant,
+      assistantStore.currentModel || assistantStore.currentModels[0]
     );
-    return createLocalConversation(normalized);
+    chatStore.addHistory(history);
+    chatStore.setMessages(history.id, []);
+    chatStore.setActiveSession(
+      createSessionFromHistory(
+        history,
+        assistantStore.modelMap,
+        assistantStore.assistantMap
+      )
+    );
+    return history;
   }
+
+  const chatId = createId();
+  const chatTitle = normalized.text.slice(0, 20);
+  const assistant = assistantStore.assistantMap?.[assistantId] || null;
+  const rawHistory = await createChatHistory({
+    chatId,
+    assistId: assistantId,
+    modelId,
+    ChatTilte: chatTitle || normalized.text,
+    studio: assistant?.type === "studio",
+  });
+  const history = adaptChatHistory(rawHistory, {
+    assistantMap: assistantStore.assistantMap,
+    modelMap: assistantStore.modelMap,
+  });
+
+  chatStore.addHistory(history);
+  chatStore.setMessages(history.id, []);
+  chatStore.setActiveSession(
+    createSessionFromHistory(
+      history,
+      assistantStore.modelMap,
+      assistantStore.assistantMap
+    )
+  );
+
+  return history;
 }
 
 function shouldCreateConversation(targetHistoryId, currentRoute = {}) {
@@ -214,8 +350,6 @@ async function ensureConversationForSubmit(
   }
 
   const history = await createConversationForSubmit(
-    createRemoteConversationForSubmit,
-    createLocalConversationForSubmit,
     normalized,
     assistantStore,
     chatStore
@@ -234,33 +368,31 @@ async function ensureConversationForSubmit(
   return targetHistoryId;
 }
 
-function createSubmitCommitter(
-  setConversation,
-  assistantStore,
-  chatStore,
-  targetHistoryId,
-  messages,
-  assistantMessage
-) {
-  return createAssistantMessageCommitter(
-    targetHistoryId,
-    messages,
-    {
-      ...assistantMessage,
-      ...createAssistantStreamingPatch(
-        isSelectedModelReasoning(assistantStore, chatStore)
-      ),
-    },
-    setConversation
-  );
-}
-
 function createRegenerateAssistantMessage(assistantStore, chatStore) {
   return createAssistantMessage(
     createAssistantStreamingPatch(
       isSelectedModelReasoning(assistantStore, chatStore)
     )
   );
+}
+
+function createAssistantUpdater(chatId, initialMessages, initialAssistantMessage) {
+  const chatStore = useChatStore();
+  let messages = initialMessages;
+  let assistantMessage = initialAssistantMessage;
+
+  function updateAssistant(patch = {}) {
+    assistantMessage = {...assistantMessage, ...patch};
+    messages = messages.map((message) =>
+      message.id === assistantMessage.id ? assistantMessage : message
+    );
+    chatStore.setMessages(chatId, messages);
+  }
+
+  return {
+    updateAssistant,
+    getAssistant: () => assistantMessage,
+  };
 }
 
 function findUserMessageForRegenerate(messages, assistantIndex) {
@@ -270,42 +402,35 @@ function findUserMessageForRegenerate(messages, assistantIndex) {
     .find((item) => item.role === "user");
 }
 
-
-let createRemoteConversationForSubmit = null;
-let createLocalConversationForSubmit = null;
-let appendMessagesForSubmit = null;
-let setConversationMessages = null;
-let getCurrentMessagesForSubmit = null;
-let scrollLatestSubmittedUserMessage = null;
-let syncHistoriesForSubmit = null;
-let renderAfterAssistantStream = null;
-let canSubmitMessage = null;
-let submitRouter = null;
-let submitRoute = null;
-
-function hasChatSubmitRuntime() {
-  return (
-    typeof createRemoteConversationForSubmit === "function" &&
-    typeof createLocalConversationForSubmit === "function" &&
-    typeof appendMessagesForSubmit === "function" &&
-    typeof setConversationMessages === "function"
-  );
+function canSubmitChatMessage() {
+  const chatStore = useChatStore();
+  const assistantStore = useAssistantStore();
+  return !chatStore.isActiveSharedRoom && !assistantStore.isActiveModelUnavailable;
 }
 
-async function submitPrompt(payload) {
-  if (!hasChatSubmitRuntime()) return;
+async function syncSubmitHistories() {
+  const chatStore = useChatStore();
+  const assistantStore = useAssistantStore();
+  const histories = await loadChatHistoryList({
+    assistantMap: assistantStore.assistantMap,
+    modelMap: assistantStore.modelMap,
+  });
+  chatStore.setHistories(histories);
+}
 
+
+async function submitPrompt(payload, context = {}) {
   const chatStreamStore = useChatStreamStore();
   const apiRequestStore = useApiRequestStore();
   const chatStore = useChatStore();
   const assistantStore = useAssistantStore();
-  const route = submitRoute?.value || submitRoute || {};
-  const router = submitRouter;
+  const route = context.route?.value || context.route || {};
+  const router = context.router;
   const normalized = normalizePromptPayload(payload);
 
   if (
     chatStore.isActiveSharedRoom ||
-    !canWrite(canSubmitMessage) ||
+    !canSubmitChatMessage() ||
     (!normalized.text && normalized.attachments.length === 0) ||
     chatStreamStore.isWait
   ) {
@@ -338,63 +463,44 @@ async function submitPrompt(payload) {
       );
     }
 
-    const {messages, assistantMessage} = appendMessagesForSubmit(
-      targetHistoryId,
-      normalized
+    const appended = appendUserAndAssistantMessages(targetHistoryId, normalized);
+    const assistantMessage = {
+      ...appended.assistantMessage,
+      ...createAssistantStreamingPatch(
+        isSelectedModelReasoning(assistantStore, chatStore)
+      ),
+    };
+    const messages = appended.messages.map((item) =>
+      item.id === assistantMessage.id ? assistantMessage : item
     );
-
-    const committer = createSubmitCommitter(
-      setConversationMessages,
-      assistantStore,
-      chatStore,
+    chatStore.setMessages(targetHistoryId, messages);
+    const generationTarget = createAssistantUpdater(
       targetHistoryId,
       messages,
       assistantMessage
     );
-    const scheduleStreamScroll = createStreamScrollScheduler();
-
-    committer.commit();
 
     if (isNewConversationSubmit) {
-      await syncHistoriesForSubmit?.();
+      await syncSubmitHistories();
       await enterNewSubmitChatRoom(router, chatStreamStore, targetHistoryId);
     } else {
-      syncHistoriesForSubmit?.();
+      syncSubmitHistories();
     }
 
     await nextTick();
-    await scrollAfterUserSubmit(scrollLatestSubmittedUserMessage, normalized);
+    await scrollAfterUserSubmit(normalized);
 
     const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
     const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
 
-    if (isGenerationErrorTestChat(targetHistoryId)) {
-      await replaceWithMockGenerationErrorMessages({
-        normalized,
-        targetHistoryId,
-        selectedAssistantId,
-        selectedModel,
-        setConversation: setConversationMessages,
-        renderAfterStream: renderAfterAssistantStream,
-        logPrefix: "[chatSubmitActions]",
-      });
-      return;
-    }
-
-    await runAssistantStream(
+    await startChatGeneration({
       normalized,
-      targetHistoryId,
-      selectedAssistantId,
-      selectedModel,
-      renderAfterAssistantStream,
-      committer.commit,
-      committer.getAssistantMessage,
-      scheduleStreamScroll,
-      "(응답 생성이 중단되었습니다.)",
-      "(응답 생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions]",
-      {setConversation: setConversationMessages}
-    );
+      chatId: targetHistoryId,
+      assistantId: selectedAssistantId,
+      modelId: selectedModel,
+      updateAssistant: generationTarget.updateAssistant,
+      getAssistant: generationTarget.getAssistant,
+    });
   } finally {
     if (overlaySuppressed) {
       apiRequestStore.resumeOverlay();
@@ -405,15 +511,13 @@ async function submitPrompt(payload) {
 }
 
 async function regenerateResponse(message = {}) {
-  if (!hasChatSubmitRuntime()) return;
-
   const chatStreamStore = useChatStreamStore();
   const chatStore = useChatStore();
   const assistantStore = useAssistantStore();
 
   if (
     chatStore.isActiveSharedRoom ||
-    !canWrite(canSubmitMessage) ||
+    !canSubmitChatMessage() ||
     chatStreamStore.isWait
   ) {
     return;
@@ -422,7 +526,7 @@ async function regenerateResponse(message = {}) {
   const targetHistoryId = normalizeChatId(resolveActiveChatId());
   if (!targetHistoryId) return;
 
-  const currentMessages = getCurrentMessagesForSubmit?.() || [];
+  const currentMessages = chatStore.messageMap[targetHistoryId] || [];
   const assistantIndex = currentMessages.findIndex(
     (item) => item.id === message.id
   );
@@ -442,90 +546,41 @@ async function regenerateResponse(message = {}) {
     assistantStore,
     chatStore
   );
-  const committer = createAssistantMessageCommitter(
+  const messages = [...currentMessages.slice(0, assistantIndex), assistantMessage];
+  chatStore.setMessages(targetHistoryId, messages);
+  const generationTarget = createAssistantUpdater(
     targetHistoryId,
-    [...currentMessages.slice(0, assistantIndex), assistantMessage],
-    assistantMessage,
-    setConversationMessages
+    messages,
+    assistantMessage
   );
-  const scheduleStreamScroll = createStreamScrollScheduler();
-
   chatStreamStore.startWait();
-
-  committer.commit();
   await nextTick();
-  await scrollLatestSubmittedUserMessage?.({
+  chatQuestionAnswerView.scrollToLatestUserMessage?.({
     behavior: "auto",
     stable: false,
     initialOnly: true,
     offset: 16,
-    pageFallback: false,
   });
 
   try {
     const selectedAssistantId = resolveSubmitAssistantId(assistantStore, chatStore);
     const selectedModel = resolveSubmitModelId(assistantStore, chatStore);
 
-    if (isGenerationErrorTestChat(targetHistoryId)) {
-      await replaceWithMockGenerationErrorMessages({
-        normalized,
-        targetHistoryId,
-        selectedAssistantId,
-        selectedModel,
-        setConversation: setConversationMessages,
-        renderAfterStream: renderAfterAssistantStream,
-        logPrefix: "[chatSubmitActions] 재생성",
-      });
-      return;
-    }
-
-    await runAssistantStream(
+    await startChatGeneration({
       normalized,
-      targetHistoryId,
-      selectedAssistantId,
-      selectedModel,
-      renderAfterAssistantStream,
-      committer.commit,
-      committer.getAssistantMessage,
-      scheduleStreamScroll,
-      "(응답 재생성이 중단되었습니다.)",
-      "(응답 재생성 중 오류가 발생했습니다.)",
-      "[chatSubmitActions] 재생성",
-      {setConversation: setConversationMessages}
-    );
+      chatId: targetHistoryId,
+      assistantId: selectedAssistantId,
+      modelId: selectedModel,
+      updateAssistant: generationTarget.updateAssistant,
+      getAssistant: generationTarget.getAssistant,
+    });
   } finally {
     chatStreamStore.finishWait();
   }
 }
 
-export function configureChatSubmit(
-  createRemoteConversation,
-  createLocalConversation,
-  appendUserAndAssistantMessages,
-  setConversation,
-  getCurrentMessages,
-  scrollLatestUserMessage,
-  syncHistories,
-  renderAfterStream,
-  canWriteCallback,
-  router,
-  route
-) {
-  createRemoteConversationForSubmit = createRemoteConversation;
-  createLocalConversationForSubmit = createLocalConversation;
-  appendMessagesForSubmit = appendUserAndAssistantMessages;
-  setConversationMessages = setConversation;
-  getCurrentMessagesForSubmit = getCurrentMessages;
-  scrollLatestSubmittedUserMessage = scrollLatestUserMessage;
-  syncHistoriesForSubmit = syncHistories;
-  renderAfterAssistantStream = renderAfterStream;
-  canSubmitMessage = canWriteCallback;
-  submitRouter = router || null;
-  submitRoute = route || null;
-}
-
-export async function submitChatMessage(payload) {
-  return submitPrompt(payload);
+export async function submitChatMessage(payload, context = {}) {
+  return submitPrompt(payload, context);
 }
 
 export async function regenerateLastAnswer(message) {
