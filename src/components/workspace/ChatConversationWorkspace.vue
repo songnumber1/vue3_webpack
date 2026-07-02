@@ -1,25 +1,16 @@
 <template>
   <ChatHeader
-    :mode="mode"
     :assistant-label="assistantLabel"
     :assistant="assistant"
-    :conversation-title="conversationTitle"
-    :theme-name="themeName"
     :show-studio-detail-button="showStudioDetailButton"
     :studio-detail-disabled="studioDetailDisabled"
   />
 
-  <MessageList
+  <ChatHistory
     ref="listRef"
     :visible="!isPromptExpandedInChat"
-    :messages="messages"
-    :loading="isGenerating"
-    :history-rendering="isHistoryRendering"
-    :history-markdown-visible="historyMarkdownVisible"
-    :history-messages-ready="historyMessagesLoaded"
-    :history-render-key="historyRenderKey"
-    :message-render-policy="messageRenderPolicy"
-    :readonly="readonly"
+    @content-rendered="handleMessageContentRendered"
+    @history-rendered="handleHistoryRendered"
   />
   <button
     v-if="
@@ -49,10 +40,12 @@
     <PromptComposer
       v-else
       ref="promptComposerRef"
-      :class="{
-        'mobile-chat-prompt': isMobile,
-        'mobile-keyboard-dock': isMobile,
-      }"
+      class="mobile-chat-prompt mobile-keyboard-dock"
+      @submit="submitPromptFromWorkspace"
+      @update-selected-model="handleSelectedModelUpdate"
+      @focus="scheduleComposerHeightUpdate"
+      @height-change="scheduleComposerHeightUpdate"
+      @expanded-change="handlePromptExpandedChange"
     />
   </div>
 
@@ -65,29 +58,21 @@
  */
 import {
   computed,
-  inject,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
   ref,
   watch,
 } from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
-import MessageList from "@/components/chat/MessageList.vue";
+import ChatHistory from "@/components/chat/ChatHistory.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
-import {useConversationComposerHeight} from "@/composables/chat/conversation/useConversationComposerHeight";
+import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  createEmptyWorkspaceState,
-} from "@/composables/chat/chatStateContext";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
-import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
-import {providePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
-import {
-  provideMessageActions,
-  useMessageActions,
-} from "@/composables/chat/context/messageActionContext";
 
 const {t} = useI18n();
 const listRef = ref(null);
@@ -95,23 +80,17 @@ const composerSlotRef = ref(null);
 const promptComposerRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
-const workspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const chatWorkspaceActions = useChatWorkspaceActions();
-const parentMessageActions = useMessageActions();
 const chatStore = useChatStore();
-const mode = computed(() => workspaceState.value.mode);
 const activeChatId = computed(() => chatStore.selectedChatId || "");
-const readonly = computed(() => workspaceState.value.readonly);
-const isMobile = computed(() => workspaceState.value.isMobile);
-const assistantLabel = computed(() => workspaceState.value.assistantLabel);
-const assistant = computed(() => workspaceState.value.assistant);
-const conversationTitle = computed(
-  () => workspaceState.value.conversationTitle
+const readonly = computed(() => chatStore.isActiveSharedRoom);
+const assistant = computed(() => chatStore.currentAssistant);
+const assistantLabel = computed(() =>
+  resolveWorkspaceAssistantLabel(
+    chatStore.activeSession,
+    assistant.value,
+    t("chat.assistant")
+  )
 );
-const themeName = computed(() => workspaceState.value.themeName);
 const showStudioDetailButton = computed(() =>
   isStudioAssistant(assistant.value)
 );
@@ -119,60 +98,102 @@ const studioDetailDisabled = computed(
   () =>
     isGenerating.value ||
     isHistoryRendering.value ||
-    workspaceState.value.isActiveModelUnavailable
+    isActiveModelUnavailable.value
 );
-const isActiveModelDeleted = computed(
-  () => workspaceState.value.isActiveModelDeleted
+const isActiveModelDeleted = computed(() =>
+  Boolean(chatStore.activeSession?.isModelDeleted)
 );
-const isActiveModelUnavailable = computed(
-  () => workspaceState.value.isActiveModelUnavailable
+const isActiveModelUnavailable = computed(() =>
+  Boolean(chatStore.activeSession?.isModelUnavailable)
 );
 const readonlyInputVariant = computed(() => {
   if (readonly.value) return "shared";
   return isActiveModelDeleted.value ? "deleted-model" : "unavailable-model";
 });
-const isGenerating = computed(() => workspaceState.value.isGenerating);
-const messages = computed(() => workspaceState.value.messages || []);
-const showScrollBottom = computed(() => workspaceState.value.showScrollBottom);
-const isHistoryRendering = computed(
-  () => workspaceState.value.isHistoryRendering
-);
-const historyMarkdownVisible = computed(
-  () => workspaceState.value.historyMarkdownVisible
-);
+const isGenerating = computed(() => chatStore.isWait);
+const messages = computed(() => chatStore.activeMessages || []);
+const showScrollBottom = computed(() => chatStore.showScrollBottom);
+const isHistoryRendering = computed(() => chatStore.isHistoryRendering);
+const historyMarkdownVisible = computed(() => chatStore.historyMarkdownVisible);
 const isComposerVisible = computed(
   () => !isHistoryRendering.value || historyMarkdownVisible.value
-);
-const historyMessagesLoaded = computed(
-  () => workspaceState.value.historyMessagesLoaded
-);
-const historyRenderKey = computed(
-  () => workspaceState.value.historyRenderKey || ""
-);
-const messageRenderPolicy = computed(
-  () => workspaceState.value.messageRenderPolicy || null
 );
 const isHistoryBusy = computed(() => resolveBooleanSource(isHistoryRendering));
 const chatPageLock = {
   isScrollButtonBlocked: computed(() => isHistoryBusy.value),
 };
 
-const {scheduleComposerHeightUpdate} = useConversationComposerHeight(
-  composerSlotRef,
+let composerResizeObserver = null;
+let composerHeightTimerIds = [];
+let composerHeightRafId = 0;
+const composerHeightWatchSources = [
+  readonly,
+  showScrollBottom,
+  isActiveModelUnavailable,
+  isGenerating,
   isHistoryRendering,
-  [
-    readonly,
-    mode,
-    showScrollBottom,
-    isActiveModelUnavailable,
-    isGenerating,
-    isHistoryRendering,
-    computed(() => messages.value.length),
-  ]
-);
+  computed(() => messages.value.length),
+];
+
+function updateComposerHeight() {
+  if (typeof document === "undefined") return;
+
+  const height = composerSlotRef.value?.offsetHeight || 0;
+  document.documentElement.style.setProperty(
+    "--chat-composer-height",
+    `${Math.max(height, 72)}px`
+  );
+}
+
+function clearComposerHeightSchedule() {
+  if (typeof window !== "undefined") {
+    composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+    if (composerHeightRafId) {
+      window.cancelAnimationFrame(composerHeightRafId);
+    }
+  }
+
+  composerHeightTimerIds = [];
+  composerHeightRafId = 0;
+}
+
+function scheduleComposerHeightUpdate() {
+  if (typeof window === "undefined") {
+    updateComposerHeight();
+    return;
+  }
+
+  clearComposerHeightSchedule();
+  composerHeightRafId = window.requestAnimationFrame(() => {
+    composerHeightRafId = 0;
+    updateComposerHeight();
+  });
+
+  if (isHistoryRendering.value) return;
+
+  composerHeightTimerIds = [80, 160].map((delay) =>
+    window.setTimeout(updateComposerHeight, delay)
+  );
+}
+
+function observeComposerHeight() {
+  if (!composerSlotRef.value) return;
+
+  updateComposerHeight();
+  if (typeof ResizeObserver !== "undefined") {
+    composerResizeObserver = new ResizeObserver(scheduleComposerHeightUpdate);
+    composerResizeObserver.observe(composerSlotRef.value);
+  }
+}
+
+function cleanupComposerHeightObserver() {
+  clearComposerHeightSchedule();
+  composerResizeObserver?.disconnect?.();
+  composerResizeObserver = null;
+}
 function scrollBottom() {
   if (chatPageLock.isScrollButtonBlocked.value) return;
-  chatWorkspaceActions.scrollBottom?.();
+  listRef.value?.scrollToBottom?.({force: true, behavior: "smooth", stable: true});
 }
 
 
@@ -191,34 +212,43 @@ function collapsePromptExpandedForChatSwitch() {
 
 
 function handleMessageContentRendered() {
-  if (!isHistoryRendering.value) {
-    parentMessageActions.messageContentRendered?.();
-  }
   scheduleComposerHeightUpdate();
 }
 
 function handleHistoryRendered() {
-  parentMessageActions.historyRendered?.();
   scheduleComposerHeightUpdate();
 }
 
-function handlePromptHeightChange() {
-  scheduleComposerHeightUpdate();
+
+function submitPromptFromWorkspace(payload) {
+  listRef.value?.submit?.(payload);
 }
 
-provideMessageActions({
-  ...parentMessageActions,
-  messageContentRendered: handleMessageContentRendered,
-  historyRendered: handleHistoryRendered,
-});
+function handleSelectedModelUpdate(value) {
+  chatStore.selectModel(value);
+}
 
-providePromptWorkspaceLayoutActions({
-  onExpandedChange: handlePromptExpandedChange,
-  onHeightChange: handlePromptHeightChange,
-});
+
 
 watch(activeChatId, () => {
   collapsePromptExpandedForChatSwitch();
+});
+
+watch(
+  () => composerHeightWatchSources.map((source) => source?.value),
+  async () => {
+    await nextTick();
+    scheduleComposerHeightUpdate();
+  }
+);
+
+onMounted(async () => {
+  await nextTick();
+  observeComposerHeight();
+});
+
+onBeforeUnmount(() => {
+  cleanupComposerHeightObserver();
 });
 
 defineExpose({

@@ -4,13 +4,12 @@ import MainPage from "@/views/MainPage.vue";
 import {isAndroidApp} from "@/core/config/appConfig";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useChatStore} from "@/stores/chatStore";
 import {resolveConversationEntryGuard} from "@/composables/chat/chatRoomActions";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
-import {ROUTE_NAMES} from "@/constants/routeNames";
+import {ROUTE_NAMES, ROUTE_PATHS} from "@/constants/routeNames";
 import {logInfo} from "@/utils/logger";
 
 const ChatPage = () =>
@@ -21,10 +20,6 @@ const GuidePage = () =>
   import(/* webpackChunkName: "guide" */ "@/views/GuidePage.vue");
 const SharedPage = () =>
   import(/* webpackChunkName: "shared" */ "@/views/SharedPage.vue");
-const PlaygroundPage = () =>
-  import(
-    /* webpackChunkName: "playground" */ "@/views/playground/PlaygroundPage.vue"
-  );
 const StudioPage = () =>
   import(/* webpackChunkName: "studio" */ "@/views/studio/StudioPage.vue");
 const McpConnectorListPage = () =>
@@ -53,40 +48,40 @@ const baseRoutes = [
     meta: {requireAuth: true},
     children: [
       {
-        path: "",
-        alias: "main",
+        path: ROUTE_PATHS.MAIN,
+        alias: ROUTE_PATHS.MAIN_ALIAS,
         name: ROUTE_NAMES.MAIN,
         component: MainPage,
         meta: {title: "Assistant"},
       },
       {
-        path: "chat",
+        path: ROUTE_PATHS.CHAT,
         name: ROUTE_NAMES.CHAT_ENTRY,
         component: ChatPage,
         meta: {title: "Chat"},
       },
       {
-        path: "chat/:id",
+        path: ROUTE_PATHS.CHAT_DETAIL,
         name: ROUTE_NAMES.CHAT_DETAIL,
         component: ChatPage,
         props: true,
         meta: {title: "Chat"},
       },
       {
-        path: "share-chat/:id",
+        path: ROUTE_PATHS.SHARE_CHAT,
         name: ROUTE_NAMES.SHARE_CHAT_ENTRY,
         component: ChatPage,
         props: true,
         meta: {title: "Chat"},
       },
       {
-        path: "chat-search",
+        path: ROUTE_PATHS.CHAT_SEARCH,
         name: ROUTE_NAMES.CHAT_SEARCH,
         component: ChatSearchPage,
         meta: {title: "Chat Search"},
       },
       {
-        path: "studio",
+        path: ROUTE_PATHS.STUDIO,
         name: ROUTE_NAMES.STUDIO,
         component: StudioPage,
         meta: {title: "Assistant Studio"},
@@ -98,35 +93,29 @@ const baseRoutes = [
         meta: {title: "Connector Store"},
       },
       {
-        path: "swagger",
+        path: ROUTE_PATHS.SWAGGER,
         name: ROUTE_NAMES.SWAGGER,
         component: SwaggerPage,
         meta: {title: "Swagger"},
       },
       {
-        path: "guide",
+        path: ROUTE_PATHS.GUIDE,
         name: ROUTE_NAMES.GUIDE,
         component: GuidePage,
         meta: {title: "Guide"},
       },
       {
-        path: "shared",
+        path: ROUTE_PATHS.SHARED,
         name: ROUTE_NAMES.SHARED,
         component: SharedPage,
         meta: {title: "Shared Chat", skipAuthCheck: true},
       },
       {
-        path: "shared/:id",
+        path: ROUTE_PATHS.SHARED_ENTRY,
         name: ROUTE_NAMES.SHARED_ENTRY,
         component: SharedPage,
         props: true,
         meta: {title: "Shared Chat", skipAuthCheck: true},
-      },
-      {
-        path: "playground",
-        name: ROUTE_NAMES.PLAYGROUND,
-        component: PlaygroundPage,
-        meta: {title: "Playground"},
       },
     ],
   },
@@ -235,12 +224,6 @@ function applyInheritedRequireAuth(routes, inheritedRequireAuth = false) {
   });
 }
 
-function guardStreamingNavigation(to) {
-  const chatStreamStore = useChatStreamStore();
-  if (!chatStreamStore.isWait) return true;
-  return chatStreamStore.consumeAllowedNavigation(to) ? true : false;
-}
-
 function guardSharedRoute(to) {
   const chatStore = useChatStore();
   // /shared is valid only after /shared/:id has confirmed an active shared room.
@@ -302,11 +285,10 @@ function registerRouteGuard(router, appInfo, context = {}) {
 
     platformStore.refresh(appInfo);
 
-    // Logout/update routes must not be blocked by chat locks.
+    // Logout/update routes bypass auth and version checks as needed.
     if (isRouteGuardBypassRoute(to)) return true;
 
     const guardResults = [
-      guardStreamingNavigation(to),
       guardSharedRoute(to),
       guardHiddenConversationEntry(to),
       await guardAuth(to, axios),

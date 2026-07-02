@@ -68,7 +68,7 @@
 
 <script setup>
 /**
- * @file components/chat/AssistantMessage.vue
+ * @file components/chat/ChatResponse.vue
  * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
  */
 
@@ -81,13 +81,12 @@ import {
 } from "@/platform/scroll/overlayScrollbarController";
 import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
 import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
 import AssistantDuoLinks from "./AssistantDuoLinks.vue";
 import AssistantRagImages from "./AssistantRagImages.vue";
 import MessageActions from "./MessageActions.vue";
-import {useMessageActions} from "@/composables/chat/context/messageActionContext";
 
 /**
  * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
@@ -98,12 +97,12 @@ const props = defineProps({
   deferMermaidEnhancement: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
-const chatStreamStore = useChatStreamStore();
-const messageActions = useMessageActions();
+const chatStore = useChatStore();
+const emit = defineEmits(["rendered", "regenerate"]);
 function notifyRendered(type) {
-  messageActions.messageRendered?.({messageId: props.message.id, type});
+  emit("rendered", {messageId: props.message.id, type});
 }
-const isInteractionBlocked = computed(() => chatStreamStore.isWait);
+const isInteractionBlocked = computed(() => chatStore.isWait);
 const html = ref("");
 const reasoningHtml = ref("");
 const contentMarkdownRendered = ref(false);
@@ -147,7 +146,7 @@ const enableMermaidRendering = computed(
 );
 
 function handleRegenerate() {
-  messageActions.regenerate?.(props.message);
+  emit("regenerate", props.message);
 }
 
 const reasoningTitle = computed(() =>
@@ -197,7 +196,7 @@ async function enhanceRenderedMarkdown({
     notifyRendered("enhanced");
   } catch (error) {
     if (componentAlive) {
-      logWarn("[AssistantMessage] markdown enhancement failed:", error);
+      logWarn("[ChatResponse] markdown enhancement failed:", error);
     }
   }
 }
@@ -255,7 +254,7 @@ async function renderContent() {
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== renderVersion) return;
-    logWarn("[AssistantMessage] content render failed:", error);
+    logWarn("[ChatResponse] content render failed:", error);
     destroyMarkdownScrollbars(contentRef.value);
     html.value = escapeHtml(props.message.content || "");
     await nextTick();
@@ -312,7 +311,7 @@ async function renderReasoningContent() {
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
-    logWarn("[AssistantMessage] reasoning render failed:", error);
+    logWarn("[ChatResponse] reasoning render failed:", error);
     destroyMarkdownScrollbars(reasoningRef.value);
     reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
     await nextTick();

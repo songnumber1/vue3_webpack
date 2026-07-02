@@ -63,11 +63,11 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import {getAssistantImageBySize} from "@/constants/assistantImages";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 import {useViewportStore} from "@/stores/viewportStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
-import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
+import {useStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
 const props = defineProps({
   mode: {type: String, default: "main"},
@@ -80,11 +80,11 @@ const props = defineProps({
 });
 
 const {t} = useI18n();
-const chatStreamStore = useChatStreamStore();
+const chatStore = useChatStore();
 const viewportStore = useViewportStore();
 const appShellStore = useAppShellStore();
-const chatWorkspaceActions = useChatWorkspaceActions();
-const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
+const studioDetailActions = useStudioDetailActions();
+const isAppShellActionBlocked = computed(() => chatStore.isWait);
 const mobileAssistantIcon = computed(() =>
   getAssistantImageBySize(props.assistant, 20)
 );
@@ -118,7 +118,7 @@ function openSettings() {
 
 function openStudioDetail() {
   if (props.studioDetailDisabled) return;
-  chatWorkspaceActions.openStudioDetail?.();
+  studioDetailActions.open?.();
 }
 </script>
 

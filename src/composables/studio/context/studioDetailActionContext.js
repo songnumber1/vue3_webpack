@@ -10,6 +10,7 @@ export const STUDIO_DETAIL_ACTION_CONTEXT_KEY = Symbol(
 
 export function createEmptyStudioDetailActions() {
   return {
+    open: null,
     close: null,
     edit: null,
     delete: null,

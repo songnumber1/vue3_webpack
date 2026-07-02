@@ -1,10 +1,10 @@
 import {createId} from "@/utils/id";
 
 export function createLocalHistory(text, assistant, model) {
-  const id = createId();
+  const chatId = createId();
 
   return {
-    id,
+    chatId,
     temporary: true,
     syncStatus: "local",
     title: text || "New chat",
@@ -45,7 +45,7 @@ export function createSessionFromHistory(
         : "";
 
   return {
-    chatId: history.id,
+    chatId: history.chatId,
     assistantId: assistant?.id || history.assistantId || model?.assistId || "",
     assistantType: assistant?.type || history.assistantType || "",
     assistantLabel: assistant?.label || history.assistantLabel || "",

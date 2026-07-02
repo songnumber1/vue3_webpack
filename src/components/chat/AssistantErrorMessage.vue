@@ -35,12 +35,11 @@
 
 <script setup>
 import {computed, onMounted} from "vue";
-import {useMessageActions} from "@/composables/chat/context/messageActionContext";
 
 const props = defineProps({
   message: {type: Object, required: true},
 });
-const messageActions = useMessageActions();
+const emit = defineEmits(["rendered"]);
 
 const errorTitle = computed(
   () =>
@@ -54,7 +53,7 @@ const errorMessage = computed(
 const errorCode = computed(() => props.message.errorCode || "");
 
 onMounted(() => {
-  messageActions.messageRendered?.({messageId: props.message.id, type: "error"});
+  emit("rendered", {messageId: props.message.id, type: "error"});
 });
 </script>
 

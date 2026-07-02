@@ -1,11 +1,8 @@
 <template>
   <section class="chat-search-workspace" :aria-label="t('chatSearch.title')">
     <ChatHeader
-      mode="main"
-      :assistant-label="workspaceState.assistantLabel"
-      :assistant="workspaceState.assistant"
-      :conversation-title="t('chatSearch.title')"
-      :theme-name="workspaceState.themeName"
+      :assistant-label="assistantLabel"
+      :assistant="assistant"
     />
 
     <div class="chat-search-scroll">
@@ -137,9 +134,10 @@
  * @file components/search/ChatSearchWorkspace.vue
  * @description Studio 목록 레이아웃 리듬을 사용하는 채팅 검색 화면입니다.
  */
-import {computed, onBeforeUnmount, onMounted, ref, watch, inject} from "vue";
+import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
+import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {openChatRoom, clearPendingChatRoom} from "@/composables/chat/chatRoomActions";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -150,21 +148,18 @@ import {
   adaptChatSearchResponse,
   createHistoryFromSearchResult,
 } from "@/adapters/chatResponseAdapter";
-import {
-  createEmptyWorkspaceState,
-  CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
 
 const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const router = useRouter();
 const chatStore = useChatStore();
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const workspaceState = computed(
-  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+const assistant = computed(() => chatStore.currentAssistant);
+const assistantLabel = computed(() =>
+  resolveWorkspaceAssistantLabel(
+    chatStore.activeSession,
+    assistant.value,
+    t("chat.assistant")
+  )
 );
 
 const keyword = ref("");
@@ -283,15 +278,11 @@ async function openChat(result) {
   const messageId = String(
     result?.messageId || result?.targetMessageId || ""
   ).trim();
-  const query = isSearchMode.value && messageId ? {messageId} : undefined;
+  const searchTargetMessageId = isSearchMode.value ? messageId : "";
 
   try {
-    const opened = await openChatRoom(router, chatId);
+    const opened = await openChatRoom(router, chatId, {searchTargetMessageId});
     if (!opened) return;
-
-    if (query) {
-      await router.replace({query}).catch(() => {});
-    }
   } catch (_error) {
     clearPendingChatRoom(chatId);
   }

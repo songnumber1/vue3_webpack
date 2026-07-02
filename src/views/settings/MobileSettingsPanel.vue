@@ -115,15 +115,9 @@ function resolveMenuTitle(key) {
 }
 
 function selectMenuItem(key) {
-  if (key === "terms" || key === "playground") {
+  if (key === "terms") {
     closePanel();
-    router
-      .push(
-        key === "terms"
-          ? {name: ROUTE_NAMES.TERMS}
-          : {name: ROUTE_NAMES.PLAYGROUND}
-      )
-      .catch(() => {});
+    router.push({name: ROUTE_NAMES.TERMS}).catch(() => {});
     return;
   }
   activeMenu.value = key;

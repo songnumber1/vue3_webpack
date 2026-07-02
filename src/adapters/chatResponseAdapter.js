@@ -51,8 +51,10 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
     : null;
   const title = resolveTitle(raw);
 
+  const chatId = firstText(raw[C.CHAT_ID]);
+
   return {
-    id: firstText(raw[C.CHAT_ID], raw.id),
+    chatId,
     title,
     preview:
       title || firstText(raw[C.PREVIEW], raw[C.SNIPPET]) || "저장된 대화",
@@ -75,7 +77,7 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
 export function adaptChatHistoryList(rawItems = [], context = {}) {
   return readApiList(rawItems, rawItems)
     .map((item) => adaptChatHistoryItem(item, context))
-    .filter((item) => item.id)
+    .filter((item) => item.chatId)
     .sort((a, b) => {
       if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
       return (
@@ -88,16 +90,17 @@ export function adaptChatHistoryList(rawItems = [], context = {}) {
  * 검색 결과 단일 item을 ChatSearchWorkspace에서 쓰는 기존 모델로 정규화합니다.
  */
 export function adaptChatSearchItem(raw = {}, options = {}) {
+  const restRaw = {...raw};
+  delete restRaw.id;
   const fallbackTitle = options.fallbackTitle || "";
-  const chatId = firstText(raw[C.CHAT_ID], raw.id);
+  const chatId = firstText(raw[C.CHAT_ID]);
   const title = firstText(raw[C.TITLE], raw[C.CHAT_TITLE]) || fallbackTitle;
   const snippet = firstText(raw[C.SNIPPET], raw[C.PREVIEW], raw.summary);
   const endedAt = firstText(raw[C.CHAT_END_DT], raw.endedAt, raw.updatedAt);
 
   return {
-    ...raw,
+    ...restRaw,
     chatId,
-    id: firstText(raw.id, chatId),
     title,
     chatTitle: firstText(raw[C.CHAT_TITLE], raw[C.TITLE]) || fallbackTitle,
     snippet,
@@ -143,12 +146,12 @@ export function adaptChatSearchResponse(response, options = {}) {
  */
 export function createHistoryFromSearchResult(result = {}, options = {}) {
   const fallbackTitle = options.fallbackTitle || "새 대화";
-  const chatId = firstText(result.chatId, result.id);
+  const chatId = firstText(result.chatId);
   const title = firstText(result.title, result.chatTitle) || fallbackTitle;
   const endedAt = firstText(result.chatEndDt, result.endedAt, result.updatedAt);
 
   return {
-    id: chatId,
+    chatId,
     title,
     preview: firstText(
       result.snippet,

@@ -7,12 +7,9 @@
     }"
   >
     <form
-      ref="fileDropZoneRef"
       class="prompt-box prompt-box--gemini tw-relative tw-flex tw-w-full tw-flex-col tw-border tw-border-app-promptBorder tw-bg-app-prompt tw-shadow-prompt"
       :class="{
         'prompt-box--expanded': isPromptExpanded,
-        'prompt-box--file-dragging': isFileDragging,
-        'prompt-box--file-drop-disabled': isFileDropDisabled,
       }"
       @submit.prevent="submit"
     >
@@ -23,8 +20,7 @@
         class="visually-hidden-file-input tw-sr-only"
         type="file"
         multiple
-        :accept="fileAccept"
-        :capture="captureMode"
+        :accept="FILE_INPUT_ACCEPT"
         @change="handleFileChange"
       />
     </form>
@@ -50,21 +46,13 @@
       :model-value="modelValue"
       @close="toolMenuOpen = false"
     />
-
-    <PromptAttachBottomSheet
-      :open="attachMenuOpen && isMobileSheet"
-      :title="t('chat.attach')"
-      :attach-options="attachOptions"
-      @close="attachMenuOpen = false"
-      @open-file-picker="openFilePicker"
-    />
   </footer>
 </template>
 
 <script setup>
 /**
  * @file components/prompt/PromptComposer.vue
- * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 PROMPT_STATE_KEY로 주입받고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
+ * @description 프롬프트 입력 UI 컴포넌트입니다. Prompt 상태는 store에서 직접 참조하고, 내부 툴바 상태는 PROMPT_TOOLBAR_STATE_KEY로 제공합니다.
  */
 
 import {
@@ -77,49 +65,33 @@ import {
   ref,
   toRef,
   watch,
-  inject,
 } from "vue";
 import PromptInputMobile from "@/components/prompt/input/PromptInputMobile.vue";
-import PromptAttachBottomSheet from "@/components/prompt/attach/mobile/PromptAttachBottomSheet.vue";
 import PromptModelBottomSheet from "@/components/prompt/model/mobile/PromptModelBottomSheet.vue";
 import PromptToolBottomSheet from "@/components/prompt/tools/mobile/PromptToolBottomSheet.vue";
 import {useI18n} from "vue-i18n";
-import {useEventListener} from "@vueuse/core";
 import {usePromptMenu} from "@/composables/prompt/usePromptMenu";
 import {usePromptText} from "@/composables/prompt/usePromptText";
 import {
-  ANDROID_TO_JS_EVENT,
-  ATTACH_MENU_OPTIONS,
   DEFAULT_FALLBACK_MODEL,
-  FILE_PICKER_TYPE,
   IMAGE_PREVIEW_EVENT,
-  NATIVE_FILE_SELECTED_TYPE,
   PROMPT_MENU_TYPE,
   PROMPT_SPEECH_LANGUAGE,
   PROMPT_TEMPLATE_MODEL_IDS,
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
-import {useAssistantStore} from "@/stores/assistantStore";
-import {usePlatformStore} from "@/stores/platformStore";
+import {useChatStore} from "@/stores/chatStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
-import {useFileDragDrop} from "@/composables/file/useFileDragDrop";
-import {openNativeFilePicker} from "@/platform/bridge/platformBridge";
 import {
   createBrowserAttachment,
-  createNativeAttachment,
   imageAttachment,
   revokeAttachmentUrl,
 } from "@/utils/attachment";
-import {logWarn} from "@/utils/logger";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
 import {
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
-  PROMPT_STATE_KEY,
-  createEmptyPromptState,
 } from "@/composables/chat/chatStateContext";
-import {usePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
-import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
 import {
   providePromptInputActions,
 } from "@/composables/prompt/context/promptInputActionContext";
@@ -134,15 +106,42 @@ const componentProps = defineProps({
   hideVoiceAction: {type: Boolean, default: false},
 });
 
-const promptState = inject(PROMPT_STATE_KEY, computed(createEmptyPromptState));
-const composerContext = usePromptComposerContext();
-const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
+const emit = defineEmits([
+  "submit",
+  "update-selected-model",
+  "focus",
+  "height-change",
+  "blur",
+  "expanded-change",
+]);
+
+const chatStore = useChatStore();
+const promptModels = computed(() => {
+  const lockedModelId = chatStore.activeSession?.modelId;
+  const lockedModel = lockedModelId
+    ? chatStore.modelMap[lockedModelId]
+    : null;
+
+  if (promptModelReadonly.value && lockedModel) return [lockedModel];
+  return chatStore.currentModels || [];
+});
+const promptModelValue = computed(() =>
+  chatStore.activeSession?.modelId || chatStore.selectedModelId || ""
+);
+const promptModelReadonly = computed(() =>
+  Boolean(
+    chatStore.isModelLocked ||
+      chatStore.selectedChatId ||
+      chatStore.activeRoomId
+  )
+);
+
 const props = reactive({
   get disabled() {
-    return promptState.value.disabled;
+    return chatStore.isActiveSharedRoom;
   },
   get generating() {
-    return promptState.value.generating;
+    return chatStore.isWait;
   },
   get submitDisabled() {
     return componentProps.submitDisabled;
@@ -157,38 +156,30 @@ const props = reactive({
     return componentProps.hideVoiceAction;
   },
   get floating() {
-    return promptState.value.floating;
+    return false;
   },
   get showHelp() {
-    return promptState.value.showHelp;
+    return false;
   },
   get placeholder() {
-    return promptState.value.placeholder;
+    return "";
   },
   get modelValue() {
-    return promptState.value.selectedModel;
+    return promptModelValue.value;
   },
   get models() {
-    return promptState.value.models;
+    return promptModels.value;
   },
   get modelReadonly() {
-    return promptState.value.modelReadonly;
+    return promptModelReadonly.value;
   },
 });
 
 
-function invokeComposerContext(actionName, payload) {
-  const action = composerContext?.[actionName];
-  if (typeof action !== "function") return false;
-
-  action(payload);
-  return true;
-}
-
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
     if (componentProps.submitDisabled) return;
-    invokeComposerContext("onSubmit", payload);
+    emit("submit", payload);
     return;
   }
   if (eventName === "open-tool") {
@@ -201,11 +192,11 @@ function handleComposerEvent(eventName, payload) {
     if (componentProps.hideVoiceAction) return;
   }
   if (eventName === "update:modelValue") {
-    invokeComposerContext("onUpdateSelectedModel", payload);
+    emit("update-selected-model", payload);
     return;
   }
   if (eventName === "focus") {
-    invokeComposerContext("onFocus", payload);
+    emit("focus", payload);
     return;
   }
   if (eventName === "height-change") {
@@ -213,7 +204,7 @@ function handleComposerEvent(eventName, payload) {
     return;
   }
   if (eventName === "blur") {
-    promptWorkspaceLayoutActions.onBlur?.(payload);
+    emit("blur", payload);
   }
 }
 
@@ -227,7 +218,6 @@ const attachmentDisabled = computed(() =>
 
 // 3. 모델 변경 시 활성화된 템플릿 설정을 초기화하기 위해 프롬프트 제어 Pinia 스토어를 로드합니다.
 const promptControlStore = usePromptControlStore();
-const platformStore = usePlatformStore();
 
 // ── [공유 레이어: 뷰포트 감지 + 메뉴 상태] ──────────────────────────────
 // 하드웨어 오리엔테이션 전환이나 가상 키보드가 올라올 때 드롭다운 메뉴들의 UI 정합성을 보정하는 영역입니다.
@@ -266,69 +256,22 @@ function setPromptInputRef(instance) {
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
 // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집합니다.
 const fileInputRef = ref(null);
-const fileDropZoneRef = ref(null);
 const attachments = ref([]);
-const fileAccept = ref("");
-const captureMode = ref(null);
-
-const showCameraMenu = computed(() => platformStore.info.isAndroidApp);
-const attachOptions = computed(() =>
-  ATTACH_MENU_OPTIONS.filter(
-    (option) => !option.requiresCamera || showCameraMenu.value
-  ).map((option) => ({
-    ...option,
-    label: t(option.labelKey),
-  }))
-);
+const FILE_INPUT_ACCEPT = ".jpg,image/jpeg";
 
 function openAttachSelector() {
-  if (attachmentDisabled.value) return;
-  toggleMenu(PROMPT_MENU_TYPE.attach);
+  openFilePicker();
 }
 
-async function openFilePicker(type = FILE_PICKER_TYPE.all) {
+function openFilePicker() {
   if (attachmentDisabled.value) return;
   attachMenuOpen.value = false;
-
-  const option =
-    ATTACH_MENU_OPTIONS.find((item) => item.id === type) ||
-    ATTACH_MENU_OPTIONS.find((item) => item.id === FILE_PICKER_TYPE.all);
-
-  if (platformStore.info.isAndroidApp) {
-    try {
-      await openNativeFilePicker({
-        source: option.nativeSource,
-        multiple: option.multiple,
-        accept: option.accept,
-      });
-      return;
-    } catch (error) {
-      logWarn("Android file picker failed. Falling back to web input.", error);
-    }
-  }
 
   const input = fileInputRef.value;
   if (!input) return;
 
-  fileAccept.value = option.accept;
-  captureMode.value = option.capture;
-
-  input.setAttribute("accept", option.accept);
-  if (option.capture) input.setAttribute("capture", option.capture);
-  else input.removeAttribute("capture");
-
   input.value = "";
   input.click();
-}
-
-function handleNativeFileSelected(event) {
-  const detail = event?.detail || {};
-  if (detail.type !== NATIVE_FILE_SELECTED_TYPE) return;
-
-  const nativeFiles = detail.payload?.files || [];
-  const mapped = nativeFiles.map(createNativeAttachment);
-
-  if (mapped.length) attachments.value = [...attachments.value, ...mapped];
 }
 
 function handleFileChange(event) {
@@ -391,18 +334,6 @@ function clearAttachments() {
   attachments.value = [];
 }
 
-function handleDroppedFiles(files) {
-  if (attachmentDisabled.value) return;
-  addFiles(files);
-}
-
-const {isFileDragging, isFileDropDisabled} = useFileDragDrop(
-  fileDropZoneRef,
-  computed(() => !attachmentDisabled.value),
-  handleDroppedFiles
-);
-
-useEventListener(window, ANDROID_TO_JS_EVENT, handleNativeFileSelected);
 
 // ── [음성 입력] ─────────────────────────────────────────────────────────
 // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
@@ -472,7 +403,6 @@ function selectModel(id) {
 
 // ── [툴 / 프롬프트 템플릿 선택] ───────────────────────────────────────────
 // 특정 페르소나나 업무 서식이 가미된 프롬프트 문틀(Template) 및 확장 API 기능(Tool)을 조합합니다.
-const assistantStore = useAssistantStore();
 const activeMobileGroupId = ref("");
 const activePromptToolSettings = computed(
   () => promptControlStore.activePromptToolSettings
@@ -495,9 +425,9 @@ function hasTemplateFields(template = {}) {
 
 const currentModelTemplates = computed(() => {
   const selectedModelId =
-    props.modelValue || assistantStore.selectedModelId || "";
+    props.modelValue || chatStore.selectedModelId || "";
 
-  return assistantStore.promptTemplates
+  return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
     .filter(
       (template) => !template.modelId || template.modelId === selectedModelId
@@ -628,7 +558,7 @@ watch(
 /** 답변 스트리밍 중에도 입력창과 주변 액션 UI는 잠그지 않고, 전송 버튼만 generating 상태로 progress를 표시합니다. */
 const actionDisabled = computed(() => disabled.value);
 
-/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 chatSubmitActions에서 generating으로 방어합니다. */
+/** 텍스트 입력이나 첨부가 있으면 제출 조건은 충족합니다. 실제 중복 전송은 submit()과 chatStore.isWait로 방어합니다. */
 const canSubmit = computed(
   () =>
     !props.submitDisabled &&
@@ -777,12 +707,11 @@ function submit() {
  * @param {ClipboardEvent} event - 브라우저 네이티브 클립보드 붙여넣기 이벤트 객체
  */
 function notifyPromptExpandedChange(expanded) {
-  promptWorkspaceLayoutActions.onExpandedChange?.(expanded);
+  emit("expanded-change", expanded);
 }
 
 function notifyPromptHeightChange(height) {
-  invokeComposerContext("onHeightChange", height);
-  promptWorkspaceLayoutActions.onHeightChange?.(height);
+  emit("height-change", height);
 }
 
 function handlePaste(event) {
@@ -916,10 +845,10 @@ provide(
     currentModel: currentModel.value,
     models: currentModels.value,
     selectedTemplateTool: selectedTemplateTool.value,
-    attachOptions: attachOptions.value,
+    attachOptions: [],
     modelMenuOpen: modelMenuOpen.value,
     toolMenuOpen: toolMenuOpen.value,
-    attachMenuOpen: attachMenuOpen.value,
+    attachMenuOpen: false,
     isMobileSheet: isMobileSheet.value,
     canSubmit: canSubmit.value,
     hasPromptText: hasPromptText.value,
@@ -958,24 +887,4 @@ defineExpose({
   border: 1px solid var(--prompt-border);
 }
 
-.prompt-box--file-dragging {
-  outline: 2px dashed var(--prompt-border);
-  outline-offset: 4px;
-}
-
-.prompt-box--file-dragging::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--app-prompt);
-  opacity: 0.72;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.prompt-box--file-dragging > * {
-  position: relative;
-  z-index: 3;
-}
 </style>

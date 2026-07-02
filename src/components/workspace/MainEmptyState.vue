@@ -66,17 +66,14 @@
  * @description 메인 화면의 빈 상태 UI를 실제 메인 화면과 Studio 미리보기에서 함께 사용하는 공통 컴포넌트입니다.
  * 실제 입력/전송 기능은 slot으로만 주입하여 Studio 미리보기에서 채팅 요청이 발생하지 않도록 분리합니다.
  */
-import {computed, unref} from "vue";
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {DEFAULT_ASSISTANT_IMAGE} from "@/constants/assistantImages";
-import {useChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
-import {usePromptWorkspaceLayoutActions} from "@/composables/prompt/context/promptWorkspaceLayoutContext";
+import {useStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
 const {t} = useI18n();
 
-const chatWorkspaceActions = useChatWorkspaceActions();
-const promptWorkspaceLayoutActions = usePromptWorkspaceLayoutActions();
-
+const studioDetailActions = useStudioDetailActions();
 const props = defineProps({
   preview: {type: Boolean, default: false},
   disableInteractions: {type: Boolean, default: false},
@@ -90,14 +87,13 @@ const props = defineProps({
   suggestions: {type: Array, default: () => []},
   showStudioDetailButton: {type: Boolean, default: false},
   studioDetailDisabled: {type: Boolean, default: false},
+  isComposerExpanded: {type: Boolean, default: false},
 });
 
 const emit = defineEmits(["suggestion-click"]);
 
 const resolvedTitle = computed(() => props.title || t("chat.startQuestion"));
-const isComposerExpanded = computed(() =>
-  Boolean(unref(promptWorkspaceLayoutActions.isExpanded))
-);
+const isComposerExpanded = computed(() => Boolean(props.isComposerExpanded));
 
 const normalizedSuggestions = computed(() =>
   (props.suggestions || [])
@@ -130,7 +126,7 @@ function handleSuggestionClick(item) {
 
 function handleStudioDetailClick() {
   if (props.studioDetailDisabled) return;
-  chatWorkspaceActions.openStudioDetail?.();
+  studioDetailActions.open?.();
 }
 </script>
 

@@ -62,17 +62,16 @@
 
 <script setup>
 /**
- * @file components/chat/UserMessage.vue
+ * @file components/chat/ChatUser.vue
  * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
  */
 
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
-import {useMessageActions} from "@/composables/chat/context/messageActionContext";
 
 const {t} = useI18n();
 /**
@@ -81,9 +80,9 @@ const {t} = useI18n();
 const props = defineProps({
   message: {type: Object, required: true},
 });
-const messageActions = useMessageActions();
-const chatStreamStore = useChatStreamStore();
-const isInteractionBlocked = computed(() => chatStreamStore.isWait);
+const emit = defineEmits(["rendered"]);
+const chatStore = useChatStore();
+const isInteractionBlocked = computed(() => chatStore.isWait);
 const showMessageActions = computed(() => !isInteractionBlocked.value);
 const hasAttachments = computed(
   () =>
@@ -100,7 +99,7 @@ function getPreviewUrl(file) {
  * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
  */
 function notifyRendered() {
-  messageActions.messageRendered?.({messageId: props.message.id, type: "attachment"});
+  emit("rendered", {messageId: props.message.id, type: "attachment"});
 }
 
 function openImage(file) {

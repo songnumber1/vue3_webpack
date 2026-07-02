@@ -7,9 +7,9 @@
   >
     <div
       v-for="item in histories"
-      :key="item.id"
+      :key="item.chatId"
       class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
-      :class="{selected: String(item.id) === String(selectedChatId)}"
+      :class="{selected: String(item.chatId) === String(selectedChatId)}"
     >
       <button
         :class="[
@@ -50,9 +50,9 @@
   <div v-else :class="[containerClass, 'tw-min-w-0']">
     <div
       v-for="item in histories"
-      :key="item.id"
+      :key="item.chatId"
       class="sidebar-history-row tw-group tw-flex tw-w-full tw-items-center tw-gap-1"
-      :class="{selected: String(item.id) === String(selectedChatId)}"
+      :class="{selected: String(item.chatId) === String(selectedChatId)}"
     >
       <button
         :class="[

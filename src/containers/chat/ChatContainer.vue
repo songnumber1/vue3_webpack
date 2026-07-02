@@ -7,6 +7,10 @@
     <HomeWorkspace
       v-if="activeWorkspaceType === 'main'"
       :ref="setWorkspaceRef"
+      @prompt-submit="handleWorkspaceSubmit"
+      @update-selected-model="handleWorkspaceSelectedModelUpdate"
+      @prompt-focus="refreshPromptViewport"
+      @prompt-height-change="refreshPromptViewport"
     />
 
     <ChatConversationWorkspace
@@ -81,10 +85,8 @@
 
 import {
   computed,
-  nextTick,
   onBeforeUnmount,
   onMounted,
-  provide,
   ref,
   watch,
 } from "vue";
@@ -95,12 +97,7 @@ import {useRoute, useRouter} from "vue-router";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
 import {ROUTE_NAMES} from "@/constants/routeNames";
-import {useAssistantStore} from "@/stores/assistantStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
-import {
-  CHAT_WORKSPACE_STATE_KEY,
-  PROMPT_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
 import ChatLayout from "@/components/chat/ChatLayout.vue";
@@ -113,42 +110,25 @@ import StudioWorkspace from "@/components/workspace/StudioWorkspace.vue";
 import McpWorkspace from "@/components/workspace/McpWorkspace.vue";
 import ChatSearchWorkspace from "@/components/search/ChatSearchWorkspace.vue";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
-import {useApiRequestStore} from "@/stores/apiRequestStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
-import {createId} from "@/utils/id";
 import {logWarn} from "@/utils/logger";
-import {warmupMermaidForHistoryRender} from "@/utils/mermaidRenderer";
-import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
 import {
-  createChatHistory,
   deleteChatHistory,
   loadChatHistoryList,
-  loadChatMessageRouters,
   loadExamplePrompts,
   renameChatHistory,
   updateChatBookmark,
 } from "@/composables/chat/runtime/chatRuntimeApi";
 import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
 import {
-  appendUserAndAssistantMessages as appendMessagesToChat,
   revokeMessageAttachments,
 } from "@/composables/chat/chatMessageActions";
-import {
-  createLocalHistory,
-  createSessionFromHistory,
-} from "@/composables/chat/runtime/chatSessionFactory";
-import {
-  markSessionAsMissingAssistant,
-  resolveConversationSessionState,
-} from "@/composables/chat/internal/policy/chatSessionPolicy";
+import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {useAutoScroll} from "@/composables/chat/useAutoScroll";
 import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
 import {syncMobileViewportSettings} from "@/utils/syncMobileViewportSettings";
-import {isProgressAllowedForCurrentPlatform} from "@/constants/chatRuntimePolicy";
 import {
   configureResponseOverlay,
   setupResponseOverlayBackGuard,
@@ -160,50 +140,25 @@ import {
   clearConversationNavigationState as clearConversationNavigationStateByPolicy,
   createPortalAssistantRoute,
   getPortalAssistantIdByRouteName,
-  hasPendingChatNavigation,
   navigateToMainAfterConversationReset,
   preparePortalConversationNavigation,
   resolveActiveChatId,
-  resolveHiddenConversationRoute,
 } from "@/composables/chat/chatRoomActions";
 import {resolveRouteMode} from "@/constants/routeNames";
 import {deleteStudio} from "@/services/studioDetailService";
-import {registerActiveConversationCleanup} from "@/composables/chat/conversation/activeConversationCleanupRegistry";
 import {
   isStudioAssistant,
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
-import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
-import {normalizeHistoryId} from "@/utils/normalize";
 import {resolveBooleanSource} from "@/utils/interactionGuard";
 
-import {
-  configureChatSubmit,
-  regenerateLastAnswer,
-  submitChatMessage,
-} from "@/composables/chat/chatSubmitActions";
-import {providePromptComposerContext} from "@/composables/chat/context/promptComposerContext";
-import {provideChatWorkspaceActions} from "@/composables/chat/context/chatWorkspaceActionContext";
-import {provideMessageActions} from "@/composables/chat/context/messageActionContext";
 import {provideNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
-import {
-  isSharedChat,
-  resolveMessageRenderPolicy,
-} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
-import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
-import {
-  resolveConversationTitle,
-  resolveWorkspaceAssistantLabel,
-} from "@/composables/chat/internal/policy/chatHeaderPolicy";
-import {useOverlayStore} from "@/stores/overlayStore";
-import {getSharedConversation} from "@/composables/chat/useSharedChat";
 
 /**
  * [ChatContainer 연결 구조]
- * 이 파일은 ChatContainer에서 route/page 상태와 주요 UI/data 흐름을 직접 연결합니다.
- * Header/Workspace/Prompt/ImagePreview/Sheet는 서로 직접 import하지 않고 provide/inject 또는 props/event로 연결됩니다.
- * 따라서 문제 추적 시 ChatContainer에서 직접 import한 store/function 흐름을 우선 확인합니다.
+ * 이 파일은 route/page 상태와 주요 UI/data 흐름을 직접 연결합니다.
+ * 채팅 질의/답변 실행은 ChatHistory가 담당하고, 이 파일은 workspace 전환과 공통 UI 상태만 관리합니다.
  */
 
 const WORKSPACE_TYPES = Object.freeze({
@@ -220,35 +175,25 @@ const props = defineProps({
 
 const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
-function waitForNextPaint() {
-  if (typeof window === "undefined") return Promise.resolve();
-  return new Promise((resolve) => {
-    window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(resolve);
-    });
-  });
-}
-
 const route = useRoute();
 const router = useRouter();
 const appRuntimeStore = useAppRuntimeStore();
-const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
-const apiRequestStore = useApiRequestStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const appBootstrap = useAppBootstrap();
 const {
   assistants: assistantListRef,
   selectedAssistantId: selectedAssistantIdRef,
   selectedModelId: selectedModelIdRef,
-  examplePromptMap,
-} = storeToRefs(assistantStore);
+} = storeToRefs(chatStore);
 const {histories: historyListRef} = storeToRefs(chatStore);
 
+// 템플릿에서는 기존 prop 이름을 그대로 사용하므로 ref alias를 명시합니다.
+const selectedAssistantId = selectedAssistantIdRef;
+
 function getRuntimeAssistantList() {
-  return Array.isArray(assistantStore.assistants)
-    ? assistantStore.assistants
+  return Array.isArray(chatStore.assistants)
+    ? chatStore.assistants
     : [];
 }
 
@@ -258,8 +203,8 @@ function getRuntimeAssistantCount() {
 async function refreshHistories({notifyOnError = false} = {}) {
   try {
     const chatHistories = await loadChatHistoryList({
-      assistantMap: assistantStore.assistantMap,
-      modelMap: assistantStore.modelMap,
+      assistantMap: chatStore.assistantMap,
+      modelMap: chatStore.modelMap,
     });
     chatStore.setHistories(chatHistories);
     return chatHistories;
@@ -280,11 +225,11 @@ function syncHistoriesInBackground(options = {}) {
 }
 
 async function toggleHistoryBookmark(history) {
-  if (!history?.id) return;
+  if (!history?.chatId) return;
   try {
     syncHistoriesInBackground({notifyOnError: true});
     await updateChatBookmark({
-      chatId: history.id,
+      chatId: history.chatId,
       bookmarkYN: !history.isPinned,
     });
     syncHistoriesInBackground({notifyOnError: true});
@@ -296,10 +241,10 @@ async function toggleHistoryBookmark(history) {
 
 async function renameHistory(history, title) {
   const chatTitle = String(title || "").trim();
-  if (!history?.id || !chatTitle) return;
+  if (!history?.chatId || !chatTitle) return;
   try {
     syncHistoriesInBackground({notifyOnError: true});
-    await renameChatHistory({chatId: history.id, chatTitle});
+    await renameChatHistory({chatId: history.chatId, chatTitle});
     syncHistoriesInBackground({notifyOnError: true});
   } catch (error) {
     logWarn("[ChatContainer] renameHistory 오류:", error);
@@ -308,13 +253,13 @@ async function renameHistory(history, title) {
 }
 
 async function removeHistory(history) {
-  if (!history?.id) return;
+  if (!history?.chatId) return;
   try {
     syncHistoriesInBackground({notifyOnError: true});
-    await deleteChatHistory({chatId: history.id});
-    delete chatStore.messageMap[history.id];
+    await deleteChatHistory({chatId: history.chatId});
+    delete chatStore.messageMap[history.chatId];
 
-    if (String(chatStore.selectedChatId) === String(history.id)) {
+    if (String(chatStore.selectedChatId) === String(history.chatId)) {
       chatStore.clearActiveSession();
     }
     syncHistoriesInBackground({notifyOnError: true});
@@ -324,7 +269,12 @@ async function removeHistory(history) {
   }
 }
 const routeMode = computed(() => resolveRouteMode(route.name));
-const conversationMessages = ref([]);
+const conversationMessages = computed({
+  get: () => chatStore.activeMessages,
+  set: (nextMessages) => {
+    chatStore.setActiveMessages(nextMessages);
+  },
+});
 
 const currentMode = computed(() => routeMode.value);
 const pageState = {
@@ -356,11 +306,7 @@ const activeHistoryId = computed(() => {
   }
 
   if (pageState.isChatPage.value) {
-    return (
-      resolveActiveChatId() ||
-      String(chatStore.pendingSelectedChatId || "").trim() ||
-      null
-    );
+    return resolveActiveChatId() || null;
   }
   if (pageState.isSharedPage.value) {
     return chatStore.activeRoomType === "shared"
@@ -371,19 +317,15 @@ const activeHistoryId = computed(() => {
 });
 pageState.activeHistoryId = activeHistoryId;
 
-const {t, locale} = useI18n();
+const {t} = useI18n();
 const {theme} = useAppContext();
 syncMobileViewportSettings();
 
 const runtimeCurrentAssistant = computed(
   () =>
-    assistantStore.currentAssistant ||
+    chatStore.currentAssistant ||
     assistantListRef.value[0] || {id: "", label: "Assistant", description: ""}
 );
-const runtimeCurrentExamplePrompts = computed(
-  () => examplePromptMap.value[selectedAssistantIdRef.value] || []
-);
-const runtimeActiveSession = computed(() => chatStore.activeSession);
 const runtimeIsActiveModelDeleted = computed(() =>
   Boolean(chatStore.activeSession?.isModelDeleted)
 );
@@ -396,16 +338,16 @@ const runtimeIsModelLocked = computed(
 const runtimeModels = computed(() => {
   const lockedModelId = chatStore.activeSession?.modelId;
   if (!runtimeIsModelLocked.value || !lockedModelId) {
-    return assistantStore.currentModels;
+    return chatStore.currentModels;
   }
 
-  return [assistantStore.modelMap[lockedModelId]].filter(Boolean);
+  return [chatStore.modelMap[lockedModelId]].filter(Boolean);
 });
 const runtimeSelectedModel = computed({
   get: () => chatStore.activeSession?.modelId || selectedModelIdRef.value,
   set: (id) => {
     if (runtimeIsModelLocked.value) return;
-    assistantStore.selectModel(id);
+    chatStore.selectModel(id);
   },
 });
 const runtimeConversations = computed(() => chatStore.messageMap);
@@ -415,178 +357,37 @@ async function initializeRuntime() {
 }
 
 async function preloadRuntimeExamplePrompts(assistantId) {
-  if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
+  if (!assistantId || chatStore.examplePromptMap[assistantId]) return;
   try {
-    const assistant = assistantStore.assistantMap[assistantId];
+    const assistant = chatStore.assistantMap[assistantId];
     const prompts = await loadExamplePrompts(
       assistantId,
       assistant?.type === "studio"
     );
-    assistantStore.setExamplePrompts(assistantId, prompts);
+    chatStore.setExamplePrompts(assistantId, prompts);
   } catch (error) {
     logWarn("[ChatContainer] preloadExamplePrompts 오류:", error);
   }
 }
 
-function shouldPreserveSidebarAssistantOnHistoryOpen() {
-  return false;
-}
-
 async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   if (!forNewChat && runtimeIsModelLocked.value) return;
-  if (!assistantStore.assistantMap[id]) return;
+  if (!chatStore.assistantMap[id]) return;
   try {
     await preloadRuntimeExamplePrompts(id);
-    assistantStore.selectAssistant(id);
+    chatStore.selectAssistant(id);
     if (forNewChat) chatStore.clearActiveSession();
   } catch (error) {
     logWarn("[ChatContainer] selectAssistant 오류:", error);
   }
 }
 
-async function ensureRuntimeConversation(historyId, options = {}) {
-  const history = chatStore.getHistory(historyId);
-  if (!history) return [];
-
-  const session = createSessionFromHistory(
-    history,
-    assistantStore.modelMap,
-    assistantStore.assistantMap
-  );
-  const sessionState = resolveConversationSessionState(
-    history,
-    session,
-    assistantStore.assistantMap,
-    getRuntimeAssistantList(),
-    studioRuntimeStore,
-    shouldPreserveSidebarAssistantOnHistoryOpen()
-  );
-  const resolvedSession = sessionState.session || session;
-
-  if (sessionState.nextSelectedAssistantId) {
-    assistantStore.selectAssistant(sessionState.nextSelectedAssistantId);
-  }
-
-  chatStore.setActiveSession(resolvedSession);
-
-  if (!chatStore.messageMap[history.id]) {
-    const messages = await loadChatMessageRouters(
-      {
-        chatId: history.id,
-        assistId: resolvedSession?.assistantId || history.assistantId,
-        modelId: resolvedSession?.modelId || history.modelId,
-        studio: resolvedSession?.assistantType === "studio",
-      },
-      options
-    );
-    chatStore.setMessages(history.id, messages);
-  }
-
-  return chatStore.messageMap[history.id] || [];
-}
-
-function createFallbackHistoryForNewSubmit({
-  chatId,
-  chatTitle,
-  assistantId,
-  modelId,
-} = {}) {
-  return adaptChatHistory(
-    {
-      chatId,
-      chatTitle: chatTitle || "새 대화",
-      assistId: assistantId,
-      modelId,
-      modeId: modelId,
-      bookmarkYN: false,
-      chatEndDt: new Date().toISOString(),
-    },
-    {
-      assistantMap: assistantStore.assistantMap,
-      modelMap: assistantStore.modelMap,
-    }
-  );
-}
-
-async function createRemoteRuntimeConversation({
-  text,
-  assistantId,
-  modelId,
-} = {}) {
-  const chatId = createId();
-  const chatTitle = String(text || "")
-    .trim()
-    .slice(0, 20);
-  const assistant = assistantStore.assistantMap?.[assistantId] || null;
-  const rawHistory = await createChatHistory({
-    chatId,
-    assistId: assistantId,
-    modelId,
-    ChatTilte: chatTitle || String(text || "").trim(),
-    studio: assistant?.type === "studio",
-  });
-  let history = adaptChatHistory(rawHistory, {
-    assistantMap: assistantStore.assistantMap,
-    modelMap: assistantStore.modelMap,
-  });
-
-  if (!history?.id) {
-    logWarn(
-      "[ChatContainer] new.do 응답에 chatId가 없어 요청 chatId로 대체합니다.",
-      rawHistory
-    );
-    history = createFallbackHistoryForNewSubmit({
-      chatId,
-      chatTitle: chatTitle || String(text || "").trim(),
-      assistantId,
-      modelId,
-    });
-  }
-
-  chatStore.addHistory(history);
-  chatStore.setMessages(history.id, []);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      assistantStore.modelMap,
-      assistantStore.assistantMap
-    )
-  );
-
-  return history;
-}
-
-function createLocalRuntimeConversation({text} = {}) {
-  const history = createLocalHistory(
-    text,
-    assistantStore.currentAssistant,
-    assistantStore.currentModel || assistantStore.currentModels[0]
-  );
-  chatStore.addHistory(history);
-  chatStore.setMessages(history.id, []);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      assistantStore.modelMap,
-      assistantStore.assistantMap
-    )
-  );
-
-  return history;
-}
-
-function appendRuntimeUserAndAssistantMessages(chatId, normalized) {
-  return appendMessagesToChat(chatId, normalized);
-}
-
 const runtime = {
   initialize: initializeRuntime,
   assistants: assistantListRef,
   currentAssistant: runtimeCurrentAssistant,
-  currentExamplePrompts: runtimeCurrentExamplePrompts,
   histories: historyListRef,
   models: runtimeModels,
-  activeSession: runtimeActiveSession,
   selectedAssistantId: selectedAssistantIdRef,
   selectedModel: runtimeSelectedModel,
   isModelLocked: runtimeIsModelLocked,
@@ -599,20 +400,18 @@ const runtime = {
   renameHistory,
   removeHistory,
   selectAssistant: selectRuntimeAssistant,
-  ensureConversation: ensureRuntimeConversation,
-  setMessages: chatStore.setMessages.bind(chatStore),
-  createRemoteConversation: createRemoteRuntimeConversation,
-  createLocalConversation: createLocalRuntimeConversation,
   clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
-  appendUserAndAssistantMessages: appendRuntimeUserAndAssistantMessages,
   revokeMessageAttachments,
 };
 
-const {scrollToBottom} = useAutoScroll({value: null});
+const assistants = runtime.assistants;
+const currentAssistant = runtime.currentAssistant;
+const selectedModel = runtime.selectedModel;
+const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
+
 const workspaceRef = ref(null);
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme.current);
-const themeName = computed(() => appShellStore.themeName);
 const assistantSheetOpen = computed({
   get: () => appShellStore.assistantSheetOpen,
   set: (value) => {
@@ -641,29 +440,28 @@ configureResponseOverlay({
 });
 setupResponseOverlayBackGuard();
 
-const showScrollBottom = ref(false);
+const showScrollBottom = computed({
+  get: () => chatStore.showScrollBottom,
+  set: (value) => {
+    chatStore.setShowScrollBottom(value);
+  },
+});
 let bottomStateTimer = 0;
-let latestUserScrollTimerIds = [];
 let pendingBottomScrollRafId = 0;
 let pendingBottomScrollFrameCount = 0;
 
 function getMessageListRef() {
   const exposed = workspaceRef.value?.listRef;
-  if (exposed?.scrollToBottom || exposed?.scrollToLatestUserMessage) {
+  if (exposed?.scrollToBottom || exposed?.scrollToLatestChatUser) {
     return exposed;
   }
   if (
     exposed?.value?.scrollToBottom ||
-    exposed?.value?.scrollToLatestUserMessage
+    exposed?.value?.scrollToLatestChatUser
   ) {
     return exposed.value;
   }
   return null;
-}
-
-function clearLatestUserScrollTimers() {
-  latestUserScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
-  latestUserScrollTimerIds = [];
 }
 
 function clearPendingBottomScrollScheduler() {
@@ -739,61 +537,10 @@ async function scrollBottom(options = {}) {
     return;
   }
 
-  await scrollToBottom(options);
-  updateScrollBottomButton();
-
   if (options.force || options.stable) {
     scheduleBottomScrollWhenListReady(options);
   }
-}
-
-async function scrollInitialTarget(scrollTarget = {}, options = {}) {
-  const list = getMessageListRef();
-  if (list?.scrollToInitialTarget) {
-    list.scrollToInitialTarget(scrollTarget, {behavior: "auto", ...options});
-    updateScrollBottomButton();
-    return true;
-  }
-
-  if (scrollTarget?.type === "bottom") {
-    await scrollBottom({force: true, behavior: "auto", ...options});
-    return true;
-  }
-
   updateScrollBottomButton();
-  return false;
-}
-
-async function scrollLatestUserMessage(options = {}) {
-  clearLatestUserScrollTimers();
-
-  const apply = () => {
-    const list = getMessageListRef();
-    if (!list?.scrollToLatestUserMessage) return false;
-
-    list.scrollToLatestUserMessage({
-      stable: true,
-      ...options,
-    });
-    updateScrollBottomButton();
-    return true;
-  };
-
-  if (apply()) return;
-
-  if (options.initialOnly) {
-    const timerId = window.setTimeout(() => {
-      apply();
-      clearLatestUserScrollTimers();
-    }, 0);
-    latestUserScrollTimerIds.push(timerId);
-    return;
-  }
-
-  [0, 32, 80, 160, 320].forEach((delay) => {
-    const timerId = window.setTimeout(apply, delay);
-    latestUserScrollTimerIds.push(timerId);
-  });
 }
 
 function scheduleBottomStateCheck() {
@@ -801,13 +548,8 @@ function scheduleBottomStateCheck() {
   bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
 }
 
-function handleMessageContentRendered() {
-  scheduleBottomStateCheck();
-}
-
 function cleanupScrollResources() {
   window.clearTimeout(bottomStateTimer);
-  clearLatestUserScrollTimers();
   clearPendingBottomScrollScheduler();
 }
 
@@ -837,7 +579,7 @@ const historyDialogTitle = computed(() => {
 
 function resolveHistoryShareChatId(history) {
   return String(
-    history?.id ||
+    history?.chatId ||
       history?.chatId ||
       history?.raw?.chatId ||
       history?.sharedId ||
@@ -883,7 +625,7 @@ function closeHistoryDialog() {
 }
 
 async function confirmHistoryDialog(value) {
-  if (chatStreamStore.isWait) return;
+  if (chatStore.isWait) return;
 
   const target = historyDialogTarget.value;
   if (!target) {
@@ -902,7 +644,7 @@ async function confirmHistoryDialog(value) {
     if (historyDialogMode.value === "delete") {
       await runtime.removeHistory(target);
 
-      if (String(activeHistoryId.value) === String(target.id)) {
+      if (String(activeHistoryId.value) === String(target.chatId)) {
         conversationMessages.value = [];
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
       }
@@ -920,7 +662,7 @@ async function confirmHistoryDialog(value) {
 }
 
 async function handleHistoryMenuAction({action, history} = {}) {
-  if (chatStreamStore.isWait) return;
+  if (chatStore.isWait) return;
   if (!history || !action) return;
 
   runtime.syncHistoriesInBackground?.({notifyOnError: true});
@@ -965,6 +707,7 @@ function refreshPromptViewport() {
 
 function clearConversationNavigationState() {
   clearConversationNavigationStateByPolicy();
+  cleanupConversationForNavigation();
 }
 
 async function navigateToMainAfterReset() {
@@ -975,7 +718,7 @@ async function navigateToMainAfterReset() {
 }
 
 async function resetChatState({assistantId = null} = {}) {
-  if (chatStreamStore.isWait) return;
+  if (chatStore.isWait) return;
 
   clearConversationNavigationState();
   runtime.revokeMessageAttachments(conversationMessages.value);
@@ -1016,647 +759,37 @@ function cleanupConversationForNavigation() {
   conversationMessages.value = [];
 }
 
-const unregisterActiveConversationCleanup = registerActiveConversationCleanup(
-  cleanupConversationForNavigation
-);
-
 function cleanupUiResources() {
-  unregisterActiveConversationCleanup();
   cleanupScrollResources();
   runtime.revokeMessageAttachments(conversationMessages.value);
 }
 
 const runtimeReady = ref(false);
-const overlayBackStore = useOverlayStore();
-const messages = conversationMessages;
-const assistants = runtime.assistants;
-const currentAssistant = runtime.currentAssistant;
-const models = runtime.models;
-const selectedAssistantId = runtime.selectedAssistantId;
-const selectedModel = runtime.selectedModel;
-const isModelLocked = runtime.isModelLocked;
-const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
-const activeSession = runtime.activeSession;
-const histories = runtime.histories;
-const currentExamplePrompts = runtime.currentExamplePrompts;
 
-function findHistory(id) {
-  const targetId = normalizeHistoryId(id);
-  if (!targetId) return null;
-  return (
-    histories.value.find(
-      (history) => normalizeHistoryId(history.id) === targetId
-    ) || null
-  );
-}
-
-const activeHistory = computed(() => findHistory(activeHistoryId.value));
-
-function isShareChatEntryRoute() {
-  return route.name === ROUTE_NAMES.SHARE_CHAT_ENTRY;
-}
-
-async function findHistoryWithShareChatRefresh(id) {
-  const targetId = normalizeHistoryId(id);
-  if (!targetId) return null;
-
-  const cachedHistory = findHistory(targetId);
-  if (cachedHistory || !isShareChatEntryRoute()) return cachedHistory;
-
-  await refreshHistories({notifyOnError: false});
-  return findHistory(targetId);
-}
-
-async function replaceShareChatEntryWithChatRoute(historyId) {
-  if (!isShareChatEntryRoute()) return;
-
-  const id = normalizeHistoryId(historyId);
-  if (id) {
-    chatStore.setPendingSelectedChatId(id);
-    chatStore.setActiveChatRoom(id);
-  }
-
-  await router.replace({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {});
-}
-
-const isReadOnly = computed(
-  () =>
-    pageState.isSharedPage.value ||
-    chatStore.isActiveSharedRoom ||
-    isSharedChat(activeHistory.value)
-);
-
-const messageRenderPolicy = computed(() =>
-  resolveMessageRenderPolicy(activeHistory.value, route.query?.messageId)
-);
-
-function getSharedEntryId() {
-  if (route.name !== ROUTE_NAMES.SHARED_ENTRY) return "";
-  return String(route.params?.id || route.params?.shareId || "").trim();
-}
-
-function clearPendingSelectedChatId(chatId) {
-  const pendingId = normalizeHistoryId(chatStore.pendingSelectedChatId);
-  const targetId = normalizeHistoryId(chatId);
-  if (!pendingId || pendingId === targetId) {
-    chatStore.clearPendingSelectedChatId();
-  }
-}
-
-async function reconcileHiddenConversationRoute() {
-  const result = resolveHiddenConversationRoute(route);
-
-  if (!result.shouldRedirect) return false;
-
-  if (result.nextActiveChatId) {
-    chatStore.setActiveChatRoom(result.nextActiveChatId);
-  }
-
-  await router.replace(result.nextRoute).catch(() => {});
-  return true;
-}
-
-function isMermaidRenderingEnabled() {
-  return isMermaidRenderingEnabledForPlatform();
-}
-
-function hasMermaidInHistoryMessages(sourceMessages = []) {
-  if (!isMermaidRenderingEnabled()) return false;
-  const list = Array.isArray(sourceMessages) ? sourceMessages : [];
-  return list.some((message) => {
-    const content = `${message?.content || ""}
-${message?.reasoningContent || ""}`;
-    return /```\s*mermaid/i.test(content);
-  });
-}
-
-const isHistoryRendering = ref(false);
-const historyMarkdownVisible = ref(false);
-const historyMessagesLoaded = ref(false);
-let historyRenderOverlayActive = false;
-let historyRenderFinishSeq = 0;
-
-async function flushConversationSwitchPaint({clearMessages = true} = {}) {
-  if (clearMessages) {
-    messages.value = [];
-  }
-
-  await nextTick();
-  await waitForNextPaint();
-}
-
-function beginHistoryRender() {
-  historyRenderFinishSeq += 1;
-  historyMessagesLoaded.value = false;
-  historyMarkdownVisible.value = false;
-  isHistoryRendering.value = true;
-  if (isProgressAllowedForCurrentPlatform() && !historyRenderOverlayActive) {
-    apiRequestStore.startOverlay();
-    historyRenderOverlayActive = true;
-  }
-}
-
-function finishHistoryRenderImmediately() {
-  historyRenderFinishSeq += 1;
-  historyMessagesLoaded.value = false;
-  historyMarkdownVisible.value = false;
-  isHistoryRendering.value = false;
-  if (historyRenderOverlayActive) {
-    apiRequestStore.stopOverlay();
-  }
-  historyRenderOverlayActive = false;
-}
-
-function finishHistoryRender() {
-  const finishSeq = ++historyRenderFinishSeq;
-
-  const revealAfterPaint = async () => {
-    try {
-      await nextTick();
-      await waitForNextPaint();
-      if (finishSeq !== historyRenderFinishSeq) return;
-
-      const skipFinalScrollTarget = historyMarkdownVisible.value;
-      isHistoryRendering.value = false;
-      historyMarkdownVisible.value = false;
-
-      if (skipFinalScrollTarget) return;
-
-      await nextTick();
-      if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
-        behavior: "auto",
-      });
-
-      await waitForNextPaint();
-      if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
-        behavior: "auto",
-      });
-
-      await waitForNextPaint();
-      if (finishSeq !== historyRenderFinishSeq) return;
-      await scrollInitialTarget(messageRenderPolicy.value.scrollTarget, {
-        behavior: "auto",
-      });
-    } finally {
-      if (finishSeq === historyRenderFinishSeq) {
-        historyMessagesLoaded.value = false;
-        if (historyRenderOverlayActive) {
-          apiRequestStore.stopOverlay();
-        }
-        historyRenderOverlayActive = false;
-      }
-    }
-  };
-
-  void revealAfterPaint();
-}
-
-async function renderAfterStream() {
-  await nextTick();
-  await waitForNextPaint();
-}
+const isGenerating = computed(() => chatStore.isWait);
+const isReadOnly = computed(() => pageState.isReadOnly.value || chatStore.isActiveSharedRoom);
+const isHistoryRendering = computed(() => chatStore.isHistoryRendering);
 
 function cleanupHistoryRender() {
-  finishHistoryRenderImmediately();
-}
-
-function clearLazyHistoryMessages() {
-  messages.value = [];
-}
-
-function setHistoryMessagesForInitialRender(sourceMessages = []) {
-  messages.value = Array.isArray(sourceMessages) ? sourceMessages : [];
-}
-
-function syncVisibleHistoryMessagesFromFull(sourceMessages = []) {
-  messages.value = Array.isArray(sourceMessages) ? sourceMessages : [];
-  return true;
-}
-
-function setConversationPreservingLazyHistory(chatId, nextMessages) {
-  messages.value = Array.isArray(nextMessages) ? nextMessages : [];
-  runtime.setMessages(chatId, messages.value);
-}
-
-function appendUserAndAssistantMessagesPreservingLazyHistory(
-  chatId,
-  normalized
-) {
-  const result = runtime.appendUserAndAssistantMessages(chatId, normalized);
-  if (Array.isArray(result.messages)) {
-    messages.value = result.messages;
-  }
-  return result;
-}
-
-const activeConversationTitle = computed(() =>
-  resolveConversationTitle(
-    pageState.isSharedPage.value,
-    activeHistoryId.value,
-    activeHistory.value,
-    t
-  )
-);
-
-const workspaceAssistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    activeSession.value,
-    currentAssistant.value,
-    t("chat.assistant")
-  )
-);
-
-const suggestions = computed(() => {
-  const assistantPrompts = currentExamplePrompts.value || [];
-  const isEnglish = locale.value === "en";
-
-  return assistantPrompts
-    .slice(0, PROMPT_SUGGESTION_LIMIT)
-    .map((prompt) => {
-      const localizedTitle = isEnglish
-        ? prompt.titleEn || prompt.titleKo
-        : prompt.titleKo || prompt.titleEn;
-      const localizedContent = isEnglish
-        ? prompt.contentEn || prompt.contentKo || localizedTitle
-        : prompt.contentKo || prompt.contentEn || localizedTitle;
-
-      const text = localizedTitle || localizedContent;
-      const content = localizedContent || localizedTitle;
-
-      return {
-        id: prompt.id,
-        text,
-        title: content || text,
-        prompt: content || text,
-      };
-    })
-    .filter((item) => item.text && item.prompt);
-});
-
-function resetMainRouteConversation() {
-  finishHistoryRender();
-  clearLazyHistoryMessages();
-  messages.value = [];
-  chatStore.pruneInactiveMessageCache(null);
-  runtime.clearActiveSession();
-}
-
-async function handleMissingHistoryId({isCurrentLoad}) {
-  const hasPendingChatEntryNavigation = hasPendingChatNavigation();
-
-  beginHistoryRender();
-  await flushConversationSwitchPaint();
-  if (!isCurrentLoad()) return;
-  clearLazyHistoryMessages();
-  messages.value = [];
-
-  if (!hasPendingChatEntryNavigation) {
-    runtime.clearActiveSession();
-  }
-  finishHistoryRender();
-
-  if (!hasPendingChatEntryNavigation) {
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-  }
-}
-
-async function redirectMissingHistory() {
-  clearPendingSelectedChatId(activeHistoryId.value);
-  finishHistoryRender();
-  await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-}
-
-async function applyPendingNewSubmitHistory(history) {
-  finishHistoryRender();
-  clearPendingSelectedChatId(history.id);
-  clearLazyHistoryMessages();
-  messages.value = runtime.conversations.value?.[history.id] || [];
-  historyMessagesLoaded.value = true;
-  await nextTick();
-}
-
-async function hydrateHistoryConversation({history, isCurrentLoad, signal}) {
-  chatStore.setPendingSelectedChatId(history.id);
-  beginHistoryRender();
-  const mermaidWarmupPromise = isMermaidRenderingEnabled()
-    ? warmupMermaidForHistoryRender().catch(() => null)
-    : Promise.resolve(null);
-
-  await flushConversationSwitchPaint();
-  if (!isCurrentLoad()) return;
-  chatStore.pruneInactiveMessageCache(history.id);
-  const loadedMessages = await runtime.ensureConversation(history.id, {signal});
-  if (hasMermaidInHistoryMessages(loadedMessages)) {
-    await mermaidWarmupPromise;
-  }
-  if (!isCurrentLoad()) return;
-  setHistoryMessagesForInitialRender(loadedMessages);
-  historyMessagesLoaded.value = true;
-  clearPendingSelectedChatId(history.id);
-  await nextTick();
-  chatStore.pruneInactiveMessageCache(history.id);
-}
-
-async function loadHistoryRouteConversation({isCurrentLoad, signal}) {
-  if (pageState.isMainPage.value) {
-    resetMainRouteConversation();
-    return;
-  }
-
-  if (!activeHistoryId.value) {
-    await handleMissingHistoryId({isCurrentLoad});
-    return;
-  }
-
-  const history = await findHistoryWithShareChatRefresh(activeHistoryId.value);
-  if (!history) {
-    await redirectMissingHistory();
-    return;
-  }
-
-  if (chatStore.consumePendingNewSubmitChat(history.id)) {
-    await applyPendingNewSubmitHistory(history);
-    return;
-  }
-
-  await hydrateHistoryConversation({history, isCurrentLoad, signal});
-
-  if (isCurrentLoad()) {
-    await replaceShareChatEntryWithChatRoute(history.id);
-  }
-}
-
-async function redirectSharedNotFound() {
-  const message = t("chat.sharedNotFoundMessage");
-  if (typeof window !== "undefined" && typeof window.alert === "function") {
-    window.alert(message);
-  }
-  chatStore.clearActiveRoom();
-  clearLazyHistoryMessages();
-  messages.value = [];
-  finishHistoryRenderImmediately();
-  await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-}
-
-async function loadSharedRouteConversation({isCurrentLoad, signal}) {
-  beginHistoryRender();
-  await flushConversationSwitchPaint();
-  if (!isCurrentLoad()) return;
-
-  const sharedEntryId = getSharedEntryId();
-  if (sharedEntryId) {
-    const result = await getSharedConversation(sharedEntryId, {signal});
-    if (!isCurrentLoad()) return;
-    if (!result.exists) {
-      await redirectSharedNotFound();
-      return;
-    }
-    chatStore.setActiveSharedRoom(result.shareId || sharedEntryId);
-    await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
-    if (!isCurrentLoad()) return;
-    setHistoryMessagesForInitialRender(result.messages);
-    historyMessagesLoaded.value = true;
-    await nextTick();
-    finishHistoryRender();
-    return;
-  }
-
-  if (!activeHistoryId.value) {
-    clearLazyHistoryMessages();
-    messages.value = [];
-    finishHistoryRender();
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    return;
-  }
-
-  const result = await getSharedConversation(activeHistoryId.value, {signal});
-  if (!isCurrentLoad()) return;
-  if (!result.exists) {
-    await redirectSharedNotFound();
-    return;
-  }
-
-  setHistoryMessagesForInitialRender(result.messages);
-  historyMessagesLoaded.value = true;
-  await nextTick();
-  finishHistoryRender();
-}
-
-let routeConversationLoadSeq = 0;
-let routeConversationAbortController = null;
-
-function isRouteConversationAbortError(error) {
-  return (
-    error?.name === "AbortError" ||
-    error?.code === "ERR_CANCELED" ||
-    error?.message === "canceled" ||
-    error?.message === "The mock request was aborted."
-  );
-}
-
-function abortRouteConversationLoad() {
-  routeConversationAbortController?.abort?.();
-  routeConversationAbortController = null;
-}
-
-function createRouteConversationLoadContext() {
-  abortRouteConversationLoad();
-
-  const loadSeq = ++routeConversationLoadSeq;
-  const controller =
-    typeof AbortController === "function" ? new AbortController() : null;
-
-  routeConversationAbortController = controller;
-
-  return {
-    signal: controller?.signal,
-    isCurrentLoad: () => loadSeq === routeConversationLoadSeq,
-  };
-}
-
-async function loadRouteConversation() {
-  const {signal, isCurrentLoad} = createRouteConversationLoadContext();
-
-  try {
-    if (pageState.isSharedPage.value) {
-      await loadSharedRouteConversation({isCurrentLoad, signal});
-      return;
-    }
-
-    await loadHistoryRouteConversation({isCurrentLoad, signal});
-  } catch (error) {
-    if (!isCurrentLoad() || isRouteConversationAbortError(error)) return;
-
-    if (pageState.isSharedPage.value) {
-      await redirectSharedNotFound({
-        message: error?.message || t("chat.sharedNotFoundMessage"),
-      });
-      return;
-    }
-    clearPendingSelectedChatId(activeHistoryId.value);
-    finishHistoryRender();
-    logWarn("[ChatContainer] loadRouteConversation 오류:", error);
-  } finally {
-    if (isCurrentLoad()) {
-      routeConversationAbortController = null;
-    }
-  }
-}
-
-function invalidateRouteLoad() {
-  routeConversationLoadSeq += 1;
-  abortRouteConversationLoad();
-}
-
-function shouldLoadRouteConversation() {
-  return pageState.isMainPage.value || pageState.isConversationPage.value;
-}
-
-function syncHistoriesAfterChatSubmit() {
-  return runtime.syncHistoriesInBackground({notifyOnError: true});
-}
-
-function canSubmitChatMessage() {
-  return (
-    !isReadOnly.value &&
-    !isHistoryRendering.value &&
-    !isActiveModelUnavailable.value
-  );
-}
-
-function getVisibleChatMessagesForSubmit() {
-  return Array.isArray(messages.value) ? messages.value : [];
-}
-
-configureChatSubmit(
-  runtime.createRemoteConversation,
-  runtime.createLocalConversation,
-  appendUserAndAssistantMessagesPreservingLazyHistory,
-  setConversationPreservingLazyHistory,
-  getVisibleChatMessagesForSubmit,
-  scrollLatestUserMessage,
-  syncHistoriesAfterChatSubmit,
-  renderAfterStream,
-  canSubmitChatMessage,
-  router,
-  route
-);
-
-const isGenerating = computed(() => chatStreamStore.isWait);
-
-function isRouteLoadSourceChanged(nextSource = [], previousSource = []) {
-  return (
-    JSON.stringify(nextSource || []) !== JSON.stringify(previousSource || [])
-  );
-}
-
-function isRealRouteLoadTargetChanged(nextSource = [], previousSource = []) {
-  return (
-    String(nextSource?.[0] || "") !== String(previousSource?.[0] || "") ||
-    String(nextSource?.[1] || "") !== String(previousSource?.[1] || "") ||
-    String(nextSource?.[2] || "") !== String(previousSource?.[2] || "") ||
-    String(nextSource?.[3] || "") !== String(previousSource?.[3] || "") ||
-    String(nextSource?.[4] || "") !== String(previousSource?.[4] || "") ||
-    String(nextSource?.[5] || "") !== String(previousSource?.[5] || "")
-  );
-}
-
-function shouldSkipRouteLoadForOverlayBack(nextSource, previousSource) {
-  if (!overlayBackStore.shouldSuppressChatRouteLoad(activeHistoryId.value)) {
-    return false;
-  }
-
-  const sourceChanged = isRouteLoadSourceChanged(nextSource, previousSource);
-  const realTargetChanged = isRealRouteLoadTargetChanged(
-    nextSource,
-    previousSource
-  );
-
-  if (sourceChanged && realTargetChanged) {
-    overlayBackStore.clearSuppressNextChatRouteLoad();
-    return false;
-  }
-
-  overlayBackStore.consumeSuppressNextChatRouteLoad(activeHistoryId.value);
-  return true;
-}
-
-function bindDataEvents() {
-  watch(
-    () => [
-      route.params.id,
-      route.params.shareId,
-      activeHistoryId.value,
-      route.query?.messageId,
-      currentMode.value,
-    ],
-    async (nextSource, previousSource) => {
-      if (!runtimeReady.value) return;
-      if (!shouldLoadRouteConversation()) {
-        invalidateRouteLoad();
-        return;
-      }
-      if (shouldSkipRouteLoadForOverlayBack(nextSource, previousSource)) {
-        invalidateRouteLoad();
-        return;
-      }
-      if (await reconcileHiddenConversationRoute()) return;
-      loadRouteConversation();
-    }
-  );
-
-  watch(
-    () => {
-      if (!pageState.isChatPage.value || !activeHistoryId.value) return null;
-      return runtime.conversations.value?.[activeHistoryId.value] || null;
-    },
-    (nextMessages) => {
-      if (!Array.isArray(nextMessages)) return;
-      if (isHistoryRendering.value) return;
-      if (messages.value === nextMessages) return;
-
-      if (syncVisibleHistoryMessagesFromFull(nextMessages)) {
-        return;
-      }
-
-      messages.value = nextMessages;
-    },
-    {deep: true}
-  );
-}
-
-function initializeDataFlow() {
-  onMounted(async () => {
-    updateMobileState();
-    try {
-      await runtime.initialize();
-    } catch (error) {
-      logWarn("[ChatContainer] runtime.initialize 오류:", error);
-    }
-    if (shouldLoadRouteConversation()) {
-      if (await reconcileHiddenConversationRoute()) {
-        await nextTick();
-      }
-      await loadRouteConversation();
-    } else {
-      invalidateRouteLoad();
-    }
-    runtimeReady.value = true;
-  });
+  chatStore.resetHistoryRenderState();
 }
 
 
-watch(pageState.isMainPage, updateMobileState);
-watch(() => pageState.isConversationPage.value, updateMobileState);
 bindUiEvents();
-bindDataEvents();
-initializeDataFlow();
+
+onMounted(async () => {
+  updateMobileState();
+  try {
+    await runtime.initialize();
+  } catch (error) {
+    logWarn("[ChatContainer] runtime.initialize 오류:", error);
+  } finally {
+    runtimeReady.value = true;
+  }
+});
 
 onBeforeUnmount(() => {
   cleanupUiResources();
-  invalidateRouteLoad();
   cleanupHistoryRender();
 });
 
@@ -1668,14 +801,14 @@ const isChatContainerHistoryBusy = computed(() =>
   resolveBooleanSource(isHistoryRendering)
 );
 const isConversationActionBlocked = computed(
-  () => chatStreamStore.isWait || isChatContainerHistoryBusy.value
+  () => chatStore.isWait || isChatContainerHistoryBusy.value
 );
 const chatPageLock = {
   isConversationActionBlocked,
   isSubmitBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
-      chatStreamStore.isWait ||
+      chatStore.isWait ||
       resolveBooleanSource(isReadOnly) ||
       resolveBooleanSource(isGenerating) ||
       resolveBooleanSource(isActiveModelUnavailable)
@@ -1703,22 +836,13 @@ useOverlayBackClose({
   historyValue: "chat-studio-detail",
 });
 
-provideChatWorkspaceActions({
-  openStudioDetail,
-  scrollBottom: handleWorkspaceScrollBottom,
-});
-
 provideNavigationActions({
   handleHistoryMenuAction,
 });
 
-provideMessageActions({
-  regenerate: handleWorkspaceRegenerate,
-  messageContentRendered: handleMessageContentRendered,
-  historyRendered: finishHistoryRender,
-});
 
 provideStudioDetailActions({
+  open: openStudioDetail,
   close: closeStudioDetail,
   edit: handleStudioDetailEdit,
   delete: handleStudioDetailDelete,
@@ -1789,7 +913,7 @@ async function handleStudioDetailDelete(studio) {
 
   if (route.name === ROUTE_NAMES.MAIN) {
     const fallback = findFirstFallbackAssistant();
-    if (fallback?.id) assistantStore.selectAssistant(fallback.id);
+    if (fallback?.id) chatStore.selectAssistant(fallback.id);
     chatStore.clearActiveSession();
     return;
   }
@@ -1839,7 +963,7 @@ async function openPortalAssistant(assistantId) {
   const targetRoute = createPortalAssistantRoute(assistantId);
 
   preparePortalNavigation();
-  assistantStore.selectAssistant(assistantId);
+  chatStore.selectAssistant(assistantId);
   assistantSheetOpen.value = false;
   await router.push(targetRoute).catch(() => {});
   cleanupAfterPortalNavigation();
@@ -1868,19 +992,19 @@ function syncAssistantSelectionWithRoute() {
   const routePortalAssistantId = getPortalAssistantIdByRouteName(route.name);
 
   if (routePortalAssistantId) {
-    const portalAssistant = assistantStore.assistantMap[routePortalAssistantId];
+    const portalAssistant = chatStore.assistantMap[routePortalAssistantId];
     if (
       portalAssistant &&
-      assistantStore.selectedAssistantId !== routePortalAssistantId
+      chatStore.selectedAssistantId !== routePortalAssistantId
     ) {
-      assistantStore.selectAssistant(routePortalAssistantId);
+      chatStore.selectAssistant(routePortalAssistantId);
     }
     return;
   }
 
-  if (isPortalAssistantId(assistantStore.selectedAssistantId)) {
+  if (isPortalAssistantId(chatStore.selectedAssistantId)) {
     const fallbackAssistant = findFirstNormalAssistant();
-    if (fallbackAssistant) assistantStore.selectAssistant(fallbackAssistant.id);
+    if (fallbackAssistant) chatStore.selectAssistant(fallbackAssistant.id);
   }
 }
 
@@ -1897,68 +1021,18 @@ function setWorkspaceRef(el) {
   workspaceRef.value = el;
 }
 
-provide(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(() => ({
-    mode: routeMode.value,
-    readonly: isReadOnly.value,
-    isMobile: isMobile.value,
-    assistantLabel: workspaceAssistantLabel.value,
-    assistant: currentAssistant.value,
-    conversationTitle: activeConversationTitle.value,
-    themeName: themeName.value,
-    suggestions: suggestions.value,
-    isActiveModelDeleted: Boolean(chatStore.activeSession?.isModelDeleted),
-    isActiveModelUnavailable: isActiveModelUnavailable.value,
-    isGenerating: isGenerating.value,
-    messages: messages.value,
-    showScrollBottom: showScrollBottom.value,
-    isHistoryRendering: isHistoryRendering.value,
-    historyMarkdownVisible: historyMarkdownVisible.value,
-    historyMessagesLoaded: historyMessagesLoaded.value,
-    historyRenderKey: activeHistoryId.value,
-    messageRenderPolicy: messageRenderPolicy.value,
-  }))
-);
-
-provide(
-  PROMPT_STATE_KEY,
-  computed(() => ({
-    isMobile: isMobile.value,
-    floating: false,
-    showHelp: false,
-    selectedModel: selectedModel.value,
-    models: models.value,
-    disabled: isReadOnly.value,
-    generating: isGenerating.value,
-    modelReadonly: isModelLocked.value,
-    placeholder: "",
-  }))
-);
-
-providePromptComposerContext({
-  onSubmit: handleWorkspaceSubmit,
-  onUpdateSelectedModel: handleWorkspaceSelectedModelUpdate,
-  onFocus: refreshPromptViewport,
-  onHeightChange: refreshPromptViewport,
-});
 
 function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;
-  submitChatMessage(payload);
-}
-
-function handleWorkspaceRegenerate(message) {
-  if (chatPageLock.isRegenerateBlocked.value) return;
-  regenerateLastAnswer(message);
+  if (route.name !== ROUTE_NAMES.MAIN) return;
+  chatStore.setPendingSubmitPayload(payload);
+  router.push({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {
+    chatStore.consumePendingSubmitPayload?.();
+  });
 }
 
 function handleWorkspaceSelectedModelUpdate(value) {
   selectedModel.value = value;
-}
-
-function handleWorkspaceScrollBottom() {
-  scrollBottom({force: true, behavior: "smooth", stable: true});
 }
 </script>
 

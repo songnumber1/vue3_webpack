@@ -19,7 +19,7 @@ export function createAssistantStreamingPatch(isReasoning) {
   };
 }
 
-export function createUserMessage(normalized) {
+export function createChatUser(normalized) {
   return {
     id: createId("message"),
     role: "user",
@@ -29,7 +29,7 @@ export function createUserMessage(normalized) {
   };
 }
 
-export function createAssistantMessage(patch = {}) {
+export function createChatResponse(patch = {}) {
   return {
     id: createId("message"),
     role: "assistant",
@@ -42,26 +42,26 @@ export function createAssistantMessage(patch = {}) {
   };
 }
 
-export function appendUserAndAssistantMessages(chatId, normalized) {
+export function appendUserAndChatResponses(chatId, normalized) {
   const chatStore = useChatStore();
   const currentMessages = chatStore.messageMap[chatId] || [];
-  const userMessage = createUserMessage(normalized);
-  const assistantMessage = createAssistantMessage();
+  const userMessage = createChatUser(normalized);
+  const assistantMessage = createChatResponse();
   const nextMessages = [...currentMessages, userMessage, assistantMessage];
 
   chatStore.setMessages(chatId, nextMessages);
   return {messages: nextMessages, assistantMessage};
 }
 
-export function patchAssistantMessage(messages, assistantMessage, patch = {}) {
-  const nextAssistantMessage = {...assistantMessage, ...patch};
+export function patchChatResponse(messages, assistantMessage, patch = {}) {
+  const nextChatResponse = {...assistantMessage, ...patch};
   const nextMessages = messages.map((message) =>
-    message.id === nextAssistantMessage.id ? nextAssistantMessage : message
+    message.id === nextChatResponse.id ? nextChatResponse : message
   );
 
   return {
     messages: nextMessages,
-    assistantMessage: nextAssistantMessage,
+    assistantMessage: nextChatResponse,
   };
 }
 
@@ -73,7 +73,7 @@ export function appendAssistantChunk(assistantMessage, content) {
   };
 }
 
-export function markAssistantMessageError(assistantMessage, errorPatch = {}) {
+export function markChatResponseError(assistantMessage, errorPatch = {}) {
   return {
     ...assistantMessage,
     status: "error",
@@ -83,30 +83,30 @@ export function markAssistantMessageError(assistantMessage, errorPatch = {}) {
   };
 }
 
-export function createAssistantMessageCommitter(
+export function createChatResponseCommitter(
   chatId,
   initialMessages,
-  initialAssistantMessage,
+  initialChatResponse,
   setConversation
 ) {
   let liveMessages = initialMessages;
-  let liveAssistantMessage = initialAssistantMessage;
+  let liveChatResponse = initialChatResponse;
 
   function commit(patch = {}) {
-    const nextState = patchAssistantMessage(
+    const nextState = patchChatResponse(
       liveMessages,
-      liveAssistantMessage,
+      liveChatResponse,
       patch
     );
 
-    liveAssistantMessage = nextState.assistantMessage;
+    liveChatResponse = nextState.assistantMessage;
     liveMessages = nextState.messages;
     setConversation(chatId, liveMessages);
   }
 
   return {
     commit,
-    getAssistantMessage: () => liveAssistantMessage,
+    getChatResponse: () => liveChatResponse,
     getMessages: () => liveMessages,
   };
 }

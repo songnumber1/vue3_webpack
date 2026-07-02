@@ -31,11 +31,8 @@
     <template v-else>
       <ChatHeader
         v-if="!studioDetailOpen"
-        mode="studio"
-        :assistant-label="workspaceState.assistantLabel"
-        :assistant="workspaceState.assistant"
-        conversation-title="Assistant Studio"
-        :theme-name="workspaceState.themeName"
+        :assistant-label="assistantLabel"
+        :assistant="assistant"
       />
 
       <StudioMainPage v-show="!studioDetailOpen" />
@@ -63,7 +60,7 @@
  * @description 공통 AppShell 내부에 라우터로 마운트되는 Assistant Studio workspace입니다.
  * 화면 전환과 Studio 상태 연결만 담당하고 실제 UI는 views/studio/components로 분리합니다.
  */
-import {computed, inject, onMounted, reactive, ref, watch} from "vue";
+import {computed, onMounted, reactive, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -79,11 +76,9 @@ import {
   adaptStudioMainInfo,
 } from "@/adapters/studioResponseAdapter";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
+import {useChatStore} from "@/stores/chatStore";
+import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
-import {
-  createEmptyWorkspaceState,
-  CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
@@ -96,12 +91,14 @@ const {t, locale} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const studioRuntimeStore = useStudioRuntimeStore();
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const workspaceState = computed(
-  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+const chatStore = useChatStore();
+const assistant = computed(() => chatStore.currentAssistant);
+const assistantLabel = computed(() =>
+  resolveWorkspaceAssistantLabel(
+    chatStore.activeSession,
+    assistant.value,
+    t("chat.assistant")
+  )
 );
 
 const searchText = ref("");

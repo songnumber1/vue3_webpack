@@ -74,7 +74,11 @@ export function resolveBasePlatform(value, ua, navPlatform) {
 }
 
 export function isSupportedBrowserName(browserName) {
-  return browserName === "chrome" || browserName === "android-webview";
+  return (
+    browserName === "chrome" ||
+    browserName === "firefox" ||
+    browserName === "android-webview"
+  );
 }
 
 export function detectDevice(env, browserName) {
@@ -84,7 +88,9 @@ export function detectDevice(env, browserName) {
       ? browserName
       : "unsupported-browser";
   }
-  return browserName === "chrome" ? "chrome" : "unsupported-browser";
+  return isSupportedBrowserName(browserName)
+    ? browserName
+    : "unsupported-browser";
 }
 
 export function createActualPlatformInfo(

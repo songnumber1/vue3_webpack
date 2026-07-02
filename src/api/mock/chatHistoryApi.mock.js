@@ -97,7 +97,6 @@ function searchChatHistories(payload = {}) {
     .slice(0, limit)
     .map((item) => ({
       chatId: item.chatId,
-      id: item.chatId,
       chatTitle: item.title,
       title: item.title,
       snippet: createSearchSnippet(item.messageText, keyword, item.title),

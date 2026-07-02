@@ -106,9 +106,7 @@ import SidebarHistoryListMobile from "@/components/navigation/history/SidebarHis
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatHistoryActionBottomSheet from "@/components/navigation/history/ChatHistoryActionBottomSheet.vue";
 import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFooter.vue";
-import {useAssistantStore} from "@/stores/assistantStore";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {isPortalAssistantId} from "@/constants/assistantPortal";
@@ -131,23 +129,18 @@ const route = useRoute();
 const router = useRouter();
 const {t} = useI18n();
 const navigationActions = useNavigationActions();
-const assistantStore = useAssistantStore();
 const chatStore = useChatStore();
-const chatStreamStore = useChatStreamStore();
 const appShellStore = useAppShellStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const {assistants, selectedAssistantId} = storeToRefs(assistantStore);
-const {histories, pendingSelectedChatId, selectedChatId} =
-  storeToRefs(chatStore);
+const {assistants, selectedAssistantId} = storeToRefs(chatStore);
+const {histories, selectedChatId} = storeToRefs(chatStore);
 const {drawerOpen} = storeToRefs(appShellStore);
 
 const assistantMenuOpen = ref(false);
 const historyMenuOpen = ref(false);
 const historyMenuTarget = ref(null);
-const effectiveSelectedChatId = computed(
-  () => pendingSelectedChatId.value || selectedChatId.value
-);
-const isSidebarActionBlocked = computed(() => chatStreamStore.isWait);
+const effectiveSelectedChatId = computed(() => selectedChatId.value);
+const isSidebarActionBlocked = computed(() => chatStore.isWait);
 const sidebarLock = {
   isHistorySelectBlocked: isSidebarActionBlocked,
   isHistoryMenuBlocked: isSidebarActionBlocked,
@@ -167,14 +160,14 @@ function isDeletedRuntimeStudio(assistant = null) {
 }
 
 async function preloadRuntimeExamplePrompts(assistantId) {
-  if (!assistantId || assistantStore.examplePromptMap[assistantId]) return;
+  if (!assistantId || chatStore.examplePromptMap[assistantId]) return;
   try {
-    const assistant = assistantStore.assistantMap[assistantId];
+    const assistant = chatStore.assistantMap[assistantId];
     const prompts = await loadExamplePrompts(
       assistantId,
       assistant?.type === "studio"
     );
-    assistantStore.setExamplePrompts(assistantId, prompts);
+    chatStore.setExamplePrompts(assistantId, prompts);
   } catch (error) {
     logWarn("[AppSidebar] preloadExamplePrompts 오류:", error);
   }
@@ -182,10 +175,10 @@ async function preloadRuntimeExamplePrompts(assistantId) {
 
 async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   if (!forNewChat && chatStore.isModelLocked) return;
-  if (!assistantStore.assistantMap[id]) return;
+  if (!chatStore.assistantMap[id]) return;
   try {
     await preloadRuntimeExamplePrompts(id);
-    assistantStore.selectAssistant(id);
+    chatStore.selectAssistant(id);
     if (forNewChat) chatStore.clearActiveSession();
   } catch (error) {
     logWarn("[AppSidebar] selectAssistant 오류:", error);
@@ -197,7 +190,7 @@ const visibleAssistants = computed(() =>
 );
 
 function getHistoryId(item) {
-  return String(item?.id || "").trim();
+  return String(item?.chatId || "").trim();
 }
 
 function closeSidebarNavigationPanels() {
@@ -229,7 +222,7 @@ async function navigatePortalAssistant(assistantId) {
   const targetRoute = createPortalAssistantRoute(assistantId);
 
   preparePortalNavigation();
-  assistantStore.selectAssistant(assistantId);
+  chatStore.selectAssistant(assistantId);
   await router.push(targetRoute).catch(() => {});
   cleanupAfterPortalNavigation();
 }
@@ -263,7 +256,7 @@ function openAssistantSelector() {
 
 async function selectAssistant(id) {
   if (isPortalAssistantId(id)) {
-    if (chatStreamStore.isWait) return;
+    if (chatStore.isWait) return;
     await navigatePortalAssistant(id);
     return;
   }

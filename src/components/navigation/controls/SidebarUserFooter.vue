@@ -37,7 +37,7 @@ import {useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useAuthStore} from "@/stores/authStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
+import {useChatStore} from "@/stores/chatStore";
 import {openSettingsOverlay} from "@/composables/overlay/responseOverlayActions";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {resetAppBootstrapState} from "@/composables/app/appBootstrapState";
@@ -52,7 +52,7 @@ import {resolveBlocked} from "@/utils/interactionGuard";
 const {t} = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-const chatStreamStore = useChatStreamStore();
+const chatStore = useChatStore();
 const {userName} = storeToRefs(authStore);
 
 const {theme} = useAppContext();
@@ -62,7 +62,7 @@ const themeName = computed({
   get: () => appShellStore.themeName,
   set: (value) => appShellStore.setThemeName(value),
 });
-const isAppShellActionBlocked = computed(() => chatStreamStore.isWait);
+const isAppShellActionBlocked = computed(() => chatStore.isWait);
 const isShellActionBlocked = () => isAppShellActionBlocked.value;
 const responseOverlay = {
   openSettings: () =>
@@ -122,7 +122,6 @@ async function logout() {
 
 const actions = {
   toggleTheme,
-  openPlayground: () => openRoute(ROUTE_NAMES.PLAYGROUND, {closeDrawer: true}),
   openSwagger: () => openRoute(ROUTE_NAMES.SWAGGER),
   logout,
 };

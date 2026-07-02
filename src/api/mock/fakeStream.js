@@ -9,16 +9,37 @@
 
 export function streamText(text, onChunk, options = {}) {
   const delay = options.delay ?? 14;
+  const signal = options.signal || null;
   let index = 0;
 
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    const createAbortError = () => {
+      const error = new Error("generation stream aborted");
+      error.name = "AbortError";
+      return error;
+    };
+
+    if (signal?.aborted) {
+      reject(createAbortError());
+      return;
+    }
+
     const timer = setInterval(() => {
       index += 1;
       onChunk(text.slice(0, index));
       if (index >= text.length) {
         clearInterval(timer);
+        signal?.removeEventListener?.("abort", abort);
         resolve();
       }
     }, delay);
+
+    const abort = () => {
+      clearInterval(timer);
+      signal?.removeEventListener?.("abort", abort);
+      reject(createAbortError());
+    };
+
+    signal?.addEventListener?.("abort", abort, {once: true});
   });
 }

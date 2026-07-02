@@ -14,7 +14,6 @@ import {
   getAppBootstrapPromise,
   setAppBootstrapPromise,
 } from "@/composables/app/appBootstrapState";
-import {useAssistantStore} from "@/stores/assistantStore";
 import {useAuthStore} from "@/stores/authStore";
 import {useChatStore} from "@/stores/chatStore";
 
@@ -26,8 +25,7 @@ import {useChatStore} from "@/stores/chatStore";
 export function useAppBootstrap() {
   const appRuntimeStore = useAppRuntimeStore();
   const authStore = useAuthStore();
-  const assistantStore = useAssistantStore();
-  const chatStore = useChatStore();
+    const chatStore = useChatStore();
 
   async function initialize() {
     if (appRuntimeStore.initialized) return true;
@@ -51,7 +49,7 @@ export function useAppBootstrap() {
           authStore.setAccessInfo(data.accessInfo);
         }
 
-        assistantStore.setBootstrapData(data);
+        chatStore.setBootstrapData(data);
         chatStore.setHistories(data.chatHistories);
 
         appRuntimeStore.finishLoading();

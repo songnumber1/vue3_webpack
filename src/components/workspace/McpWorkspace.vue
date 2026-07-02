@@ -5,11 +5,8 @@
   >
     <ChatHeader
       v-if="!mobileDetailMcp"
-      mode="studio"
-      :assistant-label="workspaceState.assistantLabel"
-      :assistant="workspaceState.assistant"
-      conversation-title="Connector Store"
-      :theme-name="workspaceState.themeName"
+      :assistant-label="assistantLabel"
+      :assistant="assistant"
     />
 
     <McpMobileDetailPage
@@ -64,7 +61,7 @@
 </template>
 
 <script setup>
-import {computed, inject, onMounted, ref, watch} from "vue";
+import {computed, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import McpMainPage from "@/components/mcp/McpMainPage.vue";
@@ -72,22 +69,22 @@ import McpMobileDetailPage from "@/components/mcp/McpMobileDetailPage.vue";
 import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {mcpApiLive} from "@/api/live/mcpApi.live";
 import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
-import {
-  createEmptyWorkspaceState,
-  CHAT_WORKSPACE_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
+import {useChatStore} from "@/stores/chatStore";
+import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 import {provideMcpList} from "@/composables/mcp/context/mcpListContext";
 import {useMcpListController} from "@/composables/mcp/useMcpListController";
 
 const {t, locale} = useI18n();
-const injectedWorkspaceState = inject(
-  CHAT_WORKSPACE_STATE_KEY,
-  computed(createEmptyWorkspaceState)
-);
-const workspaceState = computed(
-  () => injectedWorkspaceState.value || createEmptyWorkspaceState()
+const chatStore = useChatStore();
+const assistant = computed(() => chatStore.currentAssistant);
+const assistantLabel = computed(() =>
+  resolveWorkspaceAssistantLabel(
+    chatStore.activeSession,
+    assistant.value,
+    t("chat.assistant")
+  )
 );
 
 const searchText = ref("");

@@ -5,6 +5,25 @@
 
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 
+
+export const ROUTE_PATHS = Object.freeze({
+  MAIN: "",
+  MAIN_ALIAS: "main",
+  CHAT: "chat-completion",
+  CHAT_DETAIL: "chat-completion/:id",
+  SHARE_CHAT: "share-chat/:id",
+  CHAT_SEARCH: "chat-search",
+  STUDIO: "studio",
+  CONNECTOR_STORE: "mcp",
+  SWAGGER: "swagger",
+  GUIDE: "guide",
+  SHARED: "shared",
+  SHARED_ENTRY: "shared/:id",
+  TERMS: "terms",
+  LOGIN_REQUIRED: "/login-required",
+  ANDROID_UPDATE: "/android-update",
+});
+
 export const ROUTE_NAMES = Object.freeze({
   MAIN: "main",
   CHAT_ENTRY: "chat-entry",
@@ -17,7 +36,6 @@ export const ROUTE_NAMES = Object.freeze({
   SHARED: "shared",
   SHARED_ENTRY: "shared-entry",
   SHARE_CHAT_ENTRY: "share-chat-entry",
-  PLAYGROUND: "playground",
   TERMS: "terms",
   LOGIN_REQUIRED: "login-required",
   ANDROID_UPDATE: "android-update",

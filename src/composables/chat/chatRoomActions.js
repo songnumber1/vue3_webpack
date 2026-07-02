@@ -8,11 +8,9 @@ import {ROUTE_NAMES} from "@/constants/routeNames";
 import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
 import {ASSISTANT_PORTAL_IDS} from "@/constants/assistantPortal";
 import {useChatStore} from "@/stores/chatStore";
-import {useChatStreamStore} from "@/stores/chatStreamStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {normalizeId as normalizeChatRouteId} from "@/utils/normalize";
 import {normalizeChatId} from "@/utils/normalize";
-import {cleanupActiveConversationForNavigation} from "@/composables/chat/conversation/activeConversationCleanupRegistry";
 
 export const CHAT_ENTRY_ROUTE_NAME = ROUTE_NAMES.CHAT_ENTRY;
 export const CHAT_DETAIL_ROUTE_NAME = ROUTE_NAMES.CHAT_DETAIL;
@@ -45,12 +43,8 @@ export function getActiveChatRoomId() {
   return normalizeChatRouteId(chatStore?.selectedChatId);
 }
 
-export function getPendingSelectedChatId() {
-  return normalizeChatRouteId(useChatStore()?.pendingSelectedChatId);
-}
-
 export function hasPendingChatNavigation() {
-  return Boolean(getPendingSelectedChatId());
+  return false;
 }
 
 export function resolveActiveChatId() {
@@ -62,20 +56,11 @@ export function createChatRoomRoute() {
 }
 
 export function markPendingChatRoom(chatId) {
-  const id = normalizeChatId(chatId);
-  if (!id) return "";
-  useChatStore().setPendingSelectedChatId(id);
-  return id;
+  return applyActiveChatRoom(chatId);
 }
 
-export function clearPendingChatRoom(chatId = "") {
-  const chatStore = useChatStore();
-  const pendingId = normalizeChatId(chatStore.pendingSelectedChatId);
-  const targetId = normalizeChatId(chatId);
-
-  if (!targetId || pendingId === targetId) {
-    chatStore.clearPendingSelectedChatId();
-  }
+export function clearPendingChatRoom() {
+  // selectedChatId를 직접 사용하므로 별도 pending 상태는 유지하지 않습니다.
 }
 
 export function applyActiveChatRoom(chatId) {
@@ -85,45 +70,54 @@ export function applyActiveChatRoom(chatId) {
   return id;
 }
 
-async function navigateChatRoom(router, chatId, navigationMethod = "replace") {
-  const id = markPendingChatRoom(chatId);
+async function navigateChatRoom(
+  router,
+  chatId,
+  navigationMethod = "replace",
+  {searchTargetMessageId = ""} = {}
+) {
+  const id = applyActiveChatRoom(chatId);
   if (!id) return false;
+
+  const chatStore = useChatStore();
+  chatStore.setSearchTargetMessageId?.(searchTargetMessageId);
 
   try {
     const route = createChatRoomRoute();
     const navigate =
       navigationMethod === "push" ? router?.push : router?.replace;
     await navigate?.call(router, route);
-    applyActiveChatRoom(id);
     return true;
   } catch (_error) {
-    clearPendingChatRoom(id);
+    if (normalizeChatId(chatStore.selectedChatId) === id) {
+      chatStore.clearActiveSession?.();
+    }
     return false;
   }
 }
 
-export function enterChatRoom(router, chatId) {
-  return navigateChatRoom(router, chatId, "replace");
+export function enterChatRoom(router, chatId, options) {
+  return navigateChatRoom(router, chatId, "replace", options);
 }
 
-export function openChatRoom(router, chatId) {
-  return navigateChatRoom(router, chatId, "push");
+export function openChatRoom(router, chatId, options) {
+  return navigateChatRoom(router, chatId, "push", options);
 }
 
-export async function enterNewSubmitChatRoom(router, chatStreamStore, chatId) {
-  const id = markPendingChatRoom(chatId);
+export async function enterNewSubmitChatRoom(router, chatId) {
+  const id = applyActiveChatRoom(chatId);
   if (!id) return false;
 
-  const route = createChatRoomRoute();
-  chatStreamStore?.allowNavigationTo?.(route);
-
   try {
-    await router?.push?.(route);
-    applyActiveChatRoom(id);
+    const route = createChatRoomRoute();
+    if (router?.currentRoute?.value?.name !== CHAT_ENTRY_ROUTE_NAME) {
+      await router?.push?.(route);
+    }
     return true;
   } catch (_error) {
-    chatStreamStore?.clearAllowedNavigation?.();
-    clearPendingChatRoom(id);
+    if (normalizeChatId(useChatStore().selectedChatId) === id) {
+      useChatStore().clearActiveSession?.();
+    }
     return false;
   }
 }
@@ -149,7 +143,7 @@ export function isPortalRouteName(routeName) {
 
 export function clearConversationNavigationState() {
   const chatStore = useChatStore();
-  chatStore.clearPendingSelectedChatId?.();
+  chatStore.clearSearchTargetMessageId?.();
   chatStore.clearActiveSession?.();
 }
 
@@ -159,18 +153,16 @@ export function closeConversationNavigationPanels() {
 
 export function resetConversationStateForRouteChange() {
   clearConversationNavigationState();
-  cleanupActiveConversationForNavigation();
   closeConversationNavigationPanels();
 }
 
 export function preparePortalConversationNavigation() {
-  useChatStore().clearPendingSelectedChatId?.();
+  useChatStore().clearSearchTargetMessageId?.();
   closeConversationNavigationPanels();
 }
 
 export function cleanupAfterPortalConversationNavigation() {
   useChatStore().clearActiveSession?.();
-  cleanupActiveConversationForNavigation();
 }
 
 export async function navigateToMainAfterConversationReset(
@@ -199,21 +191,20 @@ export async function navigateToMainAfterConversationReset(
 }
 
 export function resolveConversationEntryGuard(to) {
-  const chatStreamStore = useChatStreamStore();
+  const chatStore = useChatStore();
   const activeChatRoomId = getActiveChatRoomId();
-  const pendingChatRoomId = getPendingSelectedChatId();
+  const pendingSubmitPayload = chatStore.hasPendingSubmitPayload?.();
 
   if (
     to?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !pendingChatRoomId &&
-    !chatStreamStore?.isWait
+    !pendingSubmitPayload
   ) {
     return {name: ROUTE_NAMES.MAIN, replace: true};
   }
 
   if (to?.name === ROUTE_NAMES.CHAT_DETAIL) {
-    if (activeChatRoomId || pendingChatRoomId) {
+    if (activeChatRoomId) {
       return {name: ROUTE_NAMES.CHAT_ENTRY, replace: true};
     }
     return {name: ROUTE_NAMES.MAIN, replace: true};
@@ -224,23 +215,21 @@ export function resolveConversationEntryGuard(to) {
 
 export function resolveHiddenConversationRoute(route) {
   const activeChatRoomId = getActiveChatRoomId();
-  const pendingChatRoomId = getPendingSelectedChatId();
 
   if (route?.name === ROUTE_NAMES.CHAT_DETAIL) {
     return {
       shouldRedirect: true,
-      nextRoute:
-        activeChatRoomId || pendingChatRoomId
-          ? {name: ROUTE_NAMES.CHAT_ENTRY}
-          : {name: ROUTE_NAMES.MAIN},
-      nextActiveChatId: activeChatRoomId || pendingChatRoomId || null,
+      nextRoute: activeChatRoomId
+        ? {name: ROUTE_NAMES.CHAT_ENTRY}
+        : {name: ROUTE_NAMES.MAIN},
+      nextActiveChatId: activeChatRoomId || null,
     };
   }
 
   if (
     route?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !pendingChatRoomId
+    !useChatStore().hasPendingSubmitPayload?.()
   ) {
     return {
       shouldRedirect: true,
