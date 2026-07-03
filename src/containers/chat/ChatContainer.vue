@@ -173,6 +173,7 @@ const props = defineProps({
   workspace: {type: String, default: ""},
 });
 
+const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 const route = useRoute();
 const router = useRouter();
@@ -256,6 +257,8 @@ async function removeHistory(history) {
   try {
     syncHistoriesInBackground({notifyOnError: true});
     await deleteChatHistory({chatId: history.chatId});
+    delete chatStore.messageMap[history.chatId];
+
     if (String(chatStore.selectedChatId) === String(history.chatId)) {
       chatStore.clearActiveSession();
     }
@@ -266,6 +269,13 @@ async function removeHistory(history) {
   }
 }
 const routeMode = computed(() => resolveRouteMode(route.name));
+const conversationMessages = computed({
+  get: () => chatStore.activeMessages,
+  set: (nextMessages) => {
+    chatStore.setActiveMessages(nextMessages);
+  },
+});
+
 const currentMode = computed(() => routeMode.value);
 const pageState = {
   currentMode,
@@ -340,6 +350,8 @@ const runtimeSelectedModel = computed({
     chatStore.selectModel(id);
   },
 });
+const runtimeConversations = computed(() => chatStore.messageMap);
+
 async function initializeRuntime() {
   await appBootstrap.ensureInitialized();
 }
@@ -381,6 +393,7 @@ const runtime = {
   isModelLocked: runtimeIsModelLocked,
   isActiveModelDeleted: runtimeIsActiveModelDeleted,
   isActiveModelUnavailable: runtimeIsActiveModelUnavailable,
+  conversations: runtimeConversations,
   refreshHistories,
   syncHistoriesInBackground,
   toggleHistoryBookmark,
@@ -396,6 +409,7 @@ const currentAssistant = runtime.currentAssistant;
 const selectedModel = runtime.selectedModel;
 const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
 
+const workspaceRef = ref(null);
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme.current);
 const assistantSheetOpen = computed({
@@ -426,7 +440,118 @@ configureResponseOverlay({
 });
 setupResponseOverlayBackGuard();
 
-function cleanupScrollResources() {}
+const showScrollBottom = computed({
+  get: () => chatStore.showScrollBottom,
+  set: (value) => {
+    chatStore.setShowScrollBottom(value);
+  },
+});
+let bottomStateTimer = 0;
+let pendingBottomScrollRafId = 0;
+let pendingBottomScrollFrameCount = 0;
+
+function getMessageListRef() {
+  const exposed = workspaceRef.value?.listRef;
+  if (exposed?.scrollToBottom || exposed?.scrollToLatestChatUser) {
+    return exposed;
+  }
+  if (
+    exposed?.value?.scrollToBottom ||
+    exposed?.value?.scrollToLatestChatUser
+  ) {
+    return exposed.value;
+  }
+  return null;
+}
+
+function clearPendingBottomScrollScheduler() {
+  if (!pendingBottomScrollRafId || typeof window === "undefined") {
+    pendingBottomScrollRafId = 0;
+    pendingBottomScrollFrameCount = 0;
+    return;
+  }
+
+  window.cancelAnimationFrame(pendingBottomScrollRafId);
+  pendingBottomScrollRafId = 0;
+  pendingBottomScrollFrameCount = 0;
+}
+
+function updateScrollBottomButton() {
+  const list = getMessageListRef();
+  showScrollBottom.value =
+    Boolean(pageState.isConversationPage?.value) &&
+    Boolean(list && !list.isAtBottom?.());
+}
+
+function applyBottomScrollWhenListReady(options = {}) {
+  const list = getMessageListRef();
+  if (!list?.scrollToBottom) return false;
+
+  if (options.afterRender && list.scrollToBottomAfterRender) {
+    list.scrollToBottomAfterRender({...options, force: true, stable: true});
+  } else {
+    list.scrollToBottom({...options, force: true, stable: true});
+  }
+
+  updateScrollBottomButton();
+  return true;
+}
+
+function scheduleBottomScrollWhenListReady(options = {}) {
+  clearPendingBottomScrollScheduler();
+
+  if (applyBottomScrollWhenListReady(options)) return;
+  if (typeof window === "undefined") return;
+
+  const check = () => {
+    pendingBottomScrollRafId = 0;
+    pendingBottomScrollFrameCount += 1;
+
+    if (applyBottomScrollWhenListReady(options)) {
+      pendingBottomScrollFrameCount = 0;
+      return;
+    }
+
+    if (pendingBottomScrollFrameCount >= LIST_READY_SCROLL_MAX_FRAMES) {
+      pendingBottomScrollFrameCount = 0;
+      updateScrollBottomButton();
+      return;
+    }
+
+    pendingBottomScrollRafId = window.requestAnimationFrame(check);
+  };
+
+  pendingBottomScrollRafId = window.requestAnimationFrame(check);
+}
+
+async function scrollBottom(options = {}) {
+  const list = getMessageListRef();
+  if (list?.scrollToBottom) {
+    clearPendingBottomScrollScheduler();
+    if (options.afterRender && list.scrollToBottomAfterRender) {
+      list.scrollToBottomAfterRender(options);
+    } else {
+      list.scrollToBottom(options);
+    }
+    updateScrollBottomButton();
+    return;
+  }
+
+  if (options.force || options.stable) {
+    scheduleBottomScrollWhenListReady(options);
+  }
+  updateScrollBottomButton();
+}
+
+function scheduleBottomStateCheck() {
+  window.clearTimeout(bottomStateTimer);
+  bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
+}
+
+function cleanupScrollResources() {
+  window.clearTimeout(bottomStateTimer);
+  clearPendingBottomScrollScheduler();
+}
 
 const {keyboardOpen, refreshViewport} = useViewportGuard({
   onChange: () => {},
@@ -520,6 +645,7 @@ async function confirmHistoryDialog(value) {
       await runtime.removeHistory(target);
 
       if (String(activeHistoryId.value) === String(target.chatId)) {
+        conversationMessages.value = [];
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
       }
       return;
@@ -595,6 +721,8 @@ async function resetChatState({assistantId = null} = {}) {
   if (chatStore.isWait) return;
 
   clearConversationNavigationState();
+  runtime.revokeMessageAttachments(conversationMessages.value);
+  conversationMessages.value = [];
 
   if (assistantId) {
     try {
@@ -613,20 +741,27 @@ const startNewChat = resetChatState;
 
 function bindUiEvents() {
   useEventListener(window, "resize", updateMobileState, {passive: true});
+  useEventListener(window, "scroll", scheduleBottomStateCheck, {
+    capture: true,
+    passive: true,
+  });
 }
 
 function handleRuntimeOverlayApplied() {
   syncMobileViewportSettings();
   refreshViewport();
   updateMobileState();
-  chatStore.requestScrollToBottom({behavior: "auto"});
+  scrollBottom({stable: true});
 }
 
 function cleanupConversationForNavigation() {
+  runtime.revokeMessageAttachments(conversationMessages.value);
+  conversationMessages.value = [];
 }
 
 function cleanupUiResources() {
   cleanupScrollResources();
+  runtime.revokeMessageAttachments(conversationMessages.value);
 }
 
 const runtimeReady = ref(false);
@@ -882,15 +1017,17 @@ watch(
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function setWorkspaceRef() {}
+function setWorkspaceRef(el) {
+  workspaceRef.value = el;
+}
 
 
 function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;
   if (route.name !== ROUTE_NAMES.MAIN) return;
-  chatStore.setInput(payload);
+  chatStore.setPendingSubmitPayload(payload);
   router.push({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {
-    chatStore.clearInput();
+    chatStore.consumePendingSubmitPayload?.();
   });
 }
 

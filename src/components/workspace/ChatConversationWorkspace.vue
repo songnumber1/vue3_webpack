@@ -7,12 +7,18 @@
   />
 
   <ChatHistory
+    ref="listRef"
     :visible="!isPromptExpandedInChat"
     @content-rendered="handleMessageContentRendered"
     @history-rendered="handleHistoryRendered"
   />
   <button
-    v-if="showScrollBottom && !isPromptExpandedInChat"
+    v-if="
+      showScrollBottom &&
+      !chatPageLock.isScrollButtonBlocked.value &&
+      !isPromptExpandedInChat &&
+      !isHistoryRendering
+    "
     class="scroll-bottom-button"
     type="button"
     :aria-label="t('chat.scrollBottom')"
@@ -20,7 +26,12 @@
   >
     ↓
   </button>
-  <div ref="composerSlotRef" class="chat-composer-slot">
+  <div
+    v-show="isComposerVisible"
+    ref="composerSlotRef"
+    class="chat-composer-slot"
+    :aria-hidden="isComposerVisible ? null : 'true'"
+  >
     <ChatReadonlyInput v-if="readonly" :variant="readonlyInputVariant" />
     <ChatReadonlyInput
       v-else-if="isActiveModelUnavailable"
@@ -61,8 +72,10 @@ import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
 import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
+import {resolveBooleanSource} from "@/utils/interactionGuard";
 
 const {t} = useI18n();
+const listRef = ref(null);
 const composerSlotRef = ref(null);
 const promptComposerRef = ref(null);
 const isPromptExpandedInChat = ref(false);
@@ -84,6 +97,7 @@ const showStudioDetailButton = computed(() =>
 const studioDetailDisabled = computed(
   () =>
     isGenerating.value ||
+    isHistoryRendering.value ||
     isActiveModelUnavailable.value
 );
 const isActiveModelDeleted = computed(() =>
@@ -97,15 +111,28 @@ const readonlyInputVariant = computed(() => {
   return isActiveModelDeleted.value ? "deleted-model" : "unavailable-model";
 });
 const isGenerating = computed(() => chatStore.isWait);
+const messages = computed(() => chatStore.activeMessages || []);
 const showScrollBottom = computed(() => chatStore.showScrollBottom);
+const isHistoryRendering = computed(() => chatStore.isHistoryRendering);
+const historyMarkdownVisible = computed(() => chatStore.historyMarkdownVisible);
+const isComposerVisible = computed(
+  () => !isHistoryRendering.value || historyMarkdownVisible.value
+);
+const isHistoryBusy = computed(() => resolveBooleanSource(isHistoryRendering));
+const chatPageLock = {
+  isScrollButtonBlocked: computed(() => isHistoryBusy.value),
+};
 
 let composerResizeObserver = null;
+let composerHeightTimerIds = [];
 let composerHeightRafId = 0;
 const composerHeightWatchSources = [
   readonly,
   showScrollBottom,
   isActiveModelUnavailable,
   isGenerating,
+  isHistoryRendering,
+  computed(() => messages.value.length),
 ];
 
 function updateComposerHeight() {
@@ -120,11 +147,13 @@ function updateComposerHeight() {
 
 function clearComposerHeightSchedule() {
   if (typeof window !== "undefined") {
+    composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
     if (composerHeightRafId) {
       window.cancelAnimationFrame(composerHeightRafId);
     }
   }
 
+  composerHeightTimerIds = [];
   composerHeightRafId = 0;
 }
 
@@ -140,6 +169,11 @@ function scheduleComposerHeightUpdate() {
     updateComposerHeight();
   });
 
+  if (isHistoryRendering.value) return;
+
+  composerHeightTimerIds = [80, 160].map((delay) =>
+    window.setTimeout(updateComposerHeight, delay)
+  );
 }
 
 function observeComposerHeight() {
@@ -158,7 +192,8 @@ function cleanupComposerHeightObserver() {
   composerResizeObserver = null;
 }
 function scrollBottom() {
-  chatStore.requestScrollToBottom();
+  if (chatPageLock.isScrollButtonBlocked.value) return;
+  listRef.value?.scrollToBottom?.({force: true, behavior: "smooth", stable: true});
 }
 
 
@@ -186,7 +221,7 @@ function handleHistoryRendered() {
 
 
 function submitPromptFromWorkspace(payload) {
-  chatStore.setInput(payload);
+  listRef.value?.submit?.(payload);
 }
 
 function handleSelectedModelUpdate(value) {
@@ -216,7 +251,9 @@ onBeforeUnmount(() => {
   cleanupComposerHeightObserver();
 });
 
-defineExpose({});
+defineExpose({
+  listRef,
+});
 </script>
 
 <style scoped lang="scss">

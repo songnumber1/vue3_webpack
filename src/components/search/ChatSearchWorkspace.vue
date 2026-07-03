@@ -275,13 +275,10 @@ async function openChat(result) {
 
   ensureSearchResultHistory(result, chatId);
 
-  const messageId =
-    result?.searchTargetMessageId ||
-    result?.messageId ||
-    result?.targetMessageId ||
-    result?.raw?.messageId ||
-    "";
-  const searchTargetMessageId = isSearchMode.value ? String(messageId).trim() : "";
+  const messageId = String(
+    result?.messageId || result?.targetMessageId || ""
+  ).trim();
+  const searchTargetMessageId = isSearchMode.value ? messageId : "";
 
   try {
     const opened = await openChatRoom(router, chatId, {searchTargetMessageId});
