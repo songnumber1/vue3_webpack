@@ -81,6 +81,7 @@ import {
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useChatStore} from "@/stores/chatStore";
+import {isSharedChat} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {
   createBrowserAttachment,
@@ -92,12 +93,8 @@ import {
   PROMPT_TEXTAREA_STATE_KEY,
   PROMPT_TOOLBAR_STATE_KEY,
 } from "@/composables/chat/chatStateContext";
-import {
-  providePromptInputActions,
-} from "@/composables/prompt/context/promptInputActionContext";
-import {
-  providePromptInputState,
-} from "@/composables/prompt/context/promptInputStateContext";
+import {providePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+import {providePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
 
 const componentProps = defineProps({
   submitDisabled: {type: Boolean, default: false},
@@ -118,27 +115,34 @@ const emit = defineEmits([
 const chatStore = useChatStore();
 const promptModels = computed(() => {
   const lockedModelId = chatStore.activeSession?.modelId;
-  const lockedModel = lockedModelId
-    ? chatStore.modelMap[lockedModelId]
-    : null;
+  const lockedModel = lockedModelId ? chatStore.modelMap[lockedModelId] : null;
 
   if (promptModelReadonly.value && lockedModel) return [lockedModel];
   return chatStore.currentModels || [];
 });
-const promptModelValue = computed(() =>
-  chatStore.activeSession?.modelId || chatStore.selectedModelId || ""
+const promptModelValue = computed(
+  () => chatStore.activeSession?.modelId || chatStore.selectedModelId || ""
 );
 const promptModelReadonly = computed(() =>
   Boolean(
     chatStore.isModelLocked ||
-      chatStore.selectedChatId ||
-      chatStore.activeRoomId
+    chatStore.selectedChatId ||
+    chatStore.activeRoomId
   )
+);
+const activeHistory = computed(() =>
+  chatStore.getHistory(chatStore.selectedChatId)
+);
+const isReadonlyConversation = computed(
+  () =>
+    chatStore.isActiveSharedRoom ||
+    isSharedChat(activeHistory.value) ||
+    Boolean(chatStore.activeSession?.sharedId)
 );
 
 const props = reactive({
   get disabled() {
-    return chatStore.isActiveSharedRoom;
+    return isReadonlyConversation.value;
   },
   get generating() {
     return chatStore.isWait;
@@ -174,7 +178,6 @@ const props = reactive({
     return promptModelReadonly.value;
   },
 });
-
 
 function handleComposerEvent(eventName, payload) {
   if (eventName === "submit") {
@@ -334,7 +337,6 @@ function clearAttachments() {
   attachments.value = [];
 }
 
-
 // ── [음성 입력] ─────────────────────────────────────────────────────────
 // STT (Speech-to-Text) 기능을 연동하여 음성을 텍스트 프롬프트 문자열로 치환하는 영역입니다.
 const isMicEnabled = computed(() => false);
@@ -424,8 +426,7 @@ function hasTemplateFields(template = {}) {
 }
 
 const currentModelTemplates = computed(() => {
-  const selectedModelId =
-    props.modelValue || chatStore.selectedModelId || "";
+  const selectedModelId = props.modelValue || chatStore.selectedModelId || "";
 
   return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
@@ -886,5 +887,4 @@ defineExpose({
 :global(body.mobile-mode) .prompt-box--gemini {
   border: 1px solid var(--prompt-border);
 }
-
 </style>

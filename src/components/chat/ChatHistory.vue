@@ -24,7 +24,7 @@
           :data-message-message-id="message.raw?.message_id"
           :data-message-role="message.role"
           :message="message"
-          :show-actions="!chatStore.isWait"
+          :show-actions="shouldShowUserActions(message)"
           @rendered="handleMessageRendered"
         />
         <AssistantErrorMessage
@@ -55,7 +55,7 @@
           :data-message-message-id="message.raw?.message_id"
           :data-message-role="message.role"
           :message="message"
-          :interaction-blocked="chatStore.isWait"
+          :interaction-blocked="shouldBlockAssistantInteraction(message)"
           :show-regenerate="!readonly && isLastChatResponse(message)"
           @rendered="handleMessageRendered"
           @regenerate="regenerate"
@@ -179,12 +179,7 @@ function clearMessages() {
 }
 
 function getMessageStyle(message) {
-  if (
-    !message?.sectorMinHeight ||
-    message.status === "complete" ||
-    message.error
-  )
-    return null;
+  if (!message?.sectorMinHeight || message.error) return null;
   return {minHeight: `${message.sectorMinHeight}px`};
 }
 
@@ -971,7 +966,6 @@ function completeAssistantMessage(assistantMessage) {
   updateAssistantMessage(assistantMessage, {
     status: "complete",
     reasoningStatus: "completed",
-    sectorMinHeight: 0,
   });
 }
 
@@ -979,7 +973,6 @@ function appendAssistantContent(assistantMessage, content) {
   updateAssistantMessage(assistantMessage, {
     content,
     reasoningStatus: "completed",
-    sectorMinHeight: 0,
   });
 }
 
@@ -1080,6 +1073,22 @@ async function regenerate(assistantMessage) {
   } finally {
     chatStore.finishWait();
   }
+}
+
+function isStreamingAssistantMessage(message) {
+  return (
+    message?.role === "assistant" &&
+    Boolean(message.status) &&
+    !["complete", "error"].includes(message.status)
+  );
+}
+
+function shouldShowUserActions() {
+  return true;
+}
+
+function shouldBlockAssistantInteraction(message) {
+  return chatStore.isWait && isStreamingAssistantMessage(message);
 }
 
 function isAssistantErrorMessage(message) {

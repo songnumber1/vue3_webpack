@@ -33,7 +33,6 @@
       @expanded-change="handlePromptExpandedChange"
     />
   </div>
-
 </template>
 
 <script setup>
@@ -41,14 +40,7 @@
  * @file components/workspace/ChatConversationWorkspace.vue
  * @description 기존 통합 채팅 workspace의 대화방 렌더링만 분리한 라우트 전용 workspace입니다.
  */
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from "vue";
+import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute} from "vue-router";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
@@ -59,6 +51,7 @@ import {useChatStore} from "@/stores/chatStore";
 import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {resolveRouteMode, ROUTE_MODES} from "@/constants/routeNames";
+import {isSharedChat} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
 
 const {t} = useI18n();
 const composerSlotRef = ref(null);
@@ -67,10 +60,15 @@ const isPromptExpandedInChat = ref(false);
 
 const chatStore = useChatStore();
 const route = useRoute();
+const activeHistory = computed(() =>
+  chatStore.getHistory(chatStore.selectedChatId)
+);
 const readonly = computed(
   () =>
     chatStore.isActiveSharedRoom ||
-    resolveRouteMode(route.name) === ROUTE_MODES.SHARED
+    resolveRouteMode(route.name) === ROUTE_MODES.SHARED ||
+    isSharedChat(activeHistory.value) ||
+    Boolean(chatStore.activeSession?.sharedId)
 );
 const assistant = computed(() => chatStore.currentAssistant);
 const assistantLabel = computed(() =>
@@ -84,9 +82,7 @@ const showStudioDetailButton = computed(() =>
   isStudioAssistant(assistant.value)
 );
 const studioDetailDisabled = computed(
-  () =>
-    isGenerating.value ||
-    isActiveModelUnavailable.value
+  () => isGenerating.value || isActiveModelUnavailable.value
 );
 const isActiveModelDeleted = computed(() =>
   Boolean(chatStore.activeSession?.isModelDeleted)

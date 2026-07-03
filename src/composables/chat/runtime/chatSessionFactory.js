@@ -46,6 +46,7 @@ export function createSessionFromHistory(
 
   return {
     chatId: history.chatId,
+    sharedId: history.sharedId || null,
     assistantId: assistant?.id || history.assistantId || model?.assistId || "",
     assistantType: assistant?.type || history.assistantType || "",
     assistantLabel: assistant?.label || history.assistantLabel || "",
