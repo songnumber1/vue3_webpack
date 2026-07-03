@@ -79,11 +79,14 @@ import {
   destroyMarkdownScrollbars,
   enhanceMarkdownScrollbars,
 } from "@/platform/scroll/overlayScrollbarController";
-import {useMarkdownTools} from "@/composables/markdown/useMarkdownTools";
-import {useOverlayScrollPolicy} from "@/composables/ui/useOverlayScrollPolicy";
 import {useChatStore} from "@/stores/chatStore";
 import {resolveMermaidPlatformSettings} from "@/utils/mermaidPlatformSettings";
 import {logWarn} from "@/utils/logger";
+import {
+  openExternalBrowser,
+  copyClipboardByPlatform,
+} from "@/platform/bridge/platformBridge";
+import {usePlatformStore} from "@/stores/platformStore";
 import AssistantDuoLinks from "./AssistantDuoLinks.vue";
 import AssistantRagImages from "./AssistantRagImages.vue";
 import MessageActions from "./MessageActions.vue";
@@ -98,6 +101,7 @@ const props = defineProps({
 });
 const {locale, t} = useI18n();
 const chatStore = useChatStore();
+const platformStore = usePlatformStore();
 const emit = defineEmits(["rendered", "regenerate"]);
 function notifyRendered(type) {
   emit("rendered", {messageId: props.message.id, type});
@@ -110,10 +114,6 @@ const reasoningMarkdownRendered = ref(false);
 const contentRef = ref(null);
 const reasoningRef = ref(null);
 const reasoningOpen = ref(false);
-const {handleMarkdownClick} = useMarkdownTools(contentRef);
-const {handleMarkdownClick: handleReasoningClick} =
-  useMarkdownTools(reasoningRef);
-const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 let componentAlive = true;
@@ -172,6 +172,138 @@ function reservePendingMermaidHeight(root) {
     });
 }
 
+function tableToText(table) {
+  return Array.from(table.rows)
+    .map((row) =>
+      Array.from(row.cells)
+        .map((cell) => cell.innerText.replace(/\s+/g, " ").trim())
+        .join("\t")
+    )
+    .join("\n");
+}
+
+function tableToCsv(table) {
+  return Array.from(table.rows)
+    .map((row) =>
+      Array.from(row.cells)
+        .map(
+          (cell) =>
+            `"${cell.innerText.replace(/"/g, '""').replace(/\s+/g, " ").trim()}"`
+        )
+        .join(",")
+    )
+    .join("\n");
+}
+
+function downloadText(content, filename, type = "text/plain;charset=utf-8") {
+  const blob = new Blob([content], {type});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function downloadCsv(csv) {
+  downloadText(
+    `\ufeff${csv}`,
+    `table-${Date.now()}.csv`,
+    "text/csv;charset=utf-8"
+  );
+}
+
+function resolveMermaidSource(card) {
+  const mermaid = card?.querySelector(".md-mermaid");
+  return (
+    mermaid?.getAttribute("data-mermaid-source") || mermaid?.textContent || ""
+  );
+}
+
+function resolveMermaidSvg(card) {
+  const svg = card?.querySelector(".md-mermaid svg");
+  if (!svg) return "";
+  const clone = svg.cloneNode(true);
+  if (!clone.getAttribute("xmlns")) {
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  }
+  return new XMLSerializer().serializeToString(clone);
+}
+
+async function handleMarkdownClick(event) {
+  const root = event.currentTarget;
+  const tableButton = event.target?.closest?.("button[data-md-table-action]");
+  if (tableButton && root?.contains(tableButton)) {
+    event.preventDefault();
+    event.stopPropagation();
+    const table = tableButton.closest(".md-table-card")?.querySelector("table");
+    if (!table) return;
+    if (tableButton.dataset.mdTableAction === "copy") {
+      await copyClipboardByPlatform(tableToText(table));
+      return;
+    }
+    if (tableButton.dataset.mdTableAction === "csv") {
+      downloadCsv(tableToCsv(table));
+    }
+    return;
+  }
+
+  const mermaidButton = event.target?.closest?.(
+    "button[data-md-mermaid-action]"
+  );
+  if (mermaidButton && root?.contains(mermaidButton)) {
+    event.preventDefault();
+    event.stopPropagation();
+    const card = mermaidButton.closest(".md-mermaid-card");
+    const action = mermaidButton.dataset.mdMermaidAction;
+    if (action === "copy") {
+      const source = resolveMermaidSource(card);
+      if (source) await copyClipboardByPlatform(source);
+      return;
+    }
+    if (action === "code") {
+      const source = resolveMermaidSource(card);
+      if (source) downloadText(source, `mermaid-${Date.now()}.mmd`);
+      return;
+    }
+    if (action === "svg") {
+      const svg = resolveMermaidSvg(card);
+      if (svg)
+        downloadText(
+          svg,
+          `mermaid-${Date.now()}.svg`,
+          "image/svg+xml;charset=utf-8"
+        );
+    }
+    return;
+  }
+
+  const codeButton = event.target?.closest?.("button[data-md-code-action]");
+  if (codeButton && root?.contains(codeButton)) {
+    event.preventDefault();
+    event.stopPropagation();
+    const pre = codeButton.closest(".md-code-card")?.querySelector("pre");
+    const code =
+      pre?.getAttribute("data-md-code-source") || pre?.innerText || "";
+    if (codeButton.dataset.mdCodeAction === "copy" && code) {
+      await copyClipboardByPlatform(code);
+    }
+    return;
+  }
+
+  const anchor = event.target?.closest?.("a[href]");
+  if (!anchor || !root?.contains(anchor)) return;
+  const href = anchor.getAttribute("href");
+  if (!href || href.startsWith("#") || !platformStore.info.isAndroidApp) return;
+  event.preventDefault();
+  event.stopPropagation();
+  await openExternalBrowser(anchor.href);
+}
+
+const handleReasoningClick = handleMarkdownClick;
+
 async function enhanceRenderedMarkdown({
   root,
   source,
@@ -190,9 +322,7 @@ async function enhanceRenderedMarkdown({
     }
     if (!componentAlive || !root?.isConnected) return;
     if (currentVersion !== getVersion()) return;
-    enhanceMarkdownScrollbars(root, {
-      enabled: () => shouldUseOverlayScrollbar.value,
-    });
+    enhanceMarkdownScrollbars(root, {enabled: true});
     notifyRendered("enhanced");
   } catch (error) {
     if (componentAlive) {
@@ -321,22 +451,11 @@ async function renderReasoningContent() {
   }
 }
 
+watch(() => [props.message.content, props.message.status], renderContent, {
+  immediate: true,
+});
 watch(
-  () => [
-    props.message.content,
-    props.message.status,
-    showMermaidHeader.value,
-    enableMermaidRendering.value,
-  ],
-  renderContent,
-  {immediate: true}
-);
-watch(
-  () => [
-    props.message.reasoningContent,
-    showMermaidHeader.value,
-    enableMermaidRendering.value,
-  ],
+  () => [props.message.reasoningContent, props.message.status],
   renderReasoningContent,
   {immediate: true}
 );

@@ -107,6 +107,7 @@ export function openChatRoom(router, chatId, options) {
 export async function enterNewSubmitChatRoom(router, chatId) {
   const id = applyActiveChatRoom(chatId);
   if (!id) return false;
+  useChatStore().clearSearchTargetMessageId?.();
 
   try {
     const route = createChatRoomRoute();
@@ -193,12 +194,10 @@ export async function navigateToMainAfterConversationReset(
 export function resolveConversationEntryGuard(to) {
   const chatStore = useChatStore();
   const activeChatRoomId = getActiveChatRoomId();
-  const pendingSubmitPayload = chatStore.hasPendingSubmitPayload?.();
-
   if (
     to?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !pendingSubmitPayload
+    !chatStore.input
   ) {
     return {name: ROUTE_NAMES.MAIN, replace: true};
   }
@@ -229,7 +228,7 @@ export function resolveHiddenConversationRoute(route) {
   if (
     route?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !useChatStore().hasPendingSubmitPayload?.()
+    !useChatStore().input
   ) {
     return {
       shouldRedirect: true,

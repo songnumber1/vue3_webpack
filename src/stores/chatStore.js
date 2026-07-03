@@ -1,16 +1,8 @@
 import {defineStore} from "pinia";
 import {usePromptControlStore} from "@/stores/promptControlStore";
-import {ACTIVE_ROOM_TYPES, normalizeActiveRoomType} from "@/constants/chatRoom";
+import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
 
 export {ACTIVE_ROOM_TYPES};
-
-export function normalizeHistoryChatId(history) {
-  return String(history?.chatId || "").trim();
-}
-
-function normalizeId(value) {
-  return String(value || "").trim();
-}
 
 export const useChatStore = defineStore("chat", {
   state: () => ({
@@ -30,14 +22,13 @@ export const useChatStore = defineStore("chat", {
     activeRoomType: null,
     searchTargetMessageId: null,
     activeSession: null,
-    messageMap: {},
-    activeMessages: [],
     showScrollBottom: false,
+    scrollRequestSeq: 0,
+    scrollRequest: null,
     isHistoryRendering: false,
     historyMarkdownVisible: false,
     historyMessagesLoaded: false,
-    pendingNewSubmitChatIds: {},
-    pendingSubmitPayload: null,
+    input: null,
     isWait: false,
   }),
   getters: {
@@ -94,53 +85,26 @@ export const useChatStore = defineStore("chat", {
     finishWait() {
       this.isWait = false;
     },
-    setPendingSubmitPayload(payload = null) {
-      this.pendingSubmitPayload = payload;
+    setInput(payload = null) {
+      this.input = payload;
     },
-    consumePendingSubmitPayload() {
-      const payload = this.pendingSubmitPayload;
-      this.pendingSubmitPayload = null;
-      return payload;
-    },
-    hasPendingSubmitPayload() {
-      return Boolean(this.pendingSubmitPayload);
-    },
-    markPendingNewSubmitChat(chatId) {
-      const id = normalizeId(chatId);
-      if (!id) return;
-      this.pendingNewSubmitChatIds = {
-        ...this.pendingNewSubmitChatIds,
-        [id]: true,
-      };
-    },
-    consumePendingNewSubmitChat(chatId) {
-      const id = normalizeId(chatId);
-      if (!id || !this.pendingNewSubmitChatIds[id]) return false;
-      const next = {...this.pendingNewSubmitChatIds};
-      delete next[id];
-      this.pendingNewSubmitChatIds = next;
-      return true;
+    clearInput() {
+      this.input = null;
     },
     setHistories(histories = []) {
       this.histories = histories;
     },
     getHistory(chatId) {
-      const id = normalizeId(chatId);
-      if (!id) return null;
-      return (
-        this.histories.find((item) => normalizeHistoryChatId(item) === id) || null
-      );
+      if (!chatId) return null;
+      return this.histories.find((item) => item.chatId === chatId) || null;
     },
     setActiveRoom(roomId, roomType = ACTIVE_ROOM_TYPES.chat) {
-      const id = normalizeId(roomId);
-      const type = normalizeActiveRoomType(roomType);
-      this.activeRoomId = id || null;
-      this.activeRoomType = id && type ? type : null;
+      this.activeRoomId = roomId || null;
+      this.activeRoomType = roomId ? roomType : null;
     },
     setActiveChatRoom(chatId) {
-      const id = normalizeId(chatId);
-      this.selectedChatId = id || null;
-      this.setActiveRoom(id, ACTIVE_ROOM_TYPES.chat);
+      this.selectedChatId = chatId || null;
+      this.setActiveRoom(chatId, ACTIVE_ROOM_TYPES.chat);
       usePromptControlStore().setActivePromptToolSettingsKey(
         this.selectedChatId
       );
@@ -154,10 +118,9 @@ export const useChatStore = defineStore("chat", {
     },
     setActiveSession(session = null) {
       this.activeSession = session;
-      const chatId = normalizeId(session?.chatId);
 
-      if (chatId) {
-        this.setActiveChatRoom(chatId);
+      if (session?.chatId) {
+        this.setActiveChatRoom(session.chatId);
       } else {
         this.selectedChatId = null;
         usePromptControlStore().setActivePromptToolSettingsKey(null);
@@ -171,25 +134,34 @@ export const useChatStore = defineStore("chat", {
     clearActiveSession() {
       this.activeSession = null;
       this.selectedChatId = null;
-      this.setActiveMessages([]);
       this.resetHistoryRenderState();
       this.clearActiveRoom();
       usePromptControlStore().setActivePromptToolSettingsKey(null);
       this.clearSearchTargetMessageId();
+      this.clearInput();
       usePromptControlStore().resetActivePromptToolSettings();
     },
     setSearchTargetMessageId(messageId) {
-      const id = normalizeId(messageId);
-      this.searchTargetMessageId = id || null;
+      this.searchTargetMessageId = messageId || null;
     },
     clearSearchTargetMessageId() {
       this.searchTargetMessageId = null;
     },
-    setActiveMessages(messages = []) {
-      this.activeMessages = Array.isArray(messages) ? messages : [];
-    },
     setShowScrollBottom(value) {
       this.showScrollBottom = Boolean(value);
+    },
+    requestScrollToBottom(options = {}) {
+      this.scrollRequestSeq += 1;
+      this.scrollRequest = {type: "bottom", options};
+    },
+    requestScrollToTop(options = {}) {
+      this.scrollRequestSeq += 1;
+      this.scrollRequest = {type: "top", options};
+    },
+    requestScrollToMessage(messageId, options = {}) {
+      if (!messageId) return;
+      this.scrollRequestSeq += 1;
+      this.scrollRequest = {type: "message", messageId, options};
     },
     setHistoryRenderState(state = {}) {
       if (Object.prototype.hasOwnProperty.call(state, "isHistoryRendering")) {
@@ -207,35 +179,11 @@ export const useChatStore = defineStore("chat", {
       this.historyMarkdownVisible = false;
       this.historyMessagesLoaded = false;
     },
-    setMessages(chatId, messages = []) {
-      const list = Array.isArray(messages) ? messages : [];
-      this.messageMap = {
-        ...this.messageMap,
-        [chatId]: list,
-      };
-      if (normalizeId(chatId) === normalizeId(this.selectedChatId)) {
-        this.setActiveMessages(list);
-      }
-    },
-    pruneInactiveMessageCache(keepChatId) {
-      const keepId = normalizeId(keepChatId);
-      const nextMessageMap = {};
-
-      Object.entries(this.messageMap || {}).forEach(([chatId, list]) => {
-        if (String(chatId) === keepId) {
-          nextMessageMap[chatId] = list;
-        }
-      });
-
-      this.messageMap = nextMessageMap;
-      usePromptControlStore().prunePromptToolSettingsCache(keepChatId);
-    },
     addHistory(history) {
-      const chatId = normalizeHistoryChatId(history);
-      if (!chatId) return;
+      if (!history?.chatId) return;
       this.histories = [
         history,
-        ...this.histories.filter((item) => normalizeHistoryChatId(item) !== chatId),
+        ...this.histories.filter((item) => item.chatId !== history.chatId),
       ];
     },
   },
