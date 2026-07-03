@@ -20,21 +20,26 @@
         />
         <AssistantErrorMessage
           v-else-if="isAssistantErrorMessage(message)"
-          :style="getMessageStyle(message)"
           :data-message-id="message.id"
           :message="message"
           @rendered="handleMessageRendered"
         />
-        <ChatResponse
-          v-else
-          :style="getMessageStyle(message)"
-          :data-message-id="message.id"
-          :message="message"
-          :interaction-blocked="shouldBlockAssistantInteraction(message)"
-          :show-regenerate="!readonly && isLastChatResponse(message)"
-          @rendered="handleMessageRendered"
-          @regenerate="regenerate"
-        />
+        <template v-else>
+          <ChatResponse
+            :data-message-id="message.id"
+            :message="message"
+            :interaction-blocked="shouldBlockAssistantInteraction(message)"
+            :show-regenerate="!readonly && isLastChatResponse(message)"
+            @rendered="handleMessageRendered"
+            @regenerate="regenerate"
+          />
+          <div
+            v-if="getMessageTailSpacerHeight(message)"
+            class="message-tail-spacer"
+            :style="{height: `${getMessageTailSpacerHeight(message)}px`}"
+            aria-hidden="true"
+          ></div>
+        </template>
       </template>
 
       <div v-if="loading" class="typing-row">
@@ -147,9 +152,14 @@ function clearMessages() {
   setMessages([]);
 }
 
-function getMessageStyle(message) {
-  if (!message?.sectorMinHeight || message.error) return null;
-  return {minHeight: `${message.sectorMinHeight}px`};
+function getMessageTailSpacerHeight(message) {
+  if (
+    message?.role !== "assistant" ||
+    message.error ||
+    !message?.sectorMinHeight
+  )
+    return 0;
+  return message.sectorMinHeight;
 }
 
 function clearMessagesOnConversationChange() {
@@ -834,6 +844,7 @@ function createPromptPayload(payload = {}) {
   return {
     text: payload.text || "",
     attachments: payload.attachments || [],
+    keyboardOpenOnSubmit: Boolean(payload.keyboardOpenOnSubmit),
   };
 }
 
@@ -877,12 +888,22 @@ async function prepareSubmitChatId(promptPayload) {
   return chatId;
 }
 
+async function scrollToQuestionStart(userMessage, assistantMessage) {
+  await nextTick();
+  updateQuestionSector(userMessage, assistantMessage);
+  await nextTick();
+  scrollToMessage(userMessage.id, "start");
+  await waitAnimationFrame();
+  scrollToMessage(userMessage.id, "start");
+}
+
 async function appendSubmitMessages(promptPayload) {
   const messagesPair = addUserAndAssistantMessages(promptPayload);
-  await nextTick();
-  updateQuestionSector(messagesPair.userMessage, messagesPair.assistantMessage);
-  await nextTick();
-  scrollToMessage(messagesPair.userMessage.id, "start");
+  await waitForSubmitKeyboardSettle(promptPayload);
+  await scrollToQuestionStart(
+    messagesPair.userMessage,
+    messagesPair.assistantMessage
+  );
   return messagesPair;
 }
 
@@ -1022,10 +1043,7 @@ async function regenerate(assistantMessage) {
     ...messages.value.slice(0, assistantIndex),
     nextAssistantMessage,
   ]);
-  await nextTick();
-  updateQuestionSector(userMessage, nextAssistantMessage);
-  await nextTick();
-  scrollToMessage(userMessage.id, "start");
+  await scrollToQuestionStart(userMessage, nextAssistantMessage);
 
   chatStore.startWait();
   try {
@@ -1179,6 +1197,7 @@ function updateQuestionSector(userMessage, assistantMessage) {
   if (!element || !userElement) return;
 
   clearAssistantSectorHeights(assistantMessage.id);
+
   const sectorMinHeight = Math.max(
     element.clientHeight - userElement.offsetHeight - 22,
     0
@@ -1190,6 +1209,62 @@ function scrollToMessage(messageId, block = "center") {
   const target = findMessageElement(messageId);
   if (!target) return false;
   return scrollElementIntoView(target, block);
+}
+
+function isMobileMode() {
+  if (typeof document === "undefined") return false;
+  return document.body?.classList?.contains("mobile-mode");
+}
+
+function readRootPxVar(name) {
+  if (typeof window === "undefined" || typeof document === "undefined")
+    return 0;
+  const value = window
+    .getComputedStyle(document.documentElement)
+    .getPropertyValue(name);
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getKeyboardViewportGap() {
+  if (typeof window === "undefined" || typeof document === "undefined")
+    return 0;
+
+  const visualHeight = window.visualViewport?.height || 0;
+  const layoutHeight = Math.max(
+    window.innerHeight || 0,
+    document.documentElement?.clientHeight || 0,
+    readRootPxVar("--layout-viewport-height"),
+    readRootPxVar("--app-height")
+  );
+  const cssKeyboardHeight = Math.max(
+    readRootPxVar("--keyboard-height"),
+    readRootPxVar("--mobile-keyboard-inset"),
+    readRootPxVar("--composer-keyboard-inset")
+  );
+
+  return Math.max(
+    cssKeyboardHeight,
+    visualHeight > 0 ? layoutHeight - visualHeight : 0
+  );
+}
+
+async function waitMilliseconds(milliseconds) {
+  await new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+async function waitForSubmitKeyboardSettle(promptPayload) {
+  if (!promptPayload?.keyboardOpenOnSubmit || !isMobileMode()) return;
+
+  const startedAt = performance.now();
+  while (performance.now() - startedAt < 700) {
+    await waitAnimationFrame();
+    if (getKeyboardViewportGap() <= 48) break;
+  }
+
+  await waitMilliseconds(80);
+  await nextTick();
+  await waitAnimationFrame();
 }
 
 function waitAnimationFrame() {
@@ -1412,11 +1487,21 @@ defineExpose({});
 .message-list {
   min-width: 0;
   min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   overflow-anchor: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
 .message-list--hidden {
   visibility: hidden;
+  pointer-events: none;
+}
+
+.message-tail-spacer {
+  flex: 0 0 auto;
+  min-height: 0;
   pointer-events: none;
 }
 
