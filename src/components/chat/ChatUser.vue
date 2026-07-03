@@ -9,7 +9,9 @@
         You
       </div>
       <div
-        v-if="hasAttachments"
+        v-if="
+          Array.isArray(message.attachments) && message.attachments.length > 0
+        "
         class="message-attachments message-attachments--user tw-flex tw-flex-wrap tw-gap-2"
       >
         <template v-for="file in message.attachments" :key="file.id">
@@ -51,51 +53,25 @@
       >
         {{ message.content }}
       </div>
-      <MessageActions
-        v-if="showMessageActions"
-        role="user"
-        :content="message.content"
-      />
+      <MessageActions role="user" :content="message.content" />
     </div>
   </article>
 </template>
 
 <script setup>
-/**
- * @file components/chat/ChatUser.vue
- * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
- */
-
-import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
 
 const {t} = useI18n();
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
 const props = defineProps({
   message: {type: Object, required: true},
-  showActions: {type: Boolean, default: true},
 });
 const emit = defineEmits(["rendered"]);
-const showMessageActions = computed(() => props.showActions);
-const hasAttachments = computed(
-  () =>
-    Array.isArray(props.message.attachments) &&
-    props.message.attachments.length > 0
-);
-/**
- * 현재 DOM, store, runtime 값에서 필요한 값을 조회합니다.
- */
 function getPreviewUrl(file) {
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
-/**
- * 관련 modal, sheet, menu, overlay 상태를 열림 상태로 전환합니다.
- */
 function notifyRendered() {
   emit("rendered", {messageId: props.message.id, type: "attachment"});
 }

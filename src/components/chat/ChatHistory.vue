@@ -1,5 +1,5 @@
 <template>
-  <div v-show="visible" class="message-list-shell">
+  <div v-show="props.visible" class="message-list-shell">
     <section
       ref="scrollRef"
       class="message-list"
@@ -15,30 +15,13 @@
         <ChatUser
           v-if="message.role === 'user'"
           :data-message-id="message.id"
-          :data-message-raw-id="message.raw?.id"
-          :data-message-msg-id="message.raw?.msgId"
-          :data-message-resp-id="message.raw?.respMsgId"
-          :data-message-search-id="
-            message.raw?.messageId || message.raw?.targetMessageId
-          "
-          :data-message-message-id="message.raw?.message_id"
-          :data-message-role="message.role"
           :message="message"
-          :show-actions="shouldShowUserActions(message)"
           @rendered="handleMessageRendered"
         />
         <AssistantErrorMessage
           v-else-if="isAssistantErrorMessage(message)"
           :style="getMessageStyle(message)"
           :data-message-id="message.id"
-          :data-message-raw-id="message.raw?.id"
-          :data-message-msg-id="message.raw?.msgId"
-          :data-message-resp-id="message.raw?.respMsgId"
-          :data-message-search-id="
-            message.raw?.messageId || message.raw?.targetMessageId
-          "
-          :data-message-message-id="message.raw?.message_id"
-          :data-message-role="message.role"
           :message="message"
           @rendered="handleMessageRendered"
         />
@@ -46,14 +29,6 @@
           v-else
           :style="getMessageStyle(message)"
           :data-message-id="message.id"
-          :data-message-raw-id="message.raw?.id"
-          :data-message-msg-id="message.raw?.msgId"
-          :data-message-resp-id="message.raw?.respMsgId"
-          :data-message-search-id="
-            message.raw?.messageId || message.raw?.targetMessageId
-          "
-          :data-message-message-id="message.raw?.message_id"
-          :data-message-role="message.role"
           :message="message"
           :interaction-blocked="shouldBlockAssistantInteraction(message)"
           :show-regenerate="!readonly && isLastChatResponse(message)"
@@ -70,13 +45,11 @@
 </template>
 
 <script setup>
-import {computed, nextTick, onBeforeUnmount, onMounted, ref, watch} from "vue";
-import {storeToRefs} from "pinia";
+import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import ChatUser from "@/components/chat/ChatUser.vue";
 import ChatResponse from "@/components/chat/ChatResponse.vue";
 import AssistantErrorMessage from "@/components/chat/AssistantErrorMessage.vue";
-import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
 import {ROUTE_NAMES, resolveRouteMode} from "@/constants/routeNames";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useChatStore} from "@/stores/chatStore";
@@ -121,13 +94,9 @@ const props = defineProps({
 });
 const route = useRoute();
 const router = useRouter();
-const appBootstrap = useAppBootstrap();
 const studioRuntimeStore = useStudioRuntimeStore();
 const chatStore = useChatStore();
 const promptControlStore = usePromptControlStore();
-const {histories} = storeToRefs(chatStore);
-
-const visible = computed(() => props.visible);
 const routeMode = computed(() => resolveRouteMode(route.name));
 const isMainPage = computed(() => routeMode.value === "main");
 const isChatPage = computed(() => routeMode.value === "chat");
@@ -352,7 +321,9 @@ async function renderLoadedMessages(nextMessages = [], signal) {
 
 function findHistory(chatId) {
   if (!chatId) return null;
-  return histories.value.find((history) => history.chatId === chatId) || null;
+  return (
+    chatStore.histories.find((history) => history.chatId === chatId) || null
+  );
 }
 
 function getSharedEntryId() {
@@ -1052,7 +1023,9 @@ async function regenerate(assistantMessage) {
     nextAssistantMessage,
   ]);
   await nextTick();
-  scrollToMessage(nextAssistantMessage.id);
+  updateQuestionSector(userMessage, nextAssistantMessage);
+  await nextTick();
+  scrollToMessage(userMessage.id, "start");
 
   chatStore.startWait();
   try {
@@ -1081,10 +1054,6 @@ function isStreamingAssistantMessage(message) {
     Boolean(message.status) &&
     !["complete", "error"].includes(message.status)
   );
-}
-
-function shouldShowUserActions() {
-  return true;
 }
 
 function shouldBlockAssistantInteraction(message) {
@@ -1229,12 +1198,6 @@ function waitAnimationFrame() {
   });
 }
 
-function waitMilliseconds(delay) {
-  return new Promise((resolve) => {
-    window.setTimeout(() => resolve(), delay);
-  });
-}
-
 function shouldStabilizeInitialScroll(request = {}) {
   return ["message", "last", "bottom"].includes(request.type);
 }
@@ -1352,7 +1315,7 @@ function applyInitialScroll(request = createInitialScrollRequest()) {
   return scrollToBottom();
 }
 
-async function applyInitialScrollSequence(request, signal, options = {}) {
+async function applyInitialScrollSequence(request, signal) {
   let applied = applyInitialScroll(request);
 
   await nextTick();
@@ -1362,16 +1325,6 @@ async function applyInitialScrollSequence(request, signal, options = {}) {
   await waitAnimationFrame();
   if (signal?.aborted) return applied;
   applied = applyInitialScroll(request) || applied;
-
-  if (options.settle) {
-    await waitMilliseconds(120);
-    if (signal?.aborted) return applied;
-    applied = applyInitialScroll(request) || applied;
-
-    await waitMilliseconds(240);
-    if (signal?.aborted) return applied;
-    applied = applyInitialScroll(request) || applied;
-  }
 
   if (!applied && request?.type === "message") {
     return scrollToTop();
@@ -1445,10 +1398,6 @@ watch(
   },
   {immediate: true}
 );
-
-onMounted(() => {
-  void appBootstrap.ensureInitialized();
-});
 
 onBeforeUnmount(() => {
   abortLoadRequest();

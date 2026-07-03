@@ -67,11 +67,6 @@
 </template>
 
 <script setup>
-/**
- * @file components/chat/ChatResponse.vue
- * @description 채팅 UI 컴포넌트입니다. 메시지, 헤더, 입력 영역, 이미지 프리뷰 등 실제 화면 렌더를 담당합니다.
- */
-
 import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
@@ -90,14 +85,10 @@ import AssistantDuoLinks from "./AssistantDuoLinks.vue";
 import AssistantRagImages from "./AssistantRagImages.vue";
 import MessageActions from "./MessageActions.vue";
 
-/**
- * 상위 컴포넌트에서 전달되는 렌더링/상태 제어 입력값입니다.
- */
 const props = defineProps({
   message: {type: Object, required: true},
   showRegenerate: {type: Boolean, default: true},
   interactionBlocked: {type: Boolean, default: false},
-  deferMermaidEnhancement: {type: Boolean, default: false},
 });
 const {locale, t} = useI18n();
 const platformStore = usePlatformStore();
@@ -339,9 +330,6 @@ function escapeHtml(value = "") {
     .replace(/\n/g, "<br>");
 }
 
-/**
- * Markdown, Mermaid 또는 Vue DOM에 표시할 결과물을 렌더링합니다.
- */
 async function renderContent() {
   const currentVersion = ++renderVersion;
   contentMarkdownRendered.value = false;
@@ -375,10 +363,7 @@ async function renderContent() {
       source: props.message.content,
       currentVersion,
       getVersion: () => renderVersion,
-      renderMermaid:
-        isMessageComplete.value &&
-        enableMermaidRendering.value &&
-        !props.deferMermaidEnhancement,
+      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== renderVersion) return;
@@ -392,9 +377,6 @@ async function renderContent() {
   }
 }
 
-/**
- * Markdown, Mermaid 또는 Vue DOM에 표시할 결과물을 렌더링합니다.
- */
 async function renderReasoningContent() {
   const currentVersion = ++reasoningRenderVersion;
   reasoningMarkdownRendered.value = false;
@@ -432,10 +414,7 @@ async function renderReasoningContent() {
       source: props.message.reasoningContent,
       currentVersion,
       getVersion: () => reasoningRenderVersion,
-      renderMermaid:
-        isMessageComplete.value &&
-        enableMermaidRendering.value &&
-        !props.deferMermaidEnhancement,
+      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
     });
   } catch (error) {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
@@ -456,36 +435,6 @@ watch(
   () => [props.message.reasoningContent, props.message.status],
   renderReasoningContent,
   {immediate: true}
-);
-watch(
-  () => props.deferMermaidEnhancement,
-  async (deferMermaidEnhancement, previousDeferMermaidEnhancement) => {
-    if (deferMermaidEnhancement || !previousDeferMermaidEnhancement) return;
-    if (!isMessageComplete.value) return;
-
-    await nextTick();
-
-    const currentContentVersion = renderVersion;
-    // history historyRender 중에는 MessageList가 v-for DOM 순서대로 Mermaid를 직렬 처리합니다.
-    // historyRender이 끝난 뒤에도 pending Mermaid가 남아 있는 예외 케이스는 여기서 한 번 더 안전하게 처리합니다.
-    void enhanceRenderedMarkdown({
-      root: contentRef.value,
-      source: props.message.content,
-      currentVersion: currentContentVersion,
-      getVersion: () => renderVersion,
-      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
-    });
-
-    const currentReasoningVersion = reasoningRenderVersion;
-    void enhanceRenderedMarkdown({
-      root: reasoningRef.value,
-      source: props.message.reasoningContent,
-      currentVersion: currentReasoningVersion,
-      getVersion: () => reasoningRenderVersion,
-      renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
-    });
-  },
-  {flush: "post"}
 );
 watch(
   () => locale.value,
