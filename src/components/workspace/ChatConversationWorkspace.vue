@@ -6,19 +6,9 @@
     :studio-detail-disabled="studioDetailDisabled"
   />
 
-  <ChatHistory
-    ref="listRef"
-    :visible="!isPromptExpandedInChat"
-    @content-rendered="handleMessageContentRendered"
-    @history-rendered="handleHistoryRendered"
-  />
+  <ChatHistory :visible="!isPromptExpandedInChat" />
   <button
-    v-if="
-      showScrollBottom &&
-      !chatPageLock.isScrollButtonBlocked.value &&
-      !isPromptExpandedInChat &&
-      !isHistoryRendering
-    "
+    v-if="showScrollBottom && !isPromptExpandedInChat"
     class="scroll-bottom-button"
     type="button"
     :aria-label="t('chat.scrollBottom')"
@@ -26,12 +16,7 @@
   >
     ↓
   </button>
-  <div
-    v-show="isComposerVisible"
-    ref="composerSlotRef"
-    class="chat-composer-slot"
-    :aria-hidden="isComposerVisible ? null : 'true'"
-  >
+  <div ref="composerSlotRef" class="chat-composer-slot">
     <ChatReadonlyInput v-if="readonly" :variant="readonlyInputVariant" />
     <ChatReadonlyInput
       v-else-if="isActiveModelUnavailable"
@@ -65,6 +50,7 @@ import {
   watch,
 } from "vue";
 import {useI18n} from "vue-i18n";
+import {useRoute} from "vue-router";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
 import ChatHistory from "@/components/chat/ChatHistory.vue";
@@ -72,17 +58,20 @@ import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
 import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
-import {resolveBooleanSource} from "@/utils/interactionGuard";
+import {resolveRouteMode, ROUTE_MODES} from "@/constants/routeNames";
 
 const {t} = useI18n();
-const listRef = ref(null);
 const composerSlotRef = ref(null);
 const promptComposerRef = ref(null);
 const isPromptExpandedInChat = ref(false);
 
 const chatStore = useChatStore();
-const activeChatId = computed(() => chatStore.selectedChatId || "");
-const readonly = computed(() => chatStore.isActiveSharedRoom);
+const route = useRoute();
+const readonly = computed(
+  () =>
+    chatStore.isActiveSharedRoom ||
+    resolveRouteMode(route.name) === ROUTE_MODES.SHARED
+);
 const assistant = computed(() => chatStore.currentAssistant);
 const assistantLabel = computed(() =>
   resolveWorkspaceAssistantLabel(
@@ -97,7 +86,6 @@ const showStudioDetailButton = computed(() =>
 const studioDetailDisabled = computed(
   () =>
     isGenerating.value ||
-    isHistoryRendering.value ||
     isActiveModelUnavailable.value
 );
 const isActiveModelDeleted = computed(() =>
@@ -111,28 +99,15 @@ const readonlyInputVariant = computed(() => {
   return isActiveModelDeleted.value ? "deleted-model" : "unavailable-model";
 });
 const isGenerating = computed(() => chatStore.isWait);
-const messages = computed(() => chatStore.activeMessages || []);
 const showScrollBottom = computed(() => chatStore.showScrollBottom);
-const isHistoryRendering = computed(() => chatStore.isHistoryRendering);
-const historyMarkdownVisible = computed(() => chatStore.historyMarkdownVisible);
-const isComposerVisible = computed(
-  () => !isHistoryRendering.value || historyMarkdownVisible.value
-);
-const isHistoryBusy = computed(() => resolveBooleanSource(isHistoryRendering));
-const chatPageLock = {
-  isScrollButtonBlocked: computed(() => isHistoryBusy.value),
-};
 
 let composerResizeObserver = null;
-let composerHeightTimerIds = [];
 let composerHeightRafId = 0;
 const composerHeightWatchSources = [
   readonly,
   showScrollBottom,
   isActiveModelUnavailable,
   isGenerating,
-  isHistoryRendering,
-  computed(() => messages.value.length),
 ];
 
 function updateComposerHeight() {
@@ -147,13 +122,11 @@ function updateComposerHeight() {
 
 function clearComposerHeightSchedule() {
   if (typeof window !== "undefined") {
-    composerHeightTimerIds.forEach((timerId) => window.clearTimeout(timerId));
     if (composerHeightRafId) {
       window.cancelAnimationFrame(composerHeightRafId);
     }
   }
 
-  composerHeightTimerIds = [];
   composerHeightRafId = 0;
 }
 
@@ -168,12 +141,6 @@ function scheduleComposerHeightUpdate() {
     composerHeightRafId = 0;
     updateComposerHeight();
   });
-
-  if (isHistoryRendering.value) return;
-
-  composerHeightTimerIds = [80, 160].map((delay) =>
-    window.setTimeout(updateComposerHeight, delay)
-  );
 }
 
 function observeComposerHeight() {
@@ -191,11 +158,10 @@ function cleanupComposerHeightObserver() {
   composerResizeObserver?.disconnect?.();
   composerResizeObserver = null;
 }
-function scrollBottom() {
-  if (chatPageLock.isScrollButtonBlocked.value) return;
-  listRef.value?.scrollToBottom?.({force: true, behavior: "smooth", stable: true});
-}
 
+function scrollBottom() {
+  chatStore.requestScrollToBottom();
+}
 
 function handlePromptExpandedChange(expanded) {
   isPromptExpandedInChat.value = Boolean(expanded);
@@ -210,29 +176,19 @@ function collapsePromptExpandedForChatSwitch() {
   scheduleComposerHeightUpdate();
 }
 
-
-function handleMessageContentRendered() {
-  scheduleComposerHeightUpdate();
-}
-
-function handleHistoryRendered() {
-  scheduleComposerHeightUpdate();
-}
-
-
 function submitPromptFromWorkspace(payload) {
-  listRef.value?.submit?.(payload);
+  chatStore.setInput(payload);
 }
-
 function handleSelectedModelUpdate(value) {
   chatStore.selectModel(value);
 }
 
-
-
-watch(activeChatId, () => {
-  collapsePromptExpandedForChatSwitch();
-});
+watch(
+  () => chatStore.selectedChatId,
+  () => {
+    collapsePromptExpandedForChatSwitch();
+  }
+);
 
 watch(
   () => composerHeightWatchSources.map((source) => source?.value),
@@ -251,9 +207,7 @@ onBeforeUnmount(() => {
   cleanupComposerHeightObserver();
 });
 
-defineExpose({
-  listRef,
-});
+defineExpose({});
 </script>
 
 <style scoped lang="scss">

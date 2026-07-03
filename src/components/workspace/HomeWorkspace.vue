@@ -87,10 +87,7 @@ const suggestions = computed(() => {
 const showStudioDetailButton = computed(() =>
   isStudioAssistant(assistant.value)
 );
-const studioDetailDisabled = computed(
-  () =>
-    chatStore.isWait || chatStore.isHistoryRendering
-);
+const studioDetailDisabled = computed(() => chatStore.isWait);
 const mainAssistantIcon = computed(() =>
   getAssistantImageBySize(assistant.value, 48)
 );

@@ -37,18 +37,10 @@ function safeCall(callback, ...args) {
 
 export function getActiveChatRoomId() {
   const chatStore = useChatStore();
-  if (chatStore?.activeRoomType === ACTIVE_ROOM_TYPE_CHAT) {
-    return normalizeChatRouteId(chatStore?.activeRoomId);
+  if (chatStore.activeRoomType === ACTIVE_ROOM_TYPE_CHAT) {
+    return normalizeChatRouteId(chatStore.activeRoomId);
   }
-  return normalizeChatRouteId(chatStore?.selectedChatId);
-}
-
-export function hasPendingChatNavigation() {
-  return false;
-}
-
-export function resolveActiveChatId() {
-  return getActiveChatRoomId();
+  return normalizeChatRouteId(chatStore.selectedChatId);
 }
 
 export function createChatRoomRoute() {
@@ -66,7 +58,7 @@ export function clearPendingChatRoom() {
 export function applyActiveChatRoom(chatId) {
   const id = normalizeChatId(chatId);
   if (!id) return "";
-  useChatStore()?.setActiveChatRoom?.(id);
+  useChatStore().setActiveChatRoom(id);
   return id;
 }
 
@@ -74,13 +66,19 @@ async function navigateChatRoom(
   router,
   chatId,
   navigationMethod = "replace",
-  {searchTargetMessageId = ""} = {}
+  {searchTargetMessageId = "", initialScrollType = "last"} = {}
 ) {
   const id = applyActiveChatRoom(chatId);
   if (!id) return false;
 
   const chatStore = useChatStore();
-  chatStore.setSearchTargetMessageId?.(searchTargetMessageId);
+  const targetMessageId = String(searchTargetMessageId || "").trim();
+  chatStore.setSearchTargetMessageId(targetMessageId);
+  chatStore.setInitialScrollRequest(
+    targetMessageId
+      ? {type: "message", messageId: targetMessageId}
+      : {type: initialScrollType || "last"}
+  );
 
   try {
     const route = createChatRoomRoute();
@@ -90,7 +88,7 @@ async function navigateChatRoom(
     return true;
   } catch (_error) {
     if (normalizeChatId(chatStore.selectedChatId) === id) {
-      chatStore.clearActiveSession?.();
+      chatStore.clearActiveSession();
     }
     return false;
   }
@@ -107,6 +105,9 @@ export function openChatRoom(router, chatId, options) {
 export async function enterNewSubmitChatRoom(router, chatId) {
   const id = applyActiveChatRoom(chatId);
   if (!id) return false;
+  const chatStore = useChatStore();
+  chatStore.clearSearchTargetMessageId();
+  chatStore.clearInitialScrollRequest();
 
   try {
     const route = createChatRoomRoute();
@@ -116,7 +117,7 @@ export async function enterNewSubmitChatRoom(router, chatId) {
     return true;
   } catch (_error) {
     if (normalizeChatId(useChatStore().selectedChatId) === id) {
-      useChatStore().clearActiveSession?.();
+      useChatStore().clearActiveSession();
     }
     return false;
   }
@@ -143,12 +144,12 @@ export function isPortalRouteName(routeName) {
 
 export function clearConversationNavigationState() {
   const chatStore = useChatStore();
-  chatStore.clearSearchTargetMessageId?.();
-  chatStore.clearActiveSession?.();
+  chatStore.clearSearchTargetMessageId();
+  chatStore.clearActiveSession();
 }
 
 export function closeConversationNavigationPanels() {
-  useAppShellStore().closeTransientShellPanels?.();
+  useAppShellStore().closeTransientShellPanels();
 }
 
 export function resetConversationStateForRouteChange() {
@@ -157,12 +158,14 @@ export function resetConversationStateForRouteChange() {
 }
 
 export function preparePortalConversationNavigation() {
-  useChatStore().clearSearchTargetMessageId?.();
+  const chatStore = useChatStore();
+  chatStore.clearSearchTargetMessageId();
+  chatStore.clearInitialScrollRequest();
   closeConversationNavigationPanels();
 }
 
 export function cleanupAfterPortalConversationNavigation() {
-  useChatStore().clearActiveSession?.();
+  useChatStore().clearActiveSession();
 }
 
 export async function navigateToMainAfterConversationReset(
@@ -193,12 +196,10 @@ export async function navigateToMainAfterConversationReset(
 export function resolveConversationEntryGuard(to) {
   const chatStore = useChatStore();
   const activeChatRoomId = getActiveChatRoomId();
-  const pendingSubmitPayload = chatStore.hasPendingSubmitPayload?.();
-
   if (
     to?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !pendingSubmitPayload
+    !chatStore.input
   ) {
     return {name: ROUTE_NAMES.MAIN, replace: true};
   }
@@ -214,6 +215,7 @@ export function resolveConversationEntryGuard(to) {
 }
 
 export function resolveHiddenConversationRoute(route) {
+  const chatStore = useChatStore();
   const activeChatRoomId = getActiveChatRoomId();
 
   if (route?.name === ROUTE_NAMES.CHAT_DETAIL) {
@@ -229,7 +231,7 @@ export function resolveHiddenConversationRoute(route) {
   if (
     route?.name === ROUTE_NAMES.CHAT_ENTRY &&
     !activeChatRoomId &&
-    !useChatStore().hasPendingSubmitPayload?.()
+    !chatStore.input
   ) {
     return {
       shouldRedirect: true,

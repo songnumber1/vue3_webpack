@@ -44,7 +44,6 @@ export const ROUTE_NAMES = Object.freeze({
 export const CHAT_ROUTE_NAMES = Object.freeze([
   ROUTE_NAMES.CHAT_DETAIL,
   ROUTE_NAMES.CHAT_ENTRY,
-  ROUTE_NAMES.SHARE_CHAT_ENTRY,
 ]);
 
 export const STUDIO_ROUTE_NAMES = Object.freeze([
@@ -55,6 +54,7 @@ export const STUDIO_ROUTE_NAMES = Object.freeze([
 export const SHARED_ROUTE_NAMES = Object.freeze([
   ROUTE_NAMES.SHARED,
   ROUTE_NAMES.SHARED_ENTRY,
+  ROUTE_NAMES.SHARE_CHAT_ENTRY,
 ]);
 
 export const ROUTE_MODES = Object.freeze({

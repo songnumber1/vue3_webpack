@@ -275,13 +275,19 @@ async function openChat(result) {
 
   ensureSearchResultHistory(result, chatId);
 
-  const messageId = String(
-    result?.messageId || result?.targetMessageId || ""
-  ).trim();
-  const searchTargetMessageId = isSearchMode.value ? messageId : "";
+  const messageId =
+    result?.searchTargetMessageId ||
+    result?.messageId ||
+    result?.targetMessageId ||
+    result?.raw?.messageId ||
+    "";
+  const searchTargetMessageId = isSearchMode.value ? String(messageId).trim() : "";
 
   try {
-    const opened = await openChatRoom(router, chatId, {searchTargetMessageId});
+    const opened = await openChatRoom(router, chatId, {
+      searchTargetMessageId,
+      initialScrollType: "top",
+    });
     if (!opened) return;
   } catch (_error) {
     clearPendingChatRoom(chatId);

@@ -68,7 +68,6 @@
 
 import {computed} from "vue";
 import {useI18n} from "vue-i18n";
-import {useChatStore} from "@/stores/chatStore";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
 import MessageActions from "./MessageActions.vue";
@@ -79,11 +78,10 @@ const {t} = useI18n();
  */
 const props = defineProps({
   message: {type: Object, required: true},
+  showActions: {type: Boolean, default: true},
 });
 const emit = defineEmits(["rendered"]);
-const chatStore = useChatStore();
-const isInteractionBlocked = computed(() => chatStore.isWait);
-const showMessageActions = computed(() => !isInteractionBlocked.value);
+const showMessageActions = computed(() => props.showActions);
 const hasAttachments = computed(
   () =>
     Array.isArray(props.message.attachments) &&

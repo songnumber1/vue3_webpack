@@ -142,7 +142,6 @@ import {
   getPortalAssistantIdByRouteName,
   navigateToMainAfterConversationReset,
   preparePortalConversationNavigation,
-  resolveActiveChatId,
 } from "@/composables/chat/chatRoomActions";
 import {resolveRouteMode} from "@/constants/routeNames";
 import {deleteStudio} from "@/services/studioDetailService";
@@ -150,8 +149,6 @@ import {
   isStudioAssistant,
   normalizeStudioDetail,
 } from "@/composables/studio/useStudioDetailModel";
-import {resolveBooleanSource} from "@/utils/interactionGuard";
-
 import {provideNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
@@ -173,7 +170,6 @@ const props = defineProps({
   workspace: {type: String, default: ""},
 });
 
-const LIST_READY_SCROLL_MAX_FRAMES = 60;
 
 const route = useRoute();
 const router = useRouter();
@@ -257,8 +253,6 @@ async function removeHistory(history) {
   try {
     syncHistoriesInBackground({notifyOnError: true});
     await deleteChatHistory({chatId: history.chatId});
-    delete chatStore.messageMap[history.chatId];
-
     if (String(chatStore.selectedChatId) === String(history.chatId)) {
       chatStore.clearActiveSession();
     }
@@ -269,13 +263,6 @@ async function removeHistory(history) {
   }
 }
 const routeMode = computed(() => resolveRouteMode(route.name));
-const conversationMessages = computed({
-  get: () => chatStore.activeMessages,
-  set: (nextMessages) => {
-    chatStore.setActiveMessages(nextMessages);
-  },
-});
-
 const currentMode = computed(() => routeMode.value);
 const pageState = {
   currentMode,
@@ -306,7 +293,7 @@ const activeHistoryId = computed(() => {
   }
 
   if (pageState.isChatPage.value) {
-    return resolveActiveChatId() || null;
+    return chatStore.selectedChatId || null;
   }
   if (pageState.isSharedPage.value) {
     return chatStore.activeRoomType === "shared"
@@ -350,8 +337,6 @@ const runtimeSelectedModel = computed({
     chatStore.selectModel(id);
   },
 });
-const runtimeConversations = computed(() => chatStore.messageMap);
-
 async function initializeRuntime() {
   await appBootstrap.ensureInitialized();
 }
@@ -393,7 +378,6 @@ const runtime = {
   isModelLocked: runtimeIsModelLocked,
   isActiveModelDeleted: runtimeIsActiveModelDeleted,
   isActiveModelUnavailable: runtimeIsActiveModelUnavailable,
-  conversations: runtimeConversations,
   refreshHistories,
   syncHistoriesInBackground,
   toggleHistoryBookmark,
@@ -409,7 +393,6 @@ const currentAssistant = runtime.currentAssistant;
 const selectedModel = runtime.selectedModel;
 const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
 
-const workspaceRef = ref(null);
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme.current);
 const assistantSheetOpen = computed({
@@ -440,118 +423,7 @@ configureResponseOverlay({
 });
 setupResponseOverlayBackGuard();
 
-const showScrollBottom = computed({
-  get: () => chatStore.showScrollBottom,
-  set: (value) => {
-    chatStore.setShowScrollBottom(value);
-  },
-});
-let bottomStateTimer = 0;
-let pendingBottomScrollRafId = 0;
-let pendingBottomScrollFrameCount = 0;
-
-function getMessageListRef() {
-  const exposed = workspaceRef.value?.listRef;
-  if (exposed?.scrollToBottom || exposed?.scrollToLatestChatUser) {
-    return exposed;
-  }
-  if (
-    exposed?.value?.scrollToBottom ||
-    exposed?.value?.scrollToLatestChatUser
-  ) {
-    return exposed.value;
-  }
-  return null;
-}
-
-function clearPendingBottomScrollScheduler() {
-  if (!pendingBottomScrollRafId || typeof window === "undefined") {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount = 0;
-    return;
-  }
-
-  window.cancelAnimationFrame(pendingBottomScrollRafId);
-  pendingBottomScrollRafId = 0;
-  pendingBottomScrollFrameCount = 0;
-}
-
-function updateScrollBottomButton() {
-  const list = getMessageListRef();
-  showScrollBottom.value =
-    Boolean(pageState.isConversationPage?.value) &&
-    Boolean(list && !list.isAtBottom?.());
-}
-
-function applyBottomScrollWhenListReady(options = {}) {
-  const list = getMessageListRef();
-  if (!list?.scrollToBottom) return false;
-
-  if (options.afterRender && list.scrollToBottomAfterRender) {
-    list.scrollToBottomAfterRender({...options, force: true, stable: true});
-  } else {
-    list.scrollToBottom({...options, force: true, stable: true});
-  }
-
-  updateScrollBottomButton();
-  return true;
-}
-
-function scheduleBottomScrollWhenListReady(options = {}) {
-  clearPendingBottomScrollScheduler();
-
-  if (applyBottomScrollWhenListReady(options)) return;
-  if (typeof window === "undefined") return;
-
-  const check = () => {
-    pendingBottomScrollRafId = 0;
-    pendingBottomScrollFrameCount += 1;
-
-    if (applyBottomScrollWhenListReady(options)) {
-      pendingBottomScrollFrameCount = 0;
-      return;
-    }
-
-    if (pendingBottomScrollFrameCount >= LIST_READY_SCROLL_MAX_FRAMES) {
-      pendingBottomScrollFrameCount = 0;
-      updateScrollBottomButton();
-      return;
-    }
-
-    pendingBottomScrollRafId = window.requestAnimationFrame(check);
-  };
-
-  pendingBottomScrollRafId = window.requestAnimationFrame(check);
-}
-
-async function scrollBottom(options = {}) {
-  const list = getMessageListRef();
-  if (list?.scrollToBottom) {
-    clearPendingBottomScrollScheduler();
-    if (options.afterRender && list.scrollToBottomAfterRender) {
-      list.scrollToBottomAfterRender(options);
-    } else {
-      list.scrollToBottom(options);
-    }
-    updateScrollBottomButton();
-    return;
-  }
-
-  if (options.force || options.stable) {
-    scheduleBottomScrollWhenListReady(options);
-  }
-  updateScrollBottomButton();
-}
-
-function scheduleBottomStateCheck() {
-  window.clearTimeout(bottomStateTimer);
-  bottomStateTimer = window.setTimeout(updateScrollBottomButton, 80);
-}
-
-function cleanupScrollResources() {
-  window.clearTimeout(bottomStateTimer);
-  clearPendingBottomScrollScheduler();
-}
+function cleanupScrollResources() {}
 
 const {keyboardOpen, refreshViewport} = useViewportGuard({
   onChange: () => {},
@@ -579,11 +451,7 @@ const historyDialogTitle = computed(() => {
 
 function resolveHistoryShareChatId(history) {
   return String(
-    history?.chatId ||
-      history?.chatId ||
-      history?.raw?.chatId ||
-      history?.sharedId ||
-      ""
+    history?.chatId || history?.raw?.chatId || history?.sharedId || ""
   ).trim();
 }
 
@@ -645,7 +513,6 @@ async function confirmHistoryDialog(value) {
       await runtime.removeHistory(target);
 
       if (String(activeHistoryId.value) === String(target.chatId)) {
-        conversationMessages.value = [];
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
       }
       return;
@@ -721,8 +588,6 @@ async function resetChatState({assistantId = null} = {}) {
   if (chatStore.isWait) return;
 
   clearConversationNavigationState();
-  runtime.revokeMessageAttachments(conversationMessages.value);
-  conversationMessages.value = [];
 
   if (assistantId) {
     try {
@@ -741,40 +606,26 @@ const startNewChat = resetChatState;
 
 function bindUiEvents() {
   useEventListener(window, "resize", updateMobileState, {passive: true});
-  useEventListener(window, "scroll", scheduleBottomStateCheck, {
-    capture: true,
-    passive: true,
-  });
 }
 
 function handleRuntimeOverlayApplied() {
   syncMobileViewportSettings();
   refreshViewport();
   updateMobileState();
-  scrollBottom({stable: true});
+  chatStore.requestScrollToBottom({behavior: "auto"});
 }
 
 function cleanupConversationForNavigation() {
-  runtime.revokeMessageAttachments(conversationMessages.value);
-  conversationMessages.value = [];
 }
 
 function cleanupUiResources() {
   cleanupScrollResources();
-  runtime.revokeMessageAttachments(conversationMessages.value);
 }
 
 const runtimeReady = ref(false);
 
 const isGenerating = computed(() => chatStore.isWait);
 const isReadOnly = computed(() => pageState.isReadOnly.value || chatStore.isActiveSharedRoom);
-const isHistoryRendering = computed(() => chatStore.isHistoryRendering);
-
-function cleanupHistoryRender() {
-  chatStore.resetHistoryRenderState();
-}
-
-
 bindUiEvents();
 
 onMounted(async () => {
@@ -790,42 +641,35 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   cleanupUiResources();
-  cleanupHistoryRender();
 });
 
 const shellReady = computed(
   () => runtimeReady.value || appRuntimeStore.initialized
 );
 
-const isChatContainerHistoryBusy = computed(() =>
-  resolveBooleanSource(isHistoryRendering)
-);
-const isConversationActionBlocked = computed(
-  () => chatStore.isWait || isChatContainerHistoryBusy.value
-);
+const isConversationActionBlocked = computed(() => chatStore.isWait);
 const chatPageLock = {
   isConversationActionBlocked,
   isSubmitBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
       chatStore.isWait ||
-      resolveBooleanSource(isReadOnly) ||
-      resolveBooleanSource(isGenerating) ||
-      resolveBooleanSource(isActiveModelUnavailable)
+      isReadOnly.value ||
+      isGenerating.value ||
+      isActiveModelUnavailable.value
   ),
   isRegenerateBlocked: computed(
     () =>
       isConversationActionBlocked.value ||
-      resolveBooleanSource(isReadOnly) ||
-      resolveBooleanSource(isGenerating)
+      isReadOnly.value ||
+      isGenerating.value
   ),
 };
 
 const isStudioDetailBlocked = computed(
   () =>
     chatPageLock.isConversationActionBlocked.value ||
-    isGenerating.value ||
-    isHistoryRendering.value
+    isGenerating.value
 );
 
 const studioDetailStudio = ref(null);
@@ -876,18 +720,6 @@ function openStudioDetail() {
   studioDetailStudio.value = studio;
 }
 
-function findFirstFallbackAssistant() {
-  return getRuntimeAssistantList().find(
-    (assistant) =>
-      assistant?.id &&
-      !isPortalAssistantId(assistant.id) &&
-      !isDeletedRuntimeStudioAssistant(assistant) &&
-      !isStudioAssistant(assistant) &&
-      assistant.type !== "mcp" &&
-      assistant.mcp !== true
-  );
-}
-
 function createStudioEditRoute() {
   return {name: ROUTE_NAMES.STUDIO};
 }
@@ -912,8 +744,8 @@ async function handleStudioDetailDelete(studio) {
   closeStudioDetail();
 
   if (route.name === ROUTE_NAMES.MAIN) {
-    const fallback = findFirstFallbackAssistant();
-    if (fallback?.id) chatStore.selectAssistant(fallback.id);
+    const nextAssistant = findFirstNormalAssistant();
+    if (nextAssistant?.id) chatStore.selectAssistant(nextAssistant.id);
     chatStore.clearActiveSession();
     return;
   }
@@ -982,6 +814,7 @@ function findFirstNormalAssistant() {
     (assistant) =>
       assistant?.id &&
       !isPortalAssistantId(assistant.id) &&
+      !isDeletedRuntimeStudioAssistant(assistant) &&
       !isStudioAssistant(assistant) &&
       assistant.type !== "mcp" &&
       assistant.mcp !== true
@@ -1017,17 +850,15 @@ watch(
 /**
  * 사용자 이벤트 또는 하위 컴포넌트 emit을 받아 필요한 상태 변경/action을 실행합니다.
  */
-function setWorkspaceRef(el) {
-  workspaceRef.value = el;
-}
+function setWorkspaceRef() {}
 
 
 function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;
   if (route.name !== ROUTE_NAMES.MAIN) return;
-  chatStore.setPendingSubmitPayload(payload);
+  chatStore.setInput(payload);
   router.push({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {
-    chatStore.consumePendingSubmitPayload?.();
+    chatStore.clearInput();
   });
 }
 
