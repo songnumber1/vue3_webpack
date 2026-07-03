@@ -279,7 +279,11 @@ async function openChat(result) {
     result?.searchTargetMessageId ||
     result?.messageId ||
     result?.targetMessageId ||
+    result?.msgId ||
+    result?.respMsgId ||
     result?.raw?.messageId ||
+    result?.raw?.msgId ||
+    result?.raw?.respMsgId ||
     "";
   const searchTargetMessageId = isSearchMode.value ? String(messageId).trim() : "";
 

@@ -112,7 +112,13 @@ export function adaptChatSearchItem(raw = {}, options = {}) {
     assistantId: firstText(raw[C.ASSISTANT_ID], raw[C.ASSIST_ID]),
     bookmarkYN: firstDefined(raw[C.BOOKMARK_YN], raw.isPinned),
     matchCount: Number(raw[C.MATCH_COUNT] || 0),
-    messageId: firstText(raw.messageId, raw.message_id, raw.targetMessageId),
+    messageId: firstText(
+      raw.messageId,
+      raw.message_id,
+      raw.targetMessageId,
+      raw.msgId,
+      raw.respMsgId
+    ),
     role: firstText(raw.role, raw.messageRole, raw.targetRole),
     sharedId: optionalText(raw[C.SHARED_ID], raw.sharedId),
   };
@@ -172,7 +178,11 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
       result.messageId,
       result.message_id,
       result.targetMessageId,
-      result.raw?.messageId
+      result.msgId,
+      result.respMsgId,
+      result.raw?.messageId,
+      result.raw?.msgId,
+      result.raw?.respMsgId
     ),
     searchTargetRole: firstText(
       result.role,
@@ -189,7 +199,11 @@ export function createHistoryFromSearchResult(result = {}, options = {}) {
         result.messageId,
         result.message_id,
         result.targetMessageId,
-        result.raw?.messageId
+        result.msgId,
+        result.respMsgId,
+        result.raw?.messageId,
+        result.raw?.msgId,
+        result.raw?.respMsgId
       ),
       role: firstText(result.role, result.messageRole, result.raw?.role),
     },

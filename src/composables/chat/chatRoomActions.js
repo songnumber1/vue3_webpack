@@ -11,6 +11,7 @@ import {useChatStore} from "@/stores/chatStore";
 import {useAppShellStore} from "@/stores/appShellStore";
 import {normalizeId as normalizeChatRouteId} from "@/utils/normalize";
 import {normalizeChatId} from "@/utils/normalize";
+import {isSharedChat} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
 
 export const CHAT_ENTRY_ROUTE_NAME = ROUTE_NAMES.CHAT_ENTRY;
 export const CHAT_DETAIL_ROUTE_NAME = ROUTE_NAMES.CHAT_DETAIL;
@@ -73,11 +74,16 @@ async function navigateChatRoom(
 
   const chatStore = useChatStore();
   const targetMessageId = String(searchTargetMessageId || "").trim();
+  const selectedHistory = chatStore.getHistory(id);
+  const resolvedInitialScrollType = isSharedChat(selectedHistory)
+    ? "top"
+    : initialScrollType || "last";
+
   chatStore.setSearchTargetMessageId(targetMessageId);
   chatStore.setInitialScrollRequest(
     targetMessageId
       ? {type: "message", messageId: targetMessageId}
-      : {type: initialScrollType || "last"}
+      : {type: resolvedInitialScrollType}
   );
 
   try {

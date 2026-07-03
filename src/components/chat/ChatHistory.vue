@@ -7,6 +7,9 @@
       aria-live="polite"
       :aria-busy="loading || !messageListReady ? 'true' : 'false'"
       @scroll.passive="handleScroll"
+      @wheel.passive="cancelInitialScrollStabilizerByUser"
+      @touchstart.passive="cancelInitialScrollStabilizerByUser"
+      @pointerdown.passive="cancelInitialScrollStabilizerByUser"
     >
       <template v-for="message in messages" :key="message.id">
         <ChatUser
@@ -163,6 +166,8 @@ let currentRouteMode = null;
 let currentHistoryId = null;
 let historyRenderWait = null;
 let historyRenderToken = 0;
+let initialScrollStabilizer = null;
+let initialScrollStabilizerFrame = 0;
 
 function setMessages(nextMessages = []) {
   messages.value = nextMessages;
@@ -204,6 +209,27 @@ function resetHistoryRenderWait() {
     historyRenderWait = null;
   }
   historyRenderToken += 1;
+}
+
+function stopInitialScrollStabilizer({finish = false} = {}) {
+  if (initialScrollStabilizerFrame) {
+    window.cancelAnimationFrame(initialScrollStabilizerFrame);
+    initialScrollStabilizerFrame = 0;
+  }
+
+  if (!initialScrollStabilizer) return;
+
+  const stabilizer = initialScrollStabilizer;
+  window.clearTimeout(stabilizer.timeoutId);
+  initialScrollStabilizer = null;
+
+  if (finish && stabilizer.applied) {
+    finishInitialScroll(stabilizer.request);
+  }
+}
+
+function cancelInitialScrollStabilizerByUser() {
+  stopInitialScrollStabilizer({finish: true});
 }
 
 function hasImageAttachment(message) {
@@ -272,6 +298,7 @@ function finishHistoryRenderPresentation() {
 function cancelHistoryRenderPresentation() {
   messageListReady.value = true;
   resetHistoryRenderWait();
+  stopInitialScrollStabilizer();
 }
 
 function getDefaultInitialScrollRequest() {
@@ -279,7 +306,10 @@ function getDefaultInitialScrollRequest() {
     return {type: "message", messageId: chatStore.searchTargetMessageId};
   }
 
-  if (isSharedPage.value) return {type: "top", messageId: null};
+  if (isSharedPage.value || isSharedChat(activeHistory.value)) {
+    return {type: "top", messageId: null};
+  }
+
   return {type: "last", messageId: null};
 }
 
@@ -299,6 +329,7 @@ async function renderLoadedMessages(nextMessages = [], signal) {
   startHistoryRenderPresentation();
   const initialScrollRequest = createInitialScrollRequest();
   const renderWait = createHistoryRenderWait(nextMessages);
+  startInitialScrollStabilizer(initialScrollRequest, signal);
   setMessages(nextMessages);
 
   await nextTick();
@@ -307,11 +338,21 @@ async function renderLoadedMessages(nextMessages = [], signal) {
 
   if (signal?.aborted) return;
 
-  applyInitialScroll(initialScrollRequest);
+  await applyInitialScrollSequence(initialScrollRequest, signal);
+  if (signal?.aborted) return;
+
   finishHistoryRenderPresentation();
   await nextTick();
-  applyInitialScroll(initialScrollRequest);
-  finishInitialScroll(initialScrollRequest);
+
+  const applied = await applyInitialScrollSequence(
+    initialScrollRequest,
+    signal
+  );
+  if (signal?.aborted) return;
+
+  if (!initialScrollStabilizer && applied) {
+    finishInitialScroll(initialScrollRequest);
+  }
 }
 
 function findHistory(chatId) {
@@ -1113,13 +1154,6 @@ function findMessageElement(messageId) {
   return element.querySelector(`[data-message-id="${message.id}"]`);
 }
 
-function getLastMessageElement() {
-  const element = getScrollElement();
-  const lastMessage = messages.value[messages.value.length - 1];
-  if (!element || !lastMessage?.id) return null;
-  return element.querySelector(`[data-message-id="${lastMessage.id}"]`);
-}
-
 function scrollElementIntoView(target, block = "center") {
   return scrollWithAutoBehavior((element) => {
     const targetTop = target.offsetTop;
@@ -1180,10 +1214,112 @@ function scrollToMessage(messageId, block = "center") {
   return scrollElementIntoView(target, block);
 }
 
-function scrollToLastMessage() {
-  const target = getLastMessageElement();
-  if (!target) return scrollToBottom();
-  return scrollElementIntoView(target, "end");
+function waitAnimationFrame() {
+  return new Promise((resolve) => {
+    window.requestAnimationFrame(() => resolve());
+  });
+}
+
+function waitMilliseconds(delay) {
+  return new Promise((resolve) => {
+    window.setTimeout(() => resolve(), delay);
+  });
+}
+
+function shouldStabilizeInitialScroll(request = {}) {
+  return ["message", "last", "bottom"].includes(request.type);
+}
+
+function getInitialScrollSignature(request = {}) {
+  const element = getScrollElement();
+  if (!element) return "";
+
+  if (request.type === "message") {
+    const target = findMessageElement(request.messageId);
+    return [
+      element.scrollHeight,
+      element.clientHeight,
+      target?.offsetTop ?? "missing",
+      target?.offsetHeight ?? 0,
+    ].join(":");
+  }
+
+  return [element.scrollHeight, element.clientHeight].join(":");
+}
+
+function isInitialScrollStabilizerStable(stabilizer, signature) {
+  if (!signature) {
+    stabilizer.stableFrames = 0;
+    stabilizer.lastSignature = "";
+    return false;
+  }
+
+  if (signature === stabilizer.lastSignature) {
+    stabilizer.stableFrames += 1;
+  } else {
+    stabilizer.lastSignature = signature;
+    stabilizer.stableFrames = 0;
+  }
+
+  const elapsed = performance.now() - stabilizer.startedAt;
+  return elapsed >= 700 && stabilizer.stableFrames >= 36;
+}
+
+function startInitialScrollStabilizer(request, signal) {
+  stopInitialScrollStabilizer();
+
+  if (!shouldStabilizeInitialScroll(request)) return;
+
+  initialScrollStabilizer = {
+    request,
+    signal,
+    applied: false,
+    startedAt: performance.now(),
+    lastSignature: "",
+    stableFrames: 0,
+    timeoutId: 0,
+  };
+
+  initialScrollStabilizer.timeoutId = window.setTimeout(() => {
+    const active = initialScrollStabilizer;
+    if (active && !active.applied && active.request?.type === "message") {
+      active.applied = scrollToTop();
+    }
+    stopInitialScrollStabilizer({finish: true});
+  }, 20000);
+
+  scheduleInitialScrollStabilizerApply();
+}
+
+function scheduleInitialScrollStabilizerApply({finish = false} = {}) {
+  const stabilizer = initialScrollStabilizer;
+  if (!stabilizer || stabilizer.signal?.aborted) return;
+
+  if (initialScrollStabilizerFrame) return;
+
+  initialScrollStabilizerFrame = window.requestAnimationFrame(() => {
+    initialScrollStabilizerFrame = 0;
+    const active = initialScrollStabilizer;
+    if (!active || active.signal?.aborted) return;
+
+    const applied = applyInitialScroll(active.request);
+    active.applied = applied || active.applied;
+
+    const signature = getInitialScrollSignature(active.request);
+    const stable =
+      active.applied && isInitialScrollStabilizerStable(active, signature);
+
+    if (finish || stable) {
+      stopInitialScrollStabilizer({finish: true});
+      return;
+    }
+
+    scheduleInitialScrollStabilizerApply();
+  });
+}
+
+function handleInitialScrollStabilizerRendered() {
+  scheduleInitialScrollStabilizerApply();
 }
 
 function finishInitialScroll(request = {}) {
@@ -1192,18 +1328,47 @@ function finishInitialScroll(request = {}) {
 
 function applyInitialScroll(request = createInitialScrollRequest()) {
   if (request.type === "message") {
+    if (!request.messageId) return false;
     return scrollToMessage(request.messageId, "center");
   }
 
-  if (request.type === "top") {
+  if (request.type === "top" || request.type === "first") {
     return scrollToTop();
   }
 
-  if (request.type === "last") {
-    return scrollToLastMessage();
+  if (request.type === "last" || request.type === "bottom") {
+    return scrollToBottom();
   }
 
   return scrollToBottom();
+}
+
+async function applyInitialScrollSequence(request, signal, options = {}) {
+  let applied = applyInitialScroll(request);
+
+  await nextTick();
+  if (signal?.aborted) return applied;
+  applied = applyInitialScroll(request) || applied;
+
+  await waitAnimationFrame();
+  if (signal?.aborted) return applied;
+  applied = applyInitialScroll(request) || applied;
+
+  if (options.settle) {
+    await waitMilliseconds(120);
+    if (signal?.aborted) return applied;
+    applied = applyInitialScroll(request) || applied;
+
+    await waitMilliseconds(240);
+    if (signal?.aborted) return applied;
+    applied = applyInitialScroll(request) || applied;
+  }
+
+  if (!applied && request?.type === "message") {
+    return scrollToTop();
+  }
+
+  return applied;
 }
 function isNearBottom() {
   const element = getScrollElement();
@@ -1221,6 +1386,7 @@ function handleScroll() {
 
 function handleMessageRendered(payload) {
   markHistoryMessageRendered(payload);
+  handleInitialScrollStabilizerRendered(payload);
 }
 
 watch(
