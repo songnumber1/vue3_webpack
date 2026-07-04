@@ -10,11 +10,11 @@
       </div>
       <div
         v-if="
-          Array.isArray(message.attachments) && message.attachments.length > 0
+          Array.isArray(chatCompletion.attachments) && chatCompletion.attachments.length > 0
         "
         class="message-attachments message-attachments--user tw-flex tw-flex-wrap tw-gap-2"
       >
-        <template v-for="file in message.attachments" :key="file.id">
+        <template v-for="file in chatCompletion.attachments" :key="file.id">
           <button
             v-if="file.kind === 'image'"
             type="button"
@@ -48,17 +48,18 @@
         </template>
       </div>
       <div
-        v-if="message.content"
+        v-if="chatCompletion.content"
         class="bubble-content bubble-content--plain tw-min-w-0 tw-whitespace-pre-wrap tw-break-words"
       >
-        {{ message.content }}
+        {{ chatCompletion.content }}
       </div>
-      <MessageActions role="user" :content="message.content" />
+      <MessageActions role="user" :content="chatCompletion.content" />
     </div>
   </article>
 </template>
 
 <script setup>
+import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {formatFileSize} from "@/utils/attachment";
@@ -66,14 +67,15 @@ import MessageActions from "./MessageActions.vue";
 
 const {t} = useI18n();
 const props = defineProps({
-  message: {type: Object, required: true},
+  requireInfo: {type: Object, required: true},
 });
+const chatCompletion = computed(() => props.requireInfo.chatCompletion);
 const emit = defineEmits(["rendered"]);
 function getPreviewUrl(file) {
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
 function notifyRendered() {
-  emit("rendered", {messageId: props.message.id, type: "attachment"});
+  emit("rendered", {messageId: chatCompletion.value.id, type: "attachment"});
 }
 
 function openImage(file) {

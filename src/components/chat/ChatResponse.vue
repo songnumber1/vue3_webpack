@@ -46,7 +46,7 @@
       </section>
 
       <div
-        v-if="message.content"
+        v-if="viewContent"
         ref="contentRef"
         class="bubble-content markdown-body tw-min-w-0 tw-break-words"
         :data-markdown-rendered="contentMarkdownRendered ? 'true' : 'false'"
@@ -58,7 +58,7 @@
       <MessageActions
         v-if="showMessageActions"
         role="assistant"
-        :content="message.content"
+        :content="sourceContent"
         :show-regenerate="showRegenerate"
         @regenerate="handleRegenerate"
       />
@@ -87,6 +87,10 @@ import MessageActions from "./MessageActions.vue";
 
 const props = defineProps({
   message: {type: Object, required: true},
+  content: {type: String, default: ""},
+  reasonContent: {type: String, default: ""},
+  isGeneration: {type: Boolean, default: false},
+  respMsgId: {type: String, default: ""},
   showRegenerate: {type: Boolean, default: true},
   interactionBlocked: {type: Boolean, default: false},
 });
@@ -98,6 +102,8 @@ function notifyRendered(type) {
 }
 const html = ref("");
 const reasoningHtml = ref("");
+const viewContent = ref("");
+const viewReasonContent = ref("");
 const contentMarkdownRendered = ref(false);
 const reasoningMarkdownRendered = ref(false);
 const contentRef = ref(null);
@@ -106,8 +112,20 @@ const reasoningOpen = ref(false);
 let renderVersion = 0;
 let reasoningRenderVersion = 0;
 let componentAlive = true;
+let contentTimer = null;
+let reasonContentTimer = null;
 
-const hasReasoning = computed(() => Boolean(props.message.reasoningContent));
+const sourceContent = computed(() => props.content || props.message.content || "");
+const sourceReasonContent = computed(
+  () => props.reasonContent || props.message.reasoningContent || ""
+);
+const shouldWriteText = computed(
+  () =>
+    props.isGeneration &&
+    props.respMsgId &&
+    props.message.id === props.respMsgId
+);
+const hasReasoning = computed(() => Boolean(viewReasonContent.value));
 const hasDuoLinks = computed(
   () => Array.isArray(props.message.duo) && props.message.duo.length > 0
 );
@@ -320,6 +338,72 @@ async function enhanceRenderedMarkdown({
   }
 }
 
+function clearContentTimer() {
+  if (contentTimer) {
+    window.clearInterval(contentTimer);
+    contentTimer = null;
+  }
+}
+
+function clearReasonContentTimer() {
+  if (reasonContentTimer) {
+    window.clearInterval(reasonContentTimer);
+    reasonContentTimer = null;
+  }
+}
+
+function writeContent(value = "") {
+  clearContentTimer();
+  const nextValue = String(value || "");
+
+  if (!shouldWriteText.value) {
+    viewContent.value = nextValue;
+    return;
+  }
+
+  if (!nextValue.startsWith(viewContent.value)) {
+    viewContent.value = "";
+  }
+
+  contentTimer = window.setInterval(() => {
+    if (!componentAlive || viewContent.value.length >= nextValue.length) {
+      clearContentTimer();
+      return;
+    }
+
+    viewContent.value = nextValue.substring(0, viewContent.value.length + 1);
+  }, 12);
+}
+
+function writeReasonContent(value = "") {
+  clearReasonContentTimer();
+  const nextValue = String(value || "");
+
+  if (!shouldWriteText.value) {
+    viewReasonContent.value = nextValue;
+    return;
+  }
+
+  if (!nextValue.startsWith(viewReasonContent.value)) {
+    viewReasonContent.value = "";
+  }
+
+  reasonContentTimer = window.setInterval(() => {
+    if (
+      !componentAlive ||
+      viewReasonContent.value.length >= nextValue.length
+    ) {
+      clearReasonContentTimer();
+      return;
+    }
+
+    viewReasonContent.value = nextValue.substring(
+      0,
+      viewReasonContent.value.length + 1
+    );
+  }, 12);
+}
+
 function escapeHtml(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -337,8 +421,8 @@ async function renderContent() {
   try {
     if (!componentAlive) return;
     const {renderMarkdown} = await import("@/utils/markdown");
-    const rendered = props.message.content
-      ? await renderMarkdown(props.message.content, {
+    const rendered = viewContent.value
+      ? await renderMarkdown(viewContent.value, {
           renderMermaid:
             isMessageComplete.value && enableMermaidRendering.value,
           showMermaidHeader: showMermaidHeader.value,
@@ -360,7 +444,7 @@ async function renderContent() {
 
     void enhanceRenderedMarkdown({
       root: contentRef.value,
-      source: props.message.content,
+      source: viewContent.value,
       currentVersion,
       getVersion: () => renderVersion,
       renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
@@ -369,7 +453,7 @@ async function renderContent() {
     if (!componentAlive || currentVersion !== renderVersion) return;
     logWarn("[ChatResponse] content render failed:", error);
     destroyMarkdownScrollbars(contentRef.value);
-    html.value = escapeHtml(props.message.content || "");
+    html.value = escapeHtml(viewContent.value || "");
     await nextTick();
     if (!componentAlive || currentVersion !== renderVersion) return;
     contentMarkdownRendered.value = true;
@@ -383,7 +467,7 @@ async function renderReasoningContent() {
 
   try {
     if (!componentAlive) return;
-    if (!props.message.reasoningContent) {
+    if (!viewReasonContent.value) {
       reasoningHtml.value = "";
       reasoningMarkdownRendered.value = true;
       notifyRendered("reasoning");
@@ -391,7 +475,7 @@ async function renderReasoningContent() {
     }
 
     const {renderMarkdown} = await import("@/utils/markdown");
-    const rendered = await renderMarkdown(props.message.reasoningContent, {
+    const rendered = await renderMarkdown(viewReasonContent.value, {
       renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
       showMermaidHeader: showMermaidHeader.value,
     });
@@ -411,7 +495,7 @@ async function renderReasoningContent() {
 
     void enhanceRenderedMarkdown({
       root: reasoningRef.value,
-      source: props.message.reasoningContent,
+      source: viewReasonContent.value,
       currentVersion,
       getVersion: () => reasoningRenderVersion,
       renderMermaid: isMessageComplete.value && enableMermaidRendering.value,
@@ -420,7 +504,7 @@ async function renderReasoningContent() {
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     logWarn("[ChatResponse] reasoning render failed:", error);
     destroyMarkdownScrollbars(reasoningRef.value);
-    reasoningHtml.value = escapeHtml(props.message.reasoningContent || "");
+    reasoningHtml.value = escapeHtml(viewReasonContent.value || "");
     await nextTick();
     if (!componentAlive || currentVersion !== reasoningRenderVersion) return;
     reasoningMarkdownRendered.value = true;
@@ -428,11 +512,21 @@ async function renderReasoningContent() {
   }
 }
 
-watch(() => [props.message.content, props.message.status], renderContent, {
+watch(
+  () => sourceContent.value,
+  (value) => writeContent(value),
+  {immediate: true}
+);
+watch(
+  () => sourceReasonContent.value,
+  (value) => writeReasonContent(value),
+  {immediate: true}
+);
+watch(() => [viewContent.value, props.message.status], renderContent, {
   immediate: true,
 });
 watch(
-  () => [props.message.reasoningContent, props.message.status],
+  () => [viewReasonContent.value, props.message.status],
   renderReasoningContent,
   {immediate: true}
 );
@@ -446,6 +540,8 @@ watch(
 
 onBeforeUnmount(() => {
   componentAlive = false;
+  clearContentTimer();
+  clearReasonContentTimer();
   renderVersion += 1;
   reasoningRenderVersion += 1;
   destroyMarkdownScrollbars(contentRef.value);
