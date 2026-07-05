@@ -35,9 +35,10 @@ import {
   inject,
   watch,
 } from "vue";
-import {PROMPT_TEXTAREA_STATE_KEY} from "@/composables/chat/chatStateContext";
 import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
 import {PROMPT_TEXTAREA_HEIGHT} from "@/constants/promptComposer";
+
+const PROMPT_TEXTAREA_STATE_KEY = "PROMPT_TEXTAREA_STATE";
 
 const textareaRef = ref(null);
 const localText = ref("");

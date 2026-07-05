@@ -21,7 +21,6 @@ import {resolveErrorUI} from "@/core/resolver/errorUi";
 import {resolveUploadStrategy} from "@/core/resolver/upload";
 import {i18n} from "@/i18n/appI18n";
 import {installViewportModeClass} from "@/platform/viewport/viewportMode";
-import {logWarn} from "@/utils/logger";
 
 /**
  * 애플리케이션의 모든 전역 상태, 네트워크 환경, 플랫폼 모듈 및 설정을
@@ -72,8 +71,10 @@ export async function bootstrap() {
 
   // 15. Vue 내부 컴포넌트의 렌더링/라이프사이클 도중 발생하는 치명적 예외를 전역적으로 수집하는 에러 핸들러를 정의합니다.
   app.config.errorHandler = (error, instance, info) => {
+    void error;
+    void instance;
+    void info;
     // 콘솔 창에 경고성 워닝 로그 형태로 발생한 에러 객체와 컴포넌트 인스턴스 위치 정보를 기록합니다.
-    logWarn("[bootstrap] vue error:", error, info, instance);
     // 사용자에게 직관적이고 친절한 시스템 알림 토스트 혹은 모달 창을 전역 UI 레이어를 통해 송출합니다.
     errorUI?.notify?.("애플리케이션 처리 중 오류가 발생했습니다.");
   };

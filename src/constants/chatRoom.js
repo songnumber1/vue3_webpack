@@ -7,7 +7,3 @@ export const ACTIVE_ROOM_TYPES = Object.freeze({
   chat: "chat",
   shared: "shared",
 });
-
-export function normalizeActiveRoomType(type) {
-  return Object.values(ACTIVE_ROOM_TYPES).includes(type) ? type : null;
-}

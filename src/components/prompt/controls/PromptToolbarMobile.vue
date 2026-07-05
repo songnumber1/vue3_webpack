@@ -154,11 +154,38 @@
 
 import {computed, ref, inject} from "vue";
 import {useI18n} from "vue-i18n";
-import {
-  PROMPT_TOOLBAR_STATE_KEY,
-  createEmptyPromptToolbarState,
-} from "@/composables/chat/chatStateContext";
 import {usePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
+
+const PROMPT_TOOLBAR_STATE_KEY = "PROMPT_TOOLBAR_STATE";
+
+function createEmptyPromptToolbarState() {
+  return {
+    disabled: false,
+    modelReadonly: false,
+    modelValue: "",
+    currentModel: {id: "", label: ""},
+    models: [],
+    selectedTemplateTool: null,
+    attachOptions: [],
+    modelMenuOpen: false,
+    toolMenuOpen: false,
+    attachMenuOpen: false,
+    isMobileSheet: true,
+    canSubmit: false,
+    hasPromptText: false,
+    isMicEnabled: false,
+    isVoiceListening: false,
+    hasVoiceStopped: false,
+    generating: false,
+    isSpeechSupported: true,
+    voiceStartLabel: "Start voice input",
+    voiceStopLabel: "Stop voice input",
+    attachLabel: "Attach",
+    sendLabel: "Send",
+    modelSelectLabel: "Select model",
+    readonlyTitle: "",
+  };
+}
 
 const {t} = useI18n();
 const modelRoot = ref(null);

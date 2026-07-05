@@ -15,23 +15,23 @@ export const ASSISTANT_PORTAL_ID_LIST = Object.freeze([
 
 const ASSISTANT_PORTAL_ID_SET = new Set(ASSISTANT_PORTAL_ID_LIST);
 
-export function normalizeAssistantPortalId(assistantId) {
+function getAssistantPortalId(assistantId) {
   return String(assistantId || "").trim();
 }
 
 export function isAssistantStudioPortalId(assistantId) {
   return (
-    normalizeAssistantPortalId(assistantId) === ASSISTANT_PORTAL_IDS.STUDIO
+    getAssistantPortalId(assistantId) === ASSISTANT_PORTAL_IDS.STUDIO
   );
 }
 
 export function isConnectorStorePortalId(assistantId) {
   return (
-    normalizeAssistantPortalId(assistantId) ===
+    getAssistantPortalId(assistantId) ===
     ASSISTANT_PORTAL_IDS.CONNECTOR_STORE
   );
 }
 
 export function isPortalAssistantId(assistantId) {
-  return ASSISTANT_PORTAL_ID_SET.has(normalizeAssistantPortalId(assistantId));
+  return ASSISTANT_PORTAL_ID_SET.has(getAssistantPortalId(assistantId));
 }

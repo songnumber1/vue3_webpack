@@ -3,6 +3,7 @@
  * @description 실제 백엔드 API 호출 모듈입니다. mock API와 동일한 인터페이스를 유지해야 합니다.
  */
 
+import axios from "axios";
 import {httpClient, unwrapResponseData} from "@/api/clients/httpClient";
 import {API_ENDPOINTS} from "@/constants/apiEndpoints";
 import {API_KEYS} from "@/constants/apiConfig";
@@ -91,10 +92,68 @@ async function searchChats(payload = {}) {
   return unwrapResponseData(response, []);
 }
 
+async function getChatOwnerName(userId, options = {}) {
+  if (!userId) return null;
+  const response = await httpClient.get(`/user/user-info?userId=${encodeURIComponent(userId)}`, {
+    signal: options.signal,
+  });
+  return unwrapResponseData(response, null);
+}
+
+async function getMessageFileHist(chatId, options = {}) {
+  if (!chatId) return [];
+  const response = await httpClient.get(`/message-file-hist/list.do?chatId=${encodeURIComponent(chatId)}`, {
+    signal: options.signal,
+  });
+  return unwrapResponseData(response, []);
+}
+
+async function getChatImageList(chatId, options = {}) {
+  if (!chatId) return [];
+  const response = await httpClient.get(`/message-image-hist/list.do?chatId=${encodeURIComponent(chatId)}`, {
+    signal: options.signal,
+  });
+  return unwrapResponseData(response, []);
+}
+
+async function getChatStudioInfo(assistId, options = {}) {
+  if (!assistId) return null;
+  const response = await httpClient.get(`/chat-history/studio-info.do?chatId=${encodeURIComponent(assistId)}`, {
+    signal: options.signal,
+  });
+  return unwrapResponseData(response, null);
+}
+
+async function getPresignedURL(filePath, genType = "", prompt = {}, crudType = "C") {
+  const response = await httpClient.post("/file/presigned-url", {
+    filePath,
+    getType: genType,
+    genType,
+    prompt,
+    crudType,
+  });
+  return unwrapResponseData(response, {});
+}
+
+async function uploadPresignedFile(presignUrl, file) {
+  if (!presignUrl || !file) return null;
+  return axios.put(presignUrl, file, {
+    headers: {
+      "Content-Type": file.type,
+    },
+  });
+}
+
 export const chatHistoryApiLive = {
   getChatHistoryList,
   createChat,
   getChatHistoryDetail,
+  getChatOwnerName,
+  getMessageFileHist,
+  getChatImageList,
+  getChatStudioInfo,
+  getPresignedURL,
+  uploadPresignedFile,
   getSharedConversation,
   searchChats,
   updateBookmark,

@@ -50,7 +50,7 @@ export function useAppBootstrap() {
         }
 
         chatStore.setBootstrapData(data);
-        chatStore.setHistories(data.chatHistories);
+        chatStore.setChatRooms(data.chatHistories);
 
         appRuntimeStore.finishLoading();
         return data;

@@ -70,22 +70,25 @@ import StudioCategoryPicker from "@/components/studio/StudioCategoryPicker.vue";
 import {mcpApiLive} from "@/api/live/mcpApi.live";
 import {adaptMcpList, adaptMcpMainInfo} from "@/adapters/mcpResponseAdapter";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 import {provideMcpList} from "@/composables/mcp/context/mcpListContext";
 import {useMcpListController} from "@/composables/mcp/useMcpListController";
 
+
 const {t, locale} = useI18n();
 const chatStore = useChatStore();
 const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    chatStore.activeSession,
-    assistant.value,
-    t("chat.assistant")
-  )
-);
+const assistantLabel = computed(() => {
+  const chatInfo = chatStore.selectedChatInfo;
+  const displayLabel = String(chatInfo?.displayAssistantLabel || "").trim();
+  if (displayLabel) return displayLabel;
+
+  const chatAssistantLabel = String(chatInfo?.assistantLabel || "").trim();
+  if (chatAssistantLabel && !chatInfo?.isModelUnavailable) return chatAssistantLabel;
+
+  return String(assistant.value?.label || "").trim() || t("chat.assistant");
+});
 
 const searchText = ref("");
 const activeTab = ref("all");

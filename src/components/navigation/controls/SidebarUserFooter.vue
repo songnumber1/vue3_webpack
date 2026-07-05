@@ -46,7 +46,6 @@ import {authApiLive} from "@/api/live/authApi.live";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {isMermaidRenderingEnabledForPlatform} from "@/utils/mermaidPlatformSettings";
 import {renderMermaidInElement} from "@/utils/mermaidRenderer";
-import {logWarn} from "@/utils/logger";
 import {resolveBlocked} from "@/utils/interactionGuard";
 
 const {t} = useI18n();
@@ -90,7 +89,7 @@ async function toggleTheme() {
       });
     }
   } catch (error) {
-    logWarn("[SidebarUserFooter] toggleTheme 오류:", error);
+    void error;
   }
 }
 
@@ -106,7 +105,7 @@ async function logout() {
   try {
     await authApiLive.logout();
   } catch (error) {
-    logWarn("[SidebarUserFooter] logout 오류:", error);
+    void error;
   } finally {
     resetAppBootstrapState();
     authStore.resetAuth?.();

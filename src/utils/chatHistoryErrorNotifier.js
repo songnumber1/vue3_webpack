@@ -7,7 +7,6 @@ import {i18n} from "@/i18n/appI18n";
 import {showToastByPlatform} from "@/platform/bridge/platformBridge";
 import {usePlatformStore} from "@/stores/platformStore";
 import {shouldUseMobileFeedbackChannel} from "@/utils/appFeedback";
-import {logWarn} from "@/utils/logger";
 
 export function getChatHistorySyncFailMessage() {
   return i18n.global.t("chat.historySync.loadFailed");
@@ -30,10 +29,8 @@ export async function notifyChatHistorySyncFailed(error) {
       window.alert(message);
     }
   } catch (notifyError) {
-    logWarn("[chatHistoryErrorNotifier] 알림 표시 실패:", notifyError);
+    void notifyError;
   } finally {
-    if (error) {
-      logWarn("[chatHistoryErrorNotifier] 대화방 목록 갱신 실패:", error);
-    }
+    void error;
   }
 }

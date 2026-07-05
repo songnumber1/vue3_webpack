@@ -137,8 +137,7 @@
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 import {useRouter} from "vue-router";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
-import {openChatRoom, clearPendingChatRoom} from "@/composables/chat/chatRoomActions";
+import {ROUTE_NAMES} from "@/constants/routeNames";
 import {useI18n} from "vue-i18n";
 import ChatHeader from "@/components/chat/ChatHeader.vue";
 import {useOverlayScrollbar} from "@/composables/ui/useOverlayScrollbar";
@@ -149,18 +148,22 @@ import {
   createHistoryFromSearchResult,
 } from "@/adapters/chatResponseAdapter";
 
+
 const {t, locale} = useI18n();
 const {shouldUseOverlayScrollbar} = useOverlayScrollPolicy();
 const router = useRouter();
 const chatStore = useChatStore();
 const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    chatStore.activeSession,
-    assistant.value,
-    t("chat.assistant")
-  )
-);
+const assistantLabel = computed(() => {
+  const chatInfo = chatStore.selectedChatInfo;
+  const displayLabel = String(chatInfo?.displayAssistantLabel || "").trim();
+  if (displayLabel) return displayLabel;
+
+  const chatAssistantLabel = String(chatInfo?.assistantLabel || "").trim();
+  if (chatAssistantLabel && !chatInfo?.isModelUnavailable) return chatAssistantLabel;
+
+  return String(assistant.value?.label || "").trim() || t("chat.assistant");
+});
 
 const keyword = ref("");
 const lastSearchedKeyword = ref("");
@@ -273,40 +276,57 @@ async function openChat(result) {
   const chatId = String(result?.chatId || result?.id || "").trim();
   if (!chatId) return;
 
-  ensureSearchResultHistory(result, chatId);
+  const messageId = getSearchTargetMessageId(result);
+  const history =
+    ensureSearchResultHistory(result, chatId) ||
+    chatStore.getHistory(chatId) ||
+    {...result, chatId};
 
-  const messageId =
-    result?.searchTargetMessageId ||
-    result?.messageId ||
-    result?.targetMessageId ||
-    result?.msgId ||
-    result?.respMsgId ||
-    result?.raw?.messageId ||
-    result?.raw?.msgId ||
-    result?.raw?.respMsgId ||
-    "";
-  const searchTargetMessageId = isSearchMode.value ? String(messageId).trim() : "";
+  chatStore.prepareChatSearchSelection(result, {
+    chatId,
+    history,
+    isSearchMode: isSearchMode.value,
+    messageId,
+    keyword: lastSearchedKeyword.value,
+    searchContent: result?.searchContent || result?.snippet || result?.preview || lastSearchedKeyword.value,
+  });
 
   try {
-    const opened = await openChatRoom(router, chatId, {
-      searchTargetMessageId,
-      initialScrollType: "top",
-    });
-    if (!opened) return;
+    await router.push({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {});
   } catch (_error) {
-    clearPendingChatRoom(chatId);
+    if (String(chatStore.selectedChatId || "").trim() === chatId) {
+      chatStore.clearSelectedChatState();
+    }
   }
 }
 
-function ensureSearchResultHistory(result = {}, chatId = "") {
-  if (!chatId || chatStore.getHistory(chatId)) return;
+function getSearchTargetMessageId(result = {}) {
+  if (!isSearchMode.value) return "";
 
-  chatStore.addHistory(
-    createHistoryFromSearchResult(
-      {...result, chatId},
-      {fallbackTitle: t("chatSearch.untitled")}
-    )
+  return String(
+    result?.searchTargetMessageId ||
+      result?.messageId ||
+      result?.targetMessageId ||
+      result?.msgId ||
+      result?.respMsgId ||
+      result?.raw?.messageId ||
+      result?.raw?.msgId ||
+      result?.raw?.respMsgId ||
+      ""
+  ).trim();
+}
+
+function ensureSearchResultHistory(result = {}, chatId = "") {
+  if (!chatId) return null;
+  const existingHistory = chatStore.getHistory(chatId);
+  if (existingHistory) return existingHistory;
+
+  const history = createHistoryFromSearchResult(
+    {...result, chatId},
+    {fallbackTitle: t("chatSearch.untitled")}
   );
+  chatStore.addHistory(history);
+  return history;
 }
 
 function formatListDate(value) {

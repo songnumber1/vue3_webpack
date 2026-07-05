@@ -8,9 +8,22 @@
  */
 
 export function cloneMockData(value) {
-  if (typeof structuredClone === "function") return structuredClone(value);
+  if (value == null) return value;
 
-  return JSON.parse(JSON.stringify(value));
+  try {
+    if (typeof structuredClone === "function") return structuredClone(value);
+  } catch (error) {
+    // Vue reactive Proxy나 File/AbortSignal 등은 structuredClone 대상이 아닙니다.
+    // mock API에서는 plain JSON 복제만 필요하므로 JSON 방식으로 안전하게 fallback합니다.
+  }
+
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch (error) {
+    if (Array.isArray(value)) return value.map((item) => ({...item}));
+    if (typeof value === "object") return {...value};
+    return value;
+  }
 }
 function createAbortError() {
   const error = new Error("The mock request was aborted.");

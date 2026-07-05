@@ -64,7 +64,6 @@ import {
   uninstallSwaggerRuntime,
 } from "@/platform/bridge/swagger/swaggerRuntime";
 import {installViewportCssVars} from "@/platform/viewport/viewportCssVars";
-import {logError} from "@/utils/logger";
 
 let swaggerInstance = null;
 
@@ -119,7 +118,6 @@ const renderSwagger = async () => {
     });
   } catch (error) {
     renderError.value = error?.message || t("swagger.renderErrorFallback");
-    logError("[SwaggerPage] render failed", error);
   }
 };
 

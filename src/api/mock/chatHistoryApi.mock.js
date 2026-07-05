@@ -244,6 +244,31 @@ export const chatHistoryApiMock = {
       options
     );
   },
+  getChatOwnerName(userId, options = {}) {
+    return resolveMock(userId ? `사용자 ${userId}` : null, 80, options);
+  },
+  getMessageFileHist(chatId, options = {}) {
+    return resolveMock([], 80, options);
+  },
+  getChatImageList(chatId, options = {}) {
+    return resolveMock([], 80, options);
+  },
+  getChatStudioInfo(assistId, options = {}) {
+    return resolveMock(assistId ? {assistId, studioYN: true} : null, 80, options);
+  },
+  getPresignedURL(filePath, genType = "", prompt = {}, crudType = "C") {
+    return resolveMock({presignUrl: `mock://presigned/${encodeURIComponent(filePath || "file")}`, filePath, genType, prompt, crudType}, 40);
+  },
+  uploadPresignedFile() {
+    return resolveMock({success: true}, 40);
+  },
+  saveGeneratedMessages({chatId, messages} = {}) {
+    if (!chatId || !Array.isArray(messages)) return resolveMock({success: false}, 40);
+    messageStore[chatId] = messages.map((message) => ({...message}));
+    const target = findHistory(chatId);
+    if (target) target[C.CHAT_END_DT] = new Date().toISOString();
+    return resolveMock({success: true}, 40);
+  },
   getSharedConversation({shareId} = {}, options = {}) {
     return resolveMock(buildSharedConversationResponse(shareId), 180, options);
   },

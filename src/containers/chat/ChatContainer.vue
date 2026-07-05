@@ -85,18 +85,20 @@
 
 import {
   computed,
-  onBeforeUnmount,
   onMounted,
   ref,
   watch,
 } from "vue";
 import {useEventListener} from "@vueuse/core";
+import {IMAGE_PREVIEW_EVENT} from "@/constants/promptComposer";
 import {useI18n} from "vue-i18n";
 import {storeToRefs} from "pinia";
 import {useRoute, useRouter} from "vue-router";
 import {useAppRuntimeStore} from "@/stores/appRuntimeStore";
-import {isPortalAssistantId} from "@/constants/assistantPortal";
-import {ROUTE_NAMES} from "@/constants/routeNames";
+import {ASSISTANT_PORTAL_IDS, isPortalAssistantId} from "@/constants/assistantPortal";
+import {CHAT_ROUTE_NAMES, ROUTE_NAMES, SHARED_ROUTE_NAMES, STUDIO_ROUTE_NAMES} from "@/constants/routeNames";
+import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
+import {createId} from "@/utils/id";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import AssistantBottomSheet from "@/components/assistant/select/AssistantBottomSheet.vue";
 import ChatImagePreview from "@/components/chat/ChatImagePreview.vue";
@@ -110,23 +112,14 @@ import StudioWorkspace from "@/components/workspace/StudioWorkspace.vue";
 import McpWorkspace from "@/components/workspace/McpWorkspace.vue";
 import ChatSearchWorkspace from "@/components/search/ChatSearchWorkspace.vue";
 import {useChatStore} from "@/stores/chatStore";
+import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useAppBootstrap} from "@/composables/app/useAppBootstrap";
-import {logWarn} from "@/utils/logger";
-import {
-  deleteChatHistory,
-  loadChatHistoryList,
-  loadExamplePrompts,
-  renameChatHistory,
-  updateChatBookmark,
-} from "@/composables/chat/runtime/chatRuntimeApi";
 import {notifyChatHistorySyncFailed} from "@/utils/chatHistoryErrorNotifier";
-import {
-  revokeMessageAttachments,
-} from "@/composables/chat/chatMessageActions";
-import {markSessionAsMissingAssistant} from "@/composables/chat/internal/policy/chatSessionPolicy";
+import {resolveChatApis} from "@/api/runtime/chatApis";
+import {adaptChatHistoryItem, adaptChatHistoryList} from "@/adapters/chatResponseAdapter";
+import {adaptExamplePromptList} from "@/adapters/promptAdapter";
 import {useAppContext} from "@/composables/app/useAppContext";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {useImagePreview} from "@/composables/chat/useImagePreview";
 import {useViewportGuard} from "@/platform/viewport/useViewportGuard";
 import {syncMobileViewportSettings} from "@/utils/syncMobileViewportSettings";
 import {
@@ -135,15 +128,6 @@ import {
 } from "@/composables/overlay/responseOverlayActions";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
 
-import {
-  cleanupAfterPortalConversationNavigation,
-  clearConversationNavigationState as clearConversationNavigationStateByPolicy,
-  createPortalAssistantRoute,
-  getPortalAssistantIdByRouteName,
-  navigateToMainAfterConversationReset,
-  preparePortalConversationNavigation,
-} from "@/composables/chat/chatRoomActions";
-import {resolveRouteMode} from "@/constants/routeNames";
 import {deleteStudio} from "@/services/studioDetailService";
 import {
   isStudioAssistant,
@@ -152,11 +136,57 @@ import {
 import {provideNavigationActions} from "@/composables/navigation/context/navigationActionContext";
 import {provideStudioDetailActions} from "@/composables/studio/context/studioDetailActionContext";
 
+
+function markSessionAsMissingAssistant(
+  session = {},
+  assistantId = "",
+  assistantLabel = "",
+  assistantType = "studio"
+) {
+  const deletedAssistantId = String(assistantId || session?.assistantId || "").trim();
+  const deletedAssistantLabel =
+    [session?.displayAssistantLabel, session?.assistantLabel, assistantLabel]
+      .map((value) => String(value || "").trim())
+      .find(Boolean) || "";
+
+  return {
+    ...session,
+    chatId: session?.chatId || "",
+    assistantId: session?.assistantId || deletedAssistantId,
+    assistantType: session?.assistantType || assistantType,
+    assistantLabel: session?.assistantLabel || deletedAssistantLabel,
+    displayAssistantId: session?.displayAssistantId || deletedAssistantId,
+    displayAssistantLabel:
+      session?.displayAssistantLabel || deletedAssistantLabel,
+    isAssistantMissing: true,
+    isModelUnavailable: true,
+    modelUnavailableReason: "missing-assistant",
+  };
+}
+
+function getPreviewSources(detail = {}) {
+  return [detail.dataUrl, detail.previewUrl, detail.url]
+    .filter((url) => typeof url === "string" && url.length > 0)
+    .filter((url, index, array) => array.indexOf(url) === index);
+}
+
+function readPreviewDataUrl(file) {
+  return new Promise((resolve) => {
+    if (!file || typeof FileReader === "undefined") return resolve("");
+    const reader = new FileReader();
+    reader.onload = () =>
+      resolve(typeof reader.result === "string" ? reader.result : "");
+    reader.onerror = () => resolve("");
+    reader.readAsDataURL(file);
+  });
+}
+
 /**
  * [ChatContainer 연결 구조]
  * 이 파일은 route/page 상태와 주요 UI/data 흐름을 직접 연결합니다.
  * 채팅 질의/답변 실행은 ChatHistory가 담당하고, 이 파일은 workspace 전환과 공통 UI 상태만 관리합니다.
  */
+
 
 const WORKSPACE_TYPES = Object.freeze({
   MAIN: "main",
@@ -175,17 +205,16 @@ const route = useRoute();
 const router = useRouter();
 const appRuntimeStore = useAppRuntimeStore();
 const chatStore = useChatStore();
+const promptControlStore = usePromptControlStore();
 const studioRuntimeStore = useStudioRuntimeStore();
 const appBootstrap = useAppBootstrap();
 const {
   assistants: assistantListRef,
-  selectedAssistantId: selectedAssistantIdRef,
-  selectedModelId: selectedModelIdRef,
+  selectedAssist: selectedAssistRef,
+  selectedModel: selectedModelRef,
 } = storeToRefs(chatStore);
-const {histories: historyListRef} = storeToRefs(chatStore);
-
 // 템플릿에서는 기존 prop 이름을 그대로 사용하므로 ref alias를 명시합니다.
-const selectedAssistantId = selectedAssistantIdRef;
+const selectedAssistantId = selectedAssistRef;
 
 function getRuntimeAssistantList() {
   return Array.isArray(chatStore.assistants)
@@ -198,16 +227,17 @@ function getRuntimeAssistantCount() {
 }
 async function refreshHistories({notifyOnError = false} = {}) {
   try {
-    const chatHistories = await loadChatHistoryList({
+    const {chatHistoryApi} = resolveChatApis();
+    const rawHistories = await chatHistoryApi.getChatHistoryList();
+    const chatHistories = adaptChatHistoryList(rawHistories, {
       assistantMap: chatStore.assistantMap,
       modelMap: chatStore.modelMap,
     });
-    chatStore.setHistories(chatHistories);
+    chatStore.setChatRooms(chatHistories);
     return chatHistories;
   } catch (error) {
-    logWarn("[ChatContainer] refreshHistories 오류:", error);
     if (notifyOnError) await notifyChatHistorySyncFailed(error);
-    return chatStore.histories;
+    return chatStore.chatRooms;
   }
 }
 
@@ -215,55 +245,48 @@ function syncHistoriesInBackground(options = {}) {
   return Promise.resolve()
     .then(() => refreshHistories(options))
     .catch((error) => {
-      logWarn("[ChatContainer] syncHistoriesInBackground 오류:", error);
-      return chatStore.histories;
+      void error;
+      return chatStore.chatRooms;
     });
 }
 
 async function toggleHistoryBookmark(history) {
   if (!history?.chatId) return;
-  try {
-    syncHistoriesInBackground({notifyOnError: true});
-    await updateChatBookmark({
-      chatId: history.chatId,
-      bookmarkYN: !history.isPinned,
-    });
-    syncHistoriesInBackground({notifyOnError: true});
-  } catch (error) {
-    logWarn("[ChatContainer] toggleHistoryBookmark 오류:", error);
-    throw error;
-  }
+  syncHistoriesInBackground({notifyOnError: true});
+  const {chatHistoryApi} = resolveChatApis();
+  await chatHistoryApi.updateBookmark({
+    chatId: history.chatId,
+    bookmarkYN: !history.isPinned,
+  });
+  syncHistoriesInBackground({notifyOnError: true});
 }
 
 async function renameHistory(history, title) {
   const chatTitle = String(title || "").trim();
   if (!history?.chatId || !chatTitle) return;
-  try {
-    syncHistoriesInBackground({notifyOnError: true});
-    await renameChatHistory({chatId: history.chatId, chatTitle});
-    syncHistoriesInBackground({notifyOnError: true});
-  } catch (error) {
-    logWarn("[ChatContainer] renameHistory 오류:", error);
-    throw error;
-  }
+  syncHistoriesInBackground({notifyOnError: true});
+  const {chatHistoryApi} = resolveChatApis();
+  await chatHistoryApi.renameChat({chatId: history.chatId, chatTitle});
+  syncHistoriesInBackground({notifyOnError: true});
 }
 
 async function removeHistory(history) {
   if (!history?.chatId) return;
-  try {
-    syncHistoriesInBackground({notifyOnError: true});
-    await deleteChatHistory({chatId: history.chatId});
-    if (String(chatStore.selectedChatId) === String(history.chatId)) {
-      chatStore.clearActiveSession();
-    }
-    syncHistoriesInBackground({notifyOnError: true});
-  } catch (error) {
-    logWarn("[ChatContainer] removeHistory 오류:", error);
-    throw error;
+  syncHistoriesInBackground({notifyOnError: true});
+  const {chatHistoryApi} = resolveChatApis();
+  await chatHistoryApi.deleteChat({chatId: history.chatId});
+  if (String(chatStore.selectedChatId) === String(history.chatId)) {
+    chatStore.clearSelectedChatState();
   }
+  syncHistoriesInBackground({notifyOnError: true});
 }
-const routeMode = computed(() => resolveRouteMode(route.name));
-const currentMode = computed(() => routeMode.value);
+const currentMode = computed(() => {
+  if (SHARED_ROUTE_NAMES.includes(route.name)) return "shared";
+  if (STUDIO_ROUTE_NAMES.includes(route.name)) return "studio";
+  if (route.name === ROUTE_NAMES.CHAT_SEARCH) return "chat-search";
+  if (CHAT_ROUTE_NAMES.includes(route.name)) return "chat";
+  return "main";
+});
 const pageState = {
   currentMode,
   isMainPage: computed(() => currentMode.value === "main"),
@@ -287,6 +310,19 @@ const activeWorkspaceType = computed(() => {
   return WORKSPACE_TYPES.MAIN;
 });
 
+const routeMode = computed(() => {
+  if (pageState.isReadOnly.value) return "shared";
+
+  const workspaceType = activeWorkspaceType.value;
+  if (workspaceType === WORKSPACE_TYPES.CONVERSATION) return "chat";
+  if (workspaceType === WORKSPACE_TYPES.MAIN) return "main";
+  if (workspaceType === WORKSPACE_TYPES.STUDIO) return "studio";
+  if (workspaceType === WORKSPACE_TYPES.MCP) return "mcp";
+  if (workspaceType === WORKSPACE_TYPES.CHAT_SEARCH) return "chat-search";
+
+  return currentMode.value;
+});
+
 const activeHistoryId = computed(() => {
   if (route.name === ROUTE_NAMES.SHARE_CHAT_ENTRY) {
     return String(route.params?.id || "").trim() || null;
@@ -296,9 +332,13 @@ const activeHistoryId = computed(() => {
     return chatStore.selectedChatId || null;
   }
   if (pageState.isSharedPage.value) {
-    return chatStore.activeRoomType === "shared"
-      ? String(chatStore.activeRoomId || "").trim()
-      : String(route.params?.id || route.params?.shareId || "").trim();
+    return String(
+      chatStore.selectedChatInfo?.sharedId ||
+        chatStore.selectedChatInfo?.chatId ||
+        route.params?.id ||
+        route.params?.shareId ||
+        ""
+    ).trim();
   }
   return null;
 });
@@ -313,25 +353,14 @@ const runtimeCurrentAssistant = computed(
     chatStore.currentAssistant ||
     assistantListRef.value[0] || {id: "", label: "Assistant", description: ""}
 );
-const runtimeIsActiveModelDeleted = computed(() =>
-  Boolean(chatStore.activeSession?.isModelDeleted)
-);
 const runtimeIsActiveModelUnavailable = computed(() =>
-  Boolean(chatStore.activeSession?.isModelUnavailable)
+  Boolean(chatStore.selectedChatInfo?.isModelUnavailable)
 );
 const runtimeIsModelLocked = computed(
   () => chatStore.isModelLocked || pageState.isConversationPage.value
 );
-const runtimeModels = computed(() => {
-  const lockedModelId = chatStore.activeSession?.modelId;
-  if (!runtimeIsModelLocked.value || !lockedModelId) {
-    return chatStore.currentModels;
-  }
-
-  return [chatStore.modelMap[lockedModelId]].filter(Boolean);
-});
 const runtimeSelectedModel = computed({
-  get: () => chatStore.activeSession?.modelId || selectedModelIdRef.value,
+  get: () => chatStore.selectedChatInfo?.modelId || selectedModelRef.value,
   set: (id) => {
     if (runtimeIsModelLocked.value) return;
     chatStore.selectModel(id);
@@ -345,13 +374,14 @@ async function preloadRuntimeExamplePrompts(assistantId) {
   if (!assistantId || chatStore.examplePromptMap[assistantId]) return;
   try {
     const assistant = chatStore.assistantMap[assistantId];
-    const prompts = await loadExamplePrompts(
-      assistantId,
-      assistant?.type === "studio"
-    );
-    chatStore.setExamplePrompts(assistantId, prompts);
+    const {examplePromptApi} = resolveChatApis();
+    const response = await examplePromptApi.getExamplePrompts({
+      assistId: assistantId,
+      studioYN: assistant?.type === "studio",
+    });
+    chatStore.setExamplePrompts(assistantId, adaptExamplePromptList(response));
   } catch (error) {
-    logWarn("[ChatContainer] preloadExamplePrompts 오류:", error);
+    void error;
   }
 }
 
@@ -361,37 +391,16 @@ async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   try {
     await preloadRuntimeExamplePrompts(id);
     chatStore.selectAssistant(id);
-    if (forNewChat) chatStore.clearActiveSession();
+    if (forNewChat) chatStore.clearSelectedChatState();
   } catch (error) {
-    logWarn("[ChatContainer] selectAssistant 오류:", error);
+    void error;
   }
 }
 
-const runtime = {
-  initialize: initializeRuntime,
-  assistants: assistantListRef,
-  currentAssistant: runtimeCurrentAssistant,
-  histories: historyListRef,
-  models: runtimeModels,
-  selectedAssistantId: selectedAssistantIdRef,
-  selectedModel: runtimeSelectedModel,
-  isModelLocked: runtimeIsModelLocked,
-  isActiveModelDeleted: runtimeIsActiveModelDeleted,
-  isActiveModelUnavailable: runtimeIsActiveModelUnavailable,
-  refreshHistories,
-  syncHistoriesInBackground,
-  toggleHistoryBookmark,
-  renameHistory,
-  removeHistory,
-  selectAssistant: selectRuntimeAssistant,
-  clearActiveSession: chatStore.clearActiveSession.bind(chatStore),
-  revokeMessageAttachments,
-};
-
-const assistants = runtime.assistants;
-const currentAssistant = runtime.currentAssistant;
-const selectedModel = runtime.selectedModel;
-const isActiveModelUnavailable = runtime.isActiveModelUnavailable;
+const assistants = assistantListRef;
+const currentAssistant = runtimeCurrentAssistant;
+const selectedModel = runtimeSelectedModel;
+const isActiveModelUnavailable = runtimeIsActiveModelUnavailable;
 
 const appShellStore = useAppShellStore();
 appShellStore.setThemeName(theme.current);
@@ -405,14 +414,87 @@ const assistantSheetOpen = computed({
     }
   },
 });
-const {previewImage, closeImagePreview, handlePreviewLoad, handlePreviewError} =
-  useImagePreview();
+const previewImage = ref(null);
+
+async function hydrateOpenPreviewFromFile(targetPreview) {
+  const dataUrl = await readPreviewDataUrl(targetPreview?.file);
+  if (!dataUrl || previewImage.value?.id !== targetPreview.id) return;
+  previewImage.value = {
+    ...previewImage.value,
+    dataUrl,
+    url: dataUrl,
+    sources: [dataUrl, ...(previewImage.value.sources || [])].filter(
+      (url, index, array) => url && array.indexOf(url) === index
+    ),
+    loading: true,
+    error: false,
+  };
+}
+
+function openImagePreview(event) {
+  const detail = event?.detail || {};
+  const sources = getPreviewSources(detail);
+  const firstUrl = sources[0] || "";
+  previewImage.value = {
+    ...detail,
+    url: firstUrl,
+    sources,
+    sourceIndex: 0,
+    loading: Boolean(firstUrl || detail.file),
+    error: !firstUrl && !detail.file,
+  };
+  if (detail.file && !detail.dataUrl) {
+    hydrateOpenPreviewFromFile({...detail, id: previewImage.value.id});
+  }
+}
+
+function handlePreviewLoad() {
+  if (!previewImage.value) return;
+  previewImage.value.loading = false;
+  previewImage.value.error = false;
+}
+
+async function handlePreviewError() {
+  const current = previewImage.value;
+  if (!current) return;
+  const nextIndex = Number(current.sourceIndex || 0) + 1;
+  const nextUrl = current.sources?.[nextIndex];
+  if (nextUrl) {
+    previewImage.value = {
+      ...current,
+      url: nextUrl,
+      sourceIndex: nextIndex,
+      loading: true,
+      error: false,
+    };
+    return;
+  }
+  const dataUrl = await readPreviewDataUrl(current.file);
+  if (dataUrl && previewImage.value?.id === current.id) {
+    previewImage.value = {
+      ...previewImage.value,
+      dataUrl,
+      url: dataUrl,
+      sources: [dataUrl],
+      sourceIndex: 0,
+      loading: true,
+      error: false,
+    };
+    return;
+  }
+  if (previewImage.value?.id === current.id) {
+    previewImage.value.loading = false;
+    previewImage.value.error = true;
+  }
+}
+
+function closeImagePreview() {
+  previewImage.value = null;
+}
+
+useEventListener(window, IMAGE_PREVIEW_EVENT, openImagePreview);
 
 const isMobile = computed(() => true);
-
-function updateMobileState() {
-  // 모바일 전용 UI라 별도 갱신이 필요 없습니다.
-}
 
 configureResponseOverlay({
   isMobile,
@@ -422,8 +504,6 @@ configureResponseOverlay({
   suppressChatRouteLoadId: activeHistoryId,
 });
 setupResponseOverlayBackGuard();
-
-function cleanupScrollResources() {}
 
 const {keyboardOpen, refreshViewport} = useViewportGuard({
   onChange: () => {},
@@ -449,14 +529,11 @@ const historyDialogTitle = computed(() => {
   return t("chat.historyDialog.renameTitle");
 });
 
-function resolveHistoryShareChatId(history) {
-  return String(
+const historyDialogShareUrl = computed(() => {
+  const history = historyDialogTarget.value;
+  const chatId = String(
     history?.chatId || history?.raw?.chatId || history?.sharedId || ""
   ).trim();
-}
-
-const historyDialogShareUrl = computed(() => {
-  const chatId = resolveHistoryShareChatId(historyDialogTarget.value);
   if (!chatId || typeof window === "undefined") return "";
 
   const href = router.resolve({
@@ -505,12 +582,12 @@ async function confirmHistoryDialog(value) {
     if (historyDialogMode.value === "rename") {
       const nextTitle = String(value || "").trim();
       if (!nextTitle) return;
-      await runtime.renameHistory(target, nextTitle);
+      await renameHistory(target, nextTitle);
       return;
     }
 
     if (historyDialogMode.value === "delete") {
-      await runtime.removeHistory(target);
+      await removeHistory(target);
 
       if (String(activeHistoryId.value) === String(target.chatId)) {
         await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
@@ -519,10 +596,10 @@ async function confirmHistoryDialog(value) {
     }
 
     if (historyDialogMode.value === "share") {
-      runtime.syncHistoriesInBackground?.({notifyOnError: true});
+      syncHistoriesInBackground({notifyOnError: true});
     }
   } catch (error) {
-    logWarn("[ChatContainer] confirmHistoryDialog 오류:", error);
+    void error;
   } finally {
     closeHistoryDialog();
   }
@@ -532,13 +609,13 @@ async function handleHistoryMenuAction({action, history} = {}) {
   if (chatStore.isWait) return;
   if (!history || !action) return;
 
-  runtime.syncHistoriesInBackground?.({notifyOnError: true});
+  syncHistoriesInBackground({notifyOnError: true});
 
   if (action === "pin" || action === "unpin") {
     try {
-      await runtime.toggleHistoryBookmark(history);
+      await toggleHistoryBookmark(history);
     } catch (error) {
-      logWarn("[ChatContainer] toggleHistoryBookmark 오류:", error);
+      void error;
     }
     return;
   }
@@ -565,7 +642,7 @@ async function handleHistoryMenuAction({action, history} = {}) {
 }
 
 function refreshPromptViewport() {
-  if (pageState.isReadOnly.value || runtime.isActiveModelUnavailable.value) {
+  if (pageState.isReadOnly.value || isActiveModelUnavailable.value) {
     return;
   }
 
@@ -573,15 +650,14 @@ function refreshPromptViewport() {
 }
 
 function clearConversationNavigationState() {
-  clearConversationNavigationStateByPolicy();
+  chatStore.setSelectedChatSearchInfo(null);
+  chatStore.clearSelectedChatState();
   cleanupConversationForNavigation();
 }
 
 async function navigateToMainAfterReset() {
-  await navigateToMainAfterConversationReset(
-    router,
-    clearConversationNavigationState
-  );
+  clearConversationNavigationState();
+  await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
 }
 
 async function resetChatState({assistantId = null} = {}) {
@@ -591,9 +667,9 @@ async function resetChatState({assistantId = null} = {}) {
 
   if (assistantId) {
     try {
-      await runtime.selectAssistant(assistantId, {forNewChat: true});
+      await selectRuntimeAssistant(assistantId, {forNewChat: true});
     } catch (error) {
-      logWarn("[ChatContainer] selectAssistant 오류:", error);
+      void error;
     }
     assistantSheetOpen.value = false;
   }
@@ -604,43 +680,27 @@ async function resetChatState({assistantId = null} = {}) {
 
 const startNewChat = resetChatState;
 
-function bindUiEvents() {
-  useEventListener(window, "resize", updateMobileState, {passive: true});
-}
-
 function handleRuntimeOverlayApplied() {
   syncMobileViewportSettings();
   refreshViewport();
-  updateMobileState();
-  chatStore.requestScrollToBottom({behavior: "auto"});
 }
 
 function cleanupConversationForNavigation() {
-}
-
-function cleanupUiResources() {
-  cleanupScrollResources();
+  return null;
 }
 
 const runtimeReady = ref(false);
 
 const isGenerating = computed(() => chatStore.isWait);
 const isReadOnly = computed(() => pageState.isReadOnly.value || chatStore.isActiveSharedRoom);
-bindUiEvents();
-
 onMounted(async () => {
-  updateMobileState();
   try {
-    await runtime.initialize();
+    await initializeRuntime();
   } catch (error) {
-    logWarn("[ChatContainer] runtime.initialize 오류:", error);
+    void error;
   } finally {
     runtimeReady.value = true;
   }
-});
-
-onBeforeUnmount(() => {
-  cleanupUiResources();
 });
 
 const shellReady = computed(
@@ -746,7 +806,7 @@ async function handleStudioDetailDelete(studio) {
   if (route.name === ROUTE_NAMES.MAIN) {
     const nextAssistant = findFirstNormalAssistant();
     if (nextAssistant?.id) chatStore.selectAssistant(nextAssistant.id);
-    chatStore.clearActiveSession();
+    chatStore.clearSelectedChatState();
     return;
   }
 
@@ -754,7 +814,7 @@ async function handleStudioDetailDelete(studio) {
     route.name === ROUTE_NAMES.CHAT_DETAIL ||
     route.name === ROUTE_NAMES.CHAT_ENTRY
   ) {
-    const currentSession = chatStore.activeSession || {};
+    const currentSession = chatStore.selectedChatInfo || {};
     const isCurrentDeletedStudio =
       String(currentSession.assistantId || "") === deletedStudioId ||
       String(currentAssistant.value?.id || "") === deletedStudioId;
@@ -769,26 +829,49 @@ async function handleStudioDetailDelete(studio) {
         ""
     ).trim();
 
-    chatStore.setActiveSession(
-      markSessionAsMissingAssistant(
-        {
-          ...currentSession,
-          chatId: currentSession.chatId || chatStore.selectedChatId,
-        },
-        deletedStudioId,
-        deletedStudioLabel,
-        "studio"
-      )
+    const missingAssistantSession = markSessionAsMissingAssistant(
+      {
+        ...currentSession,
+        chatId: currentSession.chatId || chatStore.selectedChatId,
+      },
+      deletedStudioId,
+      deletedStudioLabel,
+      "studio"
     );
+    chatStore.setSelectedChatId(missingAssistantSession.chatId || chatStore.selectedChatId);
+    chatStore.setSelectedChatInfo(missingAssistantSession);
   }
 }
 
+const PORTAL_ROUTE_BY_ASSISTANT_ID = Object.freeze({
+  [ASSISTANT_PORTAL_IDS.STUDIO]: ROUTE_NAMES.STUDIO,
+  [ASSISTANT_PORTAL_IDS.CONNECTOR_STORE]: ROUTE_NAMES.CONNECTOR_STORE,
+});
+
+const PORTAL_ASSISTANT_ID_BY_ROUTE_NAME = Object.freeze({
+  [ROUTE_NAMES.STUDIO]: ASSISTANT_PORTAL_IDS.STUDIO,
+  [ROUTE_NAMES.CONNECTOR_STORE]: ASSISTANT_PORTAL_IDS.CONNECTOR_STORE,
+});
+
+function createPortalAssistantRoute(assistantId) {
+  return {
+    name:
+      PORTAL_ROUTE_BY_ASSISTANT_ID[String(assistantId || "").trim()] ||
+      ROUTE_NAMES.STUDIO,
+  };
+}
+
+function getPortalAssistantIdByRouteName(routeName) {
+  return PORTAL_ASSISTANT_ID_BY_ROUTE_NAME[String(routeName || "").trim()] || "";
+}
+
 function preparePortalNavigation() {
-  preparePortalConversationNavigation();
+  chatStore.setSelectedChatSearchInfo(null);
+  appShellStore.closeTransientShellPanels();
 }
 
 function cleanupAfterPortalNavigation() {
-  cleanupAfterPortalConversationNavigation();
+  chatStore.clearSelectedChatState();
 }
 
 async function openPortalAssistant(assistantId) {
@@ -828,14 +911,14 @@ function syncAssistantSelectionWithRoute() {
     const portalAssistant = chatStore.assistantMap[routePortalAssistantId];
     if (
       portalAssistant &&
-      chatStore.selectedAssistantId !== routePortalAssistantId
+      chatStore.selectedAssist !== routePortalAssistantId
     ) {
       chatStore.selectAssistant(routePortalAssistantId);
     }
     return;
   }
 
-  if (isPortalAssistantId(chatStore.selectedAssistantId)) {
+  if (isPortalAssistantId(chatStore.selectedAssist)) {
     const fallbackAssistant = findFirstNormalAssistant();
     if (fallbackAssistant) chatStore.selectAssistant(fallbackAssistant.id);
   }
@@ -852,14 +935,49 @@ watch(
  */
 function setWorkspaceRef() {}
 
+async function createConversationFromInput(payload = {}) {
+  const {chatHistoryApi} = resolveChatApis();
+  const text = payload?.text || "";
+  const chatId = createId();
+  const rawHistory = await chatHistoryApi.createChat({
+    chatId,
+    assistId: chatStore.getSelectedAssistId(),
+    modelId: chatStore.getSelectedModelId(),
+    ChatTilte: String(text || "새 대화").slice(0, 20),
+    studio: Boolean(chatStore.selectedAssistInfo?.studioYN),
+  });
+  const history = adaptChatHistoryItem(rawHistory, {
+    assistantMap: chatStore.assistantMap,
+    modelMap: chatStore.modelMap,
+  });
+  const nextHistory = {
+    ...history,
+    chatId: history.chatId || chatId,
+    title: history.title || String(text || "새 대화").slice(0, 20),
+    roomType: ACTIVE_ROOM_TYPES.chat,
+  };
 
-function handleWorkspaceSubmit(payload) {
+  chatStore.addHistory(nextHistory);
+  promptControlStore.promoteDraftPromptToolSettingsToChat(nextHistory.chatId);
+  chatStore.setSelectedChatId(nextHistory.chatId);
+  chatStore.setSelectedChatInfo(nextHistory);
+
+  return nextHistory;
+}
+
+async function handleWorkspaceSubmit(payload) {
   if (chatPageLock.isSubmitBlocked.value) return;
   if (route.name !== ROUTE_NAMES.MAIN) return;
-  chatStore.setInput(payload);
-  router.push({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {
-    chatStore.clearInput();
-  });
+  if (!payload?.text && !payload?.attachments?.length) return;
+
+  try {
+    const history = await createConversationFromInput(payload);
+    await router.push({name: ROUTE_NAMES.CHAT_ENTRY});
+    chatStore.initSelectChatInfo(payload.text, history.chatId, createId());
+  } catch (error) {
+    chatStore.clearInputChat();
+    chatStore.setGenerateMsgId(null);
+  }
 }
 
 function handleWorkspaceSelectedModelUpdate(value) {

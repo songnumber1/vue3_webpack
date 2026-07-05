@@ -81,7 +81,7 @@ import {
 } from "@/constants/promptComposer";
 import {usePromptControlStore} from "@/stores/promptControlStore";
 import {useChatStore} from "@/stores/chatStore";
-import {isSharedChat} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
+import {useFileStore} from "@/stores/fileStore";
 import {useSpeechRecognition} from "@/platform/speech/useSpeechRecognition";
 import {
   createBrowserAttachment,
@@ -89,12 +89,11 @@ import {
   revokeAttachmentUrl,
 } from "@/utils/attachment";
 import {resolvePromptTemplateToolIcon} from "@/constants/toolIcons";
-import {
-  PROMPT_TEXTAREA_STATE_KEY,
-  PROMPT_TOOLBAR_STATE_KEY,
-} from "@/composables/chat/chatStateContext";
 import {providePromptInputActions} from "@/composables/prompt/context/promptInputActionContext";
 import {providePromptInputState} from "@/composables/prompt/context/promptInputStateContext";
+
+const PROMPT_TOOLBAR_STATE_KEY = "PROMPT_TOOLBAR_STATE";
+const PROMPT_TEXTAREA_STATE_KEY = "PROMPT_TEXTAREA_STATE";
 
 const componentProps = defineProps({
   submitDisabled: {type: Boolean, default: false},
@@ -112,22 +111,33 @@ const emit = defineEmits([
   "expanded-change",
 ]);
 
+
+function isSharedChat(history) {
+  return Boolean(
+    history?.sharedId ||
+      history?.shareId ||
+      history?.roomType === "shared" ||
+      history?.type === "shared"
+  );
+}
+
 const chatStore = useChatStore();
+const fileStore = useFileStore();
 const promptModels = computed(() => {
-  const lockedModelId = chatStore.activeSession?.modelId;
+  const lockedModelId = chatStore.selectedChatInfo?.modelId;
   const lockedModel = lockedModelId ? chatStore.modelMap[lockedModelId] : null;
 
   if (promptModelReadonly.value && lockedModel) return [lockedModel];
   return chatStore.currentModels || [];
 });
 const promptModelValue = computed(
-  () => chatStore.activeSession?.modelId || chatStore.selectedModelId || ""
+  () => chatStore.selectedChatInfo?.modelId || chatStore.selectedModel || ""
 );
 const promptModelReadonly = computed(() =>
   Boolean(
     chatStore.isModelLocked ||
     chatStore.selectedChatId ||
-    chatStore.activeRoomId
+    chatStore.selectedChatId
   )
 );
 const activeHistory = computed(() =>
@@ -137,7 +147,7 @@ const isReadonlyConversation = computed(
   () =>
     chatStore.isActiveSharedRoom ||
     isSharedChat(activeHistory.value) ||
-    Boolean(chatStore.activeSession?.sharedId)
+    Boolean(chatStore.selectedChatInfo?.sharedId)
 );
 
 const props = reactive({
@@ -259,7 +269,7 @@ function setPromptInputRef(instance) {
 // ── [첨부 파일] ─────────────────────────────────────────────────────────
 // 이미지, 문서 등의 물리 미디어 파일을 드롭다운 메뉴나 운영체제 탐색기를 통해 수집합니다.
 const fileInputRef = ref(null);
-const attachments = ref([]);
+const attachments = computed(() => fileStore.tempFileList);
 const FILE_INPUT_ACCEPT = ".jpg,image/jpeg";
 
 function openAttachSelector() {
@@ -286,7 +296,7 @@ function addFiles(fileList) {
   const mapped = Array.from(fileList || []).map(createBrowserAttachment);
   if (!mapped.length) return;
 
-  attachments.value = [...attachments.value, ...mapped];
+  fileStore.addTempFiles(mapped);
 
   mapped
     .filter((file) => file.kind === "image")
@@ -326,7 +336,7 @@ function removeAttachment(id) {
   const target = attachments.value.find((file) => file.id === id);
   revokeAttachmentUrl(target);
 
-  attachments.value = attachments.value.filter((file) => file.id !== id);
+  fileStore.removeTempFile(id);
   nextTick(resize);
 }
 
@@ -334,7 +344,7 @@ function clearAttachments() {
   attachments.value.forEach((file) => {
     revokeAttachmentUrl(file);
   });
-  attachments.value = [];
+  fileStore.clearTempFiles();
 }
 
 // ── [음성 입력] ─────────────────────────────────────────────────────────
@@ -426,7 +436,7 @@ function hasTemplateFields(template = {}) {
 }
 
 const currentModelTemplates = computed(() => {
-  const selectedModelId = props.modelValue || chatStore.selectedModelId || "";
+  const selectedModelId = props.modelValue || chatStore.selectedModel || "";
 
   return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
@@ -680,6 +690,11 @@ function submit() {
     text: value, // 정문화된 유저 프롬프트 문자열
     attachments: attachments.value, // 최종 검증 통과된 업로드 파일 배열 본체
     promptTemplate: selectedTemplate.value, // 결합 적용된 프롬프트 기본 서식 명세 객체
+    promptTemplateOptions: selectedTemplateOptions.value,
+    selectedRagOptions: activePromptToolSettings.value.knowledgeSearch || [],
+    tmpSelectedRagOptions: activePromptToolSettings.value.knowledgeSearch || [],
+    webSearch: activePromptToolSettings.value.webSearch || null,
+    webSearchEnabled: Boolean(activePromptToolSettings.value.webSearchEnabled),
     keyboardOpenOnSubmit, // 모바일 키보드가 열린 상태에서 전송했는지 여부. 전송 후 앵커 스크롤 보정에 사용합니다.
   });
 

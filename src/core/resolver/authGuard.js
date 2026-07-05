@@ -10,7 +10,6 @@ import {
   ENABLE_AUTH_GUARD_CACHE,
 } from "@/constants/auth";
 import {useAuthStore} from "@/stores/authStore";
-import {logInfo} from "@/utils/logger";
 import {
   resolveAuthAccessResult,
   unwrapAuthResponseBody,
@@ -42,11 +41,10 @@ function createAccessPayload(to) {
 /**
  * 인증 가드 디버그 플래그가 활성화되어 있을 때만 선택적으로 보안 콘솔 로그를 남깁니다.
  * @param {...*} args - 콘솔에 출력할 디버깅용 파라미터 나열
- * @see {@link logInfo} 커스텀 조건부 로깅 모듈 유틸리티 함수
  */
 function debugAuthGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
-    logInfo("[auth-guard]", ...args);
+    void args;
   }
 }
 

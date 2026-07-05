@@ -4,7 +4,6 @@
  */
 
 import mermaid from "mermaid";
-import {logWarn} from "@/utils/logger";
 import {destroyOverlayScrollbar} from "@/platform/scroll/overlayScrollbarController";
 
 // -----------------------------------------------------------------------------
@@ -290,10 +289,6 @@ async function isMermaidSourceRenderable(mermaid, source) {
 
     return result !== false;
   } catch (error) {
-    logWarn(
-      "Mermaid syntax validation failed. The source code block will remain visible.",
-      error
-    );
 
     return false;
   }
@@ -537,10 +532,6 @@ async function renderMermaidTargetsWithRenderApi(
       if (!shouldContinueMermaidRender(options) || !target.isConnected) break;
 
       showMermaidSourceAsCode(target);
-      logWarn(
-        "Mermaid rendering failed. The source code block will remain visible.",
-        error
-      );
     } finally {
       if (
         shouldContinueMermaidRender(options) &&

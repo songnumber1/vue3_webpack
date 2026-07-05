@@ -4,7 +4,6 @@
  */
 
 import {isAndroidApp} from "@/core/config/appConfig";
-import {logWarn} from "@/utils/logger";
 
 /**
  * @description [Null Object 패턴]: 일반 PC/모바일 웹 브라우저 환경에서 실행되어 네이티브 기능 인터페이스가 부재할 때,
@@ -14,8 +13,7 @@ const noopBridge = {
   getStorage: () => null, // 기기 네이티브 암호화 저장소 요구 시 빈 값 반환 우회
   setStorage: () => {}, // 기기 네이티브 암호화 저장소 적재 명령 무동작 스텁
   toast: (message) => {
-    // 하드웨어 토스트 팝업을 띄울 수 없으므로, 개발자 도구 콘솔창에 경고 로그로 안전하게 대체 포워딩 처리
-    logWarn("[native-toast:fallback]", message);
+    void message;
   },
   requestPermission: () => Promise.resolve(false), // OS 권한(카메라, 마이크 등) 요청 시 웹 환경이므로 즉시 거부(false) 프로미스 반환
   uploadFile: () =>

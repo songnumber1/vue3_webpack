@@ -114,7 +114,7 @@ const selectedWebSearchEngine = computed(
 );
 
 const selectableTemplates = computed(() => {
-  const modelId = props.modelValue || chatStore.selectedModelId || "";
+  const modelId = props.modelValue || chatStore.selectedModel || "";
   return chatStore.promptTemplates
     .filter((template) => isSelectableTemplate(template))
     .filter((template) => !template.modelId || template.modelId === modelId)

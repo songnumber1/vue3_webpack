@@ -89,7 +89,6 @@ import {computed, ref, watch} from "vue";
 import {useI18n} from "vue-i18n";
 import AppModal from "@/components/common/modal/AppModal.vue";
 import {copyClipboardByPlatform} from "@/platform/bridge/platformBridge";
-import {logWarn} from "@/utils/logger";
 
 const {t} = useI18n();
 
@@ -130,7 +129,7 @@ async function copyShareLink() {
     await copyClipboardByPlatform(props.shareUrl);
     emit("cancel");
   } catch (error) {
-    logWarn("[ChatHistoryConfirmDialog] copy share link failed:", error);
+    void error;
   }
 }
 

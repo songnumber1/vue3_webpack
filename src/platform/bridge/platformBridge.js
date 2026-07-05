@@ -5,7 +5,6 @@
 
 import {callNative} from "@/platform/bridge/native/bridgeNativeRuntime";
 import {usePlatformStore} from "@/stores/platformStore";
-import {logInfo, logWarn} from "@/utils/logger";
 import {copyText as copyWebText} from "@/platform/system/clipboard";
 import {i18n} from "@/i18n/appI18n";
 import {logPlatformDebug} from "@/platform/platformDebug";
@@ -74,7 +73,7 @@ async function callNativeWithLogging(type, payload = {}) {
   try {
     return await callNative(type, payload);
   } catch (error) {
-    logWarn(`[platformBridge] native bridge failed: ${type}`, error);
+    void error;
     throw error;
   }
 }
@@ -152,7 +151,7 @@ export async function copyClipboardByPlatform(text) {
 
           return webSuccess({copied}, message);
         } catch (error) {
-          logWarn("[platformBridge] browser clipboard failed:", error);
+    void error;
           return webSuccess({copied: false}, t("clipboardNote.fail"));
         }
       },
@@ -179,7 +178,7 @@ export async function openExternalBrowser(url) {
           window.open(url, "_blank", "noopener,noreferrer");
           return webSuccess({opened: true});
         } catch (error) {
-          logWarn("[platformBridge] browser external open failed:", error);
+    void error;
           return webSuccess({opened: false});
         }
       },
@@ -341,7 +340,6 @@ export async function showToastByPlatform(message, options = {}) {
     {
       browserFallback: () => {
         notifyToastRequested(normalizedMessage, options);
-        logInfo("[toast]", normalizedMessage);
 
         return webSuccess({shown: true, channel: getFeedbackChannel()});
       },
@@ -367,7 +365,6 @@ export async function writeNativeLog(data) {
     {data},
     {
       browserFallback: () => {
-        logInfo("[native-log]", data);
 
         return webSuccess({written: true});
       },

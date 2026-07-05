@@ -77,7 +77,6 @@ import {
 } from "@/adapters/studioResponseAdapter";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {normalizeStudioDetail} from "@/composables/studio/useStudioDetailModel";
 import {createStudioPaginationPages} from "@/composables/studio/studioPagination";
 import {useOverlayBackClose} from "@/composables/overlay/useOverlayBackClose";
@@ -87,19 +86,23 @@ import {useStudioCreateFormController} from "@/composables/studio/create/useStud
 import {provideStudioList} from "@/composables/studio/context/studioListContext";
 import {useStudioListController} from "@/composables/studio/useStudioListController";
 
+
 const {t, locale} = useI18n();
 const route = useRoute();
 const router = useRouter();
 const studioRuntimeStore = useStudioRuntimeStore();
 const chatStore = useChatStore();
 const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    chatStore.activeSession,
-    assistant.value,
-    t("chat.assistant")
-  )
-);
+const assistantLabel = computed(() => {
+  const chatInfo = chatStore.selectedChatInfo;
+  const displayLabel = String(chatInfo?.displayAssistantLabel || "").trim();
+  if (displayLabel) return displayLabel;
+
+  const chatAssistantLabel = String(chatInfo?.assistantLabel || "").trim();
+  if (chatAssistantLabel && !chatInfo?.isModelUnavailable) return chatAssistantLabel;
+
+  return String(assistant.value?.label || "").trim() || t("chat.assistant");
+});
 
 const searchText = ref("");
 const activeTab = ref("all");

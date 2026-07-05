@@ -1,867 +1,1286 @@
 <template>
-  <div v-show="props.visible" class="message-list-shell">
+  <div id="chat-panel-body" class="chat-panel-body message-list-shell">
     <section
       ref="scrollRef"
-      class="message-list"
-      :class="{'message-list--hidden': !messageListReady}"
+      class="chat-dialog-wrap message-list body-contents"
       aria-live="polite"
-      :aria-busy="isWait || !messageListReady ? 'true' : 'false'"
-      @scroll.passive="handleScroll"
+      :aria-busy="isWait ? 'true' : 'false'"
     >
-      <template v-for="(chatCompletion, index) in chatCompletions" :key="chatCompletion.id">
-        <ChatUser
-          v-if="chatCompletion.role === 'user'"
-          :data-message-id="chatCompletion.id"
-          :require-info="{
-            chatCompletion,
-            chatIdx: index,
-            lastChatIdx,
-            chatOwnerName,
-            messageFileHist,
-            chatImageList,
-            regFileList,
-            imageToggleInfo,
-          }"
-          @rendered="handleMessageRendered"
-        />
-        <AssistantErrorMessage
-          v-else-if="isAssistantErrorMessage(chatCompletion)"
-          :data-message-id="chatCompletion.id"
-          :message="chatCompletion"
-          @rendered="handleMessageRendered"
-        />
-        <template v-else>
-          <ChatResponse
+      <div class="chat-dialog">
+        <div
+          v-for="(chatCompletion, index) in chatCompletions.filter((item) => item.role === 'user')"
+          :id="'qna_' + index"
+          :key="chatCompletion.id || index"
+          class="qna_section"
+        >
+          <ChatUser
             :data-message-id="chatCompletion.id"
-            :message="chatCompletion"
-            :content="chatCompletion.content"
-            :reason-content="chatCompletion.reasoningContent"
-            :is-generation="isGeneration"
-            :resp-msg-id="respMsgId"
-            :interaction-blocked="shouldBlockAssistantInteraction(chatCompletion)"
-            :show-regenerate="!isReadOnlyChat && isLastChatResponse(chatCompletion)"
-            @rendered="handleMessageRendered"
-            @regenerate="reGeneration"
+            :msg-id="chatCompletion.id"
+            :require-info="{
+              isMyChat,
+              isCopyable: isAssist && isModel,
+              isDebugMode,
+              chatCompletion,
+              chatImageList,
+              refFileList: regFileList,
+              selectd: selectedModel,
+              selectedPromptTmplate,
+              changeSelectedMessageId: chageSelectedMessageId,
+              setNewIntionInfo,
+              createSearchPoint,
+              imageToggleInfo,
+            }"
           />
-          <div
-            v-if="getMessageTailSpacerHeight(chatCompletion)"
-            class="message-tail-spacer"
-            :style="{height: `${getMessageTailSpacerHeight(chatCompletion)}px`}"
-            aria-hidden="true"
-          ></div>
-        </template>
-      </template>
 
-      <div v-if="isWait" class="typing-row">
-        <span></span><span></span><span></span>
+          <ChatResponse
+            v-if="lastChatIdx >= index * 2 + 1"
+            :data-message-id="chatCompletions[index * 2 + 1].id"
+            :msg-id="chatCompletions[index * 2 + 1].id"
+            :require-info="{
+              isReasoingModel,
+              isSharedChat: isReadOnlyChat,
+              userObject: chatCompletion,
+              chatCompletions,
+              respIndex: index * 2 + 1,
+              lastIdx: lastChatIdx,
+              isActivetedRequest,
+              isActivetedReGen: isActivatedReGen,
+              isActivatedContinue: isActivetedContinue,
+              reGeneration,
+              continueGeneration,
+              registerFeedback,
+              copy,
+              openTooltiop: openTooltip,
+              closeTooltip,
+              openConfirmDialog,
+              openImagePopup,
+              moveImageDisplay,
+              createSearchPoint,
+            }"
+          />
+        </div>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import {computed, nextTick, onBeforeUnmount, ref, watch} from "vue";
-import {useRoute, useRouter} from "vue-router";
+import {computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef, triggerRef, watch} from "vue";
 import ChatUser from "@/components/chat/ChatUser.vue";
 import ChatResponse from "@/components/chat/ChatResponse.vue";
-import AssistantErrorMessage from "@/components/chat/AssistantErrorMessage.vue";
-import {ROUTE_NAMES, resolveRouteMode} from "@/constants/routeNames";
-import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
-import {useChatStore} from "@/stores/chatStore";
-import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
-import {usePromptControlStore} from "@/stores/promptControlStore";
-import {resolveChatApis} from "@/api/runtime/chatApis";
-import {adaptMessageList} from "@/adapters/messageResponseAdapter";
-import {adaptChatHistoryList} from "@/adapters/chatResponseAdapter";
-import {logWarn} from "@/utils/logger";
-import {createId} from "@/utils/id";
-import {adaptChatHistoryItem as adaptChatHistory} from "@/adapters/chatResponseAdapter";
-import {
-  DEFAULT_API_BASE_PATH,
-  SERVER_API_BASE_URL,
-  shouldUseServerApi,
-} from "@/constants/apiMode";
 import {SSE} from "@/api/sse/vendor/sse";
-import {GENERATION_API_KEYS as G} from "@/constants/api/generationApiKeys";
+import {SERVER_API_BASE_URL, shouldUseFrontendMockApi} from "@/constants/apiMode";
+import {ACTIVE_ROOM_TYPES} from "@/constants/chatRoom";
+import {resolveChatApis} from "@/api/runtime/chatApis";
+import {streamText} from "@/api/mock/fakeStream";
+import {createId} from "@/utils/id";
+import {i18n} from "@/i18n/appI18n";
+import {useChatStore} from "@/stores/chatStore";
+import {useFileStore} from "@/stores/fileStore";
+import {adaptChatHistoryList} from "@/adapters/chatResponseAdapter";
 
-const props = defineProps({
-  visible: {type: Boolean, default: true},
-});
-const route = useRoute();
-const router = useRouter();
-const studioRuntimeStore = useStudioRuntimeStore();
 const chatStore = useChatStore();
-const promptControlStore = usePromptControlStore();
-const routeMode = computed(() => resolveRouteMode(route.name));
-const isMainPage = computed(() => routeMode.value === "main");
-const isChatPage = computed(() => routeMode.value === "chat");
-const isSharedPage = computed(() => routeMode.value === "shared");
-const isConversationPage = computed(
-  () => isChatPage.value || isSharedPage.value
-);
-const activeHistoryId = computed(() => {
-  if (isChatPage.value) return chatStore.selectedChatId || null;
-  if (isSharedPage.value) {
-    if (chatStore.activeRoomType === ACTIVE_ROOM_TYPES.shared) {
-      return chatStore.activeRoomId || null;
-    }
-    return route.params.id || route.params.shareId || null;
-  }
-  return null;
-});
-const activeHistory = computed(() => findHistory(activeHistoryId.value));
-const isReadOnlyChat = computed(
-  () =>
-    isSharedPage.value ||
-    chatStore.isActiveSharedRoom ||
-    isSharedChat(activeHistory.value)
-);
-const chatCompletions = ref([]);
-const isWait = computed(() => chatStore.isWait);
-const scrollRef = ref(null);
-const messageListReady = ref(true);
+const fileStore = useFileStore();
+const {chatHistoryApi, generationErrorApi} = resolveChatApis();
+
+const chatCompletions = shallowRef([]);
 const chatOwnerName = ref(null);
-const messageFileHist = ref([]);
+const messageFileList = ref([]);
 const chatImageList = ref([]);
 const regFileList = ref([]);
-const isMsgPopup = ref(false);
-const isGeneration = ref(false);
-const isHndleScroll = ref(false);
-const isChangeChatId = ref(true);
-const respondingInfo = ref({curIdx: 0, endIdx: 0});
-const imageToggleInfo = ref({});
+const eventSource = ref(null);
+const completionTimer = ref(null);
 const respMsgId = ref(null);
+const isHndleScroll = ref(false);
+const isGeneration = ref(false);
+const isChangeChatId = ref(true);
+const abortInfo = reactive({});
+const respondingInfo = reactive({curIdex: 0, endIdx: 0});
+const imageToggleInfo = reactive({});
+const scrollRef = ref(null);
+const currentChatInfo = ref(null);
+let scrollResizeObserver = null;
+let scrollSyncTimerIds = [];
+let searchScrollTimerIds = [];
+let autoScrollBottomTimerIds = [];
+let scrollListenerElements = [];
+let lastScrollElement = null;
 
 const selectedChatId = computed(() => chatStore.selectedChatId);
-const selectedChatInfo = computed(() => activeHistory.value);
-const selectedAssist = computed(() => getSubmitAssistantId());
-const selectedModel = computed(() => getSubmitModelId());
-const selectedAssistInfo = computed(() => chatStore.activeSession || null);
-const selectedModelInfo = computed(() => chatStore.modelMap[getSubmitModelId()] || null);
-const inputChat = computed(() => chatStore.input);
+const selectedChatInfo = computed(() => chatStore.selectedChatInfo);
+const selectedAssist = computed(() => chatStore.selectedAssist);
+const selectedAssistInfo = computed(() => chatStore.selectedAssistInfo);
+const selectedModel = computed(() => chatStore.selectedModel);
+const selectedModelInfo = computed(() => chatStore.selectedModelInfo);
+const selectedChatSearchInfo = computed(() => chatStore.selectedChatSearchInfo);
+const generateMsgId = computed(() => chatStore.generateMsgId);
+const inpuChat = computed(() => chatStore.inpuChat);
+const selectedIntention = computed(() => chatStore.selectedIntention);
+const selectedPromptTmplate = computed(() => chatStore.selectedPromptTmplate);
+const selectedRagOptions = computed(() => chatStore.selectedRagOptions);
+const tmpSelectedRagOptions = computed(() => chatStore.tmpSelectedRagOptions);
+const externalOptions = computed(() => chatStore.externalOptions);
+const tempImgFile = computed(() => fileStore.tempImgFile);
+const tempFileList = computed(() => fileStore.tempFileList);
+const isActivedStop = computed(() => chatStore.isActivedStop);
+const isStopGeneration = computed(() => chatStore.isStopGeneration);
+const isActivedReGen = computed(() => chatStore.isActivedReGen);
+const isActivatedContinue = computed(() => chatStore.isActivatedContinue);
+const isWait = computed(() => chatStore.isWait);
 const isEmptyChat = computed(() => chatCompletions.value.length === 0);
 const lastChatIdx = computed(() => chatCompletions.value.length - 1);
-const lastChatInfo = computed(() =>
-  chatCompletions.value.length > 0
-    ? chatCompletions.value[chatCompletions.value.length - 1]
-    : null
+const isReadOnlyChat = computed(
+  () =>
+    chatStore.isSharedChat ||
+    chatStore.isActiveSharedRoom ||
+    selectedChatInfo.value?.roomType === ACTIVE_ROOM_TYPES.shared ||
+    selectedChatInfo.value?.sharedId ||
+    selectedChatInfo.value?.ShardId
 );
-const lastUserChatInfo = computed(() => {
-  for (let index = chatCompletions.value.length - 1; index >= 0; index -= 1) {
-    if (chatCompletions.value[index]?.role === "user") return chatCompletions.value[index];
-  }
-  return null;
+const isMyChat = computed(() => {
+  const info = selectedChatInfo.value;
+  if (!info) return undefined;
+  return chatStore.userInfo?.userId === info.userId;
+});
+const isAssist = computed(() => {
+  const info = selectedAssistInfo.value;
+  if (!info) return undefined;
+  return !info.delYN;
+});
+const isModel = computed(() => {
+  const info = selectedModelInfo.value;
+  if (!info) return undefined;
+  return !info.delYN;
+});
+const isActivetedRequest = computed(() => {
+  if (!isMyChat.value) return false;
+  if (!isAssist.value) return false;
+  if (!isModel.value) return false;
+  return !isReadOnlyChat.value;
+});
+const lastUserChat = computed(() => {
+  if (isEmptyChat.value) return null;
+  const idx = chatCompletions.value.length > 1 ? chatCompletions.value.length - 2 : 0;
+  const item = chatCompletions.value[idx];
+  return item?.role === "user" ? item : null;
+});
+const lastUserChatInfo = computed(() => lastUserChat.value);
+const lastChatInfo = computed(() => {
+  if (isEmptyChat.value) return null;
+  const item = chatCompletions.value[chatCompletions.value.length - 1];
+  return item?.role === "user" ? null : item;
+});
+const isCommonValid = computed(() => {
+  if (!isActivetedRequest.value) return false;
+  if (selectedAssistInfo.value?.privateYN) return false;
+  if (isWait.value) return false;
+  if (!lastUserChat.value) return false;
+  if (!lastChatInfo.value) return false;
+  return true;
+});
+const isActivatedReGen = computed(() => isCommonValid.value);
+const isActivetedContinue = computed(() => Boolean(isCommonValid.value && lastChatInfo.value?.stopReason === "length"));
+const isReasoingModel = computed(() => selectedAssistInfo.value?.isReasoingModel);
+const isDebugMode = computed(() => false);
+const searchContent = computed(() => {
+  const info = selectedChatSearchInfo.value;
+  if (!info) return false;
+  return info.searchContent;
 });
 
-const DONE_STREAM_MESSAGE = "[DONE]";
-const GENERATION_STREAM_TIMEOUT_MS = 120000;
-const HISTORY_RENDER_WAIT_TIMEOUT_MS = 1500;
-let loadController = null;
-let generateChatId = null;
-let currentRouteMode = null;
-let currentHistoryId = null;
-let historyRenderWait = null;
-let historyRenderToken = 0;
-let eventSource = null;
-let completionTimer = null;
-let generationResolve = null;
-let generationReject = null;
+watch(selectedChatId, () => {
+  chatStore.setCurChatIntention(null);
+  chatStore.setGenerateMsgId(null);
+  chatStore.setCodeInterpreter(null);
 
-function isSharedChat(chat) {
-  return String(chat?.sharedId || "").trim().length > 0;
+  if (!selectedChatId.value) return;
+
+  isHndleScroll.value = false;
+  resetChatCompletions();
+  isChangeChatId.value = true;
+  abortRequestAll();
+  getChatHistInfo();
+});
+
+watch(inpuChat, () => {
+  if (blockReturn()) return;
+  getLLMAnswer();
+});
+
+watch(chatCompletions, () => {
+  handleChatHistoryLoaded();
+});
+
+watch(isActivedStop, (newVal) => {
+  chatStore.setGenerationInfo({stop: newVal});
+});
+
+watch(isStopGeneration, (newVal) => {
+  if (!newVal) return;
+  chatStore.setGenerationInfo({stop: newVal, stopAction: newVal});
+});
+
+watch(isActivedReGen, (newVal) => {
+  chatStore.setGenerationInfo({re: newVal || isActivatedReGen.value});
+});
+
+watch(isActivatedContinue, (newVal) => {
+  chatStore.setGenerationInfo({con: newVal || isActivetedContinue.value});
+});
+
+onMounted(() => {
+  addEventListenerScroll();
+  initScrollBottomObserver();
+
+  let newChatFlowFunc = null;
+
+  if (!generateMsgId.value) {
+    isChangeChatId.value = false;
+    newChatFlowFunc = getLLMAnswer;
+  } else {
+    newChatFlowFunc = getChatHistInfo;
+  }
+
+  newChatFlowFunc();
+});
+
+onBeforeUnmount(() => {
+  removeEventListenerScroll();
+  destroyScrollBottomObserver();
+  if (eventSource.value) {
+    eventSource.value.close?.();
+  }
+  abortRequestAll();
+});
+
+function getUniqueElements(items) {
+  return items.filter((item, index, array) => item && array.indexOf(item) === index);
 }
 
-function revokeMessageAttachments(items = []) {
-  items.forEach((chatCompletion) => {
-    if (!Array.isArray(chatCompletion.attachments)) return;
-    chatCompletion.attachments.forEach((file) => {
-      if (file?.url?.startsWith?.("blob:")) URL.revokeObjectURL(file.url);
+function getScrollCandidates() {
+  if (typeof document === "undefined") return getUniqueElements([scrollRef.value]);
+
+  const root = scrollRef.value;
+  return getUniqueElements([
+    root?.querySelector?.("[data-overlayscrollbars-viewport]"),
+    root?.querySelector?.(".os-viewport"),
+    root,
+    document.querySelector?.(".conversation-workspace [data-overlayscrollbars-viewport]"),
+    document.querySelector?.(".conversation-workspace .os-viewport"),
+    document.querySelector?.(".conversation-workspace .message-list"),
+    document.querySelector?.(".body-contents"),
+  ]);
+}
+
+function getScrollMetrics() {
+  const candidates = getScrollCandidates();
+  let selected = null;
+
+  for (const element of candidates) {
+    if (!element || typeof element.scrollHeight !== "number") continue;
+
+    const overflow = Math.max(0, element.scrollHeight - element.clientHeight);
+    const distanceFromBottom = Math.max(0, element.scrollHeight - element.scrollTop - element.clientHeight);
+    const metrics = {element, overflow, distanceFromBottom};
+
+    if (!selected) {
+      selected = metrics;
+      continue;
+    }
+
+    if (metrics.overflow > selected.overflow) {
+      selected = metrics;
+    }
+  }
+
+  if (selected?.element) {
+    lastScrollElement = selected.element;
+  }
+
+  return selected;
+}
+
+function getScrollElement() {
+  return getScrollMetrics()?.element || lastScrollElement || scrollRef.value;
+}
+
+function resetChatCompletions() {
+  chatCompletions.value = [];
+}
+
+function abortRequestAll() {
+  Object.keys(abortInfo).forEach((key) => {
+    abortInfo[key]?.abort?.();
+    delete abortInfo[key];
+  });
+}
+
+function getSearchTargetMessageId() {
+  const info = selectedChatSearchInfo.value || {};
+  return String(
+    info.messageId ||
+      info.msgId ||
+      info.respMsgId ||
+      info.searchTargetMessageId ||
+      info.targetMessageId ||
+      info.raw?.messageId ||
+      info.raw?.msgId ||
+      info.raw?.respMsgId ||
+      ""
+  ).trim();
+}
+
+function findSearchTargetElement() {
+  const scrollElement = getScrollElement();
+  const targetMessageId = getSearchTargetMessageId();
+
+  if (targetMessageId) {
+    const targetById =
+      scrollElement?.querySelector?.(`[msg-id="${targetMessageId}"]`) ||
+      scrollElement?.querySelector?.(`[data-message-id="${targetMessageId}"]`) ||
+      document.querySelector?.(`[msg-id="${targetMessageId}"]`) ||
+      document.querySelector?.(`[data-message-id="${targetMessageId}"]`);
+
+    if (targetById) return targetById;
+  }
+
+  const search = searchContent.value;
+  if (!search) return null;
+
+  let msgId = null;
+
+  const checkFunc = (content) => {
+    if (!content) return false;
+    return String(content).indexOf(search) !== -1;
+  };
+
+  for (let i = chatCompletions.value.length - 1; i >= 0; i -= 1) {
+    const chatCompletion = chatCompletions.value[i];
+    const content = chatCompletion?.content;
+    const reasoning = chatCompletion?.reasoingContent || chatCompletion?.reasoningContent;
+
+    if (checkFunc(content) || checkFunc(reasoning)) {
+      msgId = chatCompletion.id;
+      break;
+    }
+  }
+
+  if (!msgId) return null;
+
+  return (
+    scrollElement?.querySelector?.(`[msg-id="${msgId}"]`) ||
+    scrollElement?.querySelector?.(`[data-message-id="${msgId}"]`) ||
+    document.querySelector?.(`[msg-id="${msgId}"]`) ||
+    document.querySelector?.(`[data-message-id="${msgId}"]`)
+  );
+}
+
+function syncScrollBottomButtonAfterSearch() {
+  window.requestAnimationFrame?.(() => {
+    syncScrollBottomButton();
+  });
+  window.setTimeout(() => {
+    syncScrollBottomButton();
+  }, 80);
+}
+
+function scrollToChatId() {
+  const target = findSearchTargetElement();
+
+  if (!target) {
+    return false;
+  }
+
+  target.scrollIntoView({behavior: "instant", block: "start"});
+  syncScrollBottomButtonAfterSearch();
+  return true;
+}
+
+function clearSearchScrollSchedule() {
+  searchScrollTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  searchScrollTimerIds = [];
+}
+
+function scheduleSearchScrollToChatId() {
+  clearSearchScrollSchedule();
+
+  searchScrollTimerIds = [0, 80, 240, 600, 1000].map((delay, index, delays) =>
+    window.setTimeout(() => {
+      const moved = scrollToChatId();
+      if (moved) {
+        clearSearchScrollSchedule();
+        return;
+      }
+
+      const isLastAttempt = index === delays.length - 1;
+      if (isLastAttempt) {
+        scrollDown({force: true});
+      }
+    }, delay)
+  );
+}
+
+function handleChatHistoryLoaded() {
+  if (!isGeneration.value) {
+    chatStore.setIsWait(false);
+    isGeneration.value = false;
+  }
+
+  setChatInputFiled();
+
+  nextTick(() => {
+    if (selectedChatSearchInfo.value) {
+      scheduleSearchScrollToChatId();
+    } else if (!isReadOnlyChat.value) {
+      scheduleScrollDownToBottom();
+    } else {
+      scheduleScrollBottomButtonSync();
+    }
+
+    createMultipleFeatures();
+  });
+}
+
+function setChatInputFiled() {
+  if (isEmptyChat.value) return;
+  if (!isChangeChatId.value) return;
+  isChangeChatId.value = false;
+
+  const newSelectedIntention = {};
+  setNewIntionInfo(lastUserChat.value, newSelectedIntention);
+  chatStore.setCurChatIntention(newSelectedIntention);
+}
+
+function setNewIntionInfo(userChatInfo, newIntentionInfo = {}) {
+  const isUserChatInfo = userChatInfo === null || userChatInfo === undefined;
+  const intentionInfo = !isUserChatInfo
+    ? selectedPromptTmplate.value.find((item) => item.promptTemplateName === userChatInfo.intention)
+    : null;
+  const isIntentionInfo = intentionInfo === null || intentionInfo === undefined;
+  const isRAG = isUserChatInfo ? true : userChatInfo.isRAG;
+
+  newIntentionInfo.intention = isIntentionInfo ? 0 : intentionInfo.promptTemplateOrder;
+  newIntentionInfo.isRAG = isRAG;
+
+  if (isRAG) {
+    if (!isUserChatInfo || userChatInfo.source !== "external" || externalOptions.value.length === 0) {
+      newIntentionInfo.source = "internal";
+    } else {
+      newIntentionInfo.source = "external";
+      const web = externalOptions.value.findIndex((item) => item.alias === userChatInfo.external);
+      if (web === -1) newIntentionInfo.web = 0;
+      else newIntentionInfo.web = web;
+    }
+  }
+
+  if (isIntentionInfo) {
+    return false;
+  }
+
+  const tags = JSON.parse(userChatInfo.tags);
+  const template = JSON.parse(intentionInfo.promptTemplate);
+  const templateKeyList = Object.keys(template);
+
+  for (let i = 0; i < templateKeyList.length; i += 1) {
+    const key = templateKeyList[i];
+    const templateDetilInfo = template[key];
+    const contentList = templateDetilInfo.content;
+    const isContent = contentList !== null && contentList !== undefined && contentList !== "";
+
+    if (!isContent) continue;
+
+    let isTag = false;
+
+    for (let c = 0; c < contentList.length; c += 1) {
+      const content = contentList[c];
+      const contentTag = content.tag;
+      const tagIndex = tags.findIndex((item) => item === contentTag);
+
+      if (tagIndex !== -1) {
+        newIntentionInfo[key] = c;
+        isTag = true;
+        break;
+      }
+    }
+
+    if (!isTag) {
+      newIntentionInfo[key] = 0;
+    }
+  }
+
+  return true;
+}
+
+function chageSelectedMessageId() {
+  return null;
+}
+
+function createMultipleFeatures() {
+  return null;
+}
+
+function createSearchPoint() {
+  return null;
+}
+
+function registerFeedback() {
+  return null;
+}
+
+function copy() {
+  return null;
+}
+
+function openTooltip() {
+  return null;
+}
+
+function closeTooltip() {
+  return null;
+}
+
+function openConfirmDialog() {
+  return null;
+}
+
+function openImagePopup() {
+  return null;
+}
+
+function moveImageDisplay() {
+  return null;
+}
+
+function addEventListenerScroll() {
+  removeEventListenerScroll();
+  scrollListenerElements = getScrollCandidates();
+  scrollListenerElements.forEach((element) => {
+    element.addEventListener?.("scroll", setIsHandle, {passive: true});
+  });
+}
+
+function removeEventListenerScroll() {
+  scrollListenerElements.forEach((element) => {
+    element.removeEventListener?.("scroll", setIsHandle);
+  });
+  scrollListenerElements = [];
+}
+
+function initScrollBottomObserver() {
+  if (typeof ResizeObserver === "undefined") return;
+
+  nextTick(() => {
+    scrollResizeObserver = new ResizeObserver(() => {
+      addEventListenerScroll();
+      scheduleScrollBottomButtonSync();
+    });
+
+    getScrollCandidates().forEach((element) => {
+      scrollResizeObserver.observe(element);
+      const dialog = element.querySelector?.(".chat-dialog");
+      if (dialog) scrollResizeObserver.observe(dialog);
     });
   });
 }
 
-function createAssistantStreamingPatch(isReasoning) {
-  return {
-    status: "streaming",
-    isReasoning,
-    reasoningContent: "",
-    reasoningStatus: isReasoning ? "thinking" : "completed",
-  };
+function destroyScrollBottomObserver() {
+  scrollResizeObserver?.disconnect?.();
+  scrollResizeObserver = null;
+  scrollSyncTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  scrollSyncTimerIds = [];
+  clearAutoScrollBottomSchedule();
+  clearSearchScrollSchedule();
+  removeEventListenerScroll();
 }
 
-function createChatUser(userPrompt = {}) {
-  return {
-    id: createId("message"),
-    role: "user",
-    content: userPrompt.text,
-    attachments: userPrompt.attachments,
-    createdAt: new Date().toISOString(),
-  };
-}
-
-function createChatResponse(patch = {}) {
-  return {
-    id: createId("message"),
-    role: "assistant",
-    content: "",
-    reasoningContent: "",
-    reasoningStatus: "thinking",
-    status: "streaming",
-    createdAt: new Date().toISOString(),
-    ...patch,
-  };
-}
-
-async function createChatHistory(payload = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  return chatHistoryApi.createChat(payload);
-}
-
-async function loadChatHistoryList(context = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  const rawHistories = await chatHistoryApi.getChatHistoryList();
-  return adaptChatHistoryList(rawHistories, context);
-}
-
-async function loadChatMessageRouters(payload = {}, options = {}) {
-  const {chatHistoryApi} = resolveChatApis();
-  const rawMessages = await chatHistoryApi.getChatHistoryDetail(
-    payload,
-    options
+function scheduleScrollBottomButtonSync() {
+  scrollSyncTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  scrollSyncTimerIds = [0, 80, 240, 600].map((delay) =>
+    window.setTimeout(() => {
+      syncScrollBottomButton();
+    }, delay)
   );
-  return adaptMessageList(rawMessages);
 }
 
-async function loadGenerationErrorMessages(payload = {}, cause = {}) {
-  const {generationErrorApi} = resolveChatApis();
-  if (typeof generationErrorApi?.createGenerationErrorMessages !== "function") {
-    return [];
-  }
-  const rawMessages = await generationErrorApi.createGenerationErrorMessages(
-    payload,
-    cause
-  );
-  return adaptMessageList(rawMessages);
+function clearAutoScrollBottomSchedule() {
+  autoScrollBottomTimerIds.forEach((timerId) => window.clearTimeout(timerId));
+  autoScrollBottomTimerIds = [];
 }
 
-function createLocalHistory(text, assistant, model) {
-  const chatId = createId();
-  return {
-    chatId,
-    temporary: true,
-    syncStatus: "local",
-    title: text || "New chat",
-    preview: text || "New conversation from attachments",
-    modelId: model?.id || "",
-    assistantId: assistant?.id || model?.assistId || "",
-    assistantType: assistant?.type || "",
-    assistantLabel: assistant?.label || "",
-    modelLabel: model?.label || "",
-    isPinned: false,
-    endedAt: new Date().toISOString(),
-    userId: "",
-    raw: null,
-  };
+function scheduleScrollDownToBottom() {
+  clearAutoScrollBottomSchedule();
+
+  autoScrollBottomTimerIds = [0, 80, 240, 600, 1000].map((delay) =>
+    window.setTimeout(() => {
+      scrollDown({force: true});
+    }, delay)
+  );
 }
 
-function createSessionFromHistory(history, modelMap = {}, assistantMap = {}) {
-  if (!history) return null;
-
-  const model = modelMap[history.modelId] || null;
-  const assistant = assistantMap[history.assistantId || model?.assistId] || null;
-  const modelMissing = Boolean(history.modelId && !model);
-  const assistantMissing = Boolean(
-    (history.assistantId || model?.assistId) && !assistant
-  );
-  const modelDeleted = Boolean(model?.isDeleted);
-  const unavailableReason = modelDeleted
-    ? "deleted"
-    : modelMissing
-      ? "missing-model"
-      : assistantMissing
-        ? "missing-assistant"
-        : "";
-
-  return {
-    chatId: history.chatId,
-    sharedId: history.sharedId || null,
-    assistantId: assistant?.id || history.assistantId || model?.assistId || "",
-    assistantType: assistant?.type || history.assistantType || "",
-    assistantLabel: assistant?.label || history.assistantLabel || "",
-    modelId: model?.id || history.modelId || "",
-    modelName: model?.label || history.modelLabel || "",
-    modelType: model?.type || "",
-    isModelDeleted: modelDeleted,
-    isModelMissing: modelMissing,
-    isAssistantMissing: assistantMissing,
-    isModelUnavailable: Boolean(unavailableReason),
-    modelUnavailableReason: unavailableReason,
-    displayAssistantId: "",
-    displayAssistantLabel: "",
-    readonlyModel: true,
-  };
+function setIsHandle() {
+  syncScrollBottomButton();
 }
 
-function resolveConversationSessionState(history = {}, session = null) {
-  if (!session) return {session: null, nextSelectedAssistantId: ""};
-
-  const nextSession = {...session};
-  const assistant = chatStore.assistantMap?.[nextSession.assistantId] || null;
-  const isStudioSession = Boolean(
-    nextSession.assistantType === "studio" ||
-      history?.assistantType === "studio" ||
-      assistant?.type === "studio" ||
-      assistant?.isStudio === true ||
-      assistant?.studio === true
-  );
-  const isDeletedStudio = Boolean(
-    isStudioSession &&
-      nextSession.assistantId &&
-      studioRuntimeStore?.isStudioDeleted?.(nextSession.assistantId)
-  );
-
-  if (isDeletedStudio) {
-    nextSession.displayAssistantId = nextSession.assistantId;
-    nextSession.displayAssistantLabel =
-      nextSession.assistantLabel || history.assistantLabel || "";
-    nextSession.isAssistantMissing = true;
-    nextSession.isModelUnavailable = true;
-    nextSession.modelUnavailableReason = "missing-assistant";
+function syncScrollBottomButton() {
+  const metrics = getScrollMetrics();
+  if (!metrics?.element) {
+    chatStore.setShowScrollBottom(false);
+    return;
   }
 
-  const firstAssistant = chatStore.assistants?.[0] || null;
-  const displayAssistant =
-    nextSession.isModelDeleted ||
-    nextSession.isModelMissing ||
-    nextSession.isAssistantMissing ||
-    !nextSession.assistantId
-      ? firstAssistant
-      : chatStore.assistantMap?.[nextSession.assistantId] || firstAssistant;
+  const hasOverflow = metrics.overflow > 8;
+  const shouldShow = hasOverflow && metrics.distanceFromBottom > 12;
+  isHndleScroll.value = shouldShow;
+  chatStore.setShowScrollBottom(shouldShow);
+}
 
-  if (!nextSession.displayAssistantLabel && displayAssistant?.id) {
-    nextSession.displayAssistantId = displayAssistant.id;
-    nextSession.displayAssistantLabel = displayAssistant.label;
+async function scrollDown(options = {}) {
+  const force = Boolean(options?.force);
+  if (!force && !isHndleScroll.value) return;
+
+  await nextTick();
+  const elements = getScrollCandidates();
+  if (elements.length === 0) return;
+
+  const moveToBottom = () => {
+    elements.forEach((element) => {
+      if (!element || typeof element.scrollHeight !== "number") return;
+      element.scrollTop = element.scrollHeight;
+    });
+    syncScrollBottomButton();
+  };
+
+  if (selectedAssist.value === "bed0f859-5dc4-4785-9e2e-a3cf275ff442") {
+    elements.forEach((element) => {
+      element.querySelectorAll?.("img")?.forEach((image) => {
+        image.addEventListener("load", moveToBottom, {once: true});
+      });
+    });
   }
 
-  return {
-    session: nextSession,
-    displayAssistant,
-    nextSelectedAssistantId:
-      !isDeletedStudio && displayAssistant?.id ? displayAssistant.id : "",
-  };
+  window.setTimeout(moveToBottom, 0);
 }
 
-async function getSharedConversation(shareId, options = {}) {
-  const shareIdText = String(shareId || "").trim();
-  const {chatHistoryApi} = resolveChatApis();
-  const response = await chatHistoryApi.getSharedConversation(
-    {shareId: shareIdText},
-    options
-  );
-  const messages = Array.isArray(response?.messages) ? response.messages : [];
-  const exists =
-    response?.exists === true ||
-    response?.success === true ||
-    (response?.exists !== false && response?.success !== false && messages.length > 0);
 
-  return {
-    ...response,
-    exists,
-    success: exists,
-    shareId: String(response?.shareId || shareIdText).trim(),
-    messages,
-    chatCompletions: adaptMessageList(messages),
-  };
+function shouldSkipMockEmptyHistoryResult(result) {
+  if (!shouldUseFrontendMockApi()) return false;
+  if (Array.isArray(result) && result.length > 0) return false;
+  if (isGeneration.value) return true;
+  return chatCompletions.value.length > 0;
 }
 
-async function enterNewSubmitChatRoom(router, chatId) {
-  const id = String(chatId || "").trim();
-  if (!id) return false;
+async function getResponse(isResponse) {
+  try {
+    const result = await chatHistoryApi.getChatHistoryDetail({
+      chatId: selectedChatId.value,
+      assistId: selectedAssistInfo.value.assistId,
+      modelId: selectedModelInfo.value.modelId,
+      studio: selectedAssistInfo.value.studioYN,
+      auth: false,
+      respoding: false,
+    });
 
-  chatStore.setActiveChatRoom(id);
-  chatStore.clearSearchTargetMessageId();
-  chatStore.clearInitialScrollRequest();
+    if (shouldSkipMockEmptyHistoryResult(result)) return;
+
+    chatCompletions.value = result;
+
+    if (!isLastResponse()) {
+      chatStore.setIsWait(true);
+      setWaitingResponse(false);
+      await getChatHistory(true);
+      return;
+    }
+
+    chatStore.setIsWait(false);
+    await getAssocInfo();
+    await getRoomInfo();
+  } catch (error) {
+    void isResponse;
+    if (typeof window !== "undefined") window.alert?.(error?.message || "history.do 조회에 실패했습니다.");
+    chatStore.setIsWait(false);
+  }
+}
+
+async function getChatHistory(respondingCheck) {
+  try {
+    const result = await chatHistoryApi.getChatHistoryDetail({
+      chatId: selectedChatId.value,
+      assistId: selectedAssistInfo.value.assistId,
+      modelId: selectedModelInfo.value.modelId,
+      studio: selectedAssistInfo.value.studioYN,
+      auth: false,
+      respoding: false,
+    });
+
+    if (shouldSkipMockEmptyHistoryResult(result)) return;
+
+    chatCompletions.value = result;
+
+    if (respondingCheck) {
+      if (!isLastResponse()) {
+        await createErrorChat("응답을 받던 도중 연결이 끊겼거나 에러가 발생하였습니다.");
+        return;
+      }
+
+      chatStore.setIsWait(false);
+      await getRoomInfo();
+      return;
+    }
+
+    if (!isLastResponse()) {
+      chatStore.setIsWait(true);
+      setWaitingResponse(false);
+      await getChatHistory(true);
+      return;
+    }
+
+    chatStore.setIsWait(false);
+    await getRoomInfo();
+  } catch (error) {
+    if (typeof window !== "undefined") window.alert?.(error?.message || "history.do 조회에 실패했습니다.");
+    chatStore.setIsWait(false);
+  }
+}
+
+async function getChatOwnerName() {
+  if (!selectedChatId.value) return;
+
+  const controller = new AbortController();
+  abortInfo.getChatOwnerName = controller;
 
   try {
-    if (router?.currentRoute?.value?.name !== ROUTE_NAMES.CHAT_ENTRY) {
-      await router?.push?.({name: ROUTE_NAMES.CHAT_ENTRY});
+    chatOwnerName.value = await chatHistoryApi.getChatOwnerName?.(
+      selectedChatInfo.value?.userId,
+      {signal: controller.signal}
+    );
+  } catch (error) {
+    if (error?.name !== "AbortError") {
+      if (typeof window !== "undefined") window.alert?.(error?.message || "getChatOwnerName 조회에 실패했습니다.");
+      chatStore.setIsWait(false);
     }
-    return true;
-  } catch (_error) {
-    if (String(chatStore.selectedChatId || "") === id) {
-      chatStore.clearActiveSession();
+  }
+}
+
+async function getMessageFileHist() {
+  if (!selectedChatId.value) return;
+
+  const controller = new AbortController();
+  abortInfo.getMessageFileHist = controller;
+
+  try {
+    const result = await chatHistoryApi.getMessageFileHist?.(
+      String(selectedChatId.value).substring(0, 36),
+      {signal: controller.signal}
+    );
+    messageFileList.value = result;
+  } catch (error) {
+    if (error?.name !== "AbortError") {
+      if (typeof window !== "undefined") window.alert?.(error?.message || "getMessageFileHist 조회에 실패했습니다.");
+      chatStore.setIsWait(false);
     }
-    return false;
   }
 }
 
-function setChatCompletions(nextChatCompletions = []) {
-  chatCompletions.value = nextChatCompletions;
-}
+async function getChatImageList() {
+  if (!selectedChatId.value) return;
 
-function clearChatCompletions() {
-  revokeMessageAttachments(chatCompletions.value);
-  setChatCompletions([]);
-}
+  const controller = new AbortController();
+  abortInfo.getChatImageList = controller;
 
-function getMessageTailSpacerHeight(message) {
-  if (
-    message?.role !== "assistant" ||
-    message.error ||
-    !message?.sectorMinHeight
-  )
-    return 0;
-  return message.sectorMinHeight;
-}
-
-function clearMessagesOnConversationChange() {
-  if (
-    routeMode.value === currentRouteMode &&
-    activeHistoryId.value === currentHistoryId
-  )
-    return;
-
-  currentRouteMode = routeMode.value;
-  currentHistoryId = activeHistoryId.value;
-  resetHistoryRenderWait();
-  messageListReady.value = !isConversationPage.value || !activeHistoryId.value;
-  clearChatCompletions();
-}
-
-function resetHistoryRenderWait() {
-  if (historyRenderWait) {
-    window.clearTimeout(historyRenderWait.timeoutId);
-    historyRenderWait.resolve?.();
-    historyRenderWait = null;
+  try {
+    const result = await chatHistoryApi.getChatImageList?.(
+      String(selectedChatId.value).substring(0, 36),
+      {signal: controller.signal}
+    );
+    chatImageList.value = result;
+  } catch (error) {
+    if (error?.name !== "AbortError") {
+      if (typeof window !== "undefined") window.alert?.(error?.message || "getChatImageList 조회에 실패했습니다.");
+      chatStore.setIsWait(false);
+    }
   }
-  historyRenderToken += 1;
 }
 
-function hasImageAttachment(message) {
-  return (
-    Array.isArray(message?.attachments) &&
-    message.attachments.some((file) => file?.kind === "image")
-  );
+async function getChatStudioInfo() {
+  if (!selectedChatId.value) return;
+  if (!selectedAssistInfo.value?.studioYN) return;
+
+  try {
+    const result = await chatHistoryApi.getChatStudioInfo?.(selectedAssist.value);
+    if (result && typeof result === "object") {
+      chatStore.setSelectedAssistInfo({
+        ...(selectedAssistInfo.value || {}),
+        ...result,
+      });
+    }
+  } catch (error) {
+    if (typeof window !== "undefined") window.alert?.(error?.message || "getChatStudioInfo 조회에 실패했습니다.");
+    chatStore.setIsWait(false);
+  }
 }
 
-function createHistoryRenderWait(nextChatCompletions = []) {
-  resetHistoryRenderWait();
+function blockReturn() {
+  if (!inpuChat.value) return true;
+  return isWait.value;
+}
 
-  const expected = nextChatCompletions
-    .filter(
-      (message) => message?.role === "assistant" || hasImageAttachment(message)
-    )
-    .map((message) => message.id)
-    .filter(Boolean);
-  const token = historyRenderToken;
+async function createErrorChat(content) {
+  if (isEmptyChat.value) return;
 
-  if (expected.length === 0) {
-    return {token, promise: nextTick()};
+  const errorMessage = content;
+
+  chatStore.setIsWait(true);
+  clearCompletionTimer();
+
+  if (eventSource.value !== null) {
+    eventSource.value?.removeEventListener?.("readystatechange", evtSrcReadyStateChange);
+    eventSource.value?.close?.();
   }
 
-  const pending = new Set(expected);
-  const promise = new Promise((resolve) => {
-    const timeoutId = window.setTimeout(() => {
-      if (historyRenderWait?.token !== token) return;
-      historyRenderWait = null;
-      resolve();
-    }, HISTORY_RENDER_WAIT_TIMEOUT_MS);
+  const chat = {
+    chatId: selectedChatId.value,
+    msgId: createId(),
+    assistId: selectedAssist.value,
+    modelId: selectedModel.value,
+    studio: selectedAssistInfo.value.studioYN,
+    body: errorMessage,
+  };
 
-    historyRenderWait = {token, pending, resolve, timeoutId};
-  });
-
-  return {token, promise};
-}
-
-function finishHistoryRenderWait() {
-  if (!historyRenderWait) return;
-
-  const {resolve, timeoutId} = historyRenderWait;
-  window.clearTimeout(timeoutId);
-  historyRenderWait = null;
-  resolve?.();
-}
-
-function markHistoryMessageRendered(payload = {}) {
-  if (!historyRenderWait || !payload?.messageId) return;
-  if (!["enhanced", "error", "attachment"].includes(payload.type)) return;
-
-  historyRenderWait.pending.delete(payload.messageId);
-  if (historyRenderWait.pending.size > 0) return;
-
-  finishHistoryRenderWait();
-}
-
-function startHistoryRenderPresentation() {
-  messageListReady.value = false;
-}
-
-function finishHistoryRenderPresentation() {
-  messageListReady.value = true;
-}
-
-function cancelHistoryRenderPresentation() {
-  messageListReady.value = true;
-  resetHistoryRenderWait();
-}
-
-async function renderLoadedMessages(nextChatCompletions = [], signal) {
-  startHistoryRenderPresentation();
-  const renderWait = createHistoryRenderWait(nextChatCompletions);
-  setChatCompletions(nextChatCompletions);
-
-  await nextTick();
-  await renderWait.promise;
-  await nextTick();
-
-  if (signal?.aborted) return;
-
-  scrollToChatId();
-  finishHistoryRenderPresentation();
-  await nextTick();
-}
-
-function findHistory(chatId) {
-  if (!chatId) return null;
-  return (
-    chatStore.histories.find((history) => history.chatId === chatId) || null
-  );
-}
-
-function getSharedEntryId() {
-  if (
-    ![ROUTE_NAMES.SHARED_ENTRY, ROUTE_NAMES.SHARE_CHAT_ENTRY].includes(
-      route.name
-    )
-  ) {
-    return null;
+  try {
+    const result = await generationErrorApi.createGenerationErrorMessages(chat, {message: errorMessage});
+    chatStore.setIsWait(false);
+    chatCompletions.value = result;
+    await getAssocInfo();
+    await getRoomInfo();
+    chatStore.setIsWait(false);
+  } catch (error) {
+    if (typeof window !== "undefined") window.alert?.(error?.message || "error.do 호출에 실패했습니다.");
+    chatStore.setIsWait(false);
   }
-  return route.params.id || route.params.shareId;
-}
-
-function isAbortError(error) {
-  return error?.name === "AbortError" || error?.code === "ERR_CANCELED";
-}
-
-function abortLoadRequest() {
-  loadController?.abort?.();
-  loadController = null;
-}
-
-function createLoadSignal() {
-  abortLoadRequest();
-  loadController =
-    typeof AbortController === "function" ? new AbortController() : null;
-  return loadController?.signal;
 }
 
 async function getRoomInfo() {
-  const chatHistories = await loadChatHistoryList({
-    assistantMap: chatStore.assistantMap,
-    modelMap: chatStore.modelMap,
-  });
-  chatStore.setHistories(chatHistories);
-  return chatHistories;
+  try {
+    const list = await chatHistoryApi.getChatHistoryList();
+    const chatRooms = adaptChatHistoryList(list, {
+      assistantMap: chatStore.assistantMap,
+      modelMap: chatStore.modelMap,
+    });
+    chatStore.setChatRooms(chatRooms);
+    chatStore.setSelectedChatId(selectedChatId.value);
+  } catch (error) {
+    if (typeof window !== "undefined") window.alert?.(error?.message || "list.do 조회에 실패했습니다.");
+    chatStore.setIsWait(false);
+  }
 }
 
-async function findHistoryForLoad(chatId) {
-  let history = findHistory(chatId);
-  if (history) return history;
-  await getRoomInfo();
-  return findHistory(chatId);
+async function getLastChatInfo() {
+  return null;
 }
 
-async function getResponse(history, signal) {
-  const session = createSessionFromHistory(
-    history,
-    chatStore.modelMap,
-    chatStore.assistantMap
-  );
-  const sessionState = resolveConversationSessionState(
-    history,
-    session,
-    chatStore.assistantMap,
-    chatStore.assistants,
-    studioRuntimeStore,
-    false
-  );
-  const activeSession = sessionState.session || session;
-
-  if (sessionState.nextSelectedAssistantId) {
-    chatStore.selectAssistant(sessionState.nextSelectedAssistantId);
+async function getLLMAnswer() {
+  if (eventSource.value !== null) {
+    eventSource.value.close?.();
   }
 
-  chatStore.setActiveSession(activeSession);
-
-  return loadChatMessageRouters(
-    {
-      chatId: history.chatId,
-      assistId: activeSession.assistantId,
-      modelId: activeSession.modelId,
-      studio: activeSession.assistantType === "studio",
-    },
-    {signal}
-  );
-}
-
-async function getChatHistory(respondingCheck = false, signal) {
-  if (
-    chatStore.isWait &&
-    generateChatId &&
-    activeHistoryId.value === generateChatId
-  )
-    return;
-
-  if (isMainPage.value) {
-    clearChatCompletions();
-    chatStore.clearActiveSession();
+  if (shouldUseFrontendMockApi() && !inpuChat.value) {
+    chatStore.setIsWait(false);
+    if (selectedChatId.value) await getChatHistInfo();
     return;
   }
 
-  if (!activeHistoryId.value) {
-    clearChatCompletions();
+  if (shouldUseFrontendMockApi() && (!selectedIntention.value || !selectedPromptTmplate.value)) {
+    if (!selectedIntention.value) {
+      chatStore.setSelectedIntention({intention: 0, isRAG: false, isRagCot: false, source: "internal"});
+    }
+
+    if (!selectedPromptTmplate.value) {
+      chatStore.setSelectedPromptTmplate(chatStore.promptTemplates || []);
+    }
+  }
+
+  chatStore.setIsWait(true);
+  const prompt = getChatInfo();
+
+  const userPrompt = {
+    id: prompt.msgId,
+    role: "user",
+    content: inpuChat.value,
+  };
+
+  const model = selectedModelInfo.value;
+  const selectedIntentionInfo = selectedIntention.value;
+  const intention = selectedIntentionInfo.intention;
+  const chatTemplateInfo = selectedPromptTmplate.value.find((item) => item.promptTemplateOrder === intention);
+  const promptTemplate = !chatTemplateInfo ? {} : JSON.parse(chatTemplateInfo.promptTemplate);
+
+  prompt.intention = !chatTemplateInfo ? "직접입력" : chatTemplateInfo.promptTemplateName;
+  prompt.rag = selectedAssistInfo.value.ragYN && intention === 0 ? selectedIntentionInfo.isRAG : false;
+  prompt.ragCot = model.modelType === "orch_DSLLM" && prompt.rag ? selectedIntentionInfo.isRagCot : false;
+  prompt.imgS3Path = null;
+
+  if (prompt.rag) {
+    const isSSKS = selectedModelInfo.value.modelType.indexOf("SSKS") !== -1;
+    const source = !selectedIntentionInfo.source || isSSKS ? "internal" : selectedIntentionInfo.source;
+    let arrayOptions = null;
+
+    if (isSSKS) {
+      arrayOptions = selectedAssistInfo.value.selectedRagIndexes;
+    } else if (source === "internal") {
+      arrayOptions = selectedRagOptions.value;
+    } else {
+      arrayOptions = [tmpSelectedRagOptions.value.external];
+    }
+
+    prompt.sourceType = source;
+    prompt.arrayOptions = arrayOptions;
+  }
+
+  regFileList.value = [];
+
+  if (tempFileList.value) {
+    const tempFileSuccessList = tempFileList.value.filter((item) => !item.delYN && !item.isError);
+
+    if (tempFileSuccessList.length > 0) {
+      const onlyOneFile = tempFileSuccessList[0];
+      const fileId = onlyOneFile.fileId;
+      const filePath = onlyOneFile.filePath;
+      const fileName = filePath.substring(filePath.lastIndexOf("/") + 1);
+      onlyOneFile.fileName = fileName;
+      regFileList.value = tempFileSuccessList;
+
+      prompt.getMessageFileHist = {
+        fileId,
+      };
+
+      fileStore.deletedTmpFileList?.(-1);
+    } else {
+      prompt.messageFileHist = null;
+    }
+  } else {
+    prompt.messageFileHist = null;
+  }
+
+  prompt.styles = [];
+
+  const promptKeys = Object.keys(promptTemplate);
+
+  if (promptKeys.length !== 0 && !promptKeys.includes("html")) {
+    if (intention === 5) {
+      const web = promptTemplate.web.content[selectedIntentionInfo.web].tag;
+      prompt.styles = [web];
+    } else {
+      const language = promptTemplate.language.content[selectedIntentionInfo.language].tag;
+      const style = promptTemplate.style.content[selectedIntentionInfo.style].tag;
+
+      if (intention === 1) {
+        // as-is: 메일은 별도 style 처리 없음
+      } else if (intention === 2) {
+        prompt.styles = [language, style];
+      } else if (intention === 3) {
+        const length = promptTemplate.length.content[selectedIntentionInfo.length].tag;
+        prompt.styles = [language, style, length];
+      }
+    }
+  }
+
+  prompt.body = userPrompt.content;
+  prompt.byteSize = 10000;
+
+  const ragContextMaxBytes = Number(new URLSearchParams(window.location.search).get("rag_context_max_bytes"));
+  if (Number.isNaN(ragContextMaxBytes) === false) {
+    prompt.byteSize = Math.floor(ragContextMaxBytes);
+  }
+
+  userPrompt.intention = prompt.intention;
+  userPrompt.isRAG = prompt.rag;
+  userPrompt.isRagCot = prompt.ragCot;
+  userPrompt.imgS3Path = null;
+  userPrompt.tag = JSON.stringify(prompt.styles);
+
+  await nextTick();
+  chatStore.setDetailSelectedIntention(["sender", ""]);
+  chatStore.setDetailSelectedIntention(["receiver", ""]);
+  chatStore.setInpuChat("");
+
+  if (tempImgFile.value) {
+    let folderName = getPolishedDate("D");
+    folderName += "/" + chatStore.userInfo.userId;
+    folderName += "/" + prompt.chatId;
+    folderName += "/" + prompt.msgId;
+
+    let path = folderName;
+    path += "/" + tempImgFile.value.name;
+
+    userPrompt.imgS3Path = path;
+    prompt.imgS3Path = path;
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      userPrompt.tmpImg = event.target.result;
+      setTemCompletion(userPrompt);
+    };
+
+    reader.readAsDataURL(tempImgFile.value);
+    uploadFile("", prompt);
     return;
   }
 
-  const history = await findHistoryForLoad(activeHistoryId.value);
-  if (!history) {
-    clearChatCompletions();
-    chatStore.clearActiveSession();
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    return;
+  setTemCompletion(userPrompt);
+  generation("", prompt);
+}
+
+function getChatInfo() {
+  if (!generateMsgId.value) {
+    chatStore.setGenerateMsgId(createId());
   }
 
-  chatStore.setActiveChatRoom(history.chatId);
-  const nextChatCompletions = await getResponse(history, signal);
-  if (signal?.aborted) return;
+  respMsgId.value = createId();
 
-  callbackTrnFunc(
-    {
-      tranId: respondingCheck ? "getIsResponding" : "getChatHistory",
-      result: {res: nextChatCompletions, param: null},
-    },
-    true
-  );
+  const chatInfo = {
+    chatId: selectedChatId.value,
+    msgId: generateMsgId.value,
+    respMsgId: respMsgId.value,
+    assistId: selectedAssist.value,
+    modelId: selectedModel.value,
+    studio: selectedAssistInfo.value.studioYN,
+  };
 
-  await renderLoadedMessages(chatCompletions.value, signal);
+  chatStore.setGenerateMsgId(null);
+  return chatInfo;
 }
 
-async function getSharedChatHistory(signal) {
-  const sharedId = getSharedEntryId() || activeHistoryId.value;
-  if (!sharedId) {
-    clearChatCompletions();
-    return;
+function getPolishedDate(scope) {
+  const dt = new Date();
+  let result = "";
+  result += dt.getFullYear();
+  result += "-" + (dt.getMonth() >= 9 ? "" : "0") + (dt.getMonth() + 1);
+  result += "-" + (dt.getDate() >= 10 ? "" : "0") + dt.getDate();
+
+  if (scope === "D") {
+    return result;
   }
 
-  const result = await getSharedConversation(sharedId, {signal});
-  if (!result.exists) {
-    clearChatCompletions();
-    chatStore.clearActiveRoom();
-    await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
-    return;
+  result += "-" + (dt.getHours() >= 10 ? "" : "0") + dt.getHours();
+  result += "-" + (dt.getMinutes() >= 10 ? "" : "0") + dt.getMinutes();
+  result += "-" + (dt.getSeconds() >= 10 ? "" : "0") + dt.getSeconds();
+
+  return result;
+}
+
+async function uploadFile(genType, prompt) {
+  const filePath = prompt.messageFileHist === null || prompt.messageFileHist === undefined ? prompt.imgS3Path : prompt.filePath;
+  await getPresignedURL(filePath, genType, prompt, "C");
+}
+
+async function getPresignedURL(filePath, genType, prompt, crudType) {
+  try {
+    const result = await chatHistoryApi.getPresignedURL?.(filePath, genType, prompt, crudType);
+    await uploadPresignedFile(result, {genType, prompt});
+  } catch (error) {
+    if (typeof window !== "undefined") window.alert?.(error?.message || "uploadFile 호출에 실패했습니다.");
+    chatStore.setIsWait(false);
+    await getChatHistInfo();
   }
-
-  chatStore.setActiveSharedRoom(result.shareId || sharedId);
-  if (route.name === ROUTE_NAMES.SHARED_ENTRY) {
-    await router.replace({name: ROUTE_NAMES.SHARED}).catch(() => {});
-  }
-
-  await renderLoadedMessages(result.chatCompletions, signal);
 }
 
-function getChatOwnerName() {
-  chatOwnerName.value = selectedChatInfo.value?.ownerName || selectedChatInfo.value?.userName || null;
-}
-
-function getMessageFileHist() {
-  messageFileHist.value = chatCompletions.value.filter((chatCompletion) =>
-    Array.isArray(chatCompletion?.attachments) &&
-    chatCompletion.attachments.some((file) => file?.kind !== "image")
-  );
-}
-
-function getChatImageList() {
-  chatImageList.value = chatCompletions.value.filter((chatCompletion) =>
-    Array.isArray(chatCompletion?.attachments) &&
-    chatCompletion.attachments.some((file) => file?.kind === "image")
-  );
-}
-
-function getChatStudioInfo() {
-  return selectedAssistInfo.value;
-}
-
-function getLastChatInfo() {
-  return lastChatInfo.value;
-}
-
-function getAssocInfo() {
-  getChatOwnerName();
-  getMessageFileHist();
-  getChatImageList();
-  getChatStudioInfo();
-  getLastChatInfo();
-}
-
-async function getChatHistInfo() {
-  if (!isConversationPage.value && !isMainPage.value) return;
-
-  const shouldLock =
-    isConversationPage.value && !chatStore.isWait && !chatStore.input;
-  if (shouldLock) chatStore.startWait();
-
-  const signal = createLoadSignal();
+async function uploadPresignedFile(result, param) {
+  const genType = param.genType;
+  const prompt = param.prompt;
+  const file = tempImgFile.value;
 
   try {
-    getAssocInfo();
-
-    if (isSharedPage.value) {
-      await getSharedChatHistory(signal);
-      return;
-    }
-    await getChatHistory(false, signal);
+    await chatHistoryApi.uploadPresignedFile?.(result?.presignUrl, file);
+    const chatCompletion = lastChatInfo.value;
+    if (chatCompletion) chatCompletion.content = prompt.body;
+    fileStore.setTempImgFile(null);
+    generation(genType, prompt);
   } catch (error) {
-    if (!isAbortError(error))
-      logWarn("[ChatHistory] getChatHistInfo 오류:", error);
-  } finally {
-    loadController = null;
-    if (shouldLock) chatStore.finishWait();
+    fileStore.setTempImgFile(null);
+    chatStore.setIsWait(false);
+    await getChatHistInfo();
   }
 }
 
-function callbackTrnFunc(callbackRes, isSuccess = true) {
-  const tranId = callbackRes?.tranId;
-  const result = callbackRes?.result || {};
-  const res = result.res;
-
-  if (!isSuccess) {
-    chatStore.finishWait();
-    return;
-  }
-
-  if (
-    tranId === "getResponse" ||
-    tranId === "getChatHistory" ||
-    tranId === "getIsResponding" ||
-    tranId === "createErrorChat"
-  ) {
-    if (Array.isArray(res)) setChatCompletions(res);
-    getAssocInfo();
-    return;
-  }
-
-  if (tranId === "getChatOwnerName") {
-    chatOwnerName.value = res;
-    return;
-  }
-
-  if (tranId === "getMessageFileHist") {
-    messageFileHist.value = Array.isArray(res) ? res : [];
-    return;
-  }
-
-  if (tranId === "getChatImageList") {
-    chatImageList.value = Array.isArray(res) ? res : [];
-    return;
-  }
-
-  if (tranId === "getRoomInfo" && Array.isArray(res)) {
-    chatStore.setHistories(res);
-  }
+function setTemCompletion(userPrompt) {
+  chatCompletions.value = [...chatCompletions.value, userPrompt];
+  setWaitingResponse(false);
 }
 
-function getSubmitAssistantId() {
-  return chatStore.activeSession?.assistantId || chatStore.selectedAssistantId;
-}
-
-function getSubmitModelId() {
-  return chatStore.activeSession?.modelId || chatStore.selectedModelId;
-}
-
-function isSelectedModelReasoning() {
-  return Boolean(chatStore.modelMap[getSubmitModelId()]?.isReasoning);
-}
-
-function getChatInfo(promptPayload, chatId) {
-  const settings = promptControlStore.activePromptToolSettings || {};
-  const knowledgeSearch = settings.knowledgeSearch || [];
-
-  return {
-    [G.CHAT_ID]: chatId,
-    [G.ASSIST_ID]: getSubmitAssistantId(),
-    [G.MODEL_ID]: getSubmitModelId(),
-    [G.STUDIO]: false,
-    [G.INTENTION]: "직접입력",
-    [G.RAG]: knowledgeSearch.length > 0,
-    [G.RAG_COT]: false,
-    [G.IMAGE_S3_PATH_LEGACY]: null,
-    [G.SOURCE_TYPE]: "internal",
-    [G.ARRAY_OPTIONS]: knowledgeSearch,
-    [G.MESSAGE_FILE_HISTORY]: null,
-    [G.STYLES]: [],
-    [G.BODY]: promptPayload.text,
-    [G.BYTE_SIZE]: 10000,
-    [G.LAST_FEDERATION_INFO]: null,
-    [G.UI_STATE_INFO_WRAPPER]: null,
-    [G.MESSAGE_ID]: createId("message"),
-    [G.RESPONSE_MESSAGE_ID]: createId("message"),
+function setWaitingResponse(isReplace) {
+  const waitingCompletion = {
+    role: "response",
+    content: "답변 생성 중...",
   };
+
+  if (!isReplace) {
+    chatCompletions.value = [...chatCompletions.value, waitingCompletion];
+  } else {
+    const nextCompletions = [...chatCompletions.value];
+    nextCompletions[nextCompletions.length - 1] = waitingCompletion;
+    chatCompletions.value = nextCompletions;
+  }
+
+  isHndleScroll.value = false;
+  scrollDown();
+}
+
+function resolveGenerationUrl(genType = "") {
+  const base = SERVER_API_BASE_URL.replace(/\/$/, "");
+  return `${base}/chat-message-history/${genType}generation.do`;
+}
+
+function generation(genType = "", prompt = {}) {
+  closeEventSource();
+  isGeneration.value = true;
+
+  currentChatInfo.value = prompt;
+
+  if (shouldUseFrontendMockApi()) {
+    streamFrontendGeneration(prompt);
+    return;
+  }
+
+  eventSource.value = new SSE(resolveGenerationUrl(genType), {
+    headers: {"Content-Type": "application/json"},
+    payload: JSON.stringify(prompt),
+    method: "POST",
+  });
+
+  const onmessageFunc = getOnMessageFunc();
+  let isStart = false;
+
+  eventSource.value.onmessage = (success) => {
+    if (!validateBefOnMessaging(success?.data)) return;
+    if (!isStart) {
+      isStart = true;
+      getAssocInfo();
+    }
+    onmessageFunc(success, prompt);
+  };
+
+  const errorMessage = "서비스에 문제로 인하여 잠시 후 시도하세요.";
+
+  eventSource.value.onerror = () => {
+    createErrorChat(errorMessage);
+  };
+
+  eventSource.value.addEventListener?.("readystatechange", evtSrcReadyStateChange);
+  createTimeer();
+  eventSource.value.stream();
+}
+
+function createFrontendMockAnswer(prompt = {}) {
+  const body = prompt.body || "질문";
+  return `프론트 단독 테스트 응답입니다.\n\n질문: ${body}\n\n이 응답은 mock stream으로 생성되었습니다.`;
+}
+
+function streamFrontendGeneration(prompt = {}) {
+  const controller = new AbortController();
+  const onmessageFunc = getOnMessageFunc();
+  let isStart = false;
+  let previousContent = "";
+  const useSkillSetParser = onmessageFunc === getSkillSetAnswer;
+
+  eventSource.value = {
+    close() {
+      controller.abort();
+    },
+    addEventListener() {},
+  };
+
+  createTimeer();
+
+  const dispatchMessage = (data) => {
+    if (!validateBefOnMessaging(data)) return;
+    if (!isStart) {
+      isStart = true;
+      getAssocInfo();
+      if (!useSkillSetParser) {
+        onmessageFunc(
+          {data: JSON.stringify({choices: [{finish_reason: null, delta: {role: "assistant"}}]})},
+          prompt
+        );
+      }
+    }
+    onmessageFunc({data}, prompt);
+  };
+
+  streamText(
+    createFrontendMockAnswer(prompt),
+    (content) => {
+      const deltaContent = content.slice(previousContent.length);
+      previousContent = content;
+      if (!deltaContent) return;
+
+      if (useSkillSetParser) {
+        dispatchMessage(JSON.stringify({text: deltaContent}));
+        return;
+      }
+
+      dispatchMessage(
+        JSON.stringify({choices: [{finish_reason: null, delta: {content: deltaContent}}]})
+      );
+    },
+    {delay: 18, signal: controller.signal}
+  )
+    .then(async () => {
+      finalizeFrontendMockAnswer(prompt);
+      await chatHistoryApi.saveGeneratedMessages?.({
+        chatId: prompt.chatId,
+        messages: chatCompletions.value,
+      });
+      if (prompt.chatId) await getRoomInfo();
+      evtSrcReadyStateChange({readyState: 2});
+    })
+    .catch((error) => {
+      if (error?.name !== "AbortError") createErrorChat("서비스에 문제로 인하여 잠시 후 시도하세요.");
+    });
+}
+
+function finalizeFrontendMockAnswer(prompt = {}) {
+  const index = chatCompletions.value.length - 1;
+  if (index < 0) return;
+
+  const completion = chatCompletions.value[index];
+  if (!completion || completion.role === "user") return;
+
+  const nextCompletions = [...chatCompletions.value];
+  const completedId = respMsgId.value || createId();
+
+  if (completion.role === "response") {
+    nextCompletions[index] = {
+      id: completedId,
+      content: createFrontendMockAnswer(prompt),
+      feedback: 0,
+      role: "assistant",
+      intention: prompt.intention,
+      isRAG: prompt.rag,
+      rag: prompt.rag,
+      stopReason: null,
+    };
+    chatCompletions.value = nextCompletions;
+    return;
+  }
+
+  if (completion.role === "assistant" && completion.id === 1) {
+    nextCompletions[index] = {
+      ...completion,
+      id: completedId,
+      stopReason: completion.stopReason || null,
+    };
+    chatCompletions.value = nextCompletions;
+  }
 }
 
 function evtSrcReadyStateChange(event) {
-  if (event.readyState !== 2) return;
+  if (event?.readyState !== 2) return;
   completeAnswer();
 }
 
-function createTimer() {
-  window.clearTimeout(completionTimer);
-  completionTimer = window.setTimeout(() => {
-    createErrorChat("서비스 응답이 지연되어 잠시 후 다시 시도해주세요.");
-  }, GENERATION_STREAM_TIMEOUT_MS);
-}
-
-function validateBefOnMessaging(data) {
-  const validFlag = "[__VALID__]";
-
-  if (typeof data === "string" && data.indexOf(validFlag) === 0) {
-    window.alert(data.replace(validFlag, "").split("__")[0]);
-    return false;
-  }
-
-  if (!chatStore.isWait) {
-    window.clearTimeout(completionTimer);
-    eventSource?.close?.();
-    return false;
-  }
-
-  return true;
-}
-
-function addRespCompleted(isStartResponse, responseInfo = {}) {
-  if (!isStartResponse) return false;
-
-  const response = createChatResponse({
-    id: responseInfo.id || respMsgId.value || createId("message"),
-    role: responseInfo.role || "assistant",
-    content: responseInfo.content || "",
-    reasoningContent: responseInfo.reasoningContent || "",
-    status: "streaming",
-    intention: responseInfo.intention,
-    isRAG: responseInfo.isRAG,
-  });
-
-  response.feedback = 0;
-  setChatCompletions([
-    ...chatCompletions.value.slice(0, chatCompletions.value.length - 1),
-    response,
-  ]);
-  createTimer();
-  return true;
-}
-
 function getOnMessageFunc() {
-  const modelInfo = selectedModelInfo.value || {};
-  const modelType = modelInfo.modelType || modelInfo.type || modelInfo.id;
+  const modelType = selectedModelInfo.value?.modelType;
 
   switch (modelType) {
     case "Orch_V2":
@@ -878,13 +1297,13 @@ function getOnMessageFunc() {
     case "Orch_V2_Studio_Secure":
     case "DeepResearch":
       return getReasoningModelAnswer;
-  }
 
-  if (isSelectedModelReasoning()) return getReasoningModelAnswer;
-  return getAzurAnswer;
+    default:
+      return getAzurAnswer;
+  }
 }
 
-function getAzurAnswer(success, chat) {
+function getAzurAnswer(success, chat = currentChatInfo.value || {}) {
   const data = success.data;
 
   if (data === "[DONE]") return;
@@ -895,39 +1314,43 @@ function getAzurAnswer(success, chat) {
   }
 
   const json = JSON.parse(data);
-  const choices = json.choices || [];
+  const choices = json.choices;
+
   if (choices.length === 0) return;
 
   const choice = choices[0];
   if (choice.finish_reason !== null && choice.finish_reason !== undefined) return;
 
-  const delta = choice.delta || {};
+  const delta = choice.delta;
   const respCompletion = lastChatInfo.value;
   const responseInfo = {
-    id: chat[G.RESPONSE_MESSAGE_ID],
-    role: delta.role || "assistant",
-    intention: chat[G.INTENTION],
-    isRAG: chat[G.RAG],
+    role: delta.role,
+    intention: chat.intention,
+    rag: chat.rag,
   };
 
-  if (addRespCompleted(respCompletion?.role === "response", responseInfo)) return;
+  if (addRespCompletion(delta.role === "assistant" && respCompletion?.role === "response", responseInfo)) {
+    return;
+  }
 
   nextTick(() => {
-    if (!lastChatInfo.value) return;
-    lastChatInfo.value.content += delta.content || "";
+    const response = lastChatInfo.value;
+    if (!response) return;
+    response.content = (response.content || "") + (delta.content || "");
+    triggerRef(chatCompletions);
     setIsHandle();
   });
 
-  createTimer();
+  createTimeer();
 }
 
-function getSkillSetAnswer(success, chat) {
+function getSkillSetAnswer(success, chat = currentChatInfo.value || {}) {
   const json = JSON.parse(success.data);
 
   if (json.data === "[DONE]") return;
 
   const status = json.status;
-  if (status !== undefined && status.code !== undefined) {
+  if (status !== undefined && status !== null && status.code !== undefined) {
     createErrorChat("사용자/사용량이 너무 많아서 잠시후 다시 시도해주세요");
     return;
   }
@@ -936,35 +1359,36 @@ function getSkillSetAnswer(success, chat) {
 
   if (respCompletion?.role === "response") {
     if (json.text !== undefined) {
-      const response = createChatResponse({
-        id: chat[G.RESPONSE_MESSAGE_ID],
+      const response = {
+        id: 1,
         content: json.text,
+        feedback: 0,
         role: "assistant",
-        status: "streaming",
-        intention: chat[G.INTENTION],
-        isRAG: chat[G.RAG],
-      });
-      response.feedback = 0;
-      setChatCompletions([
-        ...chatCompletions.value.slice(0, chatCompletions.value.length - 1),
-        response,
-      ]);
+        intention: chat.intention,
+        isRAG: chat.rag,
+      };
+
+      const nextCompletions = [...chatCompletions.value];
+      nextCompletions[nextCompletions.length - 1] = response;
+      chatCompletions.value = nextCompletions;
     }
 
-    createTimer();
+    createTimeer();
     return;
   }
 
   nextTick(() => {
-    if (!lastChatInfo.value) return;
-    lastChatInfo.value.content += json.text || "";
+    const response = lastChatInfo.value;
+    if (!response) return;
+    response.content = (response.content || "") + json.text;
+    triggerRef(chatCompletions);
     setIsHandle();
   });
 
-  createTimer();
+  createTimeer();
 }
 
-function getReasoningModelAnswer(success, chat) {
+function getReasoningModelAnswer(success, chat = currentChatInfo.value || {}) {
   const data = success.data;
 
   if (data === "[DONE]") return;
@@ -975,540 +1399,198 @@ function getReasoningModelAnswer(success, chat) {
   }
 
   const json = JSON.parse(data);
-  const choices = json.choices || [];
+  const choices = json.choices;
   if (choices.length === 0) return;
 
   const choice = choices[0];
   const finishReason = choice.finish_reason;
-  if (finishReason !== undefined && finishReason !== null) return;
+  if (finishReason !== null && finishReason !== undefined) return;
 
-  const delta = choice.delta || {};
+  const delta = choice.delta;
   const respCompletion = lastChatInfo.value;
   const responseInfo = {
-    id: chat[G.RESPONSE_MESSAGE_ID],
-    role: delta.role || "assistant",
-    intention: chat[G.INTENTION],
-    isRAG: chat[G.RAG],
+    role: delta.role,
+    intention: chat.intention,
+    rag: chat.rag,
   };
 
-  if (addRespCompleted(respCompletion?.role === "response", responseInfo)) return;
+  if (addRespCompletion(delta.role === "assistant" && respCompletion?.role === "response", responseInfo)) {
+    return;
+  }
 
   nextTick(() => {
-    if (!lastChatInfo.value) return;
+    const response = lastChatInfo.value;
+    if (!response) return;
 
     const reasoningContent = delta.reasoning_content;
     const content = delta.content;
 
     if (reasoningContent !== undefined && reasoningContent !== null) {
-      lastChatInfo.value.reasoningContent += reasoningContent;
+      response.reasoningContent = (response.reasoningContent || "") + reasoningContent;
     } else if (content !== undefined && content !== null) {
-      lastChatInfo.value.content += content;
+      response.content = (response.content || "") + content;
     }
 
+    triggerRef(chatCompletions);
     setIsHandle();
   });
 
-  createTimer();
+  createTimeer();
 }
 
-function completeAnswer() {
-  window.clearTimeout(completionTimer);
-  eventSource?.removeEventListener?.("readystatechange", evtSrcReadyStateChange);
-  eventSource?.close?.();
-  eventSource = null;
-  respondingInfo.value.curIdx = 0;
-  respondingInfo.value.endIdx = 0;
-  generationResolve?.();
-  generationResolve = null;
-  generationReject = null;
-  getChatHistInfo();
-}
+function addRespCompletion(isStartResponse, responseInfo = {}) {
+  if (!isStartResponse) return false;
 
-async function createErrorChat(content) {
-  if (isEmptyChat.value) return;
-
-  chatStore.startWait();
-  window.clearTimeout(completionTimer);
-
-  if (eventSource !== null) {
-    eventSource.removeEventListener?.("readystatechange", evtSrcReadyStateChange);
-    eventSource.close?.();
-    eventSource = null;
-  }
-
-  const chat = {
-    chatId: selectedChatId.value,
-    msgId: createId("message"),
-    assistId: getSubmitAssistantId(),
-    modelId: getSubmitModelId(),
-    studio: selectedAssistInfo.value?.assistantType === "studio",
-    body: content,
+  const response = {
+    id: 1,
+    feedback: 0,
+    role: responseInfo.role,
+    intention: responseInfo.intention,
+    rag: responseInfo.rag,
+    content: responseInfo.content || "",
+    reasoningContent: responseInfo.reasoningContent || "",
   };
 
-  try {
-    const errorCompletions = await loadGenerationErrorMessages(chat, {
-      message: content,
-    });
-    callbackTrnFunc(
-      {
-        tranId: "createErrorChat",
-        result: {res: errorCompletions, param: {}},
-      },
-      true
-    );
-  } catch (error) {
-    logWarn("[ChatHistory] createErrorChat 오류:", error);
-  } finally {
-    generationReject?.(new Error(content));
-    generationResolve = null;
-    generationReject = null;
-    chatStore.finishWait();
-  }
-}
-
-function generation(genType, prompt) {
-  isGeneration.value = true;
-  respMsgId.value = prompt[G.RESPONSE_MESSAGE_ID];
-
-  const base = shouldUseServerApi()
-    ? SERVER_API_BASE_URL
-    : DEFAULT_API_BASE_PATH;
-  const url = `${base.replace(/\/$/, "")}/chat-message-history/${genType}generation.do`;
-
-  eventSource = new SSE(url, {
-    headers: {"Content-Type": "application/json"},
-    payload: JSON.stringify(prompt),
-    method: "POST",
-  });
-
-  const onmessageFunc = getOnMessageFunc();
-  let isStart = false;
-
-  eventSource.onmessage = (success) => {
-    if (!validateBefOnMessaging(success.data)) return;
-
-    if (!isStart) {
-      isStart = true;
-      getAssocInfo();
-    }
-
-    onmessageFunc(success, prompt);
-  };
-
-  const errorMessage = "서비스에 문제로 인하여 잠시 후 시도하세요.";
-  eventSource.onerror = () => {
-    createErrorChat(errorMessage);
-  };
-
-  eventSource.addEventListener("readystatechange", evtSrcReadyStateChange);
-
-  createTimer();
-  eventSource.stream();
-
-  return new Promise((resolve, reject) => {
-    generationResolve = resolve;
-    generationReject = reject;
-  });
-}
-
-function createRemoteConversation(promptPayload) {
-  const chatId = createId();
-  const assistantId = getSubmitAssistantId();
-  const assistant = chatStore.assistantMap[assistantId];
-
-  return createChatHistory({
-    chatId,
-    assistId: assistantId,
-    modelId: getSubmitModelId(),
-    ChatTilte: promptPayload.text.slice(0, 20) || promptPayload.text,
-    studio: assistant?.type === "studio",
-  }).then((rawHistory) => {
-    const history = adaptChatHistory(rawHistory, {
-      assistantMap: chatStore.assistantMap,
-      modelMap: chatStore.modelMap,
-    });
-    if (!history.chatId)
-      throw new Error("new.do response does not contain chatId.");
-    return history;
-  });
-}
-
-function createLocalConversation(promptPayload) {
-  return createLocalHistory(
-    promptPayload.text,
-    chatStore.currentAssistant,
-    chatStore.currentModel || chatStore.currentModels[0]
-  );
-}
-
-async function createConversation(promptPayload) {
-  const history = shouldUseServerApi()
-    ? await createRemoteConversation(promptPayload)
-    : createLocalConversation(promptPayload);
-
-  chatStore.addHistory(history);
-  chatStore.setActiveSession(
-    createSessionFromHistory(
-      history,
-      chatStore.modelMap,
-      chatStore.assistantMap
-    )
-  );
-  return history;
-}
-
-function canSubmitChatMessage() {
-  return (
-    !isReadOnlyChat.value &&
-    !chatStore.isWait &&
-    !chatStore.activeSession?.isModelUnavailable
-  );
-}
-
-function setTemCompletion(userPrompt) {
-  setChatCompletions([...chatCompletions.value, userPrompt]);
-  setWaitingResponse(false);
-}
-
-function setWaitingResponse(isReplace) {
-  const waitingCompletion = createChatResponse(
-    createAssistantStreamingPatch(isSelectedModelReasoning())
-  );
-  waitingCompletion.role = "response";
-  waitingCompletion.content = "답변 생성 중...";
-
-  if (isReplace) {
-    setChatCompletions([
-      ...chatCompletions.value.slice(0, chatCompletions.value.length - 1),
-      waitingCompletion,
-    ]);
-  } else {
-    setChatCompletions([...chatCompletions.value, waitingCompletion]);
-  }
-
-  setAutoScroll();
-}
-
-async function getLLMAnswer(payload = {}) {
-  if (chatStore.isActiveSharedRoom || !canSubmitChatMessage()) return;
-
-  const promptPayload = {
-    text: payload.text || "",
-    attachments: payload.attachments || [],
-    keyboardOpenOnSubmit: Boolean(payload.keyboardOpenOnSubmit),
-  };
-
-  if (!promptPayload.text && promptPayload.attachments.length === 0) return;
-
-  chatStore.startWait();
-  isGeneration.value = true;
-
-  try {
-    let chatId = chatStore.selectedChatId;
-
-    if (!chatId) {
-      const history = await createConversation(promptPayload);
-      chatId = history.chatId;
-      generateChatId = chatId;
-      promptControlStore.promoteDraftPromptToolSettingsToChat(chatId);
-      await getRoomInfo();
-      await enterNewSubmitChatRoom(router, chatId);
-    } else {
-      generateChatId = chatId;
-      void getRoomInfo();
-    }
-
-    const prompt = getChatInfo(promptPayload, chatId);
-    const userPrompt = createChatUser(promptPayload);
-    userPrompt.id = prompt[G.MESSAGE_ID];
-    userPrompt.intention = prompt[G.INTENTION];
-    userPrompt.isRAG = prompt[G.RAG];
-    userPrompt.isRagCot = prompt[G.RAG_COT];
-    userPrompt.imgS3Path = prompt[G.IMAGE_S3_PATH_LEGACY];
-
-    setTemCompletion(userPrompt);
-    await nextTick();
-    setAutoScroll();
-    await generation("", prompt);
-  } catch (error) {
-    if (!isAbortError(error)) logWarn("[ChatHistory] getLLMAnswer 종료:", error);
-  } finally {
-    generateChatId = null;
-    isGeneration.value = false;
-    chatStore.finishWait();
-  }
-}
-
-async function setChatInputField(payload) {
-  await getLLMAnswer(payload);
-  if (chatStore.input === payload) chatStore.clearInput();
-}
-
-function findChatUserForRegenerate(assistantMessage) {
-  const assistantIndex = chatCompletions.value.findIndex(
-    (message) => message.id === assistantMessage.id
-  );
-  for (let index = assistantIndex - 1; index >= 0; index -= 1) {
-    if (chatCompletions.value[index].role === "user") return chatCompletions.value[index];
-  }
-  return null;
-}
-
-async function reGeneration(assistantMessage) {
-  if (!canSubmitChatMessage()) return;
-
-  const chatId = chatStore.selectedChatId;
-  const user = findChatUserForRegenerate(assistantMessage);
-  if (!chatId || !user) return;
-
-  chatStore.startWait();
-  isGeneration.value = true;
-
-  try {
-    const assistantIndex = chatCompletions.value.findIndex(
-      (chatCompletion) => chatCompletion.id === assistantMessage.id
-    );
-    setChatCompletions(chatCompletions.value.slice(0, assistantIndex));
-
-    const newChatInfo = getChatInfo(
-      {text: user.content, attachments: user.attachments || []},
-      chatId
-    );
-    newChatInfo[G.INTENTION] = user.intention;
-    newChatInfo[G.RAG] = user.isRAG;
-    newChatInfo.befMsgId = getFileFlag(user.id) ? user.id : null;
-
-    setWaitingResponse(false);
-    await nextTick();
-    setAutoScroll();
-    await generation("re-", newChatInfo);
-  } catch (error) {
-    if (!isAbortError(error)) logWarn("[ChatHistory] reGeneration 종료:", error);
-  } finally {
-    isGeneration.value = false;
-    chatStore.finishWait();
-  }
-}
-
-function getFileFlag(userMsgId) {
-  return (
-    messageFileHist.value.findIndex((file) => userMsgId === file.msgId) !== -1 ||
-    chatImageList.value.findIndex((image) => userMsgId === image.msgId) !== -1
-  );
-}
-
-function isStreamingAssistantMessage(message) {
-  return (
-    message?.role === "assistant" &&
-    Boolean(message.status) &&
-    !["complete", "error"].includes(message.status)
-  );
-}
-
-function shouldBlockAssistantInteraction(message) {
-  return chatStore.isWait && isStreamingAssistantMessage(message);
-}
-
-function isAssistantErrorMessage(message) {
-  return message?.role === "assistant" && message?.error;
-}
-
-function isLastChatResponse(message) {
-  if (!message || message.role !== "assistant") return false;
-
-  for (let index = chatCompletions.value.length - 1; index >= 0; index -= 1) {
-    const current = chatCompletions.value[index];
-    if (current.role === "assistant") return current.id === message.id;
-  }
-
-  return false;
-}
-
-function scrollDown() {
-  if (isHndleScroll.value) return false;
-
-  nextTick(() => {
-    window.setTimeout(() => {
-      const bodyContents = scrollRef.value;
-      if (!bodyContents) return;
-
-      bodyContents.scrollTop = bodyContents.scrollHeight;
-      updateBottomState();
-    }, 0);
-  });
-
+  const nextCompletions = [...chatCompletions.value];
+  nextCompletions[nextCompletions.length - 1] = response;
+  chatCompletions.value = nextCompletions;
+  createTimeer();
   return true;
 }
 
-function scrollToTop() {
-  const bodyContents = scrollRef.value;
-  if (!bodyContents) return false;
+async function completeAnswer() {
+  clearCompletionTimer();
+  eventSource.value?.close?.();
+  eventSource.value = null;
+  respondingInfo.curIdx = 0;
+  respondingInfo.endIdx = 0;
 
-  bodyContents.scrollTop = 0;
-  updateBottomState();
-  return true;
-}
-
-function setIsHandle() {
-  const bodyContents = scrollRef.value;
-  if (!bodyContents) return;
-
-  isHndleScroll.value =
-    bodyContents.scrollTop + bodyContents.clientHeight <
-    bodyContents.scrollHeight - 24;
-
-  if (!isHndleScroll.value) scrollDown();
-}
-
-function setAutoScroll() {
-  isHndleScroll.value = false;
-  scrollDown();
-}
-
-function scrollToChatId() {
-  const scrollRequest = chatStore.consumeInitialScrollRequest?.();
-  const searchMessageId =
-    scrollRequest?.messageId || chatStore.searchTargetMessageId || null;
-
-  if (searchMessageId) {
-    const targetMessage = chatCompletions.value.find((chatCompletion) => {
-      const raw = chatCompletion?.raw || {};
-      return [
-        chatCompletion?.id,
-        raw.id,
-        raw.msgId,
-        raw.respMsgId,
-        raw.messageId,
-        raw.targetMessageId,
-        raw.message_id,
-      ]
-        .filter((value) => value !== null && value !== undefined && value !== "")
-        .some((value) => String(value) === String(searchMessageId));
-    });
-
-    const target = targetMessage?.id
-      ? scrollRef.value?.querySelector(`[data-message-id="${targetMessage.id}"]`)
-      : null;
-
-    if (target) {
-      target.scrollIntoView({behavior: "instant", block: "start"});
-      chatStore.clearSearchTargetMessageId?.();
-      updateBottomState();
-      return;
-    }
-  }
-
-  if (isSharedPage.value || isSharedChat(activeHistory.value)) {
-    scrollToTop();
+  if (shouldUseFrontendMockApi()) {
+    chatStore.setIsWait(false);
+    isGeneration.value = false;
+    await nextTick();
+    scheduleScrollBottomButtonSync();
     return;
   }
 
-  setAutoScroll();
+  await getChatHistInfo();
 }
 
-function isNearBottom() {
-  const bodyContents = scrollRef.value;
-  if (!bodyContents) return true;
-  return (
-    bodyContents.scrollHeight - bodyContents.scrollTop - bodyContents.clientHeight <=
-    24
-  );
+async function getAssocInfo() {
+  await getChatOwnerName();
+  await getMessageFileHist();
+  await getChatImageList();
+  await getChatStudioInfo();
+  await getLastChatInfo();
 }
 
-function updateBottomState() {
-  chatStore.setShowScrollBottom(isConversationPage.value && !isNearBottom());
+async function getChatHistInfo() {
+  await getAssocInfo();
+  await getChatHistory(false);
 }
 
-function handleScroll() {
-  setIsHandle();
-  updateBottomState();
+function stopGeneration() {
+  return;
 }
 
-function handleMessageRendered(payload) {
-  markHistoryMessageRendered(payload);
+function getFileFlag(userMsgId) {
+  if (messageFileList.value.findIndex((item) => userMsgId === item.msgId) !== -1) return true;
+  if (chatImageList.value.findIndex((item) => userMsgId === item.msgId) !== -1) return true;
+  return false;
 }
 
-watch(
-  () => chatStore.scrollRequestSeq,
-  async () => {
-    const request = chatStore.scrollRequest;
-    if (!request) return;
+function reGeneration() {
+  if (!isActivatedReGen.value || !lastUserChatInfo.value || !selectedChatId.value) return;
 
-    await nextTick();
+  chatStore.setIsWait(true);
+  const newChatInfo = getChatInfo();
+  const user = lastUserChatInfo.value;
+  const userMsgId = user.id;
+  const isFile = getFileFlag(userMsgId);
 
-    if (request.type === "top") {
-      scrollToTop();
-      return;
-    }
+  newChatInfo.intention = user.intention;
+  newChatInfo.rag = user.isRAG;
+  newChatInfo.befMsgId = isFile ? userMsgId : null;
 
-    if (request.type === "message") {
-      scrollToChatId();
-      return;
-    }
+  setWaitingResponse(true);
+  if (!isFile) chatStore.setIsStream(true);
+  generation("re-", newChatInfo);
+}
 
-    setAutoScroll();
+function continueGeneration() {
+  if (!isActivetedContinue.value || !lastUserChatInfo.value || !selectedChatId.value) return;
+
+  chatStore.setIsWait(true);
+  const newChatInfo = getChatInfo();
+  const user = lastUserChatInfo.value;
+  const userMsgId = user.id;
+  const isFile = getFileFlag(userMsgId);
+
+  newChatInfo.intention = user.intention;
+  newChatInfo.befMsgId = isFile ? userMsgId : null;
+
+  if (lastChatInfo.value) lastChatInfo.value.id = 1;
+  chatStore.setIsStream(true);
+  isHndleScroll.value = false;
+  scrollDown();
+
+  generation("continue-", newChatInfo);
+}
+
+function clearCompletionTimer() {
+  if (!completionTimer.value) return;
+  window.clearTimeout(completionTimer.value);
+  completionTimer.value = null;
+}
+
+function createTimeer() {
+  clearCompletionTimer();
+
+  completionTimer.value = window.setTimeout(() => {
+    if (isWait.value === false) return;
+    getResponse(false);
+  }, 90 * 1000);
+}
+
+function validateBefOnMessaging(data = "") {
+  const validFlag = "[__VALID__]";
+  if (String(data).indexOf(validFlag) === 0) {
+    const validMsgs = String(data).replace(validFlag, "").split("__");
+    const locale = i18n.global.locale?.value || "ko";
+    const index = validMsgs.length === 1 || locale === "ko" ? 0 : 1;
+    if (typeof window !== "undefined") window.alert?.(validMsgs[index]);
+    return false;
   }
-);
 
-watch(
-  () => chatStore.input,
-  async (payload) => {
-    if (!payload) return;
-    await setChatInputField(payload);
-  },
-  {immediate: true}
-);
+  if (!isWait.value) {
+    clearCompletionTimer();
+    eventSource.value?.close?.();
+    return false;
+  }
 
-watch(
-  () => [
-    chatStore.selectedChatId,
-    chatStore.activeRoomId,
-    chatStore.activeRoomType,
-    activeHistoryId.value,
-    route.params.id,
-    route.params.shareId,
-    routeMode.value,
-  ],
-  async () => {
-    isChangeChatId.value = true;
-    clearMessagesOnConversationChange();
-    await getChatHistInfo();
-  },
-  {immediate: true}
-);
+  return true;
+}
 
-onBeforeUnmount(() => {
-  abortLoadRequest();
-  cancelHistoryRenderPresentation();
-  clearChatCompletions();
+function closeEventSource() {
+  clearCompletionTimer();
+  eventSource.value?.close?.();
+  eventSource.value = null;
+}
+
+
+
+function isLastResponse() {
+  if (isReadOnlyChat.value) return true;
+  return Boolean(lastChatInfo.value);
+}
+
+
+
+defineExpose({
+  scrollDown,
+  scrollToChatId,
+  reGeneration,
+  continueGeneration,
+  stopGeneration,
 });
-
-defineExpose({});
 </script>
-
-<style scoped lang="scss">
-.message-list {
-  min-width: 0;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  overflow-anchor: none;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-y;
-}
-
-.message-list--hidden {
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.message-tail-spacer {
-  flex: 0 0 auto;
-  min-height: 0;
-  pointer-events: none;
-}
-
-.typing-row {
-  flex: 0 0 auto;
-}
-</style>

@@ -109,18 +109,9 @@ import SidebarUserFooter from "@/components/navigation/controls/SidebarUserFoote
 import {useChatStore} from "@/stores/chatStore";
 import {useStudioRuntimeStore} from "@/stores/studioRuntimeStore";
 import {useAppShellStore} from "@/stores/appShellStore";
-import {isPortalAssistantId} from "@/constants/assistantPortal";
-import {loadExamplePrompts} from "@/composables/chat/runtime/chatRuntimeApi";
-import {
-  cleanupAfterPortalConversationNavigation,
-  clearConversationNavigationState as clearConversationNavigationStateByPolicy,
-  createPortalAssistantRoute,
-  enterChatRoom,
-  navigateToMainAfterConversationReset,
-  preparePortalConversationNavigation,
-  resetConversationStateForRouteChange as resetConversationStateForRouteChangeByPolicy,
-} from "@/composables/chat/chatRoomActions";
-import {logWarn} from "@/utils/logger";
+import {ASSISTANT_PORTAL_IDS, isPortalAssistantId} from "@/constants/assistantPortal";
+import {resolveChatApis} from "@/api/runtime/chatApis";
+import {adaptExamplePromptList} from "@/adapters/promptAdapter";
 import {ROUTE_NAMES} from "@/constants/routeNames";
 import {resolveBlocked} from "@/utils/interactionGuard";
 import {useNavigationActions} from "@/composables/navigation/context/navigationActionContext";
@@ -132,8 +123,9 @@ const navigationActions = useNavigationActions();
 const chatStore = useChatStore();
 const appShellStore = useAppShellStore();
 const studioRuntimeStore = useStudioRuntimeStore();
-const {assistants, selectedAssistantId} = storeToRefs(chatStore);
-const {histories, selectedChatId} = storeToRefs(chatStore);
+const {assistants, selectedAssist, chatRooms, selectedChatId} = storeToRefs(chatStore);
+const selectedAssistantId = selectedAssist;
+const histories = chatRooms;
 const {drawerOpen} = storeToRefs(appShellStore);
 
 const assistantMenuOpen = ref(false);
@@ -163,13 +155,14 @@ async function preloadRuntimeExamplePrompts(assistantId) {
   if (!assistantId || chatStore.examplePromptMap[assistantId]) return;
   try {
     const assistant = chatStore.assistantMap[assistantId];
-    const prompts = await loadExamplePrompts(
-      assistantId,
-      assistant?.type === "studio"
-    );
-    chatStore.setExamplePrompts(assistantId, prompts);
+    const {examplePromptApi} = resolveChatApis();
+    const response = await examplePromptApi.getExamplePrompts({
+      assistId: assistantId,
+      studioYN: assistant?.type === "studio",
+    });
+    chatStore.setExamplePrompts(assistantId, adaptExamplePromptList(response));
   } catch (error) {
-    logWarn("[AppSidebar] preloadExamplePrompts 오류:", error);
+    void error;
   }
 }
 
@@ -179,9 +172,9 @@ async function selectRuntimeAssistant(id, {forNewChat = false} = {}) {
   try {
     await preloadRuntimeExamplePrompts(id);
     chatStore.selectAssistant(id);
-    if (forNewChat) chatStore.clearActiveSession();
+    if (forNewChat) chatStore.clearSelectedChatState();
   } catch (error) {
-    logWarn("[AppSidebar] selectAssistant 오류:", error);
+    void error;
   }
 }
 
@@ -206,16 +199,25 @@ function closeAssistantSelector() {
 }
 
 function clearConversationNavigationState() {
-  clearConversationNavigationStateByPolicy();
+  chatStore.setSelectedChatSearchInfo(null);
+  chatStore.clearSelectedChatState();
+}
+
+function createPortalAssistantRoute(assistantId) {
+  if (assistantId === ASSISTANT_PORTAL_IDS.CONNECTOR_STORE) {
+    return {name: ROUTE_NAMES.CONNECTOR_STORE};
+  }
+  return {name: ROUTE_NAMES.STUDIO};
 }
 
 function preparePortalNavigation() {
-  preparePortalConversationNavigation();
+  chatStore.setSelectedChatSearchInfo(null);
+  closeSidebarNavigationPanels();
   closeAssistantSelector();
 }
 
 function cleanupAfterPortalNavigation() {
-  cleanupAfterPortalConversationNavigation();
+  chatStore.clearSelectedChatState();
 }
 
 async function navigatePortalAssistant(assistantId) {
@@ -228,14 +230,14 @@ async function navigatePortalAssistant(assistantId) {
 }
 
 async function navigateMainAfterReset() {
-  await navigateToMainAfterConversationReset(
-    router,
-    clearConversationNavigationState
-  );
+  clearConversationNavigationState();
+  await router.replace({name: ROUTE_NAMES.MAIN}).catch(() => {});
+  await nextTick();
 }
 
 function resetConversationStateForRouteChange() {
-  resetConversationStateForRouteChangeByPolicy();
+  clearConversationNavigationState();
+  closeSidebarNavigationPanels();
   closeAssistantSelector();
 }
 
@@ -322,9 +324,16 @@ async function selectHistory(item) {
   try {
     appShellStore.closeTransientShellPanels();
     appShellStore.setDrawerOpen(false);
+    chatStore.setSelectedChatId(historyId);
+    chatStore.setSelectedChatInfo({...item, roomType: "chat"});
+    chatStore.setSelectedChatSearchInfo(null);
     await nextTick();
-    return await enterChatRoom(router, historyId);
+    await router.replace({name: ROUTE_NAMES.CHAT_ENTRY}).catch(() => {});
+    return true;
   } catch (_error) {
+    if (String(chatStore.selectedChatId || "").trim() === historyId) {
+      chatStore.clearSelectedChatState();
+    }
     return false;
   }
 }

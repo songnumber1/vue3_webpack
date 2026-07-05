@@ -5,7 +5,6 @@
 
 import {isNativeApp} from "@/core/config/appConfig";
 import {callNative} from "@/platform/bridge/native/bridgeNativeRuntime";
-import {logWarn} from "@/utils/logger";
 import {createId} from "@/utils/id";
 
 /**
@@ -69,7 +68,6 @@ function parseEnvelope(raw) {
     return JSON.parse(raw); // 스트링 형태로 수신된 데이터 패킷을 JSON 객체 구조로 리파싱 완료
   } catch (error) {
     // 파싱 파괴 국면 발생 시 시스템 가드를 위해 경고 덤프를 남기고 안전하게 null 반환
-    logWarn("[storage] invalid native response", error);
 
     return null;
   }
@@ -84,7 +82,6 @@ function callDirectStorage(bridge, methodName, payload) {
     );
   } catch (error) {
     // 브릿지 통신선 붕괴 시 경고를 기록하고 폴백 레이어로 넘어가도록 유도
-    logWarn(`[storage] AndroidBridge.${methodName} failed`, error);
 
     return null;
   }
@@ -134,25 +131,15 @@ export function resolveStorage(appInfo, bridge) {
       },
       set(key, value) {
         // 기기 영속 저장소에 동기식 데이터 쓰기 명령 전송
-        const response = callDirectStorage(bridge, "setStorage", {
+        callDirectStorage(bridge, "setStorage", {
           key,
           value: String(value),
         });
-        if (!response?.isSuccess)
-          logWarn(
-            "[storage] native setStorage fallback used",
-            response?.message
-          );
         localStorageAdapter.set(key, value); // 네이티브 성공 여부와 무관하게 프론트엔드 자체 영속 메모리 레이어도 철저히 동시 동기화 마감
       },
       remove(key) {
         // 기기 영속 저장소 내부의 물리 캐시 키 삭제 명령 전송
-        const response = callDirectStorage(bridge, "removeStorage", {key});
-        if (!response?.isSuccess && response)
-          logWarn(
-            "[storage] native removeStorage fallback used",
-            response?.message
-          );
+        callDirectStorage(bridge, "removeStorage", {key});
         localStorageAdapter.remove(key); // 프론트엔드 자체 영속 메모리 레이어도 클린 청소
       },
 
@@ -164,7 +151,6 @@ export function resolveStorage(appInfo, bridge) {
 
           return response?.data?.value ?? localStorageAdapter.get(key); // 밸류 부재 시 웹 로컬 어댑터 값으로 안전 보정 폴백
         } catch (error) {
-          logWarn("[storage] native getAsync fallback used", error);
 
           return localStorageAdapter.get(key); // 채널 크래시 발생 시 웹 로컬 어댑터로 강제 원상 복귀
         }
@@ -174,7 +160,7 @@ export function resolveStorage(appInfo, bridge) {
           // 백그라운드 스레드 비동기 적재 채널 개통
           await callNative("SET_STORAGE", {key, value: String(value)});
         } catch (error) {
-          logWarn("[storage] native setAsync fallback used", error);
+          void error;
         }
         localStorageAdapter.set(key, value); // 프론트엔드 인메모리 및 웹뷰 물리 공간 동시 정착 완수
       },
@@ -183,7 +169,7 @@ export function resolveStorage(appInfo, bridge) {
           // 백그라운드 스레드 비동기 키 소멸 채널 개통
           await callNative("REMOVE_STORAGE", {key});
         } catch (error) {
-          logWarn("[storage] native removeAsync fallback used", error);
+          void error;
         }
         localStorageAdapter.remove(key); // 프론트엔드 샌드박스 청소
       },

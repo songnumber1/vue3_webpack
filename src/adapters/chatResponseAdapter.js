@@ -55,18 +55,24 @@ export function adaptChatHistoryItem(raw = {}, context = {}) {
 
   return {
     chatId,
+    chatTitle: title,
     title,
     preview:
       title || firstText(raw[C.PREVIEW], raw[C.SNIPPET]) || "저장된 대화",
     modelId,
     assistantId: assistantId || null,
+    assistId: assistantId || null,
+    assistInfo: raw.assistInfo || raw.assistantInfo || assistant || null,
     assistantType: assistant?.type || null,
-    assistantLabel: assistant?.label || "",
+    assistantLabel: assistant?.label || raw.assistName || raw.assistantName || "",
     modelLabel: model?.label || "",
+    bookmarkYN: firstDefined(raw[C.BOOKMARK_YN], raw.bookmarkYN),
     isPinned: toBoolean(raw[C.BOOKMARK_YN]),
-    endedAt: raw[C.CHAT_END_DT] || "",
-    userId: raw[C.USER_ID] || "",
-    sharedId: optionalText(raw[C.SHARED_ID], raw.sharedId),
+    chatEndDt: raw[C.CHAT_END_DT] || raw.chatEndDt || "",
+    endedAt: raw[C.CHAT_END_DT] || raw.chatEndDt || "",
+    userId: raw[C.USER_ID] || raw.userId || "",
+    ShardId: optionalText(raw.ShardId, raw.sharedId, raw[C.SHARED_ID]),
+    sharedId: optionalText(raw[C.SHARED_ID], raw.sharedId, raw.ShardId),
     raw,
   };
 }

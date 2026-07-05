@@ -34,13 +34,11 @@
 </template>
 
 <script setup>
-import {computed, onMounted} from "vue";
+import {computed} from "vue";
 
 const props = defineProps({
   message: {type: Object, required: true},
 });
-const emit = defineEmits(["rendered"]);
-
 const errorTitle = computed(
   () =>
     props.message.errorTitle || props.message.title || "오류가 발생했습니다."
@@ -52,9 +50,6 @@ const errorMessage = computed(
 );
 const errorCode = computed(() => props.message.errorCode || "");
 
-onMounted(() => {
-  emit("rendered", {messageId: props.message.id, type: "error"});
-});
 </script>
 
 <style scoped lang="scss">

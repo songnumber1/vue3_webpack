@@ -25,8 +25,6 @@
             <img
               :src="getPreviewUrl(file)"
               :alt="file.name"
-              @load="notifyRendered"
-              @error="notifyRendered"
             />
           </button>
           <a
@@ -69,15 +67,11 @@ const {t} = useI18n();
 const props = defineProps({
   requireInfo: {type: Object, required: true},
 });
-const chatCompletion = computed(() => props.requireInfo.chatCompletion);
-const emit = defineEmits(["rendered"]);
+
+const chatCompletion = computed(() => props.requireInfo?.chatCompletion || {});
 function getPreviewUrl(file) {
   return file?.previewUrl || file?.dataUrl || file?.url || "";
 }
-function notifyRendered() {
-  emit("rendered", {messageId: chatCompletion.value.id, type: "attachment"});
-}
-
 function openImage(file) {
   window.dispatchEvent(
     new CustomEvent(IMAGE_PREVIEW_EVENT, {

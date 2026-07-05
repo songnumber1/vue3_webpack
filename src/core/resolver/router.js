@@ -5,12 +5,10 @@ import {isAndroidApp} from "@/core/config/appConfig";
 import {isVersionLowerThan} from "@/core/config/version";
 import {usePlatformStore} from "@/stores/platformStore";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveConversationEntryGuard} from "@/composables/chat/chatRoomActions";
 import {ensureRouteAuthenticated} from "@/core/resolver/authGuard";
 import {ENABLE_AUTH_GUARD_DEBUG, AUTH_FAILURE_REASONS} from "@/constants/auth";
 import {shouldUseServerApi} from "@/constants/apiMode";
 import {ROUTE_NAMES, ROUTE_PATHS} from "@/constants/routeNames";
-import {logInfo} from "@/utils/logger";
 
 const ChatPage = () =>
   import(/* webpackChunkName: "chat-room" */ "@/views/ChatPage.vue");
@@ -193,7 +191,7 @@ function createLoginRequiredRedirect(to, reason) {
 
 function debugRouteGuard(...args) {
   if (ENABLE_AUTH_GUARD_DEBUG) {
-    logInfo("[route-guard]", ...args);
+    void args;
   }
 }
 
@@ -234,7 +232,22 @@ function guardSharedRoute(to) {
 }
 
 function guardHiddenConversationEntry(to) {
-  return resolveConversationEntryGuard(to);
+  const chatStore = useChatStore();
+  const activeChatRoomId =
+    String(chatStore.selectedChatId || chatStore.selectedChatInfo?.chatId || "").trim();
+
+  if (to?.name === ROUTE_NAMES.CHAT_ENTRY && !activeChatRoomId && !chatStore.inputChat) {
+    return {name: ROUTE_NAMES.MAIN, replace: true};
+  }
+
+  if (to?.name === ROUTE_NAMES.CHAT_DETAIL) {
+    if (activeChatRoomId) {
+      return {name: ROUTE_NAMES.CHAT_ENTRY, replace: true};
+    }
+    return {name: ROUTE_NAMES.MAIN, replace: true};
+  }
+
+  return true;
 }
 
 async function guardAuth(to, axios) {

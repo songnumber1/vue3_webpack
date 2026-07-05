@@ -5,7 +5,6 @@
 
 import {getActivePinia} from "pinia";
 import {usePlatformStore} from "@/stores/platformStore";
-import {logWarn} from "@/utils/logger";
 import {AndroidToJsContract} from "../contract";
 import {
   createAndroidToJsFallbackError,
@@ -48,7 +47,6 @@ function recordNativeEvent(type, request) {
   } catch (error) {
     window.__pendingNativeEvents = window.__pendingNativeEvents || [];
     window.__pendingNativeEvents.push({type, payload: request});
-    logWarn("Failed to record native event.", error);
   }
 }
 

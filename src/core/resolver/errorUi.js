@@ -4,7 +4,6 @@
  */
 
 import {isNativeApp} from "@/core/config/appConfig";
-import {logWarn} from "@/utils/logger";
 
 /**
  * @typedef {object} ErrorUIStrategy
@@ -39,7 +38,7 @@ export function resolveErrorUI(appInfo, bridge) {
      * @param {string} message 디버깅용 에러 본문 텍스트
      */
     notify(message) {
-      logWarn(message); // 시스템 표준 고성능 로거 유틸리티를 호출하여 덤프 기록 수립
+      void message;
     },
   };
 }

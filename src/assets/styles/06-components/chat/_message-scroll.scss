@@ -13,10 +13,6 @@ body.mobile-mode .message-list {
   scroll-padding-bottom: var(--chat-message-bottom-gap);
 }
 
-.message-list-anchor {
-  height: 1px !important;
-  margin: 0 !important;
-}
 
 .scroll-bottom-button {
   bottom: var(--chat-scroll-button-bottom) !important;
@@ -81,6 +77,3 @@ body.mobile-mode .scroll-bottom-button {
   transform: translateX(-50%) translateZ(0) !important;
 }
 
-html.is-prompt-menu-open .scroll-bottom-button {
-  display: none !important;
-}

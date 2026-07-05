@@ -1,38 +1,40 @@
 <template>
-  <ChatHeader
-    :assistant-label="assistantLabel"
-    :assistant="assistant"
-    :show-studio-detail-button="showStudioDetailButton"
-    :studio-detail-disabled="studioDetailDisabled"
-  />
+  <section class="conversation-workspace">
+    <ChatHeader
+      :assistant-label="assistantLabel"
+      :assistant="assistant"
+      :show-studio-detail-button="showStudioDetailButton"
+      :studio-detail-disabled="studioDetailDisabled"
+    />
 
-  <ChatHistory :visible="!isPromptExpandedInChat" />
-  <button
-    v-if="showScrollBottom && !isPromptExpandedInChat"
-    class="scroll-bottom-button"
-    type="button"
-    :aria-label="t('chat.scrollBottom')"
-    @click="scrollBottom"
-  >
-    ↓
-  </button>
-  <div ref="composerSlotRef" class="chat-composer-slot">
-    <ChatReadonlyInput v-if="readonly" :variant="readonlyInputVariant" />
-    <ChatReadonlyInput
-      v-else-if="isActiveModelUnavailable"
-      :variant="readonlyInputVariant"
-    />
-    <PromptComposer
-      v-else
-      ref="promptComposerRef"
-      class="mobile-chat-prompt mobile-keyboard-dock"
-      @submit="submitPromptFromWorkspace"
-      @update-selected-model="handleSelectedModelUpdate"
-      @focus="scheduleComposerHeightUpdate"
-      @height-change="scheduleComposerHeightUpdate"
-      @expanded-change="handlePromptExpandedChange"
-    />
-  </div>
+    <ChatHistory ref="chatHistoryRef" />
+    <button
+      v-if="showScrollBottom"
+      class="scroll-bottom-button"
+      type="button"
+      :aria-label="t('chat.scrollBottom')"
+      @click="scrollBottom"
+    >
+      ↓
+    </button>
+    <div ref="composerSlotRef" class="chat-composer-slot">
+      <ChatReadonlyInput v-if="readonly" :variant="readonlyInputVariant" />
+      <ChatReadonlyInput
+        v-else-if="isActiveModelUnavailable"
+        :variant="readonlyInputVariant"
+      />
+      <PromptComposer
+        v-else
+        ref="promptComposerRef"
+        class="mobile-chat-prompt mobile-keyboard-dock"
+        @submit="submitPromptFromWorkspace"
+        @update-selected-model="handleSelectedModelUpdate"
+        @focus="scheduleComposerHeightUpdate"
+        @height-change="scheduleComposerHeightUpdate"
+        @expanded-change="handlePromptExpandedChange"
+      />
+    </div>
+  </section>
 </template>
 
 <script setup>
@@ -48,47 +50,67 @@ import ChatReadonlyInput from "@/components/chat/ChatReadonlyInput.vue";
 import ChatHistory from "@/components/chat/ChatHistory.vue";
 import PromptComposer from "@/components/prompt/PromptComposer.vue";
 import {useChatStore} from "@/stores/chatStore";
-import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
-import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
-import {resolveRouteMode, ROUTE_MODES} from "@/constants/routeNames";
-import {isSharedChat} from "@/composables/chat/internal/message-list/useMessageRenderPolicy";
+import {createId} from "@/utils/id";
+import {SHARED_ROUTE_NAMES} from "@/constants/routeNames";
 
 const {t} = useI18n();
+const route = useRoute();
 const composerSlotRef = ref(null);
 const promptComposerRef = ref(null);
-const isPromptExpandedInChat = ref(false);
+const chatHistoryRef = ref(null);
 
 const chatStore = useChatStore();
-const route = useRoute();
-const activeHistory = computed(() =>
-  chatStore.getHistory(chatStore.selectedChatId)
+const selectedChatInfo = computed(() =>
+  chatStore.selectedChatInfo || chatStore.getHistory(chatStore.selectedChatId)
 );
+const selectedAssistInfo = computed(() =>
+  chatStore.selectedAssistInfo || chatStore.currentAssistant
+);
+const selectedModelInfo = computed(() =>
+  chatStore.selectedModelInfo || chatStore.currentModel
+);
+const isSharedRoute = computed(() => SHARED_ROUTE_NAMES.includes(route.name));
 const readonly = computed(
   () =>
+    isSharedRoute.value ||
+    chatStore.isSharedChat ||
     chatStore.isActiveSharedRoom ||
-    resolveRouteMode(route.name) === ROUTE_MODES.SHARED ||
-    isSharedChat(activeHistory.value) ||
-    Boolean(chatStore.activeSession?.sharedId)
+    selectedChatInfo.value?.roomType === "shared" ||
+    Boolean(selectedChatInfo.value?.sharedId || selectedChatInfo.value?.ShardId)
 );
-const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    chatStore.activeSession,
-    assistant.value,
+const assistant = computed(() => selectedAssistInfo.value);
+const assistantLabel = computed(
+  () =>
+    selectedChatInfo.value?.assistantName ||
+    selectedChatInfo.value?.assistName ||
+    assistant.value?.name ||
+    assistant.value?.title ||
     t("chat.assistant")
-  )
 );
 const showStudioDetailButton = computed(() =>
-  isStudioAssistant(assistant.value)
+  Boolean(
+    assistant.value?.studio ||
+      assistant.value?.studioYN === "Y" ||
+      assistant.value?.assistantType === "studio"
+  )
 );
 const studioDetailDisabled = computed(
   () => isGenerating.value || isActiveModelUnavailable.value
 );
 const isActiveModelDeleted = computed(() =>
-  Boolean(chatStore.activeSession?.isModelDeleted)
+  Boolean(
+    selectedModelInfo.value?.deleted ||
+      selectedModelInfo.value?.isDeleted ||
+      selectedModelInfo.value?.delYN === "Y" ||
+      selectedChatInfo.value?.isModelDeleted
+  )
 );
 const isActiveModelUnavailable = computed(() =>
-  Boolean(chatStore.activeSession?.isModelUnavailable)
+  Boolean(
+    selectedModelInfo.value?.unavailable ||
+      selectedModelInfo.value?.isUnavailable ||
+      selectedChatInfo.value?.isModelUnavailable
+  )
 );
 const readonlyInputVariant = computed(() => {
   if (readonly.value) return "shared";
@@ -156,28 +178,38 @@ function cleanupComposerHeightObserver() {
 }
 
 function scrollBottom() {
-  chatStore.requestScrollToBottom();
+  chatHistoryRef.value?.scrollDown?.({force: true});
 }
 
-function handlePromptExpandedChange(expanded) {
-  isPromptExpandedInChat.value = Boolean(expanded);
+function handlePromptExpandedChange() {
   scheduleComposerHeightUpdate();
 }
 
 function collapsePromptExpandedForChatSwitch() {
   promptComposerRef.value?.collapsePromptExpanded?.();
-  if (isPromptExpandedInChat.value) {
-    isPromptExpandedInChat.value = false;
-  }
   scheduleComposerHeightUpdate();
 }
 
-function submitPromptFromWorkspace(payload) {
-  chatStore.setInput(payload);
+function submitPromptFromWorkspace(payload = {}) {
+  if (readonly.value || isActiveModelUnavailable.value || isGenerating.value) return;
+  if (!chatStore.selectedChatId) return;
+  if (!payload?.text && !payload?.attachments?.length) return;
+
+  chatStore.setSelectedChatSearchInfo(null);
+  chatStore.initSelectChatInfo(payload.text, chatStore.selectedChatId, createId());
 }
 function handleSelectedModelUpdate(value) {
   chatStore.selectModel(value);
 }
+
+
+watch(
+  isSharedRoute,
+  (value) => {
+    chatStore.setIsSharedChat(value);
+  },
+  {immediate: true}
+);
 
 watch(
   () => chatStore.selectedChatId,
@@ -207,10 +239,40 @@ defineExpose({});
 </script>
 
 <style scoped lang="scss">
+.conversation-workspace {
+  position: relative;
+  grid-row: 1 / -1;
+  align-self: stretch;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.conversation-workspace :deep(.message-list-shell) {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.conversation-workspace :deep(.message-list) {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 /* 기존 대화방 composer 모바일 보정은 대화방 workspace가 소유합니다. */
 :global(body.mobile-mode) .mobile-chat-prompt {
   width: 100%;
   max-width: none;
+}
+
+:global(body.mobile-mode) .mobile-chat-prompt,
+:global(body.mobile-mode) .mobile-chat-prompt.prompt-wrap {
+  background: transparent;
+  box-shadow: none;
 }
 
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.prompt-box--gemini) {
@@ -241,5 +303,6 @@ defineExpose({});
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.send-button),
 :global(body.mobile-mode) .mobile-chat-prompt :deep(.voice-button) {
   flex: 0 0 auto;
+  margin-left: auto;
 }
 </style>

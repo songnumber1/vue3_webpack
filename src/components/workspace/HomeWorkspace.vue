@@ -41,27 +41,30 @@ import {getAssistantImageBySize} from "@/constants/assistantImages";
 import {isStudioAssistant} from "@/composables/studio/useStudioDetailModel";
 import {useChatStore} from "@/stores/chatStore";
 import {useI18n} from "vue-i18n";
-import {resolveWorkspaceAssistantLabel} from "@/composables/chat/internal/policy/chatHeaderPolicy";
 import {PROMPT_SUGGESTION_LIMIT} from "@/constants/promptSuggestions";
 
 const emit = defineEmits(["prompt-submit", "update-selected-model", "prompt-focus", "prompt-height-change"]);
 
 const chatStore = useChatStore();
+
 const {t, locale} = useI18n();
 const mainPromptInputRef = ref(null);
 const isMainPromptExpanded = ref(false);
 
 const assistant = computed(() => chatStore.currentAssistant);
-const assistantLabel = computed(() =>
-  resolveWorkspaceAssistantLabel(
-    chatStore.activeSession,
-    assistant.value,
-    t("chat.assistant")
-  )
-);
+const assistantLabel = computed(() => {
+  const chatInfo = chatStore.selectedChatInfo;
+  const displayLabel = String(chatInfo?.displayAssistantLabel || "").trim();
+  if (displayLabel) return displayLabel;
+
+  const chatAssistantLabel = String(chatInfo?.assistantLabel || "").trim();
+  if (chatAssistantLabel && !chatInfo?.isModelUnavailable) return chatAssistantLabel;
+
+  return String(assistant.value?.label || "").trim() || t("chat.assistant");
+});
 const suggestions = computed(() => {
   const prompts =
-    chatStore.examplePromptMap[chatStore.selectedAssistantId] || [];
+    chatStore.examplePromptMap[chatStore.selectedAssist] || [];
   const isEnglish = locale.value === "en";
 
   return prompts

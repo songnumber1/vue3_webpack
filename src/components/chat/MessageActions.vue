@@ -163,7 +163,6 @@ import {computed, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {FEEDBACK_ACTIONS, HALLUCINATION_REASONS} from "@/constants/feedback";
 import {copyClipboardByPlatform} from "@/platform/bridge/platformBridge";
-import {logWarn} from "@/utils/logger";
 
 defineEmits(["regenerate"]);
 
@@ -237,7 +236,7 @@ async function copy() {
   try {
     await copyClipboardByPlatform(props.content || "");
   } catch (error) {
-    logWarn("Failed to copy message.", error);
+    void error;
   }
 }
 </script>
