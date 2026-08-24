@@ -39,6 +39,9 @@ const AndroidUpdate = () =>
 const TermsPage = () =>
   import(/* webpackChunkName: "terms" */ "@/views/TermsPage.vue");
 
+const LongPressPage = () =>
+  import(/* webpackChunkName: "long-press" */ "@/views/poc/LongPress.vue");
+
 const baseRoutes = [
   {
     path: "/",
@@ -126,6 +129,16 @@ const legalRoutes = [
     component: TermsPage,
     meta: {
       title: "Terms of Service",
+      requireAuth: true,
+      standalone: true,
+    },
+  },
+  {
+    path: "/long-press",
+    name: ROUTE_NAMES.LONG_PRESS,
+    component: LongPressPage,
+    meta: {
+      title: "Long Press",
       requireAuth: true,
       standalone: true,
     },

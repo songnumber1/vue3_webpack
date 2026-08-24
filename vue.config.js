@@ -4,7 +4,7 @@ const API_SERVER_TARGET =
   process.env.VUE_APP_API_SERVER_TARGET || "http://localhost:8081";
 
 module.exports = defineConfig({
-  transpileDependencies: true,
+  transpileDependencies: false,
 
   productionSourceMap: false,
 
